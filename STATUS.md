@@ -1,31 +1,29 @@
 # Status
 
 ## Current target
-**Combat-feel + input + fullscreen pass [DONE this loop].** All six ordered items shipped + verified
-(builds, runs, RB_SMOKE screenshots of build/combat/map; 147 headless tests green). The shell now
-opens large + resizable, fills the window, plays on a watchable combat clock with on-screen timers,
-is fully mouse-driven, and combat chips both ways through the mitigation layer. What remains is play
-+ balance tuning — the human touchpoints. Loop stop condition reached.
+**UI fidelity + gameplay-correctness pass — gameplay items DONE; fidelity continuing (155 tests).**
+Shipped this pass: (1) FTL targeting/firing (Core charge→hold→fire + AUTO toggle, shell aim-clicks +
+FIRE + auto + per-card target/ready display); (2) fixed per-chassis default loadout as data, launch
+gate removed; (3) mouse precision (hit-rects realigned to moved rows). Fidelity self-reviews done on
+COMBAT (FTL surface, target tags, ready border), BUILD (rune costs+names, Current Core block,
+pre-slotted action-bar strip), MAP (war-party forward-pressure track + marker). All verified by
+reading the RB_SMOKE shot against the design PNG + `design/SCREENS.md`.
 
-1. [x] WINDOW / FULLSCREEN: world renders to a fixed 960x540 design target, aspect-preserving
-   fractional scale (FILLS the window, PointClamp) to a 1600x900 resizable backbuffer; F11 / Alt+Enter
-   toggles borderless fullscreen. (Integer-floor letterbox revised to full fill per human note.)
-2. [x] COMBAT PACING: battle on a fixed 10 ticks/sec accumulator clock decoupled from the frame rate;
-   cooldowns in real seconds (weak ~4.5-5s, strong ~14s, INT bolts ~3-6s), small damage; castle
-   restore/support cadences moved onto the clock so the DPS race stays winnable for a full build.
-3. [x] ACTION TIMERS: cards draw a cooldown wipe (ready = clear) + held/dry/rdy tags from
-   Caster.StatusOf (per-technique countdown/cooldown/state snapshot, via Expedition.Status).
-4. [x] MOUSE + HOVER everywhere (keyboard kept): chassis / ladders / palette / march (build); jump
-   tiles + merchant verbs (map); action-bar cards + new PAUSE/FLEE buttons (combat). Cursor mapped
-   through the letterbox; shared hit-rects drive both Update and Draw.
-5. [x] LIGHT FOE ARMING: live-run foes (Maps.EncounterFor -> Foes.Armed) carry a Frame + weak Arsenal
-   and chip the player; mitigation (leather evasion via seeded RNG, CON block) wired onto the
-   incoming-hit path. Runs stay winnable. Legacy inert Sieges kept for the headless balance sims.
-6. [x] LOCKED MECHANICS: seeded PRNG (Rng, threaded through Battle/Caster), CON->HP bonus (1 CON = 2
-   HP, chest damage shrinks MaxHp + caps current), DEX haste (~2%/pt capped 28%), data-driven minion
-   gating {Stat|None|AltCost}. TEMPO/PERIL header dropped.
+NEXT fidelity target — the full beacon-chart GRAPH on the run map (`design/03`): nodes as a graph with
+charted (solid) vs uncharted (dotted) links, "you are here", needs per-node coordinates added to map
+data. Then build-screen INVENTORY tabs (gear/techniques/minions) + drag-to-equip — BLOCKED on the
+gear/minion equip systems (DEBT G2/G7); and the dedicated Choose-Your-Core screen (`design/05`, the
+build screen doubles as picker for now — acceptable).
 
-Mode: build REAL partials; the few still-open calls stay in "Needs human"; never block.
+GAMEPLAY CORRECTNESS — all three DONE:
+1. [x] TARGETING / FIRING (FTL): Caster charges→holds→fires (Fire/SetAuto/IsReady/AimOf, Ready/Auto on
+   the snapshot); shell wires aim-clicks, FIRE/ENTER, AUTO/TAB, shows per-card target + ready. Player
+   keeps AUTO by default so unattended runs still resolve. 5 headless tests.
+2. [x] DEFAULT LOADOUT: `Chassis.DefaultLoadout` data; BuildSession seeds it (init + cycle); gate gone.
+3. [x] MOUSE PRECISION: PaletteRect / JumpOrigin realigned to moved draws; combat FoeRect/FireRect/
+   AutoRect match the painted rects through the letterbox.
+
+Mode: build REAL partials; vision-self-review each screen; park genuine OPEN calls in "Needs human".
 
 ## Feel-pass decisions (locked via interview)
 - ENEMY THREAT: light for now — basic foe damage is fine, keep the run winnable. The goal is combat
@@ -45,6 +43,16 @@ Mode: build REAL partials; the few still-open calls stay in "Needs human"; never
   retinue, no INT); or an ALTERNATE COST (e.g. a caster that summons by spending HP, no muster).
   Encode the gate as data {stat | none | alt-cost} so chassis express their theme.
 - TEMPO / PERIL header: DROPPED (hallucinated, no meaning) — remove from the combat header.
+
+## Fidelity + correctness decisions (locked via interview)
+- DEFAULT LOADOUT: FIXED per-chassis starting kit (data), grown only by finds mid-run; no build-time
+  pick gate. The build screen shows the fixed kit; Launch is never blocked.
+- TARGETING / FIRING: FTL model — activate -> CHARGE -> set target (foe or PART) -> FIRE ON COMMAND
+  -> reset; an AUTO toggle repeats at the set target without re-commanding. Per-technique aim.
+  Replaces auto-fire-at-the-front. Needs a ready-and-holding Core state.
+- FIDELITY REVIEW: the LOOP self-reviews each screen's RB_SMOKE screenshot against the design PNG +
+  `design/SCREENS.md` (Claude vision, automatic every pass). Human / Cowork review is ON REQUEST only.
+- `Roguebane.Content` is TRACKED (the earlier "untracked" note was stale) — no action.
 
 ## Design decisions (locked this pass — were "Needs human")
 - Part-targeting: PER-TECHNIQUE aim — each technique aims its own target part.
@@ -127,7 +135,24 @@ Mode: build REAL partials; the few still-open calls stay in "Needs human"; never
   feels a touch off. Working rationale: legs = stance/footing -> steady aim + dodge. Revisit (e.g.
   move accuracy elsewhere) only if it keeps nagging.
 
+## Asset gaps (Needs Claude Design)
+*UI elements the loop CANNOT render correctly because the required ART asset is missing or wrong in
+`Roguebane.Content` (a designer gap, not a code gap) and can't be composed from primitives/existing
+sprites. The loop populates this during screen self-review; a human routes each to Claude Design to
+produce/fix, then the loop finishes the screen. Empty = no known asset holes yet.*
+- (none logged yet — the loop fills this as it self-reviews each screen against `design/SCREENS.md`)
+
 ## Debt (provisional work + how to reconcile it)
+- (fidelity) BUILD screen still lacks the INVENTORY tabs (gear / techniques / minions) + drag-to-equip
+  onto the chassis anatomy, the per-stat ATTRIBUTE READOUT with gate markers, and equipped-gear on the
+  anatomy composite. Blocked on the gear/minion equip systems (G2/G7) — reconcile when those land.
+  DONE so far: rune cost+name cards, Current Core stat block, pre-slotted action-bar strip.
+- (fidelity) RUN MAP renders the current beacon + charted-jump cards + the war-party track, but NOT
+  the full node GRAPH (charted/uncharted links, layout). Needs per-node x/y coordinates added to
+  MapNode data — reconcile by authoring coords + a graph render (the next fidelity target).
+- (fidelity) FTL combat surface is click+key complete (aim/fire/auto, target+ready tags) but has no
+  PART-level aim UI (pick a foe PART), no minion-bay lane, no rallied-support lane — those wait on the
+  foe part-maps (G1) and the bay/support UI lanes (existing UI debt).
 - (feel-pass) CON block + evasion mitigation are wired on the WHOLE-HP hit path (where foe attacks
   land today). Localized block/evasion on PART hits waits on foe->player PART aim (the G1 debt) —
   reconcile both together when the defensive layer is tuned.
