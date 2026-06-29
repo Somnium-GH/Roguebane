@@ -22,6 +22,7 @@ public sealed class RunMap
     public string CurrentId { get; private set; }
     public int Supplies { get; private set; }
     public int WarPartyDistance { get; private set; } // steps from camp; 0 = camp overrun
+    public int MarchLength { get; }                    // the war party's start distance (track scale)
     public int SupportBank { get; private set; }
     public RunMapOutcome Outcome { get; private set; } = RunMapOutcome.Marching;
 
@@ -37,6 +38,7 @@ public sealed class RunMap
         _autoResolveCastle = autoResolveCastle;
         CurrentId = startId;
         Supplies = supplies;
+        MarchLength = marchLength;
         WarPartyDistance = marchLength;
         _nodes[startId].MarkVisited();
     }

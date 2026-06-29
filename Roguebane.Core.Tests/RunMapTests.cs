@@ -20,6 +20,18 @@ public class RunMapTests
     }
 
     [Fact]
+    public void MarchLengthIsTheConstantWarPartyTrackScale()
+    {
+        var map = Maps.StandardLeg();
+        var march = map.MarchLength;
+        Assert.Equal(march, map.WarPartyDistance); // starts full
+
+        map.MoveTo("a1");
+        Assert.Equal(march, map.MarchLength);          // the track scale is fixed
+        Assert.Equal(march - 1, map.WarPartyDistance); // the marker has closed one step
+    }
+
+    [Fact]
     public void OnlyChartedNeighboursAreReachable()
     {
         var map = Maps.StandardLeg();

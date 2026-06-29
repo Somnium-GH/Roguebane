@@ -274,7 +274,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private static readonly Rectangle MerchUseRect = new(74, 322, 330, 34);
     private static readonly Rectangle MerchHealRect = new(74, 360, 330, 34);
     // The jump chooser sits at a different origin at a merchant vs an open chart.
-    private Point JumpOrigin => Exp.AtMerchant ? new Point(460, 160) : new Point(200, 120);
+    private Point JumpOrigin => Exp.AtMerchant ? new Point(460, 160) : new Point(200, 130);
 
     private void ToggleFullscreen()
     {
@@ -411,14 +411,30 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawRunResources(200, 10);
         DrawSpine(720, 12);
 
+        DrawWarParty(60, 72, 470);
+
         var map = Exp.Map;
-        Sprite(_assets.Node(map.Sees(map.Current)), 60, 120, 64, 64, Color.White);
-        Text(_assets.Mono, map.Current.Type.ToString().ToLower(), 60, 190, Muted);
+        Sprite(_assets.Node(map.Sees(map.Current)), 60, 130, 64, 64, Color.White);
+        Text(_assets.Mono, "you are here", 60, 198, Muted);
 
         if (Exp.AtMerchant) DrawMerchant(60, 240);
-        else DrawJumpChooser(200, 120);
+        else DrawJumpChooser(200, 130);
 
         DrawStateOverlay();
+    }
+
+    // The forward-pressure track: the war party marches on the camp one step per jump. The marker
+    // slides toward the camp (left) as the distance closes; reaching it overruns the run.
+    private void DrawWarParty(int x, int y, int w)
+    {
+        var map = Exp.Map;
+        Text(_assets.Mono, "WAR PARTY", x + 22, y - 16, Muted);
+        Rect(x, y, w, 6, new Color(70, 55, 50));
+        Sprite(_assets.Node(map.Sees(map.Current)), x - 8, y - 8, 20, 20, Color.White); // camp end
+        var frac = map.MarchLength > 0 ? (float)map.WarPartyDistance / map.MarchLength : 0f;
+        var mx = x + (int)((1f - frac) * (w - 22));
+        Sprite(_assets.Node(NodeType.Castle), mx, y - 10, 24, 24, Blood); // the closing war party
+        Text(_assets.Mono, map.WarPartyDistance + " to camp", x + w + 12, y - 6, Blood);
     }
 
     // The charted jumps as numbered cards, each a fog-aware node icon (a `?` while still fogged).
