@@ -1,8 +1,9 @@
 # Status
 
 ## Current target
-**7c. Per-technique targeting.** Each active technique aims its own target (a foe now; a foe's
-part once multi-part foes exist) instead of all techniques sharing the caster's single focus.
+**7. End-to-end playable wiring** (headless first): pick chassis -> allocate runes -> build body
+-> run -> siege as one composable flow, then the shell screens (6b). The actual "play to feel it"
+remains a human touchpoint. 7a/7b/7c done; combat on Body.
 
 ## Design decisions (locked this pass — were "Needs human")
 - Part-targeting: PER-TECHNIQUE aim — each technique aims its own target part.
@@ -73,8 +74,10 @@ part once multi-part foes exist) instead of all techniques sharing the caster's 
 - (resolved) Combat migrated onto Body: techniques reserve a stat as Actives; Encounter foes are
   HP pools (`Foe`); Entity/AttributePool/Part/Attribute retired. Head-silence is now emergent
   (smash head -> INT drains -> spell reservations cascade off). Old Power/Focus/Vigor gone.
-- Enemies modeled as single-part encounter defenders, not multi-part foes that cast back.
-  Reconcile when an enemy needs its own parts/techniques (own Entity + Caster, step both sides).
+- Foes are single HP pools, not multi-part bodies that fight back. Per-technique aim therefore
+  targets a whole Foe; PART-level aim (the locked "per-technique aims its own target PART") waits
+  on multi-part foes. Reconcile by modelling a foe as a Body (or part set) + its own Caster aimed
+  at the player, stepping both sides; then Caster.Aim takes a part.
 - Shell ships only the combat/damage screen. Build/loadout + run-map screens (6b) unbuilt;
   unblocked once the rework + body wiring + a balance pass land.
 
@@ -93,7 +96,9 @@ part once multi-part foes exist) instead of all techniques sharing the caster's 
       head-silence emergent via cascade. Entity/AttributePool/Part/Attribute retired. 44 tests.
 - [x] 7b. Rallied support re-pointed: player-allied undamageable `Support` auto-fires on the front;
       enemy front-restore relabelled boss-self-restore. Castle races both. 3 tests.
-- [ ] 7c. Per-technique targeting in the combat/casting model.
+- [x] 7c. Per-technique targeting: each active technique carries its own aim (Caster.Aim),
+      independent of the default front, falling back to the front when its foe dies. 3 tests.
+      (Part-level aim within a multi-part foe waits on multi-part foes — Debt.)
 - [ ] 7. End-to-end playable: pick chassis -> allocate runes -> run -> siege. Play to feel it.
 - [ ] 6b. Build/loadout + run-map screens (after rework + body + balance pass).
 - [x] 8. (optional) headless balance-sim: ranks BuildSpecs by deterministic ticks-to-clear.

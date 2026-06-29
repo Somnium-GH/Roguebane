@@ -10,10 +10,11 @@ public sealed class Caster
     {
         public required Technique Tech;
         public int Countdown;
+        public Foe? Aimed; // per-technique target; null => follow the caster's default front
     }
 
     private readonly Body _self;
-    private Foe? _target;
+    private Foe? _default;
     private readonly SortedDictionary<string, Run> _active = new(StringComparer.Ordinal);
 
     public int Tick { get; private set; }
@@ -21,10 +22,16 @@ public sealed class Caster
     public Caster(Body self, Foe? target = null)
     {
         _self = self;
-        _target = target;
+        _default = target;
     }
 
-    public void Retarget(Foe target) => _target = target;
+    public void Retarget(Foe target) => _default = target;
+
+    // Per-technique aim: point one technique at its own foe, independent of the default front.
+    public void Aim(Technique technique, Foe foe)
+    {
+        if (_active.TryGetValue(technique.Id, out var run)) run.Aimed = foe;
+    }
 
     public bool IsActive(Technique technique) => _active.ContainsKey(technique.Id);
 
@@ -50,19 +57,22 @@ public sealed class Caster
     {
         Tick++;
         PruneSilenced();
-        if (_target is null) return;
 
         foreach (var run in _active.Values)
         {
+            // A technique hits its own aim while that foe stands, else falls back to the front.
+            var target = run.Aimed is { Down: false } ? run.Aimed : _default;
+            if (target is null || target.Down) continue;
+
             if (run.Tech.Kind == TechniqueKind.Sustained)
             {
-                _target.Damage(run.Tech.Power);
+                target.Damage(run.Tech.Power);
                 continue;
             }
 
             if (--run.Countdown <= 0)
             {
-                _target.Damage(run.Tech.Power);
+                target.Damage(run.Tech.Power);
                 run.Countdown = run.Tech.Cooldown;
             }
         }
