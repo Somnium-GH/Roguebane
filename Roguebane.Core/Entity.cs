@@ -52,6 +52,14 @@ public sealed class Entity
         if (next == 0) Disable(part);
     }
 
+    // Rallied support reinforces a standing part; cannot raise the dead or exceed its max.
+    public void Repair(Part part, int amount)
+    {
+        if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));
+        if (part.MaxHealth <= 0 || IsDestroyed(part)) return;
+        _health[part.Id] = Math.Min(part.MaxHealth, Health(part) + amount);
+    }
+
     // Casting flows through the head. No live head => silenced.
     public bool CanCast =>
         _parts.Any(p => p.Role == PartRole.Head && IsEnabled(p) && !IsDestroyed(p));

@@ -12,8 +12,8 @@ public sealed class Caster
     }
 
     private readonly Entity _self;
-    private readonly Entity _target;
-    private readonly Part _targetPart;
+    private Entity _target;
+    private Part _targetPart;
     private readonly SortedDictionary<string, Run> _active = new(StringComparer.Ordinal);
 
     public int Tick { get; private set; }
@@ -23,6 +23,12 @@ public sealed class Caster
         _self = self;
         _target = target;
         _targetPart = targetPart;
+    }
+
+    public void Retarget(Entity target, Part part)
+    {
+        _target = target;
+        _targetPart = part;
     }
 
     public bool IsActive(Technique t) => _active.ContainsKey(t.Id);

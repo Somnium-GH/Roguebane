@@ -1,7 +1,7 @@
 # Status
 
 ## Current target
-Item 5: enemies-with-parts, one structured castle, rallied-support stream, flee, 2-control-point run.
+Item 6: thin MonoGame shell — combat/damage screen (placeholder shapes), input->commands, pause.
 
 ## Needs human (route around these; resolve when you can)
 Each entry has enough context to resolve cold. The loop never blocks on these — it skips them.
@@ -11,10 +11,17 @@ Each entry has enough context to resolve cold. The loop never blocks on these �
   capability degradation generally: a damaged part is currently all-or-nothing (full output
   until 0 health, then destroyed). Graded would scale technique/part output with remaining
   health. To resolve: decide the curve (linear? threshold bands?) and which capabilities scale.
+- rallied-support flavor: repair the standing front (built) vs. spawn fresh defenders vs. both.
+  Decides whether a siege is a DPS race or an attrition/adds fight. See matching Debt entry.
 
 ## Debt (provisional work + how to reconcile it)
 Real-but-incomplete work and (rare) stubs, each with the trigger that lets it be finished.
-- (none yet)
+- Enemies modeled as single-part encounter defenders (a Part with health on a shared Entity),
+  not multi-part foes that cast back. Reconcile when an enemy needs its own parts/techniques:
+  give each defender its own Entity + Caster aimed at the player and step both sides in Battle.
+- Rallied support implemented as a repair-stream on the front. Alternative (spawn fresh
+  defenders into the encounter) is unbuilt — a feel call; see Needs human. Reconcile by adding
+  a spawn mode to Encounter.RallyTick once the support flavor is decided.
 
 ## POC roadmap (thesis-first; items 1-5 are headless Core+tests, no rendering)
 - [x] 1. Core skeleton: attribute pool (live allocation), Entity + Parts, base types. Tests.
@@ -26,7 +33,7 @@ Real-but-incomplete work and (rare) stubs, each with the trigger that lets it be
 - [x] 4. Techniques + combat tick: 6 techniques, timered + sustained, parallel-by-allocation,
         deterministic fixed-step. Parts as subsystems; disable = temp part-off that returns its
         attribute to the pool; damage degrades capability; head-disable silences casting. Tests.
-- [ ] 5. Enemies-with-parts + one structured castle; rallied-support stream; flee; run = 2
+- [x] 5. Enemies-with-parts + one structured castle; rallied-support stream; flee; run = 2
         control points -> castle. Tests.
 - [ ] 6. MonoGame shell: combat/damage screen (placeholder shapes), input->commands, pause.
         Then build/loadout screen. Then run map.
