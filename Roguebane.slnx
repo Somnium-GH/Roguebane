@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Roguebane.Core.Tests/Roguebane.Core.Tests.csproj" />
+  <Project Path="Roguebane.Core/Roguebane.Core.csproj" />
+  <Project Path="Roguebane.Game/Roguebane.Game.csproj" />
+</Solution>

@@ -1,0 +1,23 @@
+# .NET build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+
+# Test results
+[Tt]est[Rr]esults/
+*.trx
+
+# Rider / VS / VS Code
+.vs/
+.idea/
+*.suo
+
+# MonoGame content pipeline intermediate/output
+**/Content/obj/
+**/Content/bin/
+
+# OS
+.DS_Store
+Thumbs.db
