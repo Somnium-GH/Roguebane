@@ -1,30 +1,19 @@
 # Status
 
 ## Current target
-**Phase 2 — build the real game.** Phase 1 (the headless gym + placeholder shell) runs end to end.
-Now implement, autonomously, two things in parallel priority:
-1. **Real high-fidelity UI** — replace the placeholder rectangles. Replicate the prototype screens
-   in `design/` (`01-combat`, `02-build`, `03-runmap`, `04-campaign-spine`, `05-new-run`,
-   `06-style-frame`) using the assets in `Roguebane.Content/` (see its `ASSET_MANIFEST.md` +
-   `README.md`; build them through `Content.mgcb`). HD-pixel EGA/VGA look: `PointClamp` + integer
-   scale. Load a SpriteFont so identities are labelled, not positional.
-2. **Full gameplay loop toward a complete game** — flesh the POC gym out to the `DESIGN_SPEC` scope:
-   multi-part foes, the full node-map with all node types, the war-party clock, the campaign spine
-   to the Capital, minions, the magic/charge resource, broader data-driven content.
+**Phase 2 UI track is BUILT (U1-U6) and the shell now runs the real Expedition/Campaign loop.**
+Every screen renders from live Core state + the `Roguebane.Content` assets, verified by build +
+headless screenshot (RB_SMOKE=1 RB_SCREEN=build|map|combat RB_SHOT=path). 123 headless tests green;
+the whole solution builds (Core net8 + Game net9 + Tests).
 
-Mode: build REAL partials; DEFER every genuine open question to "Needs human" and route around it;
-never block. Goal = a near-complete, playable game the human returns to, plays, and balances. Tests
-stay green; the shell stays thin (rules in Core).
+What remains is genuinely HUMAN: visual polish & fidelity (the assets are placeholder-quality), the
+balance "play it" pass, and the parked design calls below. Plus two build-hygiene items a human must
+settle (see Debt foot): `Roguebane.Content/` is untracked but the game build now depends on it, and
+the SpriteFonts compile from SYSTEM fonts (Consolas/Georgia) — licensing/substitution call before any
+distribution.
 
-> PROGRESS (autonomous pass): the FULL gameplay loop (#2) is built and headless-tested end to end —
-> 121 green tests. Build -> march the branching map (supplies, fog, war-party race, support bank) ->
-> fight two-sided combat (localized part damage, armor, weapons-consult, minions, magic/charge) ->
-> economy (spoils, merchant shop, repair potions) -> campaign across legs to the Capital. The whole
-> loop is reachable from `BuildSession.Embark` / `Sessions.NewCampaign()`. What's LEFT and why it's
-> parked: (a) the hi-fi UI track #1 — assets + fonts + visual fidelity + "play to feel it" are
-> human-visual; the shell still renders the OLD linear Session with placeholder rects and needs
-> pointing at the Expedition/Campaign loop. (b) Balance tuning of the whole envelope (a "play it"
-> human job). (c) A few parked design calls (see "Needs human"). Per-item state is in the tracks below.
+Next loop-buildable target if resumed: foe/part variety + arming content foes is gated on the balance
+envelope (human); otherwise the remaining items need a human. The loop has reached its stop condition.
 
 ## Design decisions (locked this pass — were "Needs human")
 - Part-targeting: PER-TECHNIQUE aim — each technique aims its own target part.
@@ -129,17 +118,22 @@ stay green; the shell stays thin (rules in Core).
 - Rune grants are chassis-extension PARTS only (Hollow Vessel -> +CON, Resonant Core -> +INT). Other
   rune effects (stat multipliers, new techniques, passives) not yet modelled — reconcile by widening
   Mark with more data-driven effect kinds when a non-extension keystone is authored.
-- Expedition (the real map+combat loop) is headless-complete but the Game shell still runs the old
-  linear `Session` (`Sessions.Demo`/`Forged`). Reconcile by pointing the shell at `Sessions.Expedition()`
-  and rendering the branching chart + supplies + war-party track (UI track U4); the BuildSession
-  Launch path should also mint an Expedition, not a linear Session.
+- (resolved) Shell rewired off the linear `Session`: `BuildSession.March` mints a `Campaign` (via
+  `Forge.EmbarkCampaign`); the run screen renders the chart when choosing and the battlefield when
+  fighting, both from live state. `Battle.Encounter` exposed for the combat render. The linear
+  `Session`/`Forge.Assemble`/`Sessions.Demo`/`Forged` remain only for the older headless tests.
 - Bank-on-arrival vs bank-on-clear (minor): RunMap banks a resource-hold's support the moment the
   player lands, before the node's fight is won. Revisit if it reads wrong in play.
-- Shell is placeholder rectangles (no SpriteFont/labels) — now the Phase-2 UI track (art direction
-  IS decided: the `design/` screens + `Roguebane.Content` assets + `06-style-frame`'s palette /
-  fonts / pip grammar). Reconcile by wiring the content pipeline, an asset registry (Core id -> safe
-  asset path, e.g. Stat.Con -> constitution), TWO SpriteFonts (serif display + mono data), and
-  rendering each screen to match its prototype PNG.
+- (resolved) Shell renders all screens with real assets + SpriteFonts through `AssetRegistry`
+  (Stat.Con -> constitution, NodeType -> icon, technique id -> glyph w/ fallback, etc.). Remaining is
+  visual fidelity (placeholder-quality art) — human.
+- (NEEDS HUMAN — build hygiene) `Roguebane.Content/` is UNTRACKED in git but the game build now
+  references it (external-source mgcb at `../../Roguebane.Content/`). On a clean clone the content
+  build breaks. Decide: commit the 186 PNGs + manifest, use git-lfs, or relocate. The loop did NOT
+  commit binaries unilaterally.
+- (NEEDS HUMAN — licensing) SpriteFonts compile from SYSTEM fonts (Consolas mono, Georgia serif) to
+  make rendering real now. Swap to bundled open fonts (e.g. JetBrains Mono / IM Fell English) before
+  any distribution; `display.spritefont`/`mono.spritefont` carry the FontName to change.
 
 ## Phase 1 — headless gym + placeholder shell [DONE]
 - [x] 1-5. Core skeleton, rune economy, two chassis, techniques+combat tick, enemies+castle.
@@ -178,26 +172,30 @@ attribute-pool PIP widget (pips wrap at 10, shrink, fixed footprint, mono number
 numbers <=20); "one frame scales from a body part to a castle wall". HD-pixel: `PointClamp` +
 integer scale. Keep "FTL" out of shipped UI/strings (the style-frame label is internal reference only).
 
-UI track (hi-fi — replace the placeholder rectangles):
-- [ ] U1. Content pipeline + asset registry + two SpriteFonts; map Core ids -> safe asset paths.
-- [ ] U2. Combat screen (`design/01-combat`): you|battlefield|foe cutaways with per-part condition
-      sprites + HP bar ("heals only out of combat"); the Attribute-Pool pip widget (reserved-vs-free,
-      colour-keyed by reserver, part-damage shown); Action Bar cards (icon, stat cost, timer, state
-      ready/charging/cooldown/held, timered vs sustained); Minion Bays (toggle, idle/active);
-      battlefield auto-fire lane; foe focus reticle; pause/allocate + tempo/peril header.
-- [ ] U3. Build screen (`design/02-build`): Chassis Anatomy cutaway with equipped gear per part;
-      Attribute Readout (base+marks+current bars + gate markers + cold-climb tip); Inventory tabs
-      GEAR/TECHNIQUES/MINIONS with drag-to-equip (gear gates on its attribute); Rune Bag (budget
-      free/total, spoils; Marks/Paths/Keystones cards, socket/sell); Current Core stat block; Action
-      Bar loadout (slot techniques X/Y + bays).
-- [ ] U4. Run Map (`design/03-runmap`): half-blind beacon chart (fog — `?` beacons resolve near;
-      resource-holds + castle visible afar; merchant resolves 1 jump out); Supplies meter (1/jump);
-      Mastered Support (bank resource-holds); node-type icons; charted vs uncharted links; flee; add
-      the war-party advance track (locked design, not yet in the render).
-- [ ] U5. Campaign Spine (`design/04`) + New Run / Choose Your Core (`design/05`): branching city
-      graph to the Capital with cities-taken; five Core cards (figure, archetype, gear/arms/bays/
-      actions/budget/base, flavor) -> Begin the March.
-- [ ] U6. Global chrome: buttons (hover/pressed/disabled), panels, pips, reticles, tooltips, frame.
+UI track (hi-fi — replaced the placeholder rectangles):
+- [x] U1. Content pipeline (186 textures via external-source mgcb from `Roguebane.Content/`) +
+      `AssetRegistry` (Core id -> safe asset path, tolerant null loads) + two SpriteFonts (display
+      serif + mono). RB_SMOKE reports binding coverage (13/13). DEBT: fonts are system Consolas/
+      Georgia (licensing); `Roguebane.Content/` untracked (build depends on it).
+- [x] U2. Combat screen (`design/01`): backdrop, run resources, player part-composite (limb sprite
+      by condition) + HP bar, the attribute-pool pip widget (free/reserved/damaged per stat,
+      mono-anchored), foe sprites + focus reticle + HP, action-bar cards (icon, key, stat cost,
+      active ring). DEBT: per-card timer/charge/held states; minion bays; tempo/peril header (parked);
+      auto-fire lane. Visual fidelity = human.
+- [x] U3. Build screen (`design/02`): chassis line-up (figures + names, current ringed), runes
+      spent/budget, chassis anatomy composite + attribute pip readout, rune ladders (mark/path/
+      keystone glyphs, climbed rungs lit), technique palette (selected ring). DEBT: drag-to-equip
+      gear/minion inventory tabs; gate markers; sell/buy (needs shop economy UI).
+- [x] U4. Run Map (`design/03`): backdrop, run resources (supplies, war-party distance, support
+      bank, gold, potions), current beacon, charted jumps as fog-aware cards (via `RunMap.Sees`),
+      merchant verbs. DEBT: FULL beacon-chart layout needs per-node coordinates in map data (only the
+      current node + its options render today); dedicated war-party marker art.
+- [x] U5. Campaign Spine (`design/04`): the shell marches the whole `Campaign` (legs to the Capital,
+      auto-advance on a leg win, rest-at-city); a spine readout (castle pip per leg, current lit) +
+      campaign-aware end overlays. DEBT: full branching city-graph screen; stat-block Choose-Your-Core
+      cards (`design/05`) — the build screen serves as the core picker for now.
+- [x] U6. Global chrome: skinned buttons driven by input/interaction state (build CTA, merchant
+      verbs). DEBT: true 9-slice scaling; mouse hover; tooltips; a global window frame.
 
 Gameplay track (toward a complete game, per `DESIGN_SPEC`):
 - [x] G1. Multi-part foes + two-sided combat. Foe `Frame` of targetable parts; per-technique PART
