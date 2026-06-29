@@ -13,11 +13,13 @@ public sealed class Battle
 {
     private readonly Caster _caster;
     private readonly Encounter _encounter;
+    private readonly Support _support;
 
     public Battle(Caster caster, Encounter encounter)
     {
         _caster = caster;
         _encounter = encounter;
+        _support = new Support(encounter.SupportAmount, encounter.SupportEvery);
     }
 
     public BattleOutcome Outcome { get; private set; } = BattleOutcome.Ongoing;
@@ -26,9 +28,13 @@ public sealed class Battle
     {
         if (Outcome != BattleOutcome.Ongoing) return;
 
-        _encounter.RallyTick();
+        _encounter.BossRestoreTick();
         if (_encounter.CurrentTarget is { } target)
+        {
             _caster.Retarget(target);
+            var rallied = _support.Fire();           // player's banked auto-fire lands on the front
+            if (rallied > 0) target.Damage(rallied);
+        }
 
         _caster.Step();
 

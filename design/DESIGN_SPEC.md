@@ -304,7 +304,9 @@ to answer: **does exploiting a chassis's structure to build something it wasn't 
 9. Magic/charge resource (§10) — name; mechanic; POC presence.
 10. Keystone taxonomy; budget math (≈55%/≈120%); gold buying low-tier runes (§11).
 11. Map (§12) — city count; procgen vs. authored; Supplies cost scaling; how wide the route freedom is.
-12. Castle reinforcement/time-pressure clock; crafting from siege resources (§12).
+12. War-party forward pressure is now LOCKED (§12). Remaining knobs: arrival = instant loss (POC)
+    vs. camp-defense last stand; and whether the party can be slowed beyond cracking the castle.
+    Crafting from siege resources is still only floated.
 13. Exact action-bar size (small, Core-set; POC ~5 + 1 bay).
 
 ## 18. DROPPED — must not resurface

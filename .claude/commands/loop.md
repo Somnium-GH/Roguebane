@@ -2,7 +2,10 @@ Run the development loop AUTONOMOUSLY. Keep shipping work until everything left 
 then stop and surface the queue. Do NOT stop after one iteration.
 
 Each iteration:
-1. Read `STATUS.md`. Pick the most valuable roadmap item that is NOT parked in "Needs human".
+1. Read `STATUS.md`. Humans edit it between runs; new entries may critique or supersede
+   ALREADY-SHIPPED work (a checked-off item is NOT immutable). Address these FIRST — a human
+   revision of finished work OUTRANKS new roadmap work: re-open it as Debt and reconcile it before
+   starting anything new. Otherwise, pick the most valuable roadmap item NOT parked in "Needs human".
 2. Build the REAL thing — a working slice, not a stub — honoring the invariants in `CLAUDE.md`.
    - If it depends on something not yet built, build the real PARTIAL version that compiles and
      runs as far as it honestly can, and record what's missing + how to finish it under "Debt".

@@ -1,9 +1,8 @@
 # Status
 
 ## Current target
-**7b. Re-point rallied support** to the player's banked, undamageable, intermittent auto-fire ON
-the castle — not enemy self-restore. (Combat now runs on Body; Encounter.RallyTick currently
-restores the enemy front, the wrong direction.) Then 7c (per-technique targeting).
+**7c. Per-technique targeting.** Each active technique aims its own target (a foe now; a foe's
+part once multi-part foes exist) instead of all techniques sharing the caster's single focus.
 
 ## Design decisions (locked this pass — were "Needs human")
 - Part-targeting: PER-TECHNIQUE aim — each technique aims its own target part.
@@ -18,6 +17,11 @@ restores the enemy front, the wrong direction.) Then 7c (per-technique targeting
   (quest-like) encounters.
 - Chassis body: build the REAL body now — body parts on the Chassis as data + widen base pools —
   on the new 4-stat model. (Was item 7's blocker.)
+- Forward pressure (war party): each stage's castle marches a war party on the player's CAMP,
+  advancing one node-step per player move. Reach+crack the castle disbands it (win the race); the
+  war party reaching camp cuts supplies -> no sieges -> lose the run. POC: instant loss on arrival;
+  a camp-defense last stand (same combat grammar, you defend) is the later target. Resolves the old
+  time-pressure-clock open. See design/DESIGN_SPEC.md §12.
 
 ## Attribute model (new — one part, one stat; integer-only for determinism)
 - STR (Arms): attack power (1.0x); scales STR actives. Gates: STR weapons; shields (heavy = STR);
@@ -61,9 +65,11 @@ restores the enemy front, the wrong direction.) Then 7c (per-technique targeting
   combat tuning.
 
 ## Debt (provisional work + how to reconcile it)
-- Rallied support is coded as a repair-stream on the enemy front (Encounter.RallyTick) — WRONG
-  DIRECTION vs the locked design. Re-point it to the player's banked, undamageable, intermittent
-  auto-fire ON the castle.
+- (resolved 7b) Rallied support now player-allied: `Support` is a banked, undamageable, intermittent
+  auto-fire on the front (Battle owns it); the enemy front-restore is kept but relabelled as the
+  boss restoring its own means (Encounter.BossRestoreTick). A castle siege races both streams.
+- (resolved) CON block is reserved-CON (a held block absorbs up to the CON it reserves, capped) —
+  fixed in the Chassis/CON commit; the unallocated-CON reading is gone.
 - (resolved) Combat migrated onto Body: techniques reserve a stat as Actives; Encounter foes are
   HP pools (`Foe`); Entity/AttributePool/Part/Attribute retired. Head-silence is now emergent
   (smash head -> INT drains -> spell reservations cascade off). Old Power/Focus/Vigor gone.
@@ -85,7 +91,8 @@ restores the enemy front, the wrong direction.) Then 7c (per-technique targeting
       STR/INT/DEX/CON low scale. 4 tests. (Combat-engine migration onto Body tracked in Debt.)
 - [~] (migration) Combat engine moved onto Body: Foe HP targets, techniques reserve stats,
       head-silence emergent via cascade. Entity/AttributePool/Part/Attribute retired. 44 tests.
-- [ ] 7b. Re-point rallied support to player auto-fire on the castle.
+- [x] 7b. Rallied support re-pointed: player-allied undamageable `Support` auto-fires on the front;
+      enemy front-restore relabelled boss-self-restore. Castle races both. 3 tests.
 - [ ] 7c. Per-technique targeting in the combat/casting model.
 - [ ] 7. End-to-end playable: pick chassis -> allocate runes -> run -> siege. Play to feel it.
 - [ ] 6b. Build/loadout + run-map screens (after rework + body + balance pass).

@@ -9,11 +9,13 @@ public static class Sieges
         return new Encounter(name, foes, structural: false);
     }
 
-    // Layered defenses whose boss restores the standing front, making a siege a DPS race.
+    // Layered defenses: the boss restores its standing front while the player's rallied support
+    // auto-fires on it — a DPS race between the two streams plus the player's own techniques.
     public static Encounter Castle()
     {
         var foes = new[] { new Foe("gate", 12), new Foe("wall", 16), new Foe("keep", 12) };
-        return new Encounter("castle", foes, structural: true, restoreAmount: 2, restoreEvery: 1);
+        return new Encounter("castle", foes, structural: true,
+            restoreAmount: 2, restoreEvery: 1, supportAmount: 2, supportEvery: 2);
     }
 
     public static Run StandardRun() =>

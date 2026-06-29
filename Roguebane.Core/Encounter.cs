@@ -17,16 +17,24 @@ public sealed class Encounter
         IReadOnlyList<Foe> foes,
         bool structural,
         int restoreAmount = 0,
-        int restoreEvery = 0)
+        int restoreEvery = 0,
+        int supportAmount = 0,
+        int supportEvery = 0)
     {
         Name = name;
         _foes = foes.ToList();
         Structural = structural;
         _restoreAmount = restoreAmount;
         _restoreEvery = restoreEvery;
+        SupportAmount = supportAmount;
+        SupportEvery = supportEvery;
     }
 
     public bool Structural { get; }
+
+    // Player-allied rallied support available at this encounter (auto-fire on the front).
+    public int SupportAmount { get; }
+    public int SupportEvery { get; }
 
     public IReadOnlyList<Foe> Foes => _foes;
 
@@ -43,7 +51,8 @@ public sealed class Encounter
         }
     }
 
-    public void RallyTick()
+    // The boss restoring its own front by its own means — distinct from player rallied support.
+    public void BossRestoreTick()
     {
         _tick++;
         if (_restoreEvery <= 0 || _restoreAmount <= 0) return;
