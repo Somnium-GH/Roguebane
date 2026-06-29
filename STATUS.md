@@ -1,11 +1,9 @@
 # Status
 
 ## Current target
-**Attribute-model rework (foundational).** Rename/retune attributes to STR/INT/DEX/CON with a
-1:1 part binding, and make part damage proportionally subtract that part's attribute from the
-live pool (graded), instead of all-or-nothing on destroy. Equip/ability gating then emerges from
-the existing reservation-drop rule (a stat falling below an active's requirement deactivates it).
-Build this BEFORE the chassis->body wiring so the body is built on the new model, not the old one.
+**7a. Chassis->rune->body wiring on the new Body model.** Put body parts (Head, Chest, Arms x2,
+Legs x2) on Chassis as data, widen base pools, and migrate Caster/Session/Encounter/Game off the
+old Entity/AttributePool onto Body (see Debt). Item R (the Body model) is built and green.
 
 ## Design decisions (locked this pass — were "Needs human")
 - Part-targeting: PER-TECHNIQUE aim — each technique aims its own target part.
@@ -62,6 +60,10 @@ Build this BEFORE the chassis->body wiring so the body is built on the new model
 - Rallied support is coded as a repair-stream on the enemy front (Encounter.RallyTick) — WRONG
   DIRECTION vs the locked design. Re-point it to the player's banked, undamageable, intermittent
   auto-fire ON the castle.
+- TWO entity models coexist: new `Body` (Stat/BodyPart/Active, the locked model) vs old
+  `Entity`+`AttributePool`+`Part` (Power/Focus/Vigor) still powering Caster/Session/Encounter/Game.
+  Reconcile in 7a: migrate combat/session/shell onto Body, retire Entity/AttributePool/Attribute,
+  retune Technique.Cost + Encounter defenders to the 4-stat low scale.
 - Chassis has no parts of its own; Sessions.Demo bolts on a head so the player can cast. Reconcile
   via the attribute rework + chassis->body wiring: parts onto Chassis as data, widen base pools
   (current Grunt/Adept pools are toy thesis values).
@@ -73,11 +75,11 @@ Build this BEFORE the chassis->body wiring so the body is built on the new model
 ## POC roadmap
 - [x] 1-5. Core skeleton, rune economy, two chassis, techniques+combat tick, enemies+castle.
 - [~] 6. MonoGame shell: combat/damage screen DONE. 6b (build/loadout + run-map) parked.
-- [ ] R. Attribute-model rework (foundational): STR/INT/DEX/CON; one-part-one-stat with paired
-      Arms x2 / Legs x2 each carrying a stat share; proportional part-damage->stat reduction at a
-      LOW-number scale (attrs ~<=20, damage/heal 1-3); DEX attack(0.25x)/accuracy; STR gates
-      shields; CON block-mitigation from unallocated CON; healing split. Tests assert the reduction
-      + the gating cascade (lose an arm -> STR share gone -> plate/shield falls off).
+- [x] R. Attribute-model rework (foundational): STR/INT/DEX/CON Body where the live pool is
+      DERIVED from intact parts; paired Arms x2 / Legs x2 carry stat shares; part damage subtracts
+      that stat (graded, low scale); reservation-drop cascade (lose arm -> STR share -> gear falls
+      off); CON block-mitigation from unallocated CON; AttackPower = STR + DEX/4; Repair restores
+      parts not HP. 8 tests. NOTE: new Body coexists with old Entity/AttributePool until 7a migrates.
 - [ ] 7a. Chassis->rune->body wiring on the new model (parts on chassis as data, widen pools).
 - [ ] 7b. Re-point rallied support to player auto-fire on the castle.
 - [ ] 7c. Per-technique targeting in the combat/casting model.
