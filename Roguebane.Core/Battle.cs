@@ -40,6 +40,9 @@ public sealed class Battle
 
     public BattleOutcome Outcome { get; private set; } = BattleOutcome.Ongoing;
 
+    // The encounter under way — the render shell reads its foes and current target to paint combat.
+    public Encounter Encounter => _encounter;
+
     public void Step()
     {
         if (Outcome != BattleOutcome.Ongoing) return;

@@ -31,6 +31,15 @@ public class ExpeditionTests
     }
 
     [Fact]
+    public void TheBattleExposesItsEncounterForRendering()
+    {
+        var exp = FullLoadout();
+        exp.Enter("a2");
+        Assert.NotNull(exp.Battle!.Encounter);
+        Assert.NotEmpty(exp.Battle.Encounter.Foes); // the shell paints these
+    }
+
+    [Fact]
     public void ClearingASkirmishReturnsToChoosing()
     {
         var exp = FullLoadout();
