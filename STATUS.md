@@ -1,7 +1,8 @@
 # Status
 
 ## Current target
-Item 8: optional headless balance-sim (items 6 combat screen shipped; 6b/7 parked, see below).
+All shippable headless work done (items 1-5, 8 + item-6 combat screen). Remaining work (item 7
+end-to-end + 6b loadout/map screens) is parked on human decisions — see "Needs human".
 
 ## Needs human (route around these; resolve when you can)
 Each entry has enough context to resolve cold. The loop never blocks on these — it skips them.
@@ -52,4 +53,5 @@ Real-but-incomplete work and (rare) stubs, each with the trigger that lets it be
         — they need the item-7 chassis->rune->body flow + a balance pass. See Debt.
 - [ ] 7. End-to-end playable: pick chassis -> allocate runes -> run -> siege. Play to feel it.
         <- NEEDS HUMAN (feel/judgment + a real play session). See Needs human.
-- [ ] 8. (optional) headless balance-sim: run N builds, surface dominant strategies.
+- [x] 8. (optional) headless balance-sim: run N builds, surface dominant strategies.
+        BalanceSim ranks BuildSpecs by deterministic ticks-to-clear; sweep over 4 loadouts.
