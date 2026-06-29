@@ -34,7 +34,7 @@ public class CasterFiringTests
     {
         var foe = new Foe("dummy", 1000);
         var c = new Caster(Body(), foe);
-        c.Activate(Techniques.Jab); // auto by default
+        c.Activate(Techniques.Jab, auto: true);
 
         for (var i = 0; i < 200; i++) c.Step();
         Assert.True(foe.Hp < 1000); // fired on its own, repeatedly
@@ -73,7 +73,7 @@ public class CasterFiringTests
     {
         var foe = new Foe("dummy", 1000);
         var c = new Caster(Body(), foe);
-        c.Activate(Techniques.Jab); // auto
+        c.Activate(Techniques.Jab, auto: true);
 
         for (var i = 0; i < 60; i++) c.Step();
         var after = foe.Hp;

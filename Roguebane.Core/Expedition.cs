@@ -89,15 +89,17 @@ public sealed class Expedition
     // Live per-technique state for the action-bar render (cooldown fill + card state).
     public Caster.TechStatus Status(Technique technique) => _caster.StatusOf(technique);
 
+    // The player toggle activates AUTO-OFF: the technique reserves its stat and charges, then HOLDS at
+    // the ready until the player fires (or flips Auto on). Nothing auto-targets or auto-fires by default.
     public void Toggle(Technique technique)
     {
         if (_caster.IsActive(technique)) _caster.Deactivate(technique);
-        else _caster.Activate(technique);
+        else _caster.Activate(technique, auto: false);
     }
 
     // FTL targeting surface for the shell: the live foes, per-technique aim, manual fire, and the
-    // auto toggle. (Activation defaults to AUTO so an unattended run still resolves; turning a
-    // technique manual + firing on command is the player's added control.)
+    // auto toggle. Activation defaults AUTO-OFF — a technique charges and HOLDS at the ready until the
+    // player fires (or flips Auto on). Aiming a target never touches the auto flag.
     public IReadOnlyList<Foe> Foes => Battle?.Encounter.Foes ?? Array.Empty<Foe>();
     public void Aim(Technique technique, ICombatTarget target) => _caster.Aim(technique, target);
     public bool Fire(Technique technique) => _caster.Fire(technique);

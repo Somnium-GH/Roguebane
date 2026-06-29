@@ -6,10 +6,12 @@ namespace Roguebane.Core.Tests;
 // war party to the castle. Combat, the map, supplies and the clock compose into one win/lose result.
 public class ExpeditionTests
 {
+    // Unattended drive-to-completion harness: arm every technique AND turn auto on (the player default
+    // is auto-OFF / hold-at-ready, so a harness that only toggled would never discharge a shot).
     private static Expedition FullLoadout()
     {
         var exp = Sessions.Expedition();
-        foreach (var t in exp.Loadout) exp.Toggle(t);
+        foreach (var t in exp.Loadout) { exp.Toggle(t); exp.SetAuto(t, true); }
         return exp;
     }
 
@@ -17,6 +19,61 @@ public class ExpeditionTests
     {
         var guard = 0;
         while (exp.State == ExpeditionState.Fighting && guard++ < 10000) exp.Tick();
+    }
+
+    // FSM pin (observed-in-play bug a): the player toggle activates a technique AUTO-OFF — it reserves
+    // and charges but HOLDS at the ready, firing nothing until the player commands it. Nothing
+    // auto-targets or auto-fires by default.
+    [Fact]
+    public void PlayerActivationStartsAutoOffAndHoldsFire()
+    {
+        var exp = Sessions.Expedition();
+        exp.Toggle(Techniques.Jab); // player path — no auto
+        Assert.False(exp.IsAuto(Techniques.Jab));
+
+        exp.Enter("a2"); // a skirmish (unarmed foes — they won't whittle themselves)
+        var foe = exp.Foes[0];
+        var hp = foe.Hp;
+
+        for (var i = 0; i < 300; i++) exp.Tick(); // long past Jab's cooldown
+        Assert.True(exp.IsReady(Techniques.Jab)); // charged and holding
+        Assert.Equal(hp, foe.Hp);                 // never fired on its own
+    }
+
+    // FSM pin (observed-in-play bug b): aiming a target must NOT flip the auto flag back on.
+    [Fact]
+    public void AimingATargetPreservesTheAutoOffFlag()
+    {
+        var exp = Sessions.Expedition();
+        exp.Toggle(Techniques.Jab);
+        exp.Enter("a2");
+        var foe = exp.Foes[0];
+        Assert.False(exp.IsAuto(Techniques.Jab));
+
+        exp.Aim(Techniques.Jab, foe);           // set a target
+        Assert.False(exp.IsAuto(Techniques.Jab)); // auto STILL off — aiming left it untouched
+
+        var hp = foe.Hp;
+        for (var i = 0; i < 300; i++) exp.Tick();
+        Assert.Equal(hp, foe.Hp); // held at the ready; aiming did not start an auto-fire
+    }
+
+    // Manual fire still works once aimed + ready (the player's added control over the held technique).
+    [Fact]
+    public void ManualFireDischargesTheHeldTechniqueAtItsAim()
+    {
+        var exp = Sessions.Expedition();
+        exp.Toggle(Techniques.Jab);
+        exp.Enter("a2");
+        var foe = exp.Foes[0];
+        exp.Aim(Techniques.Jab, foe);
+
+        for (var i = 0; i < 300; i++) exp.Tick(); // charge to ready, holding
+        Assert.True(exp.IsReady(Techniques.Jab));
+        var hp = foe.Hp;
+
+        Assert.True(exp.Fire(Techniques.Jab));
+        Assert.True(foe.Hp < hp); // discharged on command
     }
 
     [Fact]

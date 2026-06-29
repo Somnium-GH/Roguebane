@@ -38,7 +38,7 @@ public sealed class Battle
             if (foe.Frame is null || foe.Arsenal.Count == 0) continue;
             var offense = new Caster(foe.Frame, _player);
             offense.UseRng(_rng);
-            foreach (var tech in foe.Arsenal) offense.Activate(tech);
+            foreach (var tech in foe.Arsenal) offense.Activate(tech); // foes fire unattended (auto on)
             _foeOffense.Add((foe, offense));
         }
     }

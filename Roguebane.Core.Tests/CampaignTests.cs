@@ -6,10 +6,11 @@ namespace Roguebane.Core.Tests;
 // party each leg.
 public class CampaignTests
 {
+    // Unattended drive-to-completion harness: arm + auto-on (player default is auto-OFF / hold).
     private static Campaign FullLoadout()
     {
         var c = Sessions.NewCampaign();
-        foreach (var t in Techniques.All) c.Toggle(t);
+        foreach (var t in Techniques.All) { c.Toggle(t); c.SetAuto(t, true); }
         return c;
     }
 

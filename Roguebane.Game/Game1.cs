@@ -159,7 +159,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
         if (march)
         {
             _campaign = _build.March(Maps.StandardLegs(3));
-            foreach (var t in Exp.Loadout) _campaign.Toggle(t); // arm the whole bar
+            // Techniques start INACTIVE: the bar is slotted but nothing is reserved/aimed/firing until
+            // the player clicks a card. (No auto-arm — that bug had the whole bar auto-targeting.)
             _screen = Screen.Run;
         }
     }

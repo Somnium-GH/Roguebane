@@ -18,7 +18,7 @@ public static class BalanceSim
         foreach (var build in builds)
         {
             var session = newSession();
-            foreach (var t in build.Activate) session.Toggle(t);
+            foreach (var t in build.Activate) session.Toggle(t); // Session.Toggle arms auto-on (sim path)
 
             var ticks = 0;
             while (session.State == SessionState.Fighting && ticks < tickCap)

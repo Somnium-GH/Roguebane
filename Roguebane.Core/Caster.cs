@@ -137,6 +137,8 @@ public sealed class Caster
         return Math.Max(1, t.Cooldown * (100 - haste) / 100);
     }
 
+    // Engine primitive: auto defaults ON (an unattended caster — foe offense, balance sim — fires on
+    // cadence). The PLAYER path activates with auto:false so a technique charges and HOLDS until fired.
     public bool Activate(Technique technique, bool auto = true)
     {
         if (_active.ContainsKey(technique.Id)) return true;
