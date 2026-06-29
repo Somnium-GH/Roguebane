@@ -216,60 +216,48 @@ public class Game1 : Microsoft.Xna.Framework.Game
         }
     }
 
-    // Stat bars sized against a reference max (~20 is huge). showReserved overlays the bright,
-    // currently-reserved portion on top of the dim capacity bar.
-    private void DrawPool(Body body, int x, int y, bool showReserved)
-    {
-        const int max = 20, fullW = 240;
-        for (var i = 0; i < StatColors.Length; i++)
-        {
-            var (s, color) = StatColors[i];
-            var cap = body.Capacity(s);
-            var top = y + i * 26;
-            var capW = Math.Min(fullW, fullW * cap / max);
-            Rect(x, top, fullW, 20, new Color(40, 40, 48));                 // track
-            Rect(x, top, capW, 20, new Color(color, 110)); // capacity (dim)
-            if (showReserved && cap > 0)
-            {
-                var used = cap - body.Available(s);
-                Rect(x, top, capW * used / cap, 20, color);                 // reserved (bright)
-            }
-        }
-    }
-
-    // The build screen: pick a chassis, climb the rune ladders, choose techniques, then Launch.
+    // Build screen (design/02): chassis anatomy + attribute readout on the left, the chassis line-up
+    // up top, rune ladders and the technique palette on the right. All read from the BuildSession.
     private void DrawBuildScreen()
     {
-        DrawChassisSelector(16, 16);
-        DrawBudget(16, 56);
-        DrawLadders(16, 92);
-        DrawPool(_build.Preview(), 16, 200, showReserved: false); // previewed body, runes folded in
-        DrawPalette(16, 320);
+        Stretch(_assets.Background("build_alcove"), 0, 0, W, H);
+        Panel(0, 0, W, 40);
+        Text(_assets.Display, "BUILD", 16, 8, Ink);
+        var runes = _build.Runes;
+        Text(_assets.Mono, $"runes {runes.Spent}/{runes.Budget}", 760, 12, Amber);
 
-        // Launch readiness: a bottom bar lights when a loadout is chosen (Enter to start the run).
+        DrawChassisSelector(180, 6);
+
+        var preview = _build.Preview();
+        Panel(40, 90, 240, 410);
+        Text(_assets.Mono, _build.Chassis.Id.ToUpper(), 56, 100, Muted);
+        DrawHumanoid(preview, 160, 200, 2);
+        DrawPips(preview, 56, 320);
+
+        DrawLadders(320, 100);
+        DrawPalette(320, 320);
+
         var ready = _build.Loadout.Count > 0;
-        Rect(16, 400, 240, 12, ready ? new Color(90, 200, 160) : new Color(50, 50, 58));
+        Panel(40, H - 40, W - 80, 32);
+        Text(_assets.Mono, ready ? "ENTER  begin the march" : "pick at least one technique",
+            56, H - 34, ready ? Amber : Muted);
     }
 
     private void DrawChassisSelector(int x, int y)
     {
         for (var i = 0; i < _build.ChassisCount; i++)
         {
-            var left = x + i * 64;
+            var left = x + i * 110;
             var selected = i == _build.ChassisIndex;
-            Rect(left, y, 56, 28, selected ? new Color(230, 200, 90) : new Color(50, 50, 58));
+            var id = Chassrium.Roster[i].Id;
+            Sprite(_assets.ChassisFigure(id), left, y, 28, 28, selected ? Color.White : new Color(150, 140, 130));
+            Text(_assets.Mono, id, left + 32, y + 8, selected ? Ink : Muted);
+            if (selected) Border(left - 2, y - 2, 100, 32, Amber);
         }
     }
 
-    private void DrawBudget(int x, int y)
-    {
-        var runes = _build.Runes;
-        const int fullW = 240;
-        Rect(x, y, fullW, 16, new Color(40, 40, 48));
-        if (runes.Budget > 0)
-            Rect(x, y, fullW * runes.Spent / runes.Budget, 16, new Color(150, 120, 210)); // spent
-    }
-
+    // Rune ladders: a row per path, a rune glyph per rung (keystone glyph at the top), filled rungs
+    // tinted, the rest dim. Climbing in order spends the budget toward a keystone.
     private void DrawLadders(int x, int y)
     {
         for (var p = 0; p < _build.Paths.Count; p++)
@@ -277,30 +265,32 @@ public class Game1 : Microsoft.Xna.Framework.Game
             var ladder = _build.Paths[p];
             if (ladder.Count == 0) continue;
             var held = _build.Runes.CurrentRank(ladder[0].Path);
-            var top = y + p * 36;
+            var top = y + p * 56;
             for (var r = 0; r < ladder.Count; r++)
             {
-                var left = x + r * 36;
+                var left = x + r * 56;
                 var filled = r < held;
                 var keystone = ladder[r].Keystone;
-                var color = filled
-                    ? keystone ? new Color(230, 160, 90) : new Color(150, 120, 210)
-                    : new Color(50, 50, 58);
-                Rect(left, top, 28, 28, color);
-                if (keystone) Border(left, top, 28, 28, new Color(230, 200, 90));
+                var glyph = _assets.Rune(keystone ? "keystone" : r == ladder.Count - 1 ? "path" : "mark");
+                Sprite(glyph, left, top, 48, 48, filled ? Color.White : new Color(110, 95, 80));
+                if (keystone) Border(left - 2, top - 2, 52, 52, Amber);
             }
+            Text(_assets.Mono, "Q W".Split(' ')[Math.Min(p, 1)], x - 18, top + 14, Muted);
         }
     }
 
     private void DrawPalette(int x, int y)
     {
+        Text(_assets.Mono, "TECHNIQUES", x, y - 20, Muted);
         for (var i = 0; i < _build.Palette.Count; i++)
         {
-            var technique = _build.Palette[i];
-            var left = x + i * 56;
-            Rect(left, y, 48, 48, new Color(40, 40, 48));
-            if (_build.IsSelected(technique)) Rect(left + 4, y + 4, 40, 40, new Color(90, 200, 160));
-            else Border(left + 4, y + 4, 40, 40, new Color(90, 90, 100));
+            var t = _build.Palette[i];
+            var left = x + i * 64;
+            var selected = _build.IsSelected(t);
+            Panel(left, y, 56, 56);
+            Sprite(_assets.Technique(t.Id), left + 4, y + 4, 48, 48, Color.White);
+            Text(_assets.Mono, (i + 1).ToString(), left + 4, y + 42, Muted);
+            Border(left, y, 56, 56, selected ? Amber : Border0);
         }
     }
 
