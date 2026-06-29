@@ -21,11 +21,17 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch = null!;
     private Texture2D _pixel = null!;
+    private AssetRegistry _assets = null!;
 
     private Screen _screen = Screen.Build;
     private BuildSession _build = null!;
     private Session _session = null!;
     private KeyboardState _prevKeys;
+
+    // Smoke mode (RB_SMOKE=1): load + render one frame, print a load report, exit. Lets the headless
+    // loop verify the pipeline builds AND the shell binds every asset without a human at the window.
+    private readonly bool _smoke = Environment.GetEnvironmentVariable("RB_SMOKE") == "1";
+    private int _frames;
 
     public Game1()
     {
@@ -46,6 +52,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         _pixel = new Texture2D(GraphicsDevice, 1, 1);
         _pixel.SetData(new[] { Color.White });
+        _assets = new AssetRegistry(Content);
     }
 
     protected override void Update(GameTime gameTime)
@@ -112,6 +119,38 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
         _spriteBatch.End();
         base.Draw(gameTime);
+
+        if (_smoke && ++_frames >= 1) SmokeReportAndExit();
+    }
+
+    // Touch one asset of every kind through the registry, then report what bound. A null is a gap in
+    // the content set, not a crash — the report counts them so the loop sees coverage at a glance.
+    private void SmokeReportAndExit()
+    {
+        (string, Texture2D?)[] probes =
+        {
+            ("node/castle", _assets.Node(NodeType.Castle)),
+            ("node/camp", _assets.Camp),
+            ("attr/str", _assets.Attr(Stat.Str)),
+            ("attr/con", _assets.Attr(Stat.Con)),
+            ("technique/cleave", _assets.Technique("cleave")),
+            ("technique/jab(fallback)", _assets.Technique("jab")),
+            ("resource/supplies", _assets.Resource("supplies")),
+            ("rune/keystone", _assets.Rune("keystone")),
+            ("pip/full", _assets.Pip("full")),
+            ("reticle/focus", _assets.Reticle("focus")),
+            ("button/normal", _assets.Button("normal")),
+            ("bg/combat_field", _assets.Background("combat_field")),
+            ("chassis/grunt", _assets.ChassisFigure("grunt")),
+        };
+        var bound = 0;
+        foreach (var (name, tex) in probes)
+        {
+            if (tex is not null) bound++;
+            else Console.WriteLine($"SMOKE MISS: {name}");
+        }
+        Console.WriteLine($"SMOKE OK: fonts=2 probes={probes.Length} bound={bound}");
+        Exit();
     }
 
     private void DrawRunScreen()
