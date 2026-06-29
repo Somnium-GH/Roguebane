@@ -37,6 +37,16 @@ public static class Sessions
 
     // The pre-run build screen's backbone: choose between the five chassis, climb either rune ladder,
     // pick from the six techniques. Launch() mints the body and drops it into the standard run.
+    // The full run as one loop: a forged body marches the StandardLeg map, fighting at each node and
+    // racing the war party to the castle. The castle's support is whatever holds were banked en route.
+    public static Expedition Expedition()
+    {
+        var body = DemoBody();
+        var caster = new Caster(body);
+        return new Expedition(
+            Forge.PlayerFighter(body), caster, Techniques.All, Maps.StandardLeg(autoResolveCastle: false));
+    }
+
     public static BuildSession NewBuild() => new(
         Chassrium.Roster,
         new[] { Paths.VesselLadder, Paths.ResonanceLadder },

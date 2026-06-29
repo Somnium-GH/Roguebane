@@ -17,6 +17,7 @@ public enum RunMapOutcome
 public sealed class RunMap
 {
     private readonly Dictionary<string, MapNode> _nodes;
+    private readonly bool _autoResolveCastle;
 
     public string CurrentId { get; private set; }
     public int Supplies { get; private set; }
@@ -24,12 +25,16 @@ public sealed class RunMap
     public int SupportBank { get; private set; }
     public RunMapOutcome Outcome { get; private set; } = RunMapOutcome.Marching;
 
-    public RunMap(IReadOnlyList<MapNode> nodes, string startId, int supplies, int marchLength)
+    // autoResolveCastle: standalone navigation treats castle arrival as an instant crack (POC). A
+    // combat driver (Expedition) passes false and instead calls CrackCastle() when the siege clears.
+    public RunMap(IReadOnlyList<MapNode> nodes, string startId, int supplies, int marchLength,
+        bool autoResolveCastle = true)
     {
         if (nodes.Count == 0) throw new ArgumentException("a map needs nodes", nameof(nodes));
         if (marchLength <= 0) throw new ArgumentOutOfRangeException(nameof(marchLength));
         _nodes = nodes.ToDictionary(n => n.Id);
         if (!_nodes.ContainsKey(startId)) throw new ArgumentException("start not on the map", nameof(startId));
+        _autoResolveCastle = autoResolveCastle;
         CurrentId = startId;
         Supplies = supplies;
         WarPartyDistance = marchLength;
@@ -37,6 +42,14 @@ public sealed class RunMap
     }
 
     public MapNode Current => _nodes[CurrentId];
+
+    public bool AtCastle => Current.Type == NodeType.Castle;
+
+    // The combat driver won the siege: disband the war party and win the leg.
+    public void CrackCastle()
+    {
+        if (Outcome == RunMapOutcome.Marching && AtCastle) Outcome = RunMapOutcome.CastleCracked;
+    }
 
     public IReadOnlyList<MapNode> Options => Current.Next.Select(id => _nodes[id]).ToList();
 
@@ -78,12 +91,13 @@ public sealed class RunMap
                 SupportBank++;
                 break;
             case NodeType.Castle:
-                Outcome = RunMapOutcome.CastleCracked; // POC: arrival = cracked (combat wiring is Debt)
+                if (_autoResolveCastle) Outcome = RunMapOutcome.CastleCracked;
                 break;
         }
 
-        // Out of supplies and not at the castle: the march can't continue and the war party arrives.
-        if (Supplies == 0 && Outcome == RunMapOutcome.Marching) Outcome = RunMapOutcome.Overrun;
+        // Out of supplies short of the castle: the march can't continue and the war party arrives.
+        if (Supplies == 0 && Outcome == RunMapOutcome.Marching && !AtCastle)
+            Outcome = RunMapOutcome.Overrun;
         return true;
     }
 
