@@ -10,7 +10,8 @@ public sealed class Caster
     {
         public required Technique Tech;
         public int Countdown;
-        public Foe? Aimed; // per-technique target; null => follow the caster's default front
+        public Foe? Aimed;      // per-technique target; null => follow the caster's default front
+        public BodyPart? Part;  // per-technique PART aim within Aimed; null => whole-foe HP damage
     }
 
     private readonly Body _self;
@@ -30,7 +31,14 @@ public sealed class Caster
     // Per-technique aim: point one technique at its own foe, independent of the default front.
     public void Aim(Technique technique, Foe foe)
     {
-        if (_active.TryGetValue(technique.Id, out var run)) run.Aimed = foe;
+        if (_active.TryGetValue(technique.Id, out var run)) { run.Aimed = foe; run.Part = null; }
+    }
+
+    // Per-technique PART aim: point one technique at a specific part of a structured foe. Damage
+    // erodes that part's stat first and only spills into the foe's HP once the part bottoms out.
+    public void Aim(Technique technique, Foe foe, BodyPart part)
+    {
+        if (_active.TryGetValue(technique.Id, out var run)) { run.Aimed = foe; run.Part = part; }
     }
 
     public bool IsActive(Technique technique) => _active.ContainsKey(technique.Id);
@@ -61,21 +69,31 @@ public sealed class Caster
         foreach (var run in _active.Values)
         {
             // A technique hits its own aim while that foe stands, else falls back to the front.
-            var target = run.Aimed is { Down: false } ? run.Aimed : _default;
+            var onAim = run.Aimed is { Down: false };
+            var target = onAim ? run.Aimed : _default;
             if (target is null || target.Down) continue;
+
+            // The PART aim only rides its own foe; a fallback to the front hits the HP pool.
+            var part = onAim ? run.Part : null;
 
             if (run.Tech.Kind == TechniqueKind.Sustained)
             {
-                target.Damage(run.Tech.Power);
+                Hit(target, part, run.Tech.Power);
                 continue;
             }
 
             if (--run.Countdown <= 0)
             {
-                target.Damage(run.Tech.Power);
+                Hit(target, part, run.Tech.Power);
                 run.Countdown = run.Tech.Cooldown;
             }
         }
+    }
+
+    private static void Hit(Foe foe, BodyPart? part, int power)
+    {
+        if (part is null) foe.Damage(power);
+        else foe.DamagePart(part, power);
     }
 
     private void PruneSilenced()

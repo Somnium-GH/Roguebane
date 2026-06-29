@@ -1,19 +1,26 @@
 namespace Roguebane.Core;
 
-// An encounter target. HP is permanent within an encounter (the boss rule) — a foe only loses HP
-// to incoming Power and recovers only by its own means. Multi-part foes that fight back are later
-// work; for now a foe is a single HP pool.
+// An encounter target. HP is a permanent life total within an encounter (the boss rule) — a foe
+// only loses HP to incoming Power and recovers only by its own means.
+//
+// A foe is also a STRUCTURED thing with targetable parts (one combat grammar everywhere): an
+// optional Frame carries the same Body-of-parts the player has. A part-aimed hit erodes that
+// part's stat first (localized degradation) and only spills into HP once the part bottoms out
+// (the §10 split: stat damage to the targeted part; HP from overkill). A foe with no Frame is an
+// unstructured HP pool (control-point fodder).
 public sealed class Foe
 {
     public string Id { get; }
     public int MaxHp { get; }
     public int Hp { get; private set; }
+    public Body? Frame { get; }
 
-    public Foe(string id, int hp)
+    public Foe(string id, int hp, Body? frame = null)
     {
         Id = id;
         MaxHp = hp;
         Hp = hp;
+        Frame = frame;
     }
 
     public bool Down => Hp <= 0;
@@ -22,6 +29,19 @@ public sealed class Foe
     {
         if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));
         Hp = Math.Max(0, Hp - amount);
+    }
+
+    // Localized damage: erode the targeted part's stat first; overkill (or any hit once the part
+    // is already gone) spills into the HP life total.
+    public void DamagePart(BodyPart part, int amount)
+    {
+        if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));
+        if (Frame is null) { Damage(amount); return; }
+
+        var absorbed = Math.Min(Frame.Contribution(part), amount);
+        if (absorbed > 0) Frame.Damage(part, absorbed);
+        var overkill = amount - absorbed;
+        if (overkill > 0) Damage(overkill);
     }
 
     public void Restore(int amount)
