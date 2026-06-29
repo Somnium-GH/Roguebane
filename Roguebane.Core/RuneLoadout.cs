@@ -24,6 +24,10 @@ public sealed class RuneLoadout
     // Chassis with cheap runes pay less per rung; refund (already < base cost) is untouched.
     public int EffectiveCost(Mark mark) => Math.Max(0, mark.Cost - _discount);
 
+    // Held rungs in a stable order — the assembler folds their grants onto the body deterministically.
+    public IReadOnlyList<Mark> HeldMarks =>
+        _held.Values.OrderBy(m => m.Path, StringComparer.Ordinal).ToList();
+
     public int CurrentRank(string path) => _held.GetValueOrDefault(path)?.Rank ?? 0;
 
     public Mark? Held(string path) => _held.GetValueOrDefault(path);

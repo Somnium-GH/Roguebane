@@ -16,5 +16,16 @@ public sealed record Chassis(
         return body;
     }
 
+    // The socketed body including everything the allocated runes grant: chassis parts first, then
+    // each held rung's extension parts. Climbing a chassis-extending keystone widens the live pool.
+    public Body NewBody(RuneLoadout runes)
+    {
+        var body = NewBody();
+        foreach (var mark in runes.HeldMarks)
+            foreach (var part in mark.Granted)
+                body.Add(part);
+        return body;
+    }
+
     public RuneLoadout NewLoadout() => new(RuneBudget, RuneDiscount);
 }

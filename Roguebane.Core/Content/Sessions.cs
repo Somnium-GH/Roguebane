@@ -23,4 +23,15 @@ public static class Sessions
         var caster = new Caster(player, run.Current.CurrentTarget);
         return new Session(player, caster, Techniques.All, run);
     }
+
+    // The real composable flow end to end: pick the Grunt chassis, climb its Vessel ladder to the
+    // Hollow Vessel keystone (chassis extension it was never built for), mint the body with that
+    // extra CON folded in, and drop it into the standard run with the full technique loadout.
+    public static Session Forged()
+    {
+        var chassis = Chassrium.Grunt;
+        var runes = chassis.NewLoadout();
+        foreach (var rung in Paths.VesselLadder) runes.TryTake(rung);
+        return Forge.Assemble(chassis, runes, Techniques.All, Sieges.StandardRun());
+    }
 }

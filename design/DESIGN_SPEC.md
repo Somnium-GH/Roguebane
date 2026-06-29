@@ -231,17 +231,20 @@ The map is **nested layers, macro → micro:**
 ## 13. Presentation — the designer's core [LOCKED]
 - **Cutaway grammar.** The screen is a **side-on cutaway of the character** — the body-as-board —
   systems visible and taking *localized* part damage. The look should *be* the mechanic.
-- **Retrofantasy art:** storybook EGA/VGA fantasy (chunky, warm, hand-painted), a slightly-zoomed
-  low-res-CRT feel — a **fairytale skin**, not sci-fi. This skin is our identity and what keeps us
-  from reading as a clone.
+- **Retrofantasy art [HIGH fidelity]:** a crisp, high-resolution rendering of oldschool 8-bit /
+  EGA-VGA storybook fantasy (Zeliard-style) — warm, hand-painted, fairytale, not sci-fi — as if that
+  retro art were **upscaled to HD while keeping its old-school soul.** Retro *style*, high *quality*
+  (NOT low-res, NOT crude). This skin is our identity and what keeps us from reading as a clone.
+  (The POC's placeholder rectangles are build scaffolding, NOT this target look.)
 - **Two screens [LOCKED]:**
   1. **Cutaway build/loadout screen** — the between-combat config screen. Sealed during combat. Shows
      chassis anatomy, the rune budget + prerequisite ladder, equipped weapons/armor, the action
      loadout.
   2. **Combat damage screen** — shown during combat; the cutaway taking localized part damage.
-- **Two registers [LOCKED]:** world/combat may be gloriously retro (chunky, zoomed); the **build
-  screen must breathe and stay legible** — a dense socket/budget interface turns to mush under heavy
-  zoom. Same palette, more clarity.
+- **Two registers [LOCKED]:** world/combat can run bolder, more atmospheric, more zoomed; the
+  **build screen must stay clean and legible** — a dense socket/budget interface needs clarity, so
+  dial back flourish and busyness there. Both at the **same high-fidelity retro bar**; the build
+  screen just trades some flourish for legibility.
 - **Combat screen layout [LOCKED]:** three vertical zones, **you | battlefield | foe**.
   - *You* = the cutaway body with its parts: **Head×1, Chest×1, Arms×2, Legs×2**, each showing its
     localized damage state and its stat; armor pieces overlay part-groups.
