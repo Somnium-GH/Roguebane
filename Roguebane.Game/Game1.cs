@@ -283,14 +283,15 @@ public class Game1 : Microsoft.Xna.Framework.Game
         if (_smoke && ++_frames >= 1) SmokeReportAndExit();
     }
 
-    // Fit the design scene into the backbuffer at the largest INTEGER scale that still fits (crisp
-    // pixels), centred with letterbox bars. Falls back to a fractional fit on very small windows.
+    // Fit the design scene into the backbuffer aspect-preserving: scale by the FULL fractional fit so
+    // the scene FILLS the window (16:9 design in a 16:9 window = no bars; thin bars only on an
+    // aspect-mismatch axis). PointClamp keeps it crisp. (Integer-only scaling was wasteful — a wide
+    // window capped at 2x and left fat side bars.)
     private void UpdateViewport()
     {
         var bw = GraphicsDevice.PresentationParameters.BackBufferWidth;
         var bh = GraphicsDevice.PresentationParameters.BackBufferHeight;
-        var fit = Math.Min((float)bw / W, (float)bh / H);
-        _viewScale = fit >= 1f ? (float)Math.Floor(fit) : fit;
+        _viewScale = Math.Min((float)bw / W, (float)bh / H);
         var dw = (int)(W * _viewScale);
         var dh = (int)(H * _viewScale);
         _viewDest = new Rectangle((bw - dw) / 2, (bh - dh) / 2, dw, dh);
