@@ -30,8 +30,9 @@ public class ChassisThesisTests
         Assert.Equal(7, runes.Spent);
         Assert.True(runes.Spent > 0);
 
-        // and the Grunt was never built for it: no Focus base, the keystone's flavor attribute
-        Assert.Equal(0, Chassrium.Grunt.Base.GetValueOrDefault(Attribute.Focus));
+        // and the Grunt was never built for it: a feeble head vs the Adept's caster INT
+        Assert.True(Chassrium.Grunt.NewBody().Capacity(Stat.Int)
+            < Chassrium.Adept.NewBody().Capacity(Stat.Int));
     }
 
     [Fact]

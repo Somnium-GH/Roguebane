@@ -84,13 +84,20 @@ public class BodyTests
     }
 
     [Fact]
-    public void UnallocatedConTanksAHitUpToTheCap()
+    public void AHeldBlockAbsorbsUpToTheConItReserves()
     {
-        var body = Build(out _, out _);
-        Assert.Equal(3, body.BlockMitigation(cap: 3)); // CON 6 available, capped at 3
+        var body = Build(out _, out _); // CON 6
+        Assert.Equal(0, body.BlockMitigation(cap: 3)); // nothing held => nothing absorbed
 
-        body.Activate(new Active("brace", Stat.Con, 5)); // spend CON to act
-        Assert.Equal(1, body.BlockMitigation(cap: 3));   // only 1 CON left to absorb
+        var brace = new Active("brace", Stat.Con, 5);
+        Assert.True(body.Activate(brace));
+        Assert.Equal(3, body.BlockMitigation(cap: 3)); // min(reserved 5, cap 3)
+
+        body.Deactivate(brace);
+        Assert.Equal(0, body.BlockMitigation(cap: 3)); // dropped => CON returns to the pool
+
+        body.Activate(new Active("light", Stat.Con, 2));
+        Assert.Equal(2, body.BlockMitigation(cap: 3)); // a lighter block absorbs only what it powers
     }
 
     [Fact]

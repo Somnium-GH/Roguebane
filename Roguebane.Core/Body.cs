@@ -59,8 +59,9 @@ public sealed class Body
             if (_actives[i].Stat == stat) _actives.RemoveAt(i);
     }
 
-    // Unallocated CON tanks a hit, up to a cap — hold it back to absorb, spend it to act.
-    public int BlockMitigation(int cap) => Math.Min(Available(Stat.Con), cap);
+    // A held block (a defensive active) reserves CON and absorbs up to the CON it reserves, capped.
+    // Raise it = power it; drop it = the CON returns to the pool.
+    public int BlockMitigation(int cap) => Math.Min(Reserved(Stat.Con), cap);
 
     // STR at full weight plus a quarter of DEX, kept in integer quarter-units.
     public int AttackPower => Capacity(Stat.Str) + Capacity(Stat.Dex) / 4;
