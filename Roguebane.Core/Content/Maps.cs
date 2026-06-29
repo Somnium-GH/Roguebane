@@ -20,6 +20,14 @@ public static class Maps
     public static RunMap StandardLeg(bool autoResolveCastle = true) =>
         new(StandardLegNodes(), startId: "camp", supplies: 8, marchLength: 6, autoResolveCastle);
 
+    // N fresh legs for a campaign march — each a standalone standard leg the combat driver resolves.
+    public static IReadOnlyList<Func<RunMap>> StandardLegs(int count)
+    {
+        var legs = new Func<RunMap>[count];
+        for (var i = 0; i < count; i++) legs[i] = () => StandardLeg(autoResolveCastle: false);
+        return legs;
+    }
+
     // The combat a node hands the Expedition. Castle support is the bank earned from resource-holds.
     public static Encounter EncounterFor(MapNode node, int supportBank) => node.Type switch
     {

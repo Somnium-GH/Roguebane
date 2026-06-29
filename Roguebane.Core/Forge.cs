@@ -28,6 +28,18 @@ public static class Forge
         return new Expedition(PlayerFighter(body), caster, WithRuneGrants(loadout, runes), map);
     }
 
+    // The same mint, marching a multi-leg campaign to the Capital instead of one leg.
+    public static Campaign EmbarkCampaign(
+        Chassis chassis,
+        RuneLoadout runes,
+        IReadOnlyList<Technique> loadout,
+        IReadOnlyList<Func<RunMap>> legs)
+    {
+        var body = chassis.NewBody(runes);
+        var caster = new Caster(body, maxCharge: MagicCapacity(body));
+        return new Campaign(PlayerFighter(body), caster, WithRuneGrants(loadout, runes), legs);
+    }
+
     // Rune-granted techniques join the loadout (deduped) — a held keystone hands you a verb your
     // chassis never had.
     private static IReadOnlyList<Technique> WithRuneGrants(

@@ -65,4 +65,8 @@ public sealed class BuildSession
 
     // Launch into the real map+combat loop: mint the chosen body and embark on the leg.
     public Expedition Embark(RunMap map) => Forge.Embark(Chassis, _runes, Loadout, map);
+
+    // March the whole campaign: the chosen body carries through every leg to the Capital.
+    public Campaign March(IReadOnlyList<Func<RunMap>> legs) =>
+        Forge.EmbarkCampaign(Chassis, _runes, Loadout, legs);
 }

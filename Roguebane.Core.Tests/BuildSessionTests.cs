@@ -87,4 +87,18 @@ public class BuildSessionTests
         Assert.Contains(exp.Loadout, t => t.Id == "jab");
         Assert.Equal("camp", exp.Map.CurrentId);
     }
+
+    [Fact]
+    public void MarchSendsTheChosenBodyDownTheCampaignSpine()
+    {
+        var build = New();
+        build.Toggle(Techniques.Jab);
+
+        var campaign = build.March(Maps.StandardLegs(3));
+
+        Assert.Equal(CampaignState.Marching, campaign.State);
+        Assert.Equal(3, campaign.LegCount);
+        Assert.Equal(0, campaign.LegIndex);
+        Assert.Contains(campaign.Current.Loadout, t => t.Id == "jab");
+    }
 }
