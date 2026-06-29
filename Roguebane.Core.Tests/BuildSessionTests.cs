@@ -10,17 +10,18 @@ public class BuildSessionTests
     public void CyclingChassisWrapsAndResetsRunes()
     {
         var build = New();
-        Assert.Same(Chassrium.Grunt, build.Chassis);
+        var roster = Chassrium.Roster;
+        Assert.Same(roster[0], build.Chassis);
 
         build.CycleChassis(1);
-        Assert.Same(Chassrium.Adept, build.Chassis);
-        Assert.Equal(Chassrium.Adept.RuneBudget, build.Runes.Available); // fresh budget
+        Assert.Same(roster[1], build.Chassis);
+        Assert.Equal(roster[1].RuneBudget, build.Runes.Available); // fresh budget
 
-        build.CycleChassis(1); // wraps back to the first
-        Assert.Same(Chassrium.Grunt, build.Chassis);
+        build.CycleChassis(-1); // back to the first
+        Assert.Same(roster[0], build.Chassis);
 
-        build.CycleChassis(-1); // wraps the other way
-        Assert.Same(Chassrium.Adept, build.Chassis);
+        build.CycleChassis(-1); // wraps to the last
+        Assert.Same(roster[^1], build.Chassis);
     }
 
     [Fact]

@@ -82,9 +82,9 @@ fall-off, and the allocation economy.
 
 | Attribute | Part | Governs / scales | Gates (equip / power) |
 |---|---|---|---|
-| **STR** | Arms (×2) | attack power (1.0×); STR-based actives | STR weapons; **equips shields** (heavy = STR); part-mitigating armor (plate) |
-| **INT** | Head (×1) | spell power; keeps spell actives **and** passives running | spell-bonus armor *(absorbs old WIS)* |
-| **DEX** | Legs (×2) | evasion; **accuracy**; **+0.25× attack power** | DEX weapons; evasion armor (leather) |
+| **STR** | Arms (×2) | attack power (1.0×); STR-based actives | STR weapons; **equips shields** (heavy = STR) |
+| **INT** | Head (×1) | spell power; keeps spell actives **and** passives running | spells need INT reserved *(absorbs old WIS)* |
+| **DEX** | Legs (×2) | evasion; **accuracy**; **+0.25× attack power** | DEX weapons |
 | **CON** | Chest (×1) | HP scaling; stun resistance (passive floor) | **defensive-active**: see §6b |
 
 - **WIS** merged into INT; **CHA** dropped (§18).
@@ -92,8 +92,15 @@ fall-off, and the allocation economy.
   independently and each carry a SHARE of their stat** (one arm = half your STR; one leg = half your
   DEX). **Armor is one piece per part-group**, part-mapped (helm→head, breastplate→chest,
   arm-armor→arms, greaves→legs); **weapons are held in hands** (hand count anatomical). Lose one arm
-  → lose its STR share → you can fall below a weapon/shield/plate equip threshold and that gear
-  **drops off**. The cascade *is* the combat depth.
+  → lose its STR share → you can fall below a weapon/shield equip threshold and that gear
+  **drops off** (and any armor on the lost part stops helping). The cascade *is* the combat depth.
+- **Armor [LIGHT effect layer — not attribute gear]:** one piece per part-group, but it does NOT
+  grant or gate attributes. Each piece gives a small, survivability-leaning effect keyed to its
+  TYPE: heavy/plate → flat **protection (1–4)** subtracted from the stat-damage a hit deals to its
+  part; **leather (DEX)** → **evasion** instead; head spell-armor → spell/blind protection. Modest
+  by design. The effect **rides the part's condition** — break the part and its armor effect goes —
+  so the cascade survives without a stat threshold. Balance: at the 1–3 damage band, keep flat
+  protection from fully negating hits.
 
 ### 6b. CON is a defensive-active stat [LOCKED]
 CON gates no equipment, so it earns its keep actively. **Sustained defensive techniques (shield
@@ -334,6 +341,8 @@ to answer: **does exploiting a chassis's structure to build something it wasn't 
 - **Party members / companions** → minions only, one main character, §9.
 - **Summoning as an action-bar technique** → **bays with instant toggle**, §9.
 - **Armor on the action bar** → **dedicated per-group slots**, §6/§13.
+- **Armor that gates on or grants attributes** (plate = STR-gate, "+X stat" armor) → armor is a
+  **light part-themed effect layer** (flat 1–4 stat-damage protection, or evasion), §6.
 - **Verbs bound to weapons** → weapons grant zero verbs; techniques consult gear, §7.
 - **Multiple consumable stockpiles** → one magic/charge resource + attribute-gated bays, §10.
 - **C++/SDL, any editor-centric / ECS / Godot path** → **MonoGame DesktopGL, code-first, no ECS**, §15.
