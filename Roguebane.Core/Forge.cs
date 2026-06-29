@@ -46,9 +46,9 @@ public static class Forge
         IReadOnlyList<Technique> loadout, RuneLoadout runes) =>
         loadout.Concat(runes.GrantedTechniques).GroupBy(t => t.Id).Select(g => g.First()).ToList();
 
-    // The player's HP life total: a small CON-scaled pool, fixed at mint. (Whether chest damage
-    // lowers MAX HP or only the available pool is parked — see "Needs human".)
-    public static Fighter PlayerFighter(Body body) => new(body, 8 + body.Capacity(Stat.Con));
+    // The player's HP life total: a natural base plus a CON bonus (1 CON = 2 HP). Smashing the chest
+    // drops CON, so MaxHp shrinks and current HP caps down — the locked CON->HP model.
+    public static Fighter PlayerFighter(Body body) => Fighter.Scaled(body, baseHp: 8);
 
     // The magic resource pool scales with INT — the head funds spellcraft. (Name/tuning deferred.)
     public static int MagicCapacity(Body body) => body.Capacity(Stat.Int);

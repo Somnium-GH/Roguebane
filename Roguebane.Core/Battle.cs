@@ -70,6 +70,7 @@ public sealed class Battle
                 if (foe.Down) continue;
                 offense.Step();
             }
+            _player.CapToMax(); // a chest hit this tick may have lowered MaxHp; persist the cap
             if (_player.Down) { Outcome = BattleOutcome.Lost; return; }
         }
 

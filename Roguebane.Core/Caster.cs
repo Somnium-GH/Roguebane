@@ -130,12 +130,19 @@ public sealed class Caster
 
     private static Active Reservation(Minion m) => new(m.Id, m.Stat, m.Reserve);
 
-    // Summon a minion into a free bay: capped by the chassis's bay count and gated by free stat.
+    // Summon a minion into a free bay: capped by the chassis's bay count, paid per its GATE — a stat
+    // reservation (default), nothing (chassis-granted), or a one-off charge cost (alt-cost caster).
     public bool Summon(Minion minion, int bayCap)
     {
         if (_bays.ContainsKey(minion.Id)) return true;
         if (_bays.Count >= bayCap) return false;
-        if (!_self.Activate(Reservation(minion))) return false;
+        switch (minion.Gate)
+        {
+            case MinionGate.None: break; // ungated loyal ally — no cost
+            case MinionGate.AltCost when !TrySpendCharge(minion.AltCost): return false;
+            case MinionGate.AltCost: break;
+            default: if (!_self.Activate(Reservation(minion))) return false; break;
+        }
         _bays[minion.Id] = minion;
         return true;
     }
@@ -143,7 +150,7 @@ public sealed class Caster
     public void Dismiss(Minion minion)
     {
         if (!_bays.Remove(minion.Id)) return;
-        _self.Deactivate(Reservation(minion));
+        if (minion.Gate == MinionGate.Stat) _self.Deactivate(Reservation(minion)); // free the stat
     }
 
     public void Step()
@@ -203,9 +210,10 @@ public sealed class Caster
             if (!_self.IsActive(Reservation(run.Tech)))
                 _active.Remove(run.Tech.Id);
 
-        // A drained stat dismisses a minion the same way it silences a technique.
+        // A drained stat dismisses a STAT-gated minion the same way it silences a technique. Ungated
+        // and alt-cost minions hold no reservation, so the cascade leaves them standing.
         foreach (var minion in _bays.Values.ToList())
-            if (!_self.IsActive(Reservation(minion)))
+            if (minion.Gate == MinionGate.Stat && !_self.IsActive(Reservation(minion)))
                 _bays.Remove(minion.Id);
     }
 }

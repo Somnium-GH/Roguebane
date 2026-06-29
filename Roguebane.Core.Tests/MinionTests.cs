@@ -79,4 +79,32 @@ public class MinionTests
         Assert.Equal(0, Chassrium.Warden.Bays);
         Assert.Equal(1, Chassrium.Grunt.Bays);
     }
+
+    [Fact]
+    public void UngatedMinionCostsNoStatAndSurvivesADrain()
+    {
+        var body = IntBody(0); // no INT at all
+        var foe = new Foe("front", 100);
+        var caster = new Caster(body, foe);
+        var retinue = new Minion("retinue", Stat.Int, 0, 1, MinionGate.None);
+
+        Assert.True(caster.Summon(retinue, bayCap: 3)); // ungated -> succeeds with zero INT
+        body.Damage(body.Parts[0], 5);                  // drain does nothing it depends on
+        caster.Step();
+        Assert.Equal(1, caster.MinionCount);            // still standing
+        Assert.Equal(99, foe.Hp);
+    }
+
+    [Fact]
+    public void AltCostMinionSpendsChargeNotStat()
+    {
+        var body = IntBody(0);
+        var caster = new Caster(body, null, maxCharge: 3);
+        var imp = new Minion("imp", Stat.Int, 0, 1, MinionGate.AltCost, AltCost: 2);
+
+        Assert.True(caster.Summon(imp, bayCap: 3)); // pays 2 charge
+        Assert.Equal(1, caster.Charge);
+        var imp2 = new Minion("imp2", Stat.Int, 0, 1, MinionGate.AltCost, AltCost: 2);
+        Assert.False(caster.Summon(imp2, bayCap: 3)); // only 1 charge left
+    }
 }
