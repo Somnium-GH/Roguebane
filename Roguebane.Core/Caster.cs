@@ -17,6 +17,7 @@ public sealed class Caster
     private readonly Body _self;
     private ICombatTarget? _default;
     private readonly SortedDictionary<string, Run> _active = new(StringComparer.Ordinal);
+    private readonly SortedDictionary<string, Minion> _bays = new(StringComparer.Ordinal);
 
     public int Tick { get; private set; }
 
@@ -61,6 +62,27 @@ public sealed class Caster
         _self.Deactivate(Reservation(technique));
     }
 
+    public int MinionCount => _bays.Count;
+    public bool HasMinion(Minion minion) => _bays.ContainsKey(minion.Id);
+
+    private static Active Reservation(Minion m) => new(m.Id, m.Stat, m.Reserve);
+
+    // Summon a minion into a free bay: capped by the chassis's bay count and gated by free stat.
+    public bool Summon(Minion minion, int bayCap)
+    {
+        if (_bays.ContainsKey(minion.Id)) return true;
+        if (_bays.Count >= bayCap) return false;
+        if (!_self.Activate(Reservation(minion))) return false;
+        _bays[minion.Id] = minion;
+        return true;
+    }
+
+    public void Dismiss(Minion minion)
+    {
+        if (!_bays.Remove(minion.Id)) return;
+        _self.Deactivate(Reservation(minion));
+    }
+
     public void Step()
     {
         Tick++;
@@ -88,6 +110,11 @@ public sealed class Caster
                 run.Countdown = run.Tech.Cooldown;
             }
         }
+
+        // Minions auto-fire on whatever the caster is pressing (the default front).
+        if (_default is { Down: false })
+            foreach (var minion in _bays.Values)
+                Hit(_default, null, minion.Power);
     }
 
     private static void Hit(ICombatTarget target, BodyPart? part, int power)
@@ -101,5 +128,10 @@ public sealed class Caster
         foreach (var run in _active.Values.ToList())
             if (!_self.IsActive(Reservation(run.Tech)))
                 _active.Remove(run.Tech.Id);
+
+        // A drained stat dismisses a minion the same way it silences a technique.
+        foreach (var minion in _bays.Values.ToList())
+            if (!_self.IsActive(Reservation(minion)))
+                _bays.Remove(minion.Id);
     }
 }

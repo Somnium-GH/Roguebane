@@ -7,7 +7,8 @@ public sealed record Chassis(
     string Id,
     IReadOnlyList<BodyPart> BodyParts,
     int RuneBudget,
-    int RuneDiscount = 0)
+    int RuneDiscount = 0,
+    int Bays = 1)
 {
     public Body NewBody()
     {
