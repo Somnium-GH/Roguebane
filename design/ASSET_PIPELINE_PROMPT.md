@@ -27,7 +27,13 @@ full-implementation-ready structure.** Convert and reorganize what exists; don't
   from the label/highlight scaffolding, which is not the style.) Current placeholders are fine while
   we nail format + structure — just don't mistake placeholder crudeness for the target look.
 
-**Guardrail:** no third-party IP (FTL / Shadowbane / PoE) in any asset, filename, or string.
+**Guardrails:**
+- No third-party IP (FTL / Shadowbane / PoE) in any asset, filename, or string.
+- **No Windows-reserved filename stems** — never name a file `con`, `prn`, `aux`, `nul`, `com1`–`com9`,
+  or `lpt1`–`lpt9` (even with an extension; `con.png` is blocked on Windows). CON (Constitution) uses
+  `constitution`. Keep every asset name cross-platform safe: ASCII, lowercase, no spaces, no reserved
+  stems. If a path is derived from a `Core` id (e.g. `Stat.Con`), the binding must map the reserved
+  ones to safe names.
 
 **Output:** the folder tree, the `ASSET_MANIFEST`, the reformatted/restructured assets, and a one-line
 note of anything you treated as `[OPEN]`.

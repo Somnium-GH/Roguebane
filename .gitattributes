@@ -1,0 +1,17 @@
+# Text files: auto line-ending normalization (repo stores LF; checkout per-OS).
+* text=auto
+
+# Binary assets — never run text/eol filters on these (protects sprites, audio, fonts).
+*.png        binary
+*.jpg        binary
+*.jpeg       binary
+*.gif        binary
+*.bmp        binary
+*.ico        binary
+*.wav        binary
+*.ogg        binary
+*.mp3        binary
+*.ttf        binary
+*.otf        binary
+*.xnb        binary
+*.spritefont binary
