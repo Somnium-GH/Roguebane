@@ -10,6 +10,7 @@ public sealed class Body
     private readonly Dictionary<string, int> _intact = new();
     private readonly List<Active> _actives = new(); // engagement order; cascade sheds newest first
     private readonly Dictionary<Stat, Armor> _armor = new(); // one piece per part-group (keyed by Stat)
+    private readonly List<Weapon> _hands = new(); // up to two; anatomical hand count
 
     public IReadOnlyList<BodyPart> Parts => _parts;
     public IReadOnlyList<Active> Actives => _actives;
@@ -45,7 +46,29 @@ public sealed class Body
         if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));
         _intact[part.Id] = Math.Max(0, Contribution(part) - amount);
         Cascade(part.Stat);
+        _hands.RemoveAll(w => Capacity(w.Stat) < w.Reserve); // gear falls off below its threshold
     }
+
+    public IReadOnlyList<Weapon> Hands => _hands;
+
+    // Wield a weapon into a free hand if the body can lift it (stat capacity meets its threshold).
+    public bool Wield(Weapon weapon)
+    {
+        if (_hands.Count >= 2) return false;
+        if (Capacity(weapon.Stat) < weapon.Reserve) return false;
+        _hands.Add(weapon);
+        return true;
+    }
+
+    public void Unwield(Weapon weapon) => _hands.Remove(weapon);
+
+    // The weapons a technique consults, by its stat (§7). Power/cost flow from these.
+    public IReadOnlyList<Weapon> Consulted(Technique technique) => technique.Consults switch
+    {
+        WeaponUse.Primary => _hands.Where(w => w.Stat == technique.Stat).Take(1).ToList(),
+        WeaponUse.Both => _hands.Where(w => w.Stat == technique.Stat).ToList(),
+        _ => Array.Empty<Weapon>(),
+    };
 
     // Armor rides on a part-group (its Stat). One piece per group — equipping replaces.
     public void Equip(Armor piece) => _armor[piece.Group] = piece;

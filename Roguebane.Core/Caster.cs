@@ -68,12 +68,22 @@ public sealed class Caster
 
     public int ActiveCount => _active.Count;
 
-    private static Active Reservation(Technique t) => new(t.Id, t.Stat, t.Reserve);
+    // A self-contained technique reserves its own stat; a weapon-consulting one reserves the sum of
+    // its consulted weapons' reserves (you can't swing what you aren't holding — reserve 0 → can't).
+    private Active Reservation(Technique t) => t.Consults == WeaponUse.None
+        ? new(t.Id, t.Stat, t.Reserve)
+        : new(t.Id, t.Stat, _self.Consulted(t).Sum(w => w.Reserve));
+
+    private int EffectivePower(Technique t) => t.Consults == WeaponUse.None
+        ? t.Power
+        : t.Power + _self.Consulted(t).Sum(w => w.Power);
 
     public bool Activate(Technique technique)
     {
         if (_active.ContainsKey(technique.Id)) return true;
-        if (!_self.Activate(Reservation(technique))) return false;
+        var reservation = Reservation(technique);
+        if (reservation.Reserve <= 0) return false; // nothing to swing (no weapon to consult)
+        if (!_self.Activate(reservation)) return false;
         _active[technique.Id] = new Run { Tech = technique, Countdown = technique.Cooldown };
         return true;
     }
@@ -128,7 +138,7 @@ public sealed class Caster
             // countdown stays elapsed) until the resource refills out of combat.
             if (run.Tech.ChargeCost > 0 && !TrySpendCharge(run.Tech.ChargeCost)) continue;
 
-            Hit(target, part, run.Tech.Power);
+            Hit(target, part, EffectivePower(run.Tech));
             if (run.Tech.Kind == TechniqueKind.Timered) run.Countdown = run.Tech.Cooldown;
         }
 

@@ -19,4 +19,5 @@ public sealed record Technique(
     TechniqueKind Kind,
     int Cooldown,
     int Power,
-    int ChargeCost = 0);
+    int ChargeCost = 0,
+    WeaponUse Consults = WeaponUse.None);
