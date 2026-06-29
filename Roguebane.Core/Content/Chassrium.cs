@@ -18,14 +18,16 @@ public static class Chassrium
         "grunt",
         StandardBody("grunt", str: 4, intel: 3, dex: 4, con: 4),
         RuneBudget: 24,
-        RuneDiscount: 1);
+        RuneDiscount: 1,
+        DefaultLoadout: new[] { Techniques.Jab, Techniques.Brace });
 
     // A caster specialist: high INT, tight budget.
     public static readonly Chassis Adept = new(
         "adept",
         StandardBody("adept", str: 4, intel: 10, dex: 4, con: 5),
         RuneBudget: 10,
-        RuneDiscount: 0);
+        RuneDiscount: 0,
+        DefaultLoadout: new[] { Techniques.Ember, Techniques.Drain });
 
     // The Wall: STR-CON tank built to hold the line — fat chest, modest budget, no bays.
     public static readonly Chassis Warden = new(
@@ -33,7 +35,8 @@ public static class Chassrium
         StandardBody("warden", str: 6, intel: 3, dex: 3, con: 9),
         RuneBudget: 12,
         RuneDiscount: 0,
-        Bays: 0);
+        Bays: 0,
+        DefaultLoadout: new[] { Techniques.Cleave, Techniques.Brace });
 
     // The Binder: an INT core that fights through summons — three bays, INT funds them all.
     public static readonly Chassis Summoner = new(
@@ -41,7 +44,8 @@ public static class Chassrium
         StandardBody("summoner", str: 3, intel: 9, dex: 4, con: 4),
         RuneBudget: 12,
         RuneDiscount: 0,
-        Bays: 3);
+        Bays: 3,
+        DefaultLoadout: new[] { Techniques.Ember, Techniques.Brace });
 
     // The Duelist: glass-cannon STR-DEX, thin chest, no bays — ends parts before they answer.
     public static readonly Chassis Reaver = new(
@@ -49,7 +53,8 @@ public static class Chassrium
         StandardBody("reaver", str: 7, intel: 3, dex: 7, con: 3),
         RuneBudget: 12,
         RuneDiscount: 0,
-        Bays: 0);
+        Bays: 0,
+        DefaultLoadout: new[] { Techniques.Lunge, Techniques.Jab });
 
     // Roster order matches design/05's Choose-Your-Core line-up. Stat/budget values are placeholder
     // (tuning is a "Needs human" touchpoint); slot/bay/action-count shapes wait on those systems.

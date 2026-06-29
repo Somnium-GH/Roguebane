@@ -49,29 +49,29 @@ public class BuildSessionTests
     [Fact]
     public void ToggleBuildsTheLoadoutInPaletteOrder()
     {
-        var build = New();
+        var build = New(); // Grunt kit pre-seeds jab + brace
         build.Toggle(Techniques.Drain);
-        build.Toggle(Techniques.Jab);
+        build.Toggle(Techniques.Lunge);
 
-        Assert.True(build.IsSelected(Techniques.Jab));
-        Assert.Equal(new[] { "jab", "drain" }, build.Loadout.Select(t => t.Id)); // palette order, not click order
+        Assert.True(build.IsSelected(Techniques.Jab)); // kit
+        Assert.Equal(new[] { "jab", "lunge", "drain", "brace" }, build.Loadout.Select(t => t.Id)); // palette order
 
-        build.Toggle(Techniques.Jab);
+        build.Toggle(Techniques.Jab); // a kit item can still be dropped
         Assert.False(build.IsSelected(Techniques.Jab));
     }
 
     [Fact]
     public void LaunchMintsTheChosenBodyIntoARun()
     {
-        var build = New();
+        var build = New(); // kit: jab, brace
         build.Climb(Paths.VesselLadder);
-        build.Toggle(Techniques.Jab);
+        build.Toggle(Techniques.Lunge);
 
         var run = Sieges.StandardRun();
         var session = build.Launch(run);
 
         Assert.Equal(SessionState.Fighting, session.State);
-        Assert.Single(session.Loadout);
+        Assert.Equal(3, session.Loadout.Count); // kit (jab, brace) + lunge
         Assert.Equal(3, session.Run.Nodes.Count); // cp1, cp2, castle
     }
 
@@ -79,12 +79,11 @@ public class BuildSessionTests
     public void EmbarkDropsTheChosenBodyIntoTheRealLoop()
     {
         var build = New();
-        build.Toggle(Techniques.Jab);
 
         var exp = build.Embark(Maps.StandardLeg(autoResolveCastle: false));
 
         Assert.Equal(ExpeditionState.Choosing, exp.State);
-        Assert.Contains(exp.Loadout, t => t.Id == "jab");
+        Assert.Contains(exp.Loadout, t => t.Id == "jab"); // shipped in the kit, no pick needed
         Assert.Equal("camp", exp.Map.CurrentId);
     }
 
@@ -92,13 +91,36 @@ public class BuildSessionTests
     public void MarchSendsTheChosenBodyDownTheCampaignSpine()
     {
         var build = New();
-        build.Toggle(Techniques.Jab);
 
         var campaign = build.March(Maps.StandardLegs(3));
 
         Assert.Equal(CampaignState.Marching, campaign.State);
         Assert.Equal(3, campaign.LegCount);
         Assert.Equal(0, campaign.LegIndex);
-        Assert.Contains(campaign.Current.Loadout, t => t.Id == "jab");
+        Assert.Contains(campaign.Current.Loadout, t => t.Id == "jab"); // kit
+    }
+
+    // The launch gate is gone: every chassis ships a non-empty fixed kit, so the bar is never empty
+    // and Launch is never blocked.
+    [Fact]
+    public void EveryChassisShipsANonEmptyKitThatLandsInTheLoadout()
+    {
+        var build = New();
+        for (var i = 0; i < build.ChassisCount; i++)
+        {
+            Assert.NotEmpty(build.Chassis.Kit);
+            Assert.NotEmpty(build.Loadout); // seeded, no manual pick
+            build.CycleChassis(1);
+        }
+    }
+
+    [Fact]
+    public void CyclingChassisReseedsTheKit()
+    {
+        var build = New(); // Grunt: jab, brace
+        Assert.Equal(new[] { "jab", "brace" }, build.Loadout.Select(t => t.Id));
+
+        build.CycleChassis(1); // Warden: cleave, brace
+        Assert.Equal(new[] { "cleave", "brace" }, build.Loadout.Select(t => t.Id));
     }
 }

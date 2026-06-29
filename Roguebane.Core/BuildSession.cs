@@ -21,6 +21,17 @@ public sealed class BuildSession
         Paths = paths;
         _palette = palette;
         _runes = _chassis[0].NewLoadout();
+        SeedKit();
+    }
+
+    // The current chassis ships a FIXED starting loadout (data) — pre-slot it so the bar is never
+    // empty and Launch needs no "pick a technique" gate. Only techniques on the palette are slotted.
+    private void SeedKit()
+    {
+        _selected.Clear();
+        var ids = _palette.Select(t => t.Id).ToHashSet(StringComparer.Ordinal);
+        foreach (var t in Chassis.Kit)
+            if (ids.Contains(t.Id)) _selected.Add(t.Id);
     }
 
     public int ChassisIndex { get; private set; }
@@ -36,7 +47,7 @@ public sealed class BuildSession
         var n = _chassis.Count;
         ChassisIndex = ((ChassisIndex + direction) % n + n) % n;
         _runes = Chassis.NewLoadout();
-        // The body changes underfoot, but the technique pick is the player's intent — keep it.
+        SeedKit(); // a fresh chassis brings its own fixed kit
     }
 
     // Climb one rung up a path's ladder if the budget allows. Rungs are taken in order (no skips).

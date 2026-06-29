@@ -141,10 +141,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
         for (var i = 0; i < _build.Palette.Count; i++)
             if (Click(PaletteRect(i))) _build.Toggle(_build.Palette[i]);
 
-        // March the campaign (gated on a chosen loadout; the footer mirrors this). Alt+Enter is the
-        // fullscreen toggle, not a march.
+        // March the campaign. The chassis ships a fixed kit so the bar is never empty — no gate.
+        // Alt+Enter is the fullscreen toggle, not a march.
         var march = (Pressed(keys, Keys.Enter) && !keys.IsKeyDown(Keys.LeftAlt)) || Click(MarchRect);
-        if (march && _build.Loadout.Count > 0)
+        if (march)
         {
             _campaign = _build.March(Maps.StandardLegs(3));
             foreach (var t in Exp.Loadout) _campaign.Toggle(t); // arm the whole bar
@@ -440,9 +440,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawLadders(320, 100);
         DrawPalette(320, 320);
 
-        var ready = _build.Loadout.Count > 0;
-        DrawButton(ready ? "ENTER  begin the march" : "pick a technique",
-            40, H - 52, 300, 44, ready, Keys.Enter);
+        DrawButton("ENTER  begin the march", 40, H - 52, 300, 44, true, Keys.Enter);
     }
 
     private void DrawChassisSelector(int x, int y)
