@@ -25,7 +25,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     private Screen _screen = Screen.Build;
     private BuildSession _build = null!;
-    private Session _session = null!;
+    private Expedition _expedition = null!;
+    private bool _paused;
     private KeyboardState _prevKeys;
 
     // Smoke mode (RB_SMOKE=1): load, drive to RB_SCREEN, render, optionally save RB_SHOT, exit. Lets
@@ -52,14 +53,17 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         _build = Sessions.NewBuild(); // start on the build screen; Launch threads into the siege
 
-        if (_smokeScreen == "combat") // jump straight into a fight and tick it into a live state
+        if (_smokeScreen is "combat" or "map") // embark into the real loop for the screenshot
         {
             _build.Toggle(Techniques.Jab);
             _build.Toggle(Techniques.Ember);
-            _session = _build.Launch(Sieges.StandardRun());
-            for (var i = 0; i < _session.Loadout.Count; i++) _session.Toggle(_session.Loadout[i]);
-            for (var i = 0; i < 6; i++) _session.Tick();
+            _expedition = _build.Embark(Maps.StandardLeg(autoResolveCastle: false));
             _screen = Screen.Run;
+            if (_smokeScreen == "combat")
+            {
+                foreach (var t in _expedition.Loadout) _expedition.Toggle(t);
+                _expedition.Enter(_expedition.Options[0].Id); // jump into the first fight (fresh)
+            }
         }
 
         base.Initialize();
@@ -98,23 +102,51 @@ public class Game1 : Microsoft.Xna.Framework.Game
             if (Pressed(keys, TechniqueKeys[i]))
                 _build.Toggle(_build.Palette[i]);
 
-        // No actions, no run: Launch is gated on a chosen loadout (the readiness bar mirrors this).
+        // Embark into the real map+combat loop (gated on a chosen loadout; the footer mirrors this).
         if (Pressed(keys, Keys.Enter) && _build.Loadout.Count > 0)
         {
-            _session = _build.Launch(Sieges.StandardRun());
+            _expedition = _build.Embark(Maps.StandardLeg(autoResolveCastle: false));
+            foreach (var t in _expedition.Loadout) _expedition.Toggle(t); // arm the whole bar
             _screen = Screen.Run;
         }
     }
 
     private void UpdateRun(KeyboardState keys)
     {
-        if (Pressed(keys, Keys.Space)) _session.TogglePause();
-        if (Pressed(keys, Keys.F)) _session.Flee();
-        for (var i = 0; i < TechniqueKeys.Length && i < _session.Loadout.Count; i++)
-            if (Pressed(keys, TechniqueKeys[i]))
-                _session.Toggle(_session.Loadout[i]);
+        if (_expedition.State == ExpeditionState.Fighting) UpdateCombat(keys);
+        else UpdateChoosing(keys);
+    }
 
-        _session.Tick();
+    private void UpdateCombat(KeyboardState keys)
+    {
+        if (Pressed(keys, Keys.Space)) _paused = !_paused;
+        if (Pressed(keys, Keys.F)) _expedition.Flee();
+        for (var i = 0; i < TechniqueKeys.Length && i < _expedition.Loadout.Count; i++)
+            if (Pressed(keys, TechniqueKeys[i]))
+                _expedition.Toggle(_expedition.Loadout[i]);
+
+        if (!_paused && !_smoke) _expedition.Tick(); // smoke freezes the staged frame for the shot
+    }
+
+    // On the chart: number keys pick a charted jump; at a merchant, the shop verbs are live.
+    private void UpdateChoosing(KeyboardState keys)
+    {
+        if (_expedition.AtMerchant)
+        {
+            if (Pressed(keys, Keys.P)) _expedition.BuyPotion();
+            if (Pressed(keys, Keys.H)) _expedition.BuyHeal();
+            if (Pressed(keys, Keys.U)) _expedition.UsePotion();
+        }
+
+        var options = _expedition.Options;
+        for (var i = 0; i < TechniqueKeys.Length && i < options.Count; i++)
+            if (Pressed(keys, TechniqueKeys[i]))
+            {
+                _expedition.Enter(options[i].Id);
+                foreach (var t in _expedition.Loadout) // keep the bar armed into the next fight
+                    if (!_expedition.IsActive(t)) _expedition.Toggle(t);
+                break;
+            }
     }
 
     private bool Pressed(KeyboardState keys, Keys key) => keys.IsKeyDown(key) && _prevKeys.IsKeyUp(key);
@@ -185,15 +217,22 @@ public class Game1 : Microsoft.Xna.Framework.Game
         Exit();
     }
 
-    // Combat screen (design/01): backdrop, the run strip up top, you on the left (part composite +
-    // HP + attribute pips), the foe on the right, the action bar along the bottom. All read from the
-    // live Session; the shell only paints it.
+    // The run renders one of two faces of the Expedition: the chart when choosing the next jump
+    // (design/03), the battlefield when a fight is under way (design/01).
     private void DrawRunScreen()
+    {
+        if (_expedition.State == ExpeditionState.Fighting) DrawCombatScreen();
+        else DrawMapScreen();
+    }
+
+    // Combat screen (design/01): backdrop, run resources up top, you on the left (part composite +
+    // HP + attribute pips), the foe on the right, the action bar along the bottom.
+    private void DrawCombatScreen()
     {
         Stretch(_assets.Background("combat_field"), 0, 0, W, H);
         Panel(0, 0, W, 40);
         Text(_assets.Display, "SIEGE", 16, 8, Ink);
-        DrawNodeStrip(180, 8);
+        DrawRunResources(200, 10);
 
         DrawFighter(40, 90);
         DrawFoes(560, 90);
@@ -201,18 +240,68 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawStateOverlay();
     }
 
-    // The run strip: a row of node icons, current node ringed amber, cleared nodes dimmed.
-    private void DrawNodeStrip(int x, int y)
+    // Run-map screen (design/03): the resources, the current beacon, and the charted jumps as cards
+    // (fog-aware icons). At a merchant the shop verbs are live instead of a fight ahead.
+    private void DrawMapScreen()
     {
-        var run = _session.Run;
-        for (var i = 0; i < run.Nodes.Count; i++)
+        Stretch(_assets.Background("map_chart"), 0, 0, W, H);
+        Panel(0, 0, W, 40);
+        Text(_assets.Display, "MARCH", 16, 8, Ink);
+        DrawRunResources(200, 10);
+
+        var map = _expedition.Map;
+        Sprite(_assets.Node(map.Sees(map.Current)), 60, 120, 64, 64, Color.White);
+        Text(_assets.Mono, map.Current.Type.ToString().ToLower(), 60, 190, Muted);
+
+        if (_expedition.AtMerchant) DrawMerchant(60, 240);
+        else DrawJumpChooser(200, 120);
+
+        DrawStateOverlay();
+    }
+
+    // The charted jumps as numbered cards, each a fog-aware node icon (a `?` while still fogged).
+    private void DrawJumpChooser(int x, int y)
+    {
+        Text(_assets.Mono, "CHARTED JUMPS", x, y - 18, Muted);
+        var map = _expedition.Map;
+        var options = _expedition.Options;
+        for (var i = 0; i < options.Count; i++)
         {
-            var node = run.Nodes[i];
-            var left = x + i * 30;
-            var icon = node.Structural ? _assets.Node(NodeType.Castle) : _assets.Node(NodeType.Skirmish);
-            var tint = node.Cleared ? new Color(90, 80, 70) : Color.White;
-            Sprite(icon, left, y, 24, 24, tint);
-            if (i == run.Index) Border(left - 1, y - 1, 26, 26, Amber);
+            var node = options[i];
+            var seen = map.Sees(node);
+            var left = x + i * 130;
+            Panel(left, y, 116, 116);
+            Sprite(_assets.Node(seen), left + 30, y + 14, 56, 56, Color.White);
+            Text(_assets.Mono, $"[{i + 1}] {seen.ToString().ToLower()}", left + 8, y + 90, Ink);
+        }
+        if (options.Count == 0) Text(_assets.Mono, "no charted jumps", x, y, Muted);
+    }
+
+    private void DrawMerchant(int x, int y)
+    {
+        Panel(x, y, 360, 150);
+        Text(_assets.Display, "MERCHANT", x + 14, y + 10, Ink);
+        Text(_assets.Mono, $"[P] buy potion (4)   potions {_expedition.Potions}", x + 14, y + 48, Muted);
+        Text(_assets.Mono, "[U] use potion  (repair parts)", x + 14, y + 72, Muted);
+        Text(_assets.Mono, "[H] heal hp     (3)", x + 14, y + 96, Muted);
+        Text(_assets.Mono, "pick a jump [1..] to march on", x + 14, y + 122, Amber);
+        DrawJumpChooser(x + 400, y - 80);
+    }
+
+    // The run's resource readout: supplies, war-party distance, banked support, gold, potions.
+    private void DrawRunResources(int x, int y)
+    {
+        var map = _expedition.Map;
+        DrawStat(_assets.Resource("supplies"), map.Supplies, x);
+        DrawStat(_assets.Node(NodeType.Castle), map.WarPartyDistance, x + 110); // war party closing in
+        DrawStat(_assets.Resource("support"), map.SupportBank, x + 220);
+        DrawStat(_assets.Resource("spoils"), _expedition.Gold, x + 330);
+        DrawStat(_assets.Resource("hp"), _expedition.Potions, x + 440);
+
+        void DrawStat(Texture2D? icon, int value, int sx)
+        {
+            Sprite(icon, sx, y, 22, 22, Color.White);
+            Text(_assets.Mono, value.ToString(), sx + 26, y + 4, Ink);
         }
     }
 
@@ -298,12 +387,12 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // and the attribute-pool pip widget below.
     private void DrawFighter(int x, int y)
     {
-        var body = _session.Player.Body;
+        var body = _expedition.Player.Body;
         Panel(x, y, 220, 360);
         Text(_assets.Mono, "YOU", x + 12, y + 8, Muted);
         DrawHumanoid(body, x + 110, y + 70, 2);
 
-        var hp = _session.Player;
+        var hp = _expedition.Player;
         DrawBar(x + 16, y + 188, 188, _assets.Resource("hp"), hp.Hp, hp.MaxHp, Blood);
         DrawPips(body, x + 16, y + 212);
     }
@@ -369,7 +458,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // Foe side: each foe a sprite + HP bar, the current target ringed by the focus reticle.
     private void DrawFoes(int x, int y)
     {
-        var encounter = _session.Run.Current;
+        var encounter = _expedition.Battle!.Encounter;
         for (var i = 0; i < encounter.Foes.Count; i++)
         {
             var foe = encounter.Foes[i];
@@ -386,11 +475,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private void DrawActionBar(int x, int y)
     {
         Panel(x, y, W - 80, 76);
-        for (var i = 0; i < _session.Loadout.Count; i++)
+        for (var i = 0; i < _expedition.Loadout.Count; i++)
         {
-            var t = _session.Loadout[i];
+            var t = _expedition.Loadout[i];
             var left = x + 12 + i * 84;
-            var active = _session.IsActive(t);
+            var active = _expedition.IsActive(t);
             Panel(left, y + 8, 76, 60);
             Sprite(_assets.Technique(t.Id), left + 14, y + 12, 48, 48, Color.White);
             Text(_assets.Mono, "[" + (i + 1) + "]", left + 6, y + 50, Muted);
@@ -401,12 +490,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     private void DrawStateOverlay()
     {
-        (Color tint, string label)? overlay = _session.State switch
+        (Color tint, string label)? overlay = _expedition.State switch
         {
-            SessionState.Won => (new Color(40, 120, 60, 110), "VICTORY"),
-            SessionState.Lost => (new Color(120, 40, 40, 140), "OVERRUN"),
-            SessionState.Fled => (new Color(120, 90, 40, 110), "FLED"),
-            _ => _session.Paused ? (new Color(0, 0, 0, 120), "PAUSED") : ((Color, string)?)null,
+            ExpeditionState.Won => (new Color(40, 120, 60, 110), "VICTORY"),
+            ExpeditionState.Lost => (new Color(120, 40, 40, 140), "OVERRUN"),
+            _ => _paused ? (new Color(0, 0, 0, 120), "PAUSED") : ((Color, string)?)null,
         };
         if (overlay is { } o)
         {
