@@ -102,10 +102,12 @@ stay green; the shell stays thin (rules in Core).
 - (resolved) Combat migrated onto Body: techniques reserve a stat as Actives; Encounter foes are
   HP pools (`Foe`); Entity/AttributePool/Part/Attribute retired. Head-silence is now emergent
   (smash head -> INT drains -> spell reservations cascade off). Old Power/Focus/Vigor gone.
-- Foes are single HP pools, not multi-part bodies that fight back. Per-technique aim therefore
-  targets a whole Foe; PART-level aim (the locked "per-technique aims its own target PART") waits
-  on multi-part foes. Reconcile by modelling a foe as a Body (or part set) + its own Caster aimed
-  at the player, stepping both sides; then Caster.Aim takes a part.
+- (G1 partial) Foes now carry an optional Body `Frame` of targetable parts; `Caster.Aim(tech, foe,
+  part)` erodes that part's stat first and spills overkill into HP (§10 split). The locked
+  per-technique PART aim is DONE on the target-resolution side. STILL DEBT: the foe-fights-back half
+  — a foe needs its OWN Caster aimed at the PLAYER (both sides step), plus player HP + a loss state.
+  Reconcile by giving structured foes a Caster targeting the player Body and a Session loss path.
+  Content factories still mint mostly unstructured HP-pool foes; give castle layers real Frames.
 - Rune grants are chassis-extension PARTS only (Hollow Vessel -> +CON, Resonant Core -> +INT). Other
   rune effects (stat multipliers, new techniques, passives) not yet modelled — reconcile by widening
   Mark with more data-driven effect kinds when a non-extension keystone is authored.
@@ -174,16 +176,18 @@ UI track (hi-fi — replace the placeholder rectangles):
 - [ ] U6. Global chrome: buttons (hover/pressed/disabled), panels, pips, reticles, tooltips, frame.
 
 Gameplay track (toward a complete game, per `DESIGN_SPEC`):
-- [ ] G1. Multi-part foes (foe as Body + own Caster aimed at the player) -> real per-technique PART
-      aim + localized foe damage (resolves the per-technique-aim Debt; foe parts per assets sheet 2).
+- [~] G1. Multi-part foes. DONE: foe `Frame` of targetable parts + per-technique PART aim with
+      localized stat erosion (overkill spills to HP, §10). DEBT: foe-fights-back (own Caster aimed
+      at the player) + player HP/loss; structured castle-layer content. Foe parts per assets sheet 2.
 - [ ] G2. Gear/inventory system: WEAPONS (and shields) are equippable objects that gate on STR/DEX
       to wield. ARMOR is a LIGHT survivability layer (NOT attribute gear): a piece per part-group
       whose effect is keyed to type — plate -> flat 1-4 protection vs stat-damage to that part;
       leather -> evasion; head spell-armor -> spell/blind protection. Armor effects ride the part's
       condition (break part -> effect gone) and share the data-driven effect vocabulary with runes
       (G7). Feeds the Build inventory + Chassis Anatomy.
-- [ ] G3. Five chassis as data (Grunt, Warden, Adept, Summoner, Reaver) with their slot/part/bay/
-      budget shapes; selectable at New Run.
+- [~] G3. Five chassis as data (Grunt, Warden, Adept, Summoner, Reaver) selectable at New Run via
+      `Chassrium.Roster`. DONE: stat bases + budgets (legible identities, tests assert them). DEBT:
+      slot/part/bay/action-count shapes wait on the gear (G2) + bay (G7) systems; values placeholder.
 - [ ] G4. Full node-map run: all node types live — skirmish, resource-hold (banks support), merchant
       (shop + HP service), unknown (fog resolve); Supplies traversal, branching, dead-ends, flee.
 - [ ] G5. War-party forward pressure: per-node advance toward camp; crack castle disbands; reach
