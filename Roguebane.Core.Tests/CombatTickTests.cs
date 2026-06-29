@@ -1,116 +1,93 @@
-using Roguebane.Core.Content;
-
 namespace Roguebane.Core.Tests;
 
 public class CombatTickTests
 {
-    private static readonly Part Head =
-        new("head", new Dictionary<Attribute, int> { [Attribute.Vigor] = 1 }, PartRole.Head, MaxHealth: 5);
+    private static BodyPart _head = null!;
 
-    private static Entity Self(int power = 20, int focus = 20, int vigor = 20)
+    private static Body Body(int str = 12, int intel = 12, int dex = 12, int con = 12)
     {
-        var e = new Entity(new AttributePool(new Dictionary<Attribute, int>
-        {
-            [Attribute.Power] = power,
-            [Attribute.Focus] = focus,
-            [Attribute.Vigor] = vigor,
-        }));
-        e.Add(Head);
-        e.Enable(Head); // live head => can cast
-        return e;
+        _head = new BodyPart("head", Stat.Int, intel);
+        var body = new Body();
+        body.Add(new BodyPart("arms", Stat.Str, str));
+        body.Add(new BodyPart("legs", Stat.Dex, dex));
+        body.Add(_head);
+        body.Add(new BodyPart("chest", Stat.Con, con));
+        return body;
     }
 
-    private static (Entity dummy, Part hide) Target(int hp = 1000)
-    {
-        var hide = new Part("hide", new Dictionary<Attribute, int>(), PartRole.Generic, MaxHealth: hp);
-        var dummy = new Entity(new AttributePool(new Dictionary<Attribute, int>()));
-        dummy.Add(hide);
-        return (dummy, hide);
-    }
-
-    private static int DamageDealt(Entity target, Part part, int startHp) => startHp - target.Health(part);
+    private static Technique Spell(string id, int reserve, int power) =>
+        new(id, Stat.Int, reserve, TechniqueKind.Sustained, Cooldown: 0, Power: power);
 
     [Fact]
     public void TimeredFiresOnCooldown()
     {
-        var self = Self();
-        var (dummy, hide) = Target();
-        var caster = new Caster(self, dummy, hide);
+        var foe = new Foe("dummy", 1000);
+        var caster = new Caster(Body(), foe);
+        caster.Activate(new Technique("jab", Stat.Str, 1, TechniqueKind.Timered, Cooldown: 2, Power: 3));
 
-        caster.Activate(Techniques.Jab); // cd 2, power 3
         for (var i = 0; i < 4; i++) caster.Step();
 
-        Assert.Equal(2 * 3, DamageDealt(dummy, hide, 1000)); // fires at tick 2 and 4
+        Assert.Equal(1000 - 2 * 3, foe.Hp); // fires at tick 2 and 4
     }
 
     [Fact]
     public void SustainedOutputsEveryTick()
     {
-        var self = Self();
-        var (dummy, hide) = Target();
-        var caster = new Caster(self, dummy, hide);
+        var foe = new Foe("dummy", 1000);
+        var caster = new Caster(Body(), foe);
+        caster.Activate(Spell("drain", reserve: 1, power: 2));
 
-        caster.Activate(Techniques.Drain); // power 2 per tick
         for (var i = 0; i < 3; i++) caster.Step();
 
-        Assert.Equal(3 * 2, DamageDealt(dummy, hide, 1000));
+        Assert.Equal(1000 - 3 * 2, foe.Hp);
     }
 
     [Fact]
-    public void ParallelByAllocation_SecondTechniqueBlockedWhenPoolIsExhausted()
+    public void ParallelByAllocation_SecondTechniqueBlockedWhenStatExhausted()
     {
-        var self = Self(focus: 4); // Drain(3) + Ember(2) = 5 focus needed, only 4 available
-        var (dummy, hide) = Target();
-        var caster = new Caster(self, dummy, hide);
+        var caster = new Caster(Body(intel: 2), new Foe("dummy", 1000));
 
-        Assert.True(caster.Activate(Techniques.Drain));
-        Assert.False(caster.Activate(Techniques.Ember));
+        Assert.True(caster.Activate(Spell("drain", reserve: 2, power: 2)));
+        Assert.False(caster.Activate(Spell("ember", reserve: 1, power: 1))); // INT 2 fully reserved
         Assert.Equal(1, caster.ActiveCount);
     }
 
     [Fact]
-    public void DeactivatingReturnsAllocationForAnother()
+    public void DeactivatingReturnsTheStatForAnother()
     {
-        var self = Self(focus: 4);
-        var (dummy, hide) = Target();
-        var caster = new Caster(self, dummy, hide);
+        var caster = new Caster(Body(intel: 2), new Foe("dummy", 1000));
+        var drain = Spell("drain", reserve: 2, power: 2);
 
-        caster.Activate(Techniques.Drain);
-        caster.Deactivate(Techniques.Drain);
-        Assert.True(caster.Activate(Techniques.Ember)); // freed focus now covers it
+        caster.Activate(drain);
+        caster.Deactivate(drain);
+        Assert.True(caster.Activate(Spell("ember", reserve: 1, power: 1)));
     }
 
     [Fact]
-    public void HeadDisableSilencesCasting()
+    public void SmashingTheHeadSilencesSpells()
     {
-        var self = Self();
-        var (dummy, hide) = Target();
-        var caster = new Caster(self, dummy, hide);
-        caster.Activate(Techniques.Drain);
+        var body = Body(intel: 4);
+        var caster = new Caster(body, new Foe("dummy", 1000));
+        caster.Activate(Spell("drain", reserve: 3, power: 2));
 
-        self.Disable(Head); // head off
+        body.Damage(_head, 4); // INT 4 -> 0, the spell reservation cascades off
 
-        Assert.False(caster.Activate(Techniques.Jab)); // cannot start a cast
-        caster.Step();                                  // active casts silenced
-        Assert.Equal(0, caster.ActiveCount);
-        Assert.Equal(0, DamageDealt(dummy, hide, 1000)); // no output the tick it dropped
+        caster.Step();
+        Assert.Equal(0, caster.ActiveCount); // silenced
     }
 
     [Fact]
-    public void DamageDestroysPartAndReturnsItsAllocation()
+    public void StrMovesSurviveAHeadSmash()
     {
-        var self = Self();
-        var arm = new Part("arm", new Dictionary<Attribute, int> { [Attribute.Power] = 5 }, MaxHealth: 4);
-        self.Add(arm);
-        Assert.True(self.Enable(arm));
-        Assert.Equal(15, self.Pool.Available(Attribute.Power));
+        var body = Body(intel: 4);
+        var caster = new Caster(body, new Foe("dummy", 1000));
+        var jab = new Technique("jab", Stat.Str, 1, TechniqueKind.Timered, Cooldown: 1, Power: 3);
+        caster.Activate(jab);
 
-        self.Damage(arm, 4);
+        body.Damage(_head, 99); // head gone, but arms still swing
 
-        Assert.True(self.IsDestroyed(arm));
-        Assert.False(self.IsEnabled(arm));
-        Assert.Equal(20, self.Pool.Available(Attribute.Power)); // allocation returned
-        Assert.False(self.Enable(arm));                          // cannot re-power a destroyed part
+        caster.Step();
+        Assert.True(caster.IsActive(jab));
     }
 
     [Fact]
@@ -118,23 +95,13 @@ public class CombatTickTests
     {
         static int Run()
         {
-            var e = new Entity(new AttributePool(new Dictionary<Attribute, int>
-            {
-                [Attribute.Power] = 20, [Attribute.Focus] = 20, [Attribute.Vigor] = 20,
-            }));
-            var head = new Part("head", new Dictionary<Attribute, int> { [Attribute.Vigor] = 1 }, PartRole.Head, 5);
-            e.Add(head);
-            e.Enable(head);
-            var hide = new Part("hide", new Dictionary<Attribute, int>(), MaxHealth: 100000);
-            var dummy = new Entity(new AttributePool(new Dictionary<Attribute, int>()));
-            dummy.Add(hide);
-
-            var caster = new Caster(e, dummy, hide);
-            caster.Activate(Techniques.Jab);
-            caster.Activate(Techniques.Cleave);
-            caster.Activate(Techniques.Drain);
+            var foe = new Foe("dummy", 100000);
+            var caster = new Caster(Body(), foe);
+            caster.Activate(new Technique("jab", Stat.Str, 1, TechniqueKind.Timered, 2, 3));
+            caster.Activate(new Technique("cleave", Stat.Str, 3, TechniqueKind.Timered, 4, 4));
+            caster.Activate(Spell("drain", reserve: 2, power: 2));
             for (var i = 0; i < 50; i++) caster.Step();
-            return 100000 - dummy.Health(hide);
+            return 100000 - foe.Hp;
         }
 
         Assert.Equal(Run(), Run());

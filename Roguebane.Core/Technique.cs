@@ -2,15 +2,17 @@ namespace Roguebane.Core;
 
 public enum TechniqueKind
 {
-    Timered,   // reserves allocation while active, bursts every Cooldown ticks
-    Sustained, // reserves allocation while active, outputs every tick
+    Timered,   // reserves its stat while active, bursts every Cooldown ticks
+    Sustained, // reserves its stat while active, outputs every tick
 }
 
-// A technique is content, not code: kind, allocation cost, cadence, and power are data.
-// One tick loop interprets all of them.
+// A technique is content, not code: it reserves one stat (STR swing, INT spell, CON block...)
+// while engaged, and one tick loop interprets kind/cadence/power. Reserve doubles as the stat
+// requirement — lose enough of the stat and the body sheds it (e.g. a smashed head silences spells).
 public sealed record Technique(
     string Id,
+    Stat Stat,
+    int Reserve,
     TechniqueKind Kind,
-    IReadOnlyDictionary<Attribute, int> Cost,
     int Cooldown,
     int Power);

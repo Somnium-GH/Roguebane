@@ -1,32 +1,21 @@
 namespace Roguebane.Core.Content;
 
-// Encounters are content. Factories return fresh, stateful instances per call.
+// Encounters are content. Factories return fresh, stateful instances per call. Low HP scale.
 public static class Sieges
 {
-    private static readonly IReadOnlyDictionary<Attribute, int> NoDemand = new Dictionary<Attribute, int>();
-
-    private static Part Defender(string id, int hp) => new(id, NoDemand, PartRole.Generic, hp);
-
-    private static Entity Hold(IEnumerable<Part> parts)
+    public static Encounter ControlPoint(string name, params int[] foeHp)
     {
-        var e = new Entity(new AttributePool(new Dictionary<Attribute, int>()));
-        foreach (var p in parts) e.Add(p);
-        return e;
+        var foes = foeHp.Select((hp, i) => new Foe($"{name}-{i}", hp)).ToList();
+        return new Encounter(name, foes, structural: false);
     }
 
-    public static Encounter ControlPoint(string name, params int[] enemyHealth)
-    {
-        var parts = enemyHealth.Select((hp, i) => Defender($"{name}-{i}", hp)).ToList();
-        return new Encounter(name, Hold(parts), parts, structural: false);
-    }
-
-    // Layered defenses with a rallied-support stream that repairs the standing front.
+    // Layered defenses whose boss restores the standing front, making a siege a DPS race.
     public static Encounter Castle()
     {
-        var parts = new[] { Defender("gate", 20), Defender("wall", 30), Defender("keep", 25) };
-        return new Encounter("castle", Hold(parts), parts, structural: true, repairAmount: 3, repairEvery: 2);
+        var foes = new[] { new Foe("gate", 12), new Foe("wall", 16), new Foe("keep", 12) };
+        return new Encounter("castle", foes, structural: true, restoreAmount: 2, restoreEvery: 1);
     }
 
     public static Run StandardRun() =>
-        new(new[] { ControlPoint("cp1", 10, 10), ControlPoint("cp2", 15), Castle() });
+        new(new[] { ControlPoint("cp1", 6, 6), ControlPoint("cp2", 10), Castle() });
 }

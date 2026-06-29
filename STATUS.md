@@ -1,9 +1,9 @@
 # Status
 
 ## Current target
-**Combat migration onto Body.** Rebuild Caster/Session/Encounter on the Body model (techniques
-reserve a stat as Actives; damage targets a part's stat), retire Entity/AttributePool/Attribute.
-Unblocks 7b (rallied-support re-point) and 7c (per-technique targeting). Chassis->body (7a) done.
+**7b. Re-point rallied support** to the player's banked, undamageable, intermittent auto-fire ON
+the castle — not enemy self-restore. (Combat now runs on Body; Encounter.RallyTick currently
+restores the enemy front, the wrong direction.) Then 7c (per-technique targeting).
 
 ## Design decisions (locked this pass — were "Needs human")
 - Part-targeting: PER-TECHNIQUE aim — each technique aims its own target part.
@@ -64,11 +64,9 @@ Unblocks 7b (rallied-support re-point) and 7c (per-technique targeting). Chassis
 - Rallied support is coded as a repair-stream on the enemy front (Encounter.RallyTick) — WRONG
   DIRECTION vs the locked design. Re-point it to the player's banked, undamageable, intermittent
   auto-fire ON the castle.
-- TWO entity models still coexist for COMBAT: new `Body` now backs Chassis (7a done), but old
-  `Entity`+`AttributePool`+`Part` (Power/Focus/Vigor) still powers Caster/Session/Encounter/Game.
-  Reconcile next: rebuild the casting/combat model on Body (techniques reserve a stat as Actives;
-  damage targets a part's stat), retire Entity/AttributePool/Attribute, retune Technique costs +
-  Encounter defenders to the 4-stat low scale. This migration enables 7b and 7c.
+- (resolved) Combat migrated onto Body: techniques reserve a stat as Actives; Encounter foes are
+  HP pools (`Foe`); Entity/AttributePool/Part/Attribute retired. Head-silence is now emergent
+  (smash head -> INT drains -> spell reservations cascade off). Old Power/Focus/Vigor gone.
 - Enemies modeled as single-part encounter defenders, not multi-part foes that cast back.
   Reconcile when an enemy needs its own parts/techniques (own Entity + Caster, step both sides).
 - Shell ships only the combat/damage screen. Build/loadout + run-map screens (6b) unbuilt;
@@ -85,6 +83,8 @@ Unblocks 7b (rallied-support re-point) and 7c (per-technique targeting). Chassis
 - [x] 7a. Chassis->rune->body wiring on the new model: Chassis carries BodyParts data (Head,
       Chest, Arms x2, Legs x2 with stat shares); NewBody() mints a Body; Grunt/Adept retuned to
       STR/INT/DEX/CON low scale. 4 tests. (Combat-engine migration onto Body tracked in Debt.)
+- [~] (migration) Combat engine moved onto Body: Foe HP targets, techniques reserve stats,
+      head-silence emergent via cascade. Entity/AttributePool/Part/Attribute retired. 44 tests.
 - [ ] 7b. Re-point rallied support to player auto-fire on the castle.
 - [ ] 7c. Per-technique targeting in the combat/casting model.
 - [ ] 7. End-to-end playable: pick chassis -> allocate runes -> run -> siege. Play to feel it.

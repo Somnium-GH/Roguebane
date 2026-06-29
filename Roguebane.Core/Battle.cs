@@ -7,8 +7,8 @@ public enum BattleOutcome
     Fled,
 }
 
-// Drives one encounter on the fixed tick: reinforcements rally first, the caster focuses the
-// current target, then acts. Fleeing ends the battle without clearing it.
+// Drives one encounter on the fixed tick: the boss rallies first, the caster focuses the current
+// target, then acts. Fleeing ends the battle without clearing it.
 public sealed class Battle
 {
     private readonly Caster _caster;
@@ -28,7 +28,7 @@ public sealed class Battle
 
         _encounter.RallyTick();
         if (_encounter.CurrentTarget is { } target)
-            _caster.Retarget(_encounter.Defenders, target);
+            _caster.Retarget(target);
 
         _caster.Step();
 

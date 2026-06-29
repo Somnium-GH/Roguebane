@@ -66,7 +66,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         _spriteBatch.Begin();
 
         DrawPlayerPool(16, 16);
-        DrawEncounter(16, 120);
+        DrawEncounter(16, 140);
         DrawLoadout(16, 360);
         DrawStateOverlay();
 
@@ -76,38 +76,38 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     private void DrawPlayerPool(int x, int y)
     {
-        var pool = _session.Player.Pool;
-        var attrs = new[]
+        var player = _session.Player;
+        var stats = new[]
         {
-            (Attribute.Power, new Color(220, 90, 70)),
-            (Attribute.Focus, new Color(80, 150, 230)),
-            (Attribute.Vigor, new Color(120, 200, 120)),
+            (Stat.Str, new Color(220, 90, 70)),
+            (Stat.Int, new Color(80, 150, 230)),
+            (Stat.Dex, new Color(120, 200, 120)),
+            (Stat.Con, new Color(200, 180, 90)),
         };
-        for (var i = 0; i < attrs.Length; i++)
+        for (var i = 0; i < stats.Length; i++)
         {
-            var (a, color) = attrs[i];
-            var cap = pool.Capacity(a);
-            var used = cap - pool.Available(a);
-            var top = y + i * 28;
-            Rect(x, top, 240, 22, new Color(40, 40, 48));      // capacity track
-            if (cap > 0) Rect(x, top, 240 * used / cap, 22, color); // allocated portion
+            var (s, color) = stats[i];
+            var cap = player.Capacity(s);
+            var used = cap - player.Available(s);
+            var top = y + i * 26;
+            Rect(x, top, 240, 20, new Color(40, 40, 48));      // capacity track
+            if (cap > 0) Rect(x, top, 240 * used / cap, 20, color); // reserved portion
         }
     }
 
     private void DrawEncounter(int x, int y)
     {
         var encounter = _session.Run.Current;
-        var defenders = encounter.Defenders;
-        for (var i = 0; i < encounter.Parts.Count; i++)
+        for (var i = 0; i < encounter.Foes.Count; i++)
         {
-            var part = encounter.Parts[i];
+            var foe = encounter.Foes[i];
             var top = y + i * 40;
-            var isTarget = ReferenceEquals(encounter.CurrentTarget, part);
+            var isTarget = ReferenceEquals(encounter.CurrentTarget, foe);
             Rect(x, top, 360, 32, new Color(40, 40, 48));
-            if (part.MaxHealth > 0)
+            if (foe.MaxHp > 0)
             {
-                var frac = (float)defenders.Health(part) / part.MaxHealth;
-                var color = defenders.IsDestroyed(part) ? new Color(60, 60, 60)
+                var frac = (float)foe.Hp / foe.MaxHp;
+                var color = foe.Down ? new Color(60, 60, 60)
                     : isTarget ? new Color(230, 200, 90) : new Color(170, 70, 70);
                 Rect(x, top, (int)(360 * frac), 32, color);
             }
