@@ -104,9 +104,17 @@ public sealed class Expedition
         if (node.Type == NodeType.Merchant)
             return true; // stay at the merchant: BuyPotion / BuyHeal / UsePotion are the verbs here
 
-        Battle = new Battle(_caster, Maps.EncounterFor(node, Map.SupportBank), _player);
+        Battle = new Battle(_caster, Maps.EncounterFor(node, Map.SupportBank), _player, Seed(node.Id));
         State = ExpeditionState.Fighting;
         return true;
+    }
+
+    // A stable per-node seed: same node id => same combat rolls, so the run stays reproducible.
+    private static ulong Seed(string nodeId)
+    {
+        ulong h = 1469598103934665603; // FNV-1a over the id
+        foreach (var c in nodeId) { h ^= c; h *= 1099511628211; }
+        return h;
     }
 
     public void Tick()

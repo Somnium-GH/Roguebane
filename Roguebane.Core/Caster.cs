@@ -14,7 +14,10 @@ public sealed class Caster
         public BodyPart? Part;       // per-technique PART aim within Aimed; null => whole-target HP
     }
 
+    private const int BlockCap = 3; // a held CON block absorbs at most this much off an HP hit (low scale)
+
     private readonly Body _self;
+    private Rng? _rng; // chance effects (evasion); set by Battle so a fight is reproducible
     private ICombatTarget? _default;
     private readonly SortedDictionary<string, Run> _active = new(StringComparer.Ordinal);
     private readonly SortedDictionary<string, Minion> _bays = new(StringComparer.Ordinal);
@@ -32,6 +35,9 @@ public sealed class Caster
         MaxCharge = maxCharge;
         _charge = maxCharge;
     }
+
+    // Battle hands every caster the fight's shared PRNG so chance rolls are deterministic.
+    public void UseRng(Rng rng) => _rng = rng;
 
     // The finite magic resource is refilled out of combat (loot / rest), not regenerated mid-fight.
     public void Recharge() => _charge = MaxCharge;
@@ -148,9 +154,21 @@ public sealed class Caster
                 Hit(_default, null, minion.Power);
     }
 
-    private static void Hit(ICombatTarget target, BodyPart? part, int power)
+    // Apply a hit through the defender's mitigation layer: leather EVASION (a dodge roll on the
+    // struck part-group) can negate it; a whole-HP hit is then blunted by the CON block. Part hits
+    // run plate protection inside DamagePart. (Block on part hits is deferred — foes hit HP today.)
+    private void Hit(ICombatTarget target, BodyPart? part, int power)
     {
-        if (part is null) target.Damage(power);
+        var frame = target.Frame;
+        if (frame is not null && _rng is not null && _rng.Chance(frame.EvasionPercent(part)))
+            return; // dodged
+
+        if (part is null)
+        {
+            var blocked = frame?.BlockMitigation(BlockCap) ?? 0;
+            var dealt = Math.Max(0, power - blocked);
+            if (dealt > 0) target.Damage(dealt);
+        }
         else target.DamagePart(part, power);
     }
 

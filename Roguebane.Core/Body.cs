@@ -109,6 +109,17 @@ public sealed class Body
     // Raise it = power it; drop it = the CON returns to the pool.
     public int BlockMitigation(int cap) => Math.Min(Reserved(Stat.Con), cap);
 
+    // Leather EVASION: a dodge chance (percent) on the struck part-group, riding its condition. A
+    // whole-HP hit (no part) consults the legs (DEX) leather — body footing/dodge — while the legs
+    // still stand. Break the part (or lose the group) and its evasion goes with it.
+    public int EvasionPercent(BodyPart? part)
+    {
+        var group = part?.Stat ?? Stat.Dex;
+        var standing = part is null ? Capacity(group) > 0 : Contribution(part) > 0;
+        return standing && _armor.TryGetValue(group, out var a) && a.Kind == ArmorKind.Leather
+            ? a.Value : 0;
+    }
+
     // STR at full weight plus a quarter of DEX, kept in integer quarter-units.
     public int AttackPower => Capacity(Stat.Str) + Capacity(Stat.Dex) / 4;
 }

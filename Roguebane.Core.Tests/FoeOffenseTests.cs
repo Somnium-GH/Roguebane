@@ -64,14 +64,16 @@ public class FoeOffenseTests
         playerCaster.Aim(smash, foe, arm);
         var battle = new Battle(playerCaster, Solo(foe), player);
 
-        battle.Step(); // arm 4 -> 2, strike still powered: foe lands 3 -> player 17
-        Assert.Equal(17, player.Hp);
+        // The smash reserves 1 CON, which now reads as a held block (1 off each HP hit), so the
+        // foe's power-3 strike lands for 2.
+        battle.Step(); // arm 4 -> 2, strike powered: 3 - 1 block -> player 18
+        Assert.Equal(18, player.Hp);
 
         battle.Step(); // arm 2 -> 0, strike cascades off before it acts -> no damage
-        Assert.Equal(17, player.Hp);
+        Assert.Equal(18, player.Hp);
 
         battle.Step();
-        Assert.Equal(17, player.Hp); // disarmed foe deals nothing further
+        Assert.Equal(18, player.Hp); // disarmed foe deals nothing further
     }
 
     [Fact]

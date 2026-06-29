@@ -21,18 +21,23 @@ public sealed class Battle
     private readonly Fighter? _player;
     private readonly List<(Foe Foe, Caster Caster)> _foeOffense = new();
 
-    public Battle(Caster caster, Encounter encounter, Fighter? player = null)
+    private readonly Rng _rng;
+
+    public Battle(Caster caster, Encounter encounter, Fighter? player = null, ulong seed = 1)
     {
         _caster = caster;
         _encounter = encounter;
         _support = new Support(encounter.SupportAmount, encounter.SupportEvery);
         _player = player;
+        _rng = new Rng(seed);          // one shared stream keeps the whole fight reproducible
+        _caster.UseRng(_rng);
 
         if (_player is null) return;
         foreach (var foe in encounter.Foes)
         {
             if (foe.Frame is null || foe.Arsenal.Count == 0) continue;
             var offense = new Caster(foe.Frame, _player);
+            offense.UseRng(_rng);
             foreach (var tech in foe.Arsenal) offense.Activate(tech);
             _foeOffense.Add((foe, offense));
         }
