@@ -8,15 +8,21 @@ public sealed class RuneLoadout
     public int Budget { get; }
     public int Spent { get; private set; }
 
+    private readonly int _discount;
     private readonly Dictionary<string, Mark> _held = new();
 
-    public RuneLoadout(int budget)
+    public RuneLoadout(int budget, int runeDiscount = 0)
     {
         if (budget < 0) throw new ArgumentOutOfRangeException(nameof(budget));
+        if (runeDiscount < 0) throw new ArgumentOutOfRangeException(nameof(runeDiscount));
         Budget = budget;
+        _discount = runeDiscount;
     }
 
     public int Available => Budget - Spent;
+
+    // Chassis with cheap runes pay less per rung; refund (already < base cost) is untouched.
+    public int EffectiveCost(Mark mark) => Math.Max(0, mark.Cost - _discount);
 
     public int CurrentRank(string path) => _held.GetValueOrDefault(path)?.Rank ?? 0;
 
@@ -30,7 +36,7 @@ public sealed class RuneLoadout
         if (mark.Rank != CurrentRank(mark.Path) + 1) return false; // ladder: no skips, no prereq gaps
 
         var refund = below?.Refund ?? 0;
-        var net = mark.Cost - refund;
+        var net = EffectiveCost(mark) - refund;
         if (net > Available) return false;
 
         Spent += net;
