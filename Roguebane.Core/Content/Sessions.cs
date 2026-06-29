@@ -18,10 +18,10 @@ public static class Sessions
 
     public static Session Demo()
     {
-        var player = DemoBody();
+        var body = DemoBody();
         var run = Sieges.StandardRun();
-        var caster = new Caster(player, run.Current.CurrentTarget);
-        return new Session(player, caster, Techniques.All, run);
+        var caster = new Caster(body, run.Current.CurrentTarget);
+        return new Session(Forge.PlayerFighter(body), caster, Techniques.All, run);
     }
 
     // The real composable flow end to end: pick the Grunt chassis, climb its Vessel ladder to the

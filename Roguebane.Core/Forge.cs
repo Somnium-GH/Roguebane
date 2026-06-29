@@ -13,6 +13,10 @@ public static class Forge
     {
         var body = chassis.NewBody(runes);
         var caster = new Caster(body, run.Current.CurrentTarget);
-        return new Session(body, caster, loadout, run);
+        return new Session(PlayerFighter(body), caster, loadout, run);
     }
+
+    // The player's HP life total: a small CON-scaled pool, fixed at mint. (Whether chest damage
+    // lowers MAX HP or only the available pool is parked — see "Needs human".)
+    public static Fighter PlayerFighter(Body body) => new(body, 8 + body.Capacity(Stat.Con));
 }

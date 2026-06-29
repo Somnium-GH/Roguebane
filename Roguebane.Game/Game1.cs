@@ -117,7 +117,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private void DrawRunScreen()
     {
         DrawNodeMap(16, 16);
-        DrawPool(_session.Player, 16, 56, showReserved: true);
+        DrawPool(_session.Player.Body, 16, 56, showReserved: true);
         DrawEncounter(16, 180);
         DrawLoadout(16, 400);
         DrawStateOverlay();

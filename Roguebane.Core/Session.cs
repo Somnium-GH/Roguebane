@@ -5,6 +5,7 @@ public enum SessionState
     Fighting,
     Won,
     Fled,
+    Lost,
 }
 
 // The playable wiring the render shell reads: a body, a loadout, and a run whose encounters are
@@ -15,19 +16,19 @@ public sealed class Session
     private readonly Caster _caster;
     private readonly IReadOnlyList<Technique> _loadout;
 
-    public Body Player { get; }
+    public Fighter Player { get; }
     public Run Run { get; }
     public Battle Battle { get; private set; }
     public bool Paused { get; private set; }
     public SessionState State { get; private set; } = SessionState.Fighting;
 
-    public Session(Body player, Caster caster, IReadOnlyList<Technique> loadout, Run run)
+    public Session(Fighter player, Caster caster, IReadOnlyList<Technique> loadout, Run run)
     {
         Player = player;
         _caster = caster;
         _loadout = loadout;
         Run = run;
-        Battle = new Battle(caster, run.Current);
+        Battle = new Battle(caster, run.Current, player);
     }
 
     public IReadOnlyList<Technique> Loadout => _loadout;
@@ -54,9 +55,10 @@ public sealed class Session
         if (Paused || State != SessionState.Fighting) return;
 
         Battle.Step();
+        if (Battle.Outcome == BattleOutcome.Lost) { State = SessionState.Lost; return; }
         if (Battle.Outcome != BattleOutcome.Cleared) return;
 
         if (Run.Completed) State = SessionState.Won;
-        else if (Run.TryAdvance()) Battle = new Battle(_caster, Run.Current);
+        else if (Run.TryAdvance()) Battle = new Battle(_caster, Run.Current, Player);
     }
 }

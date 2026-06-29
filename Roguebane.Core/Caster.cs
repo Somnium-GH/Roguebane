@@ -10,35 +10,35 @@ public sealed class Caster
     {
         public required Technique Tech;
         public int Countdown;
-        public Foe? Aimed;      // per-technique target; null => follow the caster's default front
-        public BodyPart? Part;  // per-technique PART aim within Aimed; null => whole-foe HP damage
+        public ICombatTarget? Aimed; // per-technique target; null => follow the caster's default front
+        public BodyPart? Part;       // per-technique PART aim within Aimed; null => whole-target HP
     }
 
     private readonly Body _self;
-    private Foe? _default;
+    private ICombatTarget? _default;
     private readonly SortedDictionary<string, Run> _active = new(StringComparer.Ordinal);
 
     public int Tick { get; private set; }
 
-    public Caster(Body self, Foe? target = null)
+    public Caster(Body self, ICombatTarget? target = null)
     {
         _self = self;
         _default = target;
     }
 
-    public void Retarget(Foe target) => _default = target;
+    public void Retarget(ICombatTarget target) => _default = target;
 
-    // Per-technique aim: point one technique at its own foe, independent of the default front.
-    public void Aim(Technique technique, Foe foe)
+    // Per-technique aim: point one technique at its own target, independent of the default front.
+    public void Aim(Technique technique, ICombatTarget target)
     {
-        if (_active.TryGetValue(technique.Id, out var run)) { run.Aimed = foe; run.Part = null; }
+        if (_active.TryGetValue(technique.Id, out var run)) { run.Aimed = target; run.Part = null; }
     }
 
-    // Per-technique PART aim: point one technique at a specific part of a structured foe. Damage
-    // erodes that part's stat first and only spills into the foe's HP once the part bottoms out.
-    public void Aim(Technique technique, Foe foe, BodyPart part)
+    // Per-technique PART aim: point one technique at a specific part of a structured target. Damage
+    // erodes that part's stat first and only spills into HP once the part bottoms out.
+    public void Aim(Technique technique, ICombatTarget target, BodyPart part)
     {
-        if (_active.TryGetValue(technique.Id, out var run)) { run.Aimed = foe; run.Part = part; }
+        if (_active.TryGetValue(technique.Id, out var run)) { run.Aimed = target; run.Part = part; }
     }
 
     public bool IsActive(Technique technique) => _active.ContainsKey(technique.Id);
@@ -90,10 +90,10 @@ public sealed class Caster
         }
     }
 
-    private static void Hit(Foe foe, BodyPart? part, int power)
+    private static void Hit(ICombatTarget target, BodyPart? part, int power)
     {
-        if (part is null) foe.Damage(power);
-        else foe.DamagePart(part, power);
+        if (part is null) target.Damage(power);
+        else target.DamagePart(part, power);
     }
 
     private void PruneSilenced()

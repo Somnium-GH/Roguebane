@@ -39,7 +39,7 @@ public class ForgeTests
 
         Assert.Equal(SessionState.Fighting, session.State);
         Assert.Equal(Techniques.All.Count, session.Loadout.Count);
-        Assert.Equal(chassis.NewBody().Capacity(Stat.Con) + 6, session.Player.Capacity(Stat.Con));
+        Assert.Equal(chassis.NewBody().Capacity(Stat.Con) + 6, session.Player.Body.Capacity(Stat.Con));
     }
 
     [Fact]

@@ -8,19 +8,24 @@ namespace Roguebane.Core;
 // part's stat first (localized degradation) and only spills into HP once the part bottoms out
 // (the §10 split: stat damage to the targeted part; HP from overkill). A foe with no Frame is an
 // unstructured HP pool (control-point fodder).
-public sealed class Foe
+public sealed class Foe : ICombatTarget
 {
     public string Id { get; }
     public int MaxHp { get; }
     public int Hp { get; private set; }
     public Body? Frame { get; }
 
-    public Foe(string id, int hp, Body? frame = null)
+    // The foe's offense, powered by its own Frame (a structured foe fights back). Empty = inert
+    // target. A foe needs a Frame to power an Arsenal — the same reserve-on-parts rule as the player.
+    public IReadOnlyList<Technique> Arsenal { get; }
+
+    public Foe(string id, int hp, Body? frame = null, IReadOnlyList<Technique>? arsenal = null)
     {
         Id = id;
         MaxHp = hp;
         Hp = hp;
         Frame = frame;
+        Arsenal = arsenal ?? Array.Empty<Technique>();
     }
 
     public bool Down => Hp <= 0;
