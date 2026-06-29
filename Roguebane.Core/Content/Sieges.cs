@@ -22,6 +22,22 @@ public static class Sieges
             restoreAmount: 2, restoreEvery: 10, supportAmount: supportAmount, supportEvery: 20);
     }
 
+    // Armed control point: the same fodder, but each foe carries a weak Frame+Arsenal so it fights
+    // back (the live-run encounters). Threat stays low — runs remain winnable.
+    public static Encounter ArmedPoint(string name, params int[] foeHp)
+    {
+        var foes = foeHp.Select((hp, i) => Foes.Armed($"{name}-{i}", hp)).ToList();
+        return new Encounter(name, foes, structural: false);
+    }
+
+    // Armed castle: layered, armed defenders plus the boss-restore / rallied-support DPS race.
+    public static Encounter ArmedCastle(int supportAmount = 2)
+    {
+        var foes = new[] { Foes.Armed("gate", 12), Foes.Armed("wall", 16), Foes.Armed("keep", 12) };
+        return new Encounter("castle", foes, structural: true,
+            restoreAmount: 2, restoreEvery: 10, supportAmount: supportAmount, supportEvery: 20);
+    }
+
     public static Run StandardRun() =>
         new(new[] { ControlPoint("cp1", 6, 6), ControlPoint("cp2", 10), Castle() });
 }

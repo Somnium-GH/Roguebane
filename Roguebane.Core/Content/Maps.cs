@@ -28,12 +28,14 @@ public static class Maps
         return legs;
     }
 
-    // The combat a node hands the Expedition. Castle support is the bank earned from resource-holds.
+    // The combat a node hands the Expedition. Foes here are lightly ARMED (they chip the player) so
+    // the live run has real two-sided combat; the legacy Sieges.ControlPoint stays inert for headless
+    // balance sims. Castle support is the bank earned from resource-holds.
     public static Encounter EncounterFor(MapNode node, int supportBank) => node.Type switch
     {
-        NodeType.Skirmish => Sieges.ControlPoint(node.Id, 6, 6),
-        NodeType.ResourceHold => Sieges.ControlPoint(node.Id, 8),
-        NodeType.Castle => Sieges.Castle(supportBank),
-        _ => Sieges.ControlPoint(node.Id, 6), // Unknown resolves to a light skirmish
+        NodeType.Skirmish => Sieges.ArmedPoint(node.Id, 6, 6),
+        NodeType.ResourceHold => Sieges.ArmedPoint(node.Id, 8),
+        NodeType.Castle => Sieges.ArmedCastle(supportBank),
+        _ => Sieges.ArmedPoint(node.Id, 6), // Unknown resolves to a light skirmish
     };
 }
