@@ -6,6 +6,7 @@ public sealed class Entity
 
     private readonly List<Part> _parts = new();
     private readonly HashSet<string> _enabled = new();
+    private readonly Dictionary<string, int> _health = new();
 
     public Entity(AttributePool pool) => Pool = pool;
 
@@ -13,25 +14,22 @@ public sealed class Entity
 
     public bool IsEnabled(Part part) => _enabled.Contains(part.Id);
 
-    public void Add(Part part) => _parts.Add(part);
+    public int Health(Part part) => _health.GetValueOrDefault(part.Id);
 
-    // Enabling claims the part's full demand or nothing — a part that can only be
-    // partially powered does not run.
+    public bool IsDestroyed(Part part) => part.MaxHealth > 0 && Health(part) <= 0;
+
+    public void Add(Part part)
+    {
+        _parts.Add(part);
+        _health[part.Id] = part.MaxHealth;
+    }
+
+    // Enabling claims the part's full demand or nothing; a destroyed part cannot power on.
     public bool Enable(Part part)
     {
         if (_enabled.Contains(part.Id)) return true;
-
-        var claimed = new List<KeyValuePair<Attribute, int>>();
-        foreach (var demand in part.Demand)
-        {
-            if (!Pool.TryAllocate(demand.Key, demand.Value))
-            {
-                foreach (var c in claimed) Pool.Release(c.Key, c.Value);
-                return false;
-            }
-            claimed.Add(demand);
-        }
-
+        if (IsDestroyed(part)) return false;
+        if (!Pool.TryAllocateAll(part.Demand)) return false;
         _enabled.Add(part.Id);
         return true;
     }
@@ -40,7 +38,21 @@ public sealed class Entity
     public void Disable(Part part)
     {
         if (!_enabled.Remove(part.Id)) return;
-        foreach (var demand in part.Demand)
-            Pool.Release(demand.Key, demand.Value);
+        Pool.ReleaseAll(part.Demand);
     }
+
+    // Damage degrades capability: at zero health a part is destroyed and powers off, freeing
+    // its allocation but barred from re-enabling until repaired.
+    public void Damage(Part part, int amount)
+    {
+        if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));
+        if (part.MaxHealth <= 0) return;
+        var next = Math.Max(0, Health(part) - amount);
+        _health[part.Id] = next;
+        if (next == 0) Disable(part);
+    }
+
+    // Casting flows through the head. No live head => silenced.
+    public bool CanCast =>
+        _parts.Any(p => p.Role == PartRole.Head && IsEnabled(p) && !IsDestroyed(p));
 }

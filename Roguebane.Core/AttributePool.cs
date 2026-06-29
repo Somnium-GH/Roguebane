@@ -37,4 +37,25 @@ public sealed class AttributePool
         if (next < 0) throw new InvalidOperationException("release exceeds current allocation");
         _allocated[a] = next;
     }
+
+    // Claim a whole demand or nothing — a subsystem that can only be partly powered does not run.
+    public bool TryAllocateAll(IReadOnlyDictionary<Attribute, int> demand)
+    {
+        var claimed = new List<KeyValuePair<Attribute, int>>();
+        foreach (var d in demand)
+        {
+            if (!TryAllocate(d.Key, d.Value))
+            {
+                foreach (var c in claimed) Release(c.Key, c.Value);
+                return false;
+            }
+            claimed.Add(d);
+        }
+        return true;
+    }
+
+    public void ReleaseAll(IReadOnlyDictionary<Attribute, int> demand)
+    {
+        foreach (var d in demand) Release(d.Key, d.Value);
+    }
 }

@@ -1,12 +1,16 @@
 # Status
 
 ## Current target
-Item 4: techniques + deterministic combat tick (timered + sustained, parts as subsystems).
+Item 5: enemies-with-parts, one structured castle, rallied-support stream, flee, 2-control-point run.
 
 ## Needs human (route around these; resolve when you can)
 Each entry has enough context to resolve cold. The loop never blocks on these — it skips them.
 - part-targeting interaction (per-technique aim vs. single focus-part vs. queue) — undecided.
 - silence-on-head: binary vs. graded — leaning graded, with a disable as the hard off.
+  Currently BINARY in code (head destroyed/disabled => fully silenced). Same call applies to
+  capability degradation generally: a damaged part is currently all-or-nothing (full output
+  until 0 health, then destroyed). Graded would scale technique/part output with remaining
+  health. To resolve: decide the curve (linear? threshold bands?) and which capabilities scale.
 
 ## Debt (provisional work + how to reconcile it)
 Real-but-incomplete work and (rare) stubs, each with the trigger that lets it be finished.
@@ -19,7 +23,7 @@ Real-but-incomplete work and (rare) stubs, each with the trigger that lets it be
 - [x] 3. Two chassis: Grunt (low base, fat budget, cheap runes) + specialist (high base, tight
         budget). Test: Grunt can climb to the specialist's keystone at a real cost.
         <- thesis math validated headless.
-- [ ] 4. Techniques + combat tick: 6 techniques, timered + sustained, parallel-by-allocation,
+- [x] 4. Techniques + combat tick: 6 techniques, timered + sustained, parallel-by-allocation,
         deterministic fixed-step. Parts as subsystems; disable = temp part-off that returns its
         attribute to the pool; damage degrades capability; head-disable silences casting. Tests.
 - [ ] 5. Enemies-with-parts + one structured castle; rallied-support stream; flee; run = 2
