@@ -27,6 +27,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private BuildSession _build = null!;
     private Campaign _campaign = null!;
     private bool _paused;
+    private int _selTech; // selected action-bar card: the technique that aim-clicks and FIRE target
     private KeyboardState _prevKeys;
     private KeyboardState _keys; // current frame's keys, read in Draw for button pressed-state
 
@@ -72,14 +73,24 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
         if (_smokeScreen is "combat" or "map") // march the real loop for the screenshot
         {
-            _build.Toggle(Techniques.Jab);
-            _build.Toggle(Techniques.Ember);
+            _build.Toggle(Techniques.Ember); // grow the Grunt kit (jab+brace) with a bolt for variety
             _campaign = _build.March(Maps.StandardLegs(3));
             _screen = Screen.Run;
             if (_smokeScreen == "combat")
             {
                 foreach (var t in Exp.Loadout) _campaign.Toggle(t);
                 _campaign.Enter(Exp.Options[0].Id); // jump into the first fight (fresh)
+
+                // Put the selected technique on MANUAL aimed at a foe, then drive combat ticks so it
+                // charges to ready and HOLDS — the screenshot then shows the full FTL surface
+                // (holding "RDY" card + target tag + AUTO toggle state + live cooldown wipes).
+                var sel = SelectedTechnique();
+                if (sel is not null && Exp.Foes.Count > 0)
+                {
+                    _campaign.SetAuto(sel, false);
+                    _campaign.Aim(sel, Exp.Foes[^1]);
+                }
+                for (var i = 0; i < 60; i++) _campaign.Tick();
             }
         }
 
@@ -163,9 +174,29 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         if (Pressed(keys, Keys.Space) || Click(PauseRect)) _paused = !_paused;
         if (Pressed(keys, Keys.F) || Click(FleeRect)) Exp.Flee();
+
+        // A number key / card click selects that card AND toggles it active (charges it).
         for (var i = 0; i < TechniqueKeys.Length && i < Exp.Loadout.Count; i++)
             if (Pressed(keys, TechniqueKeys[i]) || Click(ActionCardRect(i)))
+            {
+                _selTech = i;
                 _campaign.Toggle(Exp.Loadout[i]);
+            }
+
+        // FTL targeting: click a live foe to AIM the selected technique at it; ENTER / FIRE fires it
+        // on command when ready; TAB / AUTO toggles its self-firing.
+        var sel = SelectedTechnique();
+        if (sel is not null)
+        {
+            var foes = Exp.Foes;
+            for (var i = 0; i < foes.Count; i++)
+                if (!foes[i].Down && Click(FoeRect(i)))
+                    _campaign.Aim(sel, foes[i]);
+
+            if (Pressed(keys, Keys.Enter) || Click(FireRect)) _campaign.Fire(sel);
+            if (Pressed(keys, Keys.Tab) || Click(AutoRect))
+                _campaign.SetAuto(sel, !_campaign.IsAuto(sel));
+        }
 
         // The battle runs on a FIXED combat clock (10 ticks/sec) off a real-time accumulator, so the
         // deterministic sim is decoupled from the frame rate. Smoke freezes it for the screenshot.
@@ -217,8 +248,27 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private static readonly Rectangle MarchRect = new(40, H - 52, 300, 44);
     private static Rectangle JumpRect(int i, int x, int y) => new(x + i * 130, y, 116, 116);
     private static Rectangle ActionCardRect(int i) => new(52 + i * 84, H - 84, 76, 60);
+    private static Rectangle FoeRect(int i) => new(560, 90 + i * 150, 144, 156);
     private static readonly Rectangle PauseRect = new(W - 156, H - 84, 110, 26);
     private static readonly Rectangle FleeRect = new(W - 156, H - 50, 110, 26);
+    private static readonly Rectangle FireRect = new(W - 272, H - 84, 110, 26);
+    private static readonly Rectangle AutoRect = new(W - 272, H - 50, 110, 26);
+
+    // The selected action-bar technique (the one aim-clicks and FIRE act on), or null if none loaded.
+    private Technique? SelectedTechnique() =>
+        _selTech < Exp.Loadout.Count ? Exp.Loadout[_selTech] : null;
+
+    private bool SelAuto() => SelectedTechnique() is { } t && Exp.IsAuto(t);
+
+    // Which foe a target points at (for the per-card target tag), or -1 for the default front / none.
+    private int FoeIndexOf(ICombatTarget? target)
+    {
+        if (target is null) return -1;
+        var foes = Exp.Foes;
+        for (var i = 0; i < foes.Count; i++)
+            if (ReferenceEquals(foes[i], target)) return i;
+        return -1;
+    }
     // Merchant verb buttons (base at 60,240).
     private static readonly Rectangle MerchPotionRect = new(74, 284, 330, 34);
     private static readonly Rectangle MerchUseRect = new(74, 322, 330, 34);
@@ -572,14 +622,17 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private void DrawFoes(int x, int y)
     {
         var encounter = Exp.Battle!.Encounter;
+        var sel = SelectedTechnique();
+        var aim = sel is not null ? Exp.AimOf(sel) : null; // the selected technique's chosen target
         for (var i = 0; i < encounter.Foes.Count; i++)
         {
             var foe = encounter.Foes[i];
             var top = y + i * 150;
-            var isTarget = ReferenceEquals(encounter.CurrentTarget, foe);
+            var isTarget = ReferenceEquals(aim ?? encounter.CurrentTarget, foe);
             var tint = foe.Down ? new Color(70, 60, 55) : Color.White;
             Sprite(_assets.Texture("sprites/char/ogre"), x, top, 144, 156, tint);
             if (isTarget && !foe.Down) Sprite(_assets.Reticle("focus"), x + 24, top, 96, 96, Amber);
+            if (!foe.Down && Hover(FoeRect(i))) Border(x, top, 144, 156, Ink); // click to aim
             DrawBar(x, top + 156, 144, _assets.Resource("hp"), foe.Hp, foe.MaxHp, Blood);
         }
     }
@@ -607,17 +660,30 @@ public class Game1 : Microsoft.Xna.Framework.Game
             else if (st.Sustained && st.Active)
                 Rect(left + ix, y + iy, sz, sz, new Color(Amber, 60)); // held
 
+            // Ready holds bright; auto-firing cards read "auto", a held block "held", a dry charge
+            // "dry", a charging timer counts via the wipe.
             var tag = st.ChargeDry ? "dry" : st.Sustained && st.Active ? "held"
-                : st.Active && st.Countdown == 0 ? "rdy" : null;
+                : st.Ready ? (st.Auto ? "auto" : "RDY") : null;
             if (tag is not null)
                 Text(_assets.Mono, tag, left + ix, y + iy - 2, st.ChargeDry ? Blood : Amber);
+            if (st.Ready && !st.Auto && !st.Sustained)
+                Border(left + ix, y + iy, sz, sz, Amber); // holding, awaiting FIRE
+
+            // The technique's current target (which foe), top-right of the icon so the player can
+            // read each card's aim without crowding the key/cost row below.
+            var fi = st.Active ? FoeIndexOf(Exp.AimOf(t)) : -1;
+            if (fi >= 0) Text(_assets.Mono, "F" + (fi + 1), left + 50, y + iy - 2, Amber);
 
             Text(_assets.Mono, "[" + (i + 1) + "]", left + 6, y + 50, Muted);
             Text(_assets.Mono, t.Reserve.ToString(), left + 58, y + 50, StatColor(t.Stat));
-            Border(left, y + 8, 76, 60, st.Active ? Amber : Hover(ActionCardRect(i)) ? Ink : Border0);
+            var border = i == _selTech ? Ink : st.Active ? Amber : Hover(ActionCardRect(i)) ? Ink : Border0;
+            Border(left, y + 8, 76, 60, border);
+            if (i == _selTech) Border(left - 2, y + 6, 80, 64, Amber); // selected: outer ring
         }
 
-        // Mouse-reachable pause / flee (keyboard Space / F still work).
+        // Mouse-reachable combat verbs (keyboard Enter/Tab/Space/F still work).
+        DrawHotButton("FIRE", FireRect, Hover(FireRect));
+        DrawHotButton(SelAuto() ? "AUTO+" : "AUTO-", AutoRect, Hover(AutoRect));
         DrawHotButton(_paused ? "RESUME" : "PAUSE", PauseRect, Hover(PauseRect));
         DrawHotButton("FLEE", FleeRect, Hover(FleeRect));
     }

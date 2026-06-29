@@ -95,6 +95,17 @@ public sealed class Expedition
         else _caster.Activate(technique);
     }
 
+    // FTL targeting surface for the shell: the live foes, per-technique aim, manual fire, and the
+    // auto toggle. (Activation defaults to AUTO so an unattended run still resolves; turning a
+    // technique manual + firing on command is the player's added control.)
+    public IReadOnlyList<Foe> Foes => Battle?.Encounter.Foes ?? Array.Empty<Foe>();
+    public void Aim(Technique technique, ICombatTarget target) => _caster.Aim(technique, target);
+    public bool Fire(Technique technique) => _caster.Fire(technique);
+    public void SetAuto(Technique technique, bool auto) => _caster.SetAuto(technique, auto);
+    public bool IsAuto(Technique technique) => _caster.IsAuto(technique);
+    public bool IsReady(Technique technique) => _caster.IsReady(technique);
+    public ICombatTarget? AimOf(Technique technique) => _caster.AimOf(technique);
+
     // Travel to a charted neighbour and resolve what we land on.
     public bool Enter(string nodeId)
     {
