@@ -74,4 +74,17 @@ public class BuildSessionTests
         Assert.Single(session.Loadout);
         Assert.Equal(3, session.Run.Nodes.Count); // cp1, cp2, castle
     }
+
+    [Fact]
+    public void EmbarkDropsTheChosenBodyIntoTheRealLoop()
+    {
+        var build = New();
+        build.Toggle(Techniques.Jab);
+
+        var exp = build.Embark(Maps.StandardLeg(autoResolveCastle: false));
+
+        Assert.Equal(ExpeditionState.Choosing, exp.State);
+        Assert.Contains(exp.Loadout, t => t.Id == "jab");
+        Assert.Equal("camp", exp.Map.CurrentId);
+    }
 }

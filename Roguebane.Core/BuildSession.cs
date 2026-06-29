@@ -62,4 +62,7 @@ public sealed class BuildSession
     public Body Preview() => Chassis.NewBody(_runes);
 
     public Session Launch(Run run) => Forge.Assemble(Chassis, _runes, Loadout, run);
+
+    // Launch into the real map+combat loop: mint the chosen body and embark on the leg.
+    public Expedition Embark(RunMap map) => Forge.Embark(Chassis, _runes, Loadout, map);
 }

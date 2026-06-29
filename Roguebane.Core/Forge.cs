@@ -13,12 +13,26 @@ public static class Forge
     {
         var body = chassis.NewBody(runes);
         var caster = new Caster(body, run.Current.CurrentTarget, MagicCapacity(body));
-        // Rune-granted techniques join the loadout (deduped) — a held keystone can hand you a verb
-        // your chassis never had.
-        var full = loadout.Concat(runes.GrantedTechniques)
-            .GroupBy(t => t.Id).Select(g => g.First()).ToList();
-        return new Session(PlayerFighter(body), caster, full, run);
+        return new Session(PlayerFighter(body), caster, WithRuneGrants(loadout, runes), run);
     }
+
+    // The same mint, dropped into the real map+combat loop instead of a linear run.
+    public static Expedition Embark(
+        Chassis chassis,
+        RuneLoadout runes,
+        IReadOnlyList<Technique> loadout,
+        RunMap map)
+    {
+        var body = chassis.NewBody(runes);
+        var caster = new Caster(body, maxCharge: MagicCapacity(body));
+        return new Expedition(PlayerFighter(body), caster, WithRuneGrants(loadout, runes), map);
+    }
+
+    // Rune-granted techniques join the loadout (deduped) — a held keystone hands you a verb your
+    // chassis never had.
+    private static IReadOnlyList<Technique> WithRuneGrants(
+        IReadOnlyList<Technique> loadout, RuneLoadout runes) =>
+        loadout.Concat(runes.GrantedTechniques).GroupBy(t => t.Id).Select(g => g.First()).ToList();
 
     // The player's HP life total: a small CON-scaled pool, fixed at mint. (Whether chest damage
     // lowers MAX HP or only the available pool is parked — see "Needs human".)
