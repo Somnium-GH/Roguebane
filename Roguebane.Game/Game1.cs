@@ -41,16 +41,22 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private readonly string? _smokeScreen = Environment.GetEnvironmentVariable("RB_SCREEN");
     private int _frames;
 
-    private const int W = 960, H = 540; // 2x the design's 480x270 native; integer-scaled HD pixel
+    private const int W = 960, H = 540; // the fixed DESIGN space; the world renders here then scales
+
+    private RenderTarget2D _scene = null!; // world painted at design res, then letterboxed to the window
+    private Rectangle _viewDest;           // where the scaled scene lands in the backbuffer
+    private float _viewScale = 1f;         // design->backbuffer factor (mouse maps back through it)
+    private bool _fullscreen;
 
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
-        IsFixedTimeStep = true; // the Core tick advances once per fixed Update — deterministic
-        _graphics.PreferredBackBufferWidth = W;
-        _graphics.PreferredBackBufferHeight = H;
+        IsFixedTimeStep = true; // Update runs on a fixed step; the combat clock is a sub-accumulator
+        _graphics.PreferredBackBufferWidth = 1600;
+        _graphics.PreferredBackBufferHeight = 900;
+        Window.AllowUserResizing = true;
     }
 
     protected override void Initialize()
@@ -79,6 +85,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         _pixel = new Texture2D(GraphicsDevice, 1, 1);
         _pixel.SetData(new[] { Color.White });
         _assets = new AssetRegistry(Content);
+        _scene = new RenderTarget2D(GraphicsDevice, W, H);
     }
 
     protected override void Update(GameTime gameTime)
@@ -86,6 +93,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
         var keys = Keyboard.GetState();
         _keys = keys;
         if (keys.IsKeyDown(Keys.Escape)) Exit();
+
+        var altEnter = keys.IsKeyDown(Keys.LeftAlt) && Pressed(keys, Keys.Enter);
+        if (Pressed(keys, Keys.F11) || altEnter) ToggleFullscreen();
 
         if (_screen == Screen.Build) UpdateBuild(keys);
         else UpdateRun(keys);
@@ -107,8 +117,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
             if (Pressed(keys, TechniqueKeys[i]))
                 _build.Toggle(_build.Palette[i]);
 
-        // March the campaign (gated on a chosen loadout; the footer mirrors this).
-        if (Pressed(keys, Keys.Enter) && _build.Loadout.Count > 0)
+        // March the campaign (gated on a chosen loadout; the footer mirrors this). Alt+Enter is the
+        // fullscreen toggle, not a march.
+        if (Pressed(keys, Keys.Enter) && !keys.IsKeyDown(Keys.LeftAlt) && _build.Loadout.Count > 0)
         {
             _campaign = _build.March(Maps.StandardLegs(3));
             foreach (var t in Exp.Loadout) _campaign.Toggle(t); // arm the whole bar
@@ -157,6 +168,24 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     private bool Pressed(KeyboardState keys, Keys key) => keys.IsKeyDown(key) && _prevKeys.IsKeyUp(key);
 
+    private void ToggleFullscreen()
+    {
+        _fullscreen = !_fullscreen;
+        _graphics.HardwareModeSwitch = false; // borderless desktop-res fullscreen
+        if (_fullscreen)
+        {
+            _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
+            _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
+        }
+        else
+        {
+            _graphics.PreferredBackBufferWidth = 1600;
+            _graphics.PreferredBackBufferHeight = 900;
+        }
+        _graphics.IsFullScreen = _fullscreen;
+        _graphics.ApplyChanges();
+    }
+
     private static readonly (Stat Stat, Color Color)[] StatColors =
     {
         (Stat.Str, new Color(220, 90, 70)),
@@ -167,30 +196,46 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     protected override void Draw(GameTime gameTime)
     {
-        // When capturing, paint into an offscreen target so the exact frame can be saved to PNG.
-        var shooting = _smoke && _shotPath is not null;
-        RenderTarget2D? target = shooting ? new RenderTarget2D(GraphicsDevice, W, H) : null;
-        GraphicsDevice.SetRenderTarget(target);
-
+        // The world always paints at the fixed design resolution into the scene target...
+        GraphicsDevice.SetRenderTarget(_scene);
         GraphicsDevice.Clear(new Color(0x17, 0x11, 0x0b)); // panel-dark base from the locked palette
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp); // HD pixel: crisp integer edges
-
         if (_screen == Screen.Build) DrawBuildScreen();
         else DrawRunScreen();
-
         _spriteBatch.End();
 
-        if (target is not null)
+        if (_smoke && _shotPath is not null) // headless receipt: save the design-res scene verbatim
         {
             GraphicsDevice.SetRenderTarget(null);
             using var fs = System.IO.File.Create(_shotPath!);
-            target.SaveAsPng(fs, W, H);
-            target.Dispose();
+            _scene.SaveAsPng(fs, W, H);
+        }
+        else // ...then letterbox-scale it into the window backbuffer
+        {
+            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.Clear(Color.Black); // letterbox bars
+            UpdateViewport();
+            _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+            _spriteBatch.Draw(_scene, _viewDest, Color.White);
+            _spriteBatch.End();
         }
 
         base.Draw(gameTime);
 
         if (_smoke && ++_frames >= 1) SmokeReportAndExit();
+    }
+
+    // Fit the design scene into the backbuffer at the largest INTEGER scale that still fits (crisp
+    // pixels), centred with letterbox bars. Falls back to a fractional fit on very small windows.
+    private void UpdateViewport()
+    {
+        var bw = GraphicsDevice.PresentationParameters.BackBufferWidth;
+        var bh = GraphicsDevice.PresentationParameters.BackBufferHeight;
+        var fit = Math.Min((float)bw / W, (float)bh / H);
+        _viewScale = fit >= 1f ? (float)Math.Floor(fit) : fit;
+        var dw = (int)(W * _viewScale);
+        var dh = (int)(H * _viewScale);
+        _viewDest = new Rectangle((bw - dw) / 2, (bh - dh) / 2, dw, dh);
     }
 
     // Touch one asset of every kind through the registry, then report what bound. A null is a gap in
