@@ -1,19 +1,50 @@
 # Status
 
 ## Current target
-**Phase 2 UI track is BUILT (U1-U6) and the shell now runs the real Expedition/Campaign loop.**
-Every screen renders from live Core state + the `Roguebane.Content` assets, verified by build +
-headless screenshot (RB_SMOKE=1 RB_SCREEN=build|map|combat RB_SHOT=path). 123 headless tests green;
-the whole solution builds (Core net8 + Game net9 + Tests).
+**Combat-feel + input + fullscreen pass [DONE this loop].** All six ordered items shipped + verified
+(builds, runs, RB_SMOKE screenshots of build/combat/map; 147 headless tests green). The shell now
+opens large + resizable, fills the window, plays on a watchable combat clock with on-screen timers,
+is fully mouse-driven, and combat chips both ways through the mitigation layer. What remains is play
++ balance tuning — the human touchpoints. Loop stop condition reached.
 
-What remains is genuinely HUMAN: visual polish & fidelity (the assets are placeholder-quality), the
-balance "play it" pass, and the parked design calls below. Plus two build-hygiene items a human must
-settle (see Debt foot): `Roguebane.Content/` is untracked but the game build now depends on it, and
-the SpriteFonts compile from SYSTEM fonts (Consolas/Georgia) — licensing/substitution call before any
-distribution.
+1. [x] WINDOW / FULLSCREEN: world renders to a fixed 960x540 design target, aspect-preserving
+   fractional scale (FILLS the window, PointClamp) to a 1600x900 resizable backbuffer; F11 / Alt+Enter
+   toggles borderless fullscreen. (Integer-floor letterbox revised to full fill per human note.)
+2. [x] COMBAT PACING: battle on a fixed 10 ticks/sec accumulator clock decoupled from the frame rate;
+   cooldowns in real seconds (weak ~4.5-5s, strong ~14s, INT bolts ~3-6s), small damage; castle
+   restore/support cadences moved onto the clock so the DPS race stays winnable for a full build.
+3. [x] ACTION TIMERS: cards draw a cooldown wipe (ready = clear) + held/dry/rdy tags from
+   Caster.StatusOf (per-technique countdown/cooldown/state snapshot, via Expedition.Status).
+4. [x] MOUSE + HOVER everywhere (keyboard kept): chassis / ladders / palette / march (build); jump
+   tiles + merchant verbs (map); action-bar cards + new PAUSE/FLEE buttons (combat). Cursor mapped
+   through the letterbox; shared hit-rects drive both Update and Draw.
+5. [x] LIGHT FOE ARMING: live-run foes (Maps.EncounterFor -> Foes.Armed) carry a Frame + weak Arsenal
+   and chip the player; mitigation (leather evasion via seeded RNG, CON block) wired onto the
+   incoming-hit path. Runs stay winnable. Legacy inert Sieges kept for the headless balance sims.
+6. [x] LOCKED MECHANICS: seeded PRNG (Rng, threaded through Battle/Caster), CON->HP bonus (1 CON = 2
+   HP, chest damage shrinks MaxHp + caps current), DEX haste (~2%/pt capped 28%), data-driven minion
+   gating {Stat|None|AltCost}. TEMPO/PERIL header dropped.
 
-Next loop-buildable target if resumed: foe/part variety + arming content foes is gated on the balance
-envelope (human); otherwise the remaining items need a human. The loop has reached its stop condition.
+Mode: build REAL partials; the few still-open calls stay in "Needs human"; never block.
+
+## Feel-pass decisions (locked via interview)
+- ENEMY THREAT: light for now — basic foe damage is fine, keep the run winnable. The goal is combat
+  DWELL/visibility, not difficulty. The full power envelope is a later balance pass.
+- COMBAT PACING: fixed combat clock (~10 ticks/sec, deterministic accumulator); technique cooldowns
+  in real seconds — weak ~4-6s, strong ~12-15s; small damage so fights last 30s+.
+- RANDOMNESS: add a SEEDED, deterministic PRNG threaded through Core (same seed + inputs => same
+  run). Unlocks leather EVASION and any future chance effect. Determinism stays intact.
+- CON -> HP: CON grants BONUS HP on top of a natural base. Ratio 1 CON = 2 bonus HP (may vary by
+  chassis later). Chest damage drops CON -> the bonus shrinks -> MAX HP drops and current HP caps
+  down to it. Full HP + a chest hit => the bonus is lost immediately.
+- DEX = ACTION SPEED (haste): base cooldown comes from the technique (and its consulted weapon, if
+  any); DEX shortens it by a modest % per point — non-OP, tunable (suggest ~1.5-2%/DEX, capped
+  ~25-30% near 20 DEX). DEX now: evasion + accuracy + 0.25x attack + haste.
+- MINION GATING: data-driven per minion/chassis. DEFAULT = INT-gated (reserve INT). A chassis or
+  minion can OVERRIDE: a different gate stat; UNGATED (chassis-granted loyal allies — e.g. a knight's
+  retinue, no INT); or an ALTERNATE COST (e.g. a caster that summons by spending HP, no muster).
+  Encode the gate as data {stat | none | alt-cost} so chassis express their theme.
+- TEMPO / PERIL header: DROPPED (hallucinated, no meaning) — remove from the combat header.
 
 ## Design decisions (locked this pass — were "Needs human")
 - Part-targeting: PER-TECHNIQUE aim — each technique aims its own target part.
@@ -37,8 +68,9 @@ envelope (human); otherwise the remaining items need a human. The loop has reach
 ## Attribute model (new — one part, one stat; integer-only for determinism)
 - STR (Arms): attack power (1.0x); scales STR actives. Gates: STR weapons; shields (heavy = STR).
 - INT (Head): spell power; keeps spell actives AND passives running. Absorbs old WIS (merged).
-- DEX (Legs): evasion; accuracy; +0.25x attack power. Gates: DEX weapons. The 0.25 runs in
-  quarter-units (e.g. attack += DEX/4), never a float.
+- DEX (Legs): evasion; accuracy; +0.25x attack power; ACTION SPEED (haste — shortens technique
+  cooldowns a modest % per DEX, non-OP, tunable). Gates: DEX weapons. The 0.25 runs in quarter-units
+  (e.g. attack += DEX/4), never a float.
 - ARMOR is a LIGHT, survivability effect layer, NOT attribute gear (no stat grant or gate). Each
   piece sits on a part-group; its effect is keyed to TYPE: heavy/plate -> flat PROTECTION (1-4)
   subtracted from the stat-damage a hit deals to that part (blunts attribute erosion); leather (DEX)
@@ -47,7 +79,9 @@ envelope (human); otherwise the remaining items need a human. The loop has reach
   effect goes), so the cascade survives without a stat threshold. Weapons & shields still gate on
   their stat to wield. Balance note: at the 1-3 damage band, keep flat protection from fully negating
   hits. (Refines the earlier "armor gates on STR/DEX/INT" lines.)
-- CON (Chest): HP scaling; stun resistance (passive floor); plus a DEFENSIVE-ACTIVE role — CON
+- CON (Chest): HP scaling — grants BONUS HP on a natural base (1 CON = 2 HP for now; may vary by
+  chassis); chest damage drops CON -> bonus shrinks -> MAX HP drops and current HP caps down.
+  Stun resistance (passive floor); plus a DEFENSIVE-ACTIVE role — CON
   gates no equipment, so it earns its keep via sustained defensive techniques (shield block,
   Brace) that RESERVE CON while held and absorb up to the CON reserved, capped (FTL shield-layer:
   raise it = power it; drop it = CON returns to the pool). STR carries/equips the shield object;
@@ -75,21 +109,14 @@ envelope (human); otherwise the remaining items need a human. The loop has reach
   while held, at the low-number scale.
 - Arms/legs equipment vs hands: WORKING ASSUMPTION — armor is ONE piece per part-group; weapons
   stay per-hand (preserves dual-wield/Frenzy). Confirm before body-wiring (7a) hard-codes it.
-- Minion re-gating after WIS/CHA removal: re-home beast/follower minions onto STR/INT/DEX/CON.
-  POC unaffected (skeleton is INT). Decide before minion variety expands.
-- "Action speed" capability (was torso) — fold into a stat or drop? Undecided. Not POC-critical.
-- EVASION (leather armor) needs a seeded, deterministic RNG stream — Core is currently 100% RNG-free
-  and deterministic. DECISION NEEDED: introduce a seeded PRNG (and where it's threaded) before
-  evasion / any chance-based effect ships. Plate (flat protection) works today without it.
-- Arming real-content foes (castle layers + skirmishes get Frames + Arsenals so they fight back) is
-  gated on balance/feel — the two-sided machinery is built and tested but unarmed in content so the
-  loop stays winnable. Decide the enemy power envelope by playing it.
+- (RESOLVED via interview — see "Feel-pass decisions" up top: minion gating = data-driven, default
+  INT + chassis/minion overrides; action-speed = DEX haste; evasion = add a seeded PRNG; enemy threat
+  = light/winnable for now; CON->HP = bonus-HP model, 1 CON = 2 HP; TEMPO/PERIL = dropped.)
 - Balance envelope overall (stat bases, budgets, spoils/prices, march length vs supplies, foe HP,
   charge cost/pool, potion repair) — all placeholder-but-sane; this is the "play it and tune" job.
-- CON->HP timing: does chest damage lower MAX HP, or only the available pool? Decide before CON
-  combat tuning.
-- Combat header TEMPO / PERIL indicators (`design/01`) — semantics undecided; render a placeholder
-  and park.
+- Feel-pass tuning knobs now live (all placeholder-sane, tune in play): combat tick rate (10/sec),
+  technique cooldowns-in-seconds + damage, DEX haste rate/cap (2%/pt, 28%), CON->HP ratio (1:2) +
+  base HP (8), evasion %, CON block cap (3), armed-foe HP/strike, castle restore/support cadences.
 - Run-map fog reveal rules (`design/03`) — WORKING DEFAULT: resource-holds + castle visible afar,
   merchant resolves 1 jump out, everything else `?` until adjacent. Confirm.
 - War-party indicator placement on the run map (absent from the `03` render) — pick a spot, park the
@@ -101,6 +128,16 @@ envelope (human); otherwise the remaining items need a human. The loop has reach
   move accuracy elsewhere) only if it keeps nagging.
 
 ## Debt (provisional work + how to reconcile it)
+- (feel-pass) CON block + evasion mitigation are wired on the WHOLE-HP hit path (where foe attacks
+  land today). Localized block/evasion on PART hits waits on foe->player PART aim (the G1 debt) —
+  reconcile both together when the defensive layer is tuned.
+- (feel-pass) INT "beams" (Ember/Drain) were Sustained=every-tick; at 10 ticks/sec that was a
+  firehose, so they became fast Timered bolts. If a true channel/beam is wanted, add a per-tick
+  damage-scaled sustained kind rather than reverting the cadence.
+- (feel-pass) Action bar shows per-card cooldown + held/dry/rdy, but still no minion-bay lane or a
+  rallied-support auto-fire lane (UI-only; the Core streams exist).
+- (feel-pass) Mouse is click + hover-border only — no drag-to-equip, no tooltips, no key rebinding;
+  the combat PAUSE/FLEE buttons are plain rects pending the global chrome polish (U6 debt).
 - (resolved 7b) Rallied support now player-allied: `Support` is a banked, undamageable, intermittent
   auto-fire on the front (Battle owns it); the enemy front-restore is kept but relabelled as the
   boss restoring its own means (Encounter.BossRestoreTick). A castle siege races both streams.
