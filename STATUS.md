@@ -1,7 +1,7 @@
 # Status
 
 ## Current target
-Item 2: rune economy (budget, Marks ladder, Paths, Hollow Vessel keystone).
+Item 3: two chassis (Grunt vs specialist); test Grunt climbs to specialist keystone at real cost.
 
 ## Needs human (route around these; resolve when you can)
 Each entry has enough context to resolve cold. The loop never blocks on these — it skips them.
@@ -14,7 +14,7 @@ Real-but-incomplete work and (rare) stubs, each with the trigger that lets it be
 
 ## POC roadmap (thesis-first; items 1-5 are headless Core+tests, no rendering)
 - [x] 1. Core skeleton: attribute pool (live allocation), Entity + Parts, base types. Tests.
-- [ ] 2. Rune economy: budget; Marks (prereq ladder, overwrite, partial-refund climb); Paths;
+- [x] 2. Rune economy: budget; Marks (prereq ladder, overwrite, partial-refund climb); Paths;
         one keystone (Hollow Vessel). Tests assert budget/prereq/climb math.
 - [ ] 3. Two chassis: Grunt (low base, fat budget, cheap runes) + specialist (high base, tight
         budget). Test: Grunt can climb to the specialist's keystone at a real cost.
