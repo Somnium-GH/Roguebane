@@ -16,6 +16,16 @@ Mode: build REAL partials; DEFER every genuine open question to "Needs human" an
 never block. Goal = a near-complete, playable game the human returns to, plays, and balances. Tests
 stay green; the shell stays thin (rules in Core).
 
+> PROGRESS (autonomous pass): the FULL gameplay loop (#2) is built and headless-tested end to end —
+> 121 green tests. Build -> march the branching map (supplies, fog, war-party race, support bank) ->
+> fight two-sided combat (localized part damage, armor, weapons-consult, minions, magic/charge) ->
+> economy (spoils, merchant shop, repair potions) -> campaign across legs to the Capital. The whole
+> loop is reachable from `BuildSession.Embark` / `Sessions.NewCampaign()`. What's LEFT and why it's
+> parked: (a) the hi-fi UI track #1 — assets + fonts + visual fidelity + "play to feel it" are
+> human-visual; the shell still renders the OLD linear Session with placeholder rects and needs
+> pointing at the Expedition/Campaign loop. (b) Balance tuning of the whole envelope (a "play it"
+> human job). (c) A few parked design calls (see "Needs human"). Per-item state is in the tracks below.
+
 ## Design decisions (locked this pass — were "Needs human")
 - Part-targeting: PER-TECHNIQUE aim — each technique aims its own target part.
 - Degradation: GRADED via direct stat-capacity reduction — part damage subtracts that part's
@@ -79,6 +89,14 @@ stay green; the shell stays thin (rules in Core).
 - Minion re-gating after WIS/CHA removal: re-home beast/follower minions onto STR/INT/DEX/CON.
   POC unaffected (skeleton is INT). Decide before minion variety expands.
 - "Action speed" capability (was torso) — fold into a stat or drop? Undecided. Not POC-critical.
+- EVASION (leather armor) needs a seeded, deterministic RNG stream — Core is currently 100% RNG-free
+  and deterministic. DECISION NEEDED: introduce a seeded PRNG (and where it's threaded) before
+  evasion / any chance-based effect ships. Plate (flat protection) works today without it.
+- Arming real-content foes (castle layers + skirmishes get Frames + Arsenals so they fight back) is
+  gated on balance/feel — the two-sided machinery is built and tested but unarmed in content so the
+  loop stays winnable. Decide the enemy power envelope by playing it.
+- Balance envelope overall (stat bases, budgets, spoils/prices, march length vs supplies, foe HP,
+  charge cost/pool, potion repair) — all placeholder-but-sane; this is the "play it and tune" job.
 - CON->HP timing: does chest damage lower MAX HP, or only the available pool? Decide before CON
   combat tuning.
 - Combat header TEMPO / PERIL indicators (`design/01`) — semantics undecided; render a placeholder
@@ -188,12 +206,12 @@ Gameplay track (toward a complete game, per `DESIGN_SPEC`):
       the player (their attacks cascade off as their parts break); `Session` reports Lost. DEBT:
       localized foe->player PART aim + damage mitigation (block/armor) wiring; arming real content
       (castle layers) is balance/feel = human. Foe part-maps per assets sheet 2 still to author.
-- [ ] G2. Gear/inventory system: WEAPONS (and shields) are equippable objects that gate on STR/DEX
-      to wield. ARMOR is a LIGHT survivability layer (NOT attribute gear): a piece per part-group
-      whose effect is keyed to type — plate -> flat 1-4 protection vs stat-damage to that part;
-      leather -> evasion; head spell-armor -> spell/blind protection. Armor effects ride the part's
-      condition (break part -> effect gone) and share the data-driven effect vocabulary with runes
-      (G7). Feeds the Build inventory + Chassis Anatomy.
+- [~] G2. Gear/inventory system. DONE: WEAPONS are hand-held stat-sticks (zero abilities) that gate
+      on stat capacity and fall off when a smashed arm drops the stat; techniques CONSULT them
+      (Swing=primary, Frenzy=both) for cost+power (§7). ARMOR plate gives flat protection riding the
+      part's condition (G2a). DEBT: leather EVASION + head spell-ward (evasion needs a seeded RNG —
+      see Needs human); shields as CON-block OBJECTS; mixed-stat Frenzy; sell/buy + drag-to-equip UI
+      (build inventory / Chassis Anatomy); a subtle consultation-reservation recompute edge case.
 - [~] G3. Five chassis as data (Grunt, Warden, Adept, Summoner, Reaver) selectable at New Run via
       `Chassrium.Roster`. DONE: stat bases + budgets (legible identities, tests assert them). DEBT:
       slot/part/bay/action-count shapes wait on the gear (G2) + bay (G7) systems; values placeholder.
@@ -208,10 +226,11 @@ Gameplay track (toward a complete game, per `DESIGN_SPEC`):
       Stash carrying through; fresh map+war-party each leg; HP rests at each city, part wounds + gold
       persist. DEBT: per-leg escalation (distinct maps, tougher castles) is content tuning; branching
       city graph + cities-taken visual (design/04) for the UI track.
-- [ ] G7. Data-driven content breadth: richer runes (Mark/Path/Keystone effect kinds beyond
-      extension-parts -> resolves the rune-effects Debt); more techniques, foes, parts; the
-      magic/charge resource (finite, fuels magic-tier effects + affixes; name deferred); >=2 minion
-      types (re-gating where WIS/CHA gone -> defer).
+- [~] G7. Data-driven content breadth. DONE: richer runes (Marks grant techniques/minions beyond
+      extension-parts — resolves the rune-effects Debt); minions (bay-bound, INT-funded, cascade-shed;
+      2 types); magic/charge resource (finite, INT-scaled, refills out of combat; name/tuning
+      deferred). DEBT: more foes/parts variety + foe part-maps (with G1); affixes on the magic tier;
+      minion variety re-gated onto other stats (parked); auto-summon of rune-granted minions in build.
 - [~] G8. Economy. DONE: gold/spoils per cleared node, merchant repair-potion shop + paid HP service,
       potions restore PARTS out of combat (the healing split), Stash carries across legs. DEBT:
       sell/buy gear + runes at shops; consumable variety; spoils/price tuning (human balance).
