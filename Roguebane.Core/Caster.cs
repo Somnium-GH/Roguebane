@@ -74,6 +74,20 @@ public sealed class Caster
 
     public bool IsActive(Technique technique) => _active.ContainsKey(technique.Id);
 
+    // A render-facing snapshot of one technique's live state for the action bar. Countdown/Cooldown
+    // drive the cooldown fill; the flags pick the card state (held / charging-dry).
+    public readonly record struct TechStatus(
+        bool Active, int Countdown, int Cooldown, bool Sustained, bool ChargeDry);
+
+    public TechStatus StatusOf(Technique t)
+    {
+        var cooldown = EffectiveCooldown(t);
+        if (!_active.TryGetValue(t.Id, out var run))
+            return new TechStatus(false, cooldown, cooldown, t.Kind == TechniqueKind.Sustained, false);
+        var dry = t.ChargeCost > 0 && _charge < t.ChargeCost;
+        return new TechStatus(true, run.Countdown, cooldown, t.Kind == TechniqueKind.Sustained, dry);
+    }
+
     public int ActiveCount => _active.Count;
 
     // A self-contained technique reserves its own stat; a weapon-consulting one reserves the sum of

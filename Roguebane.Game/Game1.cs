@@ -544,12 +544,29 @@ public class Game1 : Microsoft.Xna.Framework.Game
         {
             var t = Exp.Loadout[i];
             var left = x + 12 + i * 84;
-            var active = Exp.IsActive(t);
+            var st = Exp.Status(t);
+            const int ix = 14, iy = 12, sz = 48;
             Panel(left, y + 8, 76, 60);
-            Sprite(_assets.Technique(t.Id), left + 14, y + 12, 48, 48, Color.White);
+            Sprite(_assets.Technique(t.Id), left + ix, y + iy, sz, sz, st.Active ? Color.White : new Color(150, 140, 130));
+
+            // Cooldown wipe: a dark veil over the icon shrinks from full as the timer recharges, so
+            // a ready technique shows clear. Sustained (held block) shows a steady held tint instead.
+            if (st.Active && !st.Sustained && st.Cooldown > 0 && st.Countdown > 0)
+            {
+                var h = sz * st.Countdown / st.Cooldown;
+                Rect(left + ix, y + iy, sz, h, new Color(0, 0, 0, 150));
+            }
+            else if (st.Sustained && st.Active)
+                Rect(left + ix, y + iy, sz, sz, new Color(Amber, 60)); // held
+
+            var tag = st.ChargeDry ? "dry" : st.Sustained && st.Active ? "held"
+                : st.Active && st.Countdown == 0 ? "rdy" : null;
+            if (tag is not null)
+                Text(_assets.Mono, tag, left + ix, y + iy - 2, st.ChargeDry ? Blood : Amber);
+
             Text(_assets.Mono, "[" + (i + 1) + "]", left + 6, y + 50, Muted);
             Text(_assets.Mono, t.Reserve.ToString(), left + 58, y + 50, StatColor(t.Stat));
-            Border(left, y + 8, 76, 60, active ? Amber : Border0);
+            Border(left, y + 8, 76, 60, st.Active ? Amber : Border0);
         }
     }
 

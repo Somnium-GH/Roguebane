@@ -86,6 +86,9 @@ public sealed class Expedition
 
     public bool IsActive(Technique technique) => _caster.IsActive(technique);
 
+    // Live per-technique state for the action-bar render (cooldown fill + card state).
+    public Caster.TechStatus Status(Technique technique) => _caster.StatusOf(technique);
+
     public void Toggle(Technique technique)
     {
         if (_caster.IsActive(technique)) _caster.Deactivate(technique);
