@@ -1,57 +1,64 @@
 # Status
 
 ## Current target
-All shippable headless work done (items 1-5, 8 + item-6 combat screen). Remaining work (item 7
-end-to-end + 6b loadout/map screens) is parked on human decisions — see "Needs human".
+**Attribute-model rework (foundational).** Rename/retune attributes to STR/INT/DEX/CON with a
+1:1 part binding, and make part damage proportionally subtract that part's attribute from the
+live pool (graded), instead of all-or-nothing on destroy. Equip/ability gating then emerges from
+the existing reservation-drop rule (a stat falling below an active's requirement deactivates it).
+Build this BEFORE the chassis->body wiring so the body is built on the new model, not the old one.
 
-## Needs human (route around these; resolve when you can)
-Each entry has enough context to resolve cold. The loop never blocks on these — it skips them.
-- part-targeting interaction (per-technique aim vs. single focus-part vs. queue) — undecided.
-  Currently single focus-part (structural=front, else weakest-first). Pick before 6b combat UX.
-- item 7 end-to-end "play to feel it": the POC's whole point is a human judging whether the
-  chassis exploit feels good. Needs (a) the chassis->rune->body flow built (see Debt), (b) a
-  balance pass, then (c) a person to play it. Decide the parts-on-chassis + base-pool widening
-  so a built body is real, then play. Headless math is already green (items 1-5).
-- silence-on-head: binary vs. graded — leaning graded, with a disable as the hard off.
-  Currently BINARY in code (head destroyed/disabled => fully silenced). Same call applies to
-  capability degradation generally: a damaged part is currently all-or-nothing (full output
-  until 0 health, then destroyed). Graded would scale technique/part output with remaining
-  health. To resolve: decide the curve (linear? threshold bands?) and which capabilities scale.
-- rallied-support flavor: repair the standing front (built) vs. spawn fresh defenders vs. both.
-  Decides whether a siege is a DPS race or an attrition/adds fight. See matching Debt entry.
+## Design decisions (locked this pass — were "Needs human")
+- Part-targeting: PER-TECHNIQUE aim — each technique aims its own target part.
+- Degradation: GRADED via direct stat-capacity reduction — part damage subtracts that part's
+  attribute from the pool until repaired. Supersedes the old binary-vs-graded question and the
+  interim "binary for now".
+- Rallied support: player-allied, CANNOT be damaged, intermittent auto-fire ON the castle — NOT
+  enemy repair. (Corrects current code; see Debt.) Castle = boss: HP is permanent within an
+  encounter; its systems/parts may be restored by its own means.
+- Healing split: potions/healing magic restore PARTS (full/partial, scaled by the attribute
+  invested), NEVER HP. HP is restored only out of combat — shop services or non-skirmish
+  (quest-like) encounters.
+- Chassis body: build the REAL body now — body parts on the Chassis as data + widen base pools —
+  on the new 4-stat model. (Was item 7's blocker.)
+
+## Attribute model (new — one part, one stat; integer-only for determinism)
+- STR (Arms): attack power (1.0x); scales STR actives. Gates: STR weapons; part-mitigating armor
+  (plate mail).
+- INT (Head): spell power; keeps spell actives AND passives running. Gates: spell-bonus armor.
+  Absorbs old WIS (merged).
+- DEX (Legs): evasion; accuracy; +0.25x attack power. Gates: DEX weapons; evasion armor (leather).
+  The 0.25 runs in quarter-units (e.g. attack += DEX/4), never a float.
+- CON (Chest): HP scaling; stun resistance. Gates: shields; chassis-extending runes.
+- CHA dropped; WIS merged into INT (five -> four).
+- Core mechanic: damage to a part directly subtracts that part's stat from the live pool until
+  repaired. This single rule unifies graded degradation, equip/ability fall-off, and the
+  allocation economy. Smash arms -> STR drops -> plate deactivates -> torso exposed.
+
+## Needs human (route around these; the loop skips them)
+- HP-vs-stat damage split — WORKING DEFAULT (accepted, revisit in play): attacks deal stat damage
+  to the targeted part; HP only takes damage from penetrating/bypassing sources or from overkill
+  once a part bottoms out.
+- Minion re-gating after WIS/CHA removal: re-home beast/follower minions onto STR/INT/DEX/CON.
+  POC unaffected (skeleton is INT). Decide before minion variety expands.
+- "Action speed" capability (was torso) — fold into a stat or drop? Undecided. Not POC-critical.
+- CON->HP timing: does chest damage lower MAX HP, or only the available pool? Decide before CON
+  combat tuning.
 
 ## Debt (provisional work + how to reconcile it)
-Real-but-incomplete work and (rare) stubs, each with the trigger that lets it be finished.
-- Enemies modeled as single-part encounter defenders (a Part with health on a shared Entity),
-  not multi-part foes that cast back. Reconcile when an enemy needs its own parts/techniques:
-  give each defender its own Entity + Caster aimed at the player and step both sides in Battle.
-- Rallied support implemented as a repair-stream on the front. Alternative (spawn fresh
-  defenders into the encounter) is unbuilt — a feel call; see Needs human. Reconcile by adding
-  a spawn mode to Encounter.RallyTick once the support flavor is decided.
-- Shell ships only the combat/damage screen. Build/loadout + run-map screens (6b) are unbuilt.
-  Blocked on: (a) the item-7 flow that turns a Chassis + RuneLoadout into a playable body
-  (Sessions.Demo currently hand-builds a body, bypassing chassis/rune allocation), and (b) a
-  balance pass. Reconcile after item 7's chassis->rune->body wiring + the parts-on-chassis call.
-- Chassis has no parts (head/limbs) of its own; Sessions.Demo bolts on a head so the player can
-  cast. Reconcile by moving body parts onto Chassis as data and widening chassis base pools to
-  cover them (the current Grunt/Adept pools are toy thesis values). Needed by item 7.
+- Rallied support is coded as a repair-stream on the enemy front (Encounter.RallyTick) — WRONG
+  DIRECTION vs the locked design. Re-point it to the player's banked, undamageable, intermittent
+  auto-fire ON the castle.
+- Chassis has no parts of its own; Sessions.Demo bolts on a head so the player can cast. Reconcile
+  via the attribute rework + chassis->body wiring: parts onto Chassis as data, widen base pools
+  (current Grunt/Adept pools are toy thesis values).
+- Enemies modeled as single-part encounter defenders, not multi-part foes that cast back.
+  Reconcile when an enemy needs its own parts/techniques (own Entity + Caster, step both sides).
+- Shell ships only the combat/damage screen. Build/loadout + run-map screens (6b) unbuilt;
+  unblocked once the rework + body wiring + a balance pass land.
 
-## POC roadmap (thesis-first; items 1-5 are headless Core+tests, no rendering)
-- [x] 1. Core skeleton: attribute pool (live allocation), Entity + Parts, base types. Tests.
-- [x] 2. Rune economy: budget; Marks (prereq ladder, overwrite, partial-refund climb); Paths;
-        one keystone (Hollow Vessel). Tests assert budget/prereq/climb math.
-- [x] 3. Two chassis: Grunt (low base, fat budget, cheap runes) + specialist (high base, tight
-        budget). Test: Grunt can climb to the specialist's keystone at a real cost.
-        <- thesis math validated headless.
-- [x] 4. Techniques + combat tick: 6 techniques, timered + sustained, parallel-by-allocation,
-        deterministic fixed-step. Parts as subsystems; disable = temp part-off that returns its
-        attribute to the pool; damage degrades capability; head-disable silences casting. Tests.
-- [x] 5. Enemies-with-parts + one structured castle; rallied-support stream; flee; run = 2
-        control points -> castle. Tests.
-- [~] 6. MonoGame shell: combat/damage screen DONE (placeholder shapes, input->commands, pause,
-        win/flee/pause overlays) over Core.Session. Build/loadout + run-map screens parked (6b)
-        — they need the item-7 chassis->rune->body flow + a balance pass. See Debt.
-- [ ] 7. End-to-end playable: pick chassis -> allocate runes -> run -> siege. Play to feel it.
-        <- NEEDS HUMAN (feel/judgment + a real play session). See Needs human.
-- [x] 8. (optional) headless balance-sim: run N builds, surface dominant strategies.
-        BalanceSim ranks BuildSpecs by deterministic ticks-to-clear; sweep over 4 loadouts.
+## POC roadmap
+- [x] 1-5. Core skeleton, rune economy, two chassis, techniques+combat tick, enemies+castle.
+- [~] 6. MonoGame shell: combat/damage screen DONE. 6b (build/loadout + run-map) parked.
+- [ ] R. Attribute-model rework (foundational): STR/INT/DEX/CON, 1:1 part binding, proportional
+      part-damage->stat reduction, DEX attack/accuracy, healing split. Tests assert the reduction
+      + the gating cascade (e.g. arm damage 

@@ -25,6 +25,5 @@ and does it feel good.
 - Comments explain WHY, never WHAT. If a comment restates code, delete it.
 - No speculative abstraction — build for the task in front of you.
 - No redundant docs. `STATUS.md` is the single source of state. This file stays under ~60 lines.
-
-## Working
-- Start each task by reading `STATUS.md`. Finish by updating it. Run work via `/loop`.
+- No third-party IP in the product. Design-reference names (FTL, Shadowbane, PoE, etc.) live in
+  d
