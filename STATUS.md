@@ -111,6 +111,12 @@ stay green; the shell stays thin (rules in Core).
 - Rune grants are chassis-extension PARTS only (Hollow Vessel -> +CON, Resonant Core -> +INT). Other
   rune effects (stat multipliers, new techniques, passives) not yet modelled — reconcile by widening
   Mark with more data-driven effect kinds when a non-extension keystone is authored.
+- Expedition (the real map+combat loop) is headless-complete but the Game shell still runs the old
+  linear `Session` (`Sessions.Demo`/`Forged`). Reconcile by pointing the shell at `Sessions.Expedition()`
+  and rendering the branching chart + supplies + war-party track (UI track U4); the BuildSession
+  Launch path should also mint an Expedition, not a linear Session.
+- Bank-on-arrival vs bank-on-clear (minor): RunMap banks a resource-hold's support the moment the
+  player lands, before the node's fight is won. Revisit if it reads wrong in play.
 - Shell is placeholder rectangles (no SpriteFont/labels) — now the Phase-2 UI track (art direction
   IS decided: the `design/` screens + `Roguebane.Content` assets + `06-style-frame`'s palette /
   fonts / pip grammar). Reconcile by wiring the content pipeline, an asset registry (Core id -> safe
@@ -191,10 +197,13 @@ Gameplay track (toward a complete game, per `DESIGN_SPEC`):
 - [~] G3. Five chassis as data (Grunt, Warden, Adept, Summoner, Reaver) selectable at New Run via
       `Chassrium.Roster`. DONE: stat bases + budgets (legible identities, tests assert them). DEBT:
       slot/part/bay/action-count shapes wait on the gear (G2) + bay (G7) systems; values placeholder.
-- [ ] G4. Full node-map run: all node types live — skirmish, resource-hold (banks support), merchant
-      (shop + HP service), unknown (fog resolve); Supplies traversal, branching, dead-ends, flee.
-- [ ] G5. War-party forward pressure: per-node advance toward camp; crack castle disbands; reach
-      camp = lose (instant now; last-stand later).
+- [~] G4. Full node-map run. DONE: `RunMap` (branching links, supplies 1/jump, fog reveal rules,
+      resource-hold support banking) + `Expedition` driving combat at each node, merchant HP service,
+      flee. DEBT: merchant SHOP needs economy (G8); Unknown currently resolves to a light skirmish
+      (author distinct unknown payloads); foe variety per node is thin pending G7.
+- [~] G5. War-party forward pressure. DONE: per-jump march on a track; overrun (or supplies dry
+      short of the castle) = lose; cracking the castle wins. DEBT: last-stand camp defense (instant
+      loss for now); fresh war party per leg waits on the campaign spine (G6).
 - [ ] G6. Campaign spine: multiple legs/cities -> Capital finale; escalating castle complexity.
 - [ ] G7. Data-driven content breadth: richer runes (Mark/Path/Keystone effect kinds beyond
       extension-parts -> resolves the rune-effects Debt); more techniques, foes, parts; the
