@@ -243,7 +243,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // Interactive layout rects — single source of truth shared by Update (hit-test) and Draw (paint
     // + hover). Mirrors the coordinates used in the Draw* methods.
     private static Rectangle ChassisRect(int i) => new(180 + i * 110 - 2, 4, 100, 32);
-    private static Rectangle PaletteRect(int i) => new(320 + i * 64, 320, 56, 56);
+    private static Rectangle PaletteRect(int i) => new(320 + i * 64, 300, 56, 56);
     private static Rectangle LadderRowRect(int p, int rungs) => new(320, 100 + p * 56, rungs * 56, 48);
     private static readonly Rectangle MarchRect = new(40, H - 52, 300, 44);
     private static Rectangle JumpRect(int i, int x, int y) => new(x + i * 130, y, 116, 116);
@@ -488,9 +488,49 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawPips(preview, 56, 320);
 
         DrawLadders(320, 100);
-        DrawPalette(320, 320);
+        DrawCoreBlock(700, 90);
+        DrawPalette(320, 300);
+        DrawLoadoutStrip(320, 400);
 
         DrawButton("ENTER  begin the march", 40, H - 52, 300, 44, true, Keys.Enter);
+    }
+
+    // CURRENT CORE stat block (design/02): the chassis's identity at a glance — base attributes,
+    // bays, rune budget, and how many techniques are slotted on the action bar.
+    private void DrawCoreBlock(int x, int y)
+    {
+        var c = _build.Chassis;
+        var baseBody = c.NewBody();
+        Panel(x, y, 220, 190);
+        Text(_assets.Display, "CURRENT CORE", x + 12, y + 10, Ink);
+        var row = y + 44;
+        void Line(string k, string v) { Text(_assets.Mono, k, x + 12, row, Muted);
+            Text(_assets.Mono, v, x + 150, row, Ink); row += 22; }
+        Line("str", baseBody.Capacity(Stat.Str).ToString());
+        Line("int", baseBody.Capacity(Stat.Int).ToString());
+        Line("dex", baseBody.Capacity(Stat.Dex).ToString());
+        Line("con", baseBody.Capacity(Stat.Con).ToString());
+        Line("bays", c.Bays.ToString());
+        Line("budget", c.RuneBudget.ToString());
+        Line("actions", _build.Loadout.Count.ToString());
+    }
+
+    // The action-bar loadout strip: the chassis's FIXED starting kit, pre-slotted (no pick gate).
+    // Mirrors the combat action bar so the player reads the bar they will fight with.
+    private void DrawLoadoutStrip(int x, int y)
+    {
+        Text(_assets.Mono, "ACTION BAR", x, y - 18, Muted);
+        var kit = _build.Loadout;
+        if (kit.Count == 0) { Text(_assets.Mono, "—", x, y, Muted); return; }
+        for (var i = 0; i < kit.Count; i++)
+        {
+            var t = kit[i];
+            var left = x + i * 64;
+            Panel(left, y, 56, 56);
+            Sprite(_assets.Technique(t.Id), left + 4, y + 4, 48, 48, Color.White);
+            Text(_assets.Mono, t.Reserve.ToString(), left + 42, y + 40, StatColor(t.Stat));
+            Border(left, y, 56, 56, Amber);
+        }
     }
 
     private void DrawChassisSelector(int x, int y)
@@ -525,9 +565,14 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 var glyph = _assets.Rune(keystone ? "keystone" : r == ladder.Count - 1 ? "path" : "mark");
                 Sprite(glyph, left, top, 48, 48, filled ? Color.White : new Color(110, 95, 80));
                 if (keystone) Border(left - 2, top - 2, 52, 52, Amber);
+                // Per-rung budget cost (discount-aware), so each rune reads as a priced card.
+                Text(_assets.Mono, _build.Runes.EffectiveCost(ladder[r]).ToString(), left + 2, top - 12,
+                    filled ? Amber : Muted);
             }
             if (Hover(LadderRowRect(p, ladder.Count))) Border(320, top, ladder.Count * 56, 48, Ink);
-            Text(_assets.Mono, "Q W".Split(' ')[Math.Min(p, 1)], x - 18, top + 14, Muted);
+            // The ladder's path named once, to the right of its rungs (the key that climbs it).
+            var nameX = x + ladder.Count * 56 + 8;
+            Text(_assets.Mono, "Q W".Split(' ')[Math.Min(p, 1)] + " " + ladder[0].Path, nameX, top + 16, Muted);
         }
     }
 
