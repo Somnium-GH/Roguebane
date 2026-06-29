@@ -34,4 +34,11 @@ public static class Sessions
         foreach (var rung in Paths.VesselLadder) runes.TryTake(rung);
         return Forge.Assemble(chassis, runes, Techniques.All, Sieges.StandardRun());
     }
+
+    // The pre-run build screen's backbone: choose between the two chassis, climb either rune ladder,
+    // pick from the six techniques. Launch() mints the body and drops it into the standard run.
+    public static BuildSession NewBuild() => new(
+        new[] { Chassrium.Grunt, Chassrium.Adept },
+        new[] { Paths.VesselLadder, Paths.ResonanceLadder },
+        Techniques.All);
 }

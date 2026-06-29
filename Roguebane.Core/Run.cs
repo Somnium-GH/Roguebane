@@ -14,6 +14,8 @@ public sealed class Run
 
     public int Index { get; private set; }
 
+    public IReadOnlyList<Encounter> Nodes => _nodes;
+
     public Encounter Current => _nodes[Index];
 
     public bool OnFinalEncounter => Index == _nodes.Count - 1;
