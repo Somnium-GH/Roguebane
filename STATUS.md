@@ -202,14 +202,19 @@ Gameplay track (toward a complete game, per `DESIGN_SPEC`):
       flee. DEBT: merchant SHOP needs economy (G8); Unknown currently resolves to a light skirmish
       (author distinct unknown payloads); foe variety per node is thin pending G7.
 - [~] G5. War-party forward pressure. DONE: per-jump march on a track; overrun (or supplies dry
-      short of the castle) = lose; cracking the castle wins. DEBT: last-stand camp defense (instant
-      loss for now); fresh war party per leg waits on the campaign spine (G6).
-- [ ] G6. Campaign spine: multiple legs/cities -> Capital finale; escalating castle complexity.
+      short of the castle) = lose; cracking the castle wins; fresh war party per leg (via G6). DEBT:
+      last-stand camp defense (instant loss for now).
+- [~] G6. Campaign spine. DONE: `Campaign` marches N legs to the Capital, one body/caster/loadout/
+      Stash carrying through; fresh map+war-party each leg; HP rests at each city, part wounds + gold
+      persist. DEBT: per-leg escalation (distinct maps, tougher castles) is content tuning; branching
+      city graph + cities-taken visual (design/04) for the UI track.
 - [ ] G7. Data-driven content breadth: richer runes (Mark/Path/Keystone effect kinds beyond
       extension-parts -> resolves the rune-effects Debt); more techniques, foes, parts; the
       magic/charge resource (finite, fuels magic-tier effects + affixes; name deferred); >=2 minion
       types (re-gating where WIS/CHA gone -> defer).
-- [ ] G8. Economy: gold/spoils, shops, HP services, sell/buy, consumables.
+- [~] G8. Economy. DONE: gold/spoils per cleared node, merchant repair-potion shop + paid HP service,
+      potions restore PARTS out of combat (the healing split), Stash carries across legs. DEBT:
+      sell/buy gear + runes at shops; consumable variety; spoils/price tuning (human balance).
 
 Discipline: build REAL partials; park genuine open questions in "Needs human" and route around them;
 never block. Stop only when all that remains is play + balance, then surface the queue.
