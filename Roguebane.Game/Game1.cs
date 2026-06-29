@@ -33,6 +33,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private const double CombatTickSeconds = 0.1; // fixed 10 ticks/sec combat clock
     private double _combatAccum;
 
+    private MouseState _prevMouse;
+    private Point _cursor;  // mouse position mapped into design space (through the letterbox)
+    private bool _clicked;  // left button went down this frame
+
     // The leg under way is the campaign's current Expedition — most of the run screen reads it.
     private Expedition Exp => _campaign.Current;
 
@@ -100,10 +104,18 @@ public class Game1 : Microsoft.Xna.Framework.Game
         var altEnter = keys.IsKeyDown(Keys.LeftAlt) && Pressed(keys, Keys.Enter);
         if (Pressed(keys, Keys.F11) || altEnter) ToggleFullscreen();
 
+        UpdateViewport(); // keep the mouse->design transform current before hit-testing
+        var mouse = Mouse.GetState();
+        _cursor = new Point(
+            _viewScale > 0 ? (int)((mouse.X - _viewDest.X) / _viewScale) : 0,
+            _viewScale > 0 ? (int)((mouse.Y - _viewDest.Y) / _viewScale) : 0);
+        _clicked = mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released;
+
         if (_screen == Screen.Build) UpdateBuild(keys);
         else UpdateRun(keys, gameTime);
 
         _prevKeys = keys;
+        _prevMouse = mouse;
         base.Update(gameTime);
     }
 
@@ -120,9 +132,19 @@ public class Game1 : Microsoft.Xna.Framework.Game
             if (Pressed(keys, TechniqueKeys[i]))
                 _build.Toggle(_build.Palette[i]);
 
+        // Mouse: click a chassis, a ladder row to climb, a palette card to toggle, the march CTA.
+        for (var i = 0; i < _build.ChassisCount; i++)
+            if (Click(ChassisRect(i))) _build.CycleChassis(i - _build.ChassisIndex);
+        for (var p = 0; p < _build.Paths.Count; p++)
+            if (_build.Paths[p].Count > 0 && Click(LadderRowRect(p, _build.Paths[p].Count)))
+                _build.Climb(_build.Paths[p]);
+        for (var i = 0; i < _build.Palette.Count; i++)
+            if (Click(PaletteRect(i))) _build.Toggle(_build.Palette[i]);
+
         // March the campaign (gated on a chosen loadout; the footer mirrors this). Alt+Enter is the
         // fullscreen toggle, not a march.
-        if (Pressed(keys, Keys.Enter) && !keys.IsKeyDown(Keys.LeftAlt) && _build.Loadout.Count > 0)
+        var march = (Pressed(keys, Keys.Enter) && !keys.IsKeyDown(Keys.LeftAlt)) || Click(MarchRect);
+        if (march && _build.Loadout.Count > 0)
         {
             _campaign = _build.March(Maps.StandardLegs(3));
             foreach (var t in Exp.Loadout) _campaign.Toggle(t); // arm the whole bar
@@ -139,10 +161,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     private void UpdateCombat(KeyboardState keys, GameTime gameTime)
     {
-        if (Pressed(keys, Keys.Space)) _paused = !_paused;
-        if (Pressed(keys, Keys.F)) Exp.Flee();
+        if (Pressed(keys, Keys.Space) || Click(PauseRect)) _paused = !_paused;
+        if (Pressed(keys, Keys.F) || Click(FleeRect)) Exp.Flee();
         for (var i = 0; i < TechniqueKeys.Length && i < Exp.Loadout.Count; i++)
-            if (Pressed(keys, TechniqueKeys[i]))
+            if (Pressed(keys, TechniqueKeys[i]) || Click(ActionCardRect(i)))
                 _campaign.Toggle(Exp.Loadout[i]);
 
         // The battle runs on a FIXED combat clock (10 ticks/sec) off a real-time accumulator, so the
@@ -162,14 +184,16 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         if (Exp.AtMerchant)
         {
-            if (Pressed(keys, Keys.P)) Exp.BuyPotion();
-            if (Pressed(keys, Keys.H)) Exp.BuyHeal();
-            if (Pressed(keys, Keys.U)) Exp.UsePotion();
+            if (Pressed(keys, Keys.P) || Click(MerchPotionRect)) Exp.BuyPotion();
+            if (Pressed(keys, Keys.H) || Click(MerchHealRect)) Exp.BuyHeal();
+            if (Pressed(keys, Keys.U) || Click(MerchUseRect)) Exp.UsePotion();
         }
 
         var options = Exp.Options;
-        for (var i = 0; i < TechniqueKeys.Length && i < options.Count; i++)
-            if (Pressed(keys, TechniqueKeys[i]))
+        var origin = JumpOrigin;
+        for (var i = 0; i < options.Count; i++)
+            if ((i < TechniqueKeys.Length && Pressed(keys, TechniqueKeys[i]))
+                || Click(JumpRect(i, origin.X, origin.Y)))
             {
                 _campaign.Enter(options[i].Id); // may win the leg and roll to the next city
                 foreach (var t in Exp.Loadout)  // keep the bar armed into the next fight/leg
@@ -179,6 +203,28 @@ public class Game1 : Microsoft.Xna.Framework.Game
     }
 
     private bool Pressed(KeyboardState keys, Keys key) => keys.IsKeyDown(key) && _prevKeys.IsKeyUp(key);
+
+    // Mouse helpers: Hover = cursor over a rect (drives Draw highlight); Click = hover + this frame's
+    // press (drives Update intents). Both read the design-space cursor mapped through the letterbox.
+    private bool Hover(Rectangle r) => !_smoke && r.Contains(_cursor);
+    private bool Click(Rectangle r) => _clicked && r.Contains(_cursor);
+
+    // Interactive layout rects — single source of truth shared by Update (hit-test) and Draw (paint
+    // + hover). Mirrors the coordinates used in the Draw* methods.
+    private static Rectangle ChassisRect(int i) => new(180 + i * 110 - 2, 4, 100, 32);
+    private static Rectangle PaletteRect(int i) => new(320 + i * 64, 320, 56, 56);
+    private static Rectangle LadderRowRect(int p, int rungs) => new(320, 100 + p * 56, rungs * 56, 48);
+    private static readonly Rectangle MarchRect = new(40, H - 52, 300, 44);
+    private static Rectangle JumpRect(int i, int x, int y) => new(x + i * 130, y, 116, 116);
+    private static Rectangle ActionCardRect(int i) => new(52 + i * 84, H - 84, 76, 60);
+    private static readonly Rectangle PauseRect = new(W - 156, H - 84, 110, 26);
+    private static readonly Rectangle FleeRect = new(W - 156, H - 50, 110, 26);
+    // Merchant verb buttons (base at 60,240).
+    private static readonly Rectangle MerchPotionRect = new(74, 284, 330, 34);
+    private static readonly Rectangle MerchUseRect = new(74, 322, 330, 34);
+    private static readonly Rectangle MerchHealRect = new(74, 360, 330, 34);
+    // The jump chooser sits at a different origin at a merchant vs an open chart.
+    private Point JumpOrigin => Exp.AtMerchant ? new Point(460, 160) : new Point(200, 120);
 
     private void ToggleFullscreen()
     {
@@ -338,6 +384,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
             Panel(left, y, 116, 116);
             Sprite(_assets.Node(seen), left + 30, y + 14, 56, 56, Color.White);
             Text(_assets.Mono, $"[{i + 1}] {seen.ToString().ToLower()}", left + 8, y + 90, Ink);
+            if (Hover(JumpRect(i, x, y))) Border(left, y, 116, 116, Ink);
         }
         if (options.Count == 0) Text(_assets.Mono, "no charted jumps", x, y, Muted);
     }
@@ -407,6 +454,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
             Sprite(_assets.ChassisFigure(id), left, y, 28, 28, selected ? Color.White : new Color(150, 140, 130));
             Text(_assets.Mono, id, left + 32, y + 8, selected ? Ink : Muted);
             if (selected) Border(left - 2, y - 2, 100, 32, Amber);
+            else if (Hover(ChassisRect(i))) Border(left - 2, y - 2, 100, 32, Ink);
         }
     }
 
@@ -429,6 +477,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 Sprite(glyph, left, top, 48, 48, filled ? Color.White : new Color(110, 95, 80));
                 if (keystone) Border(left - 2, top - 2, 52, 52, Amber);
             }
+            if (Hover(LadderRowRect(p, ladder.Count))) Border(320, top, ladder.Count * 56, 48, Ink);
             Text(_assets.Mono, "Q W".Split(' ')[Math.Min(p, 1)], x - 18, top + 14, Muted);
         }
     }
@@ -444,7 +493,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
             Panel(left, y, 56, 56);
             Sprite(_assets.Technique(t.Id), left + 4, y + 4, 48, 48, Color.White);
             Text(_assets.Mono, (i + 1).ToString(), left + 4, y + 42, Muted);
-            Border(left, y, 56, 56, selected ? Amber : Border0);
+            Border(left, y, 56, 56, selected ? Amber : Hover(PaletteRect(i)) ? Ink : Border0);
         }
     }
 
@@ -566,8 +615,23 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
             Text(_assets.Mono, "[" + (i + 1) + "]", left + 6, y + 50, Muted);
             Text(_assets.Mono, t.Reserve.ToString(), left + 58, y + 50, StatColor(t.Stat));
-            Border(left, y + 8, 76, 60, st.Active ? Amber : Border0);
+            Border(left, y + 8, 76, 60, st.Active ? Amber : Hover(ActionCardRect(i)) ? Ink : Border0);
         }
+
+        // Mouse-reachable pause / flee (keyboard Space / F still work).
+        DrawHotButton(_paused ? "RESUME" : "PAUSE", PauseRect, Hover(PauseRect));
+        DrawHotButton("FLEE", FleeRect, Hover(FleeRect));
+    }
+
+    // A compact skinned button at a fixed rect with a hover highlight (combat pause/flee).
+    private void DrawHotButton(string label, Rectangle r, bool hovered)
+    {
+        var skin = _assets.Button(hovered ? "down" : "normal");
+        if (skin is not null) Sprite(skin, r.X, r.Y, r.Width, r.Height, Color.White);
+        else Panel(r.X, r.Y, r.Width, r.Height);
+        var size = _assets.Mono.MeasureString(label);
+        Text(_assets.Mono, label, (int)(r.X + r.Width / 2 - size.X / 2), (int)(r.Y + r.Height / 2 - size.Y / 2), Ink);
+        if (hovered) Border(r.X, r.Y, r.Width, r.Height, Amber);
     }
 
     private void DrawStateOverlay()
@@ -637,13 +701,15 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // Stretch-scaled for now; true 9-slice is polish. Returns nothing — input lives in Update.
     private void DrawButton(string label, int x, int y, int w, int h, bool enabled, Keys key)
     {
-        var state = !enabled ? "disabled" : _keys.IsKeyDown(key) ? "down" : "normal";
+        var hovered = enabled && Hover(new Rectangle(x, y, w, h));
+        var state = !enabled ? "disabled" : _keys.IsKeyDown(key) || hovered ? "down" : "normal";
         var skin = _assets.Button(state);
         if (skin is not null) Sprite(skin, x, y, w, h, Color.White);
         else Panel(x, y, w, h);
         var size = _assets.Mono.MeasureString(label);
         Text(_assets.Mono, label, (int)(x + w / 2 - size.X / 2), (int)(y + h / 2 - size.Y / 2),
             enabled ? Ink : Muted);
+        if (hovered) Border(x, y, w, h, Amber);
     }
 
     // A labelled value bar (HP, etc.): icon, filled track, and the mono "cur/max" readout.
