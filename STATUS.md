@@ -6,14 +6,14 @@ Shipped this pass: (1) FTL targeting/firing (Core charge→hold→fire + AUTO to
 FIRE + auto + per-card target/ready display); (2) fixed per-chassis default loadout as data, launch
 gate removed; (3) mouse precision (hit-rects realigned to moved rows). Fidelity self-reviews done on
 COMBAT (FTL surface, target tags, ready border), BUILD (rune costs+names, Current Core block,
-pre-slotted action-bar strip), MAP (war-party forward-pressure track + marker). All verified by
-reading the RB_SMOKE shot against the design PNG + `design/SCREENS.md`.
+pre-slotted action-bar strip), MAP (war-party track + full beacon-chart GRAPH: coords on map data,
+solid/dotted charted-vs-uncharted links, fog, you-are-here, clickable numbered jumps). All verified by
+reading the RB_SMOKE shot against the design PNG + `design/SCREENS.md`. 156 tests.
 
-NEXT fidelity target — the full beacon-chart GRAPH on the run map (`design/03`): nodes as a graph with
-charted (solid) vs uncharted (dotted) links, "you are here", needs per-node coordinates added to map
-data. Then build-screen INVENTORY tabs (gear/techniques/minions) + drag-to-equip — BLOCKED on the
-gear/minion equip systems (DEBT G2/G7); and the dedicated Choose-Your-Core screen (`design/05`, the
-build screen doubles as picker for now — acceptable).
+REMAINING fidelity is parked: build-screen INVENTORY tabs (gear/techniques/minions) + drag-to-equip
+are BLOCKED on the gear/minion equip systems (DEBT G2/G7); the dedicated Choose-Your-Core screen
+(`design/05`) is acceptable-as-is (the build screen doubles as picker — locked decision); the campaign
+branching city-graph (`design/04`) is DEBT U5 (the spine strip conveys progress for now).
 
 GAMEPLAY CORRECTNESS — all three DONE:
 1. [x] TARGETING / FIRING (FTL): Caster charges→holds→fires (Fire/SetAuto/IsReady/AimOf, Ready/Auto on
@@ -147,9 +147,10 @@ produce/fix, then the loop finishes the screen. Empty = no known asset holes yet
   onto the chassis anatomy, the per-stat ATTRIBUTE READOUT with gate markers, and equipped-gear on the
   anatomy composite. Blocked on the gear/minion equip systems (G2/G7) — reconcile when those land.
   DONE so far: rune cost+name cards, Current Core stat block, pre-slotted action-bar strip.
-- (fidelity) RUN MAP renders the current beacon + charted-jump cards + the war-party track, but NOT
-  the full node GRAPH (charted/uncharted links, layout). Needs per-node x/y coordinates added to
-  MapNode data — reconcile by authoring coords + a graph render (the next fidelity target).
+- (resolved) RUN MAP now renders the full node GRAPH: MapNode carries Col/Row coords, RunMap.Nodes
+  exposes the chart, the shell draws solid/dotted charted-vs-uncharted links + fog + you-are-here +
+  clickable numbered jumps. Remaining map polish (per-leg distinct maps, war-party marker art) is
+  content/asset, not structure.
 - (fidelity) FTL combat surface is click+key complete (aim/fire/auto, target+ready tags) but has no
   PART-level aim UI (pick a foe PART), no minion-bay lane, no rallied-support lane — those wait on the
   foe part-maps (G1) and the bay/support UI lanes (existing UI debt).
