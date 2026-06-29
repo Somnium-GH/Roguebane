@@ -24,6 +24,7 @@ public sealed class BuildSession
     }
 
     public int ChassisIndex { get; private set; }
+    public int ChassisCount => _chassis.Count;
     public Chassis Chassis => _chassis[ChassisIndex];
     public RuneLoadout Runes => _runes;
     public IReadOnlyList<IReadOnlyList<Mark>> Paths { get; }
