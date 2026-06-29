@@ -14,7 +14,9 @@ public sealed class Caster
         public BodyPart? Part;       // per-technique PART aim within Aimed; null => whole-target HP
     }
 
-    private const int BlockCap = 3; // a held CON block absorbs at most this much off an HP hit (low scale)
+    private const int BlockCap = 3;  // a held CON block absorbs at most this much off an HP hit (low scale)
+    private const int HasteRate = 2; // % cooldown reduction per point of DEX (action speed)
+    private const int HasteCap = 28; // ...capped so haste stays non-OP near 20 DEX
 
     private readonly Body _self;
     private Rng? _rng; // chance effects (evasion); set by Battle so a fight is reproducible
@@ -84,13 +86,22 @@ public sealed class Caster
         ? t.Power
         : t.Power + _self.Consulted(t).Sum(w => w.Power);
 
+    // DEX haste shortens a technique's cooldown a modest % per point, capped (non-OP). Quoted in
+    // ticks at the 10/sec combat clock. Read live so a smashed leg (DEX drop) slows you back down.
+    public int EffectiveCooldown(Technique t)
+    {
+        if (t.Cooldown <= 0) return t.Cooldown;
+        var haste = Math.Min(HasteCap, _self.Capacity(Stat.Dex) * HasteRate);
+        return Math.Max(1, t.Cooldown * (100 - haste) / 100);
+    }
+
     public bool Activate(Technique technique)
     {
         if (_active.ContainsKey(technique.Id)) return true;
         var reservation = Reservation(technique);
         if (reservation.Reserve <= 0) return false; // nothing to swing (no weapon to consult)
         if (!_self.Activate(reservation)) return false;
-        _active[technique.Id] = new Run { Tech = technique, Countdown = technique.Cooldown };
+        _active[technique.Id] = new Run { Tech = technique, Countdown = EffectiveCooldown(technique) };
         return true;
     }
 
@@ -145,7 +156,7 @@ public sealed class Caster
             if (run.Tech.ChargeCost > 0 && !TrySpendCharge(run.Tech.ChargeCost)) continue;
 
             Hit(target, part, EffectivePower(run.Tech));
-            if (run.Tech.Kind == TechniqueKind.Timered) run.Countdown = run.Tech.Cooldown;
+            if (run.Tech.Kind == TechniqueKind.Timered) run.Countdown = EffectiveCooldown(run.Tech);
         }
 
         // Minions auto-fire on whatever the caster is pressing (the default front).

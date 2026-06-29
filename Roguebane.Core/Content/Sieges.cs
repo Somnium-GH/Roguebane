@@ -14,9 +14,12 @@ public static class Sieges
     // support amount is the bank earned from resource-holds on the way in.
     public static Encounter Castle(int supportAmount = 2)
     {
+        // Cadences are in COMBAT TICKS at the 10/sec clock: the boss mends its front 2 every ~1s and
+        // the rallied support pings every ~2s. A full-loadout build wins this DPS race; a starved
+        // one-technique build cannot out-damage the restore (the thesis the balance sim asserts).
         var foes = new[] { new Foe("gate", 12), new Foe("wall", 16), new Foe("keep", 12) };
         return new Encounter("castle", foes, structural: true,
-            restoreAmount: 2, restoreEvery: 1, supportAmount: supportAmount, supportEvery: 2);
+            restoreAmount: 2, restoreEvery: 10, supportAmount: supportAmount, supportEvery: 20);
     }
 
     public static Run StandardRun() =>

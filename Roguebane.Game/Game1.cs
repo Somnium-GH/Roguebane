@@ -30,6 +30,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private KeyboardState _prevKeys;
     private KeyboardState _keys; // current frame's keys, read in Draw for button pressed-state
 
+    private const double CombatTickSeconds = 0.1; // fixed 10 ticks/sec combat clock
+    private double _combatAccum;
+
     // The leg under way is the campaign's current Expedition — most of the run screen reads it.
     private Expedition Exp => _campaign.Current;
 
@@ -98,7 +101,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         if (Pressed(keys, Keys.F11) || altEnter) ToggleFullscreen();
 
         if (_screen == Screen.Build) UpdateBuild(keys);
-        else UpdateRun(keys);
+        else UpdateRun(keys, gameTime);
 
         _prevKeys = keys;
         base.Update(gameTime);
@@ -127,14 +130,14 @@ public class Game1 : Microsoft.Xna.Framework.Game
         }
     }
 
-    private void UpdateRun(KeyboardState keys)
+    private void UpdateRun(KeyboardState keys, GameTime gameTime)
     {
         if (_campaign.State != CampaignState.Marching) return; // settled: hold the end overlay
-        if (Exp.State == ExpeditionState.Fighting) UpdateCombat(keys);
+        if (Exp.State == ExpeditionState.Fighting) UpdateCombat(keys, gameTime);
         else UpdateChoosing(keys);
     }
 
-    private void UpdateCombat(KeyboardState keys)
+    private void UpdateCombat(KeyboardState keys, GameTime gameTime)
     {
         if (Pressed(keys, Keys.Space)) _paused = !_paused;
         if (Pressed(keys, Keys.F)) Exp.Flee();
@@ -142,7 +145,16 @@ public class Game1 : Microsoft.Xna.Framework.Game
             if (Pressed(keys, TechniqueKeys[i]))
                 _campaign.Toggle(Exp.Loadout[i]);
 
-        if (!_paused && !_smoke) _campaign.Tick(); // smoke freezes the staged frame for the shot
+        // The battle runs on a FIXED combat clock (10 ticks/sec) off a real-time accumulator, so the
+        // deterministic sim is decoupled from the frame rate. Smoke freezes it for the screenshot.
+        if (_paused || _smoke) return;
+        _combatAccum += gameTime.ElapsedGameTime.TotalSeconds;
+        var guard = 0;
+        while (_combatAccum >= CombatTickSeconds && Exp.State == ExpeditionState.Fighting && guard++ < 8)
+        {
+            _campaign.Tick();
+            _combatAccum -= CombatTickSeconds;
+        }
     }
 
     // On the chart: number keys pick a charted jump; at a merchant, the shop verbs are live.

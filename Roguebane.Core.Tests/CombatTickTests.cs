@@ -22,7 +22,7 @@ public class CombatTickTests
     public void TimeredFiresOnCooldown()
     {
         var foe = new Foe("dummy", 1000);
-        var caster = new Caster(Body(), foe);
+        var caster = new Caster(Body(dex: 0), foe); // no DEX so haste doesn't shift the cadence
         caster.Activate(new Technique("jab", Stat.Str, 1, TechniqueKind.Timered, Cooldown: 2, Power: 3));
 
         for (var i = 0; i < 4; i++) caster.Step();

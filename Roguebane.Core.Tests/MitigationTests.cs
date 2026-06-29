@@ -40,14 +40,14 @@ public class MitigationTests
         body.Equip(new Armor("dodge", Stat.Dex, ArmorKind.Leather, 100)); // certain dodge
         var (attacker, target) = Duel(body);
 
-        Assert.Equal(0, DamageOver(attacker, target, 40));
+        Assert.Equal(0, DamageOver(attacker, target, 300)); // long enough for many Jab cooldowns
     }
 
     [Fact]
     public void WithoutLeatherTheHitsLand()
     {
         var (attacker, target) = Duel(Humanoid());
-        Assert.True(DamageOver(attacker, target, 40) > 0);
+        Assert.True(DamageOver(attacker, target, 300) > 0);
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class MitigationTests
         var (attacker, target) = Duel(body);
 
         // Jab is power 2; block 2 => every hit fully absorbed.
-        Assert.Equal(0, DamageOver(attacker, target, 40));
+        Assert.Equal(0, DamageOver(attacker, target, 300));
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class MitigationTests
             var body = Humanoid();
             body.Equip(new Armor("dodge", Stat.Dex, ArmorKind.Leather, 50)); // half dodge
             var (attacker, target) = Duel(body);
-            return DamageOver(attacker, target, 60);
+            return DamageOver(attacker, target, 300);
         }
 
         Assert.Equal(Run(), Run()); // same seed => same damage taken
