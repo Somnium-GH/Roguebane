@@ -12,6 +12,7 @@ public sealed class Caster
         public int Countdown;
         public ICombatTarget? Aimed; // per-technique target; null => follow the caster's default front
         public BodyPart? Part;       // per-technique PART aim within Aimed; null => whole-target HP
+        public bool Auto = true;     // AUTO: re-fire on cadence without a command. Off => charge & HOLD.
     }
 
     private const int BlockCap = 3;  // a held CON block absorbs at most this much off an HP hit (low scale)
@@ -74,18 +75,45 @@ public sealed class Caster
 
     public bool IsActive(Technique technique) => _active.ContainsKey(technique.Id);
 
+    // FTL firing model: a Timered technique charges down to ready, then HOLDS (Ready) until fired —
+    // on command (Fire) or, if Auto, automatically every cadence. Toggle Auto per technique.
+    public void SetAuto(Technique technique, bool auto)
+    {
+        if (_active.TryGetValue(technique.Id, out var run)) run.Auto = auto;
+    }
+
+    public bool IsAuto(Technique technique) =>
+        _active.TryGetValue(technique.Id, out var run) && run.Auto;
+
+    // A charged technique is HOLDING when its countdown has elapsed (ready to discharge).
+    public bool IsReady(Technique technique) =>
+        _active.TryGetValue(technique.Id, out var run) && run.Countdown <= 0;
+
+    public ICombatTarget? AimOf(Technique technique) =>
+        _active.TryGetValue(technique.Id, out var run) ? run.Aimed ?? _default : null;
+
+    // Fire a charged technique NOW at its aim. No-op (false) if not active, not yet ready, sustained,
+    // or the discharge can't land (no target / dry charge). Resets the cooldown on a hit.
+    public bool Fire(Technique technique)
+    {
+        if (!_active.TryGetValue(technique.Id, out var run)) return false;
+        if (run.Tech.Kind == TechniqueKind.Sustained || run.Countdown > 0) return false;
+        return Discharge(run);
+    }
+
     // A render-facing snapshot of one technique's live state for the action bar. Countdown/Cooldown
-    // drive the cooldown fill; the flags pick the card state (held / charging-dry).
+    // drive the cooldown fill; the flags pick the card state (held / charging-dry / ready / auto).
     public readonly record struct TechStatus(
-        bool Active, int Countdown, int Cooldown, bool Sustained, bool ChargeDry);
+        bool Active, int Countdown, int Cooldown, bool Sustained, bool ChargeDry, bool Ready, bool Auto);
 
     public TechStatus StatusOf(Technique t)
     {
         var cooldown = EffectiveCooldown(t);
         if (!_active.TryGetValue(t.Id, out var run))
-            return new TechStatus(false, cooldown, cooldown, t.Kind == TechniqueKind.Sustained, false);
+            return new TechStatus(false, cooldown, cooldown, t.Kind == TechniqueKind.Sustained, false, false, false);
         var dry = t.ChargeCost > 0 && _charge < t.ChargeCost;
-        return new TechStatus(true, run.Countdown, cooldown, t.Kind == TechniqueKind.Sustained, dry);
+        var ready = run.Tech.Kind == TechniqueKind.Timered && run.Countdown <= 0;
+        return new TechStatus(true, run.Countdown, cooldown, t.Kind == TechniqueKind.Sustained, dry, ready, run.Auto);
     }
 
     public int ActiveCount => _active.Count;
@@ -109,13 +137,13 @@ public sealed class Caster
         return Math.Max(1, t.Cooldown * (100 - haste) / 100);
     }
 
-    public bool Activate(Technique technique)
+    public bool Activate(Technique technique, bool auto = true)
     {
         if (_active.ContainsKey(technique.Id)) return true;
         var reservation = Reservation(technique);
         if (reservation.Reserve <= 0) return false; // nothing to swing (no weapon to consult)
         if (!_self.Activate(reservation)) return false;
-        _active[technique.Id] = new Run { Tech = technique, Countdown = EffectiveCooldown(technique) };
+        _active[technique.Id] = new Run { Tech = technique, Countdown = EffectiveCooldown(technique), Auto = auto };
         return true;
     }
 
@@ -160,30 +188,39 @@ public sealed class Caster
 
         foreach (var run in _active.Values)
         {
-            // A technique hits its own aim while that foe stands, else falls back to the front.
-            var onAim = run.Aimed is { Down: false };
-            var target = onAim ? run.Aimed : _default;
-            if (target is null || target.Down) continue;
+            if (run.Tech.Kind == TechniqueKind.Sustained)
+            {
+                Discharge(run); // a held output: fires every tick (e.g. the CON block reserve)
+                continue;
+            }
 
-            // The PART aim only rides its own foe; a fallback to the front hits the HP pool.
-            var part = onAim ? run.Part : null;
-
-            // Sustained fires every tick; timered fires when its countdown elapses.
-            var fires = run.Tech.Kind == TechniqueKind.Sustained || --run.Countdown <= 0;
-            if (!fires) continue;
-
-            // A magic technique with no charge holds fire — a timered one keeps retrying (its
-            // countdown stays elapsed) until the resource refills out of combat.
-            if (run.Tech.ChargeCost > 0 && !TrySpendCharge(run.Tech.ChargeCost)) continue;
-
-            Hit(target, part, EffectivePower(run.Tech));
-            if (run.Tech.Kind == TechniqueKind.Timered) run.Countdown = EffectiveCooldown(run.Tech);
+            // Timered: charge down to ready, then HOLD. Auto re-fires on cadence; a non-auto
+            // technique waits at the ready for a Fire() command (it does NOT discharge here).
+            if (run.Countdown > 0) run.Countdown--;
+            if (run.Countdown <= 0 && run.Auto) Discharge(run);
         }
 
         // Minions auto-fire on whatever the caster is pressing (the default front).
         if (_default is { Down: false })
             foreach (var minion in _bays.Values)
                 Hit(_default, null, minion.Power);
+    }
+
+    // Resolve a technique's aim and land one discharge: hits its own foe (and PART) while that foe
+    // stands, else falls back to the caster's front (whole-HP). Holds fire if there's no target or
+    // the magic charge is dry; resets a Timered cooldown on a landed hit.
+    private bool Discharge(Run run)
+    {
+        var onAim = run.Aimed is { Down: false };
+        var target = onAim ? run.Aimed : _default;
+        if (target is null || target.Down) return false;
+
+        var part = onAim ? run.Part : null;
+        if (run.Tech.ChargeCost > 0 && !TrySpendCharge(run.Tech.ChargeCost)) return false;
+
+        Hit(target, part, EffectivePower(run.Tech));
+        if (run.Tech.Kind == TechniqueKind.Timered) run.Countdown = EffectiveCooldown(run.Tech);
+        return true;
     }
 
     // Apply a hit through the defender's mitigation layer: leather EVASION (a dodge roll on the
