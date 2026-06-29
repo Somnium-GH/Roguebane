@@ -30,7 +30,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     protected override void Initialize()
     {
-        _session = Sessions.Demo();
+        _session = Sessions.Forged(); // the real pick-chassis -> allocate-runes -> siege flow
         base.Initialize();
     }
 

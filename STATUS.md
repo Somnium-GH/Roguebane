@@ -1,9 +1,9 @@
 # Status
 
 ## Current target
-**7. End-to-end playable wiring** (headless first): pick chassis -> allocate runes -> build body
--> run -> siege as one composable flow, then the shell screens (6b). The actual "play to feel it"
-remains a human touchpoint. 7a/7b/7c done; combat on Body.
+**6b. Build/loadout + run-map screens** — now unblocked (rework + body wiring + balance + end-to-end
+flow all landed). Render the pick-chassis / climb-runes / node-map state the shell already owns.
+The actual "play to feel it" remains a human touchpoint.
 
 ## Design decisions (locked this pass — were "Needs human")
 - Part-targeting: PER-TECHNIQUE aim — each technique aims its own target part.
@@ -78,8 +78,11 @@ remains a human touchpoint. 7a/7b/7c done; combat on Body.
   targets a whole Foe; PART-level aim (the locked "per-technique aims its own target PART") waits
   on multi-part foes. Reconcile by modelling a foe as a Body (or part set) + its own Caster aimed
   at the player, stepping both sides; then Caster.Aim takes a part.
-- Shell ships only the combat/damage screen. Build/loadout + run-map screens (6b) unbuilt;
-  unblocked once the rework + body wiring + a balance pass land.
+- Shell ships only the combat/damage screen. Build/loadout + run-map screens (6b) unbuilt but now
+  UNBLOCKED (rework + body wiring + end-to-end flow landed). Next loop target.
+- Rune grants are chassis-extension PARTS only (Hollow Vessel -> +CON, Resonant Core -> +INT). Other
+  rune effects (stat multipliers, new techniques, passives) not yet modelled — reconcile by widening
+  Mark with more data-driven effect kinds when a non-extension keystone is authored.
 
 ## POC roadmap
 - [x] 1-5. Core skeleton, rune economy, two chassis, techniques+combat tick, enemies+castle.
@@ -99,6 +102,9 @@ remains a human touchpoint. 7a/7b/7c done; combat on Body.
 - [x] 7c. Per-technique targeting: each active technique carries its own aim (Caster.Aim),
       independent of the default front, falling back to the front when its foe dies. 3 tests.
       (Part-level aim within a multi-part foe waits on multi-part foes — Debt.)
-- [ ] 7. End-to-end playable: pick chassis -> allocate runes -> run -> siege. Play to feel it.
-- [ ] 6b. Build/loadout + run-map screens (after rework + body + balance pass).
+- [x] 7. End-to-end wiring (headless): rune grants bite the body (held Mark grants chassis-extension
+      parts as data); Forge.Assemble threads chassis -> runes -> body -> techniques -> run into one
+      Session; Sessions.Forged() climbs the Vessel keystone; the Game shell now runs that real flow.
+      4 tests. ("Play to feel it" stays a human touchpoint.)
+- [ ] 6b. Build/loadout + run-map screens (now unblocked).
 - [x] 8. (optional) headless balance-sim: ranks BuildSpecs by deterministic ticks-to-clear.
