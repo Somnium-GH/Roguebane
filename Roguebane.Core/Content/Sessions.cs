@@ -47,6 +47,21 @@ public static class Sessions
             Forge.PlayerFighter(body), caster, Techniques.All, Maps.StandardLeg(autoResolveCastle: false));
     }
 
+    // The whole march: three legs to the Capital, one body and stash carrying through. Each leg is a
+    // fresh map + war party. (Per-leg escalation of map/castle is content tuning — deferred.)
+    public static Campaign NewCampaign()
+    {
+        var body = DemoBody();
+        var caster = new Caster(body);
+        var legs = new Func<RunMap>[]
+        {
+            () => Maps.StandardLeg(autoResolveCastle: false),
+            () => Maps.StandardLeg(autoResolveCastle: false),
+            () => Maps.StandardLeg(autoResolveCastle: false),
+        };
+        return new Campaign(Forge.PlayerFighter(body), caster, Techniques.All, legs);
+    }
+
     public static BuildSession NewBuild() => new(
         Chassrium.Roster,
         new[] { Paths.VesselLadder, Paths.ResonanceLadder },

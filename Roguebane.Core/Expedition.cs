@@ -19,17 +19,20 @@ public sealed class Expedition
     private readonly Fighter _player;
     private readonly Caster _caster;
     private readonly IReadOnlyList<Technique> _loadout;
+    private readonly Stash _stash;
 
     public RunMap Map { get; }
     public Battle? Battle { get; private set; }
     public ExpeditionState State { get; private set; } = ExpeditionState.Choosing;
 
-    public Expedition(Fighter player, Caster caster, IReadOnlyList<Technique> loadout, RunMap map)
+    public Expedition(Fighter player, Caster caster, IReadOnlyList<Technique> loadout, RunMap map,
+        Stash? stash = null)
     {
         _player = player;
         _caster = caster;
         _loadout = loadout;
         Map = map;
+        _stash = stash ?? new Stash();
     }
 
     public Fighter Player => _player;
@@ -37,9 +40,11 @@ public sealed class Expedition
     public IReadOnlyList<MapNode> Options => Map.Options;
 
     // The economy: spoils from cleared nodes buy repair potions at merchants. Potions restore PARTS
-    // (the healing split — never HP); HP refills only via the merchant service.
-    public int Gold { get; private set; }
-    public int Potions { get; private set; }
+    // (the healing split — never HP); HP refills only via the merchant service. The Stash carries
+    // gold and potions across the legs of a campaign.
+    public Stash Stash => _stash;
+    public int Gold => _stash.Gold;
+    public int Potions => _stash.Potions;
 
     private const int PotionCost = 4;
     private const int PotionRepair = 2; // restored to every damaged part — low scale
@@ -58,17 +63,15 @@ public sealed class Expedition
     // Spend spoils on a repair potion (carried for later) at a merchant.
     public bool BuyPotion()
     {
-        if (!AtMerchant || Gold < PotionCost) return false;
-        Gold -= PotionCost;
-        Potions++;
+        if (!AtMerchant || !_stash.TrySpend(PotionCost)) return false;
+        _stash.AddPotion();
         return true;
     }
 
     // Use a carried potion to repair the body — out of combat only (between jumps / fights).
     public bool UsePotion()
     {
-        if (State != ExpeditionState.Choosing || Potions == 0) return false;
-        Potions--;
+        if (State != ExpeditionState.Choosing || !_stash.TryUsePotion()) return false;
         foreach (var part in _player.Body.Parts) _player.Body.Repair(part, PotionRepair);
         return true;
     }
@@ -76,8 +79,7 @@ public sealed class Expedition
     // Pay a merchant for the out-of-combat HP service.
     public bool BuyHeal()
     {
-        if (!AtMerchant || Gold < HealCost || _player.Hp >= _player.MaxHp) return false;
-        Gold -= HealCost;
+        if (!AtMerchant || _player.Hp >= _player.MaxHp || !_stash.TrySpend(HealCost)) return false;
         _player.Heal(_player.MaxHp);
         return true;
     }
@@ -118,7 +120,7 @@ public sealed class Expedition
                 State = ExpeditionState.Lost;
                 break;
             case BattleOutcome.Cleared:
-                Gold += Spoils(Map.Current.Type); // spoils for taking the node
+                _stash.AddGold(Spoils(Map.Current.Type)); // spoils for taking the node
                 if (Map.AtCastle) { Map.CrackCastle(); State = ExpeditionState.Won; }
                 else State = ExpeditionState.Choosing;
                 break;
