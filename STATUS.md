@@ -1,9 +1,9 @@
 # Status
 
 ## Current target
-**6b. Build/loadout + run-map screens** — now unblocked (rework + body wiring + balance + end-to-end
-flow all landed). Render the pick-chassis / climb-runes / node-map state the shell already owns.
-The actual "play to feel it" remains a human touchpoint.
+**Roadmap complete** — every item is done or parked in "Needs human". The whole loop now runs end
+to end: Build screen (pick chassis -> climb runes -> choose techniques) -> Launch -> siege with a
+run-map. What remains is human judgment: play it to feel it, then tune the balance envelope.
 
 ## Design decisions (locked this pass — were "Needs human")
 - Part-targeting: PER-TECHNIQUE aim — each technique aims its own target part.
@@ -78,15 +78,16 @@ The actual "play to feel it" remains a human touchpoint.
   targets a whole Foe; PART-level aim (the locked "per-technique aims its own target PART") waits
   on multi-part foes. Reconcile by modelling a foe as a Body (or part set) + its own Caster aimed
   at the player, stepping both sides; then Caster.Aim takes a part.
-- Shell ships only the combat/damage screen. Build/loadout + run-map screens (6b) unbuilt but now
-  UNBLOCKED (rework + body wiring + end-to-end flow landed). Next loop target.
 - Rune grants are chassis-extension PARTS only (Hollow Vessel -> +CON, Resonant Core -> +INT). Other
   rune effects (stat multipliers, new techniques, passives) not yet modelled — reconcile by widening
   Mark with more data-driven effect kinds when a non-extension keystone is authored.
+- Shell is placeholder rectangles (no SpriteFont/labels). Build + run-map screens read real state
+  (BuildSession/Run) but have no text — chassis/technique/rune identities are positional only.
+  Reconcile by loading a font and labelling cells once art direction is decided (human/feel).
 
 ## POC roadmap
 - [x] 1-5. Core skeleton, rune economy, two chassis, techniques+combat tick, enemies+castle.
-- [~] 6. MonoGame shell: combat/damage screen DONE. 6b (build/loadout + run-map) parked.
+- [x] 6. MonoGame shell: combat/damage screen DONE.
 - [x] R. Attribute-model rework (foundational): STR/INT/DEX/CON Body where the live pool is
       DERIVED from intact parts; paired Arms x2 / Legs x2 carry stat shares; part damage subtracts
       that stat (graded, low scale); reservation-drop cascade (lose arm -> STR share -> gear falls
@@ -106,5 +107,8 @@ The actual "play to feel it" remains a human touchpoint.
       parts as data); Forge.Assemble threads chassis -> runes -> body -> techniques -> run into one
       Session; Sessions.Forged() climbs the Vessel keystone; the Game shell now runs that real flow.
       4 tests. ("Play to feel it" stays a human touchpoint.)
-- [ ] 6b. Build/loadout + run-map screens (now unblocked).
+- [x] 6b. Build/loadout + run-map screens: headless BuildSession backbone (cycle chassis, climb
+      ladders, toggle techniques, preview minted body, Launch -> Session; 5 tests) plus the shell's
+      Build screen and run-map strip. Shell stays thin; rules live in Core. ("Play to feel it" =
+      human.)
 - [x] 8. (optional) headless balance-sim: ranks BuildSpecs by deterministic ticks-to-clear.
