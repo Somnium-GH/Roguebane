@@ -121,6 +121,7 @@ public sealed class Expedition
                 break;
             case BattleOutcome.Cleared:
                 _stash.AddGold(Spoils(Map.Current.Type)); // spoils for taking the node
+                _caster.Recharge();                       // magic refills in the lull after a fight
                 if (Map.AtCastle) { Map.CrackCastle(); State = ExpeditionState.Won; }
                 else State = ExpeditionState.Choosing;
                 break;

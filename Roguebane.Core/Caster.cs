@@ -21,10 +21,32 @@ public sealed class Caster
 
     public int Tick { get; private set; }
 
-    public Caster(Body self, ICombatTarget? target = null)
+    private int _charge;
+    public int MaxCharge { get; }
+    public int Charge => _charge;
+
+    public Caster(Body self, ICombatTarget? target = null, int maxCharge = 0)
     {
         _self = self;
         _default = target;
+        MaxCharge = maxCharge;
+        _charge = maxCharge;
+    }
+
+    // The finite magic resource is refilled out of combat (loot / rest), not regenerated mid-fight.
+    public void Recharge() => _charge = MaxCharge;
+
+    public void Recharge(int amount)
+    {
+        if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));
+        _charge = Math.Min(MaxCharge, _charge + amount);
+    }
+
+    private bool TrySpendCharge(int cost)
+    {
+        if (_charge < cost) return false;
+        _charge -= cost;
+        return true;
     }
 
     public void Retarget(ICombatTarget target) => _default = target;
@@ -98,17 +120,16 @@ public sealed class Caster
             // The PART aim only rides its own foe; a fallback to the front hits the HP pool.
             var part = onAim ? run.Part : null;
 
-            if (run.Tech.Kind == TechniqueKind.Sustained)
-            {
-                Hit(target, part, run.Tech.Power);
-                continue;
-            }
+            // Sustained fires every tick; timered fires when its countdown elapses.
+            var fires = run.Tech.Kind == TechniqueKind.Sustained || --run.Countdown <= 0;
+            if (!fires) continue;
 
-            if (--run.Countdown <= 0)
-            {
-                Hit(target, part, run.Tech.Power);
-                run.Countdown = run.Tech.Cooldown;
-            }
+            // A magic technique with no charge holds fire — a timered one keeps retrying (its
+            // countdown stays elapsed) until the resource refills out of combat.
+            if (run.Tech.ChargeCost > 0 && !TrySpendCharge(run.Tech.ChargeCost)) continue;
+
+            Hit(target, part, run.Tech.Power);
+            if (run.Tech.Kind == TechniqueKind.Timered) run.Countdown = run.Tech.Cooldown;
         }
 
         // Minions auto-fire on whatever the caster is pressing (the default front).

@@ -12,7 +12,7 @@ public static class Forge
         Run run)
     {
         var body = chassis.NewBody(runes);
-        var caster = new Caster(body, run.Current.CurrentTarget);
+        var caster = new Caster(body, run.Current.CurrentTarget, MagicCapacity(body));
         // Rune-granted techniques join the loadout (deduped) — a held keystone can hand you a verb
         // your chassis never had.
         var full = loadout.Concat(runes.GrantedTechniques)
@@ -23,4 +23,7 @@ public static class Forge
     // The player's HP life total: a small CON-scaled pool, fixed at mint. (Whether chest damage
     // lowers MAX HP or only the available pool is parked — see "Needs human".)
     public static Fighter PlayerFighter(Body body) => new(body, 8 + body.Capacity(Stat.Con));
+
+    // The magic resource pool scales with INT — the head funds spellcraft. (Name/tuning deferred.)
+    public static int MagicCapacity(Body body) => body.Capacity(Stat.Int);
 }

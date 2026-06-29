@@ -42,7 +42,7 @@ public static class Sessions
     public static Expedition Expedition()
     {
         var body = DemoBody();
-        var caster = new Caster(body);
+        var caster = new Caster(body, maxCharge: Forge.MagicCapacity(body));
         return new Expedition(
             Forge.PlayerFighter(body), caster, Techniques.All, Maps.StandardLeg(autoResolveCastle: false));
     }

@@ -30,8 +30,9 @@ public static class Paths
     // chassis never had — a sustained INT storm. Demonstrates rune-granted techniques.
     public const string Tempest = "tempest";
 
+    // A magic-tier verb: beyond reserving INT, each tick of the storm draws the finite charge.
     public static readonly Technique Maelstrom =
-        new("maelstrom", Stat.Int, Reserve: 3, TechniqueKind.Sustained, Cooldown: 0, Power: 3);
+        new("maelstrom", Stat.Int, Reserve: 3, TechniqueKind.Sustained, Cooldown: 0, Power: 3, ChargeCost: 1);
 
     public static readonly Mark TempestI = new(Tempest, Rank: 1, Cost: 4, Refund: 2);
     public static readonly Mark TempestII = new(Tempest, Rank: 2, Cost: 5, Refund: 2);
