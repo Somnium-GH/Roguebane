@@ -102,12 +102,12 @@ stay green; the shell stays thin (rules in Core).
 - (resolved) Combat migrated onto Body: techniques reserve a stat as Actives; Encounter foes are
   HP pools (`Foe`); Entity/AttributePool/Part/Attribute retired. Head-silence is now emergent
   (smash head -> INT drains -> spell reservations cascade off). Old Power/Focus/Vigor gone.
-- (G1 partial) Foes now carry an optional Body `Frame` of targetable parts; `Caster.Aim(tech, foe,
-  part)` erodes that part's stat first and spills overkill into HP (§10 split). The locked
-  per-technique PART aim is DONE on the target-resolution side. STILL DEBT: the foe-fights-back half
-  — a foe needs its OWN Caster aimed at the PLAYER (both sides step), plus player HP + a loss state.
-  Reconcile by giving structured foes a Caster targeting the player Body and a Session loss path.
-  Content factories still mint mostly unstructured HP-pool foes; give castle layers real Frames.
+- (G1 resolved — machinery) Two-sided combat shipped: `ICombatTarget`, `Fighter` (player HP), foe
+  `Arsenal` + per-foe offense Caster in `Battle`, `Session.Lost`. REMAINING (smaller): (a) foes
+  attack the player's HP only — add localized foe->player PART aim; (b) damage mitigation (CON
+  block via `Body.BlockMitigation`, armor evasion/protection from G2) is built but not on the
+  incoming-hit path; (c) real content foes are still unarmed — arming castle layers is balance/feel
+  (human). Reconcile (a)+(b) together when the defensive layer is tuned.
 - Rune grants are chassis-extension PARTS only (Hollow Vessel -> +CON, Resonant Core -> +INT). Other
   rune effects (stat multipliers, new techniques, passives) not yet modelled — reconcile by widening
   Mark with more data-driven effect kinds when a non-extension keystone is authored.
@@ -176,9 +176,12 @@ UI track (hi-fi — replace the placeholder rectangles):
 - [ ] U6. Global chrome: buttons (hover/pressed/disabled), panels, pips, reticles, tooltips, frame.
 
 Gameplay track (toward a complete game, per `DESIGN_SPEC`):
-- [~] G1. Multi-part foes. DONE: foe `Frame` of targetable parts + per-technique PART aim with
-      localized stat erosion (overkill spills to HP, §10). DEBT: foe-fights-back (own Caster aimed
-      at the player) + player HP/loss; structured castle-layer content. Foe parts per assets sheet 2.
+- [x] G1. Multi-part foes + two-sided combat. Foe `Frame` of targetable parts; per-technique PART
+      aim with localized stat erosion (overkill -> HP, §10); `ICombatTarget` unifies the grammar;
+      `Fighter` gives the player a CON-scaled HP pool; structured armed foes run their own Caster on
+      the player (their attacks cascade off as their parts break); `Session` reports Lost. DEBT:
+      localized foe->player PART aim + damage mitigation (block/armor) wiring; arming real content
+      (castle layers) is balance/feel = human. Foe part-maps per assets sheet 2 still to author.
 - [ ] G2. Gear/inventory system: WEAPONS (and shields) are equippable objects that gate on STR/DEX
       to wield. ARMOR is a LIGHT survivability layer (NOT attribute gear): a piece per part-group
       whose effect is keyed to type — plate -> flat 1-4 protection vs stat-damage to that part;
