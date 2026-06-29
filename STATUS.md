@@ -1,7 +1,7 @@
 # Status
 
 ## Current target
-(bootstrap) scaffold solution, instruction files, initial commit.
+Item 2: rune economy (budget, Marks ladder, Paths, Hollow Vessel keystone).
 
 ## Needs human (route around these; resolve when you can)
 Each entry has enough context to resolve cold. The loop never blocks on these — it skips them.
@@ -13,7 +13,7 @@ Real-but-incomplete work and (rare) stubs, each with the trigger that lets it be
 - (none yet)
 
 ## POC roadmap (thesis-first; items 1-5 are headless Core+tests, no rendering)
-- [ ] 1. Core skeleton: attribute pool (live allocation), Entity + Parts, base types. Tests.
+- [x] 1. Core skeleton: attribute pool (live allocation), Entity + Parts, base types. Tests.
 - [ ] 2. Rune economy: budget; Marks (prereq ladder, overwrite, partial-refund climb); Paths;
         one keystone (Hollow Vessel). Tests assert budget/prereq/climb math.
 - [ ] 3. Two chassis: Grunt (low base, fat budget, cheap runes) + specialist (high base, tight
