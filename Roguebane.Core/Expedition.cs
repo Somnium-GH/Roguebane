@@ -36,6 +36,52 @@ public sealed class Expedition
     public IReadOnlyList<Technique> Loadout => _loadout;
     public IReadOnlyList<MapNode> Options => Map.Options;
 
+    // The economy: spoils from cleared nodes buy repair potions at merchants. Potions restore PARTS
+    // (the healing split — never HP); HP refills only via the merchant service.
+    public int Gold { get; private set; }
+    public int Potions { get; private set; }
+
+    private const int PotionCost = 4;
+    private const int PotionRepair = 2; // restored to every damaged part — low scale
+    private const int HealCost = 3;
+
+    private static int Spoils(NodeType type) => type switch
+    {
+        NodeType.Castle => 10,
+        NodeType.ResourceHold => 4,
+        NodeType.Skirmish => 3,
+        _ => 2,
+    };
+
+    public bool AtMerchant => State == ExpeditionState.Choosing && Map.Current.Type == NodeType.Merchant;
+
+    // Spend spoils on a repair potion (carried for later) at a merchant.
+    public bool BuyPotion()
+    {
+        if (!AtMerchant || Gold < PotionCost) return false;
+        Gold -= PotionCost;
+        Potions++;
+        return true;
+    }
+
+    // Use a carried potion to repair the body — out of combat only (between jumps / fights).
+    public bool UsePotion()
+    {
+        if (State != ExpeditionState.Choosing || Potions == 0) return false;
+        Potions--;
+        foreach (var part in _player.Body.Parts) _player.Body.Repair(part, PotionRepair);
+        return true;
+    }
+
+    // Pay a merchant for the out-of-combat HP service.
+    public bool BuyHeal()
+    {
+        if (!AtMerchant || Gold < HealCost || _player.Hp >= _player.MaxHp) return false;
+        Gold -= HealCost;
+        _player.Heal(_player.MaxHp);
+        return true;
+    }
+
     public bool IsActive(Technique technique) => _caster.IsActive(technique);
 
     public void Toggle(Technique technique)
@@ -54,10 +100,7 @@ public sealed class Expedition
 
         var node = Map.Current;
         if (node.Type == NodeType.Merchant)
-        {
-            _player.Heal(_player.MaxHp); // out-of-combat HP service; shop economy is G8 (Debt)
-            return true;                 // stay at the merchant, still Choosing
-        }
+            return true; // stay at the merchant: BuyPotion / BuyHeal / UsePotion are the verbs here
 
         Battle = new Battle(_caster, Maps.EncounterFor(node, Map.SupportBank), _player);
         State = ExpeditionState.Fighting;
@@ -75,6 +118,7 @@ public sealed class Expedition
                 State = ExpeditionState.Lost;
                 break;
             case BattleOutcome.Cleared:
+                Gold += Spoils(Map.Current.Type); // spoils for taking the node
                 if (Map.AtCastle) { Map.CrackCastle(); State = ExpeditionState.Won; }
                 else State = ExpeditionState.Choosing;
                 break;

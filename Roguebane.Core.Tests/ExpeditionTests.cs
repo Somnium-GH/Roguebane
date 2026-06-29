@@ -40,18 +40,69 @@ public class ExpeditionTests
     }
 
     [Fact]
-    public void AMerchantHealsWithoutAFight()
+    public void AMerchantIsAStopNotAFight()
     {
         var exp = FullLoadout();
         exp.Enter("a2");
-        FightToEnd(exp);              // damage may have been taken
-        exp.Player.Damage(3);        // simulate carrying a wound to the merchant
-        var wounded = exp.Player.Hp;
+        FightToEnd(exp);
 
-        exp.Enter("b");              // the merchant
+        exp.Enter("b"); // the merchant
         Assert.Equal(ExpeditionState.Choosing, exp.State); // no fight
-        Assert.True(exp.Player.Hp >= wounded);
-        Assert.Equal(exp.Player.MaxHp, exp.Player.Hp);     // HP service tops up
+        Assert.True(exp.AtMerchant);
+    }
+
+    [Fact]
+    public void MerchantHpServiceCostsGoldAndTopsUp()
+    {
+        var exp = FullLoadout();
+        exp.Enter("a2"); FightToEnd(exp); // earns spoils
+        exp.Player.Damage(2);             // carry a wound in
+        exp.Enter("b");
+
+        Assert.True(exp.Gold >= 3);
+        var gold = exp.Gold;
+        Assert.True(exp.BuyHeal());
+        Assert.Equal(exp.Player.MaxHp, exp.Player.Hp);
+        Assert.Equal(gold - 3, exp.Gold);
+    }
+
+    [Fact]
+    public void PotionsAreBoughtAtMerchantsAndRepairPartsOutOfCombat()
+    {
+        var exp = FullLoadout();
+        exp.Enter("a1"); FightToEnd(exp); // bank + spoils
+        // wound a part directly to observe repair
+        var arm = exp.Player.Body.Parts.First(p => p.Stat == Stat.Str);
+        exp.Player.Body.Damage(arm, 2);
+        var hurt = exp.Player.Body.Contribution(arm);
+
+        exp.Enter("b");
+        Assert.True(exp.BuyPotion());
+        Assert.Equal(1, exp.Potions);
+
+        Assert.True(exp.UsePotion()); // out of combat (Choosing)
+        Assert.Equal(0, exp.Potions);
+        Assert.True(exp.Player.Body.Contribution(arm) > hurt); // part repaired
+    }
+
+    [Fact]
+    public void PotionsCannotBeUsedMidFight()
+    {
+        var exp = FullLoadout();
+        exp.Enter("a1"); FightToEnd(exp);
+        exp.Enter("b"); exp.BuyPotion();
+        exp.Enter("c2"); // a fight starts
+        Assert.Equal(ExpeditionState.Fighting, exp.State);
+        Assert.False(exp.UsePotion()); // sealed during combat
+    }
+
+    [Fact]
+    public void ClearingNodesAwardsSpoils()
+    {
+        var exp = FullLoadout();
+        Assert.Equal(0, exp.Gold);
+        exp.Enter("a2"); FightToEnd(exp);
+        Assert.Equal(3, exp.Gold); // a skirmish pays 3
     }
 
     [Fact]
