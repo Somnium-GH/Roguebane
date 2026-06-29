@@ -4,15 +4,17 @@ namespace Roguebane.Core.Content;
 // trades supplies and exposure for resource-holds while racing the war party home.
 public static class Maps
 {
+    // Coords (Col = depth from camp, Row = lane) lay the chart out as a graph: camp -> a1/a2 -> b ->
+    // c1/c2 -> castle. Row 1 is the centre lane; 0/2 are the upper/lower branches.
     public static IReadOnlyList<MapNode> StandardLegNodes() => new[]
     {
-        new MapNode("camp", NodeType.Skirmish, "a1", "a2"),
-        new MapNode("a1", NodeType.ResourceHold, "b"),
-        new MapNode("a2", NodeType.Skirmish, "b"),
-        new MapNode("b", NodeType.Merchant, "c1", "c2"),
-        new MapNode("c1", NodeType.Skirmish, "castle"),
-        new MapNode("c2", NodeType.ResourceHold, "castle"),
-        new MapNode("castle", NodeType.Castle),
+        new MapNode("camp", NodeType.Skirmish, "a1", "a2").At(0, 1),
+        new MapNode("a1", NodeType.ResourceHold, "b").At(1, 0),
+        new MapNode("a2", NodeType.Skirmish, "b").At(1, 2),
+        new MapNode("b", NodeType.Merchant, "c1", "c2").At(2, 1),
+        new MapNode("c1", NodeType.Skirmish, "castle").At(3, 0),
+        new MapNode("c2", NodeType.ResourceHold, "castle").At(3, 2),
+        new MapNode("castle", NodeType.Castle).At(4, 1),
     };
 
     // autoResolveCastle defaults true for standalone navigation; the Expedition driver passes false

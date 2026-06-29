@@ -17,6 +17,7 @@ public enum RunMapOutcome
 public sealed class RunMap
 {
     private readonly Dictionary<string, MapNode> _nodes;
+    private readonly IReadOnlyList<MapNode> _order;
     private readonly bool _autoResolveCastle;
 
     public string CurrentId { get; private set; }
@@ -34,6 +35,7 @@ public sealed class RunMap
         if (nodes.Count == 0) throw new ArgumentException("a map needs nodes", nameof(nodes));
         if (marchLength <= 0) throw new ArgumentOutOfRangeException(nameof(marchLength));
         _nodes = nodes.ToDictionary(n => n.Id);
+        _order = nodes.ToList();
         if (!_nodes.ContainsKey(startId)) throw new ArgumentException("start not on the map", nameof(startId));
         _autoResolveCastle = autoResolveCastle;
         CurrentId = startId;
@@ -56,6 +58,9 @@ public sealed class RunMap
     public IReadOnlyList<MapNode> Options => Current.Next.Select(id => _nodes[id]).ToList();
 
     public MapNode Node(string id) => _nodes[id];
+
+    // The whole chart (for the graph render); order is the map's declared node order.
+    public IReadOnlyList<MapNode> Nodes => _order;
 
     // What the player can see of a node through the fog, given where they stand now.
     public NodeType Sees(MapNode node)

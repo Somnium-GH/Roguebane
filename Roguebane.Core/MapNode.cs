@@ -20,11 +20,24 @@ public sealed class MapNode
     public IReadOnlyList<string> Next { get; }
     public bool Visited { get; private set; }
 
+    // Layout hints for the chart render: Col = depth from camp, Row = lane within that depth. Pure
+    // data (no engine types) so Core stays headless; the shell maps them to screen coordinates.
+    public int Col { get; private set; }
+    public int Row { get; private set; }
+
     public MapNode(string id, NodeType type, params string[] next)
     {
         Id = id;
         Type = type;
         Next = next;
+    }
+
+    // Place this node on the chart grid (fluent, returns self for terse map data).
+    public MapNode At(int col, int row)
+    {
+        Col = col;
+        Row = row;
+        return this;
     }
 
     public void MarkVisited() => Visited = true;

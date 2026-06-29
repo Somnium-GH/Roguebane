@@ -20,6 +20,18 @@ public class RunMapTests
     }
 
     [Fact]
+    public void NodesCarryChartCoordsForTheGraphRender()
+    {
+        var map = Maps.StandardLeg();
+        Assert.Equal(7, map.Nodes.Count); // the whole chart is exposed, in declared order
+
+        var camp = map.Node("camp");
+        var castle = map.Node("castle");
+        Assert.Equal(0, camp.Col);   // camp is the chart's left edge
+        Assert.True(castle.Col > camp.Col); // the castle sits deeper along the march
+    }
+
+    [Fact]
     public void MarchLengthIsTheConstantWarPartyTrackScale()
     {
         var map = Maps.StandardLeg();

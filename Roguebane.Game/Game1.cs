@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -220,11 +221,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
             if (Pressed(keys, Keys.U) || Click(MerchUseRect)) Exp.UsePotion();
         }
 
+        // Pick an onward jump: a number key, or clicking the destination beacon on the chart.
         var options = Exp.Options;
-        var origin = JumpOrigin;
         for (var i = 0; i < options.Count; i++)
             if ((i < TechniqueKeys.Length && Pressed(keys, TechniqueKeys[i]))
-                || Click(JumpRect(i, origin.X, origin.Y)))
+                || Click(NodeRect(options[i])))
             {
                 _campaign.Enter(options[i].Id); // may win the leg and roll to the next city
                 foreach (var t in Exp.Loadout)  // keep the bar armed into the next fight/leg
@@ -232,6 +233,13 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 break;
             }
     }
+
+    // Chart layout: a node's screen rect from its grid coords (Col = depth, Row = lane). Shared by
+    // the chart render and the click hit-test so a beacon is selectable exactly where it is drawn.
+    private static readonly Point ChartOrigin = new(150, 150);
+    private const int ChartColW = 150, ChartRowH = 110, ChartIcon = 48;
+    private static Rectangle NodeRect(MapNode n) =>
+        new(ChartOrigin.X + n.Col * ChartColW, ChartOrigin.Y + n.Row * ChartRowH, ChartIcon, ChartIcon);
 
     private bool Pressed(KeyboardState keys, Keys key) => keys.IsKeyDown(key) && _prevKeys.IsKeyUp(key);
 
@@ -246,7 +254,6 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private static Rectangle PaletteRect(int i) => new(320 + i * 64, 300, 56, 56);
     private static Rectangle LadderRowRect(int p, int rungs) => new(320, 100 + p * 56, rungs * 56, 48);
     private static readonly Rectangle MarchRect = new(40, H - 52, 300, 44);
-    private static Rectangle JumpRect(int i, int x, int y) => new(x + i * 130, y, 116, 116);
     private static Rectangle ActionCardRect(int i) => new(52 + i * 84, H - 84, 76, 60);
     private static Rectangle FoeRect(int i) => new(560, 90 + i * 150, 144, 156);
     private static readonly Rectangle PauseRect = new(W - 156, H - 84, 110, 26);
@@ -269,12 +276,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
             if (ReferenceEquals(foes[i], target)) return i;
         return -1;
     }
-    // Merchant verb buttons (base at 60,240).
-    private static readonly Rectangle MerchPotionRect = new(74, 284, 330, 34);
-    private static readonly Rectangle MerchUseRect = new(74, 322, 330, 34);
-    private static readonly Rectangle MerchHealRect = new(74, 360, 330, 34);
-    // The jump chooser sits at a different origin at a merchant vs an open chart.
-    private Point JumpOrigin => Exp.AtMerchant ? new Point(460, 160) : new Point(200, 130);
+    // Merchant verb buttons — mirror DrawMerchant's panel origin (560,300) + button offsets.
+    private static readonly Rectangle MerchPotionRect = new(574, 344, 330, 34);
+    private static readonly Rectangle MerchUseRect = new(574, 382, 330, 34);
+    private static readonly Rectangle MerchHealRect = new(574, 420, 330, 34);
 
     private void ToggleFullscreen()
     {
@@ -412,15 +417,61 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawSpine(720, 12);
 
         DrawWarParty(60, 72, 470);
-
-        var map = Exp.Map;
-        Sprite(_assets.Node(map.Sees(map.Current)), 60, 130, 64, 64, Color.White);
-        Text(_assets.Mono, "you are here", 60, 198, Muted);
-
-        if (Exp.AtMerchant) DrawMerchant(60, 240);
-        else DrawJumpChooser(200, 130);
+        DrawChart();
+        if (Exp.AtMerchant) DrawMerchant(560, 300);
 
         DrawStateOverlay();
+    }
+
+    // The half-blind beacon chart as a GRAPH (design/03): nodes placed by their grid coords, links
+    // drawn solid where charted (from a visited beacon) and dotted where still uncharted; fog hides a
+    // beacon's true kind behind a `?`. The current beacon reads "you are here"; reachable beacons ring
+    // and number as the onward jumps.
+    private void DrawChart()
+    {
+        var map = Exp.Map;
+
+        // Links first, so the beacons sit on top of their connecting lines.
+        foreach (var node in map.Nodes)
+        {
+            var from = NodeRect(node);
+            var fx = from.X + ChartIcon / 2;
+            var fy = from.Y + ChartIcon / 2;
+            foreach (var nid in node.Next)
+            {
+                var to = NodeRect(map.Node(nid));
+                var charted = node.Visited; // a link out of a charted beacon is itself charted
+                Line(fx, fy, to.X + ChartIcon / 2, to.Y + ChartIcon / 2, 2,
+                    charted ? new Color(150, 130, 95) : new Color(90, 78, 66), dashed: !charted);
+            }
+        }
+
+        var options = map.Options;
+        foreach (var node in map.Nodes)
+        {
+            var r = NodeRect(node);
+            var seen = map.Sees(node);
+            var isCurrent = ReferenceEquals(node, map.Current);
+            Sprite(_assets.Node(seen), r.X, r.Y, ChartIcon, ChartIcon, isCurrent ? Color.White : new Color(210, 200, 190));
+
+            var oi = IndexOf(options, node);
+            if (isCurrent)
+            {
+                Border(r.X - 3, r.Y - 3, ChartIcon + 6, ChartIcon + 6, Amber);
+                Text(_assets.Mono, "you are here", r.X - 8, r.Y + ChartIcon + 2, Amber);
+            }
+            else if (oi >= 0) // a reachable onward jump
+            {
+                Border(r.X - 2, r.Y - 2, ChartIcon + 4, ChartIcon + 4, Hover(r) ? Ink : new Color(150, 130, 95));
+                Text(_assets.Mono, $"[{oi + 1}] {seen.ToString().ToLower()}", r.X - 6, r.Y + ChartIcon + 2, Ink);
+            }
+        }
+    }
+
+    private static int IndexOf(IReadOnlyList<MapNode> list, MapNode node)
+    {
+        for (var i = 0; i < list.Count; i++) if (ReferenceEquals(list[i], node)) return i;
+        return -1;
     }
 
     // The forward-pressure track: the war party marches on the camp one step per jump. The marker
@@ -437,25 +488,6 @@ public class Game1 : Microsoft.Xna.Framework.Game
         Text(_assets.Mono, map.WarPartyDistance + " to camp", x + w + 12, y - 6, Blood);
     }
 
-    // The charted jumps as numbered cards, each a fog-aware node icon (a `?` while still fogged).
-    private void DrawJumpChooser(int x, int y)
-    {
-        Text(_assets.Mono, "CHARTED JUMPS", x, y - 18, Muted);
-        var map = Exp.Map;
-        var options = Exp.Options;
-        for (var i = 0; i < options.Count; i++)
-        {
-            var node = options[i];
-            var seen = map.Sees(node);
-            var left = x + i * 130;
-            Panel(left, y, 116, 116);
-            Sprite(_assets.Node(seen), left + 30, y + 14, 56, 56, Color.White);
-            Text(_assets.Mono, $"[{i + 1}] {seen.ToString().ToLower()}", left + 8, y + 90, Ink);
-            if (Hover(JumpRect(i, x, y))) Border(left, y, 116, 116, Ink);
-        }
-        if (options.Count == 0) Text(_assets.Mono, "no charted jumps", x, y, Muted);
-    }
-
     private void DrawMerchant(int x, int y)
     {
         Panel(x, y, 360, 170);
@@ -465,7 +497,6 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawButton("U  use potion  (repair)", x + 14, y + 82, 330, 34, Exp.Potions > 0, Keys.U);
         DrawButton("H  heal hp     (3)", x + 14, y + 120, 330, 34,
             Exp.Gold >= 3 && Exp.Player.Hp < Exp.Player.MaxHp, Keys.H);
-        DrawJumpChooser(x + 400, y - 80);
     }
 
     // The run's resource readout: supplies, war-party distance, banked support, gold, potions.
@@ -861,5 +892,32 @@ public class Game1 : Microsoft.Xna.Framework.Game
         Rect(x, y + h - 2, w, 2, color);
         Rect(x, y, 2, h, color);
         Rect(x + w - 2, y, 2, h, color);
+    }
+
+    // A straight line between two points (a stretched, rotated 1px texture) for the chart's links.
+    // dashed => draw only alternating segments, so an uncharted jump reads dotted.
+    private void Line(int x1, int y1, int x2, int y2, int thickness, Color color, bool dashed = false)
+    {
+        var a = new Vector2(x1, y1);
+        var b = new Vector2(x2, y2);
+        var delta = b - a;
+        var len = delta.Length();
+        if (len < 1f) return;
+        var angle = (float)Math.Atan2(delta.Y, delta.X);
+        if (!dashed)
+        {
+            _spriteBatch.Draw(_pixel, a, null, color, angle,
+                new Vector2(0, 0.5f), new Vector2(len, thickness), SpriteEffects.None, 0f);
+            return;
+        }
+        var dir = delta / len;
+        const float seg = 6f;
+        for (var d = 0f; d < len; d += seg * 2)
+        {
+            var p = a + dir * d;
+            var segLen = Math.Min(seg, len - d);
+            _spriteBatch.Draw(_pixel, p, null, color, angle,
+                new Vector2(0, 0.5f), new Vector2(segLen, thickness), SpriteEffects.None, 0f);
+        }
     }
 }
