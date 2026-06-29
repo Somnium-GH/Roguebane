@@ -28,6 +28,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private Campaign _campaign = null!;
     private bool _paused;
     private KeyboardState _prevKeys;
+    private KeyboardState _keys; // current frame's keys, read in Draw for button pressed-state
 
     // The leg under way is the campaign's current Expedition — most of the run screen reads it.
     private Expedition Exp => _campaign.Current;
@@ -83,6 +84,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     protected override void Update(GameTime gameTime)
     {
         var keys = Keyboard.GetState();
+        _keys = keys;
         if (keys.IsKeyDown(Keys.Escape)) Exit();
 
         if (_screen == Screen.Build) UpdateBuild(keys);
@@ -285,12 +287,13 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     private void DrawMerchant(int x, int y)
     {
-        Panel(x, y, 360, 150);
+        Panel(x, y, 360, 170);
         Text(_assets.Display, "MERCHANT", x + 14, y + 10, Ink);
-        Text(_assets.Mono, $"[P] buy potion (4)   potions {Exp.Potions}", x + 14, y + 48, Muted);
-        Text(_assets.Mono, "[U] use potion  (repair parts)", x + 14, y + 72, Muted);
-        Text(_assets.Mono, "[H] heal hp     (3)", x + 14, y + 96, Muted);
-        Text(_assets.Mono, "pick a jump [1..] to march on", x + 14, y + 122, Amber);
+        DrawButton($"P  buy potion (4)   x{Exp.Potions}", x + 14, y + 44, 330, 34,
+            Exp.Gold >= 4, Keys.P);
+        DrawButton("U  use potion  (repair)", x + 14, y + 82, 330, 34, Exp.Potions > 0, Keys.U);
+        DrawButton("H  heal hp     (3)", x + 14, y + 120, 330, 34,
+            Exp.Gold >= 3 && Exp.Player.Hp < Exp.Player.MaxHp, Keys.H);
         DrawJumpChooser(x + 400, y - 80);
     }
 
@@ -333,9 +336,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawPalette(320, 320);
 
         var ready = _build.Loadout.Count > 0;
-        Panel(40, H - 40, W - 80, 32);
-        Text(_assets.Mono, ready ? "ENTER  begin the march" : "pick at least one technique",
-            56, H - 34, ready ? Amber : Muted);
+        DrawButton(ready ? "ENTER  begin the march" : "pick a technique",
+            40, H - 52, 300, 44, ready, Keys.Enter);
     }
 
     private void DrawChassisSelector(int x, int y)
@@ -555,6 +557,19 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         Rect(x, y, w, h, new Color(Panel0, 220));
         Border(x, y, w, h, Border0);
+    }
+
+    // A skinned button whose state is driven by input (manifest: drives-from input/interaction).
+    // Stretch-scaled for now; true 9-slice is polish. Returns nothing — input lives in Update.
+    private void DrawButton(string label, int x, int y, int w, int h, bool enabled, Keys key)
+    {
+        var state = !enabled ? "disabled" : _keys.IsKeyDown(key) ? "down" : "normal";
+        var skin = _assets.Button(state);
+        if (skin is not null) Sprite(skin, x, y, w, h, Color.White);
+        else Panel(x, y, w, h);
+        var size = _assets.Mono.MeasureString(label);
+        Text(_assets.Mono, label, (int)(x + w / 2 - size.X / 2), (int)(y + h / 2 - size.Y / 2),
+            enabled ? Ink : Muted);
     }
 
     // A labelled value bar (HP, etc.): icon, filled track, and the mono "cur/max" readout.
