@@ -28,6 +28,13 @@ public sealed class RuneLoadout
     public IReadOnlyList<Mark> HeldMarks =>
         _held.Values.OrderBy(m => m.Path, StringComparer.Ordinal).ToList();
 
+    // Everything the held runes unlock, in the same stable order the body grants fold in.
+    public IReadOnlyList<Technique> GrantedTechniques =>
+        HeldMarks.SelectMany(m => m.GrantedTechniques).ToList();
+
+    public IReadOnlyList<Minion> GrantedMinions =>
+        HeldMarks.SelectMany(m => m.GrantedMinions).ToList();
+
     public int CurrentRank(string path) => _held.GetValueOrDefault(path)?.Rank ?? 0;
 
     public Mark? Held(string path) => _held.GetValueOrDefault(path);

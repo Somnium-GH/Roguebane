@@ -25,4 +25,28 @@ public static class Paths
         Grants: new[] { new BodyPart("resonant-core", Stat.Int, 4) });
 
     public static readonly IReadOnlyList<Mark> ResonanceLadder = new[] { ResonanceI, ResonanceII, ResonantCore };
+
+    // A non-extension keystone: instead of widening the pool, the Tempest keystone GRANTS a verb the
+    // chassis never had — a sustained INT storm. Demonstrates rune-granted techniques.
+    public const string Tempest = "tempest";
+
+    public static readonly Technique Maelstrom =
+        new("maelstrom", Stat.Int, Reserve: 3, TechniqueKind.Sustained, Cooldown: 0, Power: 3);
+
+    public static readonly Mark TempestI = new(Tempest, Rank: 1, Cost: 4, Refund: 2);
+    public static readonly Mark TempestII = new(Tempest, Rank: 2, Cost: 5, Refund: 2);
+    public static readonly Mark EyeOfTheStorm = new(Tempest, Rank: 3, Cost: 6, Refund: 0, Keystone: true,
+        Techniques: new[] { Maelstrom });
+
+    public static readonly IReadOnlyList<Mark> TempestLadder = new[] { TempestI, TempestII, EyeOfTheStorm };
+
+    // Another non-extension keystone: the Conclave keystone GRANTS a minion type (the bound Shade).
+    public const string Conclave = "conclave";
+
+    public static readonly Mark ConclaveI = new(Conclave, Rank: 1, Cost: 4, Refund: 2);
+    public static readonly Mark ConclaveII = new(Conclave, Rank: 2, Cost: 5, Refund: 2);
+    public static readonly Mark BoundConclave = new(Conclave, Rank: 3, Cost: 6, Refund: 0, Keystone: true,
+        Minions: new[] { Minions.Shade });
+
+    public static readonly IReadOnlyList<Mark> ConclaveLadder = new[] { ConclaveI, ConclaveII, BoundConclave };
 }
