@@ -73,7 +73,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
             if (Pressed(keys, TechniqueKeys[i]))
                 _build.Toggle(_build.Palette[i]);
 
-        if (Pressed(keys, Keys.Enter))
+        // No actions, no run: Launch is gated on a chosen loadout (the readiness bar mirrors this).
+        if (Pressed(keys, Keys.Enter) && _build.Loadout.Count > 0)
         {
             _session = _build.Launch(Sieges.StandardRun());
             _screen = Screen.Run;
