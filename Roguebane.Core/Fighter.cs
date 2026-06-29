@@ -31,9 +31,7 @@ public sealed class Fighter : ICombatTarget
     public void DamagePart(BodyPart part, int amount)
     {
         if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));
-        var absorbed = Math.Min(Body.Contribution(part), amount);
-        if (absorbed > 0) Body.Damage(part, absorbed); // routes through the reservation cascade
-        var overkill = amount - absorbed;
+        var overkill = Body.AbsorbPartHit(part, amount); // armor blunts; the part erodes (cascade)
         if (overkill > 0) Damage(overkill);
     }
 

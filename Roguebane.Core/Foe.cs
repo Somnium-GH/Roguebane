@@ -43,9 +43,7 @@ public sealed class Foe : ICombatTarget
         if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));
         if (Frame is null) { Damage(amount); return; }
 
-        var absorbed = Math.Min(Frame.Contribution(part), amount);
-        if (absorbed > 0) Frame.Damage(part, absorbed);
-        var overkill = amount - absorbed;
+        var overkill = Frame.AbsorbPartHit(part, amount); // armor blunts, the part erodes
         if (overkill > 0) Damage(overkill);
     }
 

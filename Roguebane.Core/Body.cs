@@ -9,6 +9,7 @@ public sealed class Body
     private readonly List<BodyPart> _parts = new();
     private readonly Dictionary<string, int> _intact = new();
     private readonly List<Active> _actives = new(); // engagement order; cascade sheds newest first
+    private readonly Dictionary<Stat, Armor> _armor = new(); // one piece per part-group (keyed by Stat)
 
     public IReadOnlyList<BodyPart> Parts => _parts;
     public IReadOnlyList<Active> Actives => _actives;
@@ -44,6 +45,28 @@ public sealed class Body
         if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));
         _intact[part.Id] = Math.Max(0, Contribution(part) - amount);
         Cascade(part.Stat);
+    }
+
+    // Armor rides on a part-group (its Stat). One piece per group — equipping replaces.
+    public void Equip(Armor piece) => _armor[piece.Group] = piece;
+
+    public Armor? ArmorOn(Stat group) => _armor.GetValueOrDefault(group);
+
+    // Flat plate protection on a part, but only while the part still stands — the effect rides the
+    // part's condition. Other armor kinds (leather evasion, spell-ward) are not flat protection.
+    public int Protection(BodyPart part) =>
+        Contribution(part) > 0 && _armor.TryGetValue(part.Stat, out var a) && a.Kind == ArmorKind.Plate
+            ? a.Value : 0;
+
+    // A localized incoming hit: plate blunts it, the part's stat erodes (running the cascade), and
+    // the unabsorbed remainder (overkill) is returned for the caller's HP pool to take.
+    public int AbsorbPartHit(BodyPart part, int amount)
+    {
+        if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));
+        var effective = Math.Max(0, amount - Protection(part));
+        var absorbed = Math.Min(Contribution(part), effective);
+        if (absorbed > 0) Damage(part, absorbed);
+        return effective - absorbed;
     }
 
     // Healing restores PARTS, never HP: a repaired part feeds its stat back into the pool.
