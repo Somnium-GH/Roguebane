@@ -752,8 +752,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
         return frac <= 0f ? "broken" : frac < 0.5f ? "damaged" : "healthy";
     }
 
-    // Foe side: each foe a sprite + HP bar. A foe LOCKED by a module wears a solid reticle; while a
-    // module is in TARGETING mode every live foe shows a faint pick-prompt reticle (choose a target).
+    // Foe side: each foe a sprite + HP bar. Foe/part HIGHLIGHTS come ONLY from active TARGETING (a
+    // module is picking): every live foe shows a faint pick-prompt reticle, a structured foe shows its
+    // limb bands, and the band under the cursor highlights. There is NO persistent locked-aim ring —
+    // which module targets which foe/limb reads off the action-bar card tags (F1:H). AUTO never touches
+    // this; it is purely a button state.
     private void DrawFoes(int x, int y)
     {
         var encounter = Exp.Battle!.Encounter;
@@ -764,35 +767,20 @@ public class Game1 : Microsoft.Xna.Framework.Game
             var top = y + i * 150;
             var tint = foe.Down ? new Color(70, 60, 55) : Color.White;
             Sprite(_assets.Texture("sprites/char/ogre"), x, top, 144, 156, tint);
-            if (!foe.Down)
+            if (!foe.Down && targeting)
             {
-                if (AnyModuleAims(foe)) Sprite(_assets.Reticle("focus"), x + 24, top, 96, 96, Amber);
-                else if (targeting) Sprite(_assets.Reticle("focus"), x + 24, top, 96, 96, new Color(Ink, 110));
-
-                const int band = 156 / 4;
-                // Limbs locked by a module stay ringed so the per-card tag has a visual anchor.
-                foreach (var t in Exp.Loadout)
-                    if (Exp.IsActive(t) && ReferenceEquals(Exp.AimOf(t), foe) && Exp.PartOf(t) is { } pt)
-                        Border(x, top + PartBand(pt.Stat) * band, 144, band, Amber);
-
-                if (targeting && foe.Frame is not null) // show the limb bands + highlight the one under cursor
+                Sprite(_assets.Reticle("focus"), x + 24, top, 96, 96, new Color(Ink, 110)); // pick-prompt
+                if (foe.Frame is not null) // limb bands + the band under the cursor (the hover highlight)
                 {
+                    const int band = 156 / 4;
                     for (var b = 1; b < 4; b++) Rect(x, top + b * band, 144, 1, new Color(Ink, 90));
                     if (FoePartAt(foe, _cursor) is { } hov)
                         Border(x, top + PartBand(hov.Stat) * band, 144, band, Ink);
                 }
-                else if (Hover(FoeRect(i))) Border(x, top, 144, 156, Ink); // click to aim
             }
+            else if (!foe.Down && Hover(FoeRect(i))) Border(x, top, 144, 156, Ink);
             DrawBar(x, top + 156, 144, _assets.Resource("hp"), foe.Hp, foe.MaxHp, Blood);
         }
-    }
-
-    // True if any active module is aimed at this foe (drives the locked-on reticle).
-    private bool AnyModuleAims(Foe foe)
-    {
-        foreach (var t in Exp.Loadout)
-            if (Exp.IsActive(t) && ReferenceEquals(Exp.AimOf(t), foe)) return true;
-        return false;
     }
 
     // The minion-bay lane: one slot per chassis bay, filled with its summoned occupant (a tinted disc +

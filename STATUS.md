@@ -6,7 +6,8 @@ Player casters run `requireAim`: a powered technique fires ONLY at its own expli
 back to a front, so untargeted HOLDS. Firing is target-driven (no fire button) — charged+aimed
 discharges. AUTO is ONE GLOBAL toggle: ON = no module clears its target after firing (all keep firing at
 the same target); OFF (default) = each fires once when charged+targeted, then clears. Shown as a lit/unlit
-button (no +/- glyph). Engine casters (foe offense/sim/legacy Session) keep default-front auto-fire.
+button (no +/- glyph). FIX (re-open): AUTO affects ONLY that button — it must NOT add any highlight on
+the foe or its parts (the targeting hover-highlight is separate and stays). Engine casters (foe offense/sim/legacy Session) keep default-front auto-fire.
 Shell: per-module controls (left-click inactive=power, active=enter targeting+clear; foe-click=aim+exit;
 right-click=cancel/unpower), locked + pick-prompt reticles, targeting card ring, no FIRE button / focus
 cursor. Pinned by PlayerTargetingFsmTests (incl. GlobalAutoGovernsEveryModule) + integration; RB_SMOKE OK.
@@ -114,3 +115,42 @@ from primitives. Route each to Claude Design. (Hi-fi transition: design/ASSET_HI
   war-party, campaign spine, data-driven runes/minions/magic, economy). Remaining actionable work = the
   Debt above + the targeting FSM fix. Visual truth = design/ PNGs + design/SCREENS.md; look = DESIGN_SPEC
   §13 + ASSET_HIFI_BRIEF.md. Keep "FTL" out of shipped UI text.
+
+## Phase 3 — combat depth + Race/CoreRune rename [SCOPED, not started]
+Big slice after the current combat polish. Do it in SMALL /loop slices. Reconcile DESIGN_SPEC sections
+DURING the phase with SURGICAL edits (do NOT rewrite/clobber). LOCKED below; OPEN parked at the foot.
+
+LOCKED:
+- SINGLE-ENEMY combat: always vs ONE enemy (it may be multi-PART: a human foe, an atypical creature, the
+  castle, or a special resource fight). DROP multi-foe / multiple targets entirely — the only targeting is
+  PART aim within the one enemy. (Simplifies the front-target machinery.)
+- RENAME "Chassis" -> RACE + CORE RUNE (the real names; like FTL ship + layout):
+  * RACE = starting attributes + base HP. Start with Human + Elf (more later).
+  * CORE RUNE = LAYOUT (rune budget, # techniques, # minion bays) + apex effects/bonuses (stronger than a
+    keystone). RACE GATES which core runes it may take (SB-style restriction matrix).
+  * New Run = pick RACE -> pick CORE RUNE (race-allowed). Today's 5 "chassis"
+    (Grunt/Warden/Adept/Summoner/Reaver) BECOME core runes; Race is the new orthogonal axis.
+  * Code: rename Chassis -> CoreRune everywhere; add Race; split Chassrium into Races + CoreRunes.
+- LONG COMBAT by design. Most builds carry a DEFENSIVE SOURCE (shield / stoneskin / DEX-evasion); dropping
+  it = high hit odds. A build with NONE must compensate (cheap/near-instant part-heals, or high damage +
+  evade/CON + frequent heals).
+- ENEMY HP high but SCALES with tier so early play keeps pace; ~1/4–1/3 damage taken is typical when unspecialized.
+- HEALS standard — they repair PARTS, never HP ("repair systems"): Potion (item; strong ones rare),
+  Bandage (CON ability), Cure Wounds (INT spell). Starting healless < starting shieldless in penalty.
+- SHIELDS rework: LEVELS of shielding (FTL-style); each layer absorbs 1 damage; better shields + runes add
+  levels. EQUIP = CON (heavy). Regenerates on a timer scaled by CON (mages suffer too without CON runes;
+  spell sources get slight relief). Sources: SPELLS Stoneskin/Barkskin/Steelskin/Diamondskin (always-on
+  passive, reserve lots of INT, lower caps); ABILITIES Shield Wall (CON; ~floor(troops/4) layers), Parry
+  (DEX; low cap), Bind (STR; low cap).
+
+OPEN (park; decide as the phase starts):
+- Healless compensation archetype(s): heal-spam vs damage-tank — define.
+- "Ready to block Nx faster" mechanic (the healless trade) — design it.
+- Shield damage caps per source + actual numbers (relative only so far) — balance.
+- CON as a MINION resource (CON funds minions -> a no-INT cleric-caster) — floated; ties to minion alt-cost gating.
+- Shield Wall troops->layers formula (floor(troops/4) is illustrative) — balance.
+- Race roster beyond Human/Elf; full Core-rune roster; the race<->core-rune restriction matrix.
+
+Suggested order: (1) single-enemy + part-aim simplification; (2) Chassis->Race+CoreRune rename + race-gated
+New Run; (3) shield-levels system; (4) part-repair heals; (5) defensive-source defaults in starting kits;
+(6) enemy-HP scaling. DESIGN_SPEC touch points to reconcile as each lands: §4/§6/§7/§10/§11/§16.
