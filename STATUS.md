@@ -28,9 +28,13 @@ power, or empty), from Exp.Minions/Bays. Combat RB_SMOKE (Summoner @ castle) sho
 **Build screen attribute readout — DONE** (pips show free/reserved/damaged per stat + gate markers: the
 kit's per-stat demand notch + /N, red when over-pool). Inventory tabs / drag-equip / equipped-gear-on-
 anatomy still blocked on gear/minion equip (G2/G7).
-Next actionable:
-- INT-channel sustained kind (Debt): a per-tick damage-scaled Sustained so a beam is a real channel,
-  not a 10/s firehose. Core slice, testable. OR revisit bank-on-arrival→bank-on-clear (minor Core fix).
+**Bank-on-clear — DONE.** Resource-holds bank rallied support only when their fight is won (combat driver
+via RunMap.BankHold); standalone nav still banks on arrival. Pinned in ExpeditionTests.
+Next actionable (the unblocked queue is thinning — much of what's left is human-gated or asset/design):
+- Campaign city-graph (design/04): a screen for the multi-leg march to the Capital (legs as a graph,
+  current leg highlighted). Read Campaign.LegIndex/LegCount. Check design/04 + SCREENS.md first.
+- INT-channel sustained kind: DEFERRED as speculative — no beam content authored yet (Ember/Drain are
+  fine as Timered bolts). Build it when a channel weapon is actually authored.
 - Foe -> PLAYER part aim is PARKED in "Needs human" — it depends on the HP-vs-stat split decision, and
   the current whole-HP foe contract is pinned by FoeOffenseTests. Do not flip it unilaterally.
 Other remaining (Debt): build-screen inventory tabs + drag-equip (blocked on G2/G7); Choose-Your-Core
@@ -108,7 +112,6 @@ from primitives. Route each to Claude Design. (Hi-fi transition: design/ASSET_HI
 - Mouse is click + hover only — no drag-to-equip, tooltips, rebinding; PAUSE/FLEE are plain rects (U6).
 - Rune grants = chassis-extension PARTS only; add more data-driven Mark effect kinds when a non-extension
   keystone is authored.
-- Bank-on-arrival vs bank-on-clear (minor): support banks on landing, before the fight is won. Revisit.
 - G1: foes attack player HP only (no localized foe→player PART aim); real content foes still unarmed beyond
   the light feel-pass arming (power envelope = human).
 
