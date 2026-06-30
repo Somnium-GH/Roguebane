@@ -43,9 +43,16 @@ BuyArmor. Map RB_SMOKE shows sword/dagger/plate with affordability.
 passthroughs → Gearing) → EQUIPPED readout + click-to-equip PACK chips on the map gear bar. Pinned in
 ExpeditionTests + GearingTests; map RB_SMOKE verified. Remaining: equipped gear drawn ON the anatomy
 sprite (a sword on the arm etc.) — minor art polish, not blocking.
-Next actionable: the unblocked, non-speculative queue is now largely exhausted — see "Needs human" /
-Debt. Candidates: equipped-gear-on-anatomy sprites (art polish); otherwise the remaining roadmap items
-are human-gated (campaign topology, HP-vs-stat split, balance) or design-asset.
+**Gear-on-anatomy — DONE** (composed markers: armor rings its part, weapon shows in hand; real gear
+sprites = art asset gap). G2 gear is now fully end-to-end.
+Next actionable (thin remaining unblocked slices):
+- Leather armor EVASION: Body.EvasionPercent + the seeded RNG already handle leather (the old "deferred"
+  note is stale); only CONTENT + a test are missing. Author a leather armor piece + pin that it grants a
+  dodge chance on its part-group. Clears the Armor.cs leather Debt.
+- Lower value/polish: build-screen drag-to-equip + categorized inventory tabs (click-equip already
+  works); SpellWard armor (needs spell/blind model — defer).
+- Human-gated/asset: campaign topology (§04 branching), HP-vs-stat split (foe→player part aim), balance
+  tuning, real gear/figure SPRITES (Claude Design), bundled fonts.
 - INT-channel sustained kind: DEFERRED as speculative — no beam content authored (Ember/Drain are fine
   as Timered bolts). Build it when a channel weapon is authored.
 - Foe -> PLAYER part aim PARKED (Needs human): HP-vs-stat split; whole-HP foe contract pinned by FoeOffenseTests.
