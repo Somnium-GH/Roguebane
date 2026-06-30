@@ -19,13 +19,19 @@ public sealed class Foe : ICombatTarget
     // target. A foe needs a Frame to power an Arsenal — the same reserve-on-parts rule as the player.
     public IReadOnlyList<Technique> Arsenal { get; }
 
-    public Foe(string id, int hp, Body? frame = null, IReadOnlyList<Technique>? arsenal = null)
+    // The manifest figure to render this foe with (creature figure key, e.g. "ogre"). Distinct from
+    // Id, which is an encounter-role tag ("gate", "ogre-0"). The shell composes the figure from it.
+    public string Figure { get; }
+
+    public Foe(string id, int hp, Body? frame = null, IReadOnlyList<Technique>? arsenal = null,
+        string figure = "ogre")
     {
         Id = id;
         MaxHp = hp;
         Hp = hp;
         Frame = frame;
         Arsenal = arsenal ?? Array.Empty<Technique>();
+        Figure = figure;
     }
 
     public bool Down => Hp <= 0;

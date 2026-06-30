@@ -847,13 +847,16 @@ public class Game1 : Microsoft.Xna.Framework.Game
             DrawHumanoid(body, figureId, fbCx, fbCy, fbH);
     }
 
-    private void DrawHumanoid(Body body, string figureId, int cx, int cy, int targetH)
+    // allowBare=false forces the plain (armoured-row) sprites — for figures with no bare art (foes).
+    private void DrawHumanoid(Body body, string figureId, int cx, int cy, int targetH,
+        Color? tint = null, bool allowBare = true)
     {
         var manifest = _layout.Manifest;
         if (manifest is null || !manifest.Figures.ContainsKey(figureId)) { DrawHumanoidLegacy(body, cx, cy); return; }
 
         var fig = manifest.Figures[figureId];
         var composer = new StageComposer(manifest);
+        var color = tint ?? Color.White;
         var f = (float)targetH / fig.Size[1];                 // world scale: fit the figure to the slot height
         var px = fig.Pivot[0]; var py = fig.Pivot[1];          // anchor the figure's pivot at (cx,cy)
         int SX(float fx) => cx + (int)((fx - px) * f);
@@ -861,10 +864,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
         foreach (var p in composer.ComposeFigure(figureId,
                      part => FigureBinding.Condition(body, part),
-                     part => FigureBinding.UseBare(body, part)))
+                     part => allowBare && FigureBinding.UseBare(body, part)))
         {
             var r = p.Rect; // x,y,w,h in figure space
-            Sprite(_assets.Texture(p.SpriteKey), SX(r[0]), SY(r[1]), (int)(r[2] * f), (int)(r[3] * f), Color.White);
+            Sprite(_assets.Texture(p.SpriteKey), SX(r[0]), SY(r[1]), (int)(r[2] * f), (int)(r[3] * f), color);
         }
 
         // Gear: anchor each mount's pivot at its socket point. Only draw gear the body actually carries.
@@ -927,7 +930,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
             var foe = encounter.Foes[i];
             var top = y + i * 150;
             var tint = foe.Down ? new Color(70, 60, 55) : Color.White;
-            Sprite(_assets.Texture("sprites/char/ogre"), x, top, 144, 156, tint);
+            // Compose the foe from its creature figure (no bare art for foes -> force the plain row).
+            if (foe.Frame is not null) DrawHumanoid(foe.Frame, foe.Figure, x + 72, top + 156, 156, tint, allowBare: false);
+            else Sprite(_assets.Reticle("focus"), x + 24, top, 96, 96, tint); // inert foe: a marker
             if (!foe.Down && targeting)
             {
                 Sprite(_assets.Reticle("focus"), x + 24, top, 96, 96, new Color(Ink, 110)); // pick-prompt
