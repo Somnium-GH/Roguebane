@@ -10,11 +10,14 @@ button (no +/- glyph). Engine casters (foe offense/sim/legacy Session) keep defa
 Shell: per-module controls (left-click inactive=power, active=enter targeting+clear; foe-click=aim+exit;
 right-click=cancel/unpower), locked + pick-prompt reticles, targeting card ring, no FIRE button / focus
 cursor. Pinned by PlayerTargetingFsmTests (incl. GlobalAutoGovernsEveryModule) + integration; RB_SMOKE OK.
+**G1 foe PART aim — DONE (data + shell).** Content foes carry a multi-part frame; the combat surface
+splits each foe into anatomical limb bands (head/arms/chest/legs), highlights the hovered band while
+targeting, and a band click aims the module at that part (Aim(tech, foe, part)). Locked limbs stay
+ringed; card tags read the limb (F1:H). Pinned in FoeArmingTests; RB_SMOKE shows a head-aimed module
+eroding the head stat (foe HP untouched).
 Next actionable (pick one):
-- G1 foe PART aim — SHELL half: Foes.Armed now carries a multi-part frame (STR arm/INT head/DEX legs/
-  CON chest), so the data exists. Wire the combat shell so that, in TARGETING, clicking a foe PART (vs
-  whole foe) calls Aim(tech, foe, part): hit-test part regions on the foe sprite, render them, show the
-  per-card part in the F-tag. (Core path done + tested in FoeArmingTests.)
+- Foe -> PLAYER part aim (the other G1 leg): foes currently hit player HP only; give foe offense a
+  player-PART target so CON-block + evasion mitigation localize on the struck part (clears that Debt).
 - Shell-input behaviour: the targeting click→state mapping is reviewed + visually verified but not
   headless-tested (MonoGame input). Consider extracting a thin testable combat-input reducer.
 Other remaining (Debt): build-screen inventory tabs + drag-equip (blocked on G2/G7); Choose-Your-Core
@@ -80,8 +83,8 @@ from primitives. Route each to Claude Design. (Hi-fi transition: design/ASSET_HI
 ## Debt (active — with reconcile trigger)
 - BUILD screen lacks inventory tabs (gear/tech/minions) + drag-to-equip, the per-stat attribute readout
   with gate markers, and equipped-gear on the anatomy. Blocked on gear/minion equip (G2/G7).
-- Combat surface has no PART-level aim UI, no minion-bay lane, no support lane — wait on foe part-maps (G1)
-  + the bay/support UI lanes.
+- Combat surface: PART-level aim UI DONE (limb bands + part-aim). Still no minion-bay lane, no support
+  lane — wait on the bay/support UI lanes.
 - CON block + evasion mitigation are on the WHOLE-HP path; localized on PART hits waits on foe→player PART
   aim (G1).
 - INT beams are fast Timered bolts (Sustained=every-tick was a firehose at 10/s); for a true channel, add a
