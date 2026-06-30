@@ -709,6 +709,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
         DrawLadders(320, 100);
         DrawCoreBlock(700, 90);
+        DrawMinionPreview(700, 320);
         DrawPalette(320, 300);
         DrawLoadoutStrip(320, 400);
 
@@ -740,6 +741,36 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     // The action-bar loadout strip: the chassis's FIXED starting kit, pre-slotted (no pick gate).
     // Mirrors the combat action bar so the player reads the bar they will fight with.
+    // Build-screen MINION BAYS preview (design/02): a slot per chassis bay, filled with the kit's
+    // minion sprite (or empty outline), so the player previews the retinue they'll field. Mirrors the
+    // combat bay lane; display-only.
+    private void DrawMinionPreview(int x, int y)
+    {
+        var c = _build.Chassis;
+        if (c.Bays <= 0) return;
+        Text(_assets.Mono, "MINION BAYS", x, y - 18, Muted);
+        var kit = c.MinionKit;
+        const int slot = 44, gap = 8;
+        for (var i = 0; i < c.Bays; i++)
+        {
+            var sx = x + i * (slot + gap);
+            Panel(sx, y, slot, slot);
+            if (i < kit.Count)
+            {
+                var m = kit[i];
+                var tex = _assets.Minion(m.Id);
+                if (tex is not null) Sprite(tex, sx + 4, y + 4, slot - 8, slot - 8, Color.White);
+                else
+                {
+                    Rect(sx + 6, y + 6, slot - 12, slot - 12, new Color(Amber, 70));
+                    Text(_assets.Mono, (m.Id.Length >= 2 ? m.Id[..2] : m.Id).ToUpperInvariant(), sx + 8, y + 12, Ink);
+                }
+                Text(_assets.Mono, m.Power.ToString(), sx + slot - 14, y + slot - 18, Amber);
+            }
+            else Border(sx, y, slot, slot, Border0); // empty bay
+        }
+    }
+
     private void DrawLoadoutStrip(int x, int y)
     {
         Text(_assets.Mono, "ACTION BAR", x, y - 18, Muted);
