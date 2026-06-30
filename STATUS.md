@@ -24,6 +24,8 @@ REMAINING (deliberate / not safe 1-min fragments):
   ONE shared rect (clicks aren't smoke-verifiable). Unblocks the battlefield minionField figure too.
   CONTRACT now in DESIGN_SPEC s13: foe zone holds 1-3 foes stacked in the foe column (skirmish line /
   castle gate-wall-keep) — the rebuild must handle the column, not assume the manifest's single slot.
+  BLOCKED ON A DESIGN CALL (see "Needs human"): 3 full-height stacked foes occupy the bottom band where
+  design/01 puts the attribute-pool + action-bar panels — they can't coexist until foe layout is decided.
 - EQUIPMENT screen (design/02): no screen state yet (only Build/Run). Inventory tabs (GEAR/TECH/MINIONS) +
   item cards, Rune Bag, click/drag-equip — INPUT-COUPLED features needing input wiring + mid-run stash.
 - Asset gaps (see section): skirmish node icon, wraith/gargoyle figure art, torso bare-variant (plate
@@ -139,6 +141,12 @@ screen design/05 (build screen doubles as picker — locked OK); campaign city-g
 - Five chassis stat blocks (design/05) are placeholder — tune later.
 - Part→stat friction (legs = accuracy, arms = STR) — low-pri revisit only if it nags.
 - Fonts: SpriteFonts use system Consolas/Georgia — swap to bundled open fonts before distribution.
+- COMBAT layout decision (blocks the design/01 manifest rebuild): design/01 + the manifest assume ~one
+  short foe, so the bottom holds prominent attribute-pool + action-bar PANELS. But encounters field 1-3
+  foes stacked FULL-HEIGHT in the foe column (3rd foe reaches y~546) — they occupy the bottom band where
+  those panels go. Can't coexist as-is. Needs a call: shrink/scale foes, lay foes in a HORIZONTAL row,
+  shorten the foe column, or keep the current vertical-spread layout (pips in YOU box, bar at the foot).
+  Until decided, combat stays on its working hand-placed layout; per-element manifest moves all collide.
 
 ## Locked this round (were Needs-human)
 - FOE→PLAYER PART aim — SHIPS. Foes erode player PARTS (HP-vs-stat default accepted: a hit eats the
