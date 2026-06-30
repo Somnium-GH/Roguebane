@@ -34,11 +34,13 @@ via RunMap.BankHold); standalone nav still banks on arrival. Pinned in Expeditio
 chain. Full branching city-graph parked (needs a branching campaign model — Needs human).
 **G2 gear inventory + equip — DONE (Core).** Stash carries a gear pack; Gearing moves pieces on/off the
 body honoring the gates; Body.Unequip added. Pinned in GearingTests (6).
-Next actionable (G2 continues):
-- Gear ACQUISITION: stock the merchant with a couple of weapons/armor at placeholder prices (mirrors the
-  potion/heal shop; deterministic), buy -> Stash.AddWeapon/AddArmor. Then the player can acquire gear.
-  (Gear set + prices = balance, placeholder-sane per loop; flag for human tuning.)
-- Then build-screen equip UI (inventory tab + equip via Gearing) + equipped-gear-on-anatomy render.
+**G2 gear acquisition — DONE (Core).** Merchant sells weapons/armor (Shops stock, placeholder prices)
+into the Stash pack via Expedition.BuyWeapon/BuyArmor. The acquire→carry→equip loop is now whole and
+Core-testable; only the SHELL surface is missing. Pinned in ExpeditionTests.
+Next actionable (G2 shell):
+- Merchant gear UI: at a merchant, paint OfferedWeapons/OfferedArmor + prices as buy verbs (mirror the
+  potion/heal buttons), wired to BuyWeapon/BuyArmor. Verify on the merchant RB_SMOKE.
+- Then build-screen equip UI (pack tab + equip via Gearing) + equipped-gear-on-anatomy render.
 - INT-channel sustained kind: DEFERRED as speculative — no beam content authored (Ember/Drain are fine
   as Timered bolts). Build it when a channel weapon is authored.
 - Foe -> PLAYER part aim PARKED (Needs human): HP-vs-stat split; whole-HP foe contract pinned by FoeOffenseTests.
