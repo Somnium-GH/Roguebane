@@ -21,9 +21,10 @@ POC is NOT complete; the "DONE" claim below is RETRACTED until these clear.**
   crash is gone in the live draw, not just headless.
 - Fresh design renders landed (`design/01–06`, 06-30) and are now COMMITTED as the rebuild reference.
   Audited each live shot vs its PNG (scratch-dir smoke). Punch list:
-  * 03 MAP: structural rebuild — design wants a BIGGER beacon chart, prominent top-left SUPPLIES +
-    MUSTERED-SUPPORT panels (pip bars + flavor), and a right-side "THE CASTLE — exit" panel. Build shows
-    a compact top-bar HUD + a small 5-node diamond. (Biggest gap.)
+  * 03 MAP: top-left SUPPLIES + MUSTERED-SUPPORT panels (pip bars + flavor) DONE + smoke-verified
+    (supplies/support moved off the compact top-bar; war-party track relocated to clear them). REMAINING:
+    the BIGGER beacon chart (design wants a denser graph vs the current 5-node diamond) + a right-side
+    "THE CASTLE — exit" panel. Both land cleanly via the manifest `type:"graph"` rebuild below.
   * 02 BUILD: matches except the already-known DEFERRED items — INVENTORY tabs (GEAR/TECH/MINIONS) +
     rarity item cards, and a RUNE BAG of MARKS/PATHS/KEYSTONES cards (current screen shows rune LADDERS).
     Both input-coupled (need input wiring + mid-run stash).
@@ -33,6 +34,23 @@ POC is NOT complete; the "DONE" claim below is RETRACTED until these clear.**
     `screens.newrun` + `design/05` (single-core for now; race step behind the flag).
   * PALETTE: NOT a uniform shift — 05 reads warm-dusk, 02/03 read cooler/navy; renders vary, so leave
     the palette as-is (warm-muted-dusk, DESIGN_SPEC §13) until a palette decision actually locks.
+- MANIFEST validated COMPLETE (human review of the full 3305-line `layout.json`; parses clean — an
+  earlier "truncated" read was a stale mount, ignore). runmap/campaign/newrun are now RICHLY spec'd
+  (templates coreCard/legendRow/beaconNode/cityNode, `type:"graph"` containers + `anchor:"nodePoint"`,
+  bundled open fonts) — rebuild those 3 screens FROM the manifest; they're no longer stub-blocked.
+  Consumer must learn `type:"graph"` (place nodes from map/campaign data in the region) + `nodePoint`
+  (node-relative parts) + IMAGE PARTS (done: `TemplatePart`/`PlacedPart` now carry an optional `Image`,
+  so a card part can be a figure sprite instead of text; CardTemplate schema test accepts sample-OR-image).
+  cityNode is labels-only; castle stays the generic node icon (procedural castle parked — not
+  mission-critical). REVIEW FIXES:
+  * coreCard figure is HARDCODED (`image: …/chassis/grunt.png` sample) — BIND each card's image to its
+    OWN core's figure, else all 5 New-Run cards show Grunt.
+  * Decorative glyphs `✦ ◉ ✓` render as `?` (GlyphSafe maps `· — →` but not these). ADD the glyphs the
+    design uses to the SpriteFont character regions so they render; keep GlyphSafe as the safety net.
+  * Normalize element `type` (some images/panels are typed `"text"`, e.g. combat `backdrop`) — or ensure
+    the consumer keys off image/fill/item presence.
+  * PARKED (revisit later): two literal `content` subtitles (campaign/newrun) are truncated in the
+    manifest — the text itself may be outdated, so not worth an extractor fix yet.
 
 ## Prior integration record (the "DONE" claim below is RETRACTED per the re-open above)
 **Shell wired to `layout.json` — integration DONE; combat layout RESOLVED (locked, see s13). POC functionally complete; only the low-value Equipment inventory-tabs polish remains (deferred).**

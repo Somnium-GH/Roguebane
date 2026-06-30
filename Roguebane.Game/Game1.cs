@@ -502,13 +502,47 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawRunResources(200, 10);
         DrawSpine(720, 12);
 
-        DrawWarParty(60, 72, 470);
+        DrawSupplyPanels(16, 48);
+        DrawWarParty(300, 64, 300);
         DrawChart();
         DrawMapLegend(756, 64); // top-right; clears the header, war party, and the merchant panel below
         if (Exp.AtMerchant) DrawMerchant(560, 300);
         DrawGearBar(20, H - 44);
 
         DrawStateOverlay();
+    }
+
+    // design/03 signature: the two top-left gauges as PANELS with pip bars + flavor (the jump budget
+    // and the support you can rally), in place of bare top-bar counts.
+    private void DrawSupplyPanels(int x, int y)
+    {
+        var map = Exp.Map;
+        var holds = map.Nodes.Count(n => n.Type == NodeType.ResourceHold);
+
+        Panel(x, y, 250, 64);
+        Text(_assets.Mono, "SUPPLIES", x + 12, y + 8, Muted);
+        Text(_assets.Mono, $"{map.Supplies}/{map.MaxSupplies}", x + 200, y + 8, map.Supplies > 0 ? Ink : Blood);
+        DrawPipStrip(x + 12, y + 28, map.Supplies, map.MaxSupplies, map.Supplies > 0 ? Amber : Blood);
+        Text(_assets.Mono, "1 supply spent per jump", x + 12, y + 44, Muted);
+
+        var sy = y + 72;
+        Panel(x, sy, 250, 64);
+        Text(_assets.Mono, "MUSTERED SUPPORT", x + 12, sy + 8, Muted);
+        Text(_assets.Mono, $"{map.SupportBank}/{holds}", x + 200, sy + 8, Ink);
+        DrawPipStrip(x + 12, sy + 28, map.SupportBank, holds, new Color(120, 160, 200));
+        Text(_assets.Mono, "banked from held beacons", x + 12, sy + 44, Muted);
+    }
+
+    // A row of filled/empty segments (design/03 gauges). Filled in col, the remainder a dim outline.
+    private void DrawPipStrip(int x, int y, int filled, int total, Color col)
+    {
+        const int seg = 16, gap = 4, h = 10;
+        for (var i = 0; i < total; i++)
+        {
+            var sx = x + i * (seg + gap);
+            if (i < filled) Rect(sx, y, seg, h, col);
+            else Border(sx, y, seg, h, new Color(80, 65, 60));
+        }
     }
 
     // Node-type key (design/03): what the chart icons mean. Display-only; tucked top-right where the
@@ -666,19 +700,12 @@ public class Game1 : Microsoft.Xna.Framework.Game
     }
 
     // The run's resource readout: supplies, war-party distance, banked support, gold, potions.
+    // Compact top-bar counts: gold + potions only. Supplies and mustered support moved to their
+    // design/03 panels (DrawSupplyPanels); the war-party distance reads off its own track.
     private void DrawRunResources(int x, int y)
     {
-        var map = Exp.Map;
-        // Supplies as remaining/max (the jump budget) per design/03; the rest stay single counts.
-        Sprite(_assets.Resource("supplies"), x, y, 22, 22, Color.White);
-        Text(_assets.Mono, $"{map.Supplies}/{map.MaxSupplies}", x + 26, y + 4, map.Supplies > 0 ? Ink : Blood);
-        DrawStat(_assets.Node(NodeType.Castle), map.WarPartyDistance, x + 110); // war party closing in
-        // Mastered support as banked/total holds on the leg (the support you could rally) per design/03.
-        var holds = map.Nodes.Count(n => n.Type == NodeType.ResourceHold);
-        Sprite(_assets.Resource("support"), x + 220, y, 22, 22, Color.White);
-        Text(_assets.Mono, $"{map.SupportBank}/{holds}", x + 246, y + 4, Ink);
-        DrawStat(_assets.Resource("spoils"), Exp.Gold, x + 330);
-        DrawStat(_assets.Resource("hp"), Exp.Potions, x + 440);
+        DrawStat(_assets.Resource("spoils"), Exp.Gold, x);
+        DrawStat(_assets.Resource("hp"), Exp.Potions, x + 110);
 
         void DrawStat(Texture2D? icon, int value, int sx)
         {
