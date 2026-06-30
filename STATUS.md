@@ -65,6 +65,9 @@ Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliabl
   weapons (dagger on a summoner) never showed; DrawHumanoid now draws each body.Hands weapon at a
   hand socket by its own gear sprite — verified (dagger renders at the hand). NOTE: weapon sits a
   bit low (socket+pivot tuning is manifest/art polish, not blocking).
+  Minion sprites now fill the BAYS lane (skeleton sprite; shade falls back to disc) — verified. The
+  design/01 battlefield minionField figure is DEFERRED: its manifest slot collides with the hand-
+  placed BAYS/SUPPORT lanes — unblocks once combat is rebuilt to the manifest layout (the big combat job).
   Remaining design/02: Inventory tabs (GEAR/TECH/MINIONS) + item cards, Rune Bag panel,
   Current-Core/Action-Bar bottom row. NOTE: inventory tabs + rune-bag + action-bar relocation are
   INPUT-COUPLED (click-equip, ladder/card hit-tests) — each needs draw+hit derived from ONE source
