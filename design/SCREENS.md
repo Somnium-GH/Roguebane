@@ -37,8 +37,8 @@ Action Bar loadout (bottom). **This is the worst current gap — most of the bel
 *(Terminology: "Chassis" → RACE + CORE RUNE per DESIGN_SPEC §7; the screen's "Chassis Anatomy" /
 "Current Core" labels + the design/02 PNG predate the rename — update labels to Race + Core rune.)*
 - [x] Header: title + chassis selector (5 cores, current ringed) + runes spent/budget.
-- [~] CHASSIS ANATOMY: figure cutaway + per-part STAT callouts (INT/CON/STR/DEX); wielded weapon drawn
-      on the figure. Equipped-armour-per-part overlay partial (torso has no bare/armoured variant — art gap).
+- [x] CHASSIS ANATOMY: figure cutaway + per-part STAT callouts (INT/CON/STR/DEX); wielded weapon drawn
+      on the figure; worn armour shows per part (sprite swap on limbs, composed ring on torso/head/boots).
 - [x] ATTRIBUTE READOUT: per stat a bar of base + Marks + current with the GATE marker + final value.
 - [ ] INVENTORY with TABS (GEAR / TECHNIQUES / MINIONS) + click/drag equip — input-coupled, deferred
       (equip works on the run-map gear bar today).
