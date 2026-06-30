@@ -23,9 +23,12 @@ Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliabl
   FigureBinding (parts at manifest rects, state-keyed, scaled by size/pivot; gear at sockets by
   gear pivot); legacy stat-offset kept only as a missing-manifest fallback. Chassis figure key
   threaded through assembly (Expedition.FigureId / Campaign, set from chassis.Id). NEXT: VERIFY
-  via RB_SMOKE (build + combat figure vs design PNG) — needs a human/automated smoke run; then
-  SCREENS-from-manifest (place elements by anchor+offset+size + templates + style; retire magic
-  rects; all five). Equipment screen after.
+  via RB_SMOKE (build + combat figure vs design PNG) — needs a human/automated smoke run (loop
+  defers: RB_SMOKE opens a GL window). SCREENS-from-manifest STARTED: anchor resolver landed in
+  Core (`Layout/ScreenLayout.cs`: anchor+offset+size -> design-space LayoutRect, every anchor
+  pinned). NEXT: design->screen VIEWPORT pass (cover bg + integer pixel stage scaling a 960x540
+  design space to the window) so the shell can blit resolved rects; then drive each screen's draw
+  off `screen.elements` (+ templates + style), retiring magic rects, all five. Equipment screen after.
 - Stage composer: assemble a figure from its parts at manifest rects in `z`, swap part STATE by Core
   condition (bare vs armored), mount gear at `sockets` per `mounts`, scale into the slot by `pivot`.
   RETIRE Game1 `DrawHumanoid` hard offsets (the exploded figure).
