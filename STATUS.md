@@ -34,7 +34,11 @@ Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliabl
   palette entry pinned). Core manifest-consumption toolkit now COMPLETE: manifest parse, figure
   composer+binding+blit, ScreenLayout rects, PaletteColor. NEXT (Game, blind without RB_SMOKE):
   drive each screen's draw off `screen.elements` via ScreenLayout + PaletteColor + AssetRegistry,
-  guarded by manifest-present fallback; retire magic rects; all five. Then templates (cards) +
+  guarded by manifest-present fallback; retire magic rects; all five. Then Equipment screen.
+  TEMPLATES DONE in Core (typed Template/TemplatePart + `Layout/CardTemplate.cs` stamping, pinned)
+  — resolves the reconcile-on-consume debt. Core toolkit now fully typed + tested: parse, figure
+  composer/binding/blit, ScreenLayout, PaletteColor, CardTemplate. ALL remaining layout work is
+  Game-side rendering (blind without RB_SMOKE) — drive screens off elements/templates, then the
   Equipment screen. VERIFY needs a human/automated RB_SMOKE run (loop can't open a GL window).
 - Stage composer: assemble a figure from its parts at manifest rects in `z`, swap part STATE by Core
   condition (bare vs armored), mount gear at `sockets` per `mounts`, scale into the slot by `pivot`.
