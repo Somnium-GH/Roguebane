@@ -42,6 +42,7 @@ public sealed class AssetRegistry
     public Texture2D? Rune(string tier) => Texture("icons/rune/" + tier);
     public Texture2D? Background(string id) => Texture("bg/" + id);
     public Texture2D? ChassisFigure(string id) => Texture("sprites/char/chassis/" + id);
+    public Texture2D? Minion(string id) => Texture("sprites/minion/" + id);
 
     // Technique id -> glyph where one is authored; otherwise a neutral fallback so the bar always fills.
     public Texture2D? Technique(string id) =>

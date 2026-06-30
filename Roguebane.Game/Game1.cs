@@ -999,8 +999,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
         }
     }
 
-    // The minion-bay lane: one slot per chassis bay, filled with its summoned occupant (a tinted disc +
-    // a 2-letter tag — no minion sprite asset yet) or left an empty outline. Hidden for a no-bay chassis.
+    // The minion-bay lane: one slot per chassis bay, filled with its summoned occupant (its sprite,
+    // or a tinted disc + 2-letter tag when no sprite is authored) or left an empty outline. Hidden
+    // for a no-bay chassis.
     private void DrawBays(int x, int y)
     {
         var bays = Exp.Bays;
@@ -1015,9 +1016,13 @@ public class Game1 : Microsoft.Xna.Framework.Game
             if (i < minions.Count)
             {
                 var m = minions[i];
-                Rect(sx + 6, y + 6, slot - 12, slot - 12, new Color(Amber, 70)); // occupied disc
-                var tag = (m.Id.Length >= 2 ? m.Id[..2] : m.Id).ToUpperInvariant();
-                Text(_assets.Mono, tag, sx + 8, y + 12, Ink);
+                var tex = _assets.Minion(m.Id);
+                if (tex is not null) Sprite(tex, sx + 4, y + 4, slot - 8, slot - 8, Color.White);
+                else // fallback: tinted disc + 2-letter tag
+                {
+                    Rect(sx + 6, y + 6, slot - 12, slot - 12, new Color(Amber, 70));
+                    Text(_assets.Mono, (m.Id.Length >= 2 ? m.Id[..2] : m.Id).ToUpperInvariant(), sx + 8, y + 12, Ink);
+                }
                 Text(_assets.Mono, m.Power.ToString(), sx + slot - 14, y + slot - 18, Amber); // power
             }
             else Border(sx, y, slot, slot, Border0); // empty bay
