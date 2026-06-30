@@ -1,0 +1,35 @@
+using System.Linq;
+using Microsoft.Xna.Framework;
+using Roguebane.Core.Layout;
+
+namespace Roguebane.Game;
+
+// Bridge from the typed Core layout manifest to MonoGame draw types: resolves a screen element's
+// design-space rect (via ScreenLayout) and palette colours (via PaletteColor). All lookups are
+// tolerant — a missing manifest/element/colour returns null/fallback so the shell degrades to its
+// legacy magic-number layout rather than crashing or drawing nothing.
+public sealed class ManifestUi
+{
+    private readonly LayoutRegistry _layout;
+    public ManifestUi(LayoutRegistry layout) => _layout = layout;
+
+    public bool Has => _layout.Manifest is not null;
+
+    public Rectangle? ElementRect(string screen, string id)
+    {
+        var m = _layout.Manifest;
+        if (m is null || !m.Screens.TryGetValue(screen, out var s)) return null;
+        var e = s.Elements.FirstOrDefault(x => x.Id == id);
+        if (e is null) return null;
+        var r = ScreenLayout.Resolve(s, e);
+        return new Rectangle(r.X, r.Y, r.W, r.H);
+    }
+
+    public Color Color(string name, Color fallback)
+    {
+        var style = _layout.Manifest?.Style;
+        if (style is null) return fallback;
+        var c = PaletteColor.Named(style, name, new Rgba(fallback.R, fallback.G, fallback.B, fallback.A));
+        return new Color(c.R, c.G, c.B, c.A);
+    }
+}

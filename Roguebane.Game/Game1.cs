@@ -26,6 +26,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private Texture2D _pixel = null!;
     private AssetRegistry _assets = null!;
     private readonly LayoutRegistry _layout = new();
+    private ManifestUi _ui = null!;
 
     private Screen _screen = Screen.Build;
     private BuildSession _build = null!;
@@ -128,6 +129,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         _pixel = new Texture2D(GraphicsDevice, 1, 1);
         _pixel.SetData(new[] { Color.White });
         _assets = new AssetRegistry(Content);
+        _ui = new ManifestUi(_layout);
         _scene = new RenderTarget2D(GraphicsDevice, W, H);
     }
 
@@ -658,7 +660,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         var preview = _build.Preview();
         Panel(40, 90, 240, 410);
         Text(_assets.Mono, _build.Chassis.Id.ToUpper(), 56, 100, Muted);
-        DrawHumanoid(preview, _build.Chassis.Id, 160, 470, 360);
+        DrawFigureIn(preview, _build.Chassis.Id, "build", "paperDoll", 160, 470, 360);
         DrawPips(preview, 56, 320, KitDemand());
 
         DrawLadders(320, 100);
@@ -772,7 +774,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         var body = Exp.Player.Body;
         Panel(x, y, 220, 360);
         Text(_assets.Mono, "YOU", x + 12, y + 8, Muted);
-        DrawHumanoid(body, Exp.FigureId, x + 110, y + 330, 300);
+        DrawFigureIn(body, Exp.FigureId, "combat", "heroFigure", x + 110, y + 330, 300);
 
         var hp = Exp.Player;
         DrawBar(x + 16, y + 188, 188, _assets.Resource("hp"), hp.Hp, hp.MaxHp, Blood);
@@ -834,6 +836,17 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // a state-keyed sprite (condition x armored/bare, via FigureBinding), gear mounted at its socket.
     // The pure composition lives in Core (StageComposer/FigureBinding); the shell only blits + scales.
     // Falls back to the legacy stat-offset draw when the manifest is absent (no crash on a content gap).
+    // Place the figure from a manifest screen element (feet at the box bottom-centre, scaled to the
+    // box height). Falls back to the supplied magic coords when the element/manifest is absent.
+    private void DrawFigureIn(Body body, string figureId, string screen, string elementId,
+        int fbCx, int fbCy, int fbH)
+    {
+        if (_ui.ElementRect(screen, elementId) is { } b)
+            DrawHumanoid(body, figureId, b.X + b.Width / 2, b.Y + b.Height, b.Height);
+        else
+            DrawHumanoid(body, figureId, fbCx, fbCy, fbH);
+    }
+
     private void DrawHumanoid(Body body, string figureId, int cx, int cy, int targetH)
     {
         var manifest = _layout.Manifest;
