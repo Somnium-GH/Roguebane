@@ -83,8 +83,10 @@ screen design/05 (build screen doubles as picker — locked OK); campaign city-g
 - STR (Arms): attack power 1.0x. Gates STR weapons; equips shields (heavy = STR).
 - INT (Head): spell power; keeps spell actives + passives up. Absorbs old WIS.
 - DEX (Legs): evasion; accuracy; +0.25x attack (DEX/4, int); HASTE (cooldown −%/DEX). Gates DEX weapons.
-- CON (Chest): bonus HP (1:2); stun resist; DEFENSIVE-ACTIVE — shield/Brace reserve CON and absorb up to
-  the CON reserved (capped); STR equips the shield, CON powers the block. Gates chassis-extending runes.
+- CON (Chest): bonus HP (1:2); stun resist; the DEFENSIVE stat — powers the CON "block" source and scales
+  SHIELD-POINT REGEN (all sources). STR still wields the heavy shield OBJECT; CON powers its block. Shield
+  model = the Phase 3 SHIELDS revamp (passive stat-reserving technique with regenerating 1-dmg points),
+  NOT a flat cap. Gates chassis-extending runes.
 - CHA dropped; WIS → INT (5 → 4).
 - ARMOR = light effect layer, NOT attribute gear: plate → flat 1-4 protection vs the stat-dmg to its part;
   leather (DEX) → evasion; head spell-armor → spell/blind protection. Rides the part's condition (break
@@ -97,22 +99,21 @@ screen design/05 (build screen doubles as picker — locked OK); campaign city-g
   degradation, equip/ability fall-off, and the allocation economy.
 
 ## Needs human (loop skips these)
-- HP-vs-stat split — DEFAULT: attacks → the targeted part's stat; HP only via penetrating/bypass or overkill.
-  BLOCKS foe→player PART aim: today foes hit player HP (whole-HP, pinned by FoeOffenseTests + the CON-block
-  path). Flipping foes to erode player PARTS (and localizing CON-block/evasion onto part hits) needs this
-  decision + a feel call on WHICH limb a foe targets. Player→foe part aim already ships; foe→player waits.
-- Shield-block — DEFAULT: flat while held (vs depleting/recharging).
-- Arms/legs — ASSUMPTION: armor one-per-group, weapons per-hand. Confirm.
-- Balance/feel tuning (placeholder-sane, tune in play): tick 10/s; cooldowns + damage; DEX haste 2%/pt cap
-  28%; CON→HP 1:2 + base 8; evasion %; CON block cap 3; armed-foe HP/strike; castle cadences;
-  budgets/spoils/prices; march length vs supplies.
-- Fog reveal — DEFAULT: resource-holds + castle visible afar, merchant 1 jump out, else `?` until adjacent.
-- War-party indicator placement on the map.
-- Campaign topology: branching city-graph (design/04 "pick a path, can't take them all") vs the current
-  FIXED linear leg list. The branching §04 screen + route choice wait on this. Linear spine strip ships now.
+- Balance/feel tuning (placeholder-sane, tune in play): tick 10/s; cooldowns + damage; DEX haste 2%/pt
+  cap 28%; CON→HP 1:2 + base 8; evasion %; shield amounts/regen; armed-foe HP/strike; castle cadences;
+  budgets/spoils/prices; supplies vs march length.
 - Five chassis stat blocks (design/05) are placeholder — tune later.
 - Part→stat friction (legs = accuracy, arms = STR) — low-pri revisit only if it nags.
 - Fonts: SpriteFonts use system Consolas/Georgia — swap to bundled open fonts before distribution.
+
+## Locked this round (were Needs-human)
+- FOE→PLAYER PART aim — SHIPS. Foes erode player PARTS (HP-vs-stat default accepted: a hit eats the
+  targeted part's stat; HP only via penetrate/overkill). WHICH limb = a per-foe TARGETING PERSONALITY,
+  as data: SMART (best for its build) | RANDOM | INEPT (botches a good pick). Localize CON-block/evasion
+  onto part hits here.
+- WAR-PARTY indicator — a TOP-edge track, castle (right) → camp (left), advancing each move (try top first).
+- Armor one-per-group + weapons per-hand — LOCKED. Fog reveal rules — LOCKED.
+- Campaign topology + shields — revamped this round; see Phase 3.
 
 ## Asset gaps (Needs Claude Design)
 *Loop logs here when a screen needs ART that's missing/wrong in Roguebane.Content and can't be composed
@@ -125,7 +126,7 @@ from primitives. Route each to Claude Design. (Hi-fi transition: design/ASSET_HI
 - Combat surface: PART-level aim UI DONE (limb bands + part-aim); minion-bay lane DONE. Still no
   rallied-support lane.
 - CON block + evasion mitigation are on the WHOLE-HP path; localized on PART hits waits on foe→player PART
-  aim (G1).
+  aim (G1). (Both reconcile with the Phase 3 SHIELDS revamp — current code is still the old flat block.)
 - INT beams are fast Timered bolts (Sustained=every-tick was a firehose at 10/s); for a true channel, add a
   per-tick damage-scaled sustained kind. (Speculative — defer until a channel weapon is authored.)
 - Leather armor evasion now FUNCTIONAL + content (Shops.Hide) + tested. SpellWard still deferred (no spell model).
@@ -165,11 +166,17 @@ LOCKED:
 - ENEMY HP high but SCALES with tier so early play keeps pace; ~1/4–1/3 damage taken is typical when unspecialized.
 - HEALS standard — they repair PARTS, never HP ("repair systems"): Potion (item; strong ones rare),
   Bandage (CON ability), Cure Wounds (INT spell). Starting healless < starting shieldless in penalty.
-- SHIELDS rework: LEVELS of shielding (FTL-style); each layer absorbs 1 damage; better shields + runes add
-  levels. EQUIP = CON (heavy). Regenerates on a timer scaled by CON (mages suffer too without CON runes;
-  spell sources get slight relief). Sources: SPELLS Stoneskin/Barkskin/Steelskin/Diamondskin (always-on
-  passive, reserve lots of INT, lower caps); ABILITIES Shield Wall (CON; ~floor(troops/4) layers), Parry
-  (DEX; low cap), Bind (STR; low cap).
+- SHIELDS (revamped): a shield SOURCE is a PASSIVE TECHNIQUE that RESERVES its stat in the bar and is ON
+  by default (most builds carry one for survivability); toggleable off in combat to free the stat. It
+  maintains a POOL of SHIELD POINTS (FTL layers, no hard cap) — each absorbs 1 damage and is CONSUMED on
+  hit; points REGENERATE on a timer scaled by CON (+ rune effects). The SOURCE sets amount/regen + its
+  stat: block (CON), stoneskin/barkskin/steelskin/diamondskin (INT), parry (DEX, low cap), bind (STR, low
+  cap), shield-wall (CON, scales with troops). Every class should have a viable block source. (Supersedes
+  the old "flat while held" CON-block.)
+- CAMPAIGN MAP: a forward-biased city GRAPH (NOT a fixed linear list). Movement is free-ish but generally
+  forward, GATED by SUPPLIES (deplete as you move). Run dry → you must WAIT; each waiting turn has a CHANCE
+  of an encounter (may resupply — affordable, free, or useless). The enemy war-party advances the whole
+  time toward your camp + capital; reaching them = LOSE. Unblocks the design/04 branching screen.
 
 OPEN (park; decide as the phase starts):
 - Healless compensation archetype(s): heal-spam vs damage-tank — define.

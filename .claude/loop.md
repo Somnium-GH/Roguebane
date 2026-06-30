@@ -18,6 +18,7 @@ Per run:
 4. Genuine human-need (unmade decision, feel call, secret)? Add to "Needs human" with cold-start
    context; route around it. Can't go green after a real try? Park it the same way. Don't thrash.
 5. COMMIT one small semantic slice. Update `STATUS.md`: check off, fix Debt + "Needs human", set the
-   next target. Keep STATUS LEAN (prune resolved/stale lines). Then STOP — one task done.
+   next target. Keep STATUS LEAN (prune resolved/stale lines). If the slice changed LOCKED design, also
+   reconcile `design/DESIGN_SPEC.md` (the canon). Then STOP — one task done.
 
 When everything left is in "Needs human", say so in one line instead of picking work.

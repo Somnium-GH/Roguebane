@@ -30,3 +30,6 @@ and does it feel good.
 
 ## Working
 - Start each task by reading `STATUS.md`. Finish by updating it. Run work via `/loop`.
+- Design canon = `design/DESIGN_SPEC.md`; keep it CURRENT — fold a decision in WHEN IT LOCKS. `STATUS.md`
+  is build-STATE (target / debt / needs-human / progress) and POINTS to the spec, it doesn't re-specify
+  design. A change that alters locked design reconciles DESIGN_SPEC in the same pass.
