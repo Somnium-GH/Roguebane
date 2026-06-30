@@ -51,7 +51,10 @@ Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliabl
   more combat/build elements off magic numbers via ManifestUi (verify each with a smoke shot), then
   the other screens' polish + Equipment screen. Verification is now part of the loop — smoke each
   visual change. AssetRegistry maps realigned to the drop's renamed icons (node resource, attr
-  intellect, technique glyphs) — clean-build-safe, verified on the map. Combat/build still match
+  intellect, technique glyphs) — clean-build-safe, verified on the map. Pips now use the drop's
+  per-stat coloured art (full_<stat>/reserved_<stat>/damage; fixed deleted pip_damaged), verified on
+  build. Three stale-asset bugs fixed (foe sprite, icon maps, pips) — clean content build now safe.
+  Combat/build still match
   design only loosely — the bigger remaining job is rebuilding combat to design/01 (prominent bottom
   Attribute-Pool + Action-Bar panels, figures in the open battlefield) in small smoke-verified slices.
 - Stage composer: assemble a figure from its parts at manifest rects in `z`, swap part STATE by Core
