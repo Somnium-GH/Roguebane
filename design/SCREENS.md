@@ -17,45 +17,42 @@ mono anchor), part-state sprites, `PointClamp`.
 
 ## 01 Combat — `design/01-combat.png`
 Three columns: YOU (left) | BATTLEFIELD (center) | FOE (right); header top; action bar bottom.
-- [ ] Header: encounter name + locale; pause/allocate indicator. (NO tempo/peril — dropped.)
-- [ ] YOU: cutaway body, all parts (Head, Chest, Arms x2, Legs x2), each drawn by condition.
-- [ ] YOU: HP bar ("heals only out of combat"), bound to Fighter Hp/MaxHp.
-- [ ] ATTRIBUTE-POOL PIP WIDGET (the most prominent element): a row per stat, pips split
-      free / reserved / damaged, colour-keyed, mono number anchor. Bound to Body capacity/reserved.
-- [ ] BATTLEFIELD: minion(s) in bay state; the rallied-support auto-fire lane.
-- [ ] FOE: each foe a structured body with targetable PARTS + HP; current target ringed by a reticle.
-- [ ] ACTION BAR: a card per loadout technique — icon, stat cost, COOLDOWN fill, state
-      (ready / charging / held / dry), and the technique's current TARGET indicator.
-- [ ] Minion-bay lane (toggle, idle/active).
-- [ ] Run resources: supplies, banked support, war-party distance, gold, potions.
+- [~] Header: title by node type (SIEGE/SKIRMISH/RESOURCE HOLD) + pause; locale text not shown.
+- [x] YOU: cutaway body from the manifest figure composer, all parts drawn by condition.
+- [x] YOU: HP bar bound to Fighter Hp/MaxHp; figure labelled with its chassis.
+- [x] ATTRIBUTE-POOL PIP WIDGET: per-stat coloured pips (free/reserved/damaged), mono anchor.
+      (In the YOU box, not yet the prominent bottom panel — that waits on the combat manifest rebuild.)
+- [x] BATTLEFIELD: minion sprites in the bay lane; rallied-support lane (banked / RALLIED +N).
+- [x] FOE: structured creature figure(s) with targetable PART bands + HP bar + reticle + name tag.
+- [x] ACTION BAR: card per technique — icon, stat cost, cooldown fill, state (RDY/charging/held/dry),
+      per-card target tag; global AUTO toggle, no fire button.
+- [x] Minion-bay lane (filled occupant sprite / empty outline).
+- [x] Run resources: supplies X/max, support banked/holds, war-party distance, gold, potions.
+- [ ] design/01 EXACT layout (prominent bottom attribute-pool + action-bar panels, figures in the open
+      battlefield) — deferred to the coherent combat manifest rebuild (see STATUS).
 
 ## 02 Build / Loadout — `design/02-build.png`
 Chassis Anatomy (left) | Attribute Readout + Inventory (center) | Rune Bag (right); Current Core +
 Action Bar loadout (bottom). **This is the worst current gap — most of the below is missing.**
 *(Terminology: "Chassis" → RACE + CORE RUNE per DESIGN_SPEC §7; the screen's "Chassis Anatomy" /
 "Current Core" labels + the design/02 PNG predate the rename — update labels to Race + Core rune.)*
-- [ ] Header: title + chassis selector (5 cores, current ringed) + runes spent/budget.
-- [ ] CHASSIS ANATOMY: cutaway with EQUIPPED GEAR per part (helm/plate/arms/greaves), each part
-      labelled with its stat.
-- [ ] ATTRIBUTE READOUT: per stat a bar of base + Marks + current, with the GATE marker + final
-      value; the cold-climb tip text.
-- [ ] INVENTORY with TABS (GEAR / TECHNIQUES / MINIONS): active tab lists items; gear shows part +
-      gating stat; click/drag to equip onto the matching part.
-- [ ] RUNE BAG: budget free/total + spoils; MARKS / PATHS / KEYSTONES as named cards (cost + gate +
-      tier); socket / sell verbs.
-- [ ] CURRENT CORE stat block: gear / arms / bays / actions / budget / base.
-- [ ] ACTION BAR loadout: the chassis's FIXED starting kit pre-slotted (NO "pick a technique" gate);
-      minion bays alongside.
+- [x] Header: title + chassis selector (5 cores, current ringed) + runes spent/budget.
+- [~] CHASSIS ANATOMY: figure cutaway + per-part STAT callouts (INT/CON/STR/DEX); wielded weapon drawn
+      on the figure. Equipped-armour-per-part overlay partial (torso has no bare/armoured variant — art gap).
+- [x] ATTRIBUTE READOUT: per stat a bar of base + Marks + current with the GATE marker + final value.
+- [ ] INVENTORY with TABS (GEAR / TECHNIQUES / MINIONS) + click/drag equip — input-coupled, deferred
+      (equip works on the run-map gear bar today).
+- [ ] RUNE BAG (MARKS / PATHS / KEYSTONES cards + socket/sell) — current screen shows rune LADDERS instead.
+- [x] CURRENT CORE stat block: str/int/dex/con / bays / budget / actions.
+- [x] ACTION BAR loadout: the FIXED starting kit pre-slotted (no pick gate).
 
 ## 03 Run Map — `design/03-runmap.png`
-- [ ] Supplies meter (X/Y, 1/jump); Mastered Support (banked, rains at the castle).
-- [ ] Half-blind beacon CHART: nodes as a graph (needs per-node coords in map data), charted (solid)
-      vs uncharted (dotted) links; "YOU ARE HERE" at the current beacon.
-- [ ] Fog: `?` unknown beacons; resource-holds + castle visible afar; merchant resolves 1 jump out.
-- [ ] Node-type icons: camp / merchant / resource-hold / unknown / castle.
-- [ ] War-party advance track: a TOP-edge track, castle (right) → camp (left), with a TOKEN advancing
-      each move + a closing-distance read (ADD — not in the render; needs a war-party token + camp icon).
-- [ ] Flee verb; castle "max scale" note; gold/potions readout; campaign spine strip.
+- [x] Supplies meter (X/max); Mastered Support (banked/holds).
+- [x] Half-blind beacon CHART: node graph, charted (solid) vs uncharted (dotted) links; YOU ARE HERE.
+- [x] Fog: `?` unknown beacons; resource-holds + castle visible afar; merchant resolves 1 jump out.
+- [x] Node-type icons (+ a CHART legend): camp / merchant / resource-hold / unknown / castle.
+- [~] War-party advance track (top, closing-distance read); dedicated war-party token/camp icon = art gap.
+- [x] Flee verb; gold/potions readout; campaign spine strip.
 
 ## 04 Campaign Spine — `design/04-campaign-spine.png`
 - [ ] Branching CITY GRAPH (castle icons) from start to the Capital; cities-taken counter.
