@@ -61,6 +61,10 @@ Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliabl
   design/02 BUILD started: attribute READOUT bars (base + rune-marks + gate notch + total per stat)
   replace the build pip rows per design/02 (combat keeps the pip widget per design/01) — verified.
   Chassis-anatomy stat callouts (INT/CON/STR/DEX tags by the figure parts) DONE — verified.
+  Gear-on-figure FIXED: the composer drew only a figure's fixed default mounts, so real equipped
+  weapons (dagger on a summoner) never showed; DrawHumanoid now draws each body.Hands weapon at a
+  hand socket by its own gear sprite — verified (dagger renders at the hand). NOTE: weapon sits a
+  bit low (socket+pivot tuning is manifest/art polish, not blocking).
   Remaining design/02: Inventory tabs (GEAR/TECH/MINIONS) + item cards, Rune Bag panel,
   Current-Core/Action-Bar bottom row. NOTE: inventory tabs + rune-bag + action-bar relocation are
   INPUT-COUPLED (click-equip, ladder/card hit-tests) — each needs draw+hit derived from ONE source
