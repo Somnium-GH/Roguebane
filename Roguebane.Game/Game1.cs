@@ -76,27 +76,34 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
         if (_smokeScreen is "combat" or "map") // march the real loop for the screenshot
         {
-            _build.Toggle(Techniques.Ember); // grow the Grunt kit (jab+brace) with a bolt for variety
+            _build.CycleChassis(3);          // -> the Summoner (3 bays; fields Skeleton+Shade) for the bay lane
+            _build.Toggle(Techniques.Jab);   // add a STR card for variety on the bar
             _campaign = _build.March(Maps.StandardLegs(3));
             _screen = Screen.Run;
             if (_smokeScreen == "combat")
             {
-                foreach (var t in Exp.Loadout) _campaign.Toggle(t);
-                _campaign.Enter(Exp.Options[0].Id); // jump into the first fight (fresh)
+                foreach (var t in Exp.Loadout) _campaign.Toggle(t); // power the bar
 
-                // Show the full targeting surface in one shot: card 0 LOCKED on a foe with AUTO on
-                // (persisted reticle + F-tag + "auto"), and card 1 in TARGETING mode (reticle prompt
-                // over the live foes), then drive ticks so cards charge and the cooldown wipes read.
+                // March to the tanky CASTLE fight — the Summoner's minions melt the light skirmishes
+                // en route, so screenshot there (it survives long enough to show a stable combat frame).
+                void Resolve() { for (var i = 0; i < 200 && Exp.State == ExpeditionState.Fighting; i++) _campaign.Tick(); }
+                _campaign.Enter("a2"); Resolve();
+                _campaign.Enter("b");              // merchant — no fight
+                _campaign.Enter("c1"); Resolve();
+                _campaign.Enter("castle");
+
+                // Show the targeting surface: card 0 LOCKED on a foe's head (F1:H + limb band) with AUTO
+                // on, card 1 in TARGETING, plus the filled minion-bay lane. A few ticks charge the cards.
                 if (Exp.Foes.Count > 0)
                 {
                     var foe = Exp.Foes[^1];
                     var head = foe.Frame?.Parts.FirstOrDefault(p => p.Stat == Stat.Int);
-                    if (head is not null) _campaign.Aim(Exp.Loadout[0], foe, head); // PART aim -> F1:H + limb band
+                    if (head is not null) _campaign.Aim(Exp.Loadout[0], foe, head);
                     else _campaign.Aim(Exp.Loadout[0], foe);
-                    _campaign.SetAuto(true); // global AUTO on -> the lit toggle + persisted target
-                    if (Exp.Loadout.Count > 1) _ctrl.CardPress(Exp, 1); // card 1 already powered -> enters TARGETING
+                    _campaign.SetAuto(true);
+                    if (Exp.Loadout.Count > 1) _ctrl.CardPress(Exp, 1);
                 }
-                for (var i = 0; i < 60; i++) _campaign.Tick();
+                for (var i = 0; i < 6; i++) _campaign.Tick(); // castle survives -> stay in combat
             }
         }
 
@@ -434,6 +441,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawSpine(720, 12);
 
         DrawFighter(40, 90);
+        DrawBays(300, 120);
         DrawFoes(560, 90);
         DrawActionBar(40, H - 92);
         DrawStateOverlay();
@@ -784,6 +792,31 @@ public class Game1 : Microsoft.Xna.Framework.Game
         foreach (var t in Exp.Loadout)
             if (Exp.IsActive(t) && ReferenceEquals(Exp.AimOf(t), foe)) return true;
         return false;
+    }
+
+    // The minion-bay lane: one slot per chassis bay, filled with its summoned occupant (a tinted disc +
+    // a 2-letter tag — no minion sprite asset yet) or left an empty outline. Hidden for a no-bay chassis.
+    private void DrawBays(int x, int y)
+    {
+        var bays = Exp.Bays;
+        if (bays <= 0) return;
+        Text(_assets.Mono, "BAYS", x, y - 18, Muted);
+        var minions = Exp.Minions;
+        const int slot = 44, gap = 8;
+        for (var i = 0; i < bays; i++)
+        {
+            var sx = x + i * (slot + gap);
+            Panel(sx, y, slot, slot);
+            if (i < minions.Count)
+            {
+                var m = minions[i];
+                Rect(sx + 6, y + 6, slot - 12, slot - 12, new Color(Amber, 70)); // occupied disc
+                var tag = (m.Id.Length >= 2 ? m.Id[..2] : m.Id).ToUpperInvariant();
+                Text(_assets.Mono, tag, sx + 8, y + 12, Ink);
+                Text(_assets.Mono, m.Power.ToString(), sx + slot - 14, y + slot - 18, Amber); // power
+            }
+            else Border(sx, y, slot, slot, Border0); // empty bay
+        }
     }
 
     // The action bar: one card per loadout technique — icon, mono stat cost, active ring.

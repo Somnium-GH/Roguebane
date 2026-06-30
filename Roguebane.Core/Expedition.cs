@@ -86,9 +86,10 @@ public sealed class Expedition
 
     public bool IsActive(Technique technique) => _caster.IsActive(technique);
 
-    // Bay occupants (the summoned minions) for the combat minion-bay lane.
+    // Bay occupants (the summoned minions) + total bays for the combat minion-bay lane.
     public int MinionCount => _caster.MinionCount;
     public IReadOnlyList<Minion> Minions => _caster.Minions;
+    public int Bays => _caster.BayCap;
 
     // Live per-technique state for the action-bar render (cooldown fill + card state).
     public Caster.TechStatus Status(Technique technique) => _caster.StatusOf(technique);

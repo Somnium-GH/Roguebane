@@ -37,7 +37,7 @@ public sealed class Caster
     // (untargeted holds, never falling back to a default front). Engine casters (foe offense, sims)
     // leave it false and keep the default-front auto-fire. Minions and Sustained reserves track the
     // front in BOTH modes — only the per-technique offensive FSM is gated.
-    public Caster(Body self, ICombatTarget? target = null, int maxCharge = 0, bool requireAim = false)
+    public Caster(Body self, ICombatTarget? target = null, int maxCharge = 0, bool requireAim = false, int bayCap = 0)
     {
         _self = self;
         _default = target;
@@ -45,7 +45,10 @@ public sealed class Caster
         _charge = maxCharge;
         _requireAim = requireAim;
         _keepTargets = !requireAim; // engine casters never clear (front auto-fire); player default = OFF (one-shot)
+        BayCap = bayCap;
     }
+
+    public int BayCap { get; } // how many minion bays this caster's chassis has (for the render lane)
 
     // Battle hands every caster the fight's shared PRNG so chance rolls are deterministic.
     public void UseRng(Rng rng) => _rng = rng;

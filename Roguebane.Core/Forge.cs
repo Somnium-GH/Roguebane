@@ -26,7 +26,7 @@ public static class Forge
         RunMap map)
     {
         var body = chassis.NewBody(runes);
-        var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true);
+        var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, bayCap: chassis.Bays);
         SummonKit(caster, chassis, runes);
         return new Expedition(PlayerFighter(body), caster, WithRuneGrants(loadout, runes), map);
     }
@@ -39,7 +39,7 @@ public static class Forge
         IReadOnlyList<Func<RunMap>> legs)
     {
         var body = chassis.NewBody(runes);
-        var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true);
+        var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, bayCap: chassis.Bays);
         SummonKit(caster, chassis, runes);
         return new Campaign(PlayerFighter(body), caster, WithRuneGrants(loadout, runes), legs);
     }
