@@ -14,8 +14,9 @@ build certified from scratch (226 Core tests, all 5 screens smoke clean, no stal
   header titled by node type (SIEGE/SKIRMISH/RESOURCE HOLD).
 
 VERIFY loop: `RB_SMOKE=1 RB_SHOT=x.png RB_SCREEN=<build|combat|map> dotnet run --project Roguebane.Game`
-renders a PNG + exits (headless). Smoke every visual change. GOTCHA: spritefonts are ASCII-only — a
-non-ASCII glyph in Text() THROWS at draw.
+renders a PNG + exits (headless); add `RB_CHASSIS=<0-4>` to pick a chassis on the build screen. Smoke
+every visual change. GOTCHA: spritefonts are ASCII-only — a non-ASCII glyph in Text() THROWS at draw.
+All 5 chassis figures + 3 live screens verified clean (no overlaps/clipping after the layout sweep).
 
 REMAINING (deliberate / not safe 1-min fragments):
 - COMBAT -> design/01 full manifest rebuild: every manifest position collides with the dense hand-placed
