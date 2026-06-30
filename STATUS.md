@@ -1,7 +1,7 @@
 # Status
 
 ## Current target
-**Shell wired to `layout.json` — integration DONE; remaining = a deliberate combat manifest rebuild + the Equipment screen.**
+**Shell wired to `layout.json` — integration DONE; combat layout RESOLVED (locked, see s13). POC functionally complete; only the low-value Equipment inventory-tabs polish remains (deferred).**
 Core manifest toolkit COMPLETE + pinned: `Layout/` LayoutManifest (parse), StageComposer + FigureBinding
 (figure assembly), ScreenLayout (anchor->rect), PaletteColor, CardTemplate. Game consumes it via
 `LayoutRegistry` + `ManifestUi` (tolerant ElementRect/Color). Figures (player + foes) compose from the
