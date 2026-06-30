@@ -9,8 +9,11 @@ Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliabl
 - LayoutRegistry: load `layout.json` (figures / gear / screens / style / templates).
   PROGRESS: typed PARSER landed in Core (`Layout/LayoutManifest.cs`, pinned vs the real
   manifest by LayoutManifestTests). Templates still raw (JsonElement) — type on consume.
-  NEXT: Game-side loader (read file via TitleContainer → `LayoutManifest.Parse`), then the
-  stage composer.
+  Game-side `LayoutRegistry` DONE (loads layout.json from output Content, tolerant null on
+  gap); layout.json single-sourced from Roguebane.Content via linked copy-to-output. Built
+  content mgcb resynced to the drop's asset set (Game build was broken — 147 stale-sprite
+  errors; now green). NEXT: stage composer (assemble a figure from `parts` at manifest rects
+  in `z`, swap STATE by Core condition, mount gear per `sockets`/`mounts`, scale by `pivot`).
 - Stage composer: assemble a figure from its parts at manifest rects in `z`, swap part STATE by Core
   condition (bare vs armored), mount gear at `sockets` per `mounts`, scale into the slot by `pivot`.
   RETIRE Game1 `DrawHumanoid` hard offsets (the exploded figure).
