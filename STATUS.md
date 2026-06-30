@@ -1,33 +1,21 @@
 # Status
 
 ## Current target
-**UI fidelity + gameplay-correctness pass** (most shipped, 159 tests; fidelity continuing).
-TARGETING/FIRING — STILL WRONG in play; RE-OPEN (top priority). The current build starts techniques
-powered+targeted and kept a FIRE button, a focus cursor, and a front-fallback target. None of that is
-right. Correct FTL model:
-- START: every technique AND minion bay is INACTIVE (unpowered) and UNTARGETED. Nothing charges,
-  targets, or fires until the player powers it. (FTL: systems on, weapons/drones off.)
-- NO FIRE BUTTON — remove it. Firing is driven by the target: a powered technique charges; when fully
-  charged, if it HAS a target it FIRES; if NO target it HOLDS at charged. NO default/front target —
-  untargeted never fires (remove the ClearAim front-fallback).
-- NO focus / selected-technique cursor — remove it. Targeting is per-module: click the module, then a target.
-- NEED a RETICLE visual for the targeting state.
-- CONTROLS:
-   * Left-click an INACTIVE module -> POWER it (reserve stat, begin charging); active, untargeted.
-   * Left-click an ACTIVE module -> enter TARGETING (reticle up); this CLEARS that module's target.
-   * In TARGETING, left-click a foe (-> later a foe PART) -> set the target; exit targeting.
-   * Right-click during TARGETING -> cancel targeting; the target stays CLEARED (no restore).
-   * Right-click an ACTIVE module (not targeting) -> UNPOWER it (return the reserved stat) AND clear its
-     target (never remembered across deactivation).
-   * A target is NEVER remembered — it CLEARS on: entering targeting, cancelling targeting, deactivating,
-     and after firing (unless AUTO is on).
-- AUTO toggle exists ONLY to stop the target clearing after a shot. STANDARD (AUTO OFF = default): fires
-  once when charged+targeted, then CLEARS the target (holds charged + untargeted; re-target to fire
-  again). AUTO ON: the target PERSISTS, so it keeps firing each charge at the same target.
-- Engine `Caster.Activate` may keep auto-ON for unattended callers (foe offense, BalanceSim); the player
-  layer drives the model above.
-- Behavioural pins to add: start inactive+untargeted; left-click active enters targeting AND clears its
-  target; charged+targeted fires, charged+untargeted holds; cancelling targeting leaves target cleared.
+**Targeting/firing FSM — CORE DONE; SHELL UI wiring next.** (most shipped, 165 tests.)
+CORE (done): player casters run `requireAim` — a powered technique fires ONLY at its own explicit aim,
+never falling back to a default front, so untargeted HOLDS and fires nothing. Firing is target-driven
+(no fire command): charged+aimed discharges. AUTO off (player default) = one-shot, clears the target
+after the shot; AUTO on persists it. Engine casters (foe offense/sim/legacy Session) keep default-front
+auto-fire. Pinned in PlayerTargetingFsmTests + Expedition/Campaign integration.
+SHELL UI (next, in Game1 combat input/draw) to match the model — none built yet:
+- REMOVE the FIRE button, the Enter-to-fire binding, and the focus/selected-technique cursor (firing is
+  automatic on charge+target; targeting is per-module, not via a global focus).
+- Per-module controls: left-click INACTIVE module -> POWER (already wired via Toggle); left-click ACTIVE
+  module -> enter TARGETING (reticle up) AND clear that module's target; in TARGETING left-click a foe ->
+  set target, exit; right-click during TARGETING -> cancel (target stays cleared); right-click ACTIVE
+  module (not targeting) -> UNPOWER (Deactivate, which already drops the target).
+- NEED a RETICLE visual for the targeting state; a per-card "targeting" highlight.
+- Add a driven-input smoke/behaviour check for the targeting leg once wired.
 - DEBT (smaller): left-click a foe PART (vs whole foe) waits on foe part-maps (G1).
 Other remaining (Debt): build-screen inventory tabs + drag-equip (blocked on G2/G7); Choose-Your-Core
 screen design/05 (build screen doubles as picker — locked OK); campaign city-graph design/04.
