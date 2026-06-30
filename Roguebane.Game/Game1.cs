@@ -295,7 +295,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private static Rectangle LadderRowRect(int p, int rungs) => new(320, 100 + p * 56, rungs * 56, 48);
     private static readonly Rectangle MarchRect = new(40, H - 52, 300, 44);
     private static Rectangle ActionCardRect(int i) => new(52 + i * 84, H - 84, 76, 60);
-    private static Rectangle FoeRect(int i) => new(560, 90 + i * 150, 144, 156);
+    private static Rectangle FoeRect(int i) => new(560, 90 + i * 150, 144, 132);
     private static readonly Rectangle PauseRect = new(W - 156, H - 84, 110, 26);
     private static readonly Rectangle FleeRect = new(W - 156, H - 50, 110, 26);
     private static readonly Rectangle AutoRect = new(W - 272, H - 50, 110, 26);
@@ -1023,22 +1023,24 @@ public class Game1 : Microsoft.Xna.Framework.Game
             var top = y + i * 150;
             var tint = foe.Down ? new Color(70, 60, 55) : Color.White;
             // Compose the foe from its creature figure (no bare art for foes -> force the plain row).
-            if (foe.Frame is not null) DrawHumanoid(foe.Frame, foe.Figure, x + 72, top + 156, 156, tint, allowBare: false);
+            // Foe box is shorter than the 150 pitch so figures + HP bars don't bleed into the next foe.
+            const int foeH = 132;
+            if (foe.Frame is not null) DrawHumanoid(foe.Frame, foe.Figure, x + 72, top + foeH, foeH, tint, allowBare: false);
             else Sprite(_assets.Reticle("focus"), x + 24, top, 96, 96, tint); // inert foe: a marker
             if (!foe.Down && targeting)
             {
-                Sprite(_assets.Reticle("focus"), x + 24, top, 96, 96, new Color(Ink, 110)); // pick-prompt
+                Sprite(_assets.Reticle("focus"), x + 24, top, 84, 84, new Color(Ink, 110)); // pick-prompt
                 if (foe.Frame is not null) // limb bands + the band under the cursor (the hover highlight)
                 {
-                    const int band = 156 / 4;
+                    const int band = foeH / 4;
                     for (var b = 1; b < 4; b++) Rect(x, top + b * band, 144, 1, new Color(Ink, 90));
                     if (FoePartAt(foe, _cursor) is { } hov)
                         Border(x, top + PartBand(hov.Stat) * band, 144, band, Ink);
                 }
             }
-            else if (!foe.Down && Hover(FoeRect(i))) Border(x, top, 144, 156, Ink);
+            else if (!foe.Down && Hover(FoeRect(i))) Border(x, top, 144, foeH, Ink);
             Text(_assets.Mono, foe.Figure.ToUpperInvariant(), x + 2, top + 2, foe.Down ? Muted : Ink); // creature tag
-            DrawBar(x, top + 156, 144, _assets.Resource("hp"), foe.Hp, foe.MaxHp, Blood);
+            DrawBar(x, top + foeH, 144, _assets.Resource("hp"), foe.Hp, foe.MaxHp, Blood);
         }
     }
 
