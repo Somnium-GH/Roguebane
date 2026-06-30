@@ -156,6 +156,41 @@ public class ExpeditionTests
     }
 
     [Fact]
+    public void TheMerchantSellsAWeaponIntoTheStashPack()
+    {
+        var exp = FullLoadout();
+        exp.Enter("a1"); FightToEnd(exp); // a hold pays 4 gold
+        exp.Enter("b");
+        Assert.True(exp.AtMerchant);
+
+        var gold = exp.Gold;
+        Assert.True(exp.BuyWeapon(Armory.Dagger)); // price reserve(1)+power(1) = 2
+        Assert.Equal(gold - 2, exp.Gold);
+        Assert.Contains(Armory.Dagger, exp.Stash.Weapons);
+        Assert.DoesNotContain(Armory.Dagger, exp.OfferedWeapons); // sold out of the stock
+    }
+
+    [Fact]
+    public void TheMerchantSellsArmorIntoTheStashPack()
+    {
+        var exp = FullLoadout();
+        exp.Enter("a1"); FightToEnd(exp);
+        exp.Enter("b");
+
+        Assert.True(exp.BuyArmor(Shops.Plate)); // price value(2)+2 = 4
+        Assert.Contains(Shops.Plate, exp.Stash.Armor);
+    }
+
+    [Fact]
+    public void GearCannotBeBoughtAwayFromAMerchant()
+    {
+        var exp = FullLoadout();
+        exp.Enter("a1"); // a fight, not a merchant
+        Assert.False(exp.BuyWeapon(Armory.Dagger));
+        Assert.False(exp.BuyArmor(Shops.Plate));
+    }
+
+    [Fact]
     public void PotionsCannotBeUsedMidFight()
     {
         var exp = FullLoadout();

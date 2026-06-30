@@ -169,3 +169,20 @@ OPEN (park; decide as the phase starts):
 Suggested order: (1) single-enemy + part-aim simplification; (2) Chassis->Race+CoreRune rename + race-gated
 New Run; (3) shield-levels system; (4) part-repair heals; (5) defensive-source defaults in starting kits;
 (6) enemy-HP scaling. DESIGN_SPEC touch points to reconcile as each lands: §4/§6/§7/§10/§11/§16.
+
+## Layout & assembly system (manifest-driven) [FOUNDATION — do before the fidelity rebuild]
+Fixes the EXPLODED figure and makes ALL layout pixel-perfect + viewport-independent by consuming the
+generator's emitted coords (contract: `design/LAYOUT_CONTRACT.md`). The generator already computes every
+part rect + hand socket; it will now EMIT them (`Content/layout.json` + modular part PNGs) instead of
+flattening them away. Gated on Claude Design shipping that; until then build the consumer against the
+schema with a small hand-stub manifest, then swap to the real one.
+- LayoutRegistry: load `Content/layout.json` (figures + gear + screens).
+- Stage composer: draw a figure by blitting its part sprites at manifest `rect` in `z` order, swapping
+  part STATE (healthy/damaged/broken) by Core part condition, mounting gear pivots on hand sockets;
+  uniform- (ideally integer-) scale the whole figure into its slot, pinned by `pivot`. RETIRE Game1's
+  hard-coded `DrawHumanoid` offsets (the cause of the explosion).
+- UI from manifest: place every element by anchor+offset+size; RETIRE magic-number rects.
+- Viewport (aspect-independent, no bars): background SCALE-TO-COVER; HUD anchored to real screen edges
+  (fills any aspect); pixel stage integer-scaled + centered. Only the final transform reads the backbuffer.
+- Determinism: position = f(manifest, figure->slot scale, screen). A screenshot matches the mockup BY
+  CONSTRUCTION — the loop's visual review becomes confirmation, not guess-and-nudge.

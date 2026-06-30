@@ -20,6 +20,8 @@ public sealed class Expedition
     private readonly Caster _caster;
     private readonly IReadOnlyList<Technique> _loadout;
     private readonly Stash _stash;
+    private readonly List<Weapon> _stockWeapons = new(Shops.Weapons); // this merchant's gear stock (per leg)
+    private readonly List<Armor> _stockArmor = new(Shops.Armor);
 
     public RunMap Map { get; }
     public Battle? Battle { get; private set; }
@@ -59,6 +61,29 @@ public sealed class Expedition
     };
 
     public bool AtMerchant => State == ExpeditionState.Choosing && Map.Current.Type == NodeType.Merchant;
+
+    // The merchant's gear stock and its prices (placeholder-sane: weapon = reserve+power, armor =
+    // value+2). Buying spends gold, moves the piece into the Stash pack, and clears it from the stock.
+    public IReadOnlyList<Weapon> OfferedWeapons => _stockWeapons;
+    public IReadOnlyList<Armor> OfferedArmor => _stockArmor;
+    public static int Price(Weapon weapon) => weapon.Reserve + weapon.Power;
+    public static int Price(Armor armor) => armor.Value + 2;
+
+    public bool BuyWeapon(Weapon weapon)
+    {
+        if (!AtMerchant || !_stockWeapons.Contains(weapon) || !_stash.TrySpend(Price(weapon))) return false;
+        _stockWeapons.Remove(weapon);
+        _stash.AddWeapon(weapon);
+        return true;
+    }
+
+    public bool BuyArmor(Armor armor)
+    {
+        if (!AtMerchant || !_stockArmor.Contains(armor) || !_stash.TrySpend(Price(armor))) return false;
+        _stockArmor.Remove(armor);
+        _stash.AddArmor(armor);
+        return true;
+    }
 
     // Spend spoils on a repair potion (carried for later) at a merchant.
     public bool BuyPotion()
