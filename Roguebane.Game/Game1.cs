@@ -87,10 +87,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 // March to the tanky CASTLE fight — the Summoner's minions melt the light skirmishes
                 // en route, so screenshot there (it survives long enough to show a stable combat frame).
                 void Resolve() { for (var i = 0; i < 200 && Exp.State == ExpeditionState.Fighting; i++) _campaign.Tick(); }
-                _campaign.Enter("a2"); Resolve();
+                _campaign.Enter("a1"); Resolve();  // a resource hold -> banks 1 support
                 _campaign.Enter("b");              // merchant — no fight
-                _campaign.Enter("c1"); Resolve();
-                _campaign.Enter("castle");
+                _campaign.Enter("c2"); Resolve();  // another hold -> banks a 2nd
+                _campaign.Enter("castle");         // the banked support rallies on the boss here
 
                 // Show the targeting surface: card 0 LOCKED on a foe's head (F1:H + limb band) with AUTO
                 // on, card 1 in TARGETING, plus the filled minion-bay lane. A few ticks charge the cards.
@@ -442,6 +442,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
         DrawFighter(40, 90);
         DrawBays(300, 120);
+        DrawSupport(300, 220);
         DrawFoes(560, 90);
         DrawActionBar(40, H - 92);
         DrawStateOverlay();
@@ -817,6 +818,22 @@ public class Game1 : Microsoft.Xna.Framework.Game
             }
             else Border(sx, y, slot, slot, Border0); // empty bay
         }
+    }
+
+    // The rallied-support lane: the holds banked en route become an allied force that auto-fires on the
+    // castle boss. Shows banked pips out of combat / at lesser nodes, and reads RALLIED +N (brighter)
+    // during the castle fight where that banked force is firing on the boss. Hidden when there is none.
+    private void DrawSupport(int x, int y)
+    {
+        var banked = Exp.Map.SupportBank;
+        var rallied = Exp.Battle?.Encounter.SupportAmount ?? 0; // >0 only at the castle (fed by the bank)
+        if (banked <= 0 && rallied <= 0) return;
+
+        Text(_assets.Mono, "SUPPORT", x, y - 18, Muted);
+        var pips = Math.Max(banked, rallied);
+        for (var i = 0; i < pips; i++)
+            Rect(x + i * 16, y, 12, 12, new Color(Amber, rallied > 0 ? 200 : 110)); // brighter while firing
+        Text(_assets.Mono, rallied > 0 ? "RALLIED +" + rallied : "banked", x, y + 16, rallied > 0 ? Amber : Muted);
     }
 
     // The action bar: one card per loadout technique — icon, mono stat cost, active ring.
