@@ -1,22 +1,20 @@
 # Status
 
 ## Current target
-**Targeting/firing FSM — CORE DONE; SHELL UI wiring next.** (most shipped, 165 tests.)
-CORE (done): player casters run `requireAim` — a powered technique fires ONLY at its own explicit aim,
-never falling back to a default front, so untargeted HOLDS and fires nothing. Firing is target-driven
-(no fire command): charged+aimed discharges. AUTO off (player default) = one-shot, clears the target
-after the shot; AUTO on persists it. Engine casters (foe offense/sim/legacy Session) keep default-front
-auto-fire. Pinned in PlayerTargetingFsmTests + Expedition/Campaign integration.
-SHELL UI (next, in Game1 combat input/draw) to match the model — none built yet:
-- REMOVE the FIRE button, the Enter-to-fire binding, and the focus/selected-technique cursor (firing is
-  automatic on charge+target; targeting is per-module, not via a global focus).
-- Per-module controls: left-click INACTIVE module -> POWER (already wired via Toggle); left-click ACTIVE
-  module -> enter TARGETING (reticle up) AND clear that module's target; in TARGETING left-click a foe ->
-  set target, exit; right-click during TARGETING -> cancel (target stays cleared); right-click ACTIVE
-  module (not targeting) -> UNPOWER (Deactivate, which already drops the target).
-- NEED a RETICLE visual for the targeting state; a per-card "targeting" highlight.
-- Add a driven-input smoke/behaviour check for the targeting leg once wired.
-- DEBT (smaller): left-click a foe PART (vs whole foe) waits on foe part-maps (G1).
+**Targeting/firing FSM — DONE (core + shell).** (most shipped, 166 tests.)
+Player casters run `requireAim`: a powered technique fires ONLY at its own explicit aim, never falling
+back to a front, so untargeted HOLDS. Firing is target-driven (no fire button) — charged+aimed
+discharges. AUTO off (default) = one-shot (clears target after the shot); AUTO on persists. Engine
+casters (foe offense/sim/legacy Session) keep default-front auto-fire. Shell: per-module controls
+(left-click inactive=power, active=enter targeting+clear; foe-click=aim+exit; right-click=cancel/unpower),
+locked + pick-prompt reticles, targeting card ring, no FIRE button / focus cursor. Pinned by
+PlayerTargetingFsmTests + Expedition/Campaign integration; combat RB_SMOKE verified.
+Next actionable (pick one):
+- G1 foe PART aim: author multi-part foe Frames as DATA so left-click can target a foe PART (vs whole
+  foe); then wire part-aim in the shell (Caster already supports Aim(tech, foe, part)). Unblocks the
+  localized CON-block/evasion-on-part-hit debt too.
+- Shell-input behaviour: the targeting click→state mapping is reviewed + visually verified but not
+  headless-tested (MonoGame input). Consider extracting a thin testable combat-input reducer.
 Other remaining (Debt): build-screen inventory tabs + drag-equip (blocked on G2/G7); Choose-Your-Core
 screen design/05 (build screen doubles as picker — locked OK); campaign city-graph design/04.
 
