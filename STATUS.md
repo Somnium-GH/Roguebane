@@ -36,62 +36,14 @@ flip when art lands. Cases: WAR-PARTY advance UI (war-party token + camp marker)
 two-step NEW RUN (race art). Keep the current single-core New Run until race art exists.
 
 
-## Recently shipped (combat + UI — details in git)
-**Targeting/firing FSM — DONE (core + shell, incl. global AUTO).** (most shipped, 167 tests.)
-Player casters run `requireAim`: a powered technique fires ONLY at its own explicit aim, never falling
-back to a front, so untargeted HOLDS. Firing is target-driven (no fire button) — charged+aimed
-discharges. AUTO is ONE GLOBAL toggle: ON = no module clears its target after firing (all keep firing at
-the same target); OFF (default) = each fires once when charged+targeted, then clears. Shown as a lit/unlit
-button (no +/- glyph). AUTO affects ONLY that button — foe/part highlights come solely from active
-TARGETING (pick-prompt + limb bands + hover band); no persistent locked-aim ring (which module hits
-which foe/limb reads off the card tags, F1:H). Engine casters (foe offense/sim/legacy Session) keep default-front auto-fire.
-Shell: per-module controls (left-click inactive=power, active=enter targeting+clear; foe-click=aim+exit;
-right-click=cancel/unpower), locked + pick-prompt reticles, targeting card ring, no FIRE button / focus
-cursor. Pinned by PlayerTargetingFsmTests (incl. GlobalAutoGovernsEveryModule) + integration; RB_SMOKE OK.
-**G1 foe PART aim — DONE (data + shell).** Content foes carry a multi-part frame; the combat surface
-splits each foe into anatomical limb bands (head/arms/chest/legs), highlights the hovered band while
-targeting, and a band click aims the module at that part (Aim(tech, foe, part)). Locked limbs stay
-ringed; card tags read the limb (F1:H). Pinned in FoeArmingTests; RB_SMOKE shows a head-aimed module
-eroding the head stat (foe HP untouched).
-**Shell-input FSM — now headless-testable.** The targeting click→state mapping is extracted into Core
-(CombatTargeting); Game1 only feeds it press intents. Pinned by CombatTargetingTests (9). No behaviour
-change (RB_SMOKE identical).
-**Minions now fight** (were dead in play): Forge auto-summons the chassis MinionKit + rune grants into
-bays at assembly. Summoner ships Skeleton+Shade. Exposed via Exp.MinionCount/Minions. Pinned in MinionTests.
-**Combat minion-bay lane — DONE.** BAYS lane paints a slot per chassis bay (filled occupant disc + tag +
-power, or empty), from Exp.Minions/Bays. Combat RB_SMOKE (Summoner @ castle) shows 2/3 bays filled.
-**Combat surface lanes — DONE** (PART-aim limb bands, minion-bay lane, rallied-support lane "RALLIED +N").
-**Build screen attribute readout — DONE** (pips show free/reserved/damaged per stat + gate markers: the
-kit's per-stat demand notch + /N, red when over-pool). Inventory tabs / drag-equip / equipped-gear-on-
-anatomy still blocked on gear/minion equip (G2/G7).
-**Bank-on-clear — DONE.** Resource-holds bank rallied support only when their fight is won (combat driver
-via RunMap.BankHold); standalone nav still banks on arrival. Pinned in ExpeditionTests.
-**Spine strip — DONE** (design/04 partial): Capital peak marker + cities-taken counter on the linear leg
-chain. Full branching city-graph parked (needs a branching campaign model — Needs human).
-**G2 gear inventory + equip — DONE (Core).** Stash carries a gear pack; Gearing moves pieces on/off the
-body honoring the gates; Body.Unequip added. Pinned in GearingTests (6).
-**G2 gear acquisition — DONE (Core).** Merchant sells weapons/armor (Shops stock, placeholder prices)
-into the Stash pack via Expedition.BuyWeapon/BuyArmor. The acquire→carry→equip loop is now whole and
-Core-testable; only the SHELL surface is missing. Pinned in ExpeditionTests.
-**Merchant gear UI — DONE.** Gear stock as buy chips (name+price, dimmed when unaffordable) → BuyWeapon/
-BuyArmor. Map RB_SMOKE shows sword/dagger/plate with affordability.
-**G2 gear END TO END — DONE.** Buy at merchant → Stash pack → equip out of combat (Expedition equip
-passthroughs → Gearing) → EQUIPPED readout + click-to-equip PACK chips on the map gear bar. Pinned in
-ExpeditionTests + GearingTests; map RB_SMOKE verified. Remaining: equipped gear drawn ON the anatomy
-sprite (a sword on the arm etc.) — minor art polish, not blocking.
-**Gear-on-anatomy — DONE** (composed markers: armor rings its part, weapon shows in hand; real gear
-sprites = art asset gap). G2 gear is now fully end-to-end.
-**Leather armor evasion — DONE** (Shops.Hide; dodge rides part condition; pinned in ArmorEvasionTests).
-**The high-value unblocked queue is now EXHAUSTED.** What remains is human-gated, asset, or low-value
-polish (one line each):
-- Human/design: campaign topology (§04 branching vs linear); HP-vs-stat split → foe→player PART aim
-  (whole-HP foe contract pinned by FoeOffenseTests); balance/feel tuning (the whole "Needs human" block).
-- Asset (Claude Design): real gear/figure/weapon SPRITES (gear-on-anatomy uses composed markers);
-  bundled open fonts (Consolas/Georgia placeholders).
-- Deferred/speculative: SpellWard armor (needs a spell/blind model); INT-channel sustained kind (no beam
-  content); build-screen drag-to-equip + categorized inventory tabs (click-equip already works).
-Other remaining (Debt): build-screen inventory tabs + drag-equip (blocked on G2/G7); Choose-Your-Core
-screen design/05 (build screen doubles as picker — locked OK); campaign city-graph design/04.
+## Recently shipped (one-liners; full detail in git log)
+Combat thesis loop is whole and tested (226 Core tests). Highlights — all pinned + RB_SMOKE-verified:
+- Targeting/firing FSM (requireAim, target-driven fire, one global AUTO; no fire button); foe PART-aim
+  via limb bands; shell-input mapping extracted to Core (CombatTargeting).
+- Minions fight (auto-summoned to bays); combat lanes (bay lane, rallied-support "RALLIED +N").
+- Gear END-TO-END (Core): merchant buy -> Stash pack -> equip honoring gates; leather evasion; Body.Unequip.
+- Build attribute readout + gate markers; bank-on-clear; campaign spine strip (linear).
+- THIS PHASE (layout-manifest integration): see "Current target" above.
 
 ## Locked decisions
 - Enemy threat: LIGHT/winnable for now (goal = combat dwell, not difficulty); full envelope = later balance.
