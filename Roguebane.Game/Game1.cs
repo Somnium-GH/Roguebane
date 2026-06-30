@@ -464,7 +464,15 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         Stretch(_assets.Background("combat_field"), 0, 0, W, H);
         Panel(0, 0, W, 40);
-        Text(_assets.Display, "SIEGE", 16, 8, Ink);
+        // Title by the node under fight (design/01 names the encounter), not a fixed "SIEGE".
+        var title = Exp.Map.Current.Type switch
+        {
+            NodeType.Castle => "SIEGE",
+            NodeType.ResourceHold => "RESOURCE HOLD",
+            NodeType.Skirmish => "SKIRMISH",
+            _ => "BATTLE",
+        };
+        Text(_assets.Display, title, 16, 8, Ink);
         DrawRunResources(200, 10);
         DrawSpine(720, 12);
 
