@@ -58,9 +58,12 @@ Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliabl
   render, no MISS, no stale-.xnb dependency. Drop integration solid. GOTCHA: bundled spritefonts are
   ASCII-only — Text() with a non-ASCII glyph (e.g. U+00B7) THROWS at draw; keep shell text ASCII until
   wider-coverage open fonts are bundled.
-  Combat/build still match
-  design only loosely — the bigger remaining job is rebuilding combat to design/01 (prominent bottom
-  Attribute-Pool + Action-Bar panels, figures in the open battlefield) in small smoke-verified slices.
+  design/02 BUILD started: attribute READOUT bars (base + rune-marks + gate notch + total per stat)
+  replace the build pip rows per design/02 (combat keeps the pip widget per design/01) — verified.
+  Remaining design/02: Inventory tabs (GEAR/TECH/MINIONS) + item cards, Rune Bag panel, Chassis-
+  Anatomy part labels, Current-Core/Action-Bar bottom row. Combat still matches design/01 only
+  loosely — the bigger remaining job is rebuilding combat to design/01 (prominent bottom Attribute-
+  Pool + Action-Bar panels, figures in the open battlefield) in small smoke-verified slices.
 - Stage composer: assemble a figure from its parts at manifest rects in `z`, swap part STATE by Core
   condition (bare vs armored), mount gear at `sockets` per `mounts`, scale into the slot by `pivot`.
   RETIRE Game1 `DrawHumanoid` hard offsets (the exploded figure).
