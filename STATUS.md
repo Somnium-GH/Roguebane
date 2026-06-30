@@ -20,9 +20,10 @@ non-ASCII glyph in Text() THROWS at draw.
 REMAINING (deliberate / not safe 1-min fragments):
 - COMBAT -> design/01 full manifest rebuild: every manifest position collides with the dense hand-placed
   layout, so all elements must move at once (statusStrip, attrPool, actionBar+buttons, techList, bayList,
-  foe column, hero/foe/minion figures). Needs layout judgment (3 foes vs 1 manifest slot; homeless
-  PAUSE/FLEE) + draw&hit from ONE shared rect (clicks aren't smoke-verifiable). Unblocks the battlefield
-  minionField figure too.
+  foe column, hero/foe/minion figures). Needs layout judgment (homeless PAUSE/FLEE) + draw&hit from
+  ONE shared rect (clicks aren't smoke-verifiable). Unblocks the battlefield minionField figure too.
+  CONTRACT now in DESIGN_SPEC s13: foe zone holds 1-3 foes stacked in the foe column (skirmish line /
+  castle gate-wall-keep) — the rebuild must handle the column, not assume the manifest's single slot.
 - EQUIPMENT screen (design/02): no screen state yet (only Build/Run). Inventory tabs (GEAR/TECH/MINIONS) +
   item cards, Rune Bag, click/drag-equip — INPUT-COUPLED features needing input wiring + mid-run stash.
 - Asset gaps (see section): skirmish node icon, wraith/gargoyle figure art, torso bare-variant (plate
