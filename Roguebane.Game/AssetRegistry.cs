@@ -53,8 +53,8 @@ public sealed class AssetRegistry
 
     private static readonly Dictionary<NodeType, string> NodeName = new()
     {
-        [NodeType.Skirmish] = "skirmish",
-        [NodeType.ResourceHold] = "control",
+        [NodeType.Skirmish] = "unknown", // no dedicated skirmish icon shipped — stopgap (asset gap)
+        [NodeType.ResourceHold] = "resource",
         [NodeType.Merchant] = "merchant",
         [NodeType.Unknown] = "unknown",
         [NodeType.Castle] = "castle",
@@ -63,18 +63,17 @@ public sealed class AssetRegistry
     private static readonly Dictionary<Stat, string> AttrName = new()
     {
         [Stat.Str] = "strength",
-        [Stat.Int] = "intelligence",
+        [Stat.Int] = "intellect",
         [Stat.Dex] = "dexterity",
         [Stat.Con] = "constitution",
     };
 
-    // Only ids with a matching glyph; the rest fall back (see Technique). ember reads as a firebolt.
+    // Only ids with a matching glyph; the rest fall back to swing (see Technique). ember reads as a
+    // firebolt, cleave as a frenzy sweep. (Glyph set: brace/disarm/firebolt/frenzy/swing.)
     private static readonly Dictionary<string, string> TechniqueName = new()
     {
-        ["cleave"] = "cleave",
         ["brace"] = "brace",
         ["ember"] = "firebolt",
-        ["swing"] = "swing",
-        ["frenzy"] = "frenzy",
+        ["cleave"] = "frenzy",
     };
 }
