@@ -46,4 +46,33 @@ public class FoeArmingTests
         foe.Frame!.Damage(foe.Frame.Parts[0], 4);
         Assert.Equal(0, foe.Frame.Capacity(Stat.Str));
     }
+
+    // G1: a content foe carries several distinct parts so the player can aim limb-by-limb.
+    [Fact]
+    public void ArmedFoesExposeDistinctTargetableParts()
+    {
+        var foe = Sieges.ArmedPoint("cp", 10).Foes[0];
+        var stats = foe.Frame!.Parts.Select(p => p.Stat).ToHashSet();
+        Assert.Contains(Stat.Str, stats);
+        Assert.Contains(Stat.Int, stats);
+        Assert.True(foe.Frame.Parts.Count >= 3); // real choices to pick from
+    }
+
+    // Part-aim at a content foe erodes the chosen part's stat (not its HP, until the part bottoms out).
+    [Fact]
+    public void PartAimErodesTheChosenFoePart()
+    {
+        var foe = Sieges.ArmedPoint("cp", 10).Foes[0];
+        var head = foe.Frame!.Parts.First(p => p.Stat == Stat.Int); // capacity 2
+
+        var body = new Body();
+        body.Add(new BodyPart("arm", Stat.Str, 6));
+        var c = new Caster(body, null, requireAim: true);
+        c.Activate(Techniques.Jab, auto: true);
+        c.Aim(Techniques.Jab, foe, head); // PART aim
+
+        for (var i = 0; i < 60; i++) c.Step(); // one Jab (Power 2) lands on the head
+        Assert.Equal(0, foe.Frame.Contribution(head)); // head stat eroded to 0
+        Assert.Equal(10, foe.Hp);                       // fully absorbed -> HP untouched
+    }
 }
