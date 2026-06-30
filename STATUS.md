@@ -11,9 +11,10 @@ Shell: per-module controls (left-click inactive=power, active=enter targeting+cl
 right-click=cancel/unpower), locked + pick-prompt reticles, targeting card ring, no FIRE button / focus
 cursor. Pinned by PlayerTargetingFsmTests (incl. GlobalAutoGovernsEveryModule) + integration; RB_SMOKE OK.
 Next actionable (pick one):
-- G1 foe PART aim: author multi-part foe Frames as DATA so left-click can target a foe PART (vs whole
-  foe); then wire part-aim in the shell (Caster already supports Aim(tech, foe, part)). Unblocks the
-  localized CON-block/evasion-on-part-hit debt too.
+- G1 foe PART aim — SHELL half: Foes.Armed now carries a multi-part frame (STR arm/INT head/DEX legs/
+  CON chest), so the data exists. Wire the combat shell so that, in TARGETING, clicking a foe PART (vs
+  whole foe) calls Aim(tech, foe, part): hit-test part regions on the foe sprite, render them, show the
+  per-card part in the F-tag. (Core path done + tested in FoeArmingTests.)
 - Shell-input behaviour: the targeting click→state mapping is reviewed + visually verified but not
   headless-tested (MonoGame input). Consider extracting a thin testable combat-input reducer.
 Other remaining (Debt): build-screen inventory tabs + drag-equip (blocked on G2/G7); Choose-Your-Core
