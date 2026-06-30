@@ -789,7 +789,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         for (var i = 0; i < StatColors.Length; i++)
         {
-            var (s, color) = StatColors[i];
+            var (s, _) = StatColors[i];
             var top = y + i * 30;
             Sprite(_assets.Attr(s), x, top, 24, 24, Color.White);
 
@@ -800,14 +800,15 @@ public class Game1 : Microsoft.Xna.Framework.Game
             var free = cur - reserved;
 
             var px = x + 30;
+            var suffix = s.ToString().ToLowerInvariant(); // str/int/dex/con -> per-stat coloured pips
             for (var k = 0; k < max; k++)
             {
-                Texture2D? pip;
-                Color tint;
-                if (k < free) { pip = _assets.Pip("full"); tint = color; }
-                else if (k < cur) { pip = _assets.Pip("full"); tint = new Color(color, 110); } // reserved
-                else { pip = _assets.Pip("damaged"); tint = Color.White; }
-                Sprite(pip, px + k * 16, top, 14, 14, tint);
+                // Drop ships pre-coloured per-stat pips: free=full_<stat>, reserved=reserved_<stat>,
+                // damaged=damage (the old "damaged" name was removed). White tint — the art is coloured.
+                var pip = k < free ? _assets.Pip("full_" + suffix)
+                    : k < cur ? _assets.Pip("reserved_" + suffix)
+                    : _assets.Pip("damage");
+                Sprite(pip, px + k * 16, top, 14, 14, Color.White);
             }
             Text(_assets.Mono, cur.ToString(), px + max * 16 + 6, top + 4, Ink);
 
