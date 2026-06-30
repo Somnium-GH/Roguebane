@@ -574,7 +574,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         Panel(40, 90, 240, 410);
         Text(_assets.Mono, _build.Chassis.Id.ToUpper(), 56, 100, Muted);
         DrawHumanoid(preview, 160, 200, 2);
-        DrawPips(preview, 56, 320);
+        DrawPips(preview, 56, 320, KitDemand());
 
         DrawLadders(320, 100);
         DrawCoreBlock(700, 90);
@@ -695,8 +695,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
     }
 
     // The attribute-pool pip widget: one row per stat — attribute icon, then pips for damaged (dim),
-    // free (stat colour) and reserved (dark) capacity, anchored by the live number in mono.
-    private void DrawPips(Body body, int x, int y)
+    // free (stat colour) and reserved (dark) capacity, anchored by the live number in mono. When a
+    // `demand` map is supplied (the build screen), each row also gets a GATE MARKER: a notch at the
+    // stat the slotted kit reserves, plus "/N", red when the kit out-demands the pool (can't all power).
+    private void DrawPips(Body body, int x, int y, IReadOnlyDictionary<Stat, int>? demand = null)
     {
         for (var i = 0; i < StatColors.Length; i++)
         {
@@ -721,7 +723,24 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 Sprite(pip, px + k * 16, top, 14, 14, tint);
             }
             Text(_assets.Mono, cur.ToString(), px + max * 16 + 6, top + 4, Ink);
+
+            if (demand is not null && demand.TryGetValue(s, out var need) && need > 0)
+            {
+                var fits = need <= cur;
+                Rect(px + Math.Min(need, max) * 16 - 1, top - 2, 2, 18, fits ? Amber : Blood); // gate notch
+                Text(_assets.Mono, "/" + need, px + max * 16 + 26, top + 4, fits ? Muted : Blood);
+            }
         }
+    }
+
+    // What the slotted kit (techniques + the chassis's fielded minions) reserves per stat — the demand
+    // the minted body must cover. Drives the build screen's gate markers.
+    private Dictionary<Stat, int> KitDemand()
+    {
+        var d = new Dictionary<Stat, int>();
+        foreach (var t in _build.Loadout) d[t.Stat] = d.GetValueOrDefault(t.Stat) + t.Reserve;
+        foreach (var m in _build.Chassis.MinionKit) d[m.Stat] = d.GetValueOrDefault(m.Stat) + m.Reserve;
+        return d;
     }
 
     // Lay a humanoid from its parts: head (INT), chest (CON), arms (STR ×2), legs (DEX ×2). Each
