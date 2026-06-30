@@ -74,6 +74,8 @@ Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliabl
   match needs a COHERENT full rebuild (all elements to manifest at once: statusStrip, attrPool, actionBar
   + buttons, techList, bayList, foe column, hero/foe/minion figures) — a larger deliberate unit, and
   clicks aren't smoke-verifiable so draw+hit must derive from one shared rect. Flag for a focused pass.
+  Map node-type legend (design/03) added — verified. design/03 remaining: Supplies/Mastered-Support
+  labelled pip panels (vs the current header icons), leg-name header — minor.
   Remaining design/02: Inventory tabs (GEAR/TECH/MINIONS) + item cards, Rune Bag panel,
   Current-Core/Action-Bar bottom row. NOTE: inventory tabs + rune-bag + action-bar relocation are
   INPUT-COUPLED (click-equip, ladder/card hit-tests) — each needs draw+hit derived from ONE source
