@@ -42,6 +42,28 @@ public class TargetingTests
         Assert.Equal(96, front.Hp);
     }
 
+    // FSM: right-click dismisses the target — the technique drops its own aim and follows the front
+    // again, staying active and keeping its auto flag.
+    [Fact]
+    public void ClearAimDismissesTheTargetBackToTheFront()
+    {
+        var front = new Foe("front", 100);
+        var flank = new Foe("flank", 100);
+        var caster = new Caster(CasterBody(), front);
+
+        var hex = Spell("hex", 2);
+        caster.Activate(hex);
+        caster.Aim(hex, flank);
+        caster.Step();
+        Assert.Equal(98, flank.Hp); // aimed at the flank
+
+        caster.ClearAim(hex);       // dismiss the target
+        Assert.True(caster.IsActive(hex)); // still active
+        caster.Step();
+        Assert.Equal(98, flank.Hp); // flank no longer struck
+        Assert.Equal(98, front.Hp); // now follows the front
+    }
+
     [Fact]
     public void AimFallsBackToTheFrontWhenItsFoeDies()
     {

@@ -58,6 +58,20 @@ public class ExpeditionTests
         Assert.Equal(hp, foe.Hp); // held at the ready; aiming did not start an auto-fire
     }
 
+    // FSM: dismissing the target (right-click) keeps the technique active + auto-off, just drops its aim.
+    [Fact]
+    public void DismissingTargetKeepsTheTechniqueActiveAndAutoOff()
+    {
+        var exp = Sessions.Expedition();
+        exp.Toggle(Techniques.Jab);
+        exp.Enter("a2");
+        exp.Aim(Techniques.Jab, exp.Foes[0]);
+
+        exp.ClearAim(Techniques.Jab);
+        Assert.True(exp.IsActive(Techniques.Jab));   // still active
+        Assert.False(exp.IsAuto(Techniques.Jab));    // auto untouched
+    }
+
     // Manual fire still works once aimed + ready (the player's added control over the held technique).
     [Fact]
     public void ManualFireDischargesTheHeldTechniqueAtItsAim()

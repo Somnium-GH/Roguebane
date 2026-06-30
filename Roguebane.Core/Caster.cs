@@ -73,6 +73,13 @@ public sealed class Caster
         if (_active.TryGetValue(technique.Id, out var run)) { run.Aimed = target; run.Part = part; }
     }
 
+    // Dismiss a technique's target: it drops its own aim and falls back to the caster's default front.
+    // (FSM: right-click dismisses the target.) Leaves the technique active and its auto flag untouched.
+    public void ClearAim(Technique technique)
+    {
+        if (_active.TryGetValue(technique.Id, out var run)) { run.Aimed = null; run.Part = null; }
+    }
+
     public bool IsActive(Technique technique) => _active.ContainsKey(technique.Id);
 
     // FTL firing model: a Timered technique charges down to ready, then HOLDS (Ready) until fired —

@@ -12,9 +12,12 @@ TARGETING/FIRING FSM — FIXED (was top priority):
   AUTO-off policy lives at the player layer, not baked into Core. 3 behavioural pins on the player path:
   PlayerActivationStartsAutoOffAndHoldsFire, AimingATargetPreservesTheAutoOffFlag,
   ManualFireDischargesTheHeldTechniqueAtItsAim. Combat RB_SMOKE re-verified.
-- DEBT (smaller, still open): the FSM's RIGHT-CLICK to dismiss-target / deactivate-card and left-click a
-  foe PART (vs whole foe) aren't on the shell input yet — clicks aim whole foes, right-click is unbound.
-  Part-aim UI waits on foe part-maps (G1); wire right-click dismiss/deactivate next.
+- RIGHT-CLICK now wired: right-click an active card DEACTIVATES it (returns the reserved stat);
+  right-click the battlefield DISMISSES the selected technique's target (`Caster.ClearAim` -> falls back
+  to the front, stays active, auto untouched). Pinned by ClearAimDismissesTheTargetBackToTheFront +
+  DismissingTargetKeepsTheTechniqueActiveAndAutoOff.
+- DEBT (smaller, still open): left-click a foe PART (vs whole foe) isn't on the shell input — clicks
+  aim whole foes. Part-aim UI waits on foe part-maps (G1).
 Other remaining (Debt): build-screen inventory tabs + drag-equip (blocked on G2/G7); Choose-Your-Core
 screen design/05 (build screen doubles as picker — locked OK); campaign city-graph design/04.
 

@@ -62,6 +62,7 @@ public sealed class Campaign
     // FTL targeting surface (delegates to the current leg's expedition).
     public IReadOnlyList<Foe> Foes => Current.Foes;
     public void Aim(Technique technique, ICombatTarget target) => Current.Aim(technique, target);
+    public void ClearAim(Technique technique) => Current.ClearAim(technique);
     public bool Fire(Technique technique) => Current.Fire(technique);
     public void SetAuto(Technique technique, bool auto) => Current.SetAuto(technique, auto);
     public bool IsAuto(Technique technique) => Current.IsAuto(technique);

@@ -38,6 +38,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private MouseState _prevMouse;
     private Point _cursor;  // mouse position mapped into design space (through the letterbox)
     private bool _clicked;  // left button went down this frame
+    private bool _rclicked; // right button went down this frame (FSM: dismiss target / deactivate card)
 
     // The leg under way is the campaign's current Expedition — most of the run screen reads it.
     private Expedition Exp => _campaign.Current;
@@ -122,6 +123,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
             _viewScale > 0 ? (int)((mouse.X - _viewDest.X) / _viewScale) : 0,
             _viewScale > 0 ? (int)((mouse.Y - _viewDest.Y) / _viewScale) : 0);
         _clicked = mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released;
+        _rclicked = mouse.RightButton == ButtonState.Pressed && _prevMouse.RightButton == ButtonState.Released;
 
         if (_screen == Screen.Build) UpdateBuild(keys);
         else UpdateRun(keys, gameTime);
@@ -177,16 +179,26 @@ public class Game1 : Microsoft.Xna.Framework.Game
         if (Pressed(keys, Keys.Space) || Click(PauseRect)) _paused = !_paused;
         if (Pressed(keys, Keys.F) || Click(FleeRect)) Exp.Flee();
 
-        // A number key / card click selects that card AND toggles it active (charges it).
+        // A number key / card LEFT-click selects that card AND toggles it active (charges it). A
+        // RIGHT-click on an active card DEACTIVATES it (returns the reserved stat) — FSM.
+        var rclickOnCard = false;
         for (var i = 0; i < TechniqueKeys.Length && i < Exp.Loadout.Count; i++)
+        {
             if (Pressed(keys, TechniqueKeys[i]) || Click(ActionCardRect(i)))
             {
                 _selTech = i;
                 _campaign.Toggle(Exp.Loadout[i]);
             }
+            if (RightClick(ActionCardRect(i)))
+            {
+                rclickOnCard = true;
+                if (_campaign.IsActive(Exp.Loadout[i])) _campaign.Toggle(Exp.Loadout[i]); // deactivate
+            }
+        }
 
-        // FTL targeting: click a live foe to AIM the selected technique at it; ENTER / FIRE fires it
-        // on command when ready; TAB / AUTO toggles its self-firing.
+        // FTL targeting: LEFT-click a live foe to AIM the selected technique at it; ENTER / FIRE fires
+        // it on command when ready; TAB / AUTO toggles its self-firing. RIGHT-click the battlefield
+        // DISMISSES the selected technique's target (it falls back to the front) — FSM.
         var sel = SelectedTechnique();
         if (sel is not null)
         {
@@ -198,6 +210,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
             if (Pressed(keys, Keys.Enter) || Click(FireRect)) _campaign.Fire(sel);
             if (Pressed(keys, Keys.Tab) || Click(AutoRect))
                 _campaign.SetAuto(sel, !_campaign.IsAuto(sel));
+            if (_rclicked && !rclickOnCard) _campaign.ClearAim(sel); // dismiss target
         }
 
         // The battle runs on a FIXED combat clock (10 ticks/sec) off a real-time accumulator, so the
@@ -248,6 +261,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // press (drives Update intents). Both read the design-space cursor mapped through the letterbox.
     private bool Hover(Rectangle r) => !_smoke && r.Contains(_cursor);
     private bool Click(Rectangle r) => _clicked && r.Contains(_cursor);
+    private bool RightClick(Rectangle r) => _rclicked && r.Contains(_cursor);
 
     // Interactive layout rects — single source of truth shared by Update (hit-test) and Draw (paint
     // + hover). Mirrors the coordinates used in the Draw* methods.

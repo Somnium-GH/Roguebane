@@ -102,6 +102,7 @@ public sealed class Expedition
     // player fires (or flips Auto on). Aiming a target never touches the auto flag.
     public IReadOnlyList<Foe> Foes => Battle?.Encounter.Foes ?? Array.Empty<Foe>();
     public void Aim(Technique technique, ICombatTarget target) => _caster.Aim(technique, target);
+    public void ClearAim(Technique technique) => _caster.ClearAim(technique); // right-click dismisses target
     public bool Fire(Technique technique) => _caster.Fire(technique);
     public void SetAuto(Technique technique, bool auto) => _caster.SetAuto(technique, auto);
     public bool IsAuto(Technique technique) => _caster.IsAuto(technique);
