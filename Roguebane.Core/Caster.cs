@@ -187,6 +187,7 @@ public sealed class Caster
 
     public int MinionCount => _bays.Count;
     public bool HasMinion(Minion minion) => _bays.ContainsKey(minion.Id);
+    public IReadOnlyList<Minion> Minions => _bays.Values.ToList(); // bay occupants, for the render lane
 
     private static Active Reservation(Minion m) => new(m.Id, m.Stat, m.Reserve);
 

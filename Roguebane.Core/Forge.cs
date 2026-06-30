@@ -27,6 +27,7 @@ public static class Forge
     {
         var body = chassis.NewBody(runes);
         var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true);
+        SummonKit(caster, chassis, runes);
         return new Expedition(PlayerFighter(body), caster, WithRuneGrants(loadout, runes), map);
     }
 
@@ -39,7 +40,17 @@ public static class Forge
     {
         var body = chassis.NewBody(runes);
         var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true);
+        SummonKit(caster, chassis, runes);
         return new Campaign(PlayerFighter(body), caster, WithRuneGrants(loadout, runes), legs);
+    }
+
+    // Field the chassis's minion kit plus any rune-granted minions into its bays at assembly, so the
+    // summoner archetype actually fights through its summons in a real run (capped by Bays; each pays
+    // its own gate — INT reservation, charge, or free). Summon is idempotent, so a duplicate id no-ops.
+    private static void SummonKit(Caster caster, Chassis chassis, RuneLoadout runes)
+    {
+        foreach (var minion in chassis.MinionKit.Concat(runes.GrantedMinions))
+            caster.Summon(minion, chassis.Bays);
     }
 
     // Rune-granted techniques join the loadout (deduped) — a held keystone hands you a verb your

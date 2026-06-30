@@ -95,6 +95,32 @@ public class MinionTests
         Assert.Equal(99, foe.Hp);
     }
 
+    // G7 in play: the Summoner chassis fields its minion kit into its bays at assembly, and those
+    // minions auto-fire on the front foe — so the summoner archetype actually fights through summons
+    // even when the player aims no techniques (requireAim holds the bar).
+    [Fact]
+    public void TheSummonerFieldsItsMinionsWhichChipTheFrontFoeUnaided()
+    {
+        var chassis = Chassrium.Summoner;
+        var exp = Forge.Embark(chassis, chassis.NewLoadout(), chassis.Kit, Maps.StandardLeg(autoResolveCastle: false));
+        Assert.True(exp.MinionCount > 0); // bays filled at assembly
+
+        exp.Enter("a2");
+        var foe = exp.Foes[0];
+        var hp = foe.Hp;
+
+        for (var i = 0; i < 200; i++) exp.Tick(); // no technique is aimed -> only the minions act
+        Assert.True(foe.Hp < hp);
+    }
+
+    [Fact]
+    public void TheMinionKitIsCappedByTheChassisBays()
+    {
+        var reaver = Chassrium.Reaver; // zero bays
+        var exp = Forge.Embark(reaver, reaver.NewLoadout(), reaver.Kit, Maps.StandardLeg(autoResolveCastle: false));
+        Assert.Equal(0, exp.MinionCount); // no bays -> nothing fielded
+    }
+
     [Fact]
     public void AltCostMinionSpendsChargeNotStat()
     {

@@ -45,7 +45,8 @@ public static class Chassrium
         RuneBudget: 12,
         RuneDiscount: 0,
         Bays: 3,
-        DefaultLoadout: new[] { Techniques.Ember, Techniques.Brace });
+        DefaultLoadout: new[] { Techniques.Ember, Techniques.Brace },
+        DefaultMinions: new[] { Minions.Skeleton, Minions.Shade }); // a Binder fields summons from the off
 
     // The Duelist: glass-cannon STR-DEX, thin chest, no bays — ends parts before they answer.
     public static readonly Chassis Reaver = new(

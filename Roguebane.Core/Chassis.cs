@@ -11,9 +11,14 @@ public sealed record Chassis(
     int RuneBudget,
     int RuneDiscount = 0,
     int Bays = 1,
-    IReadOnlyList<Technique>? DefaultLoadout = null)
+    IReadOnlyList<Technique>? DefaultLoadout = null,
+    IReadOnlyList<Minion>? DefaultMinions = null)
 {
     public IReadOnlyList<Technique> Kit => DefaultLoadout ?? Array.Empty<Technique>();
+
+    // The minions the chassis fields from the start (summoned into its bays at assembly), the minion
+    // analogue of the fixed technique Kit. Rune grants add more on top, capped by Bays.
+    public IReadOnlyList<Minion> MinionKit => DefaultMinions ?? Array.Empty<Minion>();
 
     public Body NewBody()
     {
