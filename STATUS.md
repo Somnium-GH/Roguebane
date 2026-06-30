@@ -50,7 +50,10 @@ Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliabl
   the DELETED `sprites/char/ogre` onto the composer (Foe.Figure) — clean-build-safe. NEXT: migrate
   more combat/build elements off magic numbers via ManifestUi (verify each with a smoke shot), then
   the other screens' polish + Equipment screen. Verification is now part of the loop — smoke each
-  visual change.
+  visual change. AssetRegistry maps realigned to the drop's renamed icons (node resource, attr
+  intellect, technique glyphs) — clean-build-safe, verified on the map. Combat/build still match
+  design only loosely — the bigger remaining job is rebuilding combat to design/01 (prominent bottom
+  Attribute-Pool + Action-Bar panels, figures in the open battlefield) in small smoke-verified slices.
 - Stage composer: assemble a figure from its parts at manifest rects in `z`, swap part STATE by Core
   condition (bare vs armored), mount gear at `sockets` per `mounts`, scale into the slot by `pivot`.
   RETIRE Game1 `DrawHumanoid` hard offsets (the exploded figure).
@@ -185,7 +188,10 @@ screen design/05 (build screen doubles as picker — locked OK); campaign city-g
 ## Asset gaps (Needs Claude Design)
 *Loop logs here when a screen needs ART that's missing/wrong in Roguebane.Content and can't be composed
 from primitives. Route each to Claude Design. (Art direction: DESIGN_SPEC §13.)*
-- (none logged yet)
+- Skirmish node icon: removed by the drop with no replacement; map renders the `unknown` "?" as a
+  stopgap (label disambiguates). Needs a dedicated combat-node icon.
+- Foe creature variety: only the `ogre` figure is wired for foes (default); troll/bandit/wraith/
+  gargoyle figures shipped but unused — needs per-encounter figure assignment in content.
 
 ## Debt (active — with reconcile trigger)
 - BUILD screen attribute readout + gate markers DONE. Still lacks inventory tabs (gear/tech/minions) +
