@@ -34,9 +34,16 @@ For each figure, in ADDITION to the flattened figure PNG (keep it — thumbnails
   to `handL/handR` (the script's `handLx/handRx/handY`). Robe figures: omit torso/legs/boots, keep arms.
 - A new race/foe needs NO game changes — it just adds its `figures.<id>` entry + part PNGs.
 
-## 2. Gear — its own pivot
-Each weapon/shield PNG gets a `gear.<id>` entry: `{ "pivot":[x,y] }` (the grip point that lands on a
-hand socket). Mount = align gear.pivot to figure.sockets.handL/handR.
+## 2. Gear — SEPARATE, mounted (not baked)
+EQUIPMENT (weapons, shields, held items) is the player's loadout and SWAPS, so it must NOT be baked into
+the figure. Today `roster_gen.js` paints it into the grid via the `front:`/`back:` callbacks — for the
+modular export, STOP doing that: export each piece as its own PNG with a `gear.<id>` entry
+`{ "pivot":[x,y] }` (the grip point), and the combat MODULAR parts (§1) must be exported WITHOUT any
+equipment painted on. Mount at runtime = align `gear.pivot` to `figure.sockets.handL/handR`.
+- DISTINCTION: this applies only to equipment. ANATOMICAL features that aren't swappable — wings, tusks,
+  horns, robe sleeves — STAY part of their body part (bake them into head/torso/arm as today).
+- The FLATTENED thumbnail figure may keep its signature gear baked in (it's a static portrait for the
+  build / New Run cards). Only the modular combat parts must be gear-free.
 
 ## 3. Screens — responsive UI manifest (fills any aspect)
 For each screen, emit `screens.<id>`:
@@ -102,3 +109,43 @@ COMPLETENESS RULE: `screens.<id>.elements[]` must be the COMPLETE inventory for 
 renders exactly that set, so it CANNOT silently drop the rune bag, the inventory tabs, or the gate
 markers (today's drift). The manifest is the machine source of truth; `design/SCREENS.md` is the
 human-readable mirror of the same inventory. Emit every element the mockup draws.
+
+## 8. Capture EVERY visual detail, not just geometry (kills the remaining drift)
+Geometry alone leaves the loop guessing fonts, colours, text, borders, states — so capture the full
+render spec. Two parts: a shared `style` block (once) + a complete per-element spec.
+
+SHARED `style` (emit once, from `design/06-style-frame.png` + `ASSET_MANIFEST.md`):
+```
+"style": {
+  "palette": { "ink":"#ece0cb","muted":"#9a8468","amber":"#d9a441","blood":"#b23b32",
+               "panel":"#1d150e","border":"#5a4636","str":"#c2553f","int":"#6f8fc4",
+               "dex":"#82a85e","con":"#cf9a44","ember":"#…","outline":"#15100c", "…":"…" },
+  "fonts":   { "display":{ "role":"serif — world & names" }, "mono":{ "role":"numbers/state/captions" },
+               "sizes":{ "title":…, "body":…, "caption":… } },
+  "partStates": { "ok":"…","damaged":"…","disabled":"…","focus":"reticle","gearSocket":"hatch" },
+  "pip": { "wrapAt":10, "shrink":true, "fixedFootprint":true, "anchor":"monoNumber", "max":20 }
+}
+```
+Elements reference palette TOKENS (`"color":"int"`) and font roles — never raw hex — so it stays
+consistent + themeable. The `partStates` grammar is the canonical condition→sprite mapping the figure
+parts (§1) use.
+
+PER-ELEMENT spec (extends §3/§7) — emit whatever the element has:
+```
+{ "id":"runeBag", "type":"panel|text|bar|pip|card|icon|tabs|button|figure|list",
+  "anchor":…, "offset":…, "size":…, "z":…,
+  "fill":"panel", "border":{ "color":"border", "w":1 },
+  "title":{ "text":"Rune Bag", "font":"display", "color":"ink", "align":"left" },
+  "caption":{ "text":"found on the march · socket or sell", "font":"mono", "color":"muted" },
+  "text":{ "binds":"runes.budget", "font":"mono", "color":"amber", "align":"right" },  // or "content":"<literal>"
+  "icon":"icon/attr/int",
+  "states":{ "selected":{"border":"amber"}, "disabled":{"color":"muted"}, "active":{…}, "locked":{…} },
+  "widget":{ /* bar: segments[base,marks,current] + gateMarker + value; pip: uses style.pip; tabs: tabs[]+activeContent */ }
+}
+```
+
+COMPLETENESS (visual): every element carries geometry + font + colour-token + content/bind + border/fill
++ states + any widget params. If the mockup shows it — a panel title, a caption/tip, a section header,
+a bar segment, a gate marker, a pip row, a card's tier ring, a tab's active state, an equip button, a
+leader-line part label, the backdrop — it's in the manifest. Then the game reproduces the screen with
+ZERO invented styling, and the vision review just confirms.

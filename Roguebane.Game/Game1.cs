@@ -97,6 +97,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 // en route, so screenshot there (it survives long enough to show a stable combat frame).
                 _campaign.Enter("a1"); Resolve();  // a resource hold -> banks 1 support
                 _campaign.Enter("b");              // merchant — no fight
+                Exp.BuyWeapon(Armory.Dagger); Exp.EquipWeapon(Armory.Dagger); // wield -> hand marker
+                Exp.Stash.AddArmor(Shops.Plate); Exp.EquipArmor(Shops.Plate);  // wear -> chest ring
                 _campaign.Enter("c2"); Resolve();  // another hold -> banks a 2nd
                 _campaign.Enter("castle");         // the banked support rallies on the boss here
 
@@ -840,8 +842,21 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 Stat.Dex => ("leg", 20, 48, legs++ == 0 ? -10 : 10, 42),
                 _ => ("chest", 40, 40, 0, 0),
             };
+            var rx = cx + dx * s - w * s / 2;
+            var ry = cy + dy * s - h * s / 2;
             var tex = _assets.Texture($"sprites/body/{asset}/base_{Condition(body, part)}");
-            Sprite(tex, cx + dx * s - w * s / 2, cy + dy * s - h * s / 2, w * s, h * s, Color.White);
+            Sprite(tex, rx, ry, w * s, h * s, Color.White);
+            // Worn armor rides the part-group: ring the part (no armor sprite yet — composed indicator).
+            if (body.ArmorOn(part.Stat) is not null) Border(rx, ry, w * s, h * s, Amber);
+        }
+
+        // Wielded weapons sit in the hands (the arms), tinted by the weapon's stat — a composed marker
+        // standing in for a weapon sprite.
+        var hand = 0;
+        foreach (var weapon in body.Hands)
+        {
+            var side = hand++ == 0 ? -1 : 1;
+            Rect(cx + 30 * side * s - 2, cy + 16 * s, 5, 20, StatColor(weapon.Stat));
         }
     }
 
