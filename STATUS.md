@@ -60,8 +60,12 @@ Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliabl
   wider-coverage open fonts are bundled.
   design/02 BUILD started: attribute READOUT bars (base + rune-marks + gate notch + total per stat)
   replace the build pip rows per design/02 (combat keeps the pip widget per design/01) — verified.
-  Remaining design/02: Inventory tabs (GEAR/TECH/MINIONS) + item cards, Rune Bag panel, Chassis-
-  Anatomy part labels, Current-Core/Action-Bar bottom row. Combat still matches design/01 only
+  Chassis-anatomy stat callouts (INT/CON/STR/DEX tags by the figure parts) DONE — verified.
+  Remaining design/02: Inventory tabs (GEAR/TECH/MINIONS) + item cards, Rune Bag panel,
+  Current-Core/Action-Bar bottom row. NOTE: inventory tabs + rune-bag + action-bar relocation are
+  INPUT-COUPLED (click-equip, ladder/card hit-tests) — each needs draw+hit derived from ONE source
+  and isn't click-verifiable via smoke; treat as careful single-unit slices, not micro-fragments.
+  Combat still matches design/01 only
   loosely — the bigger remaining job is rebuilding combat to design/01 (prominent bottom Attribute-
   Pool + Action-Bar panels, figures in the open battlefield) in small smoke-verified slices.
 - Stage composer: assemble a figure from its parts at manifest rects in `z`, swap part STATE by Core
