@@ -190,8 +190,10 @@ screen design/05 (build screen doubles as picker — locked OK); campaign city-g
 from primitives. Route each to Claude Design. (Art direction: DESIGN_SPEC §13.)*
 - Skirmish node icon: removed by the drop with no replacement; map renders the `unknown` "?" as a
   stopgap (label disambiguates). Needs a dedicated combat-node icon.
-- Foe creature variety: only the `ogre` figure is wired for foes (default); troll/bandit/wraith/
-  gargoyle figures shipped but unused — needs per-encounter figure assignment in content.
+- Foe creature variety: DONE for ogre/troll/bandit/skeleton (per-encounter assignment in Sieges —
+  raiders bandit/skeleton, castle ogre/troll). STILL UNUSED: wraith (PARTIAL art — only 12 of the
+  21 part files, renders with gaps) and gargoyle (24 files, nonstandard part layout) — both need art
+  completion/normalization before wiring.
 
 ## Debt (active — with reconcile trigger)
 - BUILD screen attribute readout + gate markers DONE. Still lacks inventory tabs (gear/tech/minions) +
