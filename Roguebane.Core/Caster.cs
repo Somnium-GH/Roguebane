@@ -117,6 +117,10 @@ public sealed class Caster
     public ICombatTarget? AimOf(Technique technique) =>
         _active.TryGetValue(technique.Id, out var run) ? run.Aimed ?? (_requireAim ? null : _default) : null;
 
+    // The technique's per-target PART aim (which foe part it strikes), or null for whole-target HP.
+    public BodyPart? PartOf(Technique technique) =>
+        _active.TryGetValue(technique.Id, out var run) ? run.Part : null;
+
     // Fire a charged technique NOW at its aim. No-op (false) if not active, not yet ready, sustained,
     // or the discharge can't land (no target / dry charge). Resets the cooldown on a hit.
     public bool Fire(Technique technique)

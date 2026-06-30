@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -88,9 +89,12 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 // over the live foes), then drive ticks so cards charge and the cooldown wipes read.
                 if (Exp.Foes.Count > 0)
                 {
-                    _campaign.Aim(Exp.Loadout[0], Exp.Foes[^1]);
+                    var foe = Exp.Foes[^1];
+                    var head = foe.Frame?.Parts.FirstOrDefault(p => p.Stat == Stat.Int);
+                    if (head is not null) _campaign.Aim(Exp.Loadout[0], foe, head); // PART aim -> F1:H + limb band
+                    else _campaign.Aim(Exp.Loadout[0], foe);
                     _campaign.SetAuto(true); // global AUTO on -> the lit toggle + persisted target
-                    if (Exp.Loadout.Count > 1) _targeting = 1;
+                    if (Exp.Loadout.Count > 1) _targeting = 1; // a second module in TARGETING -> show limb bands
                 }
                 for (var i = 0; i < 60; i++) _campaign.Tick();
             }
@@ -208,7 +212,13 @@ public class Game1 : Microsoft.Xna.Framework.Game
             var t = Exp.Loadout[_targeting];
             var foes = Exp.Foes;
             for (var i = 0; i < foes.Count; i++)
-                if (!foes[i].Down && Click(FoeRect(i))) { _campaign.Aim(t, foes[i]); _targeting = -1; }
+            {
+                if (foes[i].Down || !Click(FoeRect(i))) continue;
+                var part = FoePartAt(foes[i], _cursor); // a structured foe: the clicked limb, else whole-HP
+                if (part is not null) _campaign.Aim(t, foes[i], part);
+                else _campaign.Aim(t, foes[i]);
+                _targeting = -1;
+            }
 
             if (_rclicked && !rclickOnCard) _targeting = -1; // cancel targeting
         }
@@ -285,6 +295,40 @@ public class Game1 : Microsoft.Xna.Framework.Game
             if (ReferenceEquals(foes[i], target)) return i;
         return -1;
     }
+
+    // Anatomical part bands stacked on the foe sprite, top->bottom: head, arms, chest, legs. A
+    // structured foe is aimed limb-by-limb by clicking the band; an unstructured foe has no bands.
+    private static int PartBand(Stat stat) => stat switch
+    {
+        Stat.Int => 0, // head
+        Stat.Str => 1, // arms
+        Stat.Con => 2, // chest
+        Stat.Dex => 3, // legs
+        _ => 1,
+    };
+
+    private static Rectangle FoePartRect(int foeIndex, Stat stat)
+    {
+        var r = FoeRect(foeIndex);
+        var band = r.Height / 4;
+        return new Rectangle(r.X, r.Y + PartBand(stat) * band, r.Width, band);
+    }
+
+    // The foe PART under a screen point (structured foe only), else null = whole-HP aim.
+    private BodyPart? FoePartAt(Foe foe, Point p)
+    {
+        if (foe.Frame is null) return null;
+        var fi = FoeIndexOf(foe);
+        foreach (var part in foe.Frame.Parts)
+            if (FoePartRect(fi, part.Stat).Contains(p)) return part;
+        return null;
+    }
+
+    // One-letter limb glyph for the per-card target tag (head/arm/chest/legs).
+    private static char PartGlyph(Stat stat) => stat switch
+    {
+        Stat.Int => 'H', Stat.Str => 'A', Stat.Con => 'C', Stat.Dex => 'L', _ => '?',
+    };
     // Merchant verb buttons — mirror DrawMerchant's panel origin (560,300) + button offsets.
     private static readonly Rectangle MerchPotionRect = new(574, 344, 330, 34);
     private static readonly Rectangle MerchUseRect = new(574, 382, 330, 34);
@@ -735,7 +779,20 @@ public class Game1 : Microsoft.Xna.Framework.Game
             {
                 if (AnyModuleAims(foe)) Sprite(_assets.Reticle("focus"), x + 24, top, 96, 96, Amber);
                 else if (targeting) Sprite(_assets.Reticle("focus"), x + 24, top, 96, 96, new Color(Ink, 110));
-                if (Hover(FoeRect(i))) Border(x, top, 144, 156, Ink); // click to aim
+
+                const int band = 156 / 4;
+                // Limbs locked by a module stay ringed so the per-card tag has a visual anchor.
+                foreach (var t in Exp.Loadout)
+                    if (Exp.IsActive(t) && ReferenceEquals(Exp.AimOf(t), foe) && Exp.PartOf(t) is { } pt)
+                        Border(x, top + PartBand(pt.Stat) * band, 144, band, Amber);
+
+                if (targeting && foe.Frame is not null) // show the limb bands + highlight the one under cursor
+                {
+                    for (var b = 1; b < 4; b++) Rect(x, top + b * band, 144, 1, new Color(Ink, 90));
+                    if (FoePartAt(foe, _cursor) is { } hov)
+                        Border(x, top + PartBand(hov.Stat) * band, 144, band, Ink);
+                }
+                else if (Hover(FoeRect(i))) Border(x, top, 144, 156, Ink); // click to aim
             }
             DrawBar(x, top + 156, 144, _assets.Resource("hp"), foe.Hp, foe.MaxHp, Blood);
         }
@@ -782,10 +839,14 @@ public class Game1 : Microsoft.Xna.Framework.Game
             if (st.Ready && !st.Auto && !st.Sustained)
                 Border(left + ix, y + iy, sz, sz, Amber); // charged, holding for a target
 
-            // The technique's current target (which foe), top-right of the icon so the player can
-            // read each card's aim without crowding the key/cost row below.
+            // The technique's current target (which foe, and which limb if part-aimed), top-right of
+            // the icon so the player reads each card's aim without crowding the key/cost row below.
             var fi = st.Active ? FoeIndexOf(Exp.AimOf(t)) : -1;
-            if (fi >= 0) Text(_assets.Mono, "F" + (fi + 1), left + 50, y + iy - 2, Amber);
+            if (fi >= 0)
+            {
+                var tag2 = "F" + (fi + 1) + (Exp.PartOf(t) is { } pt ? ":" + PartGlyph(pt.Stat) : "");
+                Text(_assets.Mono, tag2, left + 44, y + iy - 2, Amber);
+            }
 
             Text(_assets.Mono, "[" + (i + 1) + "]", left + 6, y + 50, Muted);
             Text(_assets.Mono, t.Reserve.ToString(), left + 58, y + 50, StatColor(t.Stat));

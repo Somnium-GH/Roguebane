@@ -102,12 +102,14 @@ public sealed class Expedition
     // (default) is one-shot — it clears the target after the shot; AUTO on keeps firing at the target.
     public IReadOnlyList<Foe> Foes => Battle?.Encounter.Foes ?? Array.Empty<Foe>();
     public void Aim(Technique technique, ICombatTarget target) => _caster.Aim(technique, target);
+    public void Aim(Technique technique, ICombatTarget target, BodyPart part) => _caster.Aim(technique, target, part);
     public void ClearAim(Technique technique) => _caster.ClearAim(technique); // right-click clears the target
     public bool Fire(Technique technique) => _caster.Fire(technique);
     public void SetAuto(bool auto) => _caster.SetAutoAll(auto); // ONE global toggle for the whole bar
     public bool IsAuto() => _caster.AutoAll;
     public bool IsReady(Technique technique) => _caster.IsReady(technique);
     public ICombatTarget? AimOf(Technique technique) => _caster.AimOf(technique);
+    public BodyPart? PartOf(Technique technique) => _caster.PartOf(technique); // which foe part it's aimed at
 
     // Travel to a charted neighbour and resolve what we land on.
     public bool Enter(string nodeId)
