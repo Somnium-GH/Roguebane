@@ -29,7 +29,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private BuildSession _build = null!;
     private Campaign _campaign = null!;
     private bool _paused;
-    private int _targeting = -1; // action-bar card in TARGETING mode (reticle up), -1 = none. No focus cursor.
+    private readonly CombatTargeting _ctrl = new(); // the targeting FSM (headless, in Core); shell just feeds it intents
     private KeyboardState _prevKeys;
     private KeyboardState _keys; // current frame's keys, read in Draw for button pressed-state
 
@@ -94,7 +94,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
                     if (head is not null) _campaign.Aim(Exp.Loadout[0], foe, head); // PART aim -> F1:H + limb band
                     else _campaign.Aim(Exp.Loadout[0], foe);
                     _campaign.SetAuto(true); // global AUTO on -> the lit toggle + persisted target
-                    if (Exp.Loadout.Count > 1) _targeting = 1; // a second module in TARGETING -> show limb bands
+                    if (Exp.Loadout.Count > 1) _ctrl.CardPress(Exp, 1); // card 1 already powered -> enters TARGETING
                 }
                 for (var i = 0; i < 60; i++) _campaign.Tick();
             }
@@ -182,47 +182,27 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         if (Pressed(keys, Keys.Space) || Click(PauseRect)) _paused = !_paused;
         if (Pressed(keys, Keys.F) || Click(FleeRect)) Exp.Flee();
-        if (Pressed(keys, Keys.Tab) || Click(AutoRect)) _campaign.SetAuto(!_campaign.IsAuto()); // ONE global toggle
+        if (Pressed(keys, Keys.Tab) || Click(AutoRect)) _ctrl.ToggleAuto(Exp); // ONE global toggle
 
-        // Per-module FSM (no global focus). Card LEFT-click: an INACTIVE module POWERS (reserves +
-        // charges); an ACTIVE module enters TARGETING (reticle up) and CLEARS its own target. Card
-        // RIGHT-click on an active module UNPOWERS it (returns the stat, drops the target).
+        // The targeting FSM lives in Core (CombatTargeting); the shell only feeds it press intents.
+        // Card LEFT-press powers/enters-targeting; card RIGHT-press unpowers.
         var rclickOnCard = false;
         for (var i = 0; i < TechniqueKeys.Length && i < Exp.Loadout.Count; i++)
         {
-            var t = Exp.Loadout[i];
-            if (Pressed(keys, TechniqueKeys[i]) || Click(ActionCardRect(i)))
-            {
-                if (!_campaign.IsActive(t)) _campaign.Toggle(t);          // POWER
-                else { _targeting = i; _campaign.ClearAim(t); }          // enter TARGETING, clear target
-            }
-            if (RightClick(ActionCardRect(i)))
-            {
-                rclickOnCard = true;
-                if (_campaign.IsActive(t)) _campaign.Toggle(t);          // UNPOWER (drops target)
-                if (_targeting == i) _targeting = -1;
-            }
+            if (Pressed(keys, TechniqueKeys[i]) || Click(ActionCardRect(i))) _ctrl.CardPress(Exp, i);
+            if (RightClick(ActionCardRect(i))) { rclickOnCard = true; _ctrl.CardRightPress(Exp, i); }
         }
 
-        // TARGETING: a module is picking a foe (no fire button — a charged + targeted module fires on
-        // its own). LEFT-click a live foe sets the target and exits. TAB / AUTO toggles that module's
-        // AUTO (keep target after the shot). RIGHT-click cancels targeting (the target stays cleared).
-        if (_targeting >= 0 && _targeting < Exp.Loadout.Count && _campaign.IsActive(Exp.Loadout[_targeting]))
+        // While a module is targeting: LEFT-press a live foe (clicked limb -> part aim) to set + exit;
+        // RIGHT-press the battlefield cancels. A charged + targeted module fires on its own (no button).
+        if (_ctrl.IsTargeting(Exp))
         {
-            var t = Exp.Loadout[_targeting];
             var foes = Exp.Foes;
             for (var i = 0; i < foes.Count; i++)
-            {
-                if (foes[i].Down || !Click(FoeRect(i))) continue;
-                var part = FoePartAt(foes[i], _cursor); // a structured foe: the clicked limb, else whole-HP
-                if (part is not null) _campaign.Aim(t, foes[i], part);
-                else _campaign.Aim(t, foes[i]);
-                _targeting = -1;
-            }
-
-            if (_rclicked && !rclickOnCard) _targeting = -1; // cancel targeting
+                if (!foes[i].Down && Click(FoeRect(i))) _ctrl.FoePress(Exp, foes[i], FoePartAt(foes[i], _cursor));
+            if (_rclicked && !rclickOnCard) _ctrl.CancelTargeting();
         }
-        else _targeting = -1; // module deactivated/gone — leave targeting
+        else _ctrl.Sync(Exp); // module deactivated/gone -> leave targeting
 
         // The battle runs on a FIXED combat clock (10 ticks/sec) off a real-time accumulator, so the
         // deterministic sim is decoupled from the frame rate. Smoke freezes it for the screenshot.
@@ -768,7 +748,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private void DrawFoes(int x, int y)
     {
         var encounter = Exp.Battle!.Encounter;
-        var targeting = _targeting >= 0 && _targeting < Exp.Loadout.Count && Exp.IsActive(Exp.Loadout[_targeting]);
+        var targeting = _ctrl.IsTargeting(Exp);
         for (var i = 0; i < encounter.Foes.Count; i++)
         {
             var foe = encounter.Foes[i];
@@ -850,9 +830,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
             Text(_assets.Mono, "[" + (i + 1) + "]", left + 6, y + 50, Muted);
             Text(_assets.Mono, t.Reserve.ToString(), left + 58, y + 50, StatColor(t.Stat));
-            var border = i == _targeting ? Ink : st.Active ? Amber : Hover(ActionCardRect(i)) ? Ink : Border0;
+            var border = i == _ctrl.Targeting ? Ink : st.Active ? Amber : Hover(ActionCardRect(i)) ? Ink : Border0;
             Border(left, y + 8, 76, 60, border);
-            if (i == _targeting) Border(left - 2, y + 6, 80, 64, Ink); // TARGETING: outer ring (reticle up)
+            if (i == _ctrl.Targeting) Border(left - 2, y + 6, 80, 64, Ink); // TARGETING: outer ring (reticle up)
         }
 
         // Mouse-reachable combat verbs (keyboard Tab/Space/F still work). No FIRE button — a charged +
