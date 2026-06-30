@@ -115,8 +115,10 @@ public sealed class Caster
     public bool IsReady(Technique technique) =>
         _active.TryGetValue(technique.Id, out var run) && run.Countdown <= 0;
 
+    // The technique's effective target for rendering: its own aim, else the default front — but a
+    // player technique (requireAim) reports NO target when unaimed (it holds and won't fire).
     public ICombatTarget? AimOf(Technique technique) =>
-        _active.TryGetValue(technique.Id, out var run) ? run.Aimed ?? _default : null;
+        _active.TryGetValue(technique.Id, out var run) ? run.Aimed ?? (_requireAim ? null : _default) : null;
 
     // Fire a charged technique NOW at its aim. No-op (false) if not active, not yet ready, sustained,
     // or the discharge can't land (no target / dry charge). Resets the cooldown on a hit.
@@ -139,7 +141,8 @@ public sealed class Caster
             return new TechStatus(false, cooldown, cooldown, t.Kind == TechniqueKind.Sustained, false, false, false);
         var dry = t.ChargeCost > 0 && _charge < t.ChargeCost;
         var ready = run.Tech.Kind == TechniqueKind.Timered && run.Countdown <= 0;
-        return new TechStatus(true, run.Countdown, cooldown, t.Kind == TechniqueKind.Sustained, dry, ready, run.Auto);
+        // Card's "auto" = the player AUTO (persist/keep-target), not the engine discharge-on-cadence flag.
+        return new TechStatus(true, run.Countdown, cooldown, t.Kind == TechniqueKind.Sustained, dry, ready, run.Persist);
     }
 
     public int ActiveCount => _active.Count;

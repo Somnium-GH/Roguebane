@@ -71,6 +71,18 @@ public class PlayerTargetingFsmTests
     }
 
     [Fact]
+    public void AimOfReportsNoTargetUntilAimed()
+    {
+        var foe = new Foe("foe", 1000);
+        var c = new Caster(Body(), foe, requireAim: true); // a front exists but isn't a target here
+        c.Activate(Techniques.Jab, auto: true);
+        Assert.Null(c.AimOf(Techniques.Jab)); // unaimed => no target (no front fallback)
+
+        c.Aim(Techniques.Jab, foe);
+        Assert.Same(foe, c.AimOf(Techniques.Jab));
+    }
+
+    [Fact]
     public void ClearingTheAimHoldsFire()
     {
         var foe = new Foe("foe", 1000);

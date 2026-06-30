@@ -28,7 +28,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private BuildSession _build = null!;
     private Campaign _campaign = null!;
     private bool _paused;
-    private int _selTech; // selected action-bar card: the technique that aim-clicks and FIRE target
+    private int _targeting = -1; // action-bar card in TARGETING mode (reticle up), -1 = none. No focus cursor.
     private KeyboardState _prevKeys;
     private KeyboardState _keys; // current frame's keys, read in Draw for button pressed-state
 
@@ -83,14 +83,14 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 foreach (var t in Exp.Loadout) _campaign.Toggle(t);
                 _campaign.Enter(Exp.Options[0].Id); // jump into the first fight (fresh)
 
-                // Put the selected technique on MANUAL aimed at a foe, then drive combat ticks so it
-                // charges to ready and HOLDS — the screenshot then shows the full FTL surface
-                // (holding "RDY" card + target tag + AUTO toggle state + live cooldown wipes).
-                var sel = SelectedTechnique();
-                if (sel is not null && Exp.Foes.Count > 0)
+                // Show the full targeting surface in one shot: card 0 LOCKED on a foe with AUTO on
+                // (persisted reticle + F-tag + "auto"), and card 1 in TARGETING mode (reticle prompt
+                // over the live foes), then drive ticks so cards charge and the cooldown wipes read.
+                if (Exp.Foes.Count > 0)
                 {
-                    _campaign.SetAuto(sel, false);
-                    _campaign.Aim(sel, Exp.Foes[^1]);
+                    _campaign.Aim(Exp.Loadout[0], Exp.Foes[^1]);
+                    _campaign.SetAuto(Exp.Loadout[0], true);
+                    if (Exp.Loadout.Count > 1) _targeting = 1;
                 }
                 for (var i = 0; i < 60; i++) _campaign.Tick();
             }
@@ -179,39 +179,40 @@ public class Game1 : Microsoft.Xna.Framework.Game
         if (Pressed(keys, Keys.Space) || Click(PauseRect)) _paused = !_paused;
         if (Pressed(keys, Keys.F) || Click(FleeRect)) Exp.Flee();
 
-        // A number key / card LEFT-click selects that card AND toggles it active (charges it). A
-        // RIGHT-click on an active card DEACTIVATES it (returns the reserved stat) — FSM.
+        // Per-module FSM (no global focus). Card LEFT-click: an INACTIVE module POWERS (reserves +
+        // charges); an ACTIVE module enters TARGETING (reticle up) and CLEARS its own target. Card
+        // RIGHT-click on an active module UNPOWERS it (returns the stat, drops the target).
         var rclickOnCard = false;
         for (var i = 0; i < TechniqueKeys.Length && i < Exp.Loadout.Count; i++)
         {
+            var t = Exp.Loadout[i];
             if (Pressed(keys, TechniqueKeys[i]) || Click(ActionCardRect(i)))
             {
-                _selTech = i;
-                _campaign.Toggle(Exp.Loadout[i]);
+                if (!_campaign.IsActive(t)) _campaign.Toggle(t);          // POWER
+                else { _targeting = i; _campaign.ClearAim(t); }          // enter TARGETING, clear target
             }
             if (RightClick(ActionCardRect(i)))
             {
                 rclickOnCard = true;
-                if (_campaign.IsActive(Exp.Loadout[i])) _campaign.Toggle(Exp.Loadout[i]); // deactivate
+                if (_campaign.IsActive(t)) _campaign.Toggle(t);          // UNPOWER (drops target)
+                if (_targeting == i) _targeting = -1;
             }
         }
 
-        // FTL targeting: LEFT-click a live foe to AIM the selected technique at it; ENTER / FIRE fires
-        // it on command when ready; TAB / AUTO toggles its self-firing. RIGHT-click the battlefield
-        // DISMISSES the selected technique's target (it falls back to the front) — FSM.
-        var sel = SelectedTechnique();
-        if (sel is not null)
+        // TARGETING: a module is picking a foe (no fire button — a charged + targeted module fires on
+        // its own). LEFT-click a live foe sets the target and exits. TAB / AUTO toggles that module's
+        // AUTO (keep target after the shot). RIGHT-click cancels targeting (the target stays cleared).
+        if (_targeting >= 0 && _targeting < Exp.Loadout.Count && _campaign.IsActive(Exp.Loadout[_targeting]))
         {
+            var t = Exp.Loadout[_targeting];
             var foes = Exp.Foes;
             for (var i = 0; i < foes.Count; i++)
-                if (!foes[i].Down && Click(FoeRect(i)))
-                    _campaign.Aim(sel, foes[i]);
+                if (!foes[i].Down && Click(FoeRect(i))) { _campaign.Aim(t, foes[i]); _targeting = -1; }
 
-            if (Pressed(keys, Keys.Enter) || Click(FireRect)) _campaign.Fire(sel);
-            if (Pressed(keys, Keys.Tab) || Click(AutoRect))
-                _campaign.SetAuto(sel, !_campaign.IsAuto(sel));
-            if (_rclicked && !rclickOnCard) _campaign.ClearAim(sel); // dismiss target
+            if (Pressed(keys, Keys.Tab) || Click(AutoRect)) _campaign.SetAuto(t, !_campaign.IsAuto(t));
+            if (_rclicked && !rclickOnCard) _targeting = -1; // cancel targeting
         }
+        else _targeting = -1; // module deactivated/gone — leave targeting
 
         // The battle runs on a FIXED combat clock (10 ticks/sec) off a real-time accumulator, so the
         // deterministic sim is decoupled from the frame rate. Smoke freezes it for the screenshot.
@@ -273,14 +274,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private static Rectangle FoeRect(int i) => new(560, 90 + i * 150, 144, 156);
     private static readonly Rectangle PauseRect = new(W - 156, H - 84, 110, 26);
     private static readonly Rectangle FleeRect = new(W - 156, H - 50, 110, 26);
-    private static readonly Rectangle FireRect = new(W - 272, H - 84, 110, 26);
     private static readonly Rectangle AutoRect = new(W - 272, H - 50, 110, 26);
-
-    // The selected action-bar technique (the one aim-clicks and FIRE act on), or null if none loaded.
-    private Technique? SelectedTechnique() =>
-        _selTech < Exp.Loadout.Count ? Exp.Loadout[_selTech] : null;
-
-    private bool SelAuto() => SelectedTechnique() is { } t && Exp.IsAuto(t);
 
     // Which foe a target points at (for the per-card target tag), or -1 for the default front / none.
     private int FoeIndexOf(ICombatTarget? target)
@@ -725,23 +719,34 @@ public class Game1 : Microsoft.Xna.Framework.Game
         return frac <= 0f ? "broken" : frac < 0.5f ? "damaged" : "healthy";
     }
 
-    // Foe side: each foe a sprite + HP bar, the current target ringed by the focus reticle.
+    // Foe side: each foe a sprite + HP bar. A foe LOCKED by a module wears a solid reticle; while a
+    // module is in TARGETING mode every live foe shows a faint pick-prompt reticle (choose a target).
     private void DrawFoes(int x, int y)
     {
         var encounter = Exp.Battle!.Encounter;
-        var sel = SelectedTechnique();
-        var aim = sel is not null ? Exp.AimOf(sel) : null; // the selected technique's chosen target
+        var targeting = _targeting >= 0 && _targeting < Exp.Loadout.Count && Exp.IsActive(Exp.Loadout[_targeting]);
         for (var i = 0; i < encounter.Foes.Count; i++)
         {
             var foe = encounter.Foes[i];
             var top = y + i * 150;
-            var isTarget = ReferenceEquals(aim ?? encounter.CurrentTarget, foe);
             var tint = foe.Down ? new Color(70, 60, 55) : Color.White;
             Sprite(_assets.Texture("sprites/char/ogre"), x, top, 144, 156, tint);
-            if (isTarget && !foe.Down) Sprite(_assets.Reticle("focus"), x + 24, top, 96, 96, Amber);
-            if (!foe.Down && Hover(FoeRect(i))) Border(x, top, 144, 156, Ink); // click to aim
+            if (!foe.Down)
+            {
+                if (AnyModuleAims(foe)) Sprite(_assets.Reticle("focus"), x + 24, top, 96, 96, Amber);
+                else if (targeting) Sprite(_assets.Reticle("focus"), x + 24, top, 96, 96, new Color(Ink, 110));
+                if (Hover(FoeRect(i))) Border(x, top, 144, 156, Ink); // click to aim
+            }
             DrawBar(x, top + 156, 144, _assets.Resource("hp"), foe.Hp, foe.MaxHp, Blood);
         }
+    }
+
+    // True if any active module is aimed at this foe (drives the locked-on reticle).
+    private bool AnyModuleAims(Foe foe)
+    {
+        foreach (var t in Exp.Loadout)
+            if (Exp.IsActive(t) && ReferenceEquals(Exp.AimOf(t), foe)) return true;
+        return false;
     }
 
     // The action bar: one card per loadout technique — icon, mono stat cost, active ring.
@@ -767,14 +772,14 @@ public class Game1 : Microsoft.Xna.Framework.Game
             else if (st.Sustained && st.Active)
                 Rect(left + ix, y + iy, sz, sz, new Color(Amber, 60)); // held
 
-            // Ready holds bright; auto-firing cards read "auto", a held block "held", a dry charge
-            // "dry", a charging timer counts via the wipe.
+            // Ready holds bright; AUTO (persist) cards read "auto", a held block "held", a dry charge
+            // "dry", a charging timer counts via the wipe. A ready+untargeted module just HOLDS.
             var tag = st.ChargeDry ? "dry" : st.Sustained && st.Active ? "held"
                 : st.Ready ? (st.Auto ? "auto" : "RDY") : null;
             if (tag is not null)
                 Text(_assets.Mono, tag, left + ix, y + iy - 2, st.ChargeDry ? Blood : Amber);
             if (st.Ready && !st.Auto && !st.Sustained)
-                Border(left + ix, y + iy, sz, sz, Amber); // holding, awaiting FIRE
+                Border(left + ix, y + iy, sz, sz, Amber); // charged, holding for a target
 
             // The technique's current target (which foe), top-right of the icon so the player can
             // read each card's aim without crowding the key/cost row below.
@@ -783,14 +788,15 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
             Text(_assets.Mono, "[" + (i + 1) + "]", left + 6, y + 50, Muted);
             Text(_assets.Mono, t.Reserve.ToString(), left + 58, y + 50, StatColor(t.Stat));
-            var border = i == _selTech ? Ink : st.Active ? Amber : Hover(ActionCardRect(i)) ? Ink : Border0;
+            var border = i == _targeting ? Ink : st.Active ? Amber : Hover(ActionCardRect(i)) ? Ink : Border0;
             Border(left, y + 8, 76, 60, border);
-            if (i == _selTech) Border(left - 2, y + 6, 80, 64, Amber); // selected: outer ring
+            if (i == _targeting) Border(left - 2, y + 6, 80, 64, Ink); // TARGETING: outer ring (reticle up)
         }
 
-        // Mouse-reachable combat verbs (keyboard Enter/Tab/Space/F still work).
-        DrawHotButton("FIRE", FireRect, Hover(FireRect));
-        DrawHotButton(SelAuto() ? "AUTO+" : "AUTO-", AutoRect, Hover(AutoRect));
+        // Mouse-reachable combat verbs (keyboard Tab/Space/F still work). No FIRE button — a charged +
+        // targeted module fires on its own. AUTO toggles the TARGETING module's keep-target flag.
+        var autoOn = _targeting >= 0 && _targeting < Exp.Loadout.Count && Exp.IsAuto(Exp.Loadout[_targeting]);
+        DrawHotButton(autoOn ? "AUTO+" : "AUTO-", AutoRect, Hover(AutoRect));
         DrawHotButton(_paused ? "RESUME" : "PAUSE", PauseRect, Hover(PauseRect));
         DrawHotButton("FLEE", FleeRect, Hover(FleeRect));
     }
