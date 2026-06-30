@@ -19,8 +19,13 @@ Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliabl
   resolvers. NEXT: Game-side blit — DrawHumanoid → StageComposer.ComposeFigure(figureId,
   p=>FigureBinding.Condition(body,p), p=>FigureBinding.UseBare(body,p)), draw each placement rect
   scaled by figure `pivot` into the slot, mount gear by gear `pivot`; RETIRE the hard offsets +
-  dead `base_*` sprite paths. (NOTE: DrawHumanoid currently draws DELETED base_* sprites — broken
-  until rewired.) Then screens-from-manifest.
+  dead `base_*` sprite paths. FIGURE BLIT DONE: DrawHumanoid rewired onto StageComposer/
+  FigureBinding (parts at manifest rects, state-keyed, scaled by size/pivot; gear at sockets by
+  gear pivot); legacy stat-offset kept only as a missing-manifest fallback. Chassis figure key
+  threaded through assembly (Expedition.FigureId / Campaign, set from chassis.Id). NEXT: VERIFY
+  via RB_SMOKE (build + combat figure vs design PNG) — needs a human/automated smoke run; then
+  SCREENS-from-manifest (place elements by anchor+offset+size + templates + style; retire magic
+  rects; all five). Equipment screen after.
 - Stage composer: assemble a figure from its parts at manifest rects in `z`, swap part STATE by Core
   condition (bare vs armored), mount gear at `sockets` per `mounts`, scale into the slot by `pivot`.
   RETIRE Game1 `DrawHumanoid` hard offsets (the exploded figure).
