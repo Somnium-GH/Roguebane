@@ -76,7 +76,7 @@ Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliabl
   clicks aren't smoke-verifiable so draw+hit must derive from one shared rect. Flag for a focused pass.
   Map node-type legend (design/03) added — verified. Supplies header now reads remaining/max
   (RunMap.MaxSupplies, pinned) per design/03 — verified. design/03 remaining: Mastered-Support as
-  labelled pips, leg-name header — minor.
+  leg-name header — minor. Support now reads banked/holds (1/2) per design/03 — verified.
   Remaining design/02: Inventory tabs (GEAR/TECH/MINIONS) + item cards, Rune Bag panel,
   Current-Core/Action-Bar bottom row. NOTE: inventory tabs + rune-bag + action-bar relocation are
   INPUT-COUPLED (click-equip, ladder/card hit-tests) — each needs draw+hit derived from ONE source
