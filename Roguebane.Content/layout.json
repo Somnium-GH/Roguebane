@@ -1786,46 +1786,220 @@
       ],
       "elements": [
         {
-          "id": "mapBoard",
+          "id": "legSubtitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            79,
+            10
+          ],
+          "size": [
+            308,
+            8
+          ],
+          "z": 1,
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 6,
+          "content": "THE LEG TO THORNMARCH · the chart — jump beacon to beacon, reach the castle"
+        },
+        {
+          "id": "layerNote",
+          "type": "text",
+          "anchor": "TopRight",
+          "offset": [
+            -13,
+            10
+          ],
+          "size": [
+            108,
+            8
+          ],
+          "z": 1,
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 6,
+          "content": "LAYER 2 · one leg → one castle"
+        },
+        {
+          "id": "exitLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            862,
+            248
+          ],
+          "size": [
+            24,
+            7
+          ],
+          "z": 1,
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 5,
+          "content": "EXIT →"
+        },
+        {
+          "id": "youAreHere",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            36,
+            284
+          ],
+          "size": [
+            48,
+            8
+          ],
+          "z": 1,
+          "binds": "map.current",
+          "color": "good",
+          "font": "mono",
+          "fontPx": 5.5
+        },
+        {
+          "id": "chart",
+          "type": "graph",
           "anchor": "Center",
           "offset": [
             0,
-            -10
+            49
           ],
           "size": [
-            820,
-            400
+            960,
+            442
           ],
-          "z": 1,
-          "binds": "run.map"
+          "z": 2,
+          "binds": "map",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "beaconNode",
+            "flow": "graph",
+            "gap": 0,
+            "size": [
+              28,
+              28
+            ]
+          }
         },
         {
-          "id": "runHeader",
-          "anchor": "Top",
+          "id": "castleNote",
+          "type": "text",
+          "anchor": "Right",
           "offset": [
-            0,
-            16
+            -35,
+            120
           ],
           "size": [
-            820,
-            56
+            150,
+            24
           ],
-          "z": 10,
-          "binds": "run.meta"
+          "z": 3,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "content": "STRUCTURED FOE · MAX SCALE · gate · wall · catapult · ballista · banked support rains down here"
+        },
+        {
+          "id": "supplies",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            13,
+            37
+          ],
+          "size": [
+            137,
+            53
+          ],
+          "z": 5,
+          "binds": "supplies",
+          "color": "ink",
+          "fill": "panel",
+          "border": {
+            "color": "border",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "musteredSupport",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            157,
+            37
+          ],
+          "size": [
+            137,
+            53
+          ],
+          "z": 5,
+          "binds": "support",
+          "color": "ink",
+          "fill": "panel",
+          "border": {
+            "color": "border",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8
         },
         {
           "id": "legend",
-          "anchor": "BottomLeft",
+          "type": "list",
+          "anchor": "TopRight",
           "offset": [
-            24,
-            -24
+            -13,
+            37
           ],
           "size": [
             240,
-            120
+            51
           ],
-          "z": 8,
-          "binds": "run.legend"
+          "z": 5,
+          "binds": "legend",
+          "color": "mutedWarm",
+          "fill": "panelCard",
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 5.5,
+          "item": {
+            "template": "legendRow",
+            "flow": "grid",
+            "gap": 4,
+            "cols": 2,
+            "size": [
+              107,
+              8
+            ]
+          }
+        },
+        {
+          "id": "topStrip",
+          "type": "panel",
+          "anchor": "Top",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            28
+          ],
+          "z": 6,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
         }
       ]
     },
@@ -1836,46 +2010,185 @@
       ],
       "elements": [
         {
-          "id": "spine",
+          "id": "eyebrow",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            20,
+            13
+          ],
+          "size": [
+            382,
+            8
+          ],
+          "z": 1,
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 6,
+          "content": "LAYER 1 · THE CAMPAIGN ROUTE"
+        },
+        {
+          "id": "title",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            20,
+            23
+          ],
+          "size": [
+            382,
+            24
+          ],
+          "z": 1,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 19,
+          "content": "Choose your road to the Capital"
+        },
+        {
+          "id": "subtitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            20,
+            50
+          ],
+          "size": [
+            382,
+            8
+          ],
+          "z": 1,
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 6,
+          "content": "each city is held by a castle · pick a path — you can't take them all · complexi"
+        },
+        {
+          "id": "citiesTaken",
+          "type": "text",
+          "anchor": "TopRight",
+          "offset": [
+            -20,
+            36
+          ],
+          "size": [
+            130,
+            22
+          ],
+          "z": 1,
+          "binds": "campaign.taken",
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 6
+        },
+        {
+          "id": "cityGraph",
+          "type": "graph",
           "anchor": "Center",
+          "offset": [
+            0,
+            15
+          ],
+          "size": [
+            960,
+            410
+          ],
+          "z": 2,
+          "binds": "campaign",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "cityNode",
+            "flow": "graph",
+            "gap": 0,
+            "size": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "capitalMarker",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            710,
+            230
+          ],
+          "size": [
+            120,
+            21
+          ],
+          "z": 3,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "content": "✦ THE PEAK · STRONGEST CASTLE ✦"
+        },
+        {
+          "id": "callout",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            280,
+            295
+          ],
+          "size": [
+            165,
+            50
+          ],
+          "z": 4,
+          "binds": "campaign.current",
+          "color": "ink",
+          "fill": "panel",
+          "border": {
+            "color": "amber",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "header",
+          "type": "panel",
+          "anchor": "Top",
           "offset": [
             0,
             0
           ],
           "size": [
-            880,
-            360
+            960,
+            58
           ],
-          "z": 1,
-          "binds": "campaign.spine"
+          "z": 5,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
         },
         {
-          "id": "chapterCard",
-          "anchor": "TopLeft",
-          "offset": [
-            24,
-            24
-          ],
-          "size": [
-            320,
-            200
-          ],
-          "z": 6,
-          "binds": "campaign.current"
-        },
-        {
-          "id": "metaBar",
+          "id": "footer",
+          "type": "text",
           "anchor": "Bottom",
           "offset": [
             0,
-            -16
+            0
           ],
           "size": [
-            760,
-            64
+            960,
+            45
           ],
-          "z": 10,
-          "binds": "campaign.meta"
+          "z": 6,
+          "color": "ink",
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "content": "LAYER 1 the route — cities to the Capital (this screen) · LAYER 2 a city's leg — the Run Map beacon chart · LAYER 4 every node & castle is the combat grammar"
         }
       ]
     },
@@ -1886,46 +2199,166 @@
       ],
       "elements": [
         {
-          "id": "coreCards",
-          "anchor": "Center",
-          "offset": [
-            0,
-            10
-          ],
-          "size": [
-            860,
-            320
-          ],
-          "z": 2,
-          "binds": "cores"
-        },
-        {
-          "id": "title",
+          "id": "eyebrow",
+          "type": "text",
           "anchor": "Top",
           "offset": [
             0,
-            28
+            14
           ],
           "size": [
-            600,
-            60
+            920,
+            9
           ],
-          "z": 10,
-          "binds": null
+          "z": 1,
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 6.5,
+          "content": "A NEW RUN BEGINS"
         },
         {
-          "id": "confirmBar",
+          "id": "title",
+          "type": "text",
+          "anchor": "Top",
+          "offset": [
+            0,
+            26
+          ],
+          "size": [
+            920,
+            29
+          ],
+          "z": 1,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 23,
+          "content": "Choose Your Core"
+        },
+        {
+          "id": "subtitle",
+          "type": "text",
+          "anchor": "Top",
+          "offset": [
+            0,
+            59
+          ],
+          "size": [
+            920,
+            9
+          ],
+          "z": 1,
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 6.5,
+          "content": "the Core is the body you'll wear all run — it sets your slots, parts, minion bay"
+        },
+        {
+          "id": "footerStatus",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            20,
+            516
+          ],
+          "size": [
+            119,
+            8
+          ],
+          "z": 1,
+          "binds": "selection.core",
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 6
+        },
+        {
+          "id": "beginBtn",
+          "type": "button",
+          "anchor": "TopLeft",
+          "offset": [
+            820,
+            508
+          ],
+          "size": [
+            120,
+            24
+          ],
+          "z": 1,
+          "binds": "beginMarch",
+          "color": "panelDeep",
+          "fill": "good",
+          "border": {
+            "color": "panelDeep",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 7
+        },
+        {
+          "id": "header",
+          "type": "panel",
+          "anchor": "Top",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            67
+          ],
+          "z": 5,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "coreCards",
+          "type": "list",
+          "anchor": "Center",
+          "offset": [
+            0,
+            17
+          ],
+          "size": [
+            920,
+            423
+          ],
+          "z": 5,
+          "binds": "cores",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "coreCard",
+            "flow": "horizontal",
+            "gap": 10,
+            "size": [
+              176,
+              423
+            ]
+          }
+        },
+        {
+          "id": "footer",
+          "type": "panel",
           "anchor": "Bottom",
           "offset": [
             0,
-            -20
+            0
           ],
           "size": [
-            420,
-            72
+            960,
+            42
           ],
-          "z": 10,
-          "binds": "selection"
+          "z": 6,
+          "color": "ink",
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8
         }
       ]
     }
@@ -2490,6 +2923,381 @@
           "font": "mono",
           "fontPx": 4.5,
           "sample": "attr"
+        }
+      ]
+    },
+    "coreCard": {
+      "size": [
+        176,
+        423
+      ],
+      "parts": [
+        {
+          "rect": [
+            38,
+            6,
+            100,
+            140
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/sprites/char/chassis/grunt.png"
+        },
+        {
+          "rect": [
+            142,
+            7,
+            25,
+            7
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 5,
+          "sample": "STARTER"
+        },
+        {
+          "rect": [
+            5,
+            5,
+            36,
+            7
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 5,
+          "sample": "◉ SELECTED"
+        },
+        {
+          "rect": [
+            10,
+            157,
+            38,
+            18
+          ],
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 14,
+          "sample": "Grunt"
+        },
+        {
+          "rect": [
+            10,
+            175,
+            46,
+            7
+          ],
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "THE GENERALIST"
+        },
+        {
+          "rect": [
+            10,
+            190,
+            13,
+            7
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "gear"
+        },
+        {
+          "rect": [
+            82,
+            190,
+            3,
+            7
+          ],
+          "color": "inkWarm",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "4"
+        },
+        {
+          "rect": [
+            91,
+            190,
+            13,
+            7
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "arms"
+        },
+        {
+          "rect": [
+            162,
+            190,
+            3,
+            7
+          ],
+          "color": "inkWarm",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "2"
+        },
+        {
+          "rect": [
+            10,
+            199,
+            13,
+            7
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "bays"
+        },
+        {
+          "rect": [
+            82,
+            199,
+            3,
+            7
+          ],
+          "color": "inkWarm",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "1"
+        },
+        {
+          "rect": [
+            91,
+            199,
+            23,
+            7
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "actions"
+        },
+        {
+          "rect": [
+            162,
+            199,
+            3,
+            7
+          ],
+          "color": "inkWarm",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "4"
+        },
+        {
+          "rect": [
+            10,
+            208,
+            20,
+            7
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "budget"
+        },
+        {
+          "rect": [
+            78,
+            208,
+            7,
+            7
+          ],
+          "color": "amber",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "20"
+        },
+        {
+          "rect": [
+            91,
+            208,
+            13,
+            7
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "base"
+        },
+        {
+          "rect": [
+            152,
+            208,
+            13,
+            7
+          ],
+          "color": "inkWarm",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "even"
+        },
+        {
+          "rect": [
+            10,
+            222,
+            153,
+            15
+          ],
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 5,
+          "sample": "No edge, no hole. Climbs into any keysto"
+        },
+        {
+          "rect": [
+            72,
+            401,
+            31,
+            7
+          ],
+          "color": "panelDeep",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "✓ CHOSEN"
+        }
+      ]
+    },
+    "legendRow": {
+      "size": [
+        107,
+        8
+      ],
+      "parts": [
+        {
+          "rect": [
+            0,
+            0,
+            8,
+            8
+          ],
+          "color": "parch",
+          "fill": "slot",
+          "border": {
+            "color": "mutedDim",
+            "w": 1,
+            "style": "dashed"
+          },
+          "font": "mono",
+          "fontPx": 4.5,
+          "sample": "?"
+        }
+      ]
+    },
+    "beaconNode": {
+      "size": [
+        28,
+        28
+      ],
+      "parts": [
+        {
+          "rect": [
+            9,
+            7,
+            9,
+            15
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 11,
+          "sample": "◉"
+        },
+        {
+          "rect": [
+            7,
+            31,
+            14,
+            7
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 5,
+          "sample": "CAMP"
+        }
+      ]
+    },
+    "cityNode": {
+      "size": [
+        190,
+        130
+      ],
+      "anchor": "nodePoint",
+      "parts": [
+        {
+          "rect": [
+            -47,
+            7,
+            95,
+            6
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 4.5,
+          "sample": "·"
+        },
+        {
+          "rect": [
+            -21,
+            7,
+            4,
+            6
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 4.5,
+          "sample": "I"
+        },
+        {
+          "rect": [
+            -6,
+            7,
+            27,
+            6
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 4.5,
+          "sample": "TAKEN ✓"
+        },
+        {
+          "rect": [
+            -15,
+            12,
+            30,
+            11
+          ],
+          "color": "parch",
+          "font": "display",
+          "fontPx": 9,
+          "sample": "Ashford"
+        },
+        {
+          "rect": [
+            -47,
+            23,
+            95,
+            6
+          ],
+          "color": "border",
+          "font": "mono",
+          "fontPx": 4.5,
+          "sample": "castle ·  parts"
+        },
+        {
+          "rect": [
+            3,
+            23,
+            3,
+            6
+          ],
+          "color": "border",
+          "font": "mono",
+          "fontPx": 4.5,
+          "sample": "3"
         }
       ]
     }

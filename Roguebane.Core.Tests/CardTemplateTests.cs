@@ -26,7 +26,9 @@ public class CardTemplateTests
             foreach (var p in t.Parts)
             {
                 Assert.Equal(4, p.Rect.Length);
-                Assert.False(string.IsNullOrEmpty(p.Sample), $"{name} part sample");
+                // A part fills its slot with a text datum (sample) OR an image (e.g. a card's figure).
+                Assert.False(string.IsNullOrEmpty(p.Sample) && string.IsNullOrEmpty(p.Image),
+                    $"{name} part needs a sample or an image");
             }
         }
     }
