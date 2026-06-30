@@ -252,7 +252,12 @@ Nested layers, macro → micro:
   enemies** — a skirmish line, or the castle's layered **gate / wall / keep**; the layout stacks them
   in the foe column. The single-enemy framing was a simplification).
   - *You* = cutaway (Head×1, Chest×1, Arms×2, Legs×2), each showing condition + stat; armor overlays.
-  - **The attribute pool is the most prominent element** (reserved vs free, incl. shield reservations).
+  - **The attribute pool is a prominent element** (reserved vs free, incl. shield reservations). NOTE:
+    design/01's *most*-prominent bottom-panel pool was drawn for ONE foe. With 1–3 full-height foes the
+    foe column owns the bottom band, and **keeping foes large is required for clear limb-band PART-aim**
+    (the core mechanic) — shrinking them to free a bottom pool would cramp aiming. LOCKED resolution:
+    multi-foe combat keeps foes large + the attribute pool in the YOU panel (present, not bottom-dominant);
+    design/01's prominent bottom pool is the single-foe ideal. Revisit if a 1-foe mode is added.
   - *Action bar* = technique cards with parallel charge timers + state (ready/charging/held/dry), a
     per-technique target tag, and the **AUTO** lit/unlit toggle. **No fire button.**
   - *Battlefield* = autonomous minion(s) + the rallied-support auto-fire stream.

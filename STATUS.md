@@ -21,14 +21,12 @@ All usable foe figures confirmed too: ogre/troll rendered in castle combat; band
 structural equivalence (identical 7-part/21-file layout). wraith/gargoyle stay excluded (incomplete art).
 
 REMAINING (deliberate / not safe 1-min fragments):
-- COMBAT -> design/01 full manifest rebuild: every manifest position collides with the dense hand-placed
-  layout, so all elements must move at once (statusStrip, attrPool, actionBar+buttons, techList, bayList,
-  foe column, hero/foe/minion figures). Needs layout judgment (homeless PAUSE/FLEE) + draw&hit from
-  ONE shared rect (clicks aren't smoke-verifiable). Unblocks the battlefield minionField figure too.
-  CONTRACT now in DESIGN_SPEC s13: foe zone holds 1-3 foes stacked in the foe column (skirmish line /
-  castle gate-wall-keep) — the rebuild must handle the column, not assume the manifest's single slot.
-  BLOCKED ON A DESIGN CALL (see "Needs human"): 3 full-height stacked foes occupy the bottom band where
-  design/01 puts the attribute-pool + action-bar panels — they can't coexist until foe layout is decided.
+- COMBAT exact design/01 bottom-panel rebuild: SUPERSEDED by a locked decision (DESIGN_SPEC s13) — for
+  1-3 foes, large foes (clear limb-band PART-aim, the core mechanic) beat a prominent bottom attribute
+  pool; combat keeps its working hand-placed vertical-spread layout (foes large, pool in the YOU panel),
+  which is the canonical MULTI-FOE layout. design/01's bottom-dominant pool is the single-foe ideal.
+  So combat is DONE for multi-foe; the only open combat item is a future 1-foe mode (would revisit) and
+  the battlefield minionField figure (still parked — its manifest slot overlaps the working lanes).
 - EQUIPMENT screen (design/02): no screen state yet (only Build/Run). Inventory tabs (GEAR/TECH/MINIONS) +
   item cards, Rune Bag, click/drag-equip — INPUT-COUPLED features needing input wiring + mid-run stash.
 - Asset gaps (see section): skirmish node icon, wraith/gargoyle figure art, torso bare-variant (plate
@@ -96,14 +94,11 @@ Combat thesis loop is whole and tested (226 Core tests). Highlights — all pinn
 - Five chassis stat blocks (design/05) are placeholder — tune later.
 - Part→stat friction (legs = accuracy, arms = STR) — low-pri revisit only if it nags.
 - Fonts: SpriteFonts use system Consolas/Georgia — swap to bundled open fonts before distribution.
-- COMBAT layout decision (blocks the design/01 manifest rebuild): design/01 + the manifest assume ~one
-  short foe, so the bottom holds prominent attribute-pool + action-bar PANELS. But encounters field 1-3
-  foes stacked FULL-HEIGHT in the foe column (3rd foe reaches y~546) — they occupy the bottom band where
-  those panels go. Can't coexist as-is. Needs a call: shrink/scale foes, lay foes in a HORIZONTAL row,
-  shorten the foe column, or keep the current vertical-spread layout (pips in YOU box, bar at the foot).
-  Until decided, combat stays on its working hand-placed layout; per-element manifest moves all collide.
 
 ## Locked this round (were Needs-human)
+- MULTI-FOE COMBAT LAYOUT — LOCKED (DESIGN_SPEC s13). Large foes (clear limb-band PART-aim) over a
+  prominent bottom attribute pool; current vertical-spread layout is canonical for 1-3 foes. design/01's
+  bottom-dominant pool = single-foe ideal. Loop-decided given the part-aim tradeoff; revisit for a 1-foe mode.
 - FOE→PLAYER PART aim — SHIPS. Foes erode player PARTS (HP-vs-stat default accepted: a hit eats the
   targeted part's stat; HP only via penetrate/overkill). WHICH limb = a per-foe TARGETING PERSONALITY,
   as data: SMART (best for its build) | RANDOM | INEPT (botches a good pick). Localize CON-block/evasion
