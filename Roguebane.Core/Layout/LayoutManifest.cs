@@ -61,6 +61,18 @@ public sealed class Element
     public string? Font { get; init; }
     public double? FontPx { get; init; }
     public Border? Border { get; init; }
+    public string? Content { get; init; } // a literal text element (no data binding)
+    public Item? Item { get; init; }       // a repeated child: list (horizontal/vertical) or graph
+}
+
+// How a container repeats a template: per bound datum (list) or per map/campaign node (graph). The
+// consumer stamps Template at each position, laid out by Flow with Gap between Size-d cells.
+public sealed class Item
+{
+    public string Template { get; init; } = "";
+    public string Flow { get; init; } = ""; // horizontal | vertical | graph
+    public int Gap { get; init; }
+    public int[] Size { get; init; } = [];
 }
 
 public sealed class Border

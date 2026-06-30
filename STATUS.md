@@ -41,6 +41,11 @@ POC is NOT complete; the "DONE" claim below is RETRACTED until these clear.**
   Consumer must learn `type:"graph"` (place nodes from map/campaign data in the region) + `nodePoint`
   (node-relative parts) + IMAGE PARTS (done: `TemplatePart`/`PlacedPart` now carry an optional `Image`,
   so a card part can be a figure sprite instead of text; CardTemplate schema test accepts sample-OR-image).
+  MODEL HALF DONE: `Element` now parses `content` (literal text) + `item` ({template, flow, gap, size} for
+  list/graph containers) -- pinned by LayoutManifestTests against the real manifest (chart=graph/beaconNode,
+  build action bar=horizontal/techCard, newrun=coreCard). RENDER half remains: the Game consumer must
+  iterate map/campaign nodes (graph) + bound lists and STAMP the item template at each cell (CardTemplate
+  already places a template at an origin; wire data -> positions).
   cityNode is labels-only; castle stays the generic node icon (procedural castle parked — not
   mission-critical). REVIEW FIXES:
   * coreCard figure is HARDCODED (`image: …/chassis/grunt.png` sample) — BIND each card's image to its

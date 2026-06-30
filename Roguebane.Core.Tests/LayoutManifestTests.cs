@@ -69,6 +69,43 @@ public class LayoutManifestTests
     }
 
     [Fact]
+    public void GraphContainerCarriesItsItemTemplate()
+    {
+        // The runmap chart is a graph container: the consumer stamps beaconNode per map node.
+        var chart = Real().Screens["runmap"].Elements.Single(e => e.Id == "chart");
+        Assert.Equal("graph", chart.Type);
+        Assert.Equal("map", chart.Binds);
+        Assert.NotNull(chart.Item);
+        Assert.Equal("beaconNode", chart.Item!.Template);
+        Assert.Equal("graph", chart.Item.Flow);
+    }
+
+    [Fact]
+    public void ListContainerCarriesFlowGapAndCellSize()
+    {
+        // The build action bar stamps a techCard per loadout technique, laid out horizontally.
+        var lists = Real().Screens["build"].Elements.Where(e => e.Item is { Flow: "horizontal" }).ToList();
+        Assert.NotEmpty(lists);
+        Assert.All(lists, e => Assert.False(string.IsNullOrEmpty(e.Item!.Template)));
+        Assert.Contains(lists, e => e.Item!.Size.Length == 2); // most cells are sized
+        Assert.Contains(lists, e => e.Item!.Gap > 0);
+    }
+
+    [Fact]
+    public void NewRunStampsACoreCard()
+    {
+        var cores = Real().Screens["newrun"].Elements.Single(e => e.Item is { Template: "coreCard" });
+        Assert.Equal(2, cores.Item!.Size.Length); // a sized cell to stamp per core
+    }
+
+    [Fact]
+    public void LiteralTextElementsCarryContent()
+    {
+        // A `content` element is fixed copy (no data binding) — e.g. the runmap castle note.
+        Assert.Contains(Real().Screens["runmap"].Elements, e => !string.IsNullOrEmpty(e.Content));
+    }
+
+    [Fact]
     public void PaletteResolvesNamedColors()
     {
         var palette = Real().Style.Palette;
