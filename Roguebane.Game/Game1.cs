@@ -942,17 +942,25 @@ public class Game1 : Microsoft.Xna.Framework.Game
     }
 
     // The campaign spine (design/04): a pip per leg to the Capital, taken cities lit amber.
+    // The campaign-spine strip (design/04): the legs to the Capital as a chain of castles — taken
+    // (amber), here (white), unreached (dim) — the last leg marked as the Capital/peak, plus a
+    // cities-taken counter. (The full branching city-graph picker waits on a branching campaign model.)
     private void DrawSpine(int x, int y)
     {
         Text(_assets.Mono, "SPINE", x, y, Muted);
-        for (var i = 0; i < _campaign.LegCount; i++)
+        var n = _campaign.LegCount;
+        for (var i = 0; i < n; i++)
         {
             var left = x + 56 + i * 22;
             var taken = i < _campaign.LegIndex;
             var here = i == _campaign.LegIndex;
-            Sprite(_assets.Node(NodeType.Castle), left, y - 2, 18, 18,
+            var capital = i == n - 1; // the Capital: the peak castle at the end of the road
+            var sz = capital ? 22 : 18;
+            Sprite(_assets.Node(NodeType.Castle), left, y - (capital ? 4 : 2), sz, sz,
                 taken ? Amber : here ? Color.White : new Color(110, 95, 80));
+            if (capital) Text(_assets.Mono, "^", left + 6, y - 14, Amber); // peak marker
         }
+        Text(_assets.Mono, _campaign.LegIndex + "/" + n, x + 56 + n * 22 + 8, y, Amber); // cities taken
     }
 
     // Locked palette (ASSET_MANIFEST): ink/muted text, amber highlight, ember/blood, panel + borders.
