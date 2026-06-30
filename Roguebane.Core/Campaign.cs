@@ -18,6 +18,7 @@ public sealed class Campaign
     private readonly IReadOnlyList<Technique> _loadout;
     private readonly IReadOnlyList<Func<RunMap>> _legs;
     private readonly Stash _stash;
+    private readonly string _figureId;
     private int _legIndex;
 
     public Expedition Current { get; private set; }
@@ -28,7 +29,8 @@ public sealed class Campaign
         Caster caster,
         IReadOnlyList<Technique> loadout,
         IReadOnlyList<Func<RunMap>> legs,
-        Stash? stash = null)
+        Stash? stash = null,
+        string figureId = "grunt")
     {
         if (legs.Count == 0) throw new ArgumentException("a campaign needs at least one leg", nameof(legs));
         _player = player;
@@ -36,6 +38,7 @@ public sealed class Campaign
         _loadout = loadout;
         _legs = legs;
         _stash = stash ?? new Stash();
+        _figureId = figureId;
         Current = NewLeg();
     }
 
@@ -45,7 +48,7 @@ public sealed class Campaign
     public bool OnFinalLeg => _legIndex == _legs.Count - 1;
 
     private Expedition NewLeg() =>
-        new(_player, _caster, _loadout, _legs[_legIndex](), _stash);
+        new(_player, _caster, _loadout, _legs[_legIndex](), _stash, _figureId);
 
     // Top-level passthroughs so a driver talks to the campaign, not the swapping leg underneath.
     public bool Enter(string nodeId)

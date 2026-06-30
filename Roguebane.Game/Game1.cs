@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Roguebane.Core;
 using Roguebane.Core.Content;
+using Roguebane.Core.Layout;
 
 namespace Roguebane.Game;
 
@@ -24,6 +25,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private SpriteBatch _spriteBatch = null!;
     private Texture2D _pixel = null!;
     private AssetRegistry _assets = null!;
+    private readonly LayoutRegistry _layout = new();
 
     private Screen _screen = Screen.Build;
     private BuildSession _build = null!;
@@ -656,7 +658,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         var preview = _build.Preview();
         Panel(40, 90, 240, 410);
         Text(_assets.Mono, _build.Chassis.Id.ToUpper(), 56, 100, Muted);
-        DrawHumanoid(preview, 160, 200, 2);
+        DrawHumanoid(preview, _build.Chassis.Id, 160, 470, 360);
         DrawPips(preview, 56, 320, KitDemand());
 
         DrawLadders(320, 100);
@@ -770,7 +772,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         var body = Exp.Player.Body;
         Panel(x, y, 220, 360);
         Text(_assets.Mono, "YOU", x + 12, y + 8, Muted);
-        DrawHumanoid(body, x + 110, y + 70, 2);
+        DrawHumanoid(body, Exp.FigureId, x + 110, y + 330, 300);
 
         var hp = Exp.Player;
         DrawBar(x + 16, y + 188, 188, _assets.Resource("hp"), hp.Hp, hp.MaxHp, Blood);
@@ -828,43 +830,74 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     // Lay a humanoid from its parts: head (INT), chest (CON), arms (STR ×2), legs (DEX ×2). Each
     // part's sprite is picked by condition; paired parts fan out to either side of the torso.
-    private void DrawHumanoid(Body body, int cx, int cy, int s)
+    // Assemble the figure from the layout manifest: each visual part drawn at its manifest rect with
+    // a state-keyed sprite (condition x armored/bare, via FigureBinding), gear mounted at its socket.
+    // The pure composition lives in Core (StageComposer/FigureBinding); the shell only blits + scales.
+    // Falls back to the legacy stat-offset draw when the manifest is absent (no crash on a content gap).
+    private void DrawHumanoid(Body body, string figureId, int cx, int cy, int targetH)
     {
+        var manifest = _layout.Manifest;
+        if (manifest is null || !manifest.Figures.ContainsKey(figureId)) { DrawHumanoidLegacy(body, cx, cy); return; }
+
+        var fig = manifest.Figures[figureId];
+        var composer = new StageComposer(manifest);
+        var f = (float)targetH / fig.Size[1];                 // world scale: fit the figure to the slot height
+        var px = fig.Pivot[0]; var py = fig.Pivot[1];          // anchor the figure's pivot at (cx,cy)
+        int SX(float fx) => cx + (int)((fx - px) * f);
+        int SY(float fy) => cy + (int)((fy - py) * f);
+
+        foreach (var p in composer.ComposeFigure(figureId,
+                     part => FigureBinding.Condition(body, part),
+                     part => FigureBinding.UseBare(body, part)))
+        {
+            var r = p.Rect; // x,y,w,h in figure space
+            Sprite(_assets.Texture(p.SpriteKey), SX(r[0]), SY(r[1]), (int)(r[2] * f), (int)(r[3] * f), Color.White);
+        }
+
+        // Gear: anchor each mount's pivot at its socket point. Only draw gear the body actually carries.
+        foreach (var g in composer.ComposeGear(figureId))
+        {
+            if (!Carries(body, g.Gear)) continue;
+            var tex = _assets.Texture($"sprites/gear/{g.Gear}");
+            if (tex is null) continue;
+            var gp = manifest.Gear.TryGetValue(g.Gear, out var gd) && gd.Pivot.Length == 2 ? gd.Pivot : new[] { 0, 0 };
+            var gx = SX(g.Anchor[0]) - (int)(gp[0] * f);
+            var gy = SY(g.Anchor[1]) - (int)(gp[1] * f);
+            Sprite(tex, gx, gy, (int)(tex.Width * f), (int)(tex.Height * f), Color.White);
+        }
+    }
+
+    // A mount is shown only when the body wields/wears that piece (gear id matches a hand or armor id).
+    private static bool Carries(Body body, string gearId) =>
+        body.Hands.Any(w => w.Id == gearId)
+        || body.Parts.Select(p => p.Stat).Distinct().Any(s => body.ArmorOn(s)?.Id == gearId);
+
+    // Legacy fallback (manifest missing): the old stat-offset composite with composed gear markers.
+    private void DrawHumanoidLegacy(Body body, int cx, int cy)
+    {
+        const int s = 2;
         var arms = 0;
         var legs = 0;
         foreach (var part in body.Parts)
         {
-            var (asset, w, h, dx, dy) = part.Stat switch
+            var (w, h, dx, dy) = part.Stat switch
             {
-                Stat.Int => ("head", 32, 36, 0, -38),
-                Stat.Con => ("chest", 40, 40, 0, 0),
-                Stat.Str => ("arm", 20, 44, arms++ == 0 ? -30 : 30, -2),
-                Stat.Dex => ("leg", 20, 48, legs++ == 0 ? -10 : 10, 42),
-                _ => ("chest", 40, 40, 0, 0),
+                Stat.Int => (32, 36, 0, -38),
+                Stat.Con => (40, 40, 0, 0),
+                Stat.Str => (20, 44, arms++ == 0 ? -30 : 30, -2),
+                Stat.Dex => (20, 48, legs++ == 0 ? -10 : 10, 42),
+                _ => (40, 40, 0, 0),
             };
             var rx = cx + dx * s - w * s / 2;
             var ry = cy + dy * s - h * s / 2;
-            var tex = _assets.Texture($"sprites/body/{asset}/base_{Condition(body, part)}");
-            Sprite(tex, rx, ry, w * s, h * s, Color.White);
-            // Worn armor rides the part-group: ring the part (no armor sprite yet — composed indicator).
             if (body.ArmorOn(part.Stat) is not null) Border(rx, ry, w * s, h * s, Amber);
         }
-
-        // Wielded weapons sit in the hands (the arms), tinted by the weapon's stat — a composed marker
-        // standing in for a weapon sprite.
         var hand = 0;
         foreach (var weapon in body.Hands)
         {
             var side = hand++ == 0 ? -1 : 1;
             Rect(cx + 30 * side * s - 2, cy + 16 * s, 5, 20, StatColor(weapon.Stat));
         }
-    }
-
-    private static string Condition(Body body, BodyPart part)
-    {
-        if (part.Capacity == 0) return "healthy";
-        var frac = (float)body.Contribution(part) / part.Capacity;
-        return frac <= 0f ? "broken" : frac < 0.5f ? "damaged" : "healthy";
     }
 
     // Foe side: each foe a sprite + HP bar. Foe/part HIGHLIGHTS come ONLY from active TARGETING (a

@@ -28,14 +28,19 @@ public sealed class Expedition
     public ExpeditionState State { get; private set; } = ExpeditionState.Choosing;
 
     public Expedition(Fighter player, Caster caster, IReadOnlyList<Technique> loadout, RunMap map,
-        Stash? stash = null)
+        Stash? stash = null, string figureId = "grunt")
     {
         _player = player;
         _caster = caster;
         _loadout = loadout;
         Map = map;
         _stash = stash ?? new Stash();
+        FigureId = figureId;
     }
+
+    // The chassis figure to render the player with (manifest figure key); carried from assembly so
+    // the shell picks the right modular sprite set. Defaults keep legacy/test construction working.
+    public string FigureId { get; }
 
     public Fighter Player => _player;
     public IReadOnlyList<Technique> Loadout => _loadout;
