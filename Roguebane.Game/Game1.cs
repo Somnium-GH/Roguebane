@@ -708,6 +708,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawLoadoutStrip(320, 400);
 
         DrawButton("ENTER  begin the march", 40, H - 52, 300, 44, true, Keys.Enter);
+        // Control hint — rune-climbing + technique toggling aren't obvious; helps POC playtesting.
+        Text(_assets.Mono, "click a rune rung to climb a path   1-9 toggle techniques",
+            360, H - 30, Muted);
     }
 
     // CURRENT CORE stat block (design/02): the chassis's identity at a glance — base attributes,
