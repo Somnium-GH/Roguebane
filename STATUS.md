@@ -20,10 +20,11 @@ eroding the head stat (foe HP untouched).
 change (RB_SMOKE identical).
 **Minions now fight** (were dead in play): Forge auto-summons the chassis MinionKit + rune grants into
 bays at assembly. Summoner ships Skeleton+Shade. Exposed via Exp.MinionCount/Minions. Pinned in MinionTests.
+**Combat minion-bay lane — DONE.** BAYS lane paints a slot per chassis bay (filled occupant disc + tag +
+power, or empty), from Exp.Minions/Bays. Combat RB_SMOKE (Summoner @ castle) shows 2/3 bays filled.
 Next actionable:
-- Combat minion-bay lane (shell): paint the bays (filled occupant icon / empty slot) on the combat
-  screen from Exp.Minions + the chassis Bays count. Make the combat RB_SMOKE use a Summoner build so the
-  lane has occupants to verify. (Data now exists.) Then the rallied-support lane (Exp.Map.SupportBank).
+- Rallied-support lane (shell): paint the banked support (Exp.Map.SupportBank) on the combat screen, and
+  during the castle fight show it firing on the boss. Core has Support + SupportBank already.
 - Foe -> PLAYER part aim is PARKED in "Needs human" — it depends on the HP-vs-stat split decision, and
   the current whole-HP foe contract is pinned by FoeOffenseTests. Do not flip it unilaterally.
 Other remaining (Debt): build-screen inventory tabs + drag-equip (blocked on G2/G7); Choose-Your-Core
@@ -92,8 +93,8 @@ from primitives. Route each to Claude Design. (Hi-fi transition: design/ASSET_HI
 ## Debt (active — with reconcile trigger)
 - BUILD screen lacks inventory tabs (gear/tech/minions) + drag-to-equip, the per-stat attribute readout
   with gate markers, and equipped-gear on the anatomy. Blocked on gear/minion equip (G2/G7).
-- Combat surface: PART-level aim UI DONE (limb bands + part-aim). Still no minion-bay lane, no support
-  lane — wait on the bay/support UI lanes.
+- Combat surface: PART-level aim UI DONE (limb bands + part-aim); minion-bay lane DONE. Still no
+  rallied-support lane.
 - CON block + evasion mitigation are on the WHOLE-HP path; localized on PART hits waits on foe→player PART
   aim (G1).
 - INT beams are fast Timered bolts (Sustained=every-tick was a firehose at 10/s); for a true channel, add a
