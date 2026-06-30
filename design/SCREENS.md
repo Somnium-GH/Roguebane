@@ -44,7 +44,8 @@ Action Bar loadout (bottom). **This is the worst current gap — most of the bel
       (equip works on the run-map gear bar today).
 - [ ] RUNE BAG (MARKS / PATHS / KEYSTONES cards + socket/sell) — current screen shows rune LADDERS instead.
 - [x] CURRENT CORE stat block: str/int/dex/con / bays / budget / actions.
-- [x] ACTION BAR loadout: the FIXED starting kit pre-slotted (no pick gate).
+- [x] ACTION BAR loadout: the FIXED starting kit pre-slotted (no pick gate); MINION BAYS preview strip
+      shows the chassis retinue (sprite + power per bay) alongside.
 
 ## 03 Run Map — `design/03-runmap.png`
 - [x] Supplies meter (X/max); Mastered Support (banked/holds).
