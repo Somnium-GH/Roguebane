@@ -541,7 +541,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         foreach (var w in body.Hands) { GearTag(ex, w.Id, Amber); ex += 86; }
         foreach (var (s, _) in StatColors)
             if (body.ArmorOn(s) is { } a) { GearTag(ex, a.Id, StatColor(s)); ex += 86; }
-        if (ex == x) Text(_assets.Mono, "—", x, y + 4, Muted);
+        if (ex == x) Text(_assets.Mono, "-", x, y + 4, Muted);
 
         Text(_assets.Mono, "PACK  (click to equip)", x + 360, y - 16, Muted);
         for (var i = 0; i < PackCount; i++)
@@ -775,7 +775,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         Text(_assets.Mono, "ACTION BAR", x, y - 18, Muted);
         var kit = _build.Loadout;
-        if (kit.Count == 0) { Text(_assets.Mono, "—", x, y, Muted); return; }
+        if (kit.Count == 0) { Text(_assets.Mono, "-", x, y, Muted); return; }
         for (var i = 0; i < kit.Count; i++)
         {
             var t = kit[i];
@@ -1273,7 +1273,17 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private void Stretch(Texture2D? tex, int x, int y, int w, int h) => Sprite(tex, x, y, w, h, Color.White);
 
     private void Text(SpriteFont font, string s, int x, int y, Color color) =>
-        _spriteBatch.DrawString(font, s, new Vector2(x, y), color);
+        _spriteBatch.DrawString(font, Safe(font, s), new Vector2(x, y), color);
+
+    // SpriteFonts are ASCII-only and THROW on an unknown glyph. The fold-to-ASCII policy + algorithm
+    // live in Core.GlyphSafe (headless-tested); here we just cache each font's glyph set and call it.
+    private readonly System.Collections.Generic.Dictionary<SpriteFont, System.Collections.Generic.HashSet<char>> _fontGlyphs = new();
+    private string Safe(SpriteFont font, string s)
+    {
+        if (!_fontGlyphs.TryGetValue(font, out var set))
+            _fontGlyphs[font] = set = new System.Collections.Generic.HashSet<char>(font.Characters);
+        return Roguebane.Core.GlyphSafe.Sanitize(s, set);
+    }
 
     private void Panel(int x, int y, int w, int h)
     {

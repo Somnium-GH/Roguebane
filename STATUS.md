@@ -1,6 +1,23 @@
 # Status
 
 ## Current target
+**RE-OPENED by play (human): starting a run CRASHES, and screens don't match the NEW design renders —
+POC is NOT complete; the "DONE" claim below is RETRACTED until these clear.**
+- TOP — RUN-START CRASH: FIXED (confirmed via crash.log). Root cause: `DrawGearBar` drew an em-dash `—`
+  into the ASCII-only mono font (SpriteFont THROWS on unknown glyphs) on the MAP screen. Fixed
+  CENTRALLY — `Game1.Text` now runs `Safe()` (maps common typographic chars → ASCII, replaces anything
+  else the font lacks), so NO drawn string can crash again; the em-dash literal is also gone.
+  `Program.cs` keeps writing `crash.log`. The fold-to-ASCII guard is now `Core.GlyphSafe.Sanitize`
+  (pure, engine-agnostic) with 7 headless tests (245 Core tests); `Game1.Safe` is a thin caller that
+  feeds it the font's glyph set — the crash-class is regression-covered headlessly. Non-ASCII drawn-
+  literal sweep CLEAN: the only remaining drawn non-ASCII was DrawLoadoutStrip's "-" placeholder (was an
+  em-dash) -> fixed; every other non-ASCII in source is comment prose (never drawn). STILL TODO (loop):
+  a DRIVEN run-start render assert (RB_SMOKE renders a frame but didn't exercise the live map-screen draw).
+- Fresh design renders landed (`design/01–06`, 06-30): re-verify EVERY screen against the NEW PNG +
+  `screens.<id>`. "Smoke clean" ≠ "matches the design." NEW RUN is hallucinated / not manifest-driven —
+  rebuild it off `screens.newrun` + `design/05` (single-core for now; race step behind the flag).
+
+## Prior integration record (the "DONE" claim below is RETRACTED per the re-open above)
 **Shell wired to `layout.json` — integration DONE; combat layout RESOLVED (locked, see s13). POC functionally complete; only the low-value Equipment inventory-tabs polish remains (deferred).**
 Core manifest toolkit COMPLETE + pinned: `Layout/` LayoutManifest (parse), StageComposer + FigureBinding
 (figure assembly), ScreenLayout (anchor->rect), PaletteColor, CardTemplate. Game consumes it via
@@ -122,16 +139,21 @@ from primitives. Route each to Claude Design. (Art direction: DESIGN_SPEC §13.)
   drag-to-equip and equipped-gear on the anatomy. Blocked on gear/minion equip (G2/G7).
 - Combat surface: PART-level aim UI DONE (limb bands + part-aim); minion-bay lane DONE. Still no
   rallied-support lane.
-- CON block + evasion mitigation are on the WHOLE-HP path; localized on PART hits waits on foe→player PART
-  aim (G1). (Both reconcile with the Phase 3 SHIELDS revamp — current code is still the old flat block.)
+- Part-group EVASION already localizes on PART hits (Caster.Hit reads EvasionPercent(part)); it is live
+  wherever foe part-aim is on. CON block is still WHOLE-HP only — localizing it on PART hits reconciles
+  with the Phase 3 SHIELDS revamp (current code is still the old flat block).
 - INT beams are fast Timered bolts (Sustained=every-tick was a firehose at 10/s); for a true channel, add a
   per-tick damage-scaled sustained kind. (Speculative — defer until a channel weapon is authored.)
 - Leather armor evasion now FUNCTIONAL + content (Shops.Hide) + tested. SpellWard still deferred (no spell model).
 - Mouse is click + hover only — no drag-to-equip, tooltips, rebinding; PAUSE/FLEE are plain rects (U6).
 - Rune grants = chassis-extension PARTS only; add more data-driven Mark effect kinds when a non-extension
   keystone is authored.
-- G1: foes attack player HP only (no localized foe→player PART aim); real content foes still unarmed beyond
-  the light feel-pass arming (power envelope = human).
+- G1: foe->player PART aim MECHANISM shipped + headless-tested (FoeTargeting SMART/RANDOM/INEPT; Foe.Aim
+  data; Battle wires it via the Encounter.FoePartAim opt-in). STAGED OFF in all live content
+  (FoePartAim=false): persistent part erosion with NO part-heal yet (Phase 3 #4) strips the loadout and
+  makes the run unwinnable (verified — campaign flips to a DPS stalemate). RECONCILE: flip FoePartAim on
+  per-encounter once part-heals ship; authored personalities already sit dormant in Sieges. Real content
+  foes still unarmed beyond the light feel-pass arming (power envelope = human).
 
 ## Roadmap
 - Phase 1 [DONE]: Core skeleton, rune economy, chassis, techniques + deterministic combat tick,
