@@ -996,6 +996,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 }
             }
             else if (!foe.Down && Hover(FoeRect(i))) Border(x, top, 144, 156, Ink);
+            Text(_assets.Mono, foe.Figure.ToUpperInvariant(), x + 2, top + 2, foe.Down ? Muted : Ink); // creature tag
             DrawBar(x, top + 156, 144, _assets.Resource("hp"), foe.Hp, foe.MaxHp, Blood);
         }
     }
