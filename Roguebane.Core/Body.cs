@@ -73,6 +73,8 @@ public sealed class Body
     // Armor rides on a part-group (its Stat). One piece per group — equipping replaces.
     public void Equip(Armor piece) => _armor[piece.Group] = piece;
 
+    public void Unequip(Stat group) => _armor.Remove(group);
+
     public Armor? ArmorOn(Stat group) => _armor.GetValueOrDefault(group);
 
     // Flat plate protection on a part, but only while the part still stands — the effect rides the

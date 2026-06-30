@@ -1,17 +1,32 @@
 namespace Roguebane.Core;
 
-// The persistent run economy — gold and carried consumables. Lives above a single Expedition so it
-// carries across the legs of a campaign.
+// The persistent run economy — gold, carried consumables, and the gear pack (unequipped weapons +
+// armor). Lives above a single Expedition so it carries across the legs of a campaign.
 public sealed class Stash
 {
     public int Gold { get; private set; }
     public int Potions { get; private set; }
+
+    private readonly List<Weapon> _weapons = new(); // carried but not wielded
+    private readonly List<Armor> _armor = new();    // carried but not worn
 
     public Stash(int gold = 0, int potions = 0)
     {
         Gold = gold;
         Potions = potions;
     }
+
+    // The gear pack: gear acquired (found/bought) sits here until equipped onto the body, and returns
+    // here when unequipped or displaced. (Acquisition wiring — drops/shop — is a separate slice.)
+    public IReadOnlyList<Weapon> Weapons => _weapons;
+    public IReadOnlyList<Armor> Armor => _armor;
+
+    public void AddWeapon(Weapon weapon) => _weapons.Add(weapon);
+    public void AddArmor(Armor piece) => _armor.Add(piece);
+    public bool HasWeapon(Weapon weapon) => _weapons.Contains(weapon);
+    public bool HasArmor(Armor piece) => _armor.Contains(piece);
+    public bool RemoveWeapon(Weapon weapon) => _weapons.Remove(weapon);
+    public bool RemoveArmor(Armor piece) => _armor.Remove(piece);
 
     public void AddGold(int amount)
     {
