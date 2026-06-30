@@ -657,7 +657,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
         Sprite(_assets.Resource("supplies"), x, y, 22, 22, Color.White);
         Text(_assets.Mono, $"{map.Supplies}/{map.MaxSupplies}", x + 26, y + 4, map.Supplies > 0 ? Ink : Blood);
         DrawStat(_assets.Node(NodeType.Castle), map.WarPartyDistance, x + 110); // war party closing in
-        DrawStat(_assets.Resource("support"), map.SupportBank, x + 220);
+        // Mastered support as banked/total holds on the leg (the support you could rally) per design/03.
+        var holds = map.Nodes.Count(n => n.Type == NodeType.ResourceHold);
+        Sprite(_assets.Resource("support"), x + 220, y, 22, 22, Color.White);
+        Text(_assets.Mono, $"{map.SupportBank}/{holds}", x + 246, y + 4, Ink);
         DrawStat(_assets.Resource("spoils"), Exp.Gold, x + 330);
         DrawStat(_assets.Resource("hp"), Exp.Potions, x + 440);
 
