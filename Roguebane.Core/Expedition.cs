@@ -85,6 +85,18 @@ public sealed class Expedition
         return true;
     }
 
+    // Equip / unequip carried gear onto the player's body — out of combat only (between jumps/fights),
+    // moving the piece between the Stash pack and the body via Gearing (which enforces the wield/wear
+    // gates). Returns false if mid-fight or the move isn't legal.
+    public bool EquipWeapon(Weapon weapon) =>
+        State == ExpeditionState.Choosing && Gearing.EquipWeapon(_stash, _player.Body, weapon);
+    public bool UnequipWeapon(Weapon weapon) =>
+        State == ExpeditionState.Choosing && Gearing.UnequipWeapon(_stash, _player.Body, weapon);
+    public bool EquipArmor(Armor armor) =>
+        State == ExpeditionState.Choosing && Gearing.EquipArmor(_stash, _player.Body, armor);
+    public bool UnequipArmor(Stat group) =>
+        State == ExpeditionState.Choosing && Gearing.UnequipArmor(_stash, _player.Body, group);
+
     // Spend spoils on a repair potion (carried for later) at a merchant.
     public bool BuyPotion()
     {

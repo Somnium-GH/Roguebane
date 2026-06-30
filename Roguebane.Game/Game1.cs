@@ -83,10 +83,13 @@ public class Game1 : Microsoft.Xna.Framework.Game
             foreach (var t in Exp.Loadout) _campaign.Toggle(t); // power the bar (both shots)
             void Resolve() { for (var i = 0; i < 200 && Exp.State == ExpeditionState.Fighting; i++) _campaign.Tick(); }
 
-            if (_smokeScreen == "map") // stop at the merchant so the shot shows the gear stock
+            if (_smokeScreen == "map") // stop at the merchant so the shot shows the gear stock + gear bar
             {
                 _campaign.Enter("a1"); Resolve(); // earn some gold first
                 _campaign.Enter("b");             // the merchant
+                Exp.BuyWeapon(Armory.Dagger);     // dagger 2 -> pack
+                Exp.EquipWeapon(Armory.Dagger);   // -> EQUIPPED
+                Exp.Stash.AddArmor(Shops.Plate);  // seed a PACK item for the click-to-equip chip in the shot
             }
             else if (_smokeScreen == "combat")
             {
@@ -243,6 +246,13 @@ public class Game1 : Microsoft.Xna.Framework.Game
             var ars = Exp.OfferedArmor;
             for (var i = 0; i < ars.Count; i++) if (Click(MerchGearRect(ws.Count + i))) { Exp.BuyArmor(ars[i]); break; }
         }
+
+        // Equip a carried pack item onto the body (out of combat, any beacon). Weapons then armor —
+        // the same order DrawGearBar lays the chips out.
+        var pw = Exp.Stash.Weapons;
+        for (var i = 0; i < pw.Count; i++) if (Click(PackChipRect(i))) { Exp.EquipWeapon(pw[i]); break; }
+        var pa = Exp.Stash.Armor;
+        for (var i = 0; i < pa.Count; i++) if (Click(PackChipRect(pw.Count + i))) { Exp.EquipArmor(pa[i]); break; }
 
         // Pick an onward jump: a number key, or clicking the destination beacon on the chart.
         var options = Exp.Options;
@@ -473,8 +483,50 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawWarParty(60, 72, 470);
         DrawChart();
         if (Exp.AtMerchant) DrawMerchant(560, 300);
+        DrawGearBar(20, H - 44);
 
         DrawStateOverlay();
+    }
+
+    // Out-of-combat gear bar (map screen): the body's EQUIPPED gear (wielded weapons + worn armor) and
+    // the carried PACK as click-to-equip chips. Equipping moves a piece pack -> body via Expedition.
+    private void DrawGearBar(int x, int y)
+    {
+        var body = Exp.Player.Body;
+        Text(_assets.Mono, "EQUIPPED", x, y - 16, Muted);
+        var ex = x;
+        foreach (var w in body.Hands) { GearTag(ex, w.Id, Amber); ex += 86; }
+        foreach (var (s, _) in StatColors)
+            if (body.ArmorOn(s) is { } a) { GearTag(ex, a.Id, StatColor(s)); ex += 86; }
+        if (ex == x) Text(_assets.Mono, "—", x, y + 4, Muted);
+
+        Text(_assets.Mono, "PACK  (click to equip)", x + 360, y - 16, Muted);
+        for (var i = 0; i < PackCount; i++)
+        {
+            var r = PackChipRect(i);
+            var (id, col) = PackItem(i);
+            Panel(r.X, r.Y, r.Width, r.Height);
+            Text(_assets.Mono, id, r.X + 6, r.Y + 6, Ink);
+            Border(r.X, r.Y, r.Width, r.Height, Hover(r) ? Amber : col);
+        }
+
+        void GearTag(int gx, string id, Color col)
+        {
+            Panel(gx, y, 80, 28);
+            Text(_assets.Mono, id, gx + 6, y + 6, col);
+        }
+    }
+
+    private int PackCount => Exp.Stash.Weapons.Count + Exp.Stash.Armor.Count;
+    private static Rectangle PackChipRect(int i) => new(380 + i * 86, H - 44, 80, 28);
+
+    // The pack as one indexed list: weapons first, then armor (matching the click handler's order).
+    private (string Id, Color Border) PackItem(int i)
+    {
+        var ws = Exp.Stash.Weapons;
+        if (i < ws.Count) return (ws[i].Id, StatColor(ws[i].Stat));
+        var a = Exp.Stash.Armor[i - ws.Count];
+        return (a.Id, StatColor(a.Group));
     }
 
     // The half-blind beacon chart as a GRAPH (design/03): nodes placed by their grid coords, links

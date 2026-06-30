@@ -182,6 +182,30 @@ public class ExpeditionTests
     }
 
     [Fact]
+    public void BoughtGearEquipsOntoTheBodyOutOfCombat()
+    {
+        var exp = FullLoadout();
+        exp.Enter("a1"); FightToEnd(exp); // gold
+        exp.Enter("b"); exp.BuyWeapon(Armory.Dagger); // into the pack
+
+        Assert.True(exp.EquipWeapon(Armory.Dagger));   // Choosing -> legal
+        Assert.Contains(Armory.Dagger, exp.Player.Body.Hands);
+        Assert.DoesNotContain(Armory.Dagger, exp.Stash.Weapons); // left the pack
+    }
+
+    [Fact]
+    public void GearCannotBeEquippedMidFight()
+    {
+        var exp = FullLoadout();
+        exp.Enter("a1"); FightToEnd(exp);
+        exp.Enter("b"); exp.BuyWeapon(Armory.Dagger);
+        exp.Enter("c2"); // a fight starts
+        Assert.Equal(ExpeditionState.Fighting, exp.State);
+        Assert.False(exp.EquipWeapon(Armory.Dagger)); // sealed during combat
+        Assert.True(exp.Stash.HasWeapon(Armory.Dagger));
+    }
+
+    [Fact]
     public void GearCannotBeBoughtAwayFromAMerchant()
     {
         var exp = FullLoadout();
