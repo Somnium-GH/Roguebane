@@ -39,11 +39,13 @@ into the Stash pack via Expedition.BuyWeapon/BuyArmor. The acquire→carry→equ
 Core-testable; only the SHELL surface is missing. Pinned in ExpeditionTests.
 **Merchant gear UI — DONE.** Gear stock as buy chips (name+price, dimmed when unaffordable) → BuyWeapon/
 BuyArmor. Map RB_SMOKE shows sword/dagger/plate with affordability.
-Next actionable (G2 shell — last piece):
-- Build-screen / run equip UI: a pack panel listing Stash.Weapons/Armor; clicking a piece equips it via
-  Gearing (Stash + the player Body); show wielded weapons + worn armor on the anatomy. Needs a Body+Stash
-  equip entry point reachable from the shell (Expedition exposes Player.Body + Stash; add Equip passthroughs
-  or call Gearing directly). Then equipped-gear-on-anatomy render. Verify via RB_SMOKE.
+**G2 gear END TO END — DONE.** Buy at merchant → Stash pack → equip out of combat (Expedition equip
+passthroughs → Gearing) → EQUIPPED readout + click-to-equip PACK chips on the map gear bar. Pinned in
+ExpeditionTests + GearingTests; map RB_SMOKE verified. Remaining: equipped gear drawn ON the anatomy
+sprite (a sword on the arm etc.) — minor art polish, not blocking.
+Next actionable: the unblocked, non-speculative queue is now largely exhausted — see "Needs human" /
+Debt. Candidates: equipped-gear-on-anatomy sprites (art polish); otherwise the remaining roadmap items
+are human-gated (campaign topology, HP-vs-stat split, balance) or design-asset.
 - INT-channel sustained kind: DEFERRED as speculative — no beam content authored (Ember/Drain are fine
   as Timered bolts). Build it when a channel weapon is authored.
 - Foe -> PLAYER part aim PARKED (Needs human): HP-vs-stat split; whole-HP foe contract pinned by FoeOffenseTests.
