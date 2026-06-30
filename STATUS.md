@@ -54,6 +54,10 @@ Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliabl
   intellect, technique glyphs) — clean-build-safe, verified on the map. Pips now use the drop's
   per-stat coloured art (full_<stat>/reserved_<stat>/damage; fixed deleted pip_damaged), verified on
   build. Three stale-asset bugs fixed (foe sprite, icon maps, pips) — clean content build now safe.
+  VERIFIED FROM SCRATCH: wiped Content/bin+obj and Game bin+obj, rebuilt, smoked all 5 screens — all
+  render, no MISS, no stale-.xnb dependency. Drop integration solid. GOTCHA: bundled spritefonts are
+  ASCII-only — Text() with a non-ASCII glyph (e.g. U+00B7) THROWS at draw; keep shell text ASCII until
+  wider-coverage open fonts are bundled.
   Combat/build still match
   design only loosely — the bigger remaining job is rebuilding combat to design/01 (prominent bottom
   Attribute-Pool + Action-Bar panels, figures in the open battlefield) in small smoke-verified slices.
