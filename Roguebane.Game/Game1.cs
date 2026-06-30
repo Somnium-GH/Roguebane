@@ -921,23 +921,22 @@ public class Game1 : Microsoft.Xna.Framework.Game
             Sprite(_assets.Texture(p.SpriteKey), SX(r[0]), SY(r[1]), (int)(r[2] * f), (int)(r[3] * f), color);
         }
 
-        // Gear: anchor each mount's pivot at its socket point. Only draw gear the body actually carries.
-        foreach (var g in composer.ComposeGear(figureId))
+        // Gear: draw the body's ACTUAL wielded weapons at the hand sockets, each by its own gear
+        // sprite (positioned by the manifest gear pivot). Dynamic equipment — not the figure's fixed
+        // default mounts — so any equipped weapon shows. No sprite for a weapon id => simply unarmed.
+        var hands = new[] { "handR", "handL" }; // dominant hand first
+        for (var i = 0; i < body.Hands.Count && i < hands.Length; i++)
         {
-            if (!Carries(body, g.Gear)) continue;
-            var tex = _assets.Texture($"sprites/gear/{g.Gear}");
-            if (tex is null) continue;
-            var gp = manifest.Gear.TryGetValue(g.Gear, out var gd) && gd.Pivot.Length == 2 ? gd.Pivot : new[] { 0, 0 };
-            var gx = SX(g.Anchor[0]) - (int)(gp[0] * f);
-            var gy = SY(g.Anchor[1]) - (int)(gp[1] * f);
-            Sprite(tex, gx, gy, (int)(tex.Width * f), (int)(tex.Height * f), Color.White);
+            var w = body.Hands[i];
+            var tex = _assets.Texture($"sprites/gear/{w.Id}");
+            if (tex is null || !fig.Sockets.TryGetValue(hands[i], out var anchor)) continue;
+            var gp = manifest.Gear.TryGetValue(w.Id, out var gd) && gd.Pivot.Length == 2
+                ? gd.Pivot : new[] { tex.Width / 2, tex.Height / 2 };
+            var gx = SX(anchor[0]) - (int)(gp[0] * f);
+            var gy = SY(anchor[1]) - (int)(gp[1] * f);
+            Sprite(tex, gx, gy, (int)(tex.Width * f), (int)(tex.Height * f), color);
         }
     }
-
-    // A mount is shown only when the body wields/wears that piece (gear id matches a hand or armor id).
-    private static bool Carries(Body body, string gearId) =>
-        body.Hands.Any(w => w.Id == gearId)
-        || body.Parts.Select(p => p.Stat).Distinct().Any(s => body.ArmorOn(s)?.Id == gearId);
 
     // Legacy fallback (manifest missing): the old stat-offset composite with composed gear markers.
     private void DrawHumanoidLegacy(Body body, int cx, int cy)
