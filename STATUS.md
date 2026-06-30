@@ -6,8 +6,9 @@ Player casters run `requireAim`: a powered technique fires ONLY at its own expli
 back to a front, so untargeted HOLDS. Firing is target-driven (no fire button) — charged+aimed
 discharges. AUTO is ONE GLOBAL toggle: ON = no module clears its target after firing (all keep firing at
 the same target); OFF (default) = each fires once when charged+targeted, then clears. Shown as a lit/unlit
-button (no +/- glyph). FIX (re-open): AUTO affects ONLY that button — it must NOT add any highlight on
-the foe or its parts (the targeting hover-highlight is separate and stays). Engine casters (foe offense/sim/legacy Session) keep default-front auto-fire.
+button (no +/- glyph). AUTO affects ONLY that button — foe/part highlights come solely from active
+TARGETING (pick-prompt + limb bands + hover band); no persistent locked-aim ring (which module hits
+which foe/limb reads off the card tags, F1:H). Engine casters (foe offense/sim/legacy Session) keep default-front auto-fire.
 Shell: per-module controls (left-click inactive=power, active=enter targeting+clear; foe-click=aim+exit;
 right-click=cancel/unpower), locked + pick-prompt reticles, targeting card ring, no FIRE button / focus
 cursor. Pinned by PlayerTargetingFsmTests (incl. GlobalAutoGovernsEveryModule) + integration; RB_SMOKE OK.
@@ -23,9 +24,11 @@ change (RB_SMOKE identical).
 bays at assembly. Summoner ships Skeleton+Shade. Exposed via Exp.MinionCount/Minions. Pinned in MinionTests.
 **Combat minion-bay lane — DONE.** BAYS lane paints a slot per chassis bay (filled occupant disc + tag +
 power, or empty), from Exp.Minions/Bays. Combat RB_SMOKE (Summoner @ castle) shows 2/3 bays filled.
+**Combat surface lanes — DONE** (PART-aim limb bands, minion-bay lane, rallied-support lane "RALLIED +N").
 Next actionable:
-- Rallied-support lane (shell): paint the banked support (Exp.Map.SupportBank) on the combat screen, and
-  during the castle fight show it firing on the boss. Core has Support + SupportBank already.
+- Build screen: per-stat attribute readout (STR/INT/DEX/CON Capacity+Available) with gate markers — pure
+  render from Body data, unblocked. (Inventory tabs / drag-equip / equipped-gear-on-anatomy still blocked
+  on gear/minion equip G2/G7.)
 - Foe -> PLAYER part aim is PARKED in "Needs human" — it depends on the HP-vs-stat split decision, and
   the current whole-HP foe contract is pinned by FoeOffenseTests. Do not flip it unilaterally.
 Other remaining (Debt): build-screen inventory tabs + drag-equip (blocked on G2/G7); Choose-Your-Core
