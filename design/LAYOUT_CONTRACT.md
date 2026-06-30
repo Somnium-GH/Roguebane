@@ -67,3 +67,38 @@ loop's visual review becomes a confirmation, not a guess-and-nudge loop.
 - `Content/layout.json` (`figures`, `gear`, `screens`)
 - `ASSET_MANIFEST.md` updated for any new ids
 - cross-platform-safe names (no spaces / Windows-reserved stems); no third-party IP.
+
+## 6. Safe landing — ADDITIVE, don't break the running game
+The game won't read `layout.json` or the new part structure until the loop builds the consumer. Until
+then, land everything ADDITIVELY so the current build keeps running:
+- ADD the new figure-namespaced parts (`sprites/body/<figure>/<part>_<state>.png`), `layout.json`, and
+  the flattened figures ALONGSIDE existing assets. Do NOT remove or rename what the current game already
+  loads (e.g. `sprites/body/<part>/base_<state>.png`, current thumbnails) until the game has cut over.
+- Keep `Content.mgcb` IN SYNC: every file it references must exist, and each new PNG needs its own entry.
+  A removed/renamed file still referenced by mgcb = the content build FAILS and the game won't run
+  (hard break). Regenerate mgcb together with the assets.
+- `layout.json` is plain data, not a texture: copy it into the Content output (NOT the mgcb texture
+  pipeline). The game reads it directly; ignored until consumed = safe.
+- After the game is on the manifest, a cleanup slice retires the now-dead old assets + their mgcb entries.
+
+## 7. UI specifics — containers, lists & completeness (this is what closes the drift)
+Static `anchor+offset+size` covers fixed panels, but the real UI drift is DATA-DRIVEN regions the game
+guessed/omitted (rune bag, inventory tabs, action bar, attribute readout). For those the screen manifest
+emits a CONTAINER + an item TEMPLATE + a binding, so the game lays out the repeats deterministically:
+```
+{ "id":"runeBag", "anchor":"TopRight", "offset":[-16,16], "size":[260,400], "z":10,
+  "binds":"runes",
+  "item": { "template":"runeCard", "size":[244,40], "flow":"vertical", "gap":6, "pad":[8,8] } }
+```
+- `binds` = the Core collection; the game instances one `item.template` per entry, flowing them
+  (`flow`: vertical | horizontal | grid, with `gap` / `pad` / `cols`) inside the container.
+- A template is itself a mini-layout: its sub-elements (icon, name, cost, gate marker) are anchor+offset
+  +size WITHIN the card. Define each template once under `templates.<name>`.
+- Tabs = a container with a `tabs:[…]` list + the active tab's content container.
+- Fixed readouts that are still per-stat (the Attribute Readout's 4 bars + gate markers) use the same
+  container+template (binds: the 4 stats).
+
+COMPLETENESS RULE: `screens.<id>.elements[]` must be the COMPLETE inventory for that screen — the game
+renders exactly that set, so it CANNOT silently drop the rune bag, the inventory tabs, or the gate
+markers (today's drift). The manifest is the machine source of truth; `design/SCREENS.md` is the
+human-readable mirror of the same inventory. Emit every element the mockup draws.

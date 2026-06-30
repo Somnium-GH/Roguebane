@@ -80,13 +80,18 @@ public class Game1 : Microsoft.Xna.Framework.Game
             _build.Toggle(Techniques.Jab);   // add a STR card for variety on the bar
             _campaign = _build.March(Maps.StandardLegs(3));
             _screen = Screen.Run;
-            if (_smokeScreen == "combat")
-            {
-                foreach (var t in Exp.Loadout) _campaign.Toggle(t); // power the bar
+            foreach (var t in Exp.Loadout) _campaign.Toggle(t); // power the bar (both shots)
+            void Resolve() { for (var i = 0; i < 200 && Exp.State == ExpeditionState.Fighting; i++) _campaign.Tick(); }
 
+            if (_smokeScreen == "map") // stop at the merchant so the shot shows the gear stock
+            {
+                _campaign.Enter("a1"); Resolve(); // earn some gold first
+                _campaign.Enter("b");             // the merchant
+            }
+            else if (_smokeScreen == "combat")
+            {
                 // March to the tanky CASTLE fight — the Summoner's minions melt the light skirmishes
                 // en route, so screenshot there (it survives long enough to show a stable combat frame).
-                void Resolve() { for (var i = 0; i < 200 && Exp.State == ExpeditionState.Fighting; i++) _campaign.Tick(); }
                 _campaign.Enter("a1"); Resolve();  // a resource hold -> banks 1 support
                 _campaign.Enter("b");              // merchant — no fight
                 _campaign.Enter("c2"); Resolve();  // another hold -> banks a 2nd
@@ -231,6 +236,12 @@ public class Game1 : Microsoft.Xna.Framework.Game
             if (Pressed(keys, Keys.P) || Click(MerchPotionRect)) Exp.BuyPotion();
             if (Pressed(keys, Keys.H) || Click(MerchHealRect)) Exp.BuyHeal();
             if (Pressed(keys, Keys.U) || Click(MerchUseRect)) Exp.UsePotion();
+
+            // Buy a gear chip into the Stash pack (weapons first, then armor — same order as drawn).
+            var ws = Exp.OfferedWeapons;
+            for (var i = 0; i < ws.Count; i++) if (Click(MerchGearRect(i))) { Exp.BuyWeapon(ws[i]); break; }
+            var ars = Exp.OfferedArmor;
+            for (var i = 0; i < ars.Count; i++) if (Click(MerchGearRect(ws.Count + i))) { Exp.BuyArmor(ars[i]); break; }
         }
 
         // Pick an onward jump: a number key, or clicking the destination beacon on the chart.
@@ -316,10 +327,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         Stat.Int => 'H', Stat.Str => 'A', Stat.Con => 'C', Stat.Dex => 'L', _ => '?',
     };
-    // Merchant verb buttons — mirror DrawMerchant's panel origin (560,300) + button offsets.
-    private static readonly Rectangle MerchPotionRect = new(574, 344, 330, 34);
-    private static readonly Rectangle MerchUseRect = new(574, 382, 330, 34);
-    private static readonly Rectangle MerchHealRect = new(574, 420, 330, 34);
+    // Merchant verb buttons + gear chips — mirror DrawMerchant's panel origin (560,300) + offsets.
+    private static readonly Rectangle MerchPotionRect = new(574, 344, 330, 30);
+    private static readonly Rectangle MerchUseRect = new(574, 378, 330, 30);
+    private static readonly Rectangle MerchHealRect = new(574, 412, 330, 30);
+    private static Rectangle MerchGearRect(int i) => new(574 + i * 112, 472, 104, 30);
 
     private void ToggleFullscreen()
     {
@@ -532,13 +544,30 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     private void DrawMerchant(int x, int y)
     {
-        Panel(x, y, 360, 170);
+        Panel(x, y, 360, 220);
         Text(_assets.Display, "MERCHANT", x + 14, y + 10, Ink);
-        DrawButton($"P  buy potion (4)   x{Exp.Potions}", x + 14, y + 44, 330, 34,
+        DrawButton($"P  buy potion (4)   x{Exp.Potions}", x + 14, y + 44, 330, 30,
             Exp.Gold >= 4, Keys.P);
-        DrawButton("U  use potion  (repair)", x + 14, y + 82, 330, 34, Exp.Potions > 0, Keys.U);
-        DrawButton("H  heal hp     (3)", x + 14, y + 120, 330, 34,
+        DrawButton("U  use potion  (repair)", x + 14, y + 78, 330, 30, Exp.Potions > 0, Keys.U);
+        DrawButton("H  heal hp     (3)", x + 14, y + 112, 330, 30,
             Exp.Gold >= 3 && Exp.Player.Hp < Exp.Player.MaxHp, Keys.H);
+
+        // The gear stock as a compact row of buy chips (name + price); dim when unaffordable / sold.
+        Text(_assets.Mono, "GEAR", x + 14, y + 150, Muted);
+        var ws = Exp.OfferedWeapons;
+        var ars = Exp.OfferedArmor;
+        for (var i = 0; i < ws.Count; i++) GearChip(i, ws[i].Id, Expedition.Price(ws[i]));
+        for (var i = 0; i < ars.Count; i++) GearChip(ws.Count + i, ars[i].Id, Expedition.Price(ars[i]));
+
+        void GearChip(int idx, string name, int price)
+        {
+            var r = MerchGearRect(idx);
+            var ok = Exp.Gold >= price;
+            Panel(r.X, r.Y, r.Width, r.Height);
+            Text(_assets.Mono, name, r.X + 6, r.Y + 6, ok ? Ink : Muted);
+            Text(_assets.Mono, price.ToString(), r.X + r.Width - 16, r.Y + 6, ok ? Amber : Muted);
+            Border(r.X, r.Y, r.Width, r.Height, Hover(r) && ok ? Amber : Border0);
+        }
     }
 
     // The run's resource readout: supplies, war-party distance, banked support, gold, potions.
