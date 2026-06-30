@@ -19,7 +19,8 @@ public sealed class Encounter
         int restoreAmount = 0,
         int restoreEvery = 0,
         int supportAmount = 0,
-        int supportEvery = 0)
+        int supportEvery = 0,
+        bool foePartAim = false)
     {
         Name = name;
         _foes = foes.ToList();
@@ -28,9 +29,16 @@ public sealed class Encounter
         _restoreEvery = restoreEvery;
         SupportAmount = supportAmount;
         SupportEvery = supportEvery;
+        FoePartAim = foePartAim;
     }
 
     public bool Structural { get; }
+
+    // Whether foes erode the player's PARTS (§8) instead of chipping restorable HP. STAGED OFF for
+    // live content: persistent part erosion with no part-heal yet (Phase 3 #4) strips the loadout and
+    // makes the run unwinnable. Flip on per-encounter once part-heals ship. The mechanism itself is
+    // live + tested regardless of this gate.
+    public bool FoePartAim { get; }
 
     // Player-allied rallied support available at this encounter (auto-fire on the front).
     public int SupportAmount { get; }

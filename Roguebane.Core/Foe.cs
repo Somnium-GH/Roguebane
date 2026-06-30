@@ -23,8 +23,11 @@ public sealed class Foe : ICombatTarget
     // Id, which is an encounter-role tag ("gate", "ogre-0"). The shell composes the figure from it.
     public string Figure { get; }
 
+    // Which player limb this foe goes for (§8 personality, data). Inert/unaimed foes default RANDOM.
+    public FoeAim Aim { get; }
+
     public Foe(string id, int hp, Body? frame = null, IReadOnlyList<Technique>? arsenal = null,
-        string figure = "ogre")
+        string figure = "ogre", FoeAim aim = FoeAim.Random)
     {
         Id = id;
         MaxHp = hp;
@@ -32,6 +35,7 @@ public sealed class Foe : ICombatTarget
         Frame = frame;
         Arsenal = arsenal ?? Array.Empty<Technique>();
         Figure = figure;
+        Aim = aim;
     }
 
     public bool Down => Hp <= 0;

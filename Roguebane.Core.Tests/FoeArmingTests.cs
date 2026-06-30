@@ -28,6 +28,7 @@ public class FoeArmingTests
     [Fact]
     public void ArmedFoesChipAPassivePlayer()
     {
+        // Live content stays on the restorable-HP path (part-aim STAGED OFF until part-heals, §8/Phase 3).
         var player = Fighter.Scaled(PlayerBody(), baseHp: 8); // MaxHp 16
         var enc = Sieges.ArmedPoint("cp", 100, 100);          // tanky so they keep swinging
         var battle = new Battle(new Caster(player.Body), enc, player);

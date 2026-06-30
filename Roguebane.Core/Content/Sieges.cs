@@ -30,8 +30,12 @@ public static class Sieges
     // back (the live-run encounters). Threat stays low — runs remain winnable.
     public static Encounter ArmedPoint(string name, params int[] foeHp)
     {
+        // Authored §8 personalities (dormant until Encounter.FoePartAim flips on with part-heals):
+        // rough field fodder botches its pick, the rest swing at random.
         var foes = foeHp
-            .Select((hp, i) => Foes.Armed($"{name}-{i}", hp, figure: RaiderFigures[i % RaiderFigures.Length]))
+            .Select((hp, i) => Foes.Armed($"{name}-{i}", hp,
+                figure: RaiderFigures[i % RaiderFigures.Length],
+                aim: i % 2 == 0 ? FoeAim.Inept : FoeAim.Random))
             .ToList();
         return new Encounter(name, foes, structural: false);
     }
@@ -40,11 +44,13 @@ public static class Sieges
     // Heavy figures hold the wall (ogre/troll) vs the field raiders above.
     public static Encounter ArmedCastle(int supportAmount = 2)
     {
+        // Authored §8 personalities (dormant until FoePartAim flips on): the boss layer aims SMART
+        // (strip the largest live stat), its flanks swing at random.
         var foes = new[]
         {
-            Foes.Armed("gate", 12, figure: "ogre"),
-            Foes.Armed("wall", 16, figure: "troll"),
-            Foes.Armed("keep", 12, figure: "ogre"),
+            Foes.Armed("gate", 12, figure: "ogre", aim: FoeAim.Random),
+            Foes.Armed("wall", 16, figure: "troll", aim: FoeAim.Smart),
+            Foes.Armed("keep", 12, figure: "ogre", aim: FoeAim.Random),
         };
         return new Encounter("castle", foes, structural: true,
             restoreAmount: 2, restoreEvery: 10, supportAmount: supportAmount, supportEvery: 20);

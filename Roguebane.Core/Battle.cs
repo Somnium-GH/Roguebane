@@ -62,12 +62,18 @@ public sealed class Battle
 
         _caster.Step();
 
-        // The foes strike back: each standing armed foe acts on the player.
+        // The foes strike back: each standing armed foe acts on the player. Where the encounter opts
+        // into part-aim (§8), a foe erodes a player PART per its TARGETING PERSONALITY — re-picked every
+        // tick so RANDOM varies and SMART/INEPT track the eroding body; no standing part left => the
+        // swing spills onto HP. Otherwise it chips restorable HP (the staged-default until part-heals).
         if (_player is { Down: false })
         {
             foreach (var (foe, offense) in _foeOffense)
             {
                 if (foe.Down) continue;
+                var part = _encounter.FoePartAim ? FoeTargeting.Pick(foe.Aim, _player.Body, _rng) : null;
+                foreach (var tech in foe.Arsenal)
+                    if (part is not null) offense.Aim(tech, _player, part); else offense.ClearAim(tech);
                 offense.Step();
             }
             _player.CapToMax(); // a chest hit this tick may have lowered MaxHp; persist the cap
