@@ -17,6 +17,8 @@ VERIFY loop: `RB_SMOKE=1 RB_SHOT=x.png RB_SCREEN=<build|combat|map> dotnet run -
 renders a PNG + exits (headless); add `RB_CHASSIS=<0-4>` to pick a chassis on the build screen. Smoke
 every visual change. GOTCHA: spritefonts are ASCII-only — a non-ASCII glyph in Text() THROWS at draw.
 All 5 chassis figures + 3 live screens verified clean (no overlaps/clipping after the layout sweep).
+All usable foe figures confirmed too: ogre/troll rendered in castle combat; bandit/skeleton render by
+structural equivalence (identical 7-part/21-file layout). wraith/gargoyle stay excluded (incomplete art).
 
 REMAINING (deliberate / not safe 1-min fragments):
 - COMBAT -> design/01 full manifest rebuild: every manifest position collides with the dense hand-placed
