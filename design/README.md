@@ -14,12 +14,22 @@ visual source of truth the `../Content/` asset package is built to match (locked
 | 05 | `05-new-run.png` | New Run — Choose Your Core | run start |
 | 06 | `06-style-frame.png` | Style Frame — palette, cutaway grammar, type, pool study | north-star |
 
-## Asset sheets (every asset centered at integer scale, grid-aligned, labeled w/ size)
+## Asset sheets (composited DIRECTLY from the live files — labeled with native size)
 | file | contents |
 |---|---|
-| `00-assets-1-figures.png` | character composites, chassis Cores, minions, gear (weapons & shields) |
-| `00-assets-2-parts.png` | modular body parts — hero (base · plate · robe×3) + all decomposed foes (head/torso/arm/leg) |
-| `00-assets-3-ui.png` | attribute/technique/rune/node/resource icons, pips, reticles, buttons, backdrops |
+| `00-assets-1-figures.png` | assembled composites (`../proto/roster`), chassis Cores, minions, gear (weapons & shields) |
+| `00-assets-2-parts.png` | every modular body part by figure — healthy → damaged → broken (grunt also bare/armored) |
+| `00-assets-3-ui.png` | attribute/technique/rune/node/resource icons, all 17 pips, reticles, buttons, backdrops |
 
 Re-render any screen by opening its `.dc.html` and screenshotting at the design width (1920).
-Regenerate the asset sheets from the `../Content/sprites|icons|ui|bg` trees.
+
+**The three asset sheets are GENERATED, never hand-built** — `../proto/sheet_gen.js` is the persistent
+source of truth. It composites each sheet straight from `../Content/{sprites,icons,ui,bg}` and
+`../proto/roster`, so the sheets can never drift out of sync with the real package. Regenerate after
+any asset change:
+```
+const src = await readFile('proto/sheet_gen.js'); (0,eval)(src);
+await RB_generateSheets({readImage,createCanvas,saveFile,readFile,ls,log}, 'ui'); // 'figures' | 'parts' | 'ui'
+```
+(one sheet per call — the parts sheet reads ~240 PNGs). Edit the `SHEETS` config in that file to change
+what appears.

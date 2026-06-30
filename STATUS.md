@@ -14,11 +14,25 @@ POC is NOT complete; the "DONE" claim below is RETRACTED until these clear.**
   em-dash) -> fixed; every other non-ASCII in source is comment prose (never drawn). Driven run-start
   STATE regression added (RunStartTests: NewBuild -> March -> assert the map-screen render contract at
   camp/Choosing -- state, options, player HP, resource readouts, bay/loadout/gear sources; 247 Core
-  tests). STILL TODO (loop, BLOCKED): the live map-screen DRAW smoke (RB_SMOKE) -- render-side, not Core-
-  headless, and the build output is currently locked by a running Roguebane.Game (human play session).
-- Fresh design renders landed (`design/01–06`, 06-30): re-verify EVERY screen against the NEW PNG +
-  `screens.<id>`. "Smoke clean" ≠ "matches the design." NEW RUN is hallucinated / not manifest-driven —
-  rebuild it off `screens.newrun` + `design/05` (single-core for now; race step behind the flag).
+  tests). LIVE-DRAW VERIFIED (crash item DONE): a running Roguebane.Game locks the default build output,
+  so build to a SCRATCH dir and run that instance instead --
+  `dotnet build Roguebane.Game -o <scratch>` then from <scratch> `RB_SMOKE=1 RB_SCREEN=<map|build|combat>
+  RB_SHOT=x.png dotnet Roguebane.Game.dll`. All three render clean, exit 0 ("SMOKE OK") -- the run-start
+  crash is gone in the live draw, not just headless.
+- Fresh design renders landed (`design/01–06`, 06-30) and are now COMMITTED as the rebuild reference.
+  Audited each live shot vs its PNG (scratch-dir smoke). Punch list:
+  * 03 MAP: structural rebuild — design wants a BIGGER beacon chart, prominent top-left SUPPLIES +
+    MUSTERED-SUPPORT panels (pip bars + flavor), and a right-side "THE CASTLE — exit" panel. Build shows
+    a compact top-bar HUD + a small 5-node diamond. (Biggest gap.)
+  * 02 BUILD: matches except the already-known DEFERRED items — INVENTORY tabs (GEAR/TECH/MINIONS) +
+    rarity item cards, and a RUNE BAG of MARKS/PATHS/KEYSTONES cards (current screen shows rune LADDERS).
+    Both input-coupled (need input wiring + mid-run stash).
+  * 01 COMBAT: divergence from design/01 is a LOCKED decision (s13 multi-foe layout) — NOT a defect.
+  * 05 NEW RUN: a dedicated "Choose Your Core" 5-card grid (figure + stat block + flavor + SELECT, one
+    ringed, BEGIN THE MARCH). Build merges this into the BUILD screen's inline selector — rebuild it off
+    `screens.newrun` + `design/05` (single-core for now; race step behind the flag).
+  * PALETTE: NOT a uniform shift — 05 reads warm-dusk, 02/03 read cooler/navy; renders vary, so leave
+    the palette as-is (warm-muted-dusk, DESIGN_SPEC §13) until a palette decision actually locks.
 
 ## Prior integration record (the "DONE" claim below is RETRACTED per the re-open above)
 **Shell wired to `layout.json` — integration DONE; combat layout RESOLVED (locked, see s13). POC functionally complete; only the low-value Equipment inventory-tabs polish remains (deferred).**
