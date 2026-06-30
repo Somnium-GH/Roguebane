@@ -1,23 +1,15 @@
 # Status
 
 ## Current target
-**Targeting/firing FSM — DONE (core + shell).** (most shipped, 166 tests.)
+**Targeting/firing FSM — DONE (core + shell, incl. global AUTO).** (most shipped, 167 tests.)
 Player casters run `requireAim`: a powered technique fires ONLY at its own explicit aim, never falling
 back to a front, so untargeted HOLDS. Firing is target-driven (no fire button) — charged+aimed
-discharges. AUTO off (default) = one-shot (clears target after the shot); AUTO on persists. Engine
-casters (foe offense/sim/legacy Session) keep default-front auto-fire. Shell: per-module controls
-(left-click inactive=power, active=enter targeting+clear; foe-click=aim+exit; right-click=cancel/unpower),
-locked + pick-prompt reticles, targeting card ring, no FIRE button / focus cursor. Pinned by
-PlayerTargetingFsmTests + Expedition/Campaign integration; combat RB_SMOKE verified.
-
-TOP FIX (RE-OPEN) — the AUTO button is buggy in play. Required: AUTO is ONE GLOBAL toggle.
-- ON  = no powered+targeted module clears its target after firing — they keep charging and keep firing
-  at the SAME target.
-- OFF (default) = fire once when charged+targeted, then clear the target.
-- Button VISUAL: NO +/- glyph. Show ON by a HIGHLIGHT (background + text colour change); OFF = normal
-  button. (i.e. it reads as a lit/unlit toggle, not a +/- control.)
-- Behavioural pin: with AUTO on, a module that fires keeps its aim and fires again next charge; with
-  AUTO off it goes untargeted after the shot.
+discharges. AUTO is ONE GLOBAL toggle: ON = no module clears its target after firing (all keep firing at
+the same target); OFF (default) = each fires once when charged+targeted, then clears. Shown as a lit/unlit
+button (no +/- glyph). Engine casters (foe offense/sim/legacy Session) keep default-front auto-fire.
+Shell: per-module controls (left-click inactive=power, active=enter targeting+clear; foe-click=aim+exit;
+right-click=cancel/unpower), locked + pick-prompt reticles, targeting card ring, no FIRE button / focus
+cursor. Pinned by PlayerTargetingFsmTests (incl. GlobalAutoGovernsEveryModule) + integration; RB_SMOKE OK.
 Next actionable (pick one):
 - G1 foe PART aim: author multi-part foe Frames as DATA so left-click can target a foe PART (vs whole
   foe); then wire part-aim in the shell (Caster already supports Aim(tech, foe, part)). Unblocks the
