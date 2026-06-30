@@ -77,6 +77,6 @@ public sealed class Style
 {
     public Dictionary<string, string> Palette { get; init; } = new();
     public JsonElement Fonts { get; init; }
-    public JsonElement PartStates { get; init; }
+    public Dictionary<string, string> PartStates { get; init; } = new();
     public JsonElement Pip { get; init; }
 }
