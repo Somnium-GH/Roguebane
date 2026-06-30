@@ -810,7 +810,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         var body = Exp.Player.Body;
         Panel(x, y, 220, 360);
-        Text(_assets.Mono, "YOU", x + 12, y + 8, Muted);
+        // Label the player figure with its chassis (design/01 names YOU), not a bare "YOU".
+        Text(_assets.Mono, "YOU - " + Exp.FigureId.ToUpperInvariant(), x + 12, y + 8, Muted);
         DrawFigureIn(body, Exp.FigureId, "combat", "heroFigure", x + 110, y + 330, 300);
 
         var hp = Exp.Player;
