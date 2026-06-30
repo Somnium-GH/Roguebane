@@ -22,18 +22,30 @@ public static class Sieges
             restoreAmount: 2, restoreEvery: 10, supportAmount: supportAmount, supportEvery: 20);
     }
 
+    // Light humanoid raiders for field encounters — rotated by slot so a multi-foe skirmish fields
+    // a varied line (figures with the complete shipped part sets; wraith/gargoyle art is partial).
+    private static readonly string[] RaiderFigures = { "bandit", "skeleton" };
+
     // Armed control point: the same fodder, but each foe carries a weak Frame+Arsenal so it fights
     // back (the live-run encounters). Threat stays low — runs remain winnable.
     public static Encounter ArmedPoint(string name, params int[] foeHp)
     {
-        var foes = foeHp.Select((hp, i) => Foes.Armed($"{name}-{i}", hp)).ToList();
+        var foes = foeHp
+            .Select((hp, i) => Foes.Armed($"{name}-{i}", hp, figure: RaiderFigures[i % RaiderFigures.Length]))
+            .ToList();
         return new Encounter(name, foes, structural: false);
     }
 
     // Armed castle: layered, armed defenders plus the boss-restore / rallied-support DPS race.
+    // Heavy figures hold the wall (ogre/troll) vs the field raiders above.
     public static Encounter ArmedCastle(int supportAmount = 2)
     {
-        var foes = new[] { Foes.Armed("gate", 12), Foes.Armed("wall", 16), Foes.Armed("keep", 12) };
+        var foes = new[]
+        {
+            Foes.Armed("gate", 12, figure: "ogre"),
+            Foes.Armed("wall", 16, figure: "troll"),
+            Foes.Armed("keep", 12, figure: "ogre"),
+        };
         return new Encounter("castle", foes, structural: true,
             restoreAmount: 2, restoreEvery: 10, supportAmount: supportAmount, supportEvery: 20);
     }
