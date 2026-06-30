@@ -45,17 +45,15 @@ ExpeditionTests + GearingTests; map RB_SMOKE verified. Remaining: equipped gear 
 sprite (a sword on the arm etc.) — minor art polish, not blocking.
 **Gear-on-anatomy — DONE** (composed markers: armor rings its part, weapon shows in hand; real gear
 sprites = art asset gap). G2 gear is now fully end-to-end.
-Next actionable (thin remaining unblocked slices):
-- Leather armor EVASION: Body.EvasionPercent + the seeded RNG already handle leather (the old "deferred"
-  note is stale); only CONTENT + a test are missing. Author a leather armor piece + pin that it grants a
-  dodge chance on its part-group. Clears the Armor.cs leather Debt.
-- Lower value/polish: build-screen drag-to-equip + categorized inventory tabs (click-equip already
-  works); SpellWard armor (needs spell/blind model — defer).
-- Human-gated/asset: campaign topology (§04 branching), HP-vs-stat split (foe→player part aim), balance
-  tuning, real gear/figure SPRITES (Claude Design), bundled fonts.
-- INT-channel sustained kind: DEFERRED as speculative — no beam content authored (Ember/Drain are fine
-  as Timered bolts). Build it when a channel weapon is authored.
-- Foe -> PLAYER part aim PARKED (Needs human): HP-vs-stat split; whole-HP foe contract pinned by FoeOffenseTests.
+**Leather armor evasion — DONE** (Shops.Hide; dodge rides part condition; pinned in ArmorEvasionTests).
+**The high-value unblocked queue is now EXHAUSTED.** What remains is human-gated, asset, or low-value
+polish (one line each):
+- Human/design: campaign topology (§04 branching vs linear); HP-vs-stat split → foe→player PART aim
+  (whole-HP foe contract pinned by FoeOffenseTests); balance/feel tuning (the whole "Needs human" block).
+- Asset (Claude Design): real gear/figure/weapon SPRITES (gear-on-anatomy uses composed markers);
+  bundled open fonts (Consolas/Georgia placeholders).
+- Deferred/speculative: SpellWard armor (needs a spell/blind model); INT-channel sustained kind (no beam
+  content); build-screen drag-to-equip + categorized inventory tabs (click-equip already works).
 Other remaining (Debt): build-screen inventory tabs + drag-equip (blocked on G2/G7); Choose-Your-Core
 screen design/05 (build screen doubles as picker — locked OK); campaign city-graph design/04.
 
@@ -129,7 +127,8 @@ from primitives. Route each to Claude Design. (Hi-fi transition: design/ASSET_HI
 - CON block + evasion mitigation are on the WHOLE-HP path; localized on PART hits waits on foe→player PART
   aim (G1).
 - INT beams are fast Timered bolts (Sustained=every-tick was a firehose at 10/s); for a true channel, add a
-  per-tick damage-scaled sustained kind.
+  per-tick damage-scaled sustained kind. (Speculative — defer until a channel weapon is authored.)
+- Leather armor evasion now FUNCTIONAL + content (Shops.Hide) + tested. SpellWard still deferred (no spell model).
 - Mouse is click + hover only — no drag-to-equip, tooltips, rebinding; PAUSE/FLEE are plain rects (U6).
 - Rune grants = chassis-extension PARTS only; add more data-driven Mark effect kinds when a non-extension
   keystone is authored.
