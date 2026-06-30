@@ -5,8 +5,8 @@ namespace Roguebane.Core;
 // is keyed to TYPE and RIDES the part's condition — break the part and the effect goes with it.
 public enum ArmorKind
 {
-    Plate,     // flat PROTECTION (1-4) subtracted from stat-damage to that part — functional now
-    Leather,   // EVASION instead of flat protection — deferred (needs a seeded RNG; see Debt)
+    Plate,     // flat PROTECTION (1-4) subtracted from stat-damage to that part — functional
+    Leather,   // EVASION (a % dodge on the struck part-group, via the seeded RNG) — functional
     SpellWard, // head spell/blind protection — deferred (spells/blind not yet modelled; see Debt)
 }
 

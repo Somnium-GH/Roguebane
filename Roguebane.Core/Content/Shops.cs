@@ -5,8 +5,9 @@ namespace Roguebane.Core.Content;
 // "Needs human" balance touchpoint); the mechanic is what matters here.
 public static class Shops
 {
-    public static readonly Armor Plate = new("plate", Stat.Con, ArmorKind.Plate, 2); // a chest plate
+    public static readonly Armor Plate = new("plate", Stat.Con, ArmorKind.Plate, 2);     // chest plate: flat protection
+    public static readonly Armor Hide = new("hide", Stat.Dex, ArmorKind.Leather, 25);    // leg leather: 25% evasion
 
     public static readonly IReadOnlyList<Weapon> Weapons = new[] { Armory.Sword, Armory.Dagger };
-    public static readonly IReadOnlyList<Armor> Armor = new[] { Plate };
+    public static readonly IReadOnlyList<Armor> Armor = new[] { Plate }; // shop stock (Hide arrives via finds, later)
 }
