@@ -10,7 +10,8 @@ build certified from scratch (226 Core tests, all 5 screens smoke clean, no stal
 - Four stale-asset bugs fixed (foe sprite, icon maps, pips, rune path); full asset-string sweep clean.
 - design/02 build: attribute-readout bars + anatomy stat callouts. Gear-on-figure draws the actual
   wielded weapon. design/03 map: node legend + supplies remaining/max + support banked/holds.
-- Combat: foe figure variety (ogre/troll/bandit/skeleton) + name tags; minion sprites in the bay lane.
+- Combat: foe figure variety (ogre/troll/bandit/skeleton) + name tags; minion sprites in the bay lane;
+  header titled by node type (SIEGE/SKIRMISH/RESOURCE HOLD).
 
 VERIFY loop: `RB_SMOKE=1 RB_SHOT=x.png RB_SCREEN=<build|combat|map> dotnet run --project Roguebane.Game`
 renders a PNG + exits (headless). Smoke every visual change. GOTCHA: spritefonts are ASCII-only — a
