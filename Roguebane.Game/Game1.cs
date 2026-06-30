@@ -660,7 +660,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
         var preview = _build.Preview();
         Panel(40, 90, 240, 410);
         Text(_assets.Mono, _build.Chassis.Id.ToUpper(), 56, 100, Muted);
+        var figBox = _ui.ElementRect("build", "paperDoll") ?? new Rectangle(100, 104, 120, 215);
         DrawFigureIn(preview, _build.Chassis.Id, "build", "paperDoll", 160, 470, 360);
+        DrawAnatomyTags(figBox);
         DrawAttributeReadout(preview, _build.Chassis.NewBody(), 56, 318, KitDemand());
 
         DrawLadders(320, 100);
@@ -829,6 +831,19 @@ public class Game1 : Microsoft.Xna.Framework.Game
         foreach (var t in _build.Loadout) d[t.Stat] = d.GetValueOrDefault(t.Stat) + t.Reserve;
         foreach (var m in _build.Chassis.MinionKit) d[m.Stat] = d.GetValueOrDefault(m.Stat) + m.Reserve;
         return d;
+    }
+
+    // Chassis-anatomy callouts (design/02): a stat tag at each body region so the chassis structure
+    // — which part sources which stat — reads at a glance on the figure (the core thesis). Tags sit
+    // just outside the figure box: head top, arms mid-sides, chest centre, legs lower.
+    private void DrawAnatomyTags(Rectangle b)
+    {
+        void Tag(Stat s, int px, int py) => Text(_assets.Mono, s.ToString().ToUpperInvariant(), px, py, StatColor(s));
+        var rx = b.Right + 2;          // right gutter
+        Tag(Stat.Int, rx, b.Y + (int)(b.Height * 0.06f));   // head
+        Tag(Stat.Con, rx, b.Y + (int)(b.Height * 0.34f));   // chest
+        Tag(Stat.Str, rx, b.Y + (int)(b.Height * 0.50f));   // arms
+        Tag(Stat.Dex, rx, b.Y + (int)(b.Height * 0.74f));   // legs
     }
 
     // Build-screen ATTRIBUTE READOUT (design/02): a horizontal bar per stat — base (solid) + rune
