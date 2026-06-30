@@ -7,6 +7,10 @@ screens; style; templates) + figure-namespaced modular parts (state-keyed: healt
 armored + bare). Consume it. TOP: (1) UI rebuilt off the manifest; (2) the EQUIPMENT screen working.
 Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliably spec'd now.
 - LayoutRegistry: load `layout.json` (figures / gear / screens / style / templates).
+  PROGRESS: typed PARSER landed in Core (`Layout/LayoutManifest.cs`, pinned vs the real
+  manifest by LayoutManifestTests). Templates still raw (JsonElement) — type on consume.
+  NEXT: Game-side loader (read file via TitleContainer → `LayoutManifest.Parse`), then the
+  stage composer.
 - Stage composer: assemble a figure from its parts at manifest rects in `z`, swap part STATE by Core
   condition (bare vs armored), mount gear at `sockets` per `mounts`, scale into the slot by `pivot`.
   RETIRE Game1 `DrawHumanoid` hard offsets (the exploded figure).
