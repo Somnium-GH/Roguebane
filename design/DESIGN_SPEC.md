@@ -241,8 +241,11 @@ Nested layers, macro → micro:
   containers/templates, the shared style block) come from the generator-emitted manifest — see
   `design/LAYOUT_CONTRACT.md` + `design/SCREENS.md`. **Aspect-independent fill:** background
   scale-to-cover; HUD anchored to real edges; the pixel stage integer-scaled + centered (no bars).
-- **Two screens:** (1) **Build/loadout** cutaway (race+core anatomy, rune budget + ladder, equipped
-  gear, action loadout — sealed in combat); (2) **Combat** cutaway taking localized part damage.
+- **Screens** (design/ PNGs 01-05): (1) **Build/loadout** cutaway (race+core anatomy, rune budget +
+  ladder, equipped gear, action loadout — sealed in combat); (2) **Combat** cutaway taking localized
+  part damage; (3) **Run-map/chart** (design/03 — the fog-aware node graph + merchant, between fights);
+  the **campaign spine** (design/04) rides the run header. New-Run (design/05) is the build screen as
+  picker until race art lands. (Shell states today: Build + Run, the latter showing chart or combat.)
 - **Two registers:** world/combat bolder/more atmospheric; the **build screen clean + legible** — same
   high-fidelity bar, less flourish.
 - **Combat layout:** three zones, **you | battlefield | foe** (foe zone holds **1–3 structured
