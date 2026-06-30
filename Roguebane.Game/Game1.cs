@@ -482,8 +482,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawFoes(560, 90);
         DrawActionBar(40, H - 92);
         // Control hint — the targeting scheme is non-obvious (no fire button); helps POC playtesting.
-        Text(_assets.Mono, "click a foe limb to aim   charged modules fire on their own   right-click cancels",
-            48, H - 13, Muted);
+        // Kept left of the foe column (x<540) so it never collides with the bottom foe's HP bar.
+        Text(_assets.Mono, "click a foe limb to aim   right-click cancels", 48, H - 13, Muted);
         DrawStateOverlay();
     }
 
