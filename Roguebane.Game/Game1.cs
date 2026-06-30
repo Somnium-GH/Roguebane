@@ -661,7 +661,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         Panel(40, 90, 240, 410);
         Text(_assets.Mono, _build.Chassis.Id.ToUpper(), 56, 100, Muted);
         DrawFigureIn(preview, _build.Chassis.Id, "build", "paperDoll", 160, 470, 360);
-        DrawPips(preview, 56, 320, KitDemand());
+        DrawAttributeReadout(preview, _build.Chassis.NewBody(), 56, 318, KitDemand());
 
         DrawLadders(320, 100);
         DrawCoreBlock(700, 90);
@@ -829,6 +829,41 @@ public class Game1 : Microsoft.Xna.Framework.Game
         foreach (var t in _build.Loadout) d[t.Stat] = d.GetValueOrDefault(t.Stat) + t.Reserve;
         foreach (var m in _build.Chassis.MinionKit) d[m.Stat] = d.GetValueOrDefault(m.Stat) + m.Reserve;
         return d;
+    }
+
+    // Build-screen ATTRIBUTE READOUT (design/02): a horizontal bar per stat — base (solid) + rune
+    // marks (lighter extension), a gate notch at the kit's per-stat demand (amber if met, blood if
+    // over-pool), and the current total. Distinct from combat's pip widget (design/01).
+    private void DrawAttributeReadout(Body cur, Body baseBody, int x, int y, IReadOnlyDictionary<Stat, int> demand)
+    {
+        static string Part(Stat s) => s switch
+        { Stat.Str => "arms", Stat.Int => "head", Stat.Dex => "legs", Stat.Con => "chest", _ => "" };
+
+        for (var i = 0; i < StatColors.Length; i++)
+        {
+            var (s, color) = StatColors[i];
+            var top = y + i * 34;
+            Sprite(_assets.Attr(s), x, top, 20, 20, Color.White);
+            Text(_assets.Mono, s.ToString().ToUpperInvariant(), x + 26, top, color);
+            Text(_assets.Mono, Part(s), x + 26, top + 11, Muted);
+
+            var b = baseBody.Capacity(s);
+            var c = cur.Capacity(s);
+            var marks = c - b;
+            var gate = demand.TryGetValue(s, out var g) ? g : 0;
+
+            const int bx0 = 64, bw = 116, bh = 14;
+            var bx = x + bx0;
+            var top2 = top + 2;
+            var maxPts = Math.Max(Math.Max(c, gate), 6);
+            float unit = (float)bw / maxPts;
+            Rect(bx, top2, bw, bh, new Color(0x24, 0x1b, 0x14));            // slot
+            Rect(bx, top2, (int)(b * unit), bh, color);                     // base
+            if (marks > 0) Rect(bx + (int)(b * unit), top2, (int)(marks * unit), bh, new Color(color, 150)); // +marks
+            if (gate > 0) Rect(bx + (int)(gate * unit) - 1, top2 - 2, 2, bh + 4, gate <= c ? Amber : Blood);  // gate
+            Text(_assets.Mono, c.ToString(), bx + bw + 8, top2, Ink);
+            if (marks > 0) Text(_assets.Mono, "+" + marks, bx + bw + 26, top2 + 2, Muted);
+        }
     }
 
     // Lay a humanoid from its parts: head (INT), chest (CON), arms (STR ×2), legs (DEX ×2). Each
