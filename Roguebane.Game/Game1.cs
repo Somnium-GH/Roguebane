@@ -488,10 +488,31 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
         DrawWarParty(60, 72, 470);
         DrawChart();
+        DrawMapLegend(792, 64); // top-right; clears the header, war party, and the merchant panel below
         if (Exp.AtMerchant) DrawMerchant(560, 300);
         DrawGearBar(20, H - 44);
 
         DrawStateOverlay();
+    }
+
+    // Node-type key (design/03): what the chart icons mean. Display-only; tucked top-right where the
+    // chart is sparse (hidden behind the merchant panel at a merchant).
+    private void DrawMapLegend(int x, int y)
+    {
+        Text(_assets.Mono, "CHART", x, y - 16, Muted);
+        (NodeType Type, string Label)[] rows =
+        {
+            (NodeType.Castle, "castle / exit"),
+            (NodeType.Merchant, "merchant"),
+            (NodeType.ResourceHold, "resource hold"),
+            (NodeType.Unknown, "unknown / fight"),
+        };
+        for (var i = 0; i < rows.Length; i++)
+        {
+            var ry = y + i * 20;
+            Sprite(_assets.Node(rows[i].Type), x, ry, 16, 16, Color.White);
+            Text(_assets.Mono, rows[i].Label, x + 22, ry + 3, Muted);
+        }
     }
 
     // Out-of-combat gear bar (map screen): the body's EQUIPPED gear (wielded weapons + worn armor) and
