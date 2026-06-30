@@ -10,9 +10,10 @@ public sealed class Caster
     {
         public required Technique Tech;
         public int Countdown;
-        public ICombatTarget? Aimed; // per-technique target; null => follow the caster's default front
+        public ICombatTarget? Aimed; // per-technique target; null => no target (player) or default front (engine)
         public BodyPart? Part;       // per-technique PART aim within Aimed; null => whole-target HP
-        public bool Auto = true;     // AUTO: re-fire on cadence without a command. Off => charge & HOLD.
+        public bool Auto = true;     // AUTO: discharge on cadence when ready. Off => hold for a Fire() command.
+        public bool Persist = true;  // keep the target after a shot. Off (player default) => clear it (one-shot).
     }
 
     private const int BlockCap = 3;  // a held CON block absorbs at most this much off an HP hit (low scale)
@@ -21,6 +22,7 @@ public sealed class Caster
 
     private readonly Body _self;
     private Rng? _rng; // chance effects (evasion); set by Battle so a fight is reproducible
+    private readonly bool _requireAim; // player doctrine: techniques fire ONLY at an explicit aim — no front fallback
     private ICombatTarget? _default;
     private readonly SortedDictionary<string, Run> _active = new(StringComparer.Ordinal);
     private readonly SortedDictionary<string, Minion> _bays = new(StringComparer.Ordinal);
@@ -31,12 +33,17 @@ public sealed class Caster
     public int MaxCharge { get; }
     public int Charge => _charge;
 
-    public Caster(Body self, ICombatTarget? target = null, int maxCharge = 0)
+    // requireAim drives the PLAYER firing doctrine: a technique fires only at its own explicit aim
+    // (untargeted holds, never falling back to a default front). Engine casters (foe offense, sims)
+    // leave it false and keep the default-front auto-fire. Minions and Sustained reserves track the
+    // front in BOTH modes — only the per-technique offensive FSM is gated.
+    public Caster(Body self, ICombatTarget? target = null, int maxCharge = 0, bool requireAim = false)
     {
         _self = self;
         _default = target;
         MaxCharge = maxCharge;
         _charge = maxCharge;
+        _requireAim = requireAim;
     }
 
     // Battle hands every caster the fight's shared PRNG so chance rolls are deterministic.
@@ -73,8 +80,9 @@ public sealed class Caster
         if (_active.TryGetValue(technique.Id, out var run)) { run.Aimed = target; run.Part = part; }
     }
 
-    // Dismiss a technique's target: it drops its own aim and falls back to the caster's default front.
-    // (FSM: right-click dismisses the target.) Leaves the technique active and its auto flag untouched.
+    // Dismiss a technique's target: it drops its own aim. A player technique (requireAim) goes untargeted
+    // and HOLDS; an engine technique falls back to the default front. (FSM: right-click clears the target.)
+    // Leaves the technique active and its flags untouched.
     public void ClearAim(Technique technique)
     {
         if (_active.TryGetValue(technique.Id, out var run)) { run.Aimed = null; run.Part = null; }
@@ -91,6 +99,17 @@ public sealed class Caster
 
     public bool IsAuto(Technique technique) =>
         _active.TryGetValue(technique.Id, out var run) && run.Auto;
+
+    // Player AUTO toggle: whether a fired technique KEEPS its target (persist => keep firing each charge)
+    // or CLEARS it after the shot (one-shot — re-target to fire again). Distinct from the engine Auto
+    // flag above, which gates discharge-on-cadence.
+    public void SetPersist(Technique technique, bool persist)
+    {
+        if (_active.TryGetValue(technique.Id, out var run)) run.Persist = persist;
+    }
+
+    public bool IsPersist(Technique technique) =>
+        _active.TryGetValue(technique.Id, out var run) && run.Persist;
 
     // A charged technique is HOLDING when its countdown has elapsed (ready to discharge).
     public bool IsReady(Technique technique) =>
@@ -152,7 +171,12 @@ public sealed class Caster
         var reservation = Reservation(technique);
         if (reservation.Reserve <= 0) return false; // nothing to swing (no weapon to consult)
         if (!_self.Activate(reservation)) return false;
-        _active[technique.Id] = new Run { Tech = technique, Countdown = EffectiveCooldown(technique), Auto = auto };
+        // Player casters (requireAim) default to one-shot: a fired technique CLEARS its target. Engine
+        // casters persist the target (default-front auto-fire keeps landing).
+        _active[technique.Id] = new Run
+        {
+            Tech = technique, Countdown = EffectiveCooldown(technique), Auto = auto, Persist = !_requireAim,
+        };
         return true;
     }
 
@@ -203,10 +227,15 @@ public sealed class Caster
                 continue;
             }
 
-            // Timered: charge down to ready, then HOLD. Auto re-fires on cadence; a non-auto
-            // technique waits at the ready for a Fire() command (it does NOT discharge here).
+            // Timered: charge down to ready, then HOLD. Auto discharges on cadence (only if a target
+            // resolves — an untargeted player technique just holds); a non-auto technique waits for a
+            // Fire() command. A one-shot (non-persist) technique drops its target after a landed shot.
             if (run.Countdown > 0) run.Countdown--;
-            if (run.Countdown <= 0 && run.Auto) Discharge(run);
+            if (run.Countdown <= 0 && run.Auto && Discharge(run) && !run.Persist)
+            {
+                run.Aimed = null;
+                run.Part = null;
+            }
         }
 
         // Minions auto-fire on whatever the caster is pressing (the default front).
@@ -221,7 +250,8 @@ public sealed class Caster
     private bool Discharge(Run run)
     {
         var onAim = run.Aimed is { Down: false };
-        var target = onAim ? run.Aimed : _default;
+        // Player doctrine (requireAim): no live aim => HOLD, never falling back to the default front.
+        var target = onAim ? run.Aimed : (_requireAim ? null : _default);
         if (target is null || target.Down) return false;
 
         var part = onAim ? run.Part : null;

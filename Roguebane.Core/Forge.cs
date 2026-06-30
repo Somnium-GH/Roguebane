@@ -12,6 +12,8 @@ public static class Forge
         Run run)
     {
         var body = chassis.NewBody(runes);
+        // Session is the legacy linear-run + balance-sim path (unattended): keep default-front auto-fire.
+        // The interactive targeting FSM lives on the Expedition/Campaign mints below (requireAim).
         var caster = new Caster(body, run.Current.CurrentTarget, MagicCapacity(body));
         return new Session(PlayerFighter(body), caster, WithRuneGrants(loadout, runes), run);
     }
@@ -24,7 +26,7 @@ public static class Forge
         RunMap map)
     {
         var body = chassis.NewBody(runes);
-        var caster = new Caster(body, maxCharge: MagicCapacity(body));
+        var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true);
         return new Expedition(PlayerFighter(body), caster, WithRuneGrants(loadout, runes), map);
     }
 
@@ -36,7 +38,7 @@ public static class Forge
         IReadOnlyList<Func<RunMap>> legs)
     {
         var body = chassis.NewBody(runes);
-        var caster = new Caster(body, maxCharge: MagicCapacity(body));
+        var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true);
         return new Campaign(PlayerFighter(body), caster, WithRuneGrants(loadout, runes), legs);
     }
 

@@ -6,12 +6,20 @@ namespace Roguebane.Core.Tests;
 // party each leg.
 public class CampaignTests
 {
-    // Unattended drive-to-completion harness: arm + auto-on (player default is auto-OFF / hold).
+    // Unattended drive-to-completion harness: arm + AUTO on. The player requires an explicit aim to
+    // fire (no front fallback), so the harness re-aims at the first standing foe each tick (below).
     private static Campaign FullLoadout()
     {
         var c = Sessions.NewCampaign();
         foreach (var t in Techniques.All) { c.Toggle(t); c.SetAuto(t, true); }
         return c;
+    }
+
+    private static void AimAll(Campaign c)
+    {
+        var foe = c.Foes.FirstOrDefault(f => !f.Down);
+        if (foe is null) return;
+        foreach (var t in Techniques.All) if (c.IsActive(t)) c.Aim(t, foe);
     }
 
     private static void ClearLeg(Campaign c)
@@ -27,7 +35,7 @@ public class CampaignTests
     {
         c.Enter(node);
         var guard = 0;
-        while (c.Current.State == ExpeditionState.Fighting && guard++ < 10000) c.Tick();
+        while (c.Current.State == ExpeditionState.Fighting && guard++ < 10000) { AimAll(c); c.Tick(); }
     }
 
     [Fact]

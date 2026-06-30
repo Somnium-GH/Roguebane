@@ -20,7 +20,7 @@ public static class Sessions
     {
         var body = DemoBody();
         var run = Sieges.StandardRun();
-        var caster = new Caster(body, run.Current.CurrentTarget);
+        var caster = new Caster(body, run.Current.CurrentTarget); // Session = sim/legacy: default-front auto-fire
         return new Session(Forge.PlayerFighter(body), caster, Techniques.All, run);
     }
 
@@ -42,7 +42,7 @@ public static class Sessions
     public static Expedition Expedition()
     {
         var body = DemoBody();
-        var caster = new Caster(body, maxCharge: Forge.MagicCapacity(body));
+        var caster = new Caster(body, maxCharge: Forge.MagicCapacity(body), requireAim: true);
         return new Expedition(
             Forge.PlayerFighter(body), caster, Techniques.All, Maps.StandardLeg(autoResolveCastle: false));
     }
@@ -52,7 +52,7 @@ public static class Sessions
     public static Campaign NewCampaign()
     {
         var body = DemoBody();
-        var caster = new Caster(body);
+        var caster = new Caster(body, requireAim: true);
         var legs = new Func<RunMap>[]
         {
             () => Maps.StandardLeg(autoResolveCastle: false),

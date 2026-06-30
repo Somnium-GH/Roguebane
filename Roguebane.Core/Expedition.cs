@@ -89,23 +89,23 @@ public sealed class Expedition
     // Live per-technique state for the action-bar render (cooldown fill + card state).
     public Caster.TechStatus Status(Technique technique) => _caster.StatusOf(technique);
 
-    // The player toggle activates AUTO-OFF: the technique reserves its stat and charges, then HOLDS at
-    // the ready until the player fires (or flips Auto on). Nothing auto-targets or auto-fires by default.
+    // The player toggle POWERS a technique: it reserves its stat and charges. It does NOT target — an
+    // untargeted technique holds at the ready and fires nothing until the player aims it. (requireAim.)
     public void Toggle(Technique technique)
     {
         if (_caster.IsActive(technique)) _caster.Deactivate(technique);
-        else _caster.Activate(technique, auto: false);
+        else _caster.Activate(technique, auto: true); // discharges on cadence ONCE it has a target
     }
 
-    // FTL targeting surface for the shell: the live foes, per-technique aim, manual fire, and the
-    // auto toggle. Activation defaults AUTO-OFF — a technique charges and HOLDS at the ready until the
-    // player fires (or flips Auto on). Aiming a target never touches the auto flag.
+    // FTL targeting surface for the shell: the live foes, per-technique aim, and the AUTO toggle.
+    // A powered technique fires automatically when charged AND targeted (no fire button). AUTO off
+    // (default) is one-shot — it clears the target after the shot; AUTO on keeps firing at the target.
     public IReadOnlyList<Foe> Foes => Battle?.Encounter.Foes ?? Array.Empty<Foe>();
     public void Aim(Technique technique, ICombatTarget target) => _caster.Aim(technique, target);
-    public void ClearAim(Technique technique) => _caster.ClearAim(technique); // right-click dismisses target
+    public void ClearAim(Technique technique) => _caster.ClearAim(technique); // right-click clears the target
     public bool Fire(Technique technique) => _caster.Fire(technique);
-    public void SetAuto(Technique technique, bool auto) => _caster.SetAuto(technique, auto);
-    public bool IsAuto(Technique technique) => _caster.IsAuto(technique);
+    public void SetAuto(Technique technique, bool auto) => _caster.SetPersist(technique, auto);
+    public bool IsAuto(Technique technique) => _caster.IsPersist(technique);
     public bool IsReady(Technique technique) => _caster.IsReady(technique);
     public ICombatTarget? AimOf(Technique technique) => _caster.AimOf(technique);
 
