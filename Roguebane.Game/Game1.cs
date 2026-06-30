@@ -740,7 +740,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 var left = x + r * 56;
                 var filled = r < held;
                 var keystone = ladder[r].Keystone;
-                var glyph = _assets.Rune(keystone ? "keystone" : r == ladder.Count - 1 ? "path" : "mark");
+                // drop renamed rune/path -> path_major (top path rune); marks below it.
+                var glyph = _assets.Rune(keystone ? "keystone" : r == ladder.Count - 1 ? "path_major" : "mark");
                 Sprite(glyph, left, top, 48, 48, filled ? Color.White : new Color(110, 95, 80));
                 if (keystone) Border(left - 2, top - 2, 52, 52, Amber);
                 // Per-rung budget cost (discount-aware), so each rune reads as a priced card.
