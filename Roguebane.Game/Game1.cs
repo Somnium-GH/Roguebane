@@ -997,6 +997,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
         {
             var r = p.Rect; // x,y,w,h in figure space
             Sprite(_assets.Texture(p.SpriteKey), SX(r[0]), SY(r[1]), (int)(r[2] * f), (int)(r[3] * f), color);
+            // Composed armour indicator for parts with no armoured sprite row (torso/head/boots):
+            // ring the part so worn plate is visible (bare-capable parts already show armour via sprite).
+            if (allowBare && !FigureBinding.HasBareVariant(p.Part) && FigureBinding.IsArmored(body, p.Part))
+                Border(SX(r[0]), SY(r[1]), (int)(r[2] * f), (int)(r[3] * f), Amber);
         }
 
         // Gear: draw the body's ACTUAL wielded weapons at the hand sockets, each by its own gear

@@ -55,4 +55,22 @@ public class FigureBindingTests
         Assert.False(FigureBinding.UseBare(b, "torso"));
         Assert.False(FigureBinding.UseBare(b, "boots"));
     }
+
+    [Fact]
+    public void IsArmoredTracksTheGroupArmor()
+    {
+        var b = Humanoid(out _, out _, out _, out _);
+        Assert.False(FigureBinding.IsArmored(b, "torso"));
+        b.Equip(Shops.Plate); // CON / torso group
+        Assert.True(FigureBinding.IsArmored(b, "torso"));
+    }
+
+    [Fact]
+    public void OnlyLimbsHaveABareVariant()
+    {
+        Assert.True(FigureBinding.HasBareVariant("armL"));
+        Assert.True(FigureBinding.HasBareVariant("legR"));
+        Assert.False(FigureBinding.HasBareVariant("torso")); // -> shell draws a composed indicator
+        Assert.False(FigureBinding.HasBareVariant("head"));
+    }
 }

@@ -46,6 +46,14 @@ public static class FigureBinding
            && PartStat.TryGetValue(visualPart, out var stat)
            && body.ArmorOn(stat) is null;
 
+    // Is this visual part's group wearing armour?
+    public static bool IsArmored(Body body, string visualPart)
+        => PartStat.TryGetValue(visualPart, out var stat) && body.ArmorOn(stat) is not null;
+
+    // Whether this part has a bare/armoured sprite ROW. Parts without one (torso/head/boots) can't show
+    // armour through the sprite, so the shell draws a composed indicator instead.
+    public static bool HasBareVariant(string visualPart) => BareCapable.Contains(visualPart);
+
     private static PartCondition ConditionOf(Body body, IEnumerable<BodyPart> parts)
     {
         var cap = 0;
