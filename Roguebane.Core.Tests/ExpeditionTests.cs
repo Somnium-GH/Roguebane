@@ -193,6 +193,23 @@ public class ExpeditionTests
         Assert.Equal(RunMapOutcome.CastleCracked, exp.Map.Outcome);
     }
 
+    // Bank-on-CLEAR: landing a resource-hold banks nothing until its fight is won — fleeing it banks none.
+    [Fact]
+    public void AHoldBanksOnlyOnceItsFightIsCleared()
+    {
+        var exp = FullLoadout();
+        exp.Enter("a1"); // a resource-hold fight
+        Assert.Equal(ExpeditionState.Fighting, exp.State);
+        Assert.Equal(0, exp.Map.SupportBank); // not banked on arrival
+        FightToEnd(exp);
+        Assert.Equal(1, exp.Map.SupportBank); // banked on clear
+
+        var fled = FullLoadout();
+        fled.Enter("a1");
+        fled.Flee();
+        Assert.Equal(0, fled.Map.SupportBank); // abandoned mid-fight -> nothing banked
+    }
+
     [Fact]
     public void BankedHoldsFeedTheCastleSupport()
     {

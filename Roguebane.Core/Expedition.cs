@@ -155,7 +155,7 @@ public sealed class Expedition
                 _stash.AddGold(Spoils(Map.Current.Type)); // spoils for taking the node
                 _caster.Recharge();                       // magic refills in the lull after a fight
                 if (Map.AtCastle) { Map.CrackCastle(); State = ExpeditionState.Won; }
-                else State = ExpeditionState.Choosing;
+                else { Map.BankHold(); State = ExpeditionState.Choosing; } // a cleared hold banks support
                 break;
         }
     }

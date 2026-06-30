@@ -55,6 +55,13 @@ public sealed class RunMap
         if (Outcome == RunMapOutcome.Marching && AtCastle) Outcome = RunMapOutcome.CastleCracked;
     }
 
+    // The combat driver CLEARED the current resource-hold: bank its rallied support now (not on arrival,
+    // so a hold abandoned mid-fight banks nothing). Standalone navigation banks in MoveTo instead.
+    public void BankHold()
+    {
+        if (Outcome == RunMapOutcome.Marching && Current.Type == NodeType.ResourceHold) SupportBank++;
+    }
+
     public IReadOnlyList<MapNode> Options => Current.Next.Select(id => _nodes[id]).ToList();
 
     public MapNode Node(string id) => _nodes[id];
@@ -81,7 +88,8 @@ public sealed class RunMap
         Outcome == RunMapOutcome.Marching && Supplies > 0 && Current.Next.Contains(nodeId);
 
     // Jump to a charted neighbour: spend a supply, the war party advances a step, then resolve the
-    // node we land on. Banking a resource-hold and cracking the castle happen on arrival.
+    // node we land on. In standalone navigation (no combat driver) a resource-hold banks and the castle
+    // cracks on ARRIVAL; with a combat driver (Expedition) both happen on CLEAR — see BankHold/CrackCastle.
     public bool MoveTo(string nodeId)
     {
         if (!CanMoveTo(nodeId)) return false;
@@ -92,15 +100,12 @@ public sealed class RunMap
         AdvanceWarParty();
         if (Outcome != RunMapOutcome.Marching) return true;
 
-        switch (Current.Type)
-        {
-            case NodeType.ResourceHold:
-                SupportBank++;
-                break;
-            case NodeType.Castle:
-                if (_autoResolveCastle) Outcome = RunMapOutcome.CastleCracked;
-                break;
-        }
+        if (_autoResolveCastle) // standalone nav: there is no fight to win, so resolve on arrival
+            switch (Current.Type)
+            {
+                case NodeType.ResourceHold: SupportBank++; break;
+                case NodeType.Castle: Outcome = RunMapOutcome.CastleCracked; break;
+            }
 
         // Out of supplies short of the castle: the march can't continue and the war party arrives.
         if (Supplies == 0 && Outcome == RunMapOutcome.Marching && !AtCastle)
