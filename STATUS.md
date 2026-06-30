@@ -37,10 +37,13 @@ body honoring the gates; Body.Unequip added. Pinned in GearingTests (6).
 **G2 gear acquisition — DONE (Core).** Merchant sells weapons/armor (Shops stock, placeholder prices)
 into the Stash pack via Expedition.BuyWeapon/BuyArmor. The acquire→carry→equip loop is now whole and
 Core-testable; only the SHELL surface is missing. Pinned in ExpeditionTests.
-Next actionable (G2 shell):
-- Merchant gear UI: at a merchant, paint OfferedWeapons/OfferedArmor + prices as buy verbs (mirror the
-  potion/heal buttons), wired to BuyWeapon/BuyArmor. Verify on the merchant RB_SMOKE.
-- Then build-screen equip UI (pack tab + equip via Gearing) + equipped-gear-on-anatomy render.
+**Merchant gear UI — DONE.** Gear stock as buy chips (name+price, dimmed when unaffordable) → BuyWeapon/
+BuyArmor. Map RB_SMOKE shows sword/dagger/plate with affordability.
+Next actionable (G2 shell — last piece):
+- Build-screen / run equip UI: a pack panel listing Stash.Weapons/Armor; clicking a piece equips it via
+  Gearing (Stash + the player Body); show wielded weapons + worn armor on the anatomy. Needs a Body+Stash
+  equip entry point reachable from the shell (Expedition exposes Player.Body + Stash; add Equip passthroughs
+  or call Gearing directly). Then equipped-gear-on-anatomy render. Verify via RB_SMOKE.
 - INT-channel sustained kind: DEFERRED as speculative — no beam content authored (Ember/Drain are fine
   as Timered bolts). Build it when a channel weapon is authored.
 - Foe -> PLAYER part aim PARKED (Needs human): HP-vs-stat split; whole-HP foe contract pinned by FoeOffenseTests.
