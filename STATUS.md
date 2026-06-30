@@ -32,12 +32,13 @@ anatomy still blocked on gear/minion equip (G2/G7).
 via RunMap.BankHold); standalone nav still banks on arrival. Pinned in ExpeditionTests.
 **Spine strip — DONE** (design/04 partial): Capital peak marker + cities-taken counter on the linear leg
 chain. Full branching city-graph parked (needs a branching campaign model — Needs human).
-Next actionable:
-- G2 gear/equip END TO END is the main remaining buildable gameplay gap. Core equip primitives EXIST
-  (Body.Wield / Body.Equip, Weapon/Armor content in Armory) — what's missing is an INVENTORY (the Stash
-  carries gold/potions only, no gear) + an acquisition path + the build-screen equip UI + equipped-gear
-  on the anatomy. First slice: add gear to the Stash inventory + an equip/unequip action with tests.
-  (Check how gear should be ACQUIRED — if that needs a design call, park that part.)
+**G2 gear inventory + equip — DONE (Core).** Stash carries a gear pack; Gearing moves pieces on/off the
+body honoring the gates; Body.Unequip added. Pinned in GearingTests (6).
+Next actionable (G2 continues):
+- Gear ACQUISITION: stock the merchant with a couple of weapons/armor at placeholder prices (mirrors the
+  potion/heal shop; deterministic), buy -> Stash.AddWeapon/AddArmor. Then the player can acquire gear.
+  (Gear set + prices = balance, placeholder-sane per loop; flag for human tuning.)
+- Then build-screen equip UI (inventory tab + equip via Gearing) + equipped-gear-on-anatomy render.
 - INT-channel sustained kind: DEFERRED as speculative — no beam content authored (Ember/Drain are fine
   as Timered bolts). Build it when a channel weapon is authored.
 - Foe -> PLAYER part aim PARKED (Needs human): HP-vs-stat split; whole-HP foe contract pinned by FoeOffenseTests.
