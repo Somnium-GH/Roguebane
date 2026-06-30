@@ -1,104 +1,36 @@
 # Status
 
 ## Current target
-**Wire the shell to `layout.json` — the deterministic layout system is LIVE (manifest landed).**
-Claude Design shipped `Roguebane.Content/layout.json` (figures: parts/sockets/z/gear-mounts; gear; all 5
-screens; style; templates) + figure-namespaced modular parts (state-keyed: healthy/damaged/broken,
-armored + bare). Consume it. TOP: (1) UI rebuilt off the manifest; (2) the EQUIPMENT screen working.
-Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliably spec'd now.
-- LayoutRegistry: load `layout.json` (figures / gear / screens / style / templates).
-  PROGRESS: typed PARSER landed in Core (`Layout/LayoutManifest.cs`, pinned vs the real
-  manifest by LayoutManifestTests). Templates still raw (JsonElement) — type on consume.
-  Game-side `LayoutRegistry` DONE (loads layout.json from output Content, tolerant null on
-  gap); layout.json single-sourced from Roguebane.Content via linked copy-to-output. Built
-  content mgcb resynced to the drop's asset set (Game build was broken — 147 stale-sprite
-  errors; now green). Stage composer DONE in Core (`Layout/StageComposer.cs`): ComposeFigure
-  (z-ordered, state-keyed part placements, data-driven suffixes) + ComposeGear (socket-anchored
-  mounts), pinned by StageComposerTests. FigureBinding DONE in Core (`Layout/FigureBinding.cs`,
-  pinned): per-visual-part condition (L/R limb split) + armored-vs-bare choice — the composer's
-  resolvers. NEXT: Game-side blit — DrawHumanoid → StageComposer.ComposeFigure(figureId,
-  p=>FigureBinding.Condition(body,p), p=>FigureBinding.UseBare(body,p)), draw each placement rect
-  scaled by figure `pivot` into the slot, mount gear by gear `pivot`; RETIRE the hard offsets +
-  dead `base_*` sprite paths. FIGURE BLIT DONE: DrawHumanoid rewired onto StageComposer/
-  FigureBinding (parts at manifest rects, state-keyed, scaled by size/pivot; gear at sockets by
-  gear pivot); legacy stat-offset kept only as a missing-manifest fallback. Chassis figure key
-  threaded through assembly (Expedition.FigureId / Campaign, set from chassis.Id). NEXT: VERIFY
-  via RB_SMOKE (build + combat figure vs design PNG) — needs a human/automated smoke run (loop
-  defers: RB_SMOKE opens a GL window). SCREENS-from-manifest STARTED: anchor resolver landed in
-  Core (`Layout/ScreenLayout.cs`: anchor+offset+size -> design-space LayoutRect, every anchor
-  pinned). NEXT: design->screen VIEWPORT pass (cover bg + integer pixel stage scaling a 960x540
-  design space to the window) so the shell can blit resolved rects. CORRECTION: the viewport pass
-  ALREADY EXISTS (Game1 renders the 960x540 design into the `_scene` RenderTarget, then letterbox-
-  scales to the window) — so resolved design-space rects blit directly, no extra pass needed.
-  PaletteColor landed in Core (`Layout/PaletteColor.cs`: hex->Rgba + named lookup, every real
-  palette entry pinned). Core manifest-consumption toolkit now COMPLETE: manifest parse, figure
-  composer+binding+blit, ScreenLayout rects, PaletteColor. NEXT (Game, blind without RB_SMOKE):
-  drive each screen's draw off `screen.elements` via ScreenLayout + PaletteColor + AssetRegistry,
-  guarded by manifest-present fallback; retire magic rects; all five. Then Equipment screen.
-  TEMPLATES DONE in Core (typed Template/TemplatePart + `Layout/CardTemplate.cs` stamping, pinned)
-  — resolves the reconcile-on-consume debt. Core toolkit now fully typed + tested: parse, figure
-  composer/binding/blit, ScreenLayout, PaletteColor, CardTemplate. ALL remaining layout work is
-  Game-side rendering (blind without RB_SMOKE) — drive screens off elements/templates, then the
-  Equipment screen. STARTED: `ManifestUi` bridge (Game) maps manifest -> MonoGame (ElementRect via
-  ScreenLayout, Color via PaletteColor, all tolerant). First consumption: figure placement now reads
-  the manifest figure elements (build `paperDoll`, combat `heroFigure`) via DrawFigureIn, fallback to
-  guessed coords. NEXT: migrate more combat/build elements off magic numbers (backdrop, statusStrip,
-  attrPool, actionBar, top buttons) using ManifestUi; then the other 3 screens + Equipment screen.
-  RB_SMOKE WORKS HEADLESSLY (loop CAN verify): `RB_SMOKE=1 RB_SHOT=x.png RB_SCREEN=<build|combat|
-  map> dotnet run --project Roguebane.Game` renders + saves a PNG + exits. All 5 screens verified
-  rendering correctly post-drop; figure system (player + foes) confirmed. Foe rendering migrated off
-  the DELETED `sprites/char/ogre` onto the composer (Foe.Figure) — clean-build-safe. NEXT: migrate
-  more combat/build elements off magic numbers via ManifestUi (verify each with a smoke shot), then
-  the other screens' polish + Equipment screen. Verification is now part of the loop — smoke each
-  visual change. AssetRegistry maps realigned to the drop's renamed icons (node resource, attr
-  intellect, technique glyphs) — clean-build-safe, verified on the map. Pips now use the drop's
-  per-stat coloured art (full_<stat>/reserved_<stat>/damage; fixed deleted pip_damaged), verified on
-  build. FOUR stale-asset bugs fixed (foe sprite, icon maps, pips, rune path->path_major); full
-  asset-string sweep done (Resource/Reticle/Button/Background/Chassis/Technique cross-checked clean).
-  VERIFIED FROM SCRATCH: wiped Content/bin+obj and Game bin+obj, rebuilt, smoked all 5 screens — all
-  render, no MISS, no stale-.xnb dependency. Drop integration solid. GOTCHA: bundled spritefonts are
-  ASCII-only — Text() with a non-ASCII glyph (e.g. U+00B7) THROWS at draw; keep shell text ASCII until
-  wider-coverage open fonts are bundled.
-  design/02 BUILD started: attribute READOUT bars (base + rune-marks + gate notch + total per stat)
-  replace the build pip rows per design/02 (combat keeps the pip widget per design/01) — verified.
-  Chassis-anatomy stat callouts (INT/CON/STR/DEX tags by the figure parts) DONE — verified.
-  Gear-on-figure FIXED: the composer drew only a figure's fixed default mounts, so real equipped
-  weapons (dagger on a summoner) never showed; DrawHumanoid now draws each body.Hands weapon at a
-  hand socket by its own gear sprite — verified (dagger renders at the hand). NOTE: weapon sits a
-  bit low (socket+pivot tuning is manifest/art polish, not blocking).
-  Minion sprites now fill the BAYS lane (skeleton sprite; shade falls back to disc) — verified. The
-  design/01 battlefield minionField figure is DEFERRED: its manifest slot collides with the hand-
-  placed BAYS/SUPPORT lanes — unblocks once combat is rebuilt to the manifest layout (the big combat job).
-  Foe creature-name tags (OGRE/TROLL) added — verified. SAFE per-element combat wins are now EXHAUSTED:
-  every manifest position collides with the dense hand-placed combat layout, so further combat design-
-  match needs a COHERENT full rebuild (all elements to manifest at once: statusStrip, attrPool, actionBar
-  + buttons, techList, bayList, foe column, hero/foe/minion figures) — a larger deliberate unit, and
-  clicks aren't smoke-verifiable so draw+hit must derive from one shared rect. Flag for a focused pass.
-  Map node-type legend (design/03) added — verified. Supplies header now reads remaining/max
-  (RunMap.MaxSupplies, pinned) per design/03 — verified. design/03 remaining: Mastered-Support as
-  leg-name header — minor. Support now reads banked/holds (1/2) per design/03 — verified.
-  Remaining design/02: Inventory tabs (GEAR/TECH/MINIONS) + item cards, Rune Bag panel,
-  Current-Core/Action-Bar bottom row. NOTE: inventory tabs + rune-bag + action-bar relocation are
-  INPUT-COUPLED (click-equip, ladder/card hit-tests) — each needs draw+hit derived from ONE source
-  and isn't click-verifiable via smoke; treat as careful single-unit slices, not micro-fragments.
-  Combat still matches design/01 only
-  loosely — the bigger remaining job is rebuilding combat to design/01 (prominent bottom Attribute-
-  Pool + Action-Bar panels, figures in the open battlefield) in small smoke-verified slices.
-- Stage composer: assemble a figure from its parts at manifest rects in `z`, swap part STATE by Core
-  condition (bare vs armored), mount gear at `sockets` per `mounts`, scale into the slot by `pivot`.
-  RETIRE Game1 `DrawHumanoid` hard offsets (the exploded figure).
-- Screens FROM the manifest: place every element by anchor+offset+size + templates + the style block;
-  retire magic-number rects; do all five.
-- EQUIPMENT screen (design/02): the equip system is built in Core — render its manifest UI (Equipment
-  panel, Inventory tabs GEAR/TECH/MINIONS, click/drag-equip, gear-on-anatomy, Rune Bag, Current Core,
-  Action Bar loadout).
-- Viewport: aspect-independent fill (cover bg + anchored HUD via anchors + integer pixel stage).
-- Verify each screen per the loop rule (RB_SMOKE shot vs the design PNG + `design/SCREENS.md`).
-FEATURE-FLAG asset-gated work — a simple `Features` toggle, DEFAULT OFF: build it FULLY but render
-NOTHING when off (no crash, no weird draw); flip/remove the flag when the art lands, log the gap under
-"Asset gaps". Two cases: the WAR-PARTY advance UI (needs a war-party token + camp marker) and the
-RACE + CORE-RUNE two-step NEW RUN (needs race art). Keep the CURRENT single-core New Run working until
-race art exists. (This activates the FOUNDATION section below.)
+**Shell wired to `layout.json` — integration DONE; remaining = a deliberate combat manifest rebuild + the Equipment screen.**
+Core manifest toolkit COMPLETE + pinned: `Layout/` LayoutManifest (parse), StageComposer + FigureBinding
+(figure assembly), ScreenLayout (anchor->rect), PaletteColor, CardTemplate. Game consumes it via
+`LayoutRegistry` + `ManifestUi` (tolerant ElementRect/Color). Figures (player + foes) compose from the
+manifest; chassis figure key threaded through assembly (Expedition/Campaign.FigureId). Clean content
+build certified from scratch (226 Core tests, all 5 screens smoke clean, no stale-.xnb).
+- Four stale-asset bugs fixed (foe sprite, icon maps, pips, rune path); full asset-string sweep clean.
+- design/02 build: attribute-readout bars + anatomy stat callouts. Gear-on-figure draws the actual
+  wielded weapon. design/03 map: node legend + supplies remaining/max + support banked/holds.
+- Combat: foe figure variety (ogre/troll/bandit/skeleton) + name tags; minion sprites in the bay lane.
+
+VERIFY loop: `RB_SMOKE=1 RB_SHOT=x.png RB_SCREEN=<build|combat|map> dotnet run --project Roguebane.Game`
+renders a PNG + exits (headless). Smoke every visual change. GOTCHA: spritefonts are ASCII-only — a
+non-ASCII glyph in Text() THROWS at draw.
+
+REMAINING (deliberate / not safe 1-min fragments):
+- COMBAT -> design/01 full manifest rebuild: every manifest position collides with the dense hand-placed
+  layout, so all elements must move at once (statusStrip, attrPool, actionBar+buttons, techList, bayList,
+  foe column, hero/foe/minion figures). Needs layout judgment (3 foes vs 1 manifest slot; homeless
+  PAUSE/FLEE) + draw&hit from ONE shared rect (clicks aren't smoke-verifiable). Unblocks the battlefield
+  minionField figure too.
+- EQUIPMENT screen (design/02): no screen state yet (only Build/Run). Inventory tabs (GEAR/TECH/MINIONS) +
+  item cards, Rune Bag, click/drag-equip — INPUT-COUPLED features needing input wiring + mid-run stash.
+- Asset gaps (see section): skirmish node icon, wraith/gargoyle figure art, torso bare-variant (plate
+  invisible on the figure), bundled open fonts.
+
+FEATURE-FLAG asset-gated work — `Features` toggle DEFAULT OFF: build FULLY but render NOTHING when off;
+flip when art lands. Cases: WAR-PARTY advance UI (war-party token + camp marker); RACE + CORE-RUNE
+two-step NEW RUN (race art). Keep the current single-core New Run until race art exists.
+
 
 ## Recently shipped (combat + UI — details in git)
 **Targeting/firing FSM — DONE (core + shell, incl. global AUTO).** (most shipped, 167 tests.)
