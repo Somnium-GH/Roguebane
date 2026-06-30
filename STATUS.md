@@ -69,6 +69,11 @@ Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliabl
   Minion sprites now fill the BAYS lane (skeleton sprite; shade falls back to disc) — verified. The
   design/01 battlefield minionField figure is DEFERRED: its manifest slot collides with the hand-
   placed BAYS/SUPPORT lanes — unblocks once combat is rebuilt to the manifest layout (the big combat job).
+  Foe creature-name tags (OGRE/TROLL) added — verified. SAFE per-element combat wins are now EXHAUSTED:
+  every manifest position collides with the dense hand-placed combat layout, so further combat design-
+  match needs a COHERENT full rebuild (all elements to manifest at once: statusStrip, attrPool, actionBar
+  + buttons, techList, bayList, foe column, hero/foe/minion figures) — a larger deliberate unit, and
+  clicks aren't smoke-verifiable so draw+hit must derive from one shared rect. Flag for a focused pass.
   Remaining design/02: Inventory tabs (GEAR/TECH/MINIONS) + item cards, Rune Bag panel,
   Current-Core/Action-Bar bottom row. NOTE: inventory tabs + rune-bag + action-bar relocation are
   INPUT-COUPLED (click-equip, ladder/card hit-tests) — each needs draw+hit derived from ONE source
