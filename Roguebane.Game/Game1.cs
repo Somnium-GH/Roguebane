@@ -77,6 +77,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         _build = Sessions.NewBuild(); // start on the build screen; Launch threads into the siege
 
+        // Smoke: RB_CHASSIS=<index> selects a chassis on the build screen, so every chassis figure
+        // (humanoid + robed) can be RB_SMOKE-verified, not just the default.
+        if (_smoke && int.TryParse(Environment.GetEnvironmentVariable("RB_CHASSIS"), out var ci))
+            _build.CycleChassis(ci - _build.ChassisIndex);
+
         if (_smokeScreen is "combat" or "map") // march the real loop for the screenshot
         {
             _build.CycleChassis(3);          // -> the Summoner (3 bays; fields Skeleton+Shade) for the bay lane
