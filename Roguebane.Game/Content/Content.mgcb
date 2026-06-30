@@ -23,6 +23,7 @@
 /processor:FontDescriptionProcessor
 /build:mono.spritefont
 
+
 #---------------------------------- Content ---------------------------------#
 
 #begin bg/build_alcove
@@ -91,7 +92,7 @@
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/icons/attr/dexterity.png;icons/attr/dexterity
 
-#begin icons/attr/intelligence
+#begin icons/attr/intellect
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -100,7 +101,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/icons/attr/intelligence.png;icons/attr/intelligence
+/build:../../Roguebane.Content/icons/attr/intellect.png;icons/attr/intellect
 
 #begin icons/attr/strength
 /importer:TextureImporter
@@ -112,6 +113,17 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/icons/attr/strength.png;icons/attr/strength
+
+#begin icons/minion/skeleton
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/icons/minion/skeleton.png;icons/minion/skeleton
 
 #begin icons/node/camp
 /importer:TextureImporter
@@ -135,17 +147,6 @@
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/icons/node/castle.png;icons/node/castle
 
-#begin icons/node/control
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/icons/node/control.png;icons/node/control
-
 #begin icons/node/merchant
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -157,7 +158,7 @@
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/icons/node/merchant.png;icons/node/merchant
 
-#begin icons/node/mountain
+#begin icons/node/resource
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -166,18 +167,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/icons/node/mountain.png;icons/node/mountain
-
-#begin icons/node/skirmish
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/icons/node/skirmish.png;icons/node/skirmish
+/build:../../Roguebane.Content/icons/node/resource.png;icons/node/resource
 
 #begin icons/node/unknown
 /importer:TextureImporter
@@ -256,7 +246,7 @@
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/icons/rune/mark.png;icons/rune/mark
 
-#begin icons/rune/path
+#begin icons/rune/path_major
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -265,7 +255,18 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/icons/rune/path.png;icons/rune/path
+/build:../../Roguebane.Content/icons/rune/path_major.png;icons/rune/path_major
+
+#begin icons/rune/path_minor
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/icons/rune/path_minor.png;icons/rune/path_minor
 
 #begin icons/technique/brace
 /importer:TextureImporter
@@ -277,17 +278,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/icons/technique/brace.png;icons/technique/brace
-
-#begin icons/technique/cleave
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/icons/technique/cleave.png;icons/technique/cleave
 
 #begin icons/technique/disarm
 /importer:TextureImporter
@@ -333,7 +323,7 @@
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/icons/technique/swing.png;icons/technique/swing
 
-#begin sprites/body/arm/armor_broken
+#begin sprites/body/adept/armL_broken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -342,9 +332,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/arm/armor_broken.png;sprites/body/arm/armor_broken
+/build:../../Roguebane.Content/sprites/body/adept/armL_broken.png;sprites/body/adept/armL_broken
 
-#begin sprites/body/arm/armor_damaged
+#begin sprites/body/adept/armL_damaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -353,9 +343,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/arm/armor_damaged.png;sprites/body/arm/armor_damaged
+/build:../../Roguebane.Content/sprites/body/adept/armL_damaged.png;sprites/body/adept/armL_damaged
 
-#begin sprites/body/arm/armor_healthy
+#begin sprites/body/adept/armL_healthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -364,9 +354,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/arm/armor_healthy.png;sprites/body/arm/armor_healthy
+/build:../../Roguebane.Content/sprites/body/adept/armL_healthy.png;sprites/body/adept/armL_healthy
 
-#begin sprites/body/arm/base_broken
+#begin sprites/body/adept/armR_broken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -375,9 +365,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/arm/base_broken.png;sprites/body/arm/base_broken
+/build:../../Roguebane.Content/sprites/body/adept/armR_broken.png;sprites/body/adept/armR_broken
 
-#begin sprites/body/arm/base_damaged
+#begin sprites/body/adept/armR_damaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -386,9 +376,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/arm/base_damaged.png;sprites/body/arm/base_damaged
+/build:../../Roguebane.Content/sprites/body/adept/armR_damaged.png;sprites/body/adept/armR_damaged
 
-#begin sprites/body/arm/base_healthy
+#begin sprites/body/adept/armR_healthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -397,9 +387,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/arm/base_healthy.png;sprites/body/arm/base_healthy
+/build:../../Roguebane.Content/sprites/body/adept/armR_healthy.png;sprites/body/adept/armR_healthy
 
-#begin sprites/body/arm/robe_blue_broken
+#begin sprites/body/adept/head_broken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -408,9 +398,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/arm/robe_blue_broken.png;sprites/body/arm/robe_blue_broken
+/build:../../Roguebane.Content/sprites/body/adept/head_broken.png;sprites/body/adept/head_broken
 
-#begin sprites/body/arm/robe_blue_damaged
+#begin sprites/body/adept/head_damaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -419,9 +409,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/arm/robe_blue_damaged.png;sprites/body/arm/robe_blue_damaged
+/build:../../Roguebane.Content/sprites/body/adept/head_damaged.png;sprites/body/adept/head_damaged
 
-#begin sprites/body/arm/robe_blue_healthy
+#begin sprites/body/adept/head_healthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -430,9 +420,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/arm/robe_blue_healthy.png;sprites/body/arm/robe_blue_healthy
+/build:../../Roguebane.Content/sprites/body/adept/head_healthy.png;sprites/body/adept/head_healthy
 
-#begin sprites/body/arm/robe_cloth_broken
+#begin sprites/body/adept/torso_broken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -441,9 +431,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/arm/robe_cloth_broken.png;sprites/body/arm/robe_cloth_broken
+/build:../../Roguebane.Content/sprites/body/adept/torso_broken.png;sprites/body/adept/torso_broken
 
-#begin sprites/body/arm/robe_cloth_damaged
+#begin sprites/body/adept/torso_damaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -452,9 +442,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/arm/robe_cloth_damaged.png;sprites/body/arm/robe_cloth_damaged
+/build:../../Roguebane.Content/sprites/body/adept/torso_damaged.png;sprites/body/adept/torso_damaged
 
-#begin sprites/body/arm/robe_cloth_healthy
+#begin sprites/body/adept/torso_healthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -463,9 +453,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/arm/robe_cloth_healthy.png;sprites/body/arm/robe_cloth_healthy
+/build:../../Roguebane.Content/sprites/body/adept/torso_healthy.png;sprites/body/adept/torso_healthy
 
-#begin sprites/body/arm/robe_violet_broken
+#begin sprites/body/bandit/armL_broken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -474,9 +464,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/arm/robe_violet_broken.png;sprites/body/arm/robe_violet_broken
+/build:../../Roguebane.Content/sprites/body/bandit/armL_broken.png;sprites/body/bandit/armL_broken
 
-#begin sprites/body/arm/robe_violet_damaged
+#begin sprites/body/bandit/armL_damaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -485,9 +475,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/arm/robe_violet_damaged.png;sprites/body/arm/robe_violet_damaged
+/build:../../Roguebane.Content/sprites/body/bandit/armL_damaged.png;sprites/body/bandit/armL_damaged
 
-#begin sprites/body/arm/robe_violet_healthy
+#begin sprites/body/bandit/armL_healthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -496,9 +486,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/arm/robe_violet_healthy.png;sprites/body/arm/robe_violet_healthy
+/build:../../Roguebane.Content/sprites/body/bandit/armL_healthy.png;sprites/body/bandit/armL_healthy
 
-#begin sprites/body/chest/armor_broken
+#begin sprites/body/bandit/armR_broken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -507,9 +497,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/chest/armor_broken.png;sprites/body/chest/armor_broken
+/build:../../Roguebane.Content/sprites/body/bandit/armR_broken.png;sprites/body/bandit/armR_broken
 
-#begin sprites/body/chest/armor_damaged
+#begin sprites/body/bandit/armR_damaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -518,9 +508,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/chest/armor_damaged.png;sprites/body/chest/armor_damaged
+/build:../../Roguebane.Content/sprites/body/bandit/armR_damaged.png;sprites/body/bandit/armR_damaged
 
-#begin sprites/body/chest/armor_healthy
+#begin sprites/body/bandit/armR_healthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -529,9 +519,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/chest/armor_healthy.png;sprites/body/chest/armor_healthy
+/build:../../Roguebane.Content/sprites/body/bandit/armR_healthy.png;sprites/body/bandit/armR_healthy
 
-#begin sprites/body/chest/base_broken
+#begin sprites/body/bandit/boots_broken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -540,9 +530,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/chest/base_broken.png;sprites/body/chest/base_broken
+/build:../../Roguebane.Content/sprites/body/bandit/boots_broken.png;sprites/body/bandit/boots_broken
 
-#begin sprites/body/chest/base_damaged
+#begin sprites/body/bandit/boots_damaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -551,9 +541,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/chest/base_damaged.png;sprites/body/chest/base_damaged
+/build:../../Roguebane.Content/sprites/body/bandit/boots_damaged.png;sprites/body/bandit/boots_damaged
 
-#begin sprites/body/chest/base_healthy
+#begin sprites/body/bandit/boots_healthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -562,9 +552,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/chest/base_healthy.png;sprites/body/chest/base_healthy
+/build:../../Roguebane.Content/sprites/body/bandit/boots_healthy.png;sprites/body/bandit/boots_healthy
 
-#begin sprites/body/chest/robe_blue_broken
+#begin sprites/body/bandit/head_broken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -573,9 +563,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/chest/robe_blue_broken.png;sprites/body/chest/robe_blue_broken
+/build:../../Roguebane.Content/sprites/body/bandit/head_broken.png;sprites/body/bandit/head_broken
 
-#begin sprites/body/chest/robe_blue_damaged
+#begin sprites/body/bandit/head_damaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -584,9 +574,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/chest/robe_blue_damaged.png;sprites/body/chest/robe_blue_damaged
+/build:../../Roguebane.Content/sprites/body/bandit/head_damaged.png;sprites/body/bandit/head_damaged
 
-#begin sprites/body/chest/robe_blue_healthy
+#begin sprites/body/bandit/head_healthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -595,9 +585,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/chest/robe_blue_healthy.png;sprites/body/chest/robe_blue_healthy
+/build:../../Roguebane.Content/sprites/body/bandit/head_healthy.png;sprites/body/bandit/head_healthy
 
-#begin sprites/body/chest/robe_cloth_broken
+#begin sprites/body/bandit/legL_broken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -606,9 +596,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/chest/robe_cloth_broken.png;sprites/body/chest/robe_cloth_broken
+/build:../../Roguebane.Content/sprites/body/bandit/legL_broken.png;sprites/body/bandit/legL_broken
 
-#begin sprites/body/chest/robe_cloth_damaged
+#begin sprites/body/bandit/legL_damaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -617,9 +607,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/chest/robe_cloth_damaged.png;sprites/body/chest/robe_cloth_damaged
+/build:../../Roguebane.Content/sprites/body/bandit/legL_damaged.png;sprites/body/bandit/legL_damaged
 
-#begin sprites/body/chest/robe_cloth_healthy
+#begin sprites/body/bandit/legL_healthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -628,9 +618,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/chest/robe_cloth_healthy.png;sprites/body/chest/robe_cloth_healthy
+/build:../../Roguebane.Content/sprites/body/bandit/legL_healthy.png;sprites/body/bandit/legL_healthy
 
-#begin sprites/body/chest/robe_violet_broken
+#begin sprites/body/bandit/legR_broken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -639,9 +629,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/chest/robe_violet_broken.png;sprites/body/chest/robe_violet_broken
+/build:../../Roguebane.Content/sprites/body/bandit/legR_broken.png;sprites/body/bandit/legR_broken
 
-#begin sprites/body/chest/robe_violet_damaged
+#begin sprites/body/bandit/legR_damaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -650,9 +640,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/chest/robe_violet_damaged.png;sprites/body/chest/robe_violet_damaged
+/build:../../Roguebane.Content/sprites/body/bandit/legR_damaged.png;sprites/body/bandit/legR_damaged
 
-#begin sprites/body/chest/robe_violet_healthy
+#begin sprites/body/bandit/legR_healthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -661,9 +651,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/chest/robe_violet_healthy.png;sprites/body/chest/robe_violet_healthy
+/build:../../Roguebane.Content/sprites/body/bandit/legR_healthy.png;sprites/body/bandit/legR_healthy
 
-#begin sprites/body/head/armor_broken
+#begin sprites/body/bandit/torso_broken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -672,9 +662,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/head/armor_broken.png;sprites/body/head/armor_broken
+/build:../../Roguebane.Content/sprites/body/bandit/torso_broken.png;sprites/body/bandit/torso_broken
 
-#begin sprites/body/head/armor_damaged
+#begin sprites/body/bandit/torso_damaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -683,9 +673,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/head/armor_damaged.png;sprites/body/head/armor_damaged
+/build:../../Roguebane.Content/sprites/body/bandit/torso_damaged.png;sprites/body/bandit/torso_damaged
 
-#begin sprites/body/head/armor_healthy
+#begin sprites/body/bandit/torso_healthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -694,9 +684,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/head/armor_healthy.png;sprites/body/head/armor_healthy
+/build:../../Roguebane.Content/sprites/body/bandit/torso_healthy.png;sprites/body/bandit/torso_healthy
 
-#begin sprites/body/head/base_broken
+#begin sprites/body/gargoyle/armL_broken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -705,9 +695,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/head/base_broken.png;sprites/body/head/base_broken
+/build:../../Roguebane.Content/sprites/body/gargoyle/armL_broken.png;sprites/body/gargoyle/armL_broken
 
-#begin sprites/body/head/base_damaged
+#begin sprites/body/gargoyle/armL_damaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -716,9 +706,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/head/base_damaged.png;sprites/body/head/base_damaged
+/build:../../Roguebane.Content/sprites/body/gargoyle/armL_damaged.png;sprites/body/gargoyle/armL_damaged
 
-#begin sprites/body/head/base_healthy
+#begin sprites/body/gargoyle/armL_healthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -727,9 +717,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/head/base_healthy.png;sprites/body/head/base_healthy
+/build:../../Roguebane.Content/sprites/body/gargoyle/armL_healthy.png;sprites/body/gargoyle/armL_healthy
 
-#begin sprites/body/head/robe_blue_broken
+#begin sprites/body/gargoyle/armR_broken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -738,9 +728,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/head/robe_blue_broken.png;sprites/body/head/robe_blue_broken
+/build:../../Roguebane.Content/sprites/body/gargoyle/armR_broken.png;sprites/body/gargoyle/armR_broken
 
-#begin sprites/body/head/robe_blue_damaged
+#begin sprites/body/gargoyle/armR_damaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -749,9 +739,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/head/robe_blue_damaged.png;sprites/body/head/robe_blue_damaged
+/build:../../Roguebane.Content/sprites/body/gargoyle/armR_damaged.png;sprites/body/gargoyle/armR_damaged
 
-#begin sprites/body/head/robe_blue_healthy
+#begin sprites/body/gargoyle/armR_healthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -760,9 +750,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/head/robe_blue_healthy.png;sprites/body/head/robe_blue_healthy
+/build:../../Roguebane.Content/sprites/body/gargoyle/armR_healthy.png;sprites/body/gargoyle/armR_healthy
 
-#begin sprites/body/head/robe_cloth_broken
+#begin sprites/body/gargoyle/back_broken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -771,9 +761,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/head/robe_cloth_broken.png;sprites/body/head/robe_cloth_broken
+/build:../../Roguebane.Content/sprites/body/gargoyle/back_broken.png;sprites/body/gargoyle/back_broken
 
-#begin sprites/body/head/robe_cloth_damaged
+#begin sprites/body/gargoyle/back_damaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -782,9 +772,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/head/robe_cloth_damaged.png;sprites/body/head/robe_cloth_damaged
+/build:../../Roguebane.Content/sprites/body/gargoyle/back_damaged.png;sprites/body/gargoyle/back_damaged
 
-#begin sprites/body/head/robe_cloth_healthy
+#begin sprites/body/gargoyle/back_healthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -793,9 +783,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/head/robe_cloth_healthy.png;sprites/body/head/robe_cloth_healthy
+/build:../../Roguebane.Content/sprites/body/gargoyle/back_healthy.png;sprites/body/gargoyle/back_healthy
 
-#begin sprites/body/head/robe_violet_broken
+#begin sprites/body/gargoyle/boots_broken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -804,9 +794,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/head/robe_violet_broken.png;sprites/body/head/robe_violet_broken
+/build:../../Roguebane.Content/sprites/body/gargoyle/boots_broken.png;sprites/body/gargoyle/boots_broken
 
-#begin sprites/body/head/robe_violet_damaged
+#begin sprites/body/gargoyle/boots_damaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -815,9 +805,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/head/robe_violet_damaged.png;sprites/body/head/robe_violet_damaged
+/build:../../Roguebane.Content/sprites/body/gargoyle/boots_damaged.png;sprites/body/gargoyle/boots_damaged
 
-#begin sprites/body/head/robe_violet_healthy
+#begin sprites/body/gargoyle/boots_healthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -826,9 +816,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/head/robe_violet_healthy.png;sprites/body/head/robe_violet_healthy
+/build:../../Roguebane.Content/sprites/body/gargoyle/boots_healthy.png;sprites/body/gargoyle/boots_healthy
 
-#begin sprites/body/leg/armor_broken
+#begin sprites/body/gargoyle/head_broken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -837,9 +827,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/leg/armor_broken.png;sprites/body/leg/armor_broken
+/build:../../Roguebane.Content/sprites/body/gargoyle/head_broken.png;sprites/body/gargoyle/head_broken
 
-#begin sprites/body/leg/armor_damaged
+#begin sprites/body/gargoyle/head_damaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -848,9 +838,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/leg/armor_damaged.png;sprites/body/leg/armor_damaged
+/build:../../Roguebane.Content/sprites/body/gargoyle/head_damaged.png;sprites/body/gargoyle/head_damaged
 
-#begin sprites/body/leg/armor_healthy
+#begin sprites/body/gargoyle/head_healthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -859,9 +849,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/leg/armor_healthy.png;sprites/body/leg/armor_healthy
+/build:../../Roguebane.Content/sprites/body/gargoyle/head_healthy.png;sprites/body/gargoyle/head_healthy
 
-#begin sprites/body/leg/base_broken
+#begin sprites/body/gargoyle/legL_broken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -870,9 +860,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/leg/base_broken.png;sprites/body/leg/base_broken
+/build:../../Roguebane.Content/sprites/body/gargoyle/legL_broken.png;sprites/body/gargoyle/legL_broken
 
-#begin sprites/body/leg/base_damaged
+#begin sprites/body/gargoyle/legL_damaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -881,9 +871,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/leg/base_damaged.png;sprites/body/leg/base_damaged
+/build:../../Roguebane.Content/sprites/body/gargoyle/legL_damaged.png;sprites/body/gargoyle/legL_damaged
 
-#begin sprites/body/leg/base_healthy
+#begin sprites/body/gargoyle/legL_healthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -892,9 +882,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/leg/base_healthy.png;sprites/body/leg/base_healthy
+/build:../../Roguebane.Content/sprites/body/gargoyle/legL_healthy.png;sprites/body/gargoyle/legL_healthy
 
-#begin sprites/body/leg/robe_blue_broken
+#begin sprites/body/gargoyle/legR_broken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -903,9 +893,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/leg/robe_blue_broken.png;sprites/body/leg/robe_blue_broken
+/build:../../Roguebane.Content/sprites/body/gargoyle/legR_broken.png;sprites/body/gargoyle/legR_broken
 
-#begin sprites/body/leg/robe_blue_damaged
+#begin sprites/body/gargoyle/legR_damaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -914,9 +904,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/leg/robe_blue_damaged.png;sprites/body/leg/robe_blue_damaged
+/build:../../Roguebane.Content/sprites/body/gargoyle/legR_damaged.png;sprites/body/gargoyle/legR_damaged
 
-#begin sprites/body/leg/robe_blue_healthy
+#begin sprites/body/gargoyle/legR_healthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -925,9 +915,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/leg/robe_blue_healthy.png;sprites/body/leg/robe_blue_healthy
+/build:../../Roguebane.Content/sprites/body/gargoyle/legR_healthy.png;sprites/body/gargoyle/legR_healthy
 
-#begin sprites/body/leg/robe_cloth_broken
+#begin sprites/body/gargoyle/torso_broken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -936,9 +926,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/leg/robe_cloth_broken.png;sprites/body/leg/robe_cloth_broken
+/build:../../Roguebane.Content/sprites/body/gargoyle/torso_broken.png;sprites/body/gargoyle/torso_broken
 
-#begin sprites/body/leg/robe_cloth_damaged
+#begin sprites/body/gargoyle/torso_damaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -947,9 +937,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/leg/robe_cloth_damaged.png;sprites/body/leg/robe_cloth_damaged
+/build:../../Roguebane.Content/sprites/body/gargoyle/torso_damaged.png;sprites/body/gargoyle/torso_damaged
 
-#begin sprites/body/leg/robe_cloth_healthy
+#begin sprites/body/gargoyle/torso_healthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -958,9 +948,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/leg/robe_cloth_healthy.png;sprites/body/leg/robe_cloth_healthy
+/build:../../Roguebane.Content/sprites/body/gargoyle/torso_healthy.png;sprites/body/gargoyle/torso_healthy
 
-#begin sprites/body/leg/robe_violet_broken
+#begin sprites/body/grunt/armL_barebroken
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -969,9 +959,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/leg/robe_violet_broken.png;sprites/body/leg/robe_violet_broken
+/build:../../Roguebane.Content/sprites/body/grunt/armL_barebroken.png;sprites/body/grunt/armL_barebroken
 
-#begin sprites/body/leg/robe_violet_damaged
+#begin sprites/body/grunt/armL_baredamaged
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -980,9 +970,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/leg/robe_violet_damaged.png;sprites/body/leg/robe_violet_damaged
+/build:../../Roguebane.Content/sprites/body/grunt/armL_baredamaged.png;sprites/body/grunt/armL_baredamaged
 
-#begin sprites/body/leg/robe_violet_healthy
+#begin sprites/body/grunt/armL_barehealthy
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -991,7 +981,1767 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/body/leg/robe_violet_healthy.png;sprites/body/leg/robe_violet_healthy
+/build:../../Roguebane.Content/sprites/body/grunt/armL_barehealthy.png;sprites/body/grunt/armL_barehealthy
+
+#begin sprites/body/grunt/armL_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/armL_broken.png;sprites/body/grunt/armL_broken
+
+#begin sprites/body/grunt/armL_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/armL_damaged.png;sprites/body/grunt/armL_damaged
+
+#begin sprites/body/grunt/armL_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/armL_healthy.png;sprites/body/grunt/armL_healthy
+
+#begin sprites/body/grunt/armR_barebroken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/armR_barebroken.png;sprites/body/grunt/armR_barebroken
+
+#begin sprites/body/grunt/armR_baredamaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/armR_baredamaged.png;sprites/body/grunt/armR_baredamaged
+
+#begin sprites/body/grunt/armR_barehealthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/armR_barehealthy.png;sprites/body/grunt/armR_barehealthy
+
+#begin sprites/body/grunt/armR_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/armR_broken.png;sprites/body/grunt/armR_broken
+
+#begin sprites/body/grunt/armR_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/armR_damaged.png;sprites/body/grunt/armR_damaged
+
+#begin sprites/body/grunt/armR_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/armR_healthy.png;sprites/body/grunt/armR_healthy
+
+#begin sprites/body/grunt/boots_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/boots_broken.png;sprites/body/grunt/boots_broken
+
+#begin sprites/body/grunt/boots_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/boots_damaged.png;sprites/body/grunt/boots_damaged
+
+#begin sprites/body/grunt/boots_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/boots_healthy.png;sprites/body/grunt/boots_healthy
+
+#begin sprites/body/grunt/head_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/head_broken.png;sprites/body/grunt/head_broken
+
+#begin sprites/body/grunt/head_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/head_damaged.png;sprites/body/grunt/head_damaged
+
+#begin sprites/body/grunt/head_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/head_healthy.png;sprites/body/grunt/head_healthy
+
+#begin sprites/body/grunt/legL_barebroken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/legL_barebroken.png;sprites/body/grunt/legL_barebroken
+
+#begin sprites/body/grunt/legL_baredamaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/legL_baredamaged.png;sprites/body/grunt/legL_baredamaged
+
+#begin sprites/body/grunt/legL_barehealthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/legL_barehealthy.png;sprites/body/grunt/legL_barehealthy
+
+#begin sprites/body/grunt/legL_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/legL_broken.png;sprites/body/grunt/legL_broken
+
+#begin sprites/body/grunt/legL_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/legL_damaged.png;sprites/body/grunt/legL_damaged
+
+#begin sprites/body/grunt/legL_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/legL_healthy.png;sprites/body/grunt/legL_healthy
+
+#begin sprites/body/grunt/legR_barebroken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/legR_barebroken.png;sprites/body/grunt/legR_barebroken
+
+#begin sprites/body/grunt/legR_baredamaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/legR_baredamaged.png;sprites/body/grunt/legR_baredamaged
+
+#begin sprites/body/grunt/legR_barehealthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/legR_barehealthy.png;sprites/body/grunt/legR_barehealthy
+
+#begin sprites/body/grunt/legR_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/legR_broken.png;sprites/body/grunt/legR_broken
+
+#begin sprites/body/grunt/legR_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/legR_damaged.png;sprites/body/grunt/legR_damaged
+
+#begin sprites/body/grunt/legR_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/legR_healthy.png;sprites/body/grunt/legR_healthy
+
+#begin sprites/body/grunt/torso_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/torso_broken.png;sprites/body/grunt/torso_broken
+
+#begin sprites/body/grunt/torso_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/torso_damaged.png;sprites/body/grunt/torso_damaged
+
+#begin sprites/body/grunt/torso_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/grunt/torso_healthy.png;sprites/body/grunt/torso_healthy
+
+#begin sprites/body/ogre/armL_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/armL_broken.png;sprites/body/ogre/armL_broken
+
+#begin sprites/body/ogre/armL_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/armL_damaged.png;sprites/body/ogre/armL_damaged
+
+#begin sprites/body/ogre/armL_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/armL_healthy.png;sprites/body/ogre/armL_healthy
+
+#begin sprites/body/ogre/armR_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/armR_broken.png;sprites/body/ogre/armR_broken
+
+#begin sprites/body/ogre/armR_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/armR_damaged.png;sprites/body/ogre/armR_damaged
+
+#begin sprites/body/ogre/armR_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/armR_healthy.png;sprites/body/ogre/armR_healthy
+
+#begin sprites/body/ogre/boots_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/boots_broken.png;sprites/body/ogre/boots_broken
+
+#begin sprites/body/ogre/boots_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/boots_damaged.png;sprites/body/ogre/boots_damaged
+
+#begin sprites/body/ogre/boots_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/boots_healthy.png;sprites/body/ogre/boots_healthy
+
+#begin sprites/body/ogre/head_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/head_broken.png;sprites/body/ogre/head_broken
+
+#begin sprites/body/ogre/head_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/head_damaged.png;sprites/body/ogre/head_damaged
+
+#begin sprites/body/ogre/head_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/head_healthy.png;sprites/body/ogre/head_healthy
+
+#begin sprites/body/ogre/legL_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/legL_broken.png;sprites/body/ogre/legL_broken
+
+#begin sprites/body/ogre/legL_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/legL_damaged.png;sprites/body/ogre/legL_damaged
+
+#begin sprites/body/ogre/legL_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/legL_healthy.png;sprites/body/ogre/legL_healthy
+
+#begin sprites/body/ogre/legR_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/legR_broken.png;sprites/body/ogre/legR_broken
+
+#begin sprites/body/ogre/legR_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/legR_damaged.png;sprites/body/ogre/legR_damaged
+
+#begin sprites/body/ogre/legR_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/legR_healthy.png;sprites/body/ogre/legR_healthy
+
+#begin sprites/body/ogre/torso_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/torso_broken.png;sprites/body/ogre/torso_broken
+
+#begin sprites/body/ogre/torso_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/torso_damaged.png;sprites/body/ogre/torso_damaged
+
+#begin sprites/body/ogre/torso_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/ogre/torso_healthy.png;sprites/body/ogre/torso_healthy
+
+#begin sprites/body/overlay_disabled
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/overlay_disabled.png;sprites/body/overlay_disabled
+
+#begin sprites/body/reaver/armL_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/armL_broken.png;sprites/body/reaver/armL_broken
+
+#begin sprites/body/reaver/armL_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/armL_damaged.png;sprites/body/reaver/armL_damaged
+
+#begin sprites/body/reaver/armL_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/armL_healthy.png;sprites/body/reaver/armL_healthy
+
+#begin sprites/body/reaver/armR_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/armR_broken.png;sprites/body/reaver/armR_broken
+
+#begin sprites/body/reaver/armR_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/armR_damaged.png;sprites/body/reaver/armR_damaged
+
+#begin sprites/body/reaver/armR_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/armR_healthy.png;sprites/body/reaver/armR_healthy
+
+#begin sprites/body/reaver/boots_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/boots_broken.png;sprites/body/reaver/boots_broken
+
+#begin sprites/body/reaver/boots_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/boots_damaged.png;sprites/body/reaver/boots_damaged
+
+#begin sprites/body/reaver/boots_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/boots_healthy.png;sprites/body/reaver/boots_healthy
+
+#begin sprites/body/reaver/head_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/head_broken.png;sprites/body/reaver/head_broken
+
+#begin sprites/body/reaver/head_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/head_damaged.png;sprites/body/reaver/head_damaged
+
+#begin sprites/body/reaver/head_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/head_healthy.png;sprites/body/reaver/head_healthy
+
+#begin sprites/body/reaver/legL_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/legL_broken.png;sprites/body/reaver/legL_broken
+
+#begin sprites/body/reaver/legL_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/legL_damaged.png;sprites/body/reaver/legL_damaged
+
+#begin sprites/body/reaver/legL_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/legL_healthy.png;sprites/body/reaver/legL_healthy
+
+#begin sprites/body/reaver/legR_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/legR_broken.png;sprites/body/reaver/legR_broken
+
+#begin sprites/body/reaver/legR_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/legR_damaged.png;sprites/body/reaver/legR_damaged
+
+#begin sprites/body/reaver/legR_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/legR_healthy.png;sprites/body/reaver/legR_healthy
+
+#begin sprites/body/reaver/torso_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/torso_broken.png;sprites/body/reaver/torso_broken
+
+#begin sprites/body/reaver/torso_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/torso_damaged.png;sprites/body/reaver/torso_damaged
+
+#begin sprites/body/reaver/torso_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/reaver/torso_healthy.png;sprites/body/reaver/torso_healthy
+
+#begin sprites/body/skeleton/armL_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/armL_broken.png;sprites/body/skeleton/armL_broken
+
+#begin sprites/body/skeleton/armL_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/armL_damaged.png;sprites/body/skeleton/armL_damaged
+
+#begin sprites/body/skeleton/armL_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/armL_healthy.png;sprites/body/skeleton/armL_healthy
+
+#begin sprites/body/skeleton/armR_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/armR_broken.png;sprites/body/skeleton/armR_broken
+
+#begin sprites/body/skeleton/armR_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/armR_damaged.png;sprites/body/skeleton/armR_damaged
+
+#begin sprites/body/skeleton/armR_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/armR_healthy.png;sprites/body/skeleton/armR_healthy
+
+#begin sprites/body/skeleton/boots_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/boots_broken.png;sprites/body/skeleton/boots_broken
+
+#begin sprites/body/skeleton/boots_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/boots_damaged.png;sprites/body/skeleton/boots_damaged
+
+#begin sprites/body/skeleton/boots_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/boots_healthy.png;sprites/body/skeleton/boots_healthy
+
+#begin sprites/body/skeleton/head_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/head_broken.png;sprites/body/skeleton/head_broken
+
+#begin sprites/body/skeleton/head_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/head_damaged.png;sprites/body/skeleton/head_damaged
+
+#begin sprites/body/skeleton/head_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/head_healthy.png;sprites/body/skeleton/head_healthy
+
+#begin sprites/body/skeleton/legL_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/legL_broken.png;sprites/body/skeleton/legL_broken
+
+#begin sprites/body/skeleton/legL_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/legL_damaged.png;sprites/body/skeleton/legL_damaged
+
+#begin sprites/body/skeleton/legL_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/legL_healthy.png;sprites/body/skeleton/legL_healthy
+
+#begin sprites/body/skeleton/legR_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/legR_broken.png;sprites/body/skeleton/legR_broken
+
+#begin sprites/body/skeleton/legR_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/legR_damaged.png;sprites/body/skeleton/legR_damaged
+
+#begin sprites/body/skeleton/legR_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/legR_healthy.png;sprites/body/skeleton/legR_healthy
+
+#begin sprites/body/skeleton/torso_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/torso_broken.png;sprites/body/skeleton/torso_broken
+
+#begin sprites/body/skeleton/torso_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/torso_damaged.png;sprites/body/skeleton/torso_damaged
+
+#begin sprites/body/skeleton/torso_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/skeleton/torso_healthy.png;sprites/body/skeleton/torso_healthy
+
+#begin sprites/body/summoner/armL_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/summoner/armL_broken.png;sprites/body/summoner/armL_broken
+
+#begin sprites/body/summoner/armL_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/summoner/armL_damaged.png;sprites/body/summoner/armL_damaged
+
+#begin sprites/body/summoner/armL_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/summoner/armL_healthy.png;sprites/body/summoner/armL_healthy
+
+#begin sprites/body/summoner/armR_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/summoner/armR_broken.png;sprites/body/summoner/armR_broken
+
+#begin sprites/body/summoner/armR_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/summoner/armR_damaged.png;sprites/body/summoner/armR_damaged
+
+#begin sprites/body/summoner/armR_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/summoner/armR_healthy.png;sprites/body/summoner/armR_healthy
+
+#begin sprites/body/summoner/head_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/summoner/head_broken.png;sprites/body/summoner/head_broken
+
+#begin sprites/body/summoner/head_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/summoner/head_damaged.png;sprites/body/summoner/head_damaged
+
+#begin sprites/body/summoner/head_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/summoner/head_healthy.png;sprites/body/summoner/head_healthy
+
+#begin sprites/body/summoner/torso_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/summoner/torso_broken.png;sprites/body/summoner/torso_broken
+
+#begin sprites/body/summoner/torso_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/summoner/torso_damaged.png;sprites/body/summoner/torso_damaged
+
+#begin sprites/body/summoner/torso_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/summoner/torso_healthy.png;sprites/body/summoner/torso_healthy
+
+#begin sprites/body/troll/armL_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/armL_broken.png;sprites/body/troll/armL_broken
+
+#begin sprites/body/troll/armL_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/armL_damaged.png;sprites/body/troll/armL_damaged
+
+#begin sprites/body/troll/armL_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/armL_healthy.png;sprites/body/troll/armL_healthy
+
+#begin sprites/body/troll/armR_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/armR_broken.png;sprites/body/troll/armR_broken
+
+#begin sprites/body/troll/armR_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/armR_damaged.png;sprites/body/troll/armR_damaged
+
+#begin sprites/body/troll/armR_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/armR_healthy.png;sprites/body/troll/armR_healthy
+
+#begin sprites/body/troll/boots_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/boots_broken.png;sprites/body/troll/boots_broken
+
+#begin sprites/body/troll/boots_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/boots_damaged.png;sprites/body/troll/boots_damaged
+
+#begin sprites/body/troll/boots_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/boots_healthy.png;sprites/body/troll/boots_healthy
+
+#begin sprites/body/troll/head_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/head_broken.png;sprites/body/troll/head_broken
+
+#begin sprites/body/troll/head_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/head_damaged.png;sprites/body/troll/head_damaged
+
+#begin sprites/body/troll/head_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/head_healthy.png;sprites/body/troll/head_healthy
+
+#begin sprites/body/troll/legL_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/legL_broken.png;sprites/body/troll/legL_broken
+
+#begin sprites/body/troll/legL_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/legL_damaged.png;sprites/body/troll/legL_damaged
+
+#begin sprites/body/troll/legL_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/legL_healthy.png;sprites/body/troll/legL_healthy
+
+#begin sprites/body/troll/legR_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/legR_broken.png;sprites/body/troll/legR_broken
+
+#begin sprites/body/troll/legR_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/legR_damaged.png;sprites/body/troll/legR_damaged
+
+#begin sprites/body/troll/legR_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/legR_healthy.png;sprites/body/troll/legR_healthy
+
+#begin sprites/body/troll/torso_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/torso_broken.png;sprites/body/troll/torso_broken
+
+#begin sprites/body/troll/torso_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/torso_damaged.png;sprites/body/troll/torso_damaged
+
+#begin sprites/body/troll/torso_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/troll/torso_healthy.png;sprites/body/troll/torso_healthy
+
+#begin sprites/body/warden/armL_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/armL_broken.png;sprites/body/warden/armL_broken
+
+#begin sprites/body/warden/armL_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/armL_damaged.png;sprites/body/warden/armL_damaged
+
+#begin sprites/body/warden/armL_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/armL_healthy.png;sprites/body/warden/armL_healthy
+
+#begin sprites/body/warden/armR_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/armR_broken.png;sprites/body/warden/armR_broken
+
+#begin sprites/body/warden/armR_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/armR_damaged.png;sprites/body/warden/armR_damaged
+
+#begin sprites/body/warden/armR_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/armR_healthy.png;sprites/body/warden/armR_healthy
+
+#begin sprites/body/warden/boots_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/boots_broken.png;sprites/body/warden/boots_broken
+
+#begin sprites/body/warden/boots_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/boots_damaged.png;sprites/body/warden/boots_damaged
+
+#begin sprites/body/warden/boots_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/boots_healthy.png;sprites/body/warden/boots_healthy
+
+#begin sprites/body/warden/head_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/head_broken.png;sprites/body/warden/head_broken
+
+#begin sprites/body/warden/head_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/head_damaged.png;sprites/body/warden/head_damaged
+
+#begin sprites/body/warden/head_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/head_healthy.png;sprites/body/warden/head_healthy
+
+#begin sprites/body/warden/legL_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/legL_broken.png;sprites/body/warden/legL_broken
+
+#begin sprites/body/warden/legL_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/legL_damaged.png;sprites/body/warden/legL_damaged
+
+#begin sprites/body/warden/legL_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/legL_healthy.png;sprites/body/warden/legL_healthy
+
+#begin sprites/body/warden/legR_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/legR_broken.png;sprites/body/warden/legR_broken
+
+#begin sprites/body/warden/legR_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/legR_damaged.png;sprites/body/warden/legR_damaged
+
+#begin sprites/body/warden/legR_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/legR_healthy.png;sprites/body/warden/legR_healthy
+
+#begin sprites/body/warden/torso_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/torso_broken.png;sprites/body/warden/torso_broken
+
+#begin sprites/body/warden/torso_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/torso_damaged.png;sprites/body/warden/torso_damaged
+
+#begin sprites/body/warden/torso_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/warden/torso_healthy.png;sprites/body/warden/torso_healthy
+
+#begin sprites/body/wraith/armL_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/wraith/armL_broken.png;sprites/body/wraith/armL_broken
+
+#begin sprites/body/wraith/armL_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/wraith/armL_damaged.png;sprites/body/wraith/armL_damaged
+
+#begin sprites/body/wraith/armL_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/wraith/armL_healthy.png;sprites/body/wraith/armL_healthy
+
+#begin sprites/body/wraith/armR_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/wraith/armR_broken.png;sprites/body/wraith/armR_broken
+
+#begin sprites/body/wraith/armR_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/wraith/armR_damaged.png;sprites/body/wraith/armR_damaged
+
+#begin sprites/body/wraith/armR_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/wraith/armR_healthy.png;sprites/body/wraith/armR_healthy
+
+#begin sprites/body/wraith/head_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/wraith/head_broken.png;sprites/body/wraith/head_broken
+
+#begin sprites/body/wraith/head_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/wraith/head_damaged.png;sprites/body/wraith/head_damaged
+
+#begin sprites/body/wraith/head_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/wraith/head_healthy.png;sprites/body/wraith/head_healthy
+
+#begin sprites/body/wraith/torso_broken
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/wraith/torso_broken.png;sprites/body/wraith/torso_broken
+
+#begin sprites/body/wraith/torso_damaged
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/wraith/torso_damaged.png;sprites/body/wraith/torso_damaged
+
+#begin sprites/body/wraith/torso_healthy
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/sprites/body/wraith/torso_healthy.png;sprites/body/wraith/torso_healthy
 
 #begin sprites/char/chassis/adept
 /importer:TextureImporter
@@ -1048,7 +2798,7 @@
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/sprites/char/chassis/warden.png;sprites/char/chassis/warden
 
-#begin sprites/char/ogre
+#begin sprites/gear/club
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -1057,9 +2807,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/char/ogre.png;sprites/char/ogre
+/build:../../Roguebane.Content/sprites/gear/club.png;sprites/gear/club
 
-#begin sprites/char/player_knight
+#begin sprites/gear/dagger
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -1068,9 +2818,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/char/player_knight.png;sprites/char/player_knight
+/build:../../Roguebane.Content/sprites/gear/dagger.png;sprites/gear/dagger
 
-#begin sprites/char/skeleton
+#begin sprites/gear/round_shield
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -1079,9 +2829,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/char/skeleton.png;sprites/char/skeleton
+/build:../../Roguebane.Content/sprites/gear/round_shield.png;sprites/gear/round_shield
 
-#begin sprites/foe/bandit/arm/base_broken
+#begin sprites/gear/staff
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -1090,9 +2840,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/bandit/arm/base_broken.png;sprites/foe/bandit/arm/base_broken
+/build:../../Roguebane.Content/sprites/gear/staff.png;sprites/gear/staff
 
-#begin sprites/foe/bandit/arm/base_damaged
+#begin sprites/gear/sword
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -1101,9 +2851,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/bandit/arm/base_damaged.png;sprites/foe/bandit/arm/base_damaged
+/build:../../Roguebane.Content/sprites/gear/sword.png;sprites/gear/sword
 
-#begin sprites/foe/bandit/arm/base_healthy
+#begin sprites/gear/tower_shield
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -1112,788 +2862,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/bandit/arm/base_healthy.png;sprites/foe/bandit/arm/base_healthy
-
-#begin sprites/foe/bandit/head/base_broken
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/bandit/head/base_broken.png;sprites/foe/bandit/head/base_broken
-
-#begin sprites/foe/bandit/head/base_damaged
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/bandit/head/base_damaged.png;sprites/foe/bandit/head/base_damaged
-
-#begin sprites/foe/bandit/head/base_healthy
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/bandit/head/base_healthy.png;sprites/foe/bandit/head/base_healthy
-
-#begin sprites/foe/bandit/leg/base_broken
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/bandit/leg/base_broken.png;sprites/foe/bandit/leg/base_broken
-
-#begin sprites/foe/bandit/leg/base_damaged
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/bandit/leg/base_damaged.png;sprites/foe/bandit/leg/base_damaged
-
-#begin sprites/foe/bandit/leg/base_healthy
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/bandit/leg/base_healthy.png;sprites/foe/bandit/leg/base_healthy
-
-#begin sprites/foe/bandit/torso/base_broken
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/bandit/torso/base_broken.png;sprites/foe/bandit/torso/base_broken
-
-#begin sprites/foe/bandit/torso/base_damaged
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/bandit/torso/base_damaged.png;sprites/foe/bandit/torso/base_damaged
-
-#begin sprites/foe/bandit/torso/base_healthy
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/bandit/torso/base_healthy.png;sprites/foe/bandit/torso/base_healthy
-
-#begin sprites/foe/gargoyle/arm/base_broken
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/gargoyle/arm/base_broken.png;sprites/foe/gargoyle/arm/base_broken
-
-#begin sprites/foe/gargoyle/arm/base_damaged
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/gargoyle/arm/base_damaged.png;sprites/foe/gargoyle/arm/base_damaged
-
-#begin sprites/foe/gargoyle/arm/base_healthy
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/gargoyle/arm/base_healthy.png;sprites/foe/gargoyle/arm/base_healthy
-
-#begin sprites/foe/gargoyle/head/base_broken
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/gargoyle/head/base_broken.png;sprites/foe/gargoyle/head/base_broken
-
-#begin sprites/foe/gargoyle/head/base_damaged
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/gargoyle/head/base_damaged.png;sprites/foe/gargoyle/head/base_damaged
-
-#begin sprites/foe/gargoyle/head/base_healthy
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/gargoyle/head/base_healthy.png;sprites/foe/gargoyle/head/base_healthy
-
-#begin sprites/foe/gargoyle/leg/base_broken
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/gargoyle/leg/base_broken.png;sprites/foe/gargoyle/leg/base_broken
-
-#begin sprites/foe/gargoyle/leg/base_damaged
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/gargoyle/leg/base_damaged.png;sprites/foe/gargoyle/leg/base_damaged
-
-#begin sprites/foe/gargoyle/leg/base_healthy
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/gargoyle/leg/base_healthy.png;sprites/foe/gargoyle/leg/base_healthy
-
-#begin sprites/foe/gargoyle/torso/base_broken
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/gargoyle/torso/base_broken.png;sprites/foe/gargoyle/torso/base_broken
-
-#begin sprites/foe/gargoyle/torso/base_damaged
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/gargoyle/torso/base_damaged.png;sprites/foe/gargoyle/torso/base_damaged
-
-#begin sprites/foe/gargoyle/torso/base_healthy
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/gargoyle/torso/base_healthy.png;sprites/foe/gargoyle/torso/base_healthy
-
-#begin sprites/foe/ogre/arm/base_broken
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/ogre/arm/base_broken.png;sprites/foe/ogre/arm/base_broken
-
-#begin sprites/foe/ogre/arm/base_damaged
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/ogre/arm/base_damaged.png;sprites/foe/ogre/arm/base_damaged
-
-#begin sprites/foe/ogre/arm/base_healthy
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/ogre/arm/base_healthy.png;sprites/foe/ogre/arm/base_healthy
-
-#begin sprites/foe/ogre/head/base_broken
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/ogre/head/base_broken.png;sprites/foe/ogre/head/base_broken
-
-#begin sprites/foe/ogre/head/base_damaged
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/ogre/head/base_damaged.png;sprites/foe/ogre/head/base_damaged
-
-#begin sprites/foe/ogre/head/base_healthy
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/ogre/head/base_healthy.png;sprites/foe/ogre/head/base_healthy
-
-#begin sprites/foe/ogre/leg/base_broken
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/ogre/leg/base_broken.png;sprites/foe/ogre/leg/base_broken
-
-#begin sprites/foe/ogre/leg/base_damaged
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/ogre/leg/base_damaged.png;sprites/foe/ogre/leg/base_damaged
-
-#begin sprites/foe/ogre/leg/base_healthy
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/ogre/leg/base_healthy.png;sprites/foe/ogre/leg/base_healthy
-
-#begin sprites/foe/ogre/torso/base_broken
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/ogre/torso/base_broken.png;sprites/foe/ogre/torso/base_broken
-
-#begin sprites/foe/ogre/torso/base_damaged
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/ogre/torso/base_damaged.png;sprites/foe/ogre/torso/base_damaged
-
-#begin sprites/foe/ogre/torso/base_healthy
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/ogre/torso/base_healthy.png;sprites/foe/ogre/torso/base_healthy
-
-#begin sprites/foe/troll/arm/base_broken
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/troll/arm/base_broken.png;sprites/foe/troll/arm/base_broken
-
-#begin sprites/foe/troll/arm/base_damaged
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/troll/arm/base_damaged.png;sprites/foe/troll/arm/base_damaged
-
-#begin sprites/foe/troll/arm/base_healthy
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/troll/arm/base_healthy.png;sprites/foe/troll/arm/base_healthy
-
-#begin sprites/foe/troll/head/base_broken
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/troll/head/base_broken.png;sprites/foe/troll/head/base_broken
-
-#begin sprites/foe/troll/head/base_damaged
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/troll/head/base_damaged.png;sprites/foe/troll/head/base_damaged
-
-#begin sprites/foe/troll/head/base_healthy
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/troll/head/base_healthy.png;sprites/foe/troll/head/base_healthy
-
-#begin sprites/foe/troll/leg/base_broken
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/troll/leg/base_broken.png;sprites/foe/troll/leg/base_broken
-
-#begin sprites/foe/troll/leg/base_damaged
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/troll/leg/base_damaged.png;sprites/foe/troll/leg/base_damaged
-
-#begin sprites/foe/troll/leg/base_healthy
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/troll/leg/base_healthy.png;sprites/foe/troll/leg/base_healthy
-
-#begin sprites/foe/troll/torso/base_broken
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/troll/torso/base_broken.png;sprites/foe/troll/torso/base_broken
-
-#begin sprites/foe/troll/torso/base_damaged
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/troll/torso/base_damaged.png;sprites/foe/troll/torso/base_damaged
-
-#begin sprites/foe/troll/torso/base_healthy
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/troll/torso/base_healthy.png;sprites/foe/troll/torso/base_healthy
-
-#begin sprites/foe/wraith/arm/base_broken
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/wraith/arm/base_broken.png;sprites/foe/wraith/arm/base_broken
-
-#begin sprites/foe/wraith/arm/base_damaged
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/wraith/arm/base_damaged.png;sprites/foe/wraith/arm/base_damaged
-
-#begin sprites/foe/wraith/arm/base_healthy
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/wraith/arm/base_healthy.png;sprites/foe/wraith/arm/base_healthy
-
-#begin sprites/foe/wraith/head/base_broken
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/wraith/head/base_broken.png;sprites/foe/wraith/head/base_broken
-
-#begin sprites/foe/wraith/head/base_damaged
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/wraith/head/base_damaged.png;sprites/foe/wraith/head/base_damaged
-
-#begin sprites/foe/wraith/head/base_healthy
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/wraith/head/base_healthy.png;sprites/foe/wraith/head/base_healthy
-
-#begin sprites/foe/wraith/leg/base_broken
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/wraith/leg/base_broken.png;sprites/foe/wraith/leg/base_broken
-
-#begin sprites/foe/wraith/leg/base_damaged
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/wraith/leg/base_damaged.png;sprites/foe/wraith/leg/base_damaged
-
-#begin sprites/foe/wraith/leg/base_healthy
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/wraith/leg/base_healthy.png;sprites/foe/wraith/leg/base_healthy
-
-#begin sprites/foe/wraith/torso/base_broken
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/wraith/torso/base_broken.png;sprites/foe/wraith/torso/base_broken
-
-#begin sprites/foe/wraith/torso/base_damaged
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/wraith/torso/base_damaged.png;sprites/foe/wraith/torso/base_damaged
-
-#begin sprites/foe/wraith/torso/base_healthy
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/foe/wraith/torso/base_healthy.png;sprites/foe/wraith/torso/base_healthy
-
-#begin sprites/gear/club_ogre
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/gear/club_ogre.png;sprites/gear/club_ogre
-
-#begin sprites/gear/shield_buckler
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/gear/shield_buckler.png;sprites/gear/shield_buckler
-
-#begin sprites/gear/shield_kite
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/gear/shield_kite.png;sprites/gear/shield_kite
-
-#begin sprites/gear/shield_round
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/gear/shield_round.png;sprites/gear/shield_round
-
-#begin sprites/gear/shield_tower
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/gear/shield_tower.png;sprites/gear/shield_tower
-
-#begin sprites/gear/staff_summon
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/gear/staff_summon.png;sprites/gear/staff_summon
-
-#begin sprites/gear/weapon_axe
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/gear/weapon_axe.png;sprites/gear/weapon_axe
-
-#begin sprites/gear/weapon_bow
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/gear/weapon_bow.png;sprites/gear/weapon_bow
-
-#begin sprites/gear/weapon_dagger
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/gear/weapon_dagger.png;sprites/gear/weapon_dagger
-
-#begin sprites/gear/weapon_greatsword
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/gear/weapon_greatsword.png;sprites/gear/weapon_greatsword
-
-#begin sprites/gear/weapon_mace
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/gear/weapon_mace.png;sprites/gear/weapon_mace
-
-#begin sprites/gear/weapon_spear
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/gear/weapon_spear.png;sprites/gear/weapon_spear
-
-#begin sprites/gear/weapon_staff
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/gear/weapon_staff.png;sprites/gear/weapon_staff
-
-#begin sprites/gear/weapon_sword
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/gear/weapon_sword.png;sprites/gear/weapon_sword
+/build:../../Roguebane.Content/sprites/gear/tower_shield.png;sprites/gear/tower_shield
 
 #begin sprites/minion/golem
 /importer:TextureImporter
@@ -1938,28 +2907,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/sprites/minion/skeleton.png;sprites/minion/skeleton
-
-#begin sprites/minion/skeleton_active
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/minion/skeleton_active.png;sprites/minion/skeleton_active
-
-#begin sprites/minion/skeleton_idle
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/sprites/minion/skeleton_idle.png;sprites/minion/skeleton_idle
 
 #begin sprites/minion/wisp
 /importer:TextureImporter
@@ -2016,7 +2963,7 @@
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/ui/button/button_normal.png;ui/button/button_normal
 
-#begin ui/pip/pip_damaged
+#begin ui/button/button_on
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -2025,7 +2972,29 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/ui/pip/pip_damaged.png;ui/pip/pip_damaged
+/build:../../Roguebane.Content/ui/button/button_on.png;ui/button/button_on
+
+#begin ui/pip/pip_damage
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/pip/pip_damage.png;ui/pip/pip_damage
+
+#begin ui/pip/pip_debuff
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/pip/pip_debuff.png;ui/pip/pip_debuff
 
 #begin ui/pip/pip_empty
 /importer:TextureImporter
@@ -2038,6 +3007,28 @@
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/ui/pip/pip_empty.png;ui/pip/pip_empty
 
+#begin ui/pip/pip_empty_supplies
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/pip/pip_empty_supplies.png;ui/pip/pip_empty_supplies
+
+#begin ui/pip/pip_empty_support
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/pip/pip_empty_support.png;ui/pip/pip_empty_support
+
 #begin ui/pip/pip_full
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -2048,6 +3039,138 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/ui/pip/pip_full.png;ui/pip/pip_full
+
+#begin ui/pip/pip_full_con
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/pip/pip_full_con.png;ui/pip/pip_full_con
+
+#begin ui/pip/pip_full_dex
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/pip/pip_full_dex.png;ui/pip/pip_full_dex
+
+#begin ui/pip/pip_full_int
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/pip/pip_full_int.png;ui/pip/pip_full_int
+
+#begin ui/pip/pip_full_str
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/pip/pip_full_str.png;ui/pip/pip_full_str
+
+#begin ui/pip/pip_full_supplies
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/pip/pip_full_supplies.png;ui/pip/pip_full_supplies
+
+#begin ui/pip/pip_full_support
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/pip/pip_full_support.png;ui/pip/pip_full_support
+
+#begin ui/pip/pip_reserved
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/pip/pip_reserved.png;ui/pip/pip_reserved
+
+#begin ui/pip/pip_reserved_con
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/pip/pip_reserved_con.png;ui/pip/pip_reserved_con
+
+#begin ui/pip/pip_reserved_dex
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/pip/pip_reserved_dex.png;ui/pip/pip_reserved_dex
+
+#begin ui/pip/pip_reserved_int
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/pip/pip_reserved_int.png;ui/pip/pip_reserved_int
+
+#begin ui/pip/pip_reserved_str
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/pip/pip_reserved_str.png;ui/pip/pip_reserved_str
+
+#begin ui/reticle/aiming
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/reticle/aiming.png;ui/reticle/aiming
 
 #begin ui/reticle/focus
 /importer:TextureImporter
@@ -2070,3 +3193,14 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/ui/reticle/secondary.png;ui/reticle/secondary
+
+#begin ui/reticle/target_tag
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/reticle/target_tag.png;ui/reticle/target_tag

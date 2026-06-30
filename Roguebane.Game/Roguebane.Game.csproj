@@ -24,6 +24,12 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <!-- Single-source the layout manifest from the authoring dir; copy beside the built Content. -->
+    <None Include="..\Roguebane.Content\layout.json" Link="Content\layout.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.*" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.*" />
   </ItemGroup>
