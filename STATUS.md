@@ -9,6 +9,15 @@ casters (foe offense/sim/legacy Session) keep default-front auto-fire. Shell: pe
 (left-click inactive=power, active=enter targeting+clear; foe-click=aim+exit; right-click=cancel/unpower),
 locked + pick-prompt reticles, targeting card ring, no FIRE button / focus cursor. Pinned by
 PlayerTargetingFsmTests + Expedition/Campaign integration; combat RB_SMOKE verified.
+
+TOP FIX (RE-OPEN) — the AUTO button is buggy in play. Required: AUTO is ONE GLOBAL toggle.
+- ON  = no powered+targeted module clears its target after firing — they keep charging and keep firing
+  at the SAME target.
+- OFF (default) = fire once when charged+targeted, then clear the target.
+- Button VISUAL: NO +/- glyph. Show ON by a HIGHLIGHT (background + text colour change); OFF = normal
+  button. (i.e. it reads as a lit/unlit toggle, not a +/- control.)
+- Behavioural pin: with AUTO on, a module that fires keeps its aim and fires again next charge; with
+  AUTO off it goes untargeted after the shot.
 Next actionable (pick one):
 - G1 foe PART aim: author multi-part foe Frames as DATA so left-click can target a foe PART (vs whole
   foe); then wire part-aim in the shell (Caster already supports Aim(tech, foe, part)). Unblocks the

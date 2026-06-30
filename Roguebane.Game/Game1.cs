@@ -89,7 +89,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 if (Exp.Foes.Count > 0)
                 {
                     _campaign.Aim(Exp.Loadout[0], Exp.Foes[^1]);
-                    _campaign.SetAuto(Exp.Loadout[0], true);
+                    _campaign.SetAuto(true); // global AUTO on -> the lit toggle + persisted target
                     if (Exp.Loadout.Count > 1) _targeting = 1;
                 }
                 for (var i = 0; i < 60; i++) _campaign.Tick();
@@ -178,6 +178,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         if (Pressed(keys, Keys.Space) || Click(PauseRect)) _paused = !_paused;
         if (Pressed(keys, Keys.F) || Click(FleeRect)) Exp.Flee();
+        if (Pressed(keys, Keys.Tab) || Click(AutoRect)) _campaign.SetAuto(!_campaign.IsAuto()); // ONE global toggle
 
         // Per-module FSM (no global focus). Card LEFT-click: an INACTIVE module POWERS (reserves +
         // charges); an ACTIVE module enters TARGETING (reticle up) and CLEARS its own target. Card
@@ -209,7 +210,6 @@ public class Game1 : Microsoft.Xna.Framework.Game
             for (var i = 0; i < foes.Count; i++)
                 if (!foes[i].Down && Click(FoeRect(i))) { _campaign.Aim(t, foes[i]); _targeting = -1; }
 
-            if (Pressed(keys, Keys.Tab) || Click(AutoRect)) _campaign.SetAuto(t, !_campaign.IsAuto(t));
             if (_rclicked && !rclickOnCard) _targeting = -1; // cancel targeting
         }
         else _targeting = -1; // module deactivated/gone — leave targeting
@@ -772,10 +772,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
             else if (st.Sustained && st.Active)
                 Rect(left + ix, y + iy, sz, sz, new Color(Amber, 60)); // held
 
-            // Ready holds bright; AUTO (persist) cards read "auto", a held block "held", a dry charge
-            // "dry", a charging timer counts via the wipe. A ready+untargeted module just HOLDS.
+            // A charged Timered module reads "RDY" (holding for a target), a held block "held", a dry
+            // charge "dry"; a charging timer counts via the wipe. AUTO is a global toggle (the button),
+            // not a per-card state.
             var tag = st.ChargeDry ? "dry" : st.Sustained && st.Active ? "held"
-                : st.Ready ? (st.Auto ? "auto" : "RDY") : null;
+                : st.Ready ? "RDY" : null;
             if (tag is not null)
                 Text(_assets.Mono, tag, left + ix, y + iy - 2, st.ChargeDry ? Blood : Amber);
             if (st.Ready && !st.Auto && !st.Sustained)
@@ -794,9 +795,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
         }
 
         // Mouse-reachable combat verbs (keyboard Tab/Space/F still work). No FIRE button — a charged +
-        // targeted module fires on its own. AUTO toggles the TARGETING module's keep-target flag.
-        var autoOn = _targeting >= 0 && _targeting < Exp.Loadout.Count && Exp.IsAuto(Exp.Loadout[_targeting]);
-        DrawHotButton(autoOn ? "AUTO+" : "AUTO-", AutoRect, Hover(AutoRect));
+        // targeted module fires on its own. AUTO is ONE global toggle, shown lit (ON) or normal (OFF).
+        DrawToggleButton("AUTO", AutoRect, Exp.IsAuto(), Hover(AutoRect));
         DrawHotButton(_paused ? "RESUME" : "PAUSE", PauseRect, Hover(PauseRect));
         DrawHotButton("FLEE", FleeRect, Hover(FleeRect));
     }
@@ -810,6 +810,19 @@ public class Game1 : Microsoft.Xna.Framework.Game
         var size = _assets.Mono.MeasureString(label);
         Text(_assets.Mono, label, (int)(r.X + r.Width / 2 - size.X / 2), (int)(r.Y + r.Height / 2 - size.Y / 2), Ink);
         if (hovered) Border(r.X, r.Y, r.Width, r.Height, Amber);
+    }
+
+    // A two-state toggle button: ON reads LIT (amber fill + dark label + amber border), OFF reads as a
+    // normal button. No glyph — the lit/unlit state IS the indicator.
+    private void DrawToggleButton(string label, Rectangle r, bool on, bool hovered)
+    {
+        var skin = _assets.Button(on || hovered ? "down" : "normal");
+        if (skin is not null) Sprite(skin, r.X, r.Y, r.Width, r.Height, on ? Amber : Color.White);
+        else { Panel(r.X, r.Y, r.Width, r.Height); if (on) Rect(r.X, r.Y, r.Width, r.Height, new Color(Amber, 110)); }
+        var size = _assets.Mono.MeasureString(label);
+        Text(_assets.Mono, label, (int)(r.X + r.Width / 2 - size.X / 2), (int)(r.Y + r.Height / 2 - size.Y / 2),
+            on ? new Color(30, 24, 18) : Ink);
+        if (on || hovered) Border(r.X, r.Y, r.Width, r.Height, Amber);
     }
 
     private void DrawStateOverlay()

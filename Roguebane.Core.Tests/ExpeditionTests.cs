@@ -12,7 +12,8 @@ public class ExpeditionTests
     private static Expedition FullLoadout()
     {
         var exp = Sessions.Expedition();
-        foreach (var t in exp.Loadout) { exp.Toggle(t); exp.SetAuto(t, true); }
+        foreach (var t in exp.Loadout) exp.Toggle(t);
+        exp.SetAuto(true); // global AUTO on so the re-aimed targets persist
         return exp;
     }
 
@@ -36,7 +37,7 @@ public class ExpeditionTests
     {
         var exp = Sessions.Expedition();
         exp.Toggle(Techniques.Jab);          // power only — no target
-        Assert.False(exp.IsAuto(Techniques.Jab)); // AUTO off by default
+        Assert.False(exp.IsAuto()); // AUTO off by default
 
         exp.Enter("a2");                     // a skirmish; foe HP only ever moves by the player's hand
         var foe = exp.Foes[0];
@@ -59,7 +60,7 @@ public class ExpeditionTests
         var hp = foe.Hp;
 
         exp.Aim(Techniques.Jab, foe);
-        Assert.False(exp.IsAuto(Techniques.Jab)); // aiming left AUTO untouched
+        Assert.False(exp.IsAuto()); // aiming left AUTO untouched
 
         for (var i = 0; i < 120; i++) exp.Tick(); // charge to ready -> fires at the aim
         Assert.True(foe.Hp < hp);                 // the target drove the shot
@@ -76,7 +77,7 @@ public class ExpeditionTests
 
         exp.ClearAim(Techniques.Jab);
         Assert.True(exp.IsActive(Techniques.Jab));   // still active
-        Assert.False(exp.IsAuto(Techniques.Jab));    // AUTO untouched
+        Assert.False(exp.IsAuto());    // AUTO untouched
     }
 
     [Fact]

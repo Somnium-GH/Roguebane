@@ -104,8 +104,8 @@ public sealed class Expedition
     public void Aim(Technique technique, ICombatTarget target) => _caster.Aim(technique, target);
     public void ClearAim(Technique technique) => _caster.ClearAim(technique); // right-click clears the target
     public bool Fire(Technique technique) => _caster.Fire(technique);
-    public void SetAuto(Technique technique, bool auto) => _caster.SetPersist(technique, auto);
-    public bool IsAuto(Technique technique) => _caster.IsPersist(technique);
+    public void SetAuto(bool auto) => _caster.SetAutoAll(auto); // ONE global toggle for the whole bar
+    public bool IsAuto() => _caster.AutoAll;
     public bool IsReady(Technique technique) => _caster.IsReady(technique);
     public ICombatTarget? AimOf(Technique technique) => _caster.AimOf(technique);
 

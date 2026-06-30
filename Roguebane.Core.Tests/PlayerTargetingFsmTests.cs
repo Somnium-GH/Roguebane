@@ -34,7 +34,7 @@ public class PlayerTargetingFsmTests
         var foe = new Foe("foe", 1000);
         var c = new Caster(Body(), null, requireAim: true);
         c.Activate(Techniques.Jab, auto: true);
-        Assert.False(c.IsPersist(Techniques.Jab)); // player default: AUTO off / one-shot
+        Assert.False(c.AutoAll); // player default: AUTO off / one-shot
         c.Aim(Techniques.Jab, foe);
 
         for (var i = 0; i < 200; i++) c.Step();    // 200 ticks = ~4 cooldowns of 50
@@ -63,11 +63,44 @@ public class PlayerTargetingFsmTests
         var foe = new Foe("foe", 1000);
         var c = new Caster(Body(), null, requireAim: true);
         c.Activate(Techniques.Jab, auto: true);
-        c.SetPersist(Techniques.Jab, true);    // AUTO on
+        c.SetAutoAll(true);    // AUTO on
         c.Aim(Techniques.Jab, foe);
 
         for (var i = 0; i < 200; i++) c.Step();
         Assert.True(foe.Hp <= 992);            // ~4 charges => >=4 shots at the same persisted target
+    }
+
+    // AUTO is ONE global toggle: it governs EVERY module's keep-target-after-fire, not one card.
+    [Fact]
+    public void GlobalAutoGovernsEveryModule()
+    {
+        static (Caster, Foe, Foe) Setup()
+        {
+            var b = new Body();
+            b.Add(new BodyPart("arm", Stat.Str, 6)); // Jab (reserve 1)
+            b.Add(new BodyPart("leg", Stat.Dex, 6)); // Lunge (reserve 1); no shared-stat contention
+            var c = new Caster(b, null, requireAim: true);
+            var f1 = new Foe("f1", 1000);
+            var f2 = new Foe("f2", 1000);
+            c.Activate(Techniques.Jab, auto: true);
+            c.Activate(Techniques.Lunge, auto: true);
+            c.Aim(Techniques.Jab, f1);
+            c.Aim(Techniques.Lunge, f2);
+            return (c, f1, f2);
+        }
+
+        // AUTO off (default): BOTH modules fire once then clear -> one shot each.
+        var (off, o1, o2) = Setup();
+        for (var i = 0; i < 200; i++) off.Step();
+        Assert.Equal(998, o1.Hp); // Jab Power 2, once
+        Assert.Equal(998, o2.Hp); // Lunge Power 2, once
+
+        // AUTO on: BOTH keep their targets and keep firing.
+        var (on, n1, n2) = Setup();
+        on.SetAutoAll(true);
+        for (var i = 0; i < 200; i++) on.Step();
+        Assert.True(n1.Hp <= 992); // repeated
+        Assert.True(n2.Hp <= 992); // repeated
     }
 
     [Fact]
@@ -88,7 +121,7 @@ public class PlayerTargetingFsmTests
         var foe = new Foe("foe", 1000);
         var c = new Caster(Body(), null, requireAim: true);
         c.Activate(Techniques.Jab, auto: true);
-        c.SetPersist(Techniques.Jab, true);
+        c.SetAutoAll(true);
         c.Aim(Techniques.Jab, foe);
 
         for (var i = 0; i < 60; i++) c.Step(); // one shot

@@ -64,8 +64,8 @@ public sealed class Campaign
     public void Aim(Technique technique, ICombatTarget target) => Current.Aim(technique, target);
     public void ClearAim(Technique technique) => Current.ClearAim(technique);
     public bool Fire(Technique technique) => Current.Fire(technique);
-    public void SetAuto(Technique technique, bool auto) => Current.SetAuto(technique, auto);
-    public bool IsAuto(Technique technique) => Current.IsAuto(technique);
+    public void SetAuto(bool auto) => Current.SetAuto(auto); // ONE global toggle
+    public bool IsAuto() => Current.IsAuto();
     public bool IsReady(Technique technique) => Current.IsReady(technique);
     public ICombatTarget? AimOf(Technique technique) => Current.AimOf(technique);
 

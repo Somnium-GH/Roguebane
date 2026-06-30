@@ -13,7 +13,6 @@ public sealed class Caster
         public ICombatTarget? Aimed; // per-technique target; null => no target (player) or default front (engine)
         public BodyPart? Part;       // per-technique PART aim within Aimed; null => whole-target HP
         public bool Auto = true;     // AUTO: discharge on cadence when ready. Off => hold for a Fire() command.
-        public bool Persist = true;  // keep the target after a shot. Off (player default) => clear it (one-shot).
     }
 
     private const int BlockCap = 3;  // a held CON block absorbs at most this much off an HP hit (low scale)
@@ -23,6 +22,7 @@ public sealed class Caster
     private readonly Body _self;
     private Rng? _rng; // chance effects (evasion); set by Battle so a fight is reproducible
     private readonly bool _requireAim; // player doctrine: techniques fire ONLY at an explicit aim — no front fallback
+    private bool _keepTargets;         // global player AUTO: ON => no module clears its target after firing
     private ICombatTarget? _default;
     private readonly SortedDictionary<string, Run> _active = new(StringComparer.Ordinal);
     private readonly SortedDictionary<string, Minion> _bays = new(StringComparer.Ordinal);
@@ -44,6 +44,7 @@ public sealed class Caster
         MaxCharge = maxCharge;
         _charge = maxCharge;
         _requireAim = requireAim;
+        _keepTargets = !requireAim; // engine casters never clear (front auto-fire); player default = OFF (one-shot)
     }
 
     // Battle hands every caster the fight's shared PRNG so chance rolls are deterministic.
@@ -100,16 +101,12 @@ public sealed class Caster
     public bool IsAuto(Technique technique) =>
         _active.TryGetValue(technique.Id, out var run) && run.Auto;
 
-    // Player AUTO toggle: whether a fired technique KEEPS its target (persist => keep firing each charge)
-    // or CLEARS it after the shot (one-shot — re-target to fire again). Distinct from the engine Auto
-    // flag above, which gates discharge-on-cadence.
-    public void SetPersist(Technique technique, bool persist)
-    {
-        if (_active.TryGetValue(technique.Id, out var run)) run.Persist = persist;
-    }
-
-    public bool IsPersist(Technique technique) =>
-        _active.TryGetValue(technique.Id, out var run) && run.Persist;
+    // The GLOBAL player AUTO toggle: ON => no module clears its target after firing (every powered +
+    // targeted module keeps charging and firing at the SAME target); OFF (default) => one-shot, each
+    // module clears its target after the shot. One switch governs the whole bar. Distinct from the
+    // per-technique engine Auto flag above (discharge-on-cadence).
+    public void SetAutoAll(bool keepTargets) => _keepTargets = keepTargets;
+    public bool AutoAll => _keepTargets;
 
     // A charged technique is HOLDING when its countdown has elapsed (ready to discharge).
     public bool IsReady(Technique technique) =>
@@ -141,8 +138,8 @@ public sealed class Caster
             return new TechStatus(false, cooldown, cooldown, t.Kind == TechniqueKind.Sustained, false, false, false);
         var dry = t.ChargeCost > 0 && _charge < t.ChargeCost;
         var ready = run.Tech.Kind == TechniqueKind.Timered && run.Countdown <= 0;
-        // Card's "auto" = the player AUTO (persist/keep-target), not the engine discharge-on-cadence flag.
-        return new TechStatus(true, run.Countdown, cooldown, t.Kind == TechniqueKind.Sustained, dry, ready, run.Persist);
+        // Card's "auto" reflects the GLOBAL player AUTO (keep-targets), not the engine cadence flag.
+        return new TechStatus(true, run.Countdown, cooldown, t.Kind == TechniqueKind.Sustained, dry, ready, _keepTargets);
     }
 
     public int ActiveCount => _active.Count;
@@ -174,12 +171,7 @@ public sealed class Caster
         var reservation = Reservation(technique);
         if (reservation.Reserve <= 0) return false; // nothing to swing (no weapon to consult)
         if (!_self.Activate(reservation)) return false;
-        // Player casters (requireAim) default to one-shot: a fired technique CLEARS its target. Engine
-        // casters persist the target (default-front auto-fire keeps landing).
-        _active[technique.Id] = new Run
-        {
-            Tech = technique, Countdown = EffectiveCooldown(technique), Auto = auto, Persist = !_requireAim,
-        };
+        _active[technique.Id] = new Run { Tech = technique, Countdown = EffectiveCooldown(technique), Auto = auto };
         return true;
     }
 
@@ -234,7 +226,7 @@ public sealed class Caster
             // resolves — an untargeted player technique just holds); a non-auto technique waits for a
             // Fire() command. A one-shot (non-persist) technique drops its target after a landed shot.
             if (run.Countdown > 0) run.Countdown--;
-            if (run.Countdown <= 0 && run.Auto && Discharge(run) && !run.Persist)
+            if (run.Countdown <= 0 && run.Auto && Discharge(run) && !_keepTargets)
             {
                 run.Aimed = null;
                 run.Part = null;

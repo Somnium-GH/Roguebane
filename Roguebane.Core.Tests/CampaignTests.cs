@@ -11,7 +11,8 @@ public class CampaignTests
     private static Campaign FullLoadout()
     {
         var c = Sessions.NewCampaign();
-        foreach (var t in Techniques.All) { c.Toggle(t); c.SetAuto(t, true); }
+        foreach (var t in Techniques.All) c.Toggle(t);
+        c.SetAuto(true); // global AUTO on so the re-aimed targets persist
         return c;
     }
 
