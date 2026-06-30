@@ -18,9 +18,12 @@ eroding the head stat (foe HP untouched).
 **Shell-input FSM — now headless-testable.** The targeting click→state mapping is extracted into Core
 (CombatTargeting); Game1 only feeds it press intents. Pinned by CombatTargetingTests (9). No behaviour
 change (RB_SMOKE identical).
+**Minions now fight** (were dead in play): Forge auto-summons the chassis MinionKit + rune grants into
+bays at assembly. Summoner ships Skeleton+Shade. Exposed via Exp.MinionCount/Minions. Pinned in MinionTests.
 Next actionable:
-- Combat surface lanes: minion-bay lane + rallied-support lane on the combat screen (Core has minions +
-  Support; the shell paints neither). Unblocked UI slice.
+- Combat minion-bay lane (shell): paint the bays (filled occupant icon / empty slot) on the combat
+  screen from Exp.Minions + the chassis Bays count. Make the combat RB_SMOKE use a Summoner build so the
+  lane has occupants to verify. (Data now exists.) Then the rallied-support lane (Exp.Map.SupportBank).
 - Foe -> PLAYER part aim is PARKED in "Needs human" — it depends on the HP-vs-stat split decision, and
   the current whole-HP foe contract is pinned by FoeOffenseTests. Do not flip it unilaterally.
 Other remaining (Debt): build-screen inventory tabs + drag-equip (blocked on G2/G7); Choose-Your-Core
