@@ -653,7 +653,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private void DrawRunResources(int x, int y)
     {
         var map = Exp.Map;
-        DrawStat(_assets.Resource("supplies"), map.Supplies, x);
+        // Supplies as remaining/max (the jump budget) per design/03; the rest stay single counts.
+        Sprite(_assets.Resource("supplies"), x, y, 22, 22, Color.White);
+        Text(_assets.Mono, $"{map.Supplies}/{map.MaxSupplies}", x + 26, y + 4, map.Supplies > 0 ? Ink : Blood);
         DrawStat(_assets.Node(NodeType.Castle), map.WarPartyDistance, x + 110); // war party closing in
         DrawStat(_assets.Resource("support"), map.SupportBank, x + 220);
         DrawStat(_assets.Resource("spoils"), Exp.Gold, x + 330);
