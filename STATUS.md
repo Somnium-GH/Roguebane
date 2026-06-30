@@ -15,11 +15,14 @@ splits each foe into anatomical limb bands (head/arms/chest/legs), highlights th
 targeting, and a band click aims the module at that part (Aim(tech, foe, part)). Locked limbs stay
 ringed; card tags read the limb (F1:H). Pinned in FoeArmingTests; RB_SMOKE shows a head-aimed module
 eroding the head stat (foe HP untouched).
-Next actionable (pick one):
-- Foe -> PLAYER part aim (the other G1 leg): foes currently hit player HP only; give foe offense a
-  player-PART target so CON-block + evasion mitigation localize on the struck part (clears that Debt).
-- Shell-input behaviour: the targeting click→state mapping is reviewed + visually verified but not
-  headless-tested (MonoGame input). Consider extracting a thin testable combat-input reducer.
+**Shell-input FSM — now headless-testable.** The targeting click→state mapping is extracted into Core
+(CombatTargeting); Game1 only feeds it press intents. Pinned by CombatTargetingTests (9). No behaviour
+change (RB_SMOKE identical).
+Next actionable:
+- Combat surface lanes: minion-bay lane + rallied-support lane on the combat screen (Core has minions +
+  Support; the shell paints neither). Unblocked UI slice.
+- Foe -> PLAYER part aim is PARKED in "Needs human" — it depends on the HP-vs-stat split decision, and
+  the current whole-HP foe contract is pinned by FoeOffenseTests. Do not flip it unilaterally.
 Other remaining (Debt): build-screen inventory tabs + drag-equip (blocked on G2/G7); Choose-Your-Core
 screen design/05 (build screen doubles as picker — locked OK); campaign city-graph design/04.
 
@@ -64,6 +67,9 @@ screen design/05 (build screen doubles as picker — locked OK); campaign city-g
 
 ## Needs human (loop skips these)
 - HP-vs-stat split — DEFAULT: attacks → the targeted part's stat; HP only via penetrating/bypass or overkill.
+  BLOCKS foe→player PART aim: today foes hit player HP (whole-HP, pinned by FoeOffenseTests + the CON-block
+  path). Flipping foes to erode player PARTS (and localizing CON-block/evasion onto part hits) needs this
+  decision + a feel call on WHICH limb a foe targets. Player→foe part aim already ships; foe→player waits.
 - Shield-block — DEFAULT: flat while held (vs depleting/recharging).
 - Arms/legs — ASSUMPTION: armor one-per-group, weapons per-hand. Confirm.
 - Balance/feel tuning (placeholder-sane, tune in play): tick 10/s; cooldowns + damage; DEX haste 2%/pt cap
