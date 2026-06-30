@@ -245,13 +245,16 @@ Nested layers, macro → micro:
   gear, action loadout — sealed in combat); (2) **Combat** cutaway taking localized part damage.
 - **Two registers:** world/combat bolder/more atmospheric; the **build screen clean + legible** — same
   high-fidelity bar, less flourish.
-- **Combat layout:** three zones, **you | battlefield | foe** (foe = the single enemy).
+- **Combat layout:** three zones, **you | battlefield | foe** (foe zone holds **1–3 structured
+  enemies** — a skirmish line, or the castle's layered **gate / wall / keep**; the layout stacks them
+  in the foe column. The single-enemy framing was a simplification).
   - *You* = cutaway (Head×1, Chest×1, Arms×2, Legs×2), each showing condition + stat; armor overlays.
   - **The attribute pool is the most prominent element** (reserved vs free, incl. shield reservations).
   - *Action bar* = technique cards with parallel charge timers + state (ready/charging/held/dry), a
     per-technique target tag, and the **AUTO** lit/unlit toggle. **No fire button.**
   - *Battlefield* = autonomous minion(s) + the rallied-support auto-fire stream.
-  - *Foe* = the one structured enemy/castle with targetable PARTS + the targeting reticle.
+  - *Foe* = the structured enemy/enemies (1–3) with targetable PARTS + the targeting reticle; each
+    carries its own creature figure (ogre/troll/bandit/skeleton wired; wraith/gargoyle art pending).
   - Corrections from old wireframes: parallel action bar (not one-hand); **no poise/stagger bar**;
     minions in **bays**; **no TEMPO/PERIL header**.
 
