@@ -44,8 +44,13 @@ Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliabl
   the manifest figure elements (build `paperDoll`, combat `heroFigure`) via DrawFigureIn, fallback to
   guessed coords. NEXT: migrate more combat/build elements off magic numbers (backdrop, statusStrip,
   attrPool, actionBar, top buttons) using ManifestUi; then the other 3 screens + Equipment screen.
-  VERIFY needs a human/automated RB_SMOKE run (loop can't open a GL window) — accumulating blind
-  Game changes; a smoke pass should be run before trusting the visual result.
+  RB_SMOKE WORKS HEADLESSLY (loop CAN verify): `RB_SMOKE=1 RB_SHOT=x.png RB_SCREEN=<build|combat|
+  map> dotnet run --project Roguebane.Game` renders + saves a PNG + exits. All 5 screens verified
+  rendering correctly post-drop; figure system (player + foes) confirmed. Foe rendering migrated off
+  the DELETED `sprites/char/ogre` onto the composer (Foe.Figure) — clean-build-safe. NEXT: migrate
+  more combat/build elements off magic numbers via ManifestUi (verify each with a smoke shot), then
+  the other screens' polish + Equipment screen. Verification is now part of the loop — smoke each
+  visual change.
 - Stage composer: assemble a figure from its parts at manifest rects in `z`, swap part STATE by Core
   condition (bare vs armored), mount gear at `sockets` per `mounts`, scale into the slot by `pivot`.
   RETIRE Game1 `DrawHumanoid` hard offsets (the exploded figure).
