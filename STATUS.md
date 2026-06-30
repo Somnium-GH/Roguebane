@@ -27,8 +27,15 @@ Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliabl
   defers: RB_SMOKE opens a GL window). SCREENS-from-manifest STARTED: anchor resolver landed in
   Core (`Layout/ScreenLayout.cs`: anchor+offset+size -> design-space LayoutRect, every anchor
   pinned). NEXT: design->screen VIEWPORT pass (cover bg + integer pixel stage scaling a 960x540
-  design space to the window) so the shell can blit resolved rects; then drive each screen's draw
-  off `screen.elements` (+ templates + style), retiring magic rects, all five. Equipment screen after.
+  design space to the window) so the shell can blit resolved rects. CORRECTION: the viewport pass
+  ALREADY EXISTS (Game1 renders the 960x540 design into the `_scene` RenderTarget, then letterbox-
+  scales to the window) — so resolved design-space rects blit directly, no extra pass needed.
+  PaletteColor landed in Core (`Layout/PaletteColor.cs`: hex->Rgba + named lookup, every real
+  palette entry pinned). Core manifest-consumption toolkit now COMPLETE: manifest parse, figure
+  composer+binding+blit, ScreenLayout rects, PaletteColor. NEXT (Game, blind without RB_SMOKE):
+  drive each screen's draw off `screen.elements` via ScreenLayout + PaletteColor + AssetRegistry,
+  guarded by manifest-present fallback; retire magic rects; all five. Then templates (cards) +
+  Equipment screen. VERIFY needs a human/automated RB_SMOKE run (loop can't open a GL window).
 - Stage composer: assemble a figure from its parts at manifest rects in `z`, swap part STATE by Core
   condition (bare vs armored), mount gear at `sockets` per `mounts`, scale into the slot by `pivot`.
   RETIRE Game1 `DrawHumanoid` hard offsets (the exploded figure).
