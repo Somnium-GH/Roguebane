@@ -12,8 +12,11 @@ Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliabl
   Game-side `LayoutRegistry` DONE (loads layout.json from output Content, tolerant null on
   gap); layout.json single-sourced from Roguebane.Content via linked copy-to-output. Built
   content mgcb resynced to the drop's asset set (Game build was broken — 147 stale-sprite
-  errors; now green). NEXT: stage composer (assemble a figure from `parts` at manifest rects
-  in `z`, swap STATE by Core condition, mount gear per `sockets`/`mounts`, scale by `pivot`).
+  errors; now green). Stage composer DONE in Core (`Layout/StageComposer.cs`): ComposeFigure
+  (z-ordered, state-keyed part placements, data-driven suffixes) + ComposeGear (socket-anchored
+  mounts), pinned by StageComposerTests. NEXT: Game-side blit — feed Core condition→PartCondition
+  + useBare resolvers, draw placements scaled by figure `pivot` into the slot, mount gear by gear
+  `pivot`; RETIRE Game1 `DrawHumanoid` hard offsets. Then screens-from-manifest.
 - Stage composer: assemble a figure from its parts at manifest rects in `z`, swap part STATE by Core
   condition (bare vs armored), mount gear at `sockets` per `mounts`, scale into the slot by `pivot`.
   RETIRE Game1 `DrawHumanoid` hard offsets (the exploded figure).
