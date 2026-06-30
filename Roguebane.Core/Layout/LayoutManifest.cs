@@ -11,10 +11,7 @@ public sealed class LayoutManifest
     public Dictionary<string, Gear> Gear { get; init; } = new();
     public Dictionary<string, Screen> Screens { get; init; } = new();
     public Style Style { get; init; } = new();
-
-    // Templates are heterogeneous (poolRow/techCard/attrBar/… each differ); kept raw
-    // until the screen builder needs a typed shape. Reconcile when consumed.
-    public Dictionary<string, JsonElement> Templates { get; init; } = new();
+    public Dictionary<string, Template> Templates { get; init; } = new();
 
     private static readonly JsonSerializerOptions Opts = new() { PropertyNameCaseInsensitive = true };
 
@@ -71,6 +68,23 @@ public sealed class Border
     public string Color { get; init; } = "";
     public int W { get; init; }
     public string Style { get; init; } = "";
+}
+
+// A repeated UI card (techCard/poolRow/invCard/…): a fixed-size box of styled sub-parts whose
+// rects are card-local. The shell stamps it at a screen position via CardTemplate.
+public sealed class Template
+{
+    public int[] Size { get; init; } = [];
+    public TemplatePart[] Parts { get; init; } = [];
+}
+
+public sealed class TemplatePart
+{
+    public int[] Rect { get; init; } = []; // card-local x,y,w,h
+    public string Color { get; init; } = "";
+    public string Font { get; init; } = "";
+    public double FontPx { get; init; }
+    public string Sample { get; init; } = ""; // which datum fills this slot (name/cost/desc/…)
 }
 
 public sealed class Style
