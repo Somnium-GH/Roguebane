@@ -53,7 +53,8 @@ Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliabl
   visual change. AssetRegistry maps realigned to the drop's renamed icons (node resource, attr
   intellect, technique glyphs) — clean-build-safe, verified on the map. Pips now use the drop's
   per-stat coloured art (full_<stat>/reserved_<stat>/damage; fixed deleted pip_damaged), verified on
-  build. Three stale-asset bugs fixed (foe sprite, icon maps, pips) — clean content build now safe.
+  build. FOUR stale-asset bugs fixed (foe sprite, icon maps, pips, rune path->path_major); full
+  asset-string sweep done (Resource/Reticle/Button/Background/Chassis/Technique cross-checked clean).
   VERIFIED FROM SCRATCH: wiped Content/bin+obj and Game bin+obj, rebuilt, smoked all 5 screens — all
   render, no MISS, no stale-.xnb dependency. Drop integration solid. GOTCHA: bundled spritefonts are
   ASCII-only — Text() with a non-ASCII glyph (e.g. U+00B7) THROWS at draw; keep shell text ASCII until
