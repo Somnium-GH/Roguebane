@@ -11,8 +11,11 @@ POC is NOT complete; the "DONE" claim below is RETRACTED until these clear.**
   (pure, engine-agnostic) with 7 headless tests (245 Core tests); `Game1.Safe` is a thin caller that
   feeds it the font's glyph set — the crash-class is regression-covered headlessly. Non-ASCII drawn-
   literal sweep CLEAN: the only remaining drawn non-ASCII was DrawLoadoutStrip's "-" placeholder (was an
-  em-dash) -> fixed; every other non-ASCII in source is comment prose (never drawn). STILL TODO (loop):
-  a DRIVEN run-start render assert (RB_SMOKE renders a frame but didn't exercise the live map-screen draw).
+  em-dash) -> fixed; every other non-ASCII in source is comment prose (never drawn). Driven run-start
+  STATE regression added (RunStartTests: NewBuild -> March -> assert the map-screen render contract at
+  camp/Choosing -- state, options, player HP, resource readouts, bay/loadout/gear sources; 247 Core
+  tests). STILL TODO (loop, BLOCKED): the live map-screen DRAW smoke (RB_SMOKE) -- render-side, not Core-
+  headless, and the build output is currently locked by a running Roguebane.Game (human play session).
 - Fresh design renders landed (`design/01–06`, 06-30): re-verify EVERY screen against the NEW PNG +
   `screens.<id>`. "Smoke clean" ≠ "matches the design." NEW RUN is hallucinated / not manifest-driven —
   rebuild it off `screens.newrun` + `design/05` (single-core for now; race step behind the flag).
