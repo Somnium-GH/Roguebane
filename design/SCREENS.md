@@ -32,6 +32,8 @@ Three columns: YOU (left) | BATTLEFIELD (center) | FOE (right); header top; acti
 ## 02 Build / Loadout — `design/02-build.png`
 Chassis Anatomy (left) | Attribute Readout + Inventory (center) | Rune Bag (right); Current Core +
 Action Bar loadout (bottom). **This is the worst current gap — most of the below is missing.**
+*(Terminology: "Chassis" → RACE + CORE RUNE per DESIGN_SPEC §7; the screen's "Chassis Anatomy" /
+"Current Core" labels + the design/02 PNG predate the rename — update labels to Race + Core rune.)*
 - [ ] Header: title + chassis selector (5 cores, current ringed) + runes spent/budget.
 - [ ] CHASSIS ANATOMY: cutaway with EQUIPPED GEAR per part (helm/plate/arms/greaves), each part
       labelled with its stat.
@@ -51,7 +53,8 @@ Action Bar loadout (bottom). **This is the worst current gap — most of the bel
       vs uncharted (dotted) links; "YOU ARE HERE" at the current beacon.
 - [ ] Fog: `?` unknown beacons; resource-holds + castle visible afar; merchant resolves 1 jump out.
 - [ ] Node-type icons: camp / merchant / resource-hold / unknown / castle.
-- [ ] War-party advance track/marker (ADD — not in the render).
+- [ ] War-party advance track: a TOP-edge track, castle (right) → camp (left), with a TOKEN advancing
+      each move + a closing-distance read (ADD — not in the render; needs a war-party token + camp icon).
 - [ ] Flee verb; castle "max scale" note; gold/potions readout; campaign spine strip.
 
 ## 04 Campaign Spine — `design/04-campaign-spine.png`
@@ -59,8 +62,12 @@ Action Bar loadout (bottom). **This is the worst current gap — most of the bel
 - [ ] Current city highlighted; taken / available / unreached routes distinguished.
 - [ ] Capital marked as the strongest/peak castle.
 
-## 05 New Run / Choose Your Core — `design/05-new-run.png`
-- [ ] FIVE core cards (Grunt/Warden/Adept/Summoner/Reaver): figure, archetype label, stat block
-      (gear/arms/bays/actions/budget/base), flavor line.
-- [ ] Select + "Begin the March". (Today the build screen doubles as the picker — a dedicated screen
-      is the target.)
+## 05 New Run — RACE then CORE RUNE — `design/05-new-run.png` (needs redesign; current PNG is core-only)
+Two-axis pick (DESIGN_SPEC §7), ideally a COMBINED experience rather than two hard steps:
+- [ ] Pick a RACE: a card per race (start: Human, Elf) — figure + base attributes + base HP + flavor.
+- [ ] Pick a CORE RUNE: cards for the core runes the chosen race ALLOWS (others greyed/hidden) —
+      figure/identity + layout block (budget / #techniques / #bays / apex effect) + flavor.
+- [ ] COMBINED ideal: a race selector + a core-rune grid that filters/updates to the race's allowed
+      set, previewing the resulting race-base × core-rune-layout combo. (Old single "Chassis" pick is
+      retired — design/05 PNG predates this.)
+- [ ] Begin the March.

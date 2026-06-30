@@ -149,3 +149,22 @@ COMPLETENESS (visual): every element carries geometry + font + colour-token + co
 a bar segment, a gate marker, a pip row, a card's tier ring, a tab's active state, an equip button, a
 leader-line part label, the backdrop — it's in the manifest. Then the game reproduces the screen with
 ZERO invented styling, and the vision review just confirms.
+
+## 9. HOW the screen manifest is PRODUCED — extracted from the `.dc.html`, never hand-authored
+This is the deterministic converter (the screen analog of `roster_gen.js`). The `.dc.html` already
+RENDERS each screen via the DOM, so the browser has computed every element's exact rect, text, font and
+colour. EMIT the manifest from that render — do not transcribe the screens by hand.
+1. **Instrument the dc.html** — tag each meaningful node with `data-el="id"` plus the intent the DOM
+   can't infer: `data-anchor` (screen edge it sticks to), `data-binds` (Core state), `data-container` /
+   `data-template` / `data-flow` (dynamic lists, §7), `data-z`. Geometry, text, font and colour need NO
+   annotation — they come from the render.
+2. **Extract in the SAME headless-browser run that screenshots the screen** — walk every `[data-el]`:
+   `getBoundingClientRect()` ÷ the 2× design scale → design-space rect/anchor-offset; `getComputedStyle()`
+   → font role + nearest palette TOKEN; `textContent` → literal (or `data-binds` if bound); plus the
+   `data-*` semantics. Serialize to `layout.json` `screens.<id>`.
+3. **One style source** — the dc.html and the extractor both read the SAME `style_tokens.js`
+   (palette/fonts, §8); that table is emitted once into `layout.json.style`.
+DETERMINISTIC: same dc.html → same DOM → same computed layout → byte-identical manifest. The dc.html is
+the single source; the manifest is a mechanical projection of it. (Persistent-generator rule, applied to
+screens: never hand-author the manifest. If the dc.html is screenshotted manually today, script the
+render+extract so both the PNG and the manifest come from one run.)

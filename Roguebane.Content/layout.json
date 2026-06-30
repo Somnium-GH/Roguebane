@@ -1,0 +1,2497 @@
+{
+  "figures": {
+    "grunt": {
+      "size": [
+        328,
+        360
+      ],
+      "pivot": [
+        140,
+        352
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            88,
+            256,
+            40,
+            72
+          ]
+        },
+        "legR": {
+          "rect": [
+            152,
+            256,
+            40,
+            72
+          ]
+        },
+        "boots": {
+          "rect": [
+            80,
+            328,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            56,
+            96,
+            160,
+            160
+          ]
+        },
+        "armL": {
+          "rect": [
+            16,
+            96,
+            48,
+            112
+          ]
+        },
+        "armR": {
+          "rect": [
+            208,
+            96,
+            48,
+            112
+          ]
+        },
+        "head": {
+          "rect": [
+            88,
+            8,
+            104,
+            104
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          36,
+          196
+        ],
+        "handR": [
+          236,
+          196
+        ],
+        "neck": [
+          140,
+          108
+        ],
+        "shoulderL": [
+          44,
+          100
+        ],
+        "shoulderR": [
+          228,
+          100
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "sword",
+          "socket": "handL"
+        },
+        {
+          "gear": "round_shield",
+          "socket": "handR"
+        }
+      ]
+    },
+    "warden": {
+      "size": [
+        336,
+        376
+      ],
+      "pivot": [
+        148,
+        368
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            88,
+            272,
+            48,
+            72
+          ]
+        },
+        "legR": {
+          "rect": [
+            160,
+            272,
+            48,
+            72
+          ]
+        },
+        "boots": {
+          "rect": [
+            80,
+            344,
+            136,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            56,
+            104,
+            176,
+            168
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            104,
+            56,
+            120
+          ]
+        },
+        "armR": {
+          "rect": [
+            224,
+            104,
+            56,
+            120
+          ]
+        },
+        "head": {
+          "rect": [
+            88,
+            8,
+            112,
+            112
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          36,
+          212
+        ],
+        "handR": [
+          252,
+          212
+        ],
+        "neck": [
+          148,
+          116
+        ],
+        "shoulderL": [
+          36,
+          108
+        ],
+        "shoulderR": [
+          252,
+          108
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "tower_shield",
+          "socket": "handR"
+        }
+      ]
+    },
+    "adept": {
+      "size": [
+        280,
+        392
+      ],
+      "pivot": [
+        140,
+        384
+      ],
+      "z": [
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "torso": {
+          "rect": [
+            16,
+            96,
+            248,
+            288
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            96,
+            64,
+            128
+          ]
+        },
+        "armR": {
+          "rect": [
+            208,
+            96,
+            64,
+            128
+          ]
+        },
+        "head": {
+          "rect": [
+            88,
+            8,
+            104,
+            112
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          44,
+          212
+        ],
+        "handR": [
+          236,
+          212
+        ],
+        "neck": [
+          140,
+          116
+        ],
+        "shoulderL": [
+          44,
+          100
+        ],
+        "shoulderR": [
+          236,
+          100
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "staff",
+          "socket": "handR"
+        }
+      ]
+    },
+    "summoner": {
+      "size": [
+        280,
+        392
+      ],
+      "pivot": [
+        140,
+        384
+      ],
+      "z": [
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "torso": {
+          "rect": [
+            16,
+            96,
+            248,
+            288
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            96,
+            64,
+            128
+          ]
+        },
+        "armR": {
+          "rect": [
+            208,
+            96,
+            64,
+            128
+          ]
+        },
+        "head": {
+          "rect": [
+            88,
+            8,
+            104,
+            112
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          44,
+          212
+        ],
+        "handR": [
+          236,
+          212
+        ],
+        "neck": [
+          140,
+          116
+        ],
+        "shoulderL": [
+          44,
+          100
+        ],
+        "shoulderR": [
+          236,
+          100
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "staff",
+          "socket": "handR"
+        }
+      ]
+    },
+    "reaver": {
+      "size": [
+        248,
+        360
+      ],
+      "pivot": [
+        124,
+        352
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            72,
+            248,
+            40,
+            80
+          ]
+        },
+        "legR": {
+          "rect": [
+            136,
+            248,
+            40,
+            80
+          ]
+        },
+        "boots": {
+          "rect": [
+            64,
+            328,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            48,
+            96,
+            152,
+            152
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            96,
+            48,
+            104
+          ]
+        },
+        "armR": {
+          "rect": [
+            192,
+            96,
+            48,
+            104
+          ]
+        },
+        "head": {
+          "rect": [
+            72,
+            8,
+            104,
+            104
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          28,
+          188
+        ],
+        "handR": [
+          220,
+          188
+        ],
+        "neck": [
+          124,
+          108
+        ],
+        "shoulderL": [
+          36,
+          100
+        ],
+        "shoulderR": [
+          212,
+          100
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "dagger",
+          "socket": "handL"
+        },
+        {
+          "gear": "dagger",
+          "socket": "handR"
+        }
+      ]
+    },
+    "skeleton": {
+      "size": [
+        312,
+        328
+      ],
+      "pivot": [
+        132,
+        320
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            80,
+            224,
+            40,
+            72
+          ]
+        },
+        "legR": {
+          "rect": [
+            144,
+            224,
+            40,
+            72
+          ]
+        },
+        "boots": {
+          "rect": [
+            72,
+            296,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            56,
+            72,
+            144,
+            152
+          ]
+        },
+        "armL": {
+          "rect": [
+            16,
+            72,
+            48,
+            112
+          ]
+        },
+        "armR": {
+          "rect": [
+            192,
+            72,
+            48,
+            112
+          ]
+        },
+        "head": {
+          "rect": [
+            80,
+            8,
+            104,
+            104
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          36,
+          172
+        ],
+        "handR": [
+          220,
+          172
+        ],
+        "neck": [
+          132,
+          108
+        ],
+        "shoulderL": [
+          44,
+          76
+        ],
+        "shoulderR": [
+          212,
+          76
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "sword",
+          "socket": "handL"
+        },
+        {
+          "gear": "round_shield",
+          "socket": "handR"
+        }
+      ]
+    },
+    "bandit": {
+      "size": [
+        248,
+        352
+      ],
+      "pivot": [
+        124,
+        344
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            72,
+            248,
+            40,
+            72
+          ]
+        },
+        "legR": {
+          "rect": [
+            136,
+            248,
+            40,
+            72
+          ]
+        },
+        "boots": {
+          "rect": [
+            64,
+            320,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            48,
+            96,
+            152,
+            152
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            96,
+            48,
+            104
+          ]
+        },
+        "armR": {
+          "rect": [
+            192,
+            96,
+            48,
+            104
+          ]
+        },
+        "head": {
+          "rect": [
+            72,
+            8,
+            104,
+            104
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          28,
+          188
+        ],
+        "handR": [
+          220,
+          188
+        ],
+        "neck": [
+          124,
+          108
+        ],
+        "shoulderL": [
+          36,
+          100
+        ],
+        "shoulderR": [
+          212,
+          100
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "dagger",
+          "socket": "handL"
+        },
+        {
+          "gear": "dagger",
+          "socket": "handR"
+        }
+      ]
+    },
+    "wraith": {
+      "size": [
+        280,
+        392
+      ],
+      "pivot": [
+        140,
+        384
+      ],
+      "z": [
+        "torso",
+        "armL",
+        "armR",
+        "head"
+      ],
+      "parts": {
+        "torso": {
+          "rect": [
+            16,
+            96,
+            248,
+            288
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            96,
+            64,
+            128
+          ]
+        },
+        "armR": {
+          "rect": [
+            208,
+            96,
+            64,
+            128
+          ]
+        },
+        "head": {
+          "rect": [
+            88,
+            8,
+            104,
+            112
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          44,
+          212
+        ],
+        "handR": [
+          236,
+          212
+        ],
+        "neck": [
+          140,
+          116
+        ],
+        "shoulderL": [
+          44,
+          100
+        ],
+        "shoulderR": [
+          236,
+          100
+        ]
+      },
+      "mounts": []
+    },
+    "ogre": {
+      "size": [
+        368,
+        448
+      ],
+      "pivot": [
+        188,
+        440
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            104,
+            320,
+            64,
+            88
+          ]
+        },
+        "legR": {
+          "rect": [
+            200,
+            320,
+            64,
+            88
+          ]
+        },
+        "boots": {
+          "rect": [
+            96,
+            408,
+            176,
+            32
+          ]
+        },
+        "torso": {
+          "rect": [
+            72,
+            120,
+            224,
+            200
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            120,
+            72,
+            152
+          ]
+        },
+        "armR": {
+          "rect": [
+            288,
+            120,
+            72,
+            152
+          ]
+        },
+        "head": {
+          "rect": [
+            112,
+            8,
+            152,
+            144
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          44,
+          260
+        ],
+        "handR": [
+          324,
+          260
+        ],
+        "neck": [
+          188,
+          140
+        ],
+        "shoulderL": [
+          44,
+          124
+        ],
+        "shoulderR": [
+          324,
+          124
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "club",
+          "socket": "handR"
+        }
+      ]
+    },
+    "troll": {
+      "size": [
+        352,
+        408
+      ],
+      "pivot": [
+        180,
+        400
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            96,
+            296,
+            64,
+            72
+          ]
+        },
+        "legR": {
+          "rect": [
+            192,
+            296,
+            64,
+            72
+          ]
+        },
+        "boots": {
+          "rect": [
+            88,
+            368,
+            176,
+            32
+          ]
+        },
+        "torso": {
+          "rect": [
+            72,
+            88,
+            208,
+            208
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            88,
+            72,
+            192
+          ]
+        },
+        "armR": {
+          "rect": [
+            272,
+            88,
+            72,
+            192
+          ]
+        },
+        "head": {
+          "rect": [
+            104,
+            8,
+            144,
+            136
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          44,
+          268
+        ],
+        "handR": [
+          308,
+          268
+        ],
+        "neck": [
+          180,
+          132
+        ],
+        "shoulderL": [
+          44,
+          92
+        ],
+        "shoulderR": [
+          308,
+          92
+        ]
+      },
+      "mounts": []
+    },
+    "gargoyle": {
+      "size": [
+        432,
+        392
+      ],
+      "pivot": [
+        220,
+        384
+      ],
+      "z": [
+        "back",
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head"
+      ],
+      "parts": {
+        "back": {
+          "rect": [
+            8,
+            104,
+            416,
+            192
+          ]
+        },
+        "legL": {
+          "rect": [
+            152,
+            296,
+            48,
+            64
+          ]
+        },
+        "legR": {
+          "rect": [
+            232,
+            296,
+            48,
+            64
+          ]
+        },
+        "boots": {
+          "rect": [
+            144,
+            360,
+            144,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            128,
+            120,
+            176,
+            176
+          ]
+        },
+        "armL": {
+          "rect": [
+            80,
+            120,
+            56,
+            128
+          ]
+        },
+        "armR": {
+          "rect": [
+            296,
+            120,
+            56,
+            128
+          ]
+        },
+        "head": {
+          "rect": [
+            160,
+            8,
+            120,
+            128
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          108,
+          236
+        ],
+        "handR": [
+          324,
+          236
+        ],
+        "neck": [
+          220,
+          132
+        ],
+        "shoulderL": [
+          108,
+          124
+        ],
+        "shoulderR": [
+          324,
+          124
+        ]
+      },
+      "mounts": []
+    }
+  },
+  "gear": {
+    "sword": {
+      "pivot": [
+        28,
+        156
+      ]
+    },
+    "round_shield": {
+      "pivot": [
+        60,
+        60
+      ]
+    },
+    "tower_shield": {
+      "pivot": [
+        36,
+        108
+      ]
+    },
+    "dagger": {
+      "pivot": [
+        20,
+        28
+      ]
+    },
+    "club": {
+      "pivot": [
+        36,
+        164
+      ]
+    },
+    "staff": {
+      "pivot": [
+        28,
+        172
+      ]
+    }
+  },
+  "screens": {
+    "combat": {
+      "designSize": [
+        960,
+        540
+      ],
+      "elements": [
+        {
+          "id": "backdrop",
+          "type": "text",
+          "anchor": "Center",
+          "offset": [
+            0,
+            -77
+          ],
+          "size": [
+            960,
+            330
+          ],
+          "z": 0,
+          "binds": "encounter.scene",
+          "image": "Content/bg/combat_field.png"
+        },
+        {
+          "id": "heldBadge",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            462,
+            6
+          ],
+          "size": [
+            48,
+            16
+          ],
+          "z": 1,
+          "binds": "combat.paused",
+          "color": "amber",
+          "fill": "slot",
+          "border": {
+            "color": "border",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 6.5
+        },
+        {
+          "id": "topControls",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            794,
+            4
+          ],
+          "size": [
+            153,
+            20
+          ],
+          "z": 1
+        },
+        {
+          "id": "autoAttackBtn",
+          "type": "button",
+          "anchor": "TopLeft",
+          "offset": [
+            794,
+            4
+          ],
+          "size": [
+            98,
+            20
+          ],
+          "z": 1,
+          "binds": "combat.autoAttack",
+          "image": "Content/ui/button/button_on.png"
+        },
+        {
+          "id": "fleeBtn",
+          "type": "button",
+          "anchor": "TopLeft",
+          "offset": [
+            897,
+            4
+          ],
+          "size": [
+            50,
+            20
+          ],
+          "z": 1,
+          "binds": "combat.flee",
+          "image": "Content/ui/button/button_normal.png"
+        },
+        {
+          "id": "heroHp",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            75,
+            321
+          ],
+          "size": [
+            120,
+            24
+          ],
+          "z": 1,
+          "binds": "Body.hp"
+        },
+        {
+          "id": "foeReticle",
+          "type": "icon",
+          "anchor": "TopLeft",
+          "offset": [
+            796,
+            143
+          ],
+          "size": [
+            64,
+            64
+          ],
+          "z": 1,
+          "binds": "targeting.focus",
+          "image": "Content/ui/reticle/focus.png"
+        },
+        {
+          "id": "foeHp",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            750,
+            321
+          ],
+          "size": [
+            150,
+            14
+          ],
+          "z": 1,
+          "binds": "encounter.foe.hp"
+        },
+        {
+          "id": "poolRows",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            10,
+            389
+          ],
+          "size": [
+            309,
+            77
+          ],
+          "z": 1,
+          "binds": "pool",
+          "item": {
+            "template": "poolRow",
+            "flow": "vertical",
+            "gap": 6,
+            "size": [
+              309,
+              15
+            ]
+          }
+        },
+        {
+          "id": "poolLegend",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            10,
+            528
+          ],
+          "size": [
+            309,
+            6
+          ],
+          "z": 1,
+          "binds": "pool.legend",
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 4.5
+        },
+        {
+          "id": "techList",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            340,
+            397
+          ],
+          "size": [
+            495,
+            136
+          ],
+          "z": 1,
+          "binds": "loadout.techniques",
+          "item": {
+            "template": "techCard",
+            "flow": "horizontal",
+            "gap": 6,
+            "size": [
+              94,
+              136
+            ]
+          }
+        },
+        {
+          "id": "bayList",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            850,
+            397
+          ],
+          "size": [
+            100,
+            136
+          ],
+          "z": 1,
+          "binds": "loadout.bays",
+          "item": {
+            "template": "minionBay",
+            "flow": "horizontal",
+            "gap": 6,
+            "size": [
+              100,
+              136
+            ]
+          }
+        },
+        {
+          "id": "heroFigure",
+          "type": "figure",
+          "anchor": "BottomLeft",
+          "offset": [
+            60,
+            -222
+          ],
+          "size": [
+            180,
+            215
+          ],
+          "z": 2,
+          "binds": "Body"
+        },
+        {
+          "id": "minionField",
+          "type": "figure",
+          "anchor": "Bottom",
+          "offset": [
+            -214,
+            -256
+          ],
+          "size": [
+            75,
+            84
+          ],
+          "z": 2,
+          "binds": "encounter.minions"
+        },
+        {
+          "id": "foeFigure",
+          "type": "figure",
+          "anchor": "BottomRight",
+          "offset": [
+            -45,
+            -217
+          ],
+          "size": [
+            180,
+            220
+          ],
+          "z": 2,
+          "binds": "encounter.foe"
+        },
+        {
+          "id": "statusStrip",
+          "type": "panel",
+          "anchor": "Top",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            28
+          ],
+          "z": 6,
+          "fill": "panel",
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid"
+          }
+        },
+        {
+          "id": "attrPool",
+          "type": "panel",
+          "anchor": "BottomLeft",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            330,
+            181
+          ],
+          "z": 6,
+          "binds": "Body.pool",
+          "fill": "panel"
+        },
+        {
+          "id": "actionBar",
+          "type": "panel",
+          "anchor": "Bottom",
+          "offset": [
+            165,
+            0
+          ],
+          "size": [
+            630,
+            181
+          ],
+          "z": 6,
+          "binds": "loadout",
+          "fill": "panel"
+        }
+      ]
+    },
+    "build": {
+      "designSize": [
+        960,
+        540
+      ],
+      "elements": [
+        {
+          "id": "statusStrip",
+          "type": "panel",
+          "anchor": "Top",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            28
+          ],
+          "z": 6,
+          "fill": "panel",
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid"
+          },
+          "content": "Roguebane · BETWEEN BATTLES · LOADOUT · CORE GRUNT"
+        },
+        {
+          "id": "equipPanel",
+          "type": "panel",
+          "anchor": "Left",
+          "offset": [
+            0,
+            -52
+          ],
+          "size": [
+            250,
+            380
+          ],
+          "z": 2,
+          "binds": "Body",
+          "image": "Content/bg/build_alcove.png"
+        },
+        {
+          "id": "paperDoll",
+          "type": "figure",
+          "anchor": "Left",
+          "offset": [
+            75,
+            -59
+          ],
+          "size": [
+            120,
+            215
+          ],
+          "z": 2,
+          "binds": "Body"
+        },
+        {
+          "id": "attrTitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            261,
+            36
+          ],
+          "size": [
+            431,
+            15
+          ],
+          "z": 1,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 11.5,
+          "content": "Attributes"
+        },
+        {
+          "id": "attrReadout",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            261,
+            56
+          ],
+          "size": [
+            431,
+            67
+          ],
+          "z": 1,
+          "binds": "attrs",
+          "item": {
+            "template": "attrBar",
+            "flow": "vertical",
+            "gap": 5,
+            "size": [
+              431,
+              13
+            ]
+          }
+        },
+        {
+          "id": "inventory",
+          "type": "panel",
+          "anchor": "Center",
+          "offset": [
+            -3,
+            -4
+          ],
+          "size": [
+            431,
+            270
+          ],
+          "z": 5,
+          "binds": "inventory",
+          "fill": "panelTab",
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid"
+          }
+        },
+        {
+          "id": "invTabs",
+          "type": "tabs",
+          "anchor": "TopLeft",
+          "offset": [
+            262,
+            151
+          ],
+          "size": [
+            429,
+            29
+          ],
+          "z": 5,
+          "binds": "tabs",
+          "item": {
+            "template": "invTab",
+            "flow": "horizontal",
+            "gap": 4,
+            "size": [
+              40,
+              18
+            ]
+          }
+        },
+        {
+          "id": "invItems",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            270,
+            180
+          ],
+          "size": [
+            413,
+            105
+          ],
+          "z": 5,
+          "binds": "invItems",
+          "item": {
+            "template": "invCard",
+            "flow": "grid",
+            "gap": 6,
+            "cols": 2,
+            "size": [
+              204,
+              31
+            ]
+          }
+        },
+        {
+          "id": "runeBag",
+          "type": "panel",
+          "anchor": "Right",
+          "offset": [
+            0,
+            -52
+          ],
+          "size": [
+            256,
+            380
+          ],
+          "z": 5,
+          "binds": "runes"
+        },
+        {
+          "id": "runeBudget",
+          "type": "bar",
+          "anchor": "TopLeft",
+          "offset": [
+            714,
+            56
+          ],
+          "size": [
+            236,
+            17
+          ],
+          "z": 5,
+          "binds": "runes.budget"
+        },
+        {
+          "id": "runeGroups",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            714,
+            91
+          ],
+          "size": [
+            236,
+            309
+          ],
+          "z": 5,
+          "binds": "runeGroups",
+          "item": {
+            "template": "runeGroup",
+            "flow": "vertical",
+            "gap": 6,
+            "size": [
+              236,
+              78
+            ]
+          }
+        },
+        {
+          "id": "bottomBand",
+          "type": "panel",
+          "anchor": "Bottom",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            132
+          ],
+          "z": 6,
+          "fill": "panel",
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid"
+          }
+        },
+        {
+          "id": "currentCore",
+          "type": "panel",
+          "anchor": "BottomLeft",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            150,
+            131
+          ],
+          "z": 6,
+          "binds": "core"
+        },
+        {
+          "id": "actionBar",
+          "type": "panel",
+          "anchor": "Bottom",
+          "offset": [
+            -75,
+            0
+          ],
+          "size": [
+            810,
+            131
+          ],
+          "z": 6,
+          "binds": "loadout"
+        },
+        {
+          "id": "loadoutList",
+          "type": "list",
+          "anchor": "BottomLeft",
+          "offset": [
+            160,
+            -7
+          ],
+          "size": [
+            681,
+            89
+          ],
+          "z": 6,
+          "binds": "loadout",
+          "item": {
+            "template": "loadoutCard",
+            "flow": "horizontal",
+            "gap": 6,
+            "size": [
+              131,
+              89
+            ]
+          }
+        },
+        {
+          "id": "buildMinions",
+          "type": "list",
+          "anchor": "BottomRight",
+          "offset": [
+            -10,
+            -7
+          ],
+          "size": [
+            94,
+            89
+          ],
+          "z": 6,
+          "binds": "minions",
+          "item": {
+            "template": "loadoutCard",
+            "flow": "horizontal",
+            "gap": 6
+          }
+        }
+      ]
+    },
+    "runmap": {
+      "designSize": [
+        960,
+        540
+      ],
+      "elements": [
+        {
+          "id": "mapBoard",
+          "anchor": "Center",
+          "offset": [
+            0,
+            -10
+          ],
+          "size": [
+            820,
+            400
+          ],
+          "z": 1,
+          "binds": "run.map"
+        },
+        {
+          "id": "runHeader",
+          "anchor": "Top",
+          "offset": [
+            0,
+            16
+          ],
+          "size": [
+            820,
+            56
+          ],
+          "z": 10,
+          "binds": "run.meta"
+        },
+        {
+          "id": "legend",
+          "anchor": "BottomLeft",
+          "offset": [
+            24,
+            -24
+          ],
+          "size": [
+            240,
+            120
+          ],
+          "z": 8,
+          "binds": "run.legend"
+        }
+      ]
+    },
+    "campaign": {
+      "designSize": [
+        960,
+        540
+      ],
+      "elements": [
+        {
+          "id": "spine",
+          "anchor": "Center",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            880,
+            360
+          ],
+          "z": 1,
+          "binds": "campaign.spine"
+        },
+        {
+          "id": "chapterCard",
+          "anchor": "TopLeft",
+          "offset": [
+            24,
+            24
+          ],
+          "size": [
+            320,
+            200
+          ],
+          "z": 6,
+          "binds": "campaign.current"
+        },
+        {
+          "id": "metaBar",
+          "anchor": "Bottom",
+          "offset": [
+            0,
+            -16
+          ],
+          "size": [
+            760,
+            64
+          ],
+          "z": 10,
+          "binds": "campaign.meta"
+        }
+      ]
+    },
+    "newrun": {
+      "designSize": [
+        960,
+        540
+      ],
+      "elements": [
+        {
+          "id": "coreCards",
+          "anchor": "Center",
+          "offset": [
+            0,
+            10
+          ],
+          "size": [
+            860,
+            320
+          ],
+          "z": 2,
+          "binds": "cores"
+        },
+        {
+          "id": "title",
+          "anchor": "Top",
+          "offset": [
+            0,
+            28
+          ],
+          "size": [
+            600,
+            60
+          ],
+          "z": 10,
+          "binds": null
+        },
+        {
+          "id": "confirmBar",
+          "anchor": "Bottom",
+          "offset": [
+            0,
+            -20
+          ],
+          "size": [
+            420,
+            72
+          ],
+          "z": 10,
+          "binds": "selection"
+        }
+      ]
+    }
+  },
+  "style": {
+    "palette": {
+      "ink": "#ece0cb",
+      "inkBright": "#f0dcb4",
+      "inkWarm": "#e9d6b0",
+      "parch": "#cdbfa8",
+      "muted": "#9a8468",
+      "mutedDim": "#8d775c",
+      "mutedWarm": "#b09a82",
+      "ground": "#0c0810",
+      "panel": "#1d150e",
+      "panelDeep": "#15100b",
+      "panelCard": "#1c140d",
+      "panelTab": "#17110b",
+      "slot": "#241b14",
+      "border": "#5a4636",
+      "borderMid": "#4a3729",
+      "borderDim": "#382a1d",
+      "borderFaint": "#2e2218",
+      "outline": "#0a0807",
+      "amber": "#d9a441",
+      "gold": "#cf9a44",
+      "blood": "#b23b32",
+      "flame": "#e8913a",
+      "hit": "#e0654b",
+      "str": "#c2553f",
+      "int": "#6f8fc4",
+      "dex": "#82a85e",
+      "con": "#cf9a44",
+      "good": "#7fa05a",
+      "mintActive": "#7fc4b0",
+      "teal": "#4f9a8a",
+      "lockRed": "#b0473a",
+      "lockText": "#d0744a",
+      "rareCommon": "#9a8c7a",
+      "rareMagic": "#6f9fd6",
+      "rareRare": "#c66fb4",
+      "rareEpic": "#e0a23c"
+    },
+    "fonts": {
+      "display": {
+        "family": "'IM Fell English', Georgia, serif",
+        "role": "world & names (storybook serif)"
+      },
+      "mono": {
+        "family": "'JetBrains Mono', monospace",
+        "role": "numbers / state / captions"
+      },
+      "sizes": {
+        "title": 12,
+        "header": 11.5,
+        "body": 8.25,
+        "label": 7,
+        "caption": 5.5,
+        "num": 11,
+        "numBig": 13
+      }
+    },
+    "partStates": {
+      "ok": "healthy",
+      "damaged": "damaged",
+      "broken": "broken",
+      "bareOk": "barehealthy",
+      "bareDmg": "baredamaged",
+      "bareBroke": "barebroken",
+      "hidden": "hidden",
+      "focus": "ui/reticle/focus",
+      "aiming": "ui/reticle/aiming",
+      "gearSocket": "hatch"
+    },
+    "pip": {
+      "wrapAt": 10,
+      "shrink": true,
+      "fixedFootprint": true,
+      "anchor": "monoNumber",
+      "max": 20
+    }
+  },
+  "templates": {
+    "poolRow": {
+      "size": [
+        309,
+        15
+      ],
+      "parts": [
+        {
+          "rect": [
+            9,
+            0,
+            12,
+            9
+          ],
+          "color": "inkWarm",
+          "font": "mono",
+          "fontPx": 6.5,
+          "sample": "STR"
+        },
+        {
+          "rect": [
+            0,
+            9,
+            11,
+            6
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 4.5,
+          "sample": "Arms"
+        },
+        {
+          "rect": [
+            54,
+            0,
+            13,
+            15
+          ],
+          "color": "ink",
+          "font": "mono",
+          "fontPx": 11,
+          "sample": "alloc"
+        },
+        {
+          "rect": [
+            69,
+            4,
+            5,
+            10
+          ],
+          "color": "border",
+          "font": "mono",
+          "fontPx": 7.5,
+          "sample": "/"
+        },
+        {
+          "rect": [
+            76,
+            0,
+            13,
+            15
+          ],
+          "color": "lockText",
+          "font": "mono",
+          "fontPx": 11,
+          "sample": "avail"
+        }
+      ]
+    },
+    "techCard": {
+      "size": [
+        94,
+        136
+      ],
+      "parts": [
+        {
+          "rect": [
+            10,
+            7,
+            6,
+            10
+          ],
+          "color": "outline",
+          "font": "mono",
+          "fontPx": 7.5,
+          "sample": "glyph"
+        },
+        {
+          "rect": [
+            71,
+            10,
+            15,
+            5
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 4,
+          "sample": "state"
+        },
+        {
+          "rect": [
+            6,
+            24,
+            21,
+            11
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8.5,
+          "sample": "name"
+        },
+        {
+          "rect": [
+            69,
+            25,
+            12,
+            9
+          ],
+          "color": "str",
+          "font": "mono",
+          "fontPx": 6.5,
+          "sample": "attr"
+        },
+        {
+          "rect": [
+            85,
+            25,
+            4,
+            9
+          ],
+          "color": "str",
+          "font": "mono",
+          "fontPx": 6.5,
+          "sample": "cost"
+        },
+        {
+          "rect": [
+            6,
+            44,
+            79,
+            23
+          ],
+          "color": "parch",
+          "font": "display",
+          "fontPx": 8.25,
+          "sample": "desc"
+        },
+        {
+          "rect": [
+            6,
+            125,
+            16,
+            6
+          ],
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 4.5,
+          "sample": "timer"
+        }
+      ]
+    },
+    "minionBay": {
+      "size": [
+        100,
+        136
+      ],
+      "parts": [
+        {
+          "rect": [
+            74,
+            10,
+            17,
+            5
+          ],
+          "color": "mintActive",
+          "font": "mono",
+          "fontPx": 4,
+          "sample": "state"
+        },
+        {
+          "rect": [
+            6,
+            24,
+            31,
+            11
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8.5,
+          "sample": "name"
+        },
+        {
+          "rect": [
+            75,
+            25,
+            20,
+            9
+          ],
+          "color": "int",
+          "font": "mono",
+          "fontPx": 6.5,
+          "sample": "attr"
+        },
+        {
+          "rect": [
+            91,
+            25,
+            4,
+            9
+          ],
+          "color": "int",
+          "font": "mono",
+          "fontPx": 6.5,
+          "sample": "cost"
+        },
+        {
+          "rect": [
+            6,
+            44,
+            88,
+            23
+          ],
+          "color": "parch",
+          "font": "display",
+          "fontPx": 8.25,
+          "sample": "desc"
+        }
+      ]
+    },
+    "attrBar": {
+      "size": [
+        431,
+        13
+      ],
+      "parts": [
+        {
+          "rect": [
+            12,
+            2,
+            13,
+            9
+          ],
+          "color": "inkWarm",
+          "font": "mono",
+          "fontPx": 7,
+          "sample": "STR"
+        },
+        {
+          "rect": [
+            35,
+            3,
+            12,
+            7
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 5,
+          "sample": "part"
+        },
+        {
+          "rect": [
+            404,
+            0,
+            6,
+            13
+          ],
+          "color": "ink",
+          "font": "mono",
+          "fontPx": 10,
+          "sample": "alloc"
+        },
+        {
+          "rect": [
+            412,
+            3,
+            4,
+            9
+          ],
+          "color": "border",
+          "font": "mono",
+          "fontPx": 7,
+          "sample": "/"
+        },
+        {
+          "rect": [
+            419,
+            0,
+            12,
+            13
+          ],
+          "color": "lockText",
+          "font": "mono",
+          "fontPx": 10,
+          "sample": "avail"
+        }
+      ]
+    },
+    "invTab": {
+      "size": [
+        40,
+        18
+      ],
+      "parts": [
+        {
+          "rect": [
+            12,
+            5,
+            16,
+            8
+          ],
+          "color": "inkBright",
+          "font": "mono",
+          "fontPx": 6,
+          "sample": "label"
+        }
+      ]
+    },
+    "invCard": {
+      "size": [
+        204,
+        31
+      ],
+      "parts": [
+        {
+          "rect": [
+            16,
+            9,
+            9,
+            5
+          ],
+          "color": "outline",
+          "font": "mono",
+          "fontPx": 4,
+          "sample": "badgeAttr"
+        },
+        {
+          "rect": [
+            16,
+            13,
+            8,
+            9
+          ],
+          "color": "outline",
+          "font": "mono",
+          "fontPx": 7,
+          "sample": "badgeNum"
+        },
+        {
+          "rect": [
+            40,
+            10,
+            21,
+            10
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "sample": "name"
+        },
+        {
+          "rect": [
+            176,
+            12,
+            15,
+            7
+          ],
+          "color": "rareEpic",
+          "font": "mono",
+          "fontPx": 5,
+          "sample": "rarity"
+        }
+      ]
+    },
+    "runeGroup": {
+      "size": [
+        236,
+        78
+      ],
+      "parts": [
+        {
+          "rect": [
+            0,
+            0,
+            22,
+            7
+          ],
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "title"
+        },
+        {
+          "rect": [
+            26,
+            20,
+            57,
+            9
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 7.5,
+          "sample": "name"
+        },
+        {
+          "rect": [
+            26,
+            30,
+            60,
+            7
+          ],
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 5.25,
+          "sample": "effect"
+        },
+        {
+          "rect": [
+            196,
+            21,
+            33,
+            6
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 4.5,
+          "sample": "state"
+        },
+        {
+          "rect": [
+            222,
+            29,
+            7,
+            8
+          ],
+          "color": "amber",
+          "font": "mono",
+          "fontPx": 6,
+          "sample": "cost"
+        }
+      ]
+    },
+    "loadoutCard": {
+      "size": [
+        131,
+        89
+      ],
+      "parts": [
+        {
+          "rect": [
+            61,
+            28,
+            10,
+            13
+          ],
+          "color": "outline",
+          "font": "mono",
+          "fontPx": 13,
+          "sample": "glyph"
+        },
+        {
+          "rect": [
+            57,
+            49,
+            17,
+            9
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 7,
+          "sample": "name"
+        },
+        {
+          "rect": [
+            59,
+            60,
+            14,
+            6
+          ],
+          "color": "str",
+          "font": "mono",
+          "fontPx": 4.5,
+          "sample": "attr"
+        }
+      ]
+    }
+  }
+}

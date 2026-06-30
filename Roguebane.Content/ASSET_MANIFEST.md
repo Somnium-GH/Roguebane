@@ -1,6 +1,27 @@
 # Roguebane — ASSET MANIFEST
 
-**Art target = HIGH-fidelity retrofantasy EGA/VGA** — a crisp, high-resolution rendering of the
+## Two-tier art direction — READ FIRST
+Roguebane renders in **two deliberately different visual registers**, and an asset belongs to exactly one:
+
+**Tier 1 — the UI chrome is HIGH-DEF, sleek, refined.** Everything that frames play — panels, bars,
+pips, technique/attr chips, badges, buttons, reticles, type — is crisp and clean: hard black borders,
+saturated fills, anti-aliased glyphs, high contrast, NO dithering, NO pixelation. **Depth is allowed and
+intentional on interactive chrome** — buttons, inventory-selection tiles, and the map node tokens carry
+real bevel/emboss/gloss; flat-shaded pictographs (attr/rune/resource glyphs, pips) stay flat. It reads
+like a modern, tightly-drawn fantasy game UI. These atoms are not hand-drawn in
+canvas — they are **captured from the live `.dc.html` screens** (ASSET_GEN_METHOD.md / §12 of
+`LAYOUT_CONTRACT.md`), reproducing the design pixel-perfect (depth included) by construction.
+
+**Tier 2 — the world art is LOW-RES 8-bit.** Characters, gear, minions and backdrops are chunky,
+blocky, flat-shaded pixel art with a single bevel and crisp nearest-neighbour edges (the locked
+proportions + rules live in `ART_RULES.md`). Think NES/early-VGA storybook, upscaled but keeping its
+coarse soul. This is the ONLY tier that is "8-bit"; the UI is not.
+
+The mistake to avoid: making the UI look cartoonish/blocky to "match" the sprites, or making the sprites
+slick to "match" the UI. They are intentionally different. When in doubt: chrome = Tier 1 (capture from
+the screen), world = Tier 2 (generate from `roster_gen.js`/`bg_gen.js`).
+
+**Art target (Tier 2 sprites)** = HIGH-fidelity retrofantasy EGA/VGA — a crisp, high-resolution rendering of the
 oldschool 8-bit / EGA-VGA storybook look (Zeliard-style), as if that retro art were upscaled to HD
 while keeping its old-school soul: polished, decent quality, NOT crude or low-res. (Separate
 from the label/highlight scaffolding, which is not the style.) Current placeholders are fine while
@@ -33,120 +54,115 @@ dependency; **OPEN** = binding or content undecided (see foot).
 
 | id | type | screen | drives-from (Core) | size px | variants | status |
 |---|---|---|---|---|---|---|
-## sprites/body/{part}/ — MODULAR base + armor layers (PNG32, transparent, PointClamp)
 
-Each part is **two stacked layers** — a bare `base` limb and an `armor` overlay that acts as a
-proxy on top (armor renders over the limb when equipped; strip it and the base shows through).
-Each layer has three condition states: `healthy` · `damaged` · `broken`. The renderer composites
-`base_<cond>` then, if armored, `armor_<cond>` at the part's body anchor. One `arm`/`leg` asset is
-reused for both sides (mirror the right). Centered, grid-aligned, full part size.
+## sprites/body/<figure>/ — PER-FIGURE modular parts + `Content/layout.json` (LOCKED idiom)
 
-| id | type | screen | drives-from (Core) | size px | variants | status |
-|---|---|---|---|---|---|---|
-| `body/head/base_*` | head limb | Combat, Build | `parts[Head].condition` | 32×36 | `healthy·damaged·broken` | placeholder |
-| `body/head/armor_*` | head armor (helm) | Combat, Build | `head.armorId` + `armor.condition` | 32×36 | `healthy·damaged·broken` | placeholder |
-| `body/chest/base_*` | chest limb | Combat, Build | `parts[Chest].condition` | 40×40 | `healthy·damaged·broken` | placeholder |
-| `body/chest/armor_*` | chest armor (plate) | Combat, Build | `chest.armorId` + condition | 40×40 | `healthy·damaged·broken` | placeholder |
-| `body/arm/base_*` | arm limb (×2 mirror) | Combat, Build | `parts[Arm].condition` | 20×44 | `healthy·damaged·broken` | placeholder |
-| `body/arm/armor_*` | arm armor (vambrace) | Combat, Build | `arm.armorId` + condition | 20×44 | `healthy·damaged·broken` | placeholder |
-| `body/leg/base_*` | leg limb (×2 mirror) | Combat, Build | `parts[Leg].condition` | 20×48 | `healthy·damaged·broken` | placeholder |
-| `body/leg/armor_*` | leg armor (greave) | Combat, Build | `leg.armorId` + condition | 20×48 | `healthy·damaged·broken` | placeholder |
+The flat-bevel roster (see `proto/roster_gen.js`, `ART_RULES.md`, `LAYOUT_CONTRACT.md`) emits **per-figure**
+parts — each figure has its own `head/torso/armL/armR/legL/legR/boots` (robe figures: `torso`(robe)/`armL`/`armR`/`head`;
+some carry `back`(wings) or `frontGear`), every part as `<part>_<state>.png` for `healthy·damaged·broken`.
+Figures: `grunt warden adept summoner reaver skeleton bandit wraith ogre troll gargoyle`. Flattened
+thumbnails live in `proto/roster/<figure>.png`. Damage = darken + hairline crack (broken adds a corner
+chip), shown by shading/cracks never color.
 
-*Armor variants per part:* `armor_*` (steel plate) plus `robe_blue_*` · `robe_violet_*` ·
-`robe_cloth_*` (caster robe colorways) — each with `healthy·damaged·broken`. The renderer picks
-the variant by `armorId`, so an Adept/Summoner wears a robe through the same modular slot a Warden
-wears plate.
+**`Content/layout.json`** is the coordinate source of truth (per `LAYOUT_CONTRACT.md`): `figures.<id>` =
+`{size, pivot, z, parts:{<part>:{rect:[x,y,w,h]}}, sockets:{handL,handR,neck,shoulderL,shoulderR}, mounts}`
+in figure-space px; `gear.<id>` = `{pivot}`; `screens.<id>` = responsive design-space (960×540) UI manifests.
+The game composites parts at `rect` in `z` order (verified pixel-identical to the flattened PNG) and mounts
+each `gear` PNG by aligning its `pivot` to the figure's hand socket. Detached gear PNGs: `sprites/gear/{sword,
+round_shield,tower_shield,dagger,club,staff}.png`.
 
-| id | type | screen | drives-from (Core) | size px | variants | status |
-|---|---|---|---|---|---|---|
-| `sprites/gear/weapon_{sword,axe,mace,greatsword,dagger,spear,bow,staff,staff_summon}` | weapon → arm | Combat, Build | `loadout.arms.weaponId` | ~16×52 | — | placeholder |
-| `sprites/gear/shield_{round,tower,kite,buckler}` | shield → off-arm | Combat, Build | `loadout.offArm.shieldId` | ~28×42 | — | placeholder |
-| `sprites/gear/club_ogre` | foe weapon | Combat | `enemy.weaponId` | 20×56 | — | placeholder |
+**Screen manifests (§3/§7/§8/§9).** `layout.json` also carries the full UI layout for `combat` + `build`
+(others coarse — see [OPEN]): `style` (single palette/font/partStates/pip table, mirrored from
+`style_tokens.js`), `templates.<name>` (per-card mini-layouts: rect + colour-token + font-role + sample
+per sub-part), and `screens.<id>.elements[]` (anchor + design-space offset/size + z + binds + colour
+token + font role; data-driven regions carry `item:{template,flow,gap,cols,size}`). These are NOT
+hand-authored: `proto/screen_extract.js` walks the live instrumented `.dc.html` DOM (`[data-el]`,
+`data-anchor/binds/container/template/flow/z`) and projects computed geometry/colour into the manifest,
+so same DOM ⇒ byte-identical manifest. `style_tokens.js` is the one style source both the screens and
+the extractor read. Re-run after any screen edit; `layout.json` ships via `/copy:` (plain data, not a
+texture).
 
-*Armor is a separate modular layer, NOT baked into the limb — so a part can be bare, armored, or
-have its armor shatter (→ `broken`) independently of the flesh underneath. The showcase
-`sprites/char/player_knight` is the composite of base+armor+weapon+shield at `healthy`.*
+*Swept:* the earlier painterly `sprites/body/{arm,chest,head,leg}/`, `sprites/foe/*`, `sprites/char/*`,
+and redundant `sprites/gear/weapon_*`·`shield_*` assets were removed — the per-figure tree + generated
+gear are the only character art now. `Content.mgcb` mirrors the on-disk tree exactly.
 
-## sprites/foe/ogre/{part}/ — MODULAR ogre limb parts (base only, no armor)
+## sprites/gear/ — detached weapons + shields (generator-produced, pivots in layout.json)
 
-Same per-part decomposition as the hero, but the ogre is bare (no armor layer). Head, torso, and
-mirrored arm/leg, each `base_{healthy·damaged·broken}` (gash → torn-away chunk, raw flesh). The
-club is a separate gear overlay. Skeleton minion is intentionally NOT decomposed yet (one whole
-sprite; a single damaged variant may come later).
+Six gear PNGs from `proto/roster_gen.js`, each mounted by aligning its `gear.<id>.pivot` (in
+`Content/layout.json`) to a figure's hand socket. Flat-bevel idiom, 1px outline.
 
-| id | type | screen | drives-from (Core) | size px | variants | status |
-|---|---|---|---|---|---|---|
-| `foe/ogre/head/base_*` | ogre head | Combat | `enemy.parts[Head].condition` | 36×36 | `healthy·damaged·broken` | placeholder |
-| `foe/ogre/torso/base_*` | ogre torso | Combat | `enemy.parts[Core].condition` | 52×36 | `healthy·damaged·broken` | placeholder |
-| `foe/ogre/arm/base_*` | ogre arm (×2 mirror) | Combat | `enemy.parts[Arm].condition` | 20×40 | `healthy·damaged·broken` | placeholder |
-| `foe/ogre/leg/base_*` | ogre leg (×2 mirror) | Combat | `enemy.parts[Leg].condition` | 22×34 | `healthy·damaged·broken` | placeholder |
-| `sprites/gear/club_ogre` | ogre club | Combat | `enemy.weaponId` | 20×56 | — | placeholder |
+| id | type | screen | mounts to | status |
+|---|---|---|---|---|
+| `sprites/gear/sword` | one-hand blade (points up) | Combat, Build | hand socket | hi-fi |
+| `sprites/gear/dagger` | off-hand dagger (points down) | Combat, Build | hand socket | hi-fi |
+| `sprites/gear/club` | brute club | Combat | hand socket | hi-fi |
+| `sprites/gear/staff` | caster staff + orb | Combat, Build | hand socket | hi-fi |
+| `sprites/gear/round_shield` | round shield + boss | Combat, Build | off-hand socket | hi-fi |
+| `sprites/gear/tower_shield` | royal tower shield | Combat, Build | off-hand socket | hi-fi |
 
-## sprites/foe/{foe}/{part}/ — decomposed foes (base limb states, no armor)
+## sprites/minion/ — summon creatures (generator-produced, single flat-bevel sprites)
 
-Every foe is decomposed like the ogre — head · torso · arm (×2 mirror) · leg (×2 mirror), each
-`base_{healthy·damaged·broken}` (gash → torn chunk + raw). No armor layer (foes are bare).
+Whole-sprite minions from `proto/roster_gen.js` (the `MIN.*` specs), same locked idiom as the
+roster: per-part 1px outline, flat fill + bottom/right bevel.
 
-| id | type | screen | drives-from (Core) | size px | variants | status |
-|---|---|---|---|---|---|---|
-| `foe/ogre/{head,torso,arm,leg}/base_*` | ogre parts | Combat | `enemy.parts[*].condition` | 36×36 … 22×34 | `healthy·damaged·broken` | placeholder |
-| `foe/bandit/{head,torso,arm,leg}/base_*` | hooded rogue | Combat | `enemy.parts[*].condition` | 32×32 … 20×34 | `healthy·damaged·broken` | placeholder |
-| `foe/wraith/{head,torso,arm,leg}/base_*` | cloaked spirit | Combat | `enemy.parts[*].condition` | 32×32 … 20×34 | `healthy·damaged·broken` | placeholder |
-| `foe/troll/{head,torso,arm,leg}/base_*` | hulking brute | Combat | `enemy.parts[*].condition` | 32×32 … 20×34 | `healthy·damaged·broken` | placeholder |
-| `foe/gargoyle/{head,torso,arm,leg}/base_*` | winged stone fiend | Combat | `enemy.parts[*].condition` | 32×32 … 20×34 | `healthy·damaged·broken` | placeholder |
+| id | type | screen | drives-from (Core) | status |
+|---|---|---|---|---|
+| `sprites/minion/skeleton` | bone summon (skull + ribcage) | Combat | `bay.minion.id` | hi-fi |
+| `sprites/minion/wisp` | teal spirit (floating orb) | Combat | `bay.minion.id` | hi-fi |
+| `sprites/minion/hound` | dark beast (quadruped) | Combat | `bay.minion.id` | hi-fi |
+| `sprites/minion/golem` | stone construct | Combat | `bay.minion.id` | hi-fi |
+| `sprites/minion/imp` | red demon (horns + tail) | Combat | `bay.minion.id` | hi-fi |
 
-## sprites/char/chassis/ — selectable Core figures (New Run; placeholder)
+## targeting — combat HUD affordances (PNG32, transparent)
 
-One figure per Core, shown on the Choose-Your-Core screen and as the in-game body. Flat
-grid-aligned silhouettes, distinct per archetype.
+**UI atoms come from TWO sources (no hand-painting, no hallucinated twins).**
+(a) **Captured from the live screens** (§12 of `LAYOUT_CONTRACT.md`, via `proto/atom_capture.js` — the
+screen's own rendered `[data-atom]` nodes sliced to PNG, listed in `proto/atom_registry.json`): the
+technique glyph chips `icons/technique/{swing,frenzy,firebolt,disarm,brace}` and the pool-pip states
+the pool pips `ui/pip/*` — token-stamped per colour from `proto/atom_slice.js` (`pip_full_<colour>` solid; `pip_reserved_<attr>` black −45° hatch; `pip_empty`/`pip_empty_<resource>` dark socket, dashed frame on resources; `pip_debuff`/`pip_damage` amber/red +45° hatch), AND the map node tokens `icons/node/*` — CAPTURED flat from the RunMap node DOM via `proto/atom_capture.js` (ASSET_GEN_METHOD.md).
+(b) **Generated as deterministic vector shapes** by **`proto/ui_atoms_gen.js`** (for atoms that are NOT on
+the screens as polished art), coloured from `style_tokens.js`: `icons/attr/{strength,intellect,dexterity,
+constitution}`, `icons/rune/{mark,path_minor,path_major,keystone}`, `icons/resource/{supplies,support,spoils,hp}`,
+`icons/minion/skeleton`, `ui/reticle/{focus,secondary,aiming,target_tag}`. Re-run to reproduce identically.
 
-| id | type | screen | drives-from (Core) | size px | variants | status |
-|---|---|---|---|---|---|---|
-| `char/chassis/grunt` | core figure · generalist | New Run | `chassis.id` | 64×92 | — | placeholder |
-| `char/chassis/warden` | core figure · bulwark | New Run | `chassis.id` | 64×92 | — | placeholder |
-| `char/chassis/adept` | core figure · caster | New Run | `chassis.id` | 64×92 | — | placeholder |
-| `char/chassis/summoner` | core figure · binder | New Run | `chassis.id` | 64×92 | — | placeholder |
-| `char/chassis/reaver` | core figure · duelist | New Run | `chassis.id` | 64×92 | — | placeholder |
+Generators + capture (the whole package is reproducible from these): `roster_gen.js` (figures+gear+layout.json),
+`bg_gen.js` (backdrops), `ui_gen.js` (buttons), `ui_atoms_gen.js`
+(attr/rune/resource/reticle/minion icons), `atom_capture.js` + `atom_slice.js` (technique chips, pips, and
+map node tokens — captured/stamped from the screens; see ASSET_GEN_METHOD.md), `mgcb_gen.js` (Content.mgcb
+from disk), `screen_extract.js` (screens→layout.json). `node_icons_gen.js` is DEPRECATED (hand-canvas).
 
-## sprites/minion/ — summon figures (Combat; placeholder, whole sprites)
-
-Whole figures (no part-decomposition yet — a single damaged variant may come later).
-
-| id | type | screen | drives-from (Core) | size px | variants | status |
-|---|---|---|---|---|---|---|
-| `minion/skeleton` | minion · bone soldier | Combat | `bay.minion.id` | 52×64 | — | placeholder |
-| `minion/wisp` | minion · spirit | Combat | `bay.minion.id` | 40×52 | — | placeholder |
-| `minion/hound` | minion · beast | Combat | `bay.minion.id` | 60×44 | — | placeholder |
-| `minion/golem` | minion · stone brute | Combat | `bay.minion.id` | 54×66 | — | placeholder |
-| `minion/imp` | minion · winged devil | Combat | `bay.minion.id` | 48×52 | — | placeholder |
-
-## sprites/char/ — composited figures actually rendered by the screens (PNG32, transparent, PointClamp)
-
-High-fidelity chunky pixel-art (flat 2-tone + bold black outline), drawn whole rather than as part-stacks — this is what Combat & Build display today. Part *damage* reads from the Attribute Pool + small per-part damage bars, not from swapping these sprites (see [OPEN] for final per-part art).
+Note: **action cards and the auto-attack toggle are NOT standalone PNGs** — the game COMPOSES them
+from `layout.json` `templates.techCard` / `templates.minionBay` + `style` tokens (exactly as the
+`.dc.html` mock draws them inline), so there is nothing to blit and nothing to drift. The auto-attack
+control uses the shared `ui/button/button_{on,normal}` chrome.
 
 | id | type | screen | drives-from (Core) | size px | variants | status |
 |---|---|---|---|---|---|---|
-| `sprites/char/player_knight` | hero figure | Combat, Build | `chassis.id` | 64×74 | — | placeholder |
-| `sprites/char/ogre` | foe figure | Combat | `enemy.id` | 72×78 | — | placeholder |
-| `sprites/char/skeleton` | minion figure | Combat | `bay.minion.id` | 50×64 | — | placeholder |
+| `ui/reticle/focus` · `secondary` | locked-target brackets | Combat | `technique.aim.role` | 96×96 | 2 | hi-fi |
+| `ui/reticle/aiming` | choose-a-target cursor (distinct from locked) | Combat | targeting mode active | 96×96 | — | hi-fi |
+| `ui/reticle/target_tag` | per-technique target pin (which foe/part) | Combat | `technique.targetPartId` | 28×34 | — | hi-fi |
+| `sprites/body/overlay_disabled` | cutaway "disabled" part overlay (beyond healthy/damaged/broken) | Combat | `parts[*].disabled` | 48×48 | — | hi-fi |
 
 ## icons/ — attributes, techniques, runes, nodes, resources (PNG32, transparent)
 
 | id | type | screen | drives-from (Core) | size px | variants | status |
 |---|---|---|---|---|---|---|
-| `icons/attr/{str,int,dex,con}` | attribute emblem | all | static attribute id | 48×48 | 4 | placeholder |
-| `icons/technique/{swing,frenzy,firebolt,disarm,brace,cleave}` | technique glyph | Combat, Build | `technique.id` | 48×48 | 6 | placeholder |
-| `icons/rune/{mark,path,keystone}` | rune tier glyph | Build | `rune.tier` | 40/48/56 | 3 | placeholder |
-| `icons/node/{camp,skirmish,control,merchant,mountain,unknown,castle}` | map token | Run Map | `node.type` + `node.revealed` (→`unknown`) | 56 (castle 128) | 7 | placeholder |
+| `icons/attr/{strength,intellect,dexterity,constitution}` | attribute swatch (NO glyph — plain stat-colour box) | all | static attribute id | 120×120 | 4 | hi-fi · deterministic colour box (engine may draw a tinted rect instead — see UI_ASSET_MAP.md) |
+| `icons/technique/{swing,frenzy,firebolt,disarm,brace}` | technique glyph chip | Combat, Build | `technique.id` | 120×120 | 5 | hi-fi · deterministic chip + screen glyph, re-centred (§12) |
+| `icons/rune/{mark,path_minor,path_major,keystone}` | rune tier glyph — shape encodes tier: diamond(4)/pentagon(5)/hexagon(6)/octagon(8) | Build | `rune.tier` | 120×120 | 4 | hi-fi · deterministic polygon per tier (`ui_atoms_gen.js`) |
+| `icons/node/{camp,resource,merchant,unknown,castle}` | map token | Run Map | `node.type` + `node.revealed` (→`unknown`) | 220 (castle 413) | 5 | hi-fi · captured WITH a smooth high-res emboss (gloss + soft bevel) from the RunMap nodes; transparent corners via dual-bg recovery (ASSET_GEN_METHOD.md) |
 | `icons/resource/{supplies,support,spoils,hp}` | resource glyph | Run Map, Spine, Combat | resource readouts | 48×48 | 4 | placeholder |
 
 ## ui/ — pips, reticles, buttons (PNG32, transparent; buttons 9-sliceable)
 
 | id | type | screen | drives-from (Core) | size px | variants | status |
 |---|---|---|---|---|---|---|
-| `ui/pip/{pip_full,pip_empty,pip_damaged}` | pool pip | Combat | per-pip: reserved\|free\|damaged | 24×24 | 3 | placeholder |
+| `ui/pip/pip_full_{str,int,dex,con,supplies,support}` (+ generic `pip_full`) | filled pool pip, per colour | Combat, Run Map | attribute/resource colour | 128×80 | 7 | hi-fi · DETERMINISTIC from tokens |
+| `ui/pip/pip_reserved_{str,int,dex,con}` (+ generic `pip_reserved`) | gear-reserved pip, per attr | Combat | gear reservation | 128×80 | 5 | hi-fi · black −45° hatch over colour |
+| `ui/pip/{pip_empty,pip_empty_supplies,pip_empty_support}` | free socket — generic + special dashed resource empties | Combat, Run Map | empty / supplies / support | 128×80 | 3 | hi-fi · dashed coloured frame on resources |
+| `ui/pip/{pip_debuff,pip_damage}` | debuff / damage pip (never recolour) | Combat | debuff\|damaged | 128×80 | 2 | hi-fi · amber/red +45° hatch (§12) |
 | `ui/reticle/{focus,secondary}` | targeting bracket | Combat | `technique.aim.role` | 96×96 | 2 | placeholder |
-| `ui/button/button_{normal,hover,down,disabled}` | button skin | all | input/interaction state | 160×44 (9-slice) | 4 | placeholder |
+| `ui/button/button_{normal,hover,down,disabled,on}` | button skin (one set 9-slices to EVERY button) | all | input/interaction state + toggle | 160×44 (9-slice) | 5 | hi-fi · deterministic, black border + state accent + bevel (`proto/ui_gen.js`) |
 
 *Button **labels are runtime text** (drawn over the skin), never baked into the asset.*
 

@@ -1,6 +1,29 @@
 # Status
 
 ## Current target
+**Wire the shell to `layout.json` — the deterministic layout system is LIVE (manifest landed).**
+Claude Design shipped `Roguebane.Content/layout.json` (figures: parts/sockets/z/gear-mounts; gear; all 5
+screens; style; templates) + figure-namespaced modular parts (state-keyed: healthy/damaged/broken,
+armored + bare). Consume it. TOP: (1) UI rebuilt off the manifest; (2) the EQUIPMENT screen working.
+Then FULLY build all 5 screens (combat/build/runmap/campaign/newrun) — reliably spec'd now.
+- LayoutRegistry: load `layout.json` (figures / gear / screens / style / templates).
+- Stage composer: assemble a figure from its parts at manifest rects in `z`, swap part STATE by Core
+  condition (bare vs armored), mount gear at `sockets` per `mounts`, scale into the slot by `pivot`.
+  RETIRE Game1 `DrawHumanoid` hard offsets (the exploded figure).
+- Screens FROM the manifest: place every element by anchor+offset+size + templates + the style block;
+  retire magic-number rects; do all five.
+- EQUIPMENT screen (design/02): the equip system is built in Core — render its manifest UI (Equipment
+  panel, Inventory tabs GEAR/TECH/MINIONS, click/drag-equip, gear-on-anatomy, Rune Bag, Current Core,
+  Action Bar loadout).
+- Viewport: aspect-independent fill (cover bg + anchored HUD via anchors + integer pixel stage).
+- Verify each screen per the loop rule (RB_SMOKE shot vs the design PNG + `design/SCREENS.md`).
+FEATURE-FLAG asset-gated work — a simple `Features` toggle, DEFAULT OFF: build it FULLY but render
+NOTHING when off (no crash, no weird draw); flip/remove the flag when the art lands, log the gap under
+"Asset gaps". Two cases: the WAR-PARTY advance UI (needs a war-party token + camp marker) and the
+RACE + CORE-RUNE two-step NEW RUN (needs race art). Keep the CURRENT single-core New Run working until
+race art exists. (This activates the FOUNDATION section below.)
+
+## Recently shipped (combat + UI — details in git)
 **Targeting/firing FSM — DONE (core + shell, incl. global AUTO).** (most shipped, 167 tests.)
 Player casters run `requireAim`: a powered technique fires ONLY at its own explicit aim, never falling
 back to a front, so untargeted HOLDS. Firing is target-driven (no fire button) — charged+aimed
@@ -117,7 +140,7 @@ screen design/05 (build screen doubles as picker — locked OK); campaign city-g
 
 ## Asset gaps (Needs Claude Design)
 *Loop logs here when a screen needs ART that's missing/wrong in Roguebane.Content and can't be composed
-from primitives. Route each to Claude Design. (Hi-fi transition: design/ASSET_HIFI_BRIEF.md.)*
+from primitives. Route each to Claude Design. (Art direction: DESIGN_SPEC §13.)*
 - (none logged yet)
 
 ## Debt (active — with reconcile trigger)
@@ -143,7 +166,7 @@ from primitives. Route each to Claude Design. (Hi-fi transition: design/ASSET_HI
   Gameplay G1-G8 built or partial (multi-part foes, gear/weapons + plate armor, 5 chassis, node-map run,
   war-party, campaign spine, data-driven runes/minions/magic, economy). Remaining actionable work = the
   Debt above + the targeting FSM fix. Visual truth = design/ PNGs + design/SCREENS.md; look = DESIGN_SPEC
-  §13 + ASSET_HIFI_BRIEF.md. Keep "FTL" out of shipped UI text.
+  §13. Keep "FTL" out of shipped UI text.
 
 ## Phase 3 — combat depth + Race/CoreRune rename [SCOPED, not started]
 Big slice after the current combat polish. Do it in SMALL /loop slices. Reconcile DESIGN_SPEC sections
