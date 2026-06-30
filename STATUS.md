@@ -30,13 +30,17 @@ kit's per-stat demand notch + /N, red when over-pool). Inventory tabs / drag-equ
 anatomy still blocked on gear/minion equip (G2/G7).
 **Bank-on-clear — DONE.** Resource-holds bank rallied support only when their fight is won (combat driver
 via RunMap.BankHold); standalone nav still banks on arrival. Pinned in ExpeditionTests.
-Next actionable (the unblocked queue is thinning — much of what's left is human-gated or asset/design):
-- Campaign city-graph (design/04): a screen for the multi-leg march to the Capital (legs as a graph,
-  current leg highlighted). Read Campaign.LegIndex/LegCount. Check design/04 + SCREENS.md first.
-- INT-channel sustained kind: DEFERRED as speculative — no beam content authored yet (Ember/Drain are
-  fine as Timered bolts). Build it when a channel weapon is actually authored.
-- Foe -> PLAYER part aim is PARKED in "Needs human" — it depends on the HP-vs-stat split decision, and
-  the current whole-HP foe contract is pinned by FoeOffenseTests. Do not flip it unilaterally.
+**Spine strip — DONE** (design/04 partial): Capital peak marker + cities-taken counter on the linear leg
+chain. Full branching city-graph parked (needs a branching campaign model — Needs human).
+Next actionable:
+- G2 gear/equip END TO END is the main remaining buildable gameplay gap. Core equip primitives EXIST
+  (Body.Wield / Body.Equip, Weapon/Armor content in Armory) — what's missing is an INVENTORY (the Stash
+  carries gold/potions only, no gear) + an acquisition path + the build-screen equip UI + equipped-gear
+  on the anatomy. First slice: add gear to the Stash inventory + an equip/unequip action with tests.
+  (Check how gear should be ACQUIRED — if that needs a design call, park that part.)
+- INT-channel sustained kind: DEFERRED as speculative — no beam content authored (Ember/Drain are fine
+  as Timered bolts). Build it when a channel weapon is authored.
+- Foe -> PLAYER part aim PARKED (Needs human): HP-vs-stat split; whole-HP foe contract pinned by FoeOffenseTests.
 Other remaining (Debt): build-screen inventory tabs + drag-equip (blocked on G2/G7); Choose-Your-Core
 screen design/05 (build screen doubles as picker — locked OK); campaign city-graph design/04.
 
@@ -91,6 +95,8 @@ screen design/05 (build screen doubles as picker — locked OK); campaign city-g
   budgets/spoils/prices; march length vs supplies.
 - Fog reveal — DEFAULT: resource-holds + castle visible afar, merchant 1 jump out, else `?` until adjacent.
 - War-party indicator placement on the map.
+- Campaign topology: branching city-graph (design/04 "pick a path, can't take them all") vs the current
+  FIXED linear leg list. The branching §04 screen + route choice wait on this. Linear spine strip ships now.
 - Five chassis stat blocks (design/05) are placeholder — tune later.
 - Part→stat friction (legs = accuracy, arms = STR) — low-pri revisit only if it nags.
 - Fonts: SpriteFonts use system Consolas/Georgia — swap to bundled open fonts before distribution.
