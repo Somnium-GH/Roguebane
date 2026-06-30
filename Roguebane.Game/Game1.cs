@@ -499,7 +499,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
         DrawWarParty(60, 72, 470);
         DrawChart();
-        DrawMapLegend(792, 64); // top-right; clears the header, war party, and the merchant panel below
+        DrawMapLegend(756, 64); // top-right; clears the header, war party, and the merchant panel below
         if (Exp.AtMerchant) DrawMerchant(560, 300);
         DrawGearBar(20, H - 44);
 
@@ -516,7 +516,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
             (NodeType.Castle, "castle / exit"),
             (NodeType.Merchant, "merchant"),
             (NodeType.ResourceHold, "resource hold"),
-            (NodeType.Unknown, "unknown / fight"),
+            (NodeType.Unknown, "unknown/fight"),
         };
         for (var i = 0; i < rows.Length; i++)
         {
