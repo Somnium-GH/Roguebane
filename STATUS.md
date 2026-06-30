@@ -25,10 +25,12 @@ bays at assembly. Summoner ships Skeleton+Shade. Exposed via Exp.MinionCount/Min
 **Combat minion-bay lane — DONE.** BAYS lane paints a slot per chassis bay (filled occupant disc + tag +
 power, or empty), from Exp.Minions/Bays. Combat RB_SMOKE (Summoner @ castle) shows 2/3 bays filled.
 **Combat surface lanes — DONE** (PART-aim limb bands, minion-bay lane, rallied-support lane "RALLIED +N").
+**Build screen attribute readout — DONE** (pips show free/reserved/damaged per stat + gate markers: the
+kit's per-stat demand notch + /N, red when over-pool). Inventory tabs / drag-equip / equipped-gear-on-
+anatomy still blocked on gear/minion equip (G2/G7).
 Next actionable:
-- Build screen: per-stat attribute readout (STR/INT/DEX/CON Capacity+Available) with gate markers — pure
-  render from Body data, unblocked. (Inventory tabs / drag-equip / equipped-gear-on-anatomy still blocked
-  on gear/minion equip G2/G7.)
+- INT-channel sustained kind (Debt): a per-tick damage-scaled Sustained so a beam is a real channel,
+  not a 10/s firehose. Core slice, testable. OR revisit bank-on-arrival→bank-on-clear (minor Core fix).
 - Foe -> PLAYER part aim is PARKED in "Needs human" — it depends on the HP-vs-stat split decision, and
   the current whole-HP foe contract is pinned by FoeOffenseTests. Do not flip it unilaterally.
 Other remaining (Debt): build-screen inventory tabs + drag-equip (blocked on G2/G7); Choose-Your-Core
@@ -95,8 +97,8 @@ from primitives. Route each to Claude Design. (Hi-fi transition: design/ASSET_HI
 - (none logged yet)
 
 ## Debt (active — with reconcile trigger)
-- BUILD screen lacks inventory tabs (gear/tech/minions) + drag-to-equip, the per-stat attribute readout
-  with gate markers, and equipped-gear on the anatomy. Blocked on gear/minion equip (G2/G7).
+- BUILD screen attribute readout + gate markers DONE. Still lacks inventory tabs (gear/tech/minions) +
+  drag-to-equip and equipped-gear on the anatomy. Blocked on gear/minion equip (G2/G7).
 - Combat surface: PART-level aim UI DONE (limb bands + part-aim); minion-bay lane DONE. Still no
   rallied-support lane.
 - CON block + evasion mitigation are on the WHOLE-HP path; localized on PART hits waits on foe→player PART
