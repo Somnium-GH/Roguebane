@@ -11,6 +11,14 @@ attrs→Forge/BuildSession assemble from Race→CycleRace selection→NewGame ra
 fidelity ENGINE set (drop-shadow + gradient + 1080-class fonts via 2× supersample); rune-ladder test
 retired; merchant per-HP heal price; comment hygiene.
 
+CORE PLAYABILITY now under test: CoreCampaignTests drives EVERY core (assembled from a Race + its own
+kit) through a full campaign — asserts each reaches a terminal state (no hang/crash) + the loop is
+beatable with a real core. Caught + fixed a real BUG: the RANGER pure-bow kit was UNWINNABLE (bow Shot
+is Charge-gated, Charge is INT-pooled with no mid-fight refill → dry after ~3 shots → the fight stalled).
+Fix: the Ranger kit pairs the bow with a Charge-free DEX melee (Lunge) — bow = pierce finisher, blade =
+bread-and-butter. (Per-core WIN/LOSS with placeholder numbers is still a play-tuning touchpoint; the
+tests only require no-hang + at-least-one-wins.)
+
 OPEN — needs a HUMAN decision before I build (do NOT guess):
 - **#4 Equipment between-fights MUTATION model** — read-side data exists (Expedition.Player/Equipment/
   Minions/Gold; gear-equip already works on the CityMap). Undecided: what a dedicated between-fights

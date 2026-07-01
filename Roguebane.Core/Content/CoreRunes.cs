@@ -54,14 +54,16 @@ public static class CoreRunes
         Archetype: "THE DUELIST",
         Flavor: "No shield, twin blades. Glass-cannon STR-DEX - ends parts before they answer.");
 
-    // The Marksman: ranged core. Its primary is the shield-piercing BOW (charge #4) — it wields a Bow
-    // and its Shot verb bypasses shields for Charge. A pure data build: a weapon kit + a consulting verb.
+    // The Marksman: ranged core. Its signature is the shield-piercing BOW (charge #4) — Shot bypasses
+    // shields for Charge. But Charge is scarce (INT-pooled, no mid-fight refill), so a pure-bow build
+    // runs dry and stalls; the kit pairs Shot with a CHARGE-FREE DEX melee (Lunge) for sustained damage —
+    // the bow is the pierce finisher, the blade is bread-and-butter. Verified winnable (CoreCampaignTests).
     public static readonly CoreRune Ranger = new(
         "ranger",
         RuneBudget: 12,
         RuneDiscount: 0,
         Bays: 0,
-        DefaultEquipment: new[] { Armory.Shot, Techniques.Brace, Techniques.Bandage },
+        DefaultEquipment: new[] { Armory.Shot, Techniques.Lunge, Techniques.Brace, Techniques.Bandage },
         DefaultWeapons: new[] { Armory.Bow },
         Archetype: "THE MARKSMAN",
         Flavor: "Strikes from range with a shield-piercing bow; high DEX, thin armour - answers first.");
