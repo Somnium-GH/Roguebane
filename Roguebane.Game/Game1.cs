@@ -341,7 +341,16 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private static Rectangle PaletteRect(int i) => new(320 + i * 52, 300, 48, 48); // fits 7 before the bay preview
     private static Rectangle LadderRowRect(int p, int rungs) => new(320, 100 + p * 56, rungs * 56, 48);
     private static readonly Rectangle RedeployRect = new(40, H - 52, 300, 44);
-    private static Rectangle ActionCardRect(int i) => new(52 + i * 84, H - 84, 76, 60);
+    // The action bar sits bottom-RIGHT (design/01), right of the attribute pool and left of the combat
+    // verb buttons. Card pitch adapts to the loadout size so N cards fit the region.
+    private const int ActBarX = 366, ActBarY = H - 84, ActBarW = 314;
+    private Rectangle ActionCardRect(int i)
+    {
+        var n = Math.Max(1, Exp.Loadout.Count);
+        var pitch = Math.Min(80, ActBarW / n);
+        var card = Math.Max(42, pitch - 6);
+        return new(ActBarX + i * pitch, ActBarY, card, 60);
+    }
     // Single-foe (canon): ONE enemy, drawn large on the right. The index is vestigial (always 0).
     private static Rectangle FoeRect(int i = 0) => new(632, 96, 224, 252);
     private static readonly Rectangle PauseRect = new(W - 156, H - 84, 110, 26);
@@ -531,10 +540,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawBays(300, 120);
         DrawSupport(300, 220);
         DrawFoe();
-        DrawActionBar(40, H - 92);
-        // Control hint — the targeting scheme is non-obvious (no fire button); helps POC playtesting.
-        // Kept left of the foe column (x<540) so it never collides with the bottom foe's HP bar.
-        Text(_assets.Mono, "click a foe limb to aim   right-click cancels", 48, H - 13, Muted);
+        // Control hint (POC): the targeting scheme is non-obvious (no fire button). In the header gap.
+        Text(_assets.Mono, "click a foe limb to aim   right-click cancels", 330, 70, Muted);
+        DrawAttributePool(16, H - 160);
+        DrawActionBar();
         DrawStateOverlay();
     }
 
@@ -1015,17 +1024,26 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     // Player side: a part composite (each limb's sprite chosen by its condition), the HP life total,
     // and the attribute-pool pip widget below.
+    // The YOU side of the battlefield (design/01): the player figure + HP. The attribute POOL moved to
+    // its own prominent bottom-left panel (DrawAttributePool), per design/01.
     private void DrawFighter(int x, int y)
     {
         var body = Exp.Player.Body;
-        Panel(x, y, 220, 360);
-        // Label the player figure with its chassis (design/01 names YOU), not a bare "YOU".
+        Panel(x, y, 220, 250);
         Text(_assets.Mono, "YOU - " + Exp.FigureId.ToUpperInvariant(), x + 12, y + 8, Muted);
-        DrawFigureIn(body, Exp.FigureId, "combat", "heroFigure", x + 110, y + 330, 300);
+        DrawFigureIn(body, Exp.FigureId, "combat", "heroFigure", x + 110, y + 226, 210);
 
         var hp = Exp.Player;
-        DrawBar(x + 16, y + 188, 188, _assets.Resource("hp"), hp.Hp, hp.MaxHp, Blood);
-        DrawPips(body, x + 16, y + 212);
+        DrawBar(x + 16, y + 224, 188, _assets.Resource("hp"), hp.Hp, hp.MaxHp, Blood);
+    }
+
+    // design/01 signature: the prominent bottom-left ATTRIBUTE POOL — per-stat pips (free / reserved /
+    // damaged), the read the whole build revolves around.
+    private void DrawAttributePool(int x, int y)
+    {
+        Panel(x, y, 344, 156);
+        Text(_assets.Mono, "ATTRIBUTE POOL", x + 12, y + 8, Muted);
+        DrawPips(Exp.Player.Body, x + 12, y + 30);
     }
 
     // The attribute-pool pip widget: one row per stat — attribute icon, then pips for damaged (dim),
@@ -1296,57 +1314,44 @@ public class Game1 : Microsoft.Xna.Framework.Game
         Text(_assets.Mono, rallied > 0 ? "RALLIED +" + rallied : "banked", x, y + 16, rallied > 0 ? Amber : Muted);
     }
 
-    // The action bar: one card per loadout technique — icon, mono stat cost, active ring.
-    private void DrawActionBar(int x, int y)
+    // The action bar (design/01, bottom-right): one card per loadout technique — icon, stat cost, active
+    // ring, cooldown wipe, target tag. Card geometry comes from ActionCardRect so hit-tests line up.
+    private void DrawActionBar()
     {
-        Panel(x, y, W - 80, 76);
+        Text(_assets.Mono, "ACTION BAR", ActBarX, ActBarY - 16, Muted);
         for (var i = 0; i < Exp.Loadout.Count; i++)
         {
             var t = Exp.Loadout[i];
-            var left = x + 12 + i * 84;
+            var r = ActionCardRect(i);
             var st = Exp.Status(t);
-            const int ix = 14, iy = 12, sz = 48;
-            Panel(left, y + 8, 76, 60);
-            Sprite(_assets.Technique(t.Id), left + ix, y + iy, sz, sz, st.Active ? Color.White : new Color(150, 140, 130));
+            var sz = r.Height - 22;            // icon square
+            int ix = r.X + (r.Width - sz) / 2, iy = r.Y + 4;
+            Panel(r.X, r.Y, r.Width, r.Height);
+            Sprite(_assets.Technique(t.Id), ix, iy, sz, sz, st.Active ? Color.White : new Color(150, 140, 130));
 
-            // Cooldown wipe: a dark veil over the icon shrinks from full as the timer recharges, so
-            // a ready technique shows clear. Sustained (held block) shows a steady held tint instead.
+            // Cooldown wipe (Timered) or a held tint (Sustained block).
             if (st.Active && !st.Sustained && st.Cooldown > 0 && st.Countdown > 0)
-            {
-                var h = sz * st.Countdown / st.Cooldown;
-                Rect(left + ix, y + iy, sz, h, new Color(0, 0, 0, 150));
-            }
+                Rect(ix, iy, sz, sz * st.Countdown / st.Cooldown, new Color(0, 0, 0, 150));
             else if (st.Sustained && st.Active)
-                Rect(left + ix, y + iy, sz, sz, new Color(Amber, 60)); // held
+                Rect(ix, iy, sz, sz, new Color(Amber, 60));
 
-            // A charged Timered module reads "RDY" (holding for a target), a held block "held", a dry
-            // charge "dry"; a charging timer counts via the wipe. AUTO is a global toggle (the button),
-            // not a per-card state.
-            var tag = st.ChargeDry ? "dry" : st.Sustained && st.Active ? "held"
-                : st.Ready ? "RDY" : null;
-            if (tag is not null)
-                Text(_assets.Mono, tag, left + ix, y + iy - 2, st.ChargeDry ? Blood : Amber);
-            if (st.Ready && !st.Auto && !st.Sustained)
-                Border(left + ix, y + iy, sz, sz, Amber); // charged, holding for a target
+            var tag = st.ChargeDry ? "dry" : st.Sustained && st.Active ? "held" : st.Ready ? "RDY" : null;
+            if (tag is not null) Text(_assets.Mono, tag, ix, iy - 2, st.ChargeDry ? Blood : Amber);
+            if (st.Ready && !st.Auto && !st.Sustained) Border(ix, iy, sz, sz, Amber); // holding for a target
 
-            // The technique's current target (which foe, and which limb if part-aimed), top-right of
-            // the icon so the player reads each card's aim without crowding the key/cost row below.
-            var fi = st.Active ? FoeIndexOf(Exp.AimOf(t)) : -1;
-            if (fi >= 0)
-            {
-                var tag2 = "F" + (fi + 1) + (Exp.PartOf(t) is { } pt ? ":" + PartGlyph(pt.Stat) : "");
-                Text(_assets.Mono, tag2, left + 44, y + iy - 2, Amber);
-            }
+            // Current aim (which limb if part-aimed) — single foe, so just the part glyph.
+            if (st.Active && Exp.AimOf(t) is not null)
+                Text(_assets.Mono, Exp.PartOf(t) is { } pt ? PartGlyph(pt.Stat).ToString() : "*",
+                    r.Right - 12, iy - 2, Amber);
 
-            Text(_assets.Mono, "[" + (i + 1) + "]", left + 6, y + 50, Muted);
-            Text(_assets.Mono, t.Reserve.ToString(), left + 58, y + 50, StatColor(t.Stat));
-            var border = i == _ctrl.Targeting ? Ink : st.Active ? Amber : Hover(ActionCardRect(i)) ? Ink : Border0;
-            Border(left, y + 8, 76, 60, border);
-            if (i == _ctrl.Targeting) Border(left - 2, y + 6, 80, 64, Ink); // TARGETING: outer ring (reticle up)
+            Text(_assets.Mono, "[" + (i + 1) + "]", r.X + 3, r.Bottom - 12, Muted);
+            Text(_assets.Mono, t.Reserve.ToString(), r.Right - 12, r.Bottom - 12, StatColor(t.Stat));
+            var border = i == _ctrl.Targeting ? Ink : st.Active ? Amber : Hover(r) ? Ink : Border0;
+            Border(r.X, r.Y, r.Width, r.Height, border);
+            if (i == _ctrl.Targeting) Border(r.X - 2, r.Y - 2, r.Width + 4, r.Height + 4, Ink);
         }
 
-        // Mouse-reachable combat verbs (keyboard Tab/Space/F still work). No FIRE button — a charged +
-        // targeted module fires on its own. AUTO is ONE global toggle, shown lit (ON) or normal (OFF).
+        // Combat verbs (keyboard Tab/Space/F still work). No FIRE button. AUTO is ONE global toggle.
         DrawToggleButton("AUTO", AutoRect, Exp.IsAuto(), Hover(AutoRect));
         DrawHotButton(_paused ? "RESUME" : "PAUSE", PauseRect, Hover(PauseRect));
         DrawHotButton("RETREAT", RetreatRect, Hover(RetreatRect));

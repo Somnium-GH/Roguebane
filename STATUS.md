@@ -64,10 +64,11 @@ branch; KEEP the multi-foe capability latent ONLY if it stays neat (else drop it
 kept as a thin 1-element compat surface so Battle/shell/drivers are untouched. Sieges folds each old
 multi-layer encounter into ONE tankier foe (skirmish = one raider; castle = one hp-40 restoring boss).
 Tests reconciled (SupportTests/RunSiegeTests/SiegeFigureTests dropped front-rotation/variety asserts;
-FoeOffense/PartAim Solo helpers single-foe). 282 Core green. SHELL: DrawFoes multi-spread RETIRED ->
-DrawFoe draws the ONE enemy LARGE on the right (FoeRect 224x252, name tag + HP bar + limb bands for
-part-aim); smoke-verified. REMAINING (next slice): bring back the prominent bottom ATTRIBUTE POOL panel
-(move the pips out of the YOU panel to a design/01 bottom-left pool; shift the action bar right).]
+FoeOffense/PartAim Solo helpers single-foe). 282 Core green. SHELL design/01 single-foe LAYOUT DONE:
+DrawFoe draws the ONE enemy LARGE on the right (name tag + HP + limb bands); the prominent bottom-left
+ATTRIBUTE POOL panel is back (pips moved out of the YOU panel); the ACTION BAR moved bottom-right with
+adaptive card pitch (ActionCardRect fits N cards beside the pool, before the AUTO/PAUSE/RETREAT verbs).
+Smoke-verified vs design/01. Multi-foe capability fully dropped.]
 
 ## Current target
 **RE-OPEN RESOLVED (both threads cleared) — POC functionally complete again.**
