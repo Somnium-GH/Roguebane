@@ -12,7 +12,7 @@ public static class Techniques
         new("jab", Stat.Str, Reserve: 1, TechniqueKind.Timered, Cooldown: 50, Power: 2);    // ~5s
 
     public static readonly Technique Cleave =
-        new("cleave", Stat.Str, Reserve: 3, TechniqueKind.Timered, Cooldown: 140, Power: 3); // ~14s
+        new("cleave", Stat.Str, Reserve: 2, TechniqueKind.Timered, Cooldown: 140, Power: 3); // ~14s; reserve 2 so the frail Elf can still swing it
 
     public static readonly Technique Lunge =
         new("lunge", Stat.Dex, Reserve: 1, TechniqueKind.Timered, Cooldown: 45, Power: 2);  // ~4.5s

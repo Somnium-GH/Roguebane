@@ -1,5 +1,41 @@
 # Status
 
+## ⇒⇒ RESCUE — CLOSE THE DESIGN DELTA via a MANIFEST RENDERER (2026-07-01 — OVERRIDES "AT A GLANCE / done")
+The "directive backlog DONE / POC plays" claim below is about the SIM. The SCREENS are NOT done: the game
+still DRAWS old hand-coded prototypal screens with bolt-ons (a `RACE [tab]` stapled to the old 5-card
+NewGame; core-switch tabs on the "Equipment" build screen; hand-drawn nested frames = the "extra
+borders"). It does NOT render the landed designs, so none of the new design (single-screen NewGame,
+Equipment inventory/rune-bag, hi-fi chrome) nor CD's pipeline (templates, binds, shadow/frame/gradient,
+rune icons, instrumented Loadout panel) reaches the screen. THAT is the whole delta. Do NOT report
+"exhausted" while this is open. (Prune the DONE directive blocks below to keep STATUS lean.)
+
+**DIRECTIVE — build ONE manifest-driven screen RENDERER; cut EVERY screen over to it, one per slice, each
+VERIFIED pixel-close to its `design/NN-*.png`.** Stop hand-drawing/patching screens — draw them FROM
+`layout.json`. Finish the partial `ManifestUi`/`CardTemplate`/`GraphLayout`/`ListLayout` into ONE path
+handling: typed elements (panel/text/bar/pip/card/icon/figure/list/graph); `fill`/`frame`/`shadow`/
+gradient draw (§10); containers that stamp an item template per datum with per-part `binds` (live data
+else `sample`); graph/`nodePoint`; the shared `style` block. A screenshot ≠ correct — drive the state.
+
+SLICES (one screen/pass, verify vs its design PNG):
+1. **NewGame** (worst delta): render `screens.newgame` — ONE screen, 3 columns: Race (head cards) | the
+   6 Core-rune cards (rune icons `icons/rune/core_<id>` + apex) | Loadout preview (composed figure +
+   attr/HP/layout tiles + apex). Header "Choose your Loadout". DELETE the old 5-card + RACE-tab screen.
+2. **Equipment** = a BETWEEN-FIGHTS loadout for the CURRENT core (NO core-switch tabs — that's NewGame):
+   render `screens.equipment` (Attributes bars, Inventory tabs GEAR/TECH/MINIONS + rarity cards, Rune Bag
+   Marks/Paths/Keystones, composed figure + Loadout stats + apex, Action Bar). Reads RUN state.
+3. **Encounter**: render `screens.encounter` (single foe, attribute pool, action bar) — single-frame
+   panels, no hand-drawn nested borders.
+4. **CityMap**: render `screens.citymap` (node graph, supplies, war-party RIGHT→LEFT, Equipment button).
+5. **CampaignMap**: BUILD it (not implemented yet) from `screens.campaignmap`.
+FIDELITY DRAW (shadow/frame/gradient, §10) feeds all of the above — same critical path, do it first.
+
+FLOW: Equipment reachable BETWEEN fights — from the post-combat Cleared/Redeploy state + CityMap +
+CampaignMap — editing the CURRENT loadout (core fixed), NOT a core-picker.
+
+If a screen genuinely can't be driven from the manifest, document the SPECIFIC missing capability (what
+the manifest expresses that the renderer can't draw) as a concrete Needs-human/CD item — never claim
+"exhausted" while these are open.
+
 ## ⇒ AT A GLANCE (updated 2026-07-01) — read this first; detail is in the sections below
 State: build GREEN (273 Core tests); all four screens smoke-clean; POC loop plays NewGame→Equipment→
 Redeploy→fight→merchant. The self-contained, spec'd, Core-testable directive backlog is DONE.
@@ -18,10 +54,15 @@ its own kit) through a full campaign — no hang/crash, and EVERY core WINS at t
    ~3 shots → fight stalled) — kit now pairs Shot with a Charge-free DEX melee (Lunge). [real fix]
 2) The apparent "4/6 cores lose" was a TEST-STRATEGY artifact, not a balance bug: the harness aimed at the
    foe's whole HP. Real §8 play PART-AIMS the castle's STR arm, which cascades its BossStrike off (its own
-   body rule) — disabling the boss's offense beats out-tanking it. With arm-aim, ALL 6 cores win at the
+   body rule) — disabling the boss's offense beats out-tanking it. With arm-aim, ALL cores win at the
    ORIGINAL design race numbers. So the interim race buff was UNNECESSARY and is REVERTED (design/05 stats
-   restored). Kept: RaceTests/ConHpTests now reference Race values (not literals) so future tuning won't
-   redden the build. Foe/castle numbers remain placeholder — dial the FEEL in play.
+   restored). Kept: RaceTests/ConHpTests reference Race values (not literals) so future tuning won't redden.
+3) Extended the test over BOTH races (Human + Elf = 12 Race×Core combos). Caught elf/warden HANGING: the
+   frail Elf (STR2) couldn't power Warden's Cleave (reserved STR3) → no active attack → its Brace shield
+   tanked weak strikes forever with nothing to kill → infinite stall. Fixed: Cleave reserve 3→2 (a slow
+   cd140 heavy hit; reserve 2 keeps it a heavy STR verb the frail Elf can still swing). Now EVERY Race×Core
+   combo (12) both terminates AND wins with part-aim; BalanceSim green. (Note: SIM/gameplay is verified —
+   the OPEN work is now the SCREENS delta, see the RESCUE directive at the top.)
 
 OPEN — needs a HUMAN decision before I build (do NOT guess):
 - **#4 Equipment between-fights MUTATION model** — read-side data exists (Expedition.Player/Equipment/

@@ -7,8 +7,8 @@ namespace Roguebane.Core.Tests;
 // loop is actually BEATABLE with a real core, not just the sim body.
 public class CoreCampaignTests
 {
-    private static Campaign Embark(CoreRune core) =>
-        Forge.EmbarkCampaign(Races.Human, core, core.NewLoadout(), core.Kit, Maps.StandardLegs(3));
+    private static Campaign Embark(Race race, CoreRune core) =>
+        Forge.EmbarkCampaign(race, core, core.NewLoadout(), core.Kit, Maps.StandardLegs(3));
 
     private static void Fight(Campaign c, string node)
     {
@@ -29,9 +29,9 @@ public class CoreCampaignTests
         if (c.State == CampaignState.Redeploying) c.Redeploy(); // a cleared node holds -> back to the chart
     }
 
-    private static CampaignState RunCampaign(CoreRune core)
+    private static CampaignState RunCampaign(Race race, CoreRune core)
     {
-        var c = Embark(core);
+        var c = Embark(race, core);
         foreach (var t in c.Current.Equipment) c.Toggle(t); // power the bar
         c.SetAuto(true);                                     // keep the re-aimed targets
 
@@ -46,25 +46,27 @@ public class CoreCampaignTests
     }
 
     [Fact]
-    public void EveryCoreDrivesAFullCampaignToATerminalState()
+    public void EveryRaceAndCoreDrivesAFullCampaignToATerminalState()
     {
-        // No hang, no crash: each core assembled with its own kit resolves to Won or Lost.
-        foreach (var core in CoreRunes.Roster)
-        {
-            var outcome = RunCampaign(core);
-            Assert.True(outcome is CampaignState.Won or CampaignState.Lost,
-                $"{core.Id} did not terminate (state {outcome})");
-        }
+        // No hang, no crash: every Race x Core combo assembled with its own kit resolves to Won or Lost.
+        foreach (var race in Races.Roster)
+            foreach (var core in CoreRunes.Roster)
+            {
+                var outcome = RunCampaign(race, core);
+                Assert.True(outcome is CampaignState.Won or CampaignState.Lost,
+                    $"{race.Id}/{core.Id} did not terminate (state {outcome})");
+            }
     }
 
     [Fact]
-    public void EveryCoreWinsTheCampaignWithPartAimPlay()
+    public void EveryRaceAndCoreWinsTheCampaignWithPartAimPlay()
     {
         // The run is winnable for real (not just with the synthetic sim body): with the INTENDED §8 play
-        // -- part-aim the foe's STR arm to cascade its strike off, disabling offense -- EVERY core clears
-        // the campaign on its own default kit. Even the shield-less glass/caster cores, at design-scale
-        // race stats, because disabling the boss beats out-tanking it.
-        foreach (var core in CoreRunes.Roster)
-            Assert.Equal(CampaignState.Won, RunCampaign(core));
+        // -- part-aim the foe's STR arm to cascade its strike off, disabling offense -- EVERY Race x Core
+        // combo clears the campaign on its own default kit at design-scale race stats (incl. the frail
+        // Elf + shield-less glass/caster cores), because disabling the boss beats out-tanking it.
+        foreach (var race in Races.Roster)
+            foreach (var core in CoreRunes.Roster)
+                Assert.Equal(CampaignState.Won, RunCampaign(race, core));
     }
 }
