@@ -51,8 +51,16 @@ LAYOUT_CONTRACT §10-11 (fidelity primitives + 1080). Priority order:
    (PointClamp sampler rules out a stretched-texture lerp; vertical/horizontal, diagonal deferred).
    Panel() now fades PanelTop (a touch lighter) -> PanelBot (Panel0) vertically under the border, so the
    flat chrome reads as soft-lit depth alongside the shadow. Screenshot-verified. Reusable for a manifest
-   `fill:{type:gradient}` field when CD authors one. STILL TODO: per-element manifest `shadow`/`fill`
-   fields; 1080-class SpriteFonts. FRAMES blocked on CD assets.]
+   `fill:{type:gradient}` field when CD authors one.]
+   [1080 FONTS DONE (§11 density): the scene RenderTarget is now SS=2x design (1920x1080), painted via a
+   `Matrix.CreateScale(SS)` on the scene SpriteBatch.Begin — design COORDS unchanged (960x540). Fonts
+   rebuilt at 2x (mono 14->28, display 20->40); Text() draws at 1/SS so on-screen size matches design
+   while glyphs rasterize at 1080 density (crisp). All 7 MeasureString sites route through a single
+   `MeasureText` helper (/SS) so centring/wrapping stay in design space. INPUT UNAFFECTED — the
+   mouse->design transform derives from the W,H design constants + _viewScale, decoupled from the scene
+   resolution (verified). Smoke receipts now 1920x1080; screenshot-verified crisp text + intact layout on
+   build + combat. Game-only. STILL TODO: per-element manifest `shadow`/`fill` fields. FRAMES blocked on
+   CD assets. -> the §10-11 ENGINE fidelity work (shadow + gradient + 1080 fonts) is now COMPLETE.]
 6. **BUG BATCH:**
    - CityMap supplies label "spent per jump" → **"per deployment"** (drop the FTL wording). [DONE]
    - CityMap movement **ANY-DIRECTION**: any move (incl. back to a merchant) costs 1 supply AND advances

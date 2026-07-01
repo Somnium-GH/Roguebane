@@ -56,6 +56,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private int _frames;
 
     private const int W = 960, H = 540; // the fixed DESIGN space; the world renders here then scales
+    private const int SS = 2; // §11 supersample: the scene target is SS x design so text/glyphs rasterize
+                              // at 1080-class density (fonts built 2x, drawn 1/SS). Design COORDS unchanged.
 
     private RenderTarget2D _scene = null!; // world painted at design res, then letterboxed to the window
     private Rectangle _viewDest;           // where the scaled scene lands in the backbuffer
@@ -136,7 +138,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         _pixel.SetData(new[] { Color.White });
         _assets = new AssetRegistry(Content);
         _ui = new ManifestUi(_layout);
-        _scene = new RenderTarget2D(GraphicsDevice, W, H);
+        _scene = new RenderTarget2D(GraphicsDevice, W * SS, H * SS);
     }
 
     protected override void Update(GameTime gameTime)
@@ -428,7 +430,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
         // The world always paints at the fixed design resolution into the scene target...
         GraphicsDevice.SetRenderTarget(_scene);
         GraphicsDevice.Clear(new Color(0x17, 0x11, 0x0b)); // panel-dark base from the locked palette
-        _spriteBatch.Begin(samplerState: SamplerState.PointClamp); // HD pixel: crisp integer edges
+        // §11 supersample: paint design-space (960x540) into the SSx target via a scale matrix, so glyphs
+        // rasterize at 1080-class density; coordinates are unchanged.
+        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Matrix.CreateScale(SS));
         if (_screen == Screen.NewGame) DrawNewGameScreen();
         else if (_screen == Screen.Equipment) DrawEquipmentScreen();
         else DrawRunScreen();
@@ -438,7 +442,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         {
             GraphicsDevice.SetRenderTarget(null);
             using var fs = System.IO.File.Create(_shotPath!);
-            _scene.SaveAsPng(fs, W, H);
+            _scene.SaveAsPng(fs, W * SS, H * SS);
         }
         else // ...then letterbox-scale it into the window backbuffer
         {
@@ -834,7 +838,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // Draw text horizontally centred on cx at y (measures the font-safe form so centring matches draw).
     private void DrawCentered(SpriteFont font, string text, Color col, int cx, int y)
     {
-        var w = font.MeasureString(Safe(font, text)).X;
+        var w = MeasureText(font, text).X;
         Text(font, text, (int)(cx - w / 2), y, col);
     }
 
@@ -846,7 +850,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         foreach (var word in text.Split(' '))
         {
             var trial = line.Length == 0 ? word : line + " " + word;
-            if (line.Length > 0 && _assets.Mono.MeasureString(trial).X > w)
+            if (line.Length > 0 && MeasureText(_assets.Mono, trial).X > w)
             {
                 Text(_assets.Mono, line, x, ly, col);
                 ly += 14;
@@ -1329,7 +1333,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         var skin = _assets.Button(hovered ? "down" : "normal");
         if (skin is not null) Sprite(skin, r.X, r.Y, r.Width, r.Height, Color.White);
         else Panel(r.X, r.Y, r.Width, r.Height);
-        var size = _assets.Mono.MeasureString(label);
+        var size = MeasureText(_assets.Mono, label);
         Text(_assets.Mono, label, (int)(r.X + r.Width / 2 - size.X / 2), (int)(r.Y + r.Height / 2 - size.Y / 2), Ink);
         if (hovered) Border(r.X, r.Y, r.Width, r.Height, Amber);
     }
@@ -1341,7 +1345,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         var skin = _assets.Button(on || hovered ? "down" : "normal");
         if (skin is not null) Sprite(skin, r.X, r.Y, r.Width, r.Height, on ? Amber : Color.White);
         else { Panel(r.X, r.Y, r.Width, r.Height); if (on) Rect(r.X, r.Y, r.Width, r.Height, new Color(Amber, 110)); }
-        var size = _assets.Mono.MeasureString(label);
+        var size = MeasureText(_assets.Mono, label);
         Text(_assets.Mono, label, (int)(r.X + r.Width / 2 - size.X / 2), (int)(r.Y + r.Height / 2 - size.Y / 2),
             on ? new Color(30, 24, 18) : Ink);
         if (on || hovered) Border(r.X, r.Y, r.Width, r.Height, Amber);
@@ -1355,7 +1359,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         if (_campaign.State == CampaignState.Redeploying && Exp.State == ExpeditionState.Cleared)
         {
             Rect(0, 0, W, H, new Color(20, 45, 30, 120));
-            var s = _assets.Display.MeasureString("NODE CLEARED");
+            var s = MeasureText(_assets.Display, "NODE CLEARED");
             Text(_assets.Display, "NODE CLEARED", (int)(W / 2 - s.X / 2), H / 2 - 40, Ink);
             DrawButton("REDEPLOY", ClearedRedeployRect.X, ClearedRedeployRect.Y,
                 ClearedRedeployRect.Width, ClearedRedeployRect.Height, true, Keys.Space);
@@ -1371,7 +1375,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         if (overlay is { } o)
         {
             Rect(0, 0, W, H, o.tint);
-            var size = _assets.Display.MeasureString(o.label);
+            var size = MeasureText(_assets.Display, o.label);
             Text(_assets.Display, o.label, (int)(W / 2 - size.X / 2), H / 2 - 12, Ink);
             if (_campaign.State != CampaignState.Redeploying)
                 Text(_assets.Mono, "Esc to quit", W / 2 - 40, H / 2 + 20, Muted);
@@ -1425,8 +1429,14 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     private void Stretch(Texture2D? tex, int x, int y, int w, int h) => Sprite(tex, x, y, w, h, Color.White);
 
+    // Fonts are built at SSx; under the scene's SS scale matrix we draw at 1/SS so the ON-SCREEN size
+    // matches the design space while the glyph rasterizes at full 1080-class density.
     private void Text(SpriteFont font, string s, int x, int y, Color color) =>
-        _spriteBatch.DrawString(font, Safe(font, s), new Vector2(x, y), color);
+        _spriteBatch.DrawString(font, Safe(font, s), new Vector2(x, y), color, 0f, Vector2.Zero,
+            1f / SS, SpriteEffects.None, 0f);
+
+    // Design-space text size: MeasureString is at the SSx raster, so scale back by 1/SS to match Text().
+    private Vector2 MeasureText(SpriteFont font, string s) => font.MeasureString(Safe(font, s)) / SS;
 
     // SpriteFonts are ASCII-only and THROW on an unknown glyph. The fold-to-ASCII policy + algorithm
     // live in Core.GlyphSafe (headless-tested); here we just cache each font's glyph set and call it.
@@ -1483,7 +1493,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         var skin = _assets.Button(state);
         if (skin is not null) Sprite(skin, x, y, w, h, Color.White);
         else Panel(x, y, w, h);
-        var size = _assets.Mono.MeasureString(label);
+        var size = MeasureText(_assets.Mono, label);
         Text(_assets.Mono, label, (int)(x + w / 2 - size.X / 2), (int)(y + h / 2 - size.Y / 2),
             enabled ? Ink : Muted);
         if (hovered) Border(x, y, w, h, Amber);
