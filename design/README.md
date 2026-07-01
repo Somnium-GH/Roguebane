@@ -7,11 +7,11 @@ visual source of truth the `../Content/` asset package is built to match (locked
 ## Screens
 | # | file | screen | layer |
 |---|---|---|---|
-| 01 | `01-combat.png` | Combat / damage — you · battlefield · foe, Attribute Pool, Action Bar + Minion Bays | Layer 4 |
-| 02 | `02-build.png` | Build / loadout — chassis figure, attributes, Inventory tabs, Rune Bag | between-battles |
-| 03 | `03-runmap.png` | Run Map — half-blind FTL beacon chart, Supplies/Support | Layer 2 |
-| 04 | `04-campaign-spine.png` | Campaign Spine — branching route of cities to the Capital | Layer 1 |
-| 05 | `05-new-run.png` | New Run — Choose Your Core | run start |
+| 01 | `01-encounter.png` | Encounter / damage — you · battlefield · foe, Attribute Pool, Action Bar + Minion Bays | Layer 4 |
+| 02 | `02-equipment.png` | Equipment / loadout — chassis figure, attributes, Inventory tabs, Rune Bag | between-battles |
+| 03 | `03-citymap.png` | City Map — half-blind FTL beacon chart, Supplies/Support | Layer 2 |
+| 04 | `04-campaignmap.png` | Campaign Map — branching route of cities to the Capital | Layer 1 |
+| 05 | `05-newgame.png` | New Game — Choose Your Core | run start |
 | 06 | `06-style-frame.png` | Style Frame — palette, cutaway grammar, type, pool study | north-star |
 
 ## Asset sheets (composited DIRECTLY from the live files — labeled with native size)

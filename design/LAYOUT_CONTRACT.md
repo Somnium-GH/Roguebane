@@ -182,6 +182,12 @@ wrapper noise and duplicates). **SELF-AUDIT every screen before shipping:** diff
 wasn't instrumented → fix it. Never ship a lossy export; if something genuinely can't be captured, flag
 it (don't silently drop it).
 
+**NO LAYOUT DRIFT [required].** An instrumentation or fidelity/frame pass must NEVER alter an APPROVED
+layout — tagging and re-skinning change ZERO pixels of position/structure. After any such pass, RE-DIFF
+the screen against its locked reference render; the only allowed deltas are ones explicitly requested.
+Flag (don't ship) any unintended change — e.g. a nested inner border/box appearing inside cards, headers,
+or footers is DRIFT, not fidelity.
+
 ## 10. Fidelity primitives — shadow, frame, fill (the chrome depth the flat renderer lacks)
 The game currently draws chrome with only fill-rect + 1px border — flat, no depth. That is the whole
 "not sleek" gap. Add three techniques; the manifest references them by field/type. APPROACH = MIX:

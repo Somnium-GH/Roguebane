@@ -20,11 +20,25 @@ OPEN — needs a HUMAN decision before I build (do NOT guess):
   RE-TUNED DPS-race (BalanceSimTests assert glass-loses / AllSix-wins). Balance numbers are yours.
 - **PLATE armour role** — inert since §8 (flagged in Shops.cs): give it a role (shield source?) or retire.
 
-BLOCKED on Claude Design assets/manifest:
-- nine-slice FRAME assets; per-element manifest `shadow`/`fill` fields; manifest screen-id renames
-  (newrun/build/runmap→newgame/equipment/citymap); per-PART `binds` (manifest-drive arc blocker);
-  BOW sprite + Ranger `human_ranger`/`elf_ranger` figures; the TWO divergent `Content.mgcb`
-  (game-side hand-synced vs CD's) need a single source of truth.
+CD LANDING (2026-07-01, mid-loop external drop — now committed): a big Claude-Design payload arrived —
+`ui/frame/` NINE-SLICE assets, `sprites/gear/bow.png`, `sprites/body/{human,elf}_ranger/` figures,
+`icons/rune/core_*.png`, refreshed backgrounds + button skins, new `design/01-05*.png`, and a new
+`layout.json` carrying **gradient `fill` OBJECTS**. Reconciled: LayoutManifest now parses `fill` as a
+string-or-gradient union (`Fill` + `FillConverter`); ListLayout falls back to the TEMPLATE size when a
+terse item omits its own `size` (CD's `buildMinions`); manifest schema-tests relaxed to the resolvable
+contract. 274 Core green; all screens smoke-clean with the new assets.
+
+STILL BLOCKED / TODO on the Claude Design side:
+- WIRE the landed assets into the renderer: nine-slice FRAME blitter (assets now exist); consume the
+  manifest `fill:{gradient}` + a per-element `shadow` field; the bow WEAPON (art now exists — still
+  needs the Core bow type, charge #4) + Ranger figure repoint.
+- Manifest screen-id renames (newrun/build/runmap→newgame/equipment/citymap); per-PART `binds`
+  (manifest-drive arc blocker); the TWO divergent `Content.mgcb` still need a single source of truth.
+
+DONE this loop: between-fights **Equipment view** (#3/#4 flow slice) — EQUIPMENT [E] button on the
+CityMap opens a LOADOUT overlay reading the RUN state (figure, HP/gold, attrs, minions) with technique
+RE-SLOTTING via the existing Toggle; mid-run gear/rune mutation still deferred (design-open). Fixed a
+pre-existing `map` smoke bug (missing Redeploy left it stuck at a cleared fight).
 
 ## ⇒ HUMAN DIRECTIVES — 2026-06-30 (do these FIRST; they revise shipped work and WIN)
 Rationale now in canon: DESIGN_SPEC (damage/symmetry/heal/flow/nomenclature §8/§10/§12/§13) +
@@ -371,6 +385,25 @@ and it's GATED on the engine draw — bump the fidelity primitives to the FRONT 
   content lands). But the NewGame **Loadout panel internals + section headers are NOT in the manifest yet**
   — CD is re-instrumenting them (LAYOUT_CONTRACT §9 completeness). Build the Race/Core columns now; leave
   the Loadout panel a placeholder until CD's re-instrumented drop — do NOT hand-fake its internals.
+
+**CD PIPELINE DONE — engine DRAW is now the SOLE hi-fi blocker (2026-06-30 pm drop).** CD closed almost
+the entire pipeline side. Loop actions once the drop LANDS locally (add the new rune PNGs to `mgcb`; let
+the contract-based manifest tests absorb the re-extract — do NOT re-pin content):
+- **ENGINE DRAW = TOP PRIORITY, now the ONLY thing between us and hi-fi chrome.** Implement: offset+blur
+  **shadow** draw, nine-patch **frame** blit (read the updated slice = 60/36 + the v2 button skins),
+  corner-interpolated **gradient** fill (LAYOUT_CONTRACT §10). CD wired shadow+frame+gradient CAPTURE on
+  all 5 screens + a richer v2 frame/button/background set + an `interactionStates` table — until the
+  engine draws these, the chrome renders flat. This is the whole ballgame now.
+- **Wire the baked rune icons** `icons/rune/core_<core.id>` (grunt/warden/adept/summoner/reaver) into the
+  NewGame core cards — same convention as `icons/node/<type>`. (#2 done by CD.)
+- **Build the FULL NewGame Loadout panel** from the re-extracted `screens.newgame` — now properly
+  instrumented (previewAttrRow container + attr/HP/layout tiles + apex + section headers; header copy is
+  "Choose your Loadout"). DROP the placeholder — render it for real. (#5 done by CD.)
+- **CONFIRM on wire** (so Doug can tell CD to close the entries): rune icons in use (#2); Loadout panel
+  renders full (#5); templates read clean, no doubled parts (#8 — CD dedupes at source; keep the consumer
+  safety-net as belt-and-suspenders); cityNode reads [8,8] (#12); recaptured `castle.png` in use (#6).
+- Still OPEN: the DRAW above; container overflow/scroll (#4, deferred); literal 80-char truncation (#9,
+  parked).
 
 ## Current target
 **RE-OPEN RESOLVED (both threads cleared) — POC functionally complete again.**

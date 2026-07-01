@@ -83,10 +83,13 @@ public class LayoutManifestTests
         var templates = Real().Templates.Keys.ToHashSet();
         var items = Real().Screens.Values.SelectMany(s => s.Elements).Where(e => e.Item is not null).ToList();
         Assert.NotEmpty(items); // the manifest drives at least one list/graph from run data
+        var real = Real();
         Assert.All(items, e =>
         {
             Assert.Contains(e.Item!.Template, templates); // the stamped template exists
-            Assert.Equal(2, e.Item.Size.Length);          // a sized cell to stamp per datum
+            // A sized cell must be RESOLVABLE — from the item's own size, or (terse form) the template's.
+            var cell = e.Item.Size.Length == 2 ? e.Item.Size : real.Templates[e.Item.Template].Size;
+            Assert.Equal(2, cell.Length);
         });
     }
 

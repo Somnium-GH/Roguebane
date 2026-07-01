@@ -5,10 +5,14 @@ namespace Roguebane.Core.Layout;
 // GraphLayout instead. Cells start at the region origin and step by cell size + gap along the flow.
 public static class ListLayout
 {
-    public static IReadOnlyList<LayoutRect> Cells(LayoutRect region, Item item, int count)
+    // The cell size comes from the item's `size`; when the manifest omits it (a terse list that reuses
+    // its template's footprint), the caller passes the template's Size as `fallbackSize`.
+    public static IReadOnlyList<LayoutRect> Cells(LayoutRect region, Item item, int count,
+        int[]? fallbackSize = null)
     {
-        var w = item.Size.Length > 0 ? item.Size[0] : 0;
-        var h = item.Size.Length > 1 ? item.Size[1] : 0;
+        var size = item.Size.Length >= 2 ? item.Size : fallbackSize ?? item.Size;
+        var w = size.Length > 0 ? size[0] : 0;
+        var h = size.Length > 1 ? size[1] : 0;
         var vertical = item.Flow == "vertical";
 
         var cells = new List<LayoutRect>(Math.Max(0, count));

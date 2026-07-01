@@ -34,7 +34,8 @@ public sealed class ManifestUi
         var e = s.Elements.FirstOrDefault(x => x.Id == id);
         if (e?.Item is null) return null;
         var region = ScreenLayout.Resolve(s, e);
-        return ListLayout.Cells(region, e.Item, count)
+        var tmplSize = m.Templates.TryGetValue(e.Item.Template, out var tmpl) ? tmpl.Size : null;
+        return ListLayout.Cells(region, e.Item, count, tmplSize)
             .Select(r => new Rectangle(r.X, r.Y, r.W, r.H)).ToList();
     }
 

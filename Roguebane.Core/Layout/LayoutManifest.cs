@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Roguebane.Core.Layout;
 
@@ -32,6 +33,36 @@ public sealed class Figure
 
 public sealed class Part { public int[] Rect { get; init; } = []; }
 
+// A fill is EITHER a flat colour token (string) OR a gradient object ({type,from,to,dir}, §10). The
+// converter accepts either so a Claude-Design manifest can carry gradient chrome without breaking parse.
+[JsonConverter(typeof(FillConverter))]
+public sealed class Fill
+{
+    public string? Token { get; init; } // the flat-token form (a style colour name)
+    public string? Type { get; init; }  // "gradient" for the object form
+    public string? From { get; init; }
+    public string? To { get; init; }
+    public string? Dir { get; init; }    // vertical | horizontal | diagonal
+    public bool IsGradient => string.Equals(Type, "gradient", StringComparison.OrdinalIgnoreCase);
+}
+
+public sealed class FillConverter : JsonConverter<Fill>
+{
+    public override Fill Read(ref Utf8JsonReader reader, Type t, JsonSerializerOptions o)
+    {
+        if (reader.TokenType == JsonTokenType.String)
+            return new Fill { Token = reader.GetString() };
+        using var doc = JsonDocument.ParseValue(ref reader);
+        var e = doc.RootElement;
+        string? S(string k) => e.TryGetProperty(k, out var v) && v.ValueKind == JsonValueKind.String
+            ? v.GetString() : null;
+        return new Fill { Type = S("type"), From = S("from"), To = S("to"), Dir = S("dir") };
+    }
+
+    public override void Write(Utf8JsonWriter w, Fill v, JsonSerializerOptions o)
+        => throw new NotSupportedException();
+}
+
 public sealed class Mount
 {
     public string Gear { get; init; } = "";
@@ -57,7 +88,7 @@ public sealed class Element
     public string? Binds { get; init; }
     public string? Image { get; init; }
     public string? Color { get; init; }
-    public string? Fill { get; init; }
+    public Fill? Fill { get; init; }
     public string? Font { get; init; }
     public double? FontPx { get; init; }
     public Border? Border { get; init; }

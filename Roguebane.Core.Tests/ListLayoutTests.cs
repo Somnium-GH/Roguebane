@@ -43,4 +43,15 @@ public class ListLayoutTests
     {
         Assert.Empty(ListLayout.Cells(Region, Horizontal, 0));
     }
+
+    [Fact]
+    public void FallsBackToTheTemplateSizeWhenTheItemOmitsIt()
+    {
+        // A terse list item (no own size) that reuses its template's footprint: the caller passes the
+        // template Size as fallback, so cells are sized instead of collapsing to 0x0.
+        var terse = new Item { Template = "loadoutCard", Flow = "horizontal", Gap = 6 }; // Size unset
+        var c = ListLayout.Cells(Region, terse, 1, fallbackSize: new[] { 131, 89 })[0];
+        Assert.Equal(131, c.W);
+        Assert.Equal(89, c.H);
+    }
 }

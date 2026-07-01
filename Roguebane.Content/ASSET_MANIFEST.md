@@ -60,17 +60,19 @@ dependency; **OPEN** = binding or content undecided (see foot).
 The flat-bevel roster (see `proto/roster_gen.js`, `ART_RULES.md`, `LAYOUT_CONTRACT.md`) emits **per-figure**
 parts — each figure has its own `head/torso/armL/armR/legL/legR/boots` (robe figures: `torso`(robe)/`armL`/`armR`/`head`;
 some carry `back`(wings) or `frontGear`), every part as `<part>_<state>.png` for `healthy·damaged·broken`.
-Figures: `human_grunt human_warden human_adept human_summoner human_reaver` (the 5 human cores) plus the
+Figures: `human_grunt human_warden human_adept human_summoner human_reaver human_ranger` (the 6 human cores) plus the
 non-human core permutations and standalone foes `skeleton bandit wraith ogre troll gargoyle`. Flattened
 thumbnails live in `proto/roster/<figure>.png`. Damage = darken + hairline crack (broken adds a corner
 chip), shown by shading/cracks never color.
 
 **RACE × CORE axis.** Identity = a race BASE-BODY (skin/hair ramp, ears, build) × a core kit
-(the archetype, formerly "chassis"). EVERY playable race emits its 5 cores as decomposed figures keyed
+(the archetype, formerly "chassis"). EVERY playable race emits its 6 cores as decomposed figures keyed
 `<race>_<core>` (LAYOUT_CONTRACT §1 — no bare core ids): humans are `human_grunt human_warden
-human_adept human_summoner human_reaver`; Elf adds `elf_grunt elf_warden elf_adept elf_summoner
-elf_reaver` (leaner build, pointed ears baked into `head`, cooler/paler skin ramp; same part set +
-damage/bare states + layout.json entry as the human cores). Standalone foes (`skeleton bandit wraith
+human_adept human_summoner human_reaver human_ranger`; Elf adds `elf_grunt elf_warden elf_adept elf_summoner
+elf_reaver elf_ranger` (leaner build, pointed ears baked into `head`, cooler/paler skin ramp; same part set +
+damage/bare states + layout.json entry as the human cores). `ranger` ("THE MARKSMAN") is a light-leather DEX
+duelist-at-range core — shield-ignoring, wields the detached `sprites/gear/bow` mounted to `handL` (no
+off-hand piece, unlike grunt/warden's shield hand). Standalone foes (`skeleton bandit wraith
 ogre troll gargoyle`) keep bare ids — they have no race axis. Adding a race = one entry in the `RACE`
 table in `roster_gen.js`, then rerun the driver.
 
@@ -109,6 +111,7 @@ Six gear PNGs from `proto/roster_gen.js`, each mounted by aligning its `gear.<id
 | `sprites/gear/staff` | caster staff + orb | Combat, Build | hand socket | hi-fi |
 | `sprites/gear/round_shield` | round shield + boss | Combat, Build | off-hand socket | hi-fi |
 | `sprites/gear/tower_shield` | royal tower shield | Combat, Build | off-hand socket | hi-fi |
+| `sprites/gear/bow` | 3-segment recurve silhouette + taut string (Ranger's DEX weapon — shield-ignoring, one-handed grip only) | Combat, Build | hand socket | hi-fi |
 
 ## sprites/minion/ — summon creatures (generator-produced, single flat-bevel sprites)
 
@@ -137,9 +140,14 @@ constitution}`, `icons/rune/{mark,path_minor,path_major,keystone}`, `icons/resou
 
 Generators + capture (the whole package is reproducible from these): `roster_gen.js` (figures+gear+layout.json),
 `bg_gen.js` (backdrops), `ui_gen.js` (buttons), `ui_atoms_gen.js`
-(attr/rune/resource/reticle/minion icons), `atom_capture.js` + `atom_slice.js` (technique chips, pips, and
-map node tokens — captured/stamped from the screens; see ASSET_GEN_METHOD.md), `mgcb_gen.js` (Content.mgcb
-from disk), `screen_extract.js` (screens→layout.json). `node_icons_gen.js` is DEPRECATED (hand-canvas).
+(attr/rune-TIER/resource/reticle/minion icons), `atom_capture.js` + `atom_slice.js` (technique chips, pips, and
+map node tokens — captured/stamped from the screens; see ASSET_GEN_METHOD.md), `rune_capture.js` (the five
+Core-rune identity tokens `icons/rune/core_*` — captured from NewGame's own decagon+glyph cards, dual-bg
+transparency recovery), `frame_gen.js` (the 9-slice
+`ui/frame/*` ornate panel/card chrome — LAYOUT_CONTRACT §10), `mgcb_gen.js` (Content.mgcb
+from disk), `screen_extract.js` (screens→layout.json, now also emitting `shadow`/`frame`/gradient `fill` per
+element from `data-shadow`/`data-frame` tokens and CSS gradients, and `binds` on template sub-parts, deduped —
+see DEV_LOOP_MEMORY.md). `node_icons_gen.js` is DEPRECATED (hand-canvas).
 
 Note: **action cards and the auto-attack toggle are NOT standalone PNGs** — the game COMPOSES them
 from `layout.json` `templates.techCard` / `templates.minionBay` + `style` tokens (exactly as the
@@ -160,9 +168,27 @@ control uses the shared `ui/button/button_{on,normal}` chrome.
 | `icons/attr/{strength,intellect,dexterity,constitution}` | attribute swatch (NO glyph — plain stat-colour box) | all | static attribute id | 120×120 | 4 | hi-fi · deterministic colour box (engine may draw a tinted rect instead — see UI_ASSET_MAP.md) |
 | `icons/technique/{swing,frenzy,firebolt,disarm,brace}` | technique glyph chip | Combat, Build | `technique.id` | 120×120 | 5 | hi-fi · deterministic chip + screen glyph, re-centred (§12) |
 | `icons/rune/{mark,path_minor,path_major,keystone}` | rune tier glyph — shape encodes tier: diamond(4)/pentagon(5)/hexagon(6)/octagon(8) | Build | `rune.tier` | 120×120 | 4 | hi-fi · deterministic polygon per tier (`ui_atoms_gen.js`) |
+| `icons/rune/core_{grunt,warden,adept,summoner,reaver,ranger}` | Core-rune identity token — decagon (10-gon) shape encodes the "Core" tier, per-core accent fill + carved glyph (✚◈✦❖⚔↗) | New Game | `core.id` | ~412×412 | 6 | hi-fi · CAPTURED from the live NewGame core cards (`proto/rune_capture.js`, dual-bg transparency recovery) — not hand-drawn; supersedes the inline-SVG-only token (DEV_LOOP_MEMORY #2) |
 | `icons/node/{camp,resource,merchant,unknown,castle}` | map token | Run Map | `node.type` + `node.revealed` (→`unknown`) | 220 (castle 413) | 5 | hi-fi · captured WITH a smooth high-res emboss (gloss + soft bevel) from the RunMap nodes; transparent corners via dual-bg recovery (ASSET_GEN_METHOD.md) |
 | `icons/resource/{supplies,support,spoils,hp}` | resource glyph | Run Map, Spine, Combat | resource readouts | 48×48 | 4 | placeholder |
 | `icons/map/{enemy_host,enemy_host_near}` | enemy war-party marker — a LEFT-facing mounted knight + red war banner + barding; rides the leading edge of the Run Map DOOM BAR as the horde marches from the castle (right) toward your camp (left). Reaching camp = you lose; `enemy_host_near` brightens the red as it closes | Run Map (doom bar) | `enemy.advance` distance + near-camp danger flag | 60×52 | 2 | world-art · deterministic flat-bevel (ART_RULES) via `proto/party_gen.js` |
+
+## ui/frame/ — 9-slice ORNATE panel/card chrome (LAYOUT_CONTRACT §10, PNG32, transparent centre)
+
+**The "engine does heavy lifting" split.** Shadows are NEVER a PNG — every drop shadow/text-shadow is
+engine-drawn from a `style.shadows.<token>` spec (`{dx,dy,blur,color,opacity}`) a screen references via
+`data-shadow="<token>"`; adding a shadow anywhere is a markup change, not a new asset. Ornate/carved
+frames ARE small painted assets because a nine-patch border is not something the engine can draw from
+colour tokens alone — `proto/frame_gen.js` paints the reusable set once; a screen references one by
+`data-frame="<token>"` and the extractor emits `{asset, slice:[L,T,R,B]}` so the engine nine-patch-blits
+it at ANY element size. Reserve frames for STATIC/neutral chrome (a legend box, a HUD footer) — state-
+coloured borders (ready/targeting/locked, danger banners like the RunMap doom bar) stay flat engine-drawn
+borders so their colour can change per state; do not force those onto a frame token.
+
+| id | slice [L,T,R,B] | used by (token) | status |
+|---|---|---|---|
+| `ui/frame/panel` | [60,60,60,60] @ 240×240 | `data-frame="panel"` — Combat `hudFooter`, Equipment `bottomBand`, CityMap `legend`, CampaignMap `footer` | hi-fi · v2 (double engraved band + edge ticks + layered corner medallion) |
+| `ui/frame/card` | [36,36,36,36] @ 144×144 | `data-frame="card"` — Equipment `inventory` | hi-fi · v2 (double engraved band + edge ticks + layered corner medallion) |
 
 ## ui/ — pips, reticles, buttons (PNG32, transparent; buttons 9-sliceable)
 
@@ -173,18 +199,18 @@ control uses the shared `ui/button/button_{on,normal}` chrome.
 | `ui/pip/{pip_empty,pip_empty_supplies,pip_empty_support}` | free socket — generic + special dashed resource empties | Combat, Run Map | empty / supplies / support | 128×80 | 3 | hi-fi · dashed coloured frame on resources |
 | `ui/pip/{pip_debuff,pip_damage}` | debuff / damage pip (never recolour) | Combat | debuff\|damaged | 128×80 | 2 | hi-fi · amber/red +45° hatch (§12) |
 | `ui/reticle/{focus,secondary}` | targeting bracket | Combat | `technique.aim.role` | 96×96 | 2 | placeholder |
-| `ui/button/button_{normal,hover,down,disabled,on}` | button skin (one set 9-slices to EVERY button) | all | input/interaction state + toggle | 160×44 (9-slice) | 5 | hi-fi · deterministic, black border + state accent + bevel (`proto/ui_gen.js`) |
+| `ui/button/button_{normal,hover,down,disabled,on}` | button skin (one set 9-slices to EVERY button) | all | input/interaction state + toggle | 160×44 (9-slice) | 5 | hi-fi · v2: black border + double engraved line + state accent + top-sheen gloss + corner rivets + bevel (`proto/ui_gen.js`) |
 
 *Button **labels are runtime text** (drawn over the skin), never baked into the asset.*
 
-## bg/ — backdrops (PNG32, opaque, 480×270 native → integer upscale)
+## bg/ — backdrops (PNG32, opaque, 1920×1080 native — 1080-density per LAYOUT_CONTRACT §11, not upscaled)
 
 | id | type | screen | drives-from (Core) | size px | variants | status |
 |---|---|---|---|---|---|---|
-| `bg/combat_field` | scene backdrop | Combat | active encounter biome | 480×270 | — | placeholder |
-| `bg/build_alcove` | scene backdrop | Build | static (loadout) | 480×270 | — | placeholder |
-| `bg/map_chart` | scene backdrop | Run Map | static | 480×270 | — | placeholder |
-| `bg/spine_road` | scene backdrop | Campaign Spine | static | 480×270 | — | placeholder |
+| `bg/combat_field` | scene backdrop | Combat | active encounter biome | 1920×1080 | — | placeholder |
+| `bg/build_alcove` | scene backdrop | Build | static (loadout) | 1920×1080 | — | placeholder |
+| `bg/map_chart` | scene backdrop | Run Map | static | 1920×1080 | — | placeholder |
+| `bg/spine_road` | scene backdrop | Campaign Spine | static | 1920×1080 | — | placeholder |
 
 ## fonts/ — type (external)
 

@@ -1591,6 +1591,220 @@
         ]
       },
       "mounts": []
+    },
+    "human_ranger": {
+      "size": [
+        264,
+        352
+      ],
+      "race": "human",
+      "pivot": [
+        140,
+        344
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            88,
+            248,
+            40,
+            72
+          ]
+        },
+        "legR": {
+          "rect": [
+            152,
+            248,
+            40,
+            72
+          ]
+        },
+        "boots": {
+          "rect": [
+            80,
+            320,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            64,
+            96,
+            152,
+            152
+          ]
+        },
+        "armL": {
+          "rect": [
+            24,
+            96,
+            48,
+            112
+          ]
+        },
+        "armR": {
+          "rect": [
+            208,
+            96,
+            48,
+            112
+          ]
+        },
+        "head": {
+          "rect": [
+            88,
+            8,
+            104,
+            104
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          44,
+          196
+        ],
+        "handR": [
+          236,
+          196
+        ],
+        "neck": [
+          140,
+          108
+        ],
+        "shoulderL": [
+          52,
+          100
+        ],
+        "shoulderR": [
+          228,
+          100
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "bow",
+          "socket": "handL"
+        }
+      ]
+    },
+    "elf_ranger": {
+      "size": [
+        248,
+        352
+      ],
+      "race": "elf",
+      "pivot": [
+        132,
+        344
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            80,
+            248,
+            40,
+            72
+          ]
+        },
+        "legR": {
+          "rect": [
+            144,
+            248,
+            40,
+            72
+          ]
+        },
+        "boots": {
+          "rect": [
+            72,
+            320,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            64,
+            96,
+            136,
+            152
+          ]
+        },
+        "armL": {
+          "rect": [
+            24,
+            96,
+            48,
+            112
+          ]
+        },
+        "armR": {
+          "rect": [
+            192,
+            96,
+            48,
+            112
+          ]
+        },
+        "head": {
+          "rect": [
+            56,
+            8,
+            152,
+            104
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          44,
+          196
+        ],
+        "handR": [
+          220,
+          196
+        ],
+        "neck": [
+          132,
+          108
+        ],
+        "shoulderL": [
+          52,
+          100
+        ],
+        "shoulderR": [
+          212,
+          100
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "bow",
+          "socket": "handL"
+        }
+      ]
     }
   },
   "gear": {
@@ -1629,271 +1843,1681 @@
         28,
         172
       ]
+    },
+    "bow": {
+      "pivot": [
+        36,
+        132
+      ]
     }
   },
   "screens": {
-    "combat": {
+    "encounter": {
       "designSize": [
         960,
         540
       ],
       "elements": [
         {
-          "id": "foeStage",
+          "id": "backdrop",
+          "type": "text",
+          "anchor": "Center",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            540
+          ],
+          "z": 0,
+          "binds": "encounter.scene",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/bg/combat_field.png"
+        },
+        {
+          "id": "heldBadge",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            462,
+            6
+          ],
+          "size": [
+            48,
+            16
+          ],
+          "z": 1,
+          "binds": "combat.paused",
+          "color": "amber",
+          "fill": "slot",
+          "border": {
+            "color": "border",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 6.5
+        },
+        {
+          "id": "topControls",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            794,
+            4
+          ],
+          "size": [
+            153,
+            20
+          ],
+          "z": 1,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "autoAttackBtn",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            794,
+            4
+          ],
+          "size": [
+            98,
+            20
+          ],
+          "z": 1,
+          "binds": "combat.autoAttack",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/ui/button/button_on.png"
+        },
+        {
+          "id": "fleeBtn",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            897,
+            4
+          ],
+          "size": [
+            50,
+            20
+          ],
+          "z": 1,
+          "binds": "combat.flee",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/ui/button/button_normal.png"
+        },
+        {
+          "id": "youLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            13,
+            34
+          ],
+          "size": [
+            18,
+            13
+          ],
+          "z": 1,
+          "color": "inkWarm",
+          "font": "display",
+          "fontPx": 10,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          },
+          "content": "You"
+        },
+        {
+          "id": "foeLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            929,
+            34
+          ],
+          "size": [
+            18,
+            13
+          ],
+          "z": 1,
+          "color": "inkWarm",
+          "font": "display",
+          "fontPx": 10,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          },
+          "content": "Foe"
+        },
+        {
+          "id": "heroHp",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            75,
+            321
+          ],
+          "size": [
+            120,
+            24
+          ],
+          "z": 1,
+          "binds": "Body.hp",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "foeReticle",
+          "type": "icon",
+          "anchor": "TopLeft",
+          "offset": [
+            796,
+            143
+          ],
+          "size": [
+            64,
+            64
+          ],
+          "z": 1,
+          "binds": "targeting.focus",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/ui/reticle/focus.png"
+        },
+        {
+          "id": "foeHp",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            750,
+            321
+          ],
+          "size": [
+            150,
+            14
+          ],
+          "z": 1,
+          "binds": "encounter.foe.hp",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "hudFooter",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            0,
+            358
+          ],
+          "size": [
+            960,
+            182
+          ],
+          "z": 1,
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "panel",
+            "to": "panelDeep",
+            "dir": "vertical"
+          },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          },
+          "frame": {
+            "token": "panel",
+            "asset": "ui/frame/panel",
+            "slice": [
+              40,
+              40,
+              40,
+              40
+            ]
+          }
+        },
+        {
+          "id": "poolRows",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            10,
+            389
+          ],
+          "size": [
+            309,
+            77
+          ],
+          "z": 1,
+          "binds": "pool",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "poolRow",
+            "flow": "vertical",
+            "gap": 6,
+            "size": [
+              309,
+              15
+            ]
+          }
+        },
+        {
+          "id": "poolLegend",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            10,
+            528
+          ],
+          "size": [
+            309,
+            6
+          ],
+          "z": 1,
+          "binds": "pool.legend",
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 4.5
+        },
+        {
+          "id": "techList",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            340,
+            397
+          ],
+          "size": [
+            495,
+            136
+          ],
+          "z": 1,
+          "binds": "loadout.techniques",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "techCard",
+            "flow": "horizontal",
+            "gap": 6,
+            "size": [
+              94,
+              136
+            ]
+          }
+        },
+        {
+          "id": "bayList",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            850,
+            397
+          ],
+          "size": [
+            100,
+            136
+          ],
+          "z": 1,
+          "binds": "loadout.bays",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "minionBay",
+            "flow": "horizontal",
+            "gap": 6,
+            "size": [
+              100,
+              136
+            ]
+          }
+        },
+        {
+          "id": "heroFigure",
+          "type": "figure",
+          "anchor": "BottomLeft",
+          "offset": [
+            60,
+            -222
+          ],
+          "size": [
+            180,
+            215
+          ],
+          "z": 2,
+          "binds": "Body",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "minionField",
+          "type": "figure",
+          "anchor": "Bottom",
+          "offset": [
+            -214,
+            -256
+          ],
+          "size": [
+            75,
+            84
+          ],
+          "z": 2,
+          "binds": "encounter.minions",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "foeFigure",
+          "type": "figure",
+          "anchor": "BottomRight",
+          "offset": [
+            -45,
+            -217
+          ],
+          "size": [
+            180,
+            220
+          ],
+          "z": 2,
+          "binds": "encounter.foe",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "statusStrip",
+          "type": "panel",
           "anchor": "Top",
           "offset": [
             0,
-            40
+            0
           ],
           "size": [
-            520,
-            300
+            960,
+            28
           ],
-          "z": 1,
-          "binds": "encounter.foes"
-        },
-        {
-          "id": "heroStage",
-          "anchor": "BottomLeft",
-          "offset": [
-            40,
-            -150
-          ],
-          "size": [
-            220,
-            300
-          ],
-          "z": 2,
-          "binds": "Body"
+          "z": 6,
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "slot",
+            "to": "panelCard",
+            "dir": "vertical"
+          },
+          "font": "display",
+          "fontPx": 8
         },
         {
           "id": "attrPool",
+          "type": "panel",
           "anchor": "BottomLeft",
           "offset": [
-            16,
-            -16
+            0,
+            0
           ],
           "size": [
-            220,
-            120
+            330,
+            181
           ],
-          "z": 10,
-          "binds": "Body.pool"
+          "z": 6,
+          "binds": "Body.pool",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
         },
         {
           "id": "actionBar",
+          "type": "panel",
           "anchor": "Bottom",
           "offset": [
-            0,
-            -12
-          ],
-          "size": [
-            760,
-            76
-          ],
-          "z": 10,
-          "binds": "loadout"
-        },
-        {
-          "id": "foePanel",
-          "anchor": "TopRight",
-          "offset": [
-            -24,
-            24
-          ],
-          "size": [
-            300,
-            180
-          ],
-          "z": 5,
-          "binds": "encounter.foe"
-        },
-        {
-          "id": "logRail",
-          "anchor": "Right",
-          "offset": [
-            -16,
+            165,
             0
           ],
           "size": [
-            260,
-            220
+            630,
+            181
           ],
-          "z": 4,
-          "binds": "combatLog"
+          "z": 6,
+          "binds": "loadout",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
         }
       ]
     },
-    "build": {
+    "equipment": {
       "designSize": [
         960,
         540
       ],
       "elements": [
         {
-          "id": "paperDoll",
-          "anchor": "Left",
+          "id": "equipTitle",
+          "type": "text",
+          "anchor": "TopLeft",
           "offset": [
-            60,
-            0
+            10,
+            34
           ],
           "size": [
-            260,
-            420
-          ],
-          "z": 2,
-          "binds": "Body"
-        },
-        {
-          "id": "partList",
-          "anchor": "TopRight",
-          "offset": [
-            -24,
-            24
-          ],
-          "size": [
-            360,
-            300
-          ],
-          "z": 5,
-          "binds": "Body.parts"
-        },
-        {
-          "id": "attrPanel",
-          "anchor": "BottomRight",
-          "offset": [
-            -24,
-            -24
-          ],
-          "size": [
-            360,
-            150
-          ],
-          "z": 5,
-          "binds": "Body.attrs"
-        },
-        {
-          "id": "gearTray",
-          "anchor": "Bottom",
-          "offset": [
-            0,
-            -12
-          ],
-          "size": [
-            640,
-            84
-          ],
-          "z": 10,
-          "binds": "inventory"
-        }
-      ]
-    },
-    "runmap": {
-      "designSize": [
-        960,
-        540
-      ],
-      "elements": [
-        {
-          "id": "mapBoard",
-          "anchor": "Center",
-          "offset": [
-            0,
-            -10
-          ],
-          "size": [
-            820,
-            400
+            55,
+            14
           ],
           "z": 1,
-          "binds": "run.map"
+          "color": "inkWarm",
+          "font": "display",
+          "fontPx": 11,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          },
+          "content": "Equipment"
         },
         {
-          "id": "runHeader",
+          "id": "attrTitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            261,
+            36
+          ],
+          "size": [
+            431,
+            15
+          ],
+          "z": 1,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 11.5,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          },
+          "content": "Attributes"
+        },
+        {
+          "id": "attrReadout",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            261,
+            56
+          ],
+          "size": [
+            431,
+            67
+          ],
+          "z": 1,
+          "binds": "attrs",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "attrBar",
+            "flow": "vertical",
+            "gap": 5,
+            "size": [
+              431,
+              13
+            ]
+          }
+        },
+        {
+          "id": "invTabs",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            262,
+            151
+          ],
+          "size": [
+            429,
+            29
+          ],
+          "z": 1,
+          "binds": "tabs",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "invTab",
+            "flow": "horizontal",
+            "gap": 4,
+            "size": [
+              40,
+              18
+            ]
+          }
+        },
+        {
+          "id": "invItems",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            270,
+            180
+          ],
+          "size": [
+            413,
+            105
+          ],
+          "z": 1,
+          "binds": "invItems",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "invCard",
+            "flow": "grid",
+            "gap": 6,
+            "cols": 2,
+            "size": [
+              204,
+              31
+            ]
+          }
+        },
+        {
+          "id": "runeBagTitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            714,
+            36
+          ],
+          "size": [
+            51,
+            15
+          ],
+          "z": 1,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 11.5,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          },
+          "content": "Rune Bag"
+        },
+        {
+          "id": "runeBudget",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            714,
+            56
+          ],
+          "size": [
+            236,
+            17
+          ],
+          "z": 1,
+          "binds": "runes.budget",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "runeGroups",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            714,
+            91
+          ],
+          "size": [
+            236,
+            309
+          ],
+          "z": 1,
+          "binds": "runeGroups",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "runeGroup",
+            "flow": "vertical",
+            "gap": 6,
+            "size": [
+              236,
+              78
+            ]
+          }
+        },
+        {
+          "id": "currentCore",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            0,
+            409
+          ],
+          "size": [
+            150,
+            131
+          ],
+          "z": 1,
+          "binds": "core",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "actionBar",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            150,
+            409
+          ],
+          "size": [
+            810,
+            131
+          ],
+          "z": 1,
+          "binds": "loadout",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "actionBarTitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            160,
+            416
+          ],
+          "size": [
+            50,
+            13
+          ],
+          "z": 1,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 10,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          },
+          "content": "Action Bar"
+        },
+        {
+          "id": "loadoutList",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            160,
+            444
+          ],
+          "size": [
+            681,
+            89
+          ],
+          "z": 1,
+          "binds": "loadout",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "loadoutCard",
+            "flow": "horizontal",
+            "gap": 6,
+            "size": [
+              131,
+              89
+            ]
+          }
+        },
+        {
+          "id": "buildMinions",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            856,
+            444
+          ],
+          "size": [
+            94,
+            89
+          ],
+          "z": 1,
+          "binds": "minions",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "loadoutCard",
+            "flow": "horizontal",
+            "gap": 6
+          }
+        },
+        {
+          "id": "equipPanel",
+          "type": "panel",
+          "anchor": "Left",
+          "offset": [
+            0,
+            -52
+          ],
+          "size": [
+            250,
+            380
+          ],
+          "z": 2,
+          "binds": "Body",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "paperDoll",
+          "type": "figure",
+          "anchor": "Left",
+          "offset": [
+            75,
+            -59
+          ],
+          "size": [
+            120,
+            215
+          ],
+          "z": 2,
+          "binds": "Body",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "inventory",
+          "type": "panel",
+          "anchor": "Center",
+          "offset": [
+            -3,
+            -4
+          ],
+          "size": [
+            431,
+            270
+          ],
+          "z": 5,
+          "binds": "inventory",
+          "color": "ink",
+          "fill": "panelTab",
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          },
+          "frame": {
+            "token": "card",
+            "asset": "ui/frame/card",
+            "slice": [
+              24,
+              24,
+              24,
+              24
+            ]
+          }
+        },
+        {
+          "id": "runeBag",
+          "type": "panel",
+          "anchor": "Right",
+          "offset": [
+            0,
+            -52
+          ],
+          "size": [
+            256,
+            380
+          ],
+          "z": 5,
+          "binds": "runes",
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "borderDim",
+            "to": "panelCard",
+            "dir": "vertical"
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "statusStrip",
+          "type": "text",
           "anchor": "Top",
           "offset": [
             0,
-            16
+            0
           ],
           "size": [
-            820,
-            56
+            960,
+            28
           ],
-          "z": 10,
-          "binds": "run.meta"
+          "z": 6,
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "slot",
+            "to": "panelCard",
+            "dir": "vertical"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "content": "Roguebane CORE GRUNT ▶ READY TO MARCH"
         },
         {
-          "id": "legend",
-          "anchor": "BottomLeft",
-          "offset": [
-            24,
-            -24
-          ],
-          "size": [
-            240,
-            120
-          ],
-          "z": 8,
-          "binds": "run.legend"
-        }
-      ]
-    },
-    "campaign": {
-      "designSize": [
-        960,
-        540
-      ],
-      "elements": [
-        {
-          "id": "spine",
-          "anchor": "Center",
+          "id": "bottomBand",
+          "type": "panel",
+          "anchor": "Bottom",
           "offset": [
             0,
             0
           ],
           "size": [
-            880,
-            360
-          ],
-          "z": 1,
-          "binds": "campaign.spine"
-        },
-        {
-          "id": "chapterCard",
-          "anchor": "TopLeft",
-          "offset": [
-            24,
-            24
-          ],
-          "size": [
-            320,
-            200
+            960,
+            132
           ],
           "z": 6,
-          "binds": "campaign.current"
-        },
-        {
-          "id": "metaBar",
-          "anchor": "Bottom",
-          "offset": [
-            0,
-            -16
-          ],
-          "size": [
-            760,
-            64
-          ],
-          "z": 10,
-          "binds": "campaign.meta"
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "panel",
+            "to": "panelTab",
+            "dir": "vertical"
+          },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          },
+          "frame": {
+            "token": "panel",
+            "asset": "ui/frame/panel",
+            "slice": [
+              40,
+              40,
+              40,
+              40
+            ]
+          }
         }
       ]
     },
-    "newrun": {
+    "citymap": {
       "designSize": [
         960,
         540
       ],
       "elements": [
+        {
+          "id": "legSubtitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            79,
+            10
+          ],
+          "size": [
+            90,
+            8
+          ],
+          "z": 1,
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 6,
+          "content": "THE CITY OF THORNMARCH"
+        },
+        {
+          "id": "layerNote",
+          "type": "text",
+          "anchor": "TopRight",
+          "offset": [
+            -13,
+            10
+          ],
+          "size": [
+            25,
+            8
+          ],
+          "z": 1,
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 6,
+          "content": "LAYER 2"
+        },
+        {
+          "id": "doomEta",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            545,
+            46
+          ],
+          "size": [
+            103,
+            8
+          ],
+          "z": 1,
+          "color": "hit",
+          "font": "mono",
+          "fontPx": 6,
+          "content": "1 WAYPOINT AWAY FROM CAMP"
+        },
+        {
+          "id": "doomCampIcon",
+          "type": "icon",
+          "anchor": "TopLeft",
+          "offset": [
+            313,
+            60
+          ],
+          "size": [
+            22,
+            22
+          ],
+          "z": 1,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/icons/node/camp.png",
+          "shadow": {
+            "token": "soft",
+            "dx": 0,
+            "dy": 3,
+            "blur": 4,
+            "color": "outline",
+            "opacity": 0.45
+          }
+        },
+        {
+          "id": "doomTrack",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            341,
+            60
+          ],
+          "size": [
+            277,
+            21
+          ],
+          "z": 1,
+          "color": "ink",
+          "fill": "panel",
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "doomFill",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            359,
+            61
+          ],
+          "size": [
+            259,
+            19
+          ],
+          "z": 1,
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "blood",
+            "to": "blood",
+            "dir": "diagonal"
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "doomHost",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            353,
+            39
+          ],
+          "size": [
+            41,
+            41
+          ],
+          "z": 1,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/icons/map/enemy_host_near.png",
+          "shadow": {
+            "token": "soft",
+            "dx": 0,
+            "dy": 3,
+            "blur": 4,
+            "color": "outline",
+            "opacity": 0.45
+          }
+        },
+        {
+          "id": "doomCastleIcon",
+          "type": "icon",
+          "anchor": "TopLeft",
+          "offset": [
+            624,
+            59
+          ],
+          "size": [
+            23,
+            23
+          ],
+          "z": 1,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/icons/node/castle.png",
+          "shadow": {
+            "token": "soft",
+            "dx": 0,
+            "dy": 3,
+            "blur": 4,
+            "color": "outline",
+            "opacity": 0.45
+          }
+        },
+        {
+          "id": "exitLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            862,
+            248
+          ],
+          "size": [
+            24,
+            7
+          ],
+          "z": 1,
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 5,
+          "content": "EXIT →"
+        },
+        {
+          "id": "chart",
+          "type": "graph",
+          "anchor": "Center",
+          "offset": [
+            0,
+            49
+          ],
+          "size": [
+            960,
+            442
+          ],
+          "z": 2,
+          "binds": "map",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "beaconNode",
+            "flow": "graph",
+            "gap": 0,
+            "size": [
+              28,
+              28
+            ]
+          }
+        },
+        {
+          "id": "castleNote",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -35,
+            116
+          ],
+          "size": [
+            150,
+            16
+          ],
+          "z": 3,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "content": "CASTLE FORTIFICATIONSgate · wall · catapult · ballista"
+        },
+        {
+          "id": "supplies",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            13,
+            37
+          ],
+          "size": [
+            137,
+            51
+          ],
+          "z": 5,
+          "binds": "supplies",
+          "color": "ink",
+          "fill": "panel",
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "soft",
+            "dx": 0,
+            "dy": 3,
+            "blur": 4,
+            "color": "outline",
+            "opacity": 0.45
+          },
+          "frame": {
+            "token": "card",
+            "asset": "ui/frame/card",
+            "slice": [
+              36,
+              36,
+              36,
+              36
+            ]
+          }
+        },
+        {
+          "id": "musteredSupport",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            157,
+            37
+          ],
+          "size": [
+            137,
+            51
+          ],
+          "z": 5,
+          "binds": "support",
+          "color": "ink",
+          "fill": "panel",
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "soft",
+            "dx": 0,
+            "dy": 3,
+            "blur": 4,
+            "color": "outline",
+            "opacity": 0.45
+          },
+          "frame": {
+            "token": "card",
+            "asset": "ui/frame/card",
+            "slice": [
+              36,
+              36,
+              36,
+              36
+            ]
+          }
+        },
+        {
+          "id": "legend",
+          "type": "list",
+          "anchor": "TopRight",
+          "offset": [
+            -13,
+            37
+          ],
+          "size": [
+            240,
+            44
+          ],
+          "z": 5,
+          "binds": "legend",
+          "color": "mutedWarm",
+          "fill": "panelCard",
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 5.5,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          },
+          "frame": {
+            "token": "panel",
+            "asset": "ui/frame/panel",
+            "slice": [
+              60,
+              60,
+              60,
+              60
+            ]
+          },
+          "item": {
+            "template": "legendRow",
+            "flow": "grid",
+            "gap": 4,
+            "cols": 2,
+            "size": [
+              107,
+              8
+            ]
+          }
+        },
+        {
+          "id": "topStrip",
+          "type": "panel",
+          "anchor": "Top",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            28
+          ],
+          "z": 6,
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "slot",
+            "to": "panelCard",
+            "dir": "vertical"
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "doomBar",
+          "type": "panel",
+          "anchor": "Top",
+          "offset": [
+            0,
+            37
+          ],
+          "size": [
+            354,
+            53
+          ],
+          "z": 6,
+          "binds": "enemy.advance",
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "panel",
+            "to": "panelTab",
+            "dir": "vertical"
+          },
+          "border": {
+            "color": "border",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8
+        }
+      ]
+    },
+    "campaignmap": {
+      "designSize": [
+        960,
+        540
+      ],
+      "elements": [
+        {
+          "id": "eyebrow",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            20,
+            13
+          ],
+          "size": [
+            234,
+            8
+          ],
+          "z": 1,
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 6,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          },
+          "content": "Campaign"
+        },
+        {
+          "id": "title",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            20,
+            23
+          ],
+          "size": [
+            234,
+            24
+          ],
+          "z": 1,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 19,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          },
+          "content": "Advance Toward the Capital"
+        },
+        {
+          "id": "citiesTaken",
+          "type": "text",
+          "anchor": "TopRight",
+          "offset": [
+            -20,
+            36
+          ],
+          "size": [
+            65,
+            11
+          ],
+          "z": 1,
+          "binds": "campaign.taken",
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 6
+        },
+        {
+          "id": "cityGraph",
+          "type": "graph",
+          "anchor": "Center",
+          "offset": [
+            0,
+            15
+          ],
+          "size": [
+            960,
+            410
+          ],
+          "z": 2,
+          "binds": "campaign",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "cityNode",
+            "flow": "graph",
+            "gap": 0,
+            "size": [
+              8,
+              8
+            ]
+          }
+        },
+        {
+          "id": "capitalMarker",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            710,
+            230
+          ],
+          "size": [
+            120,
+            0
+          ],
+          "z": 3,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          }
+        },
+        {
+          "id": "header",
+          "type": "panel",
+          "anchor": "Top",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            47
+          ],
+          "z": 5,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "footer",
+          "type": "text",
+          "anchor": "Bottom",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            45
+          ],
+          "z": 6,
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "panel",
+            "to": "panelTab",
+            "dir": "vertical"
+          },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          },
+          "frame": {
+            "token": "panel",
+            "asset": "ui/frame/panel",
+            "slice": [
+              60,
+              60,
+              60,
+              60
+            ]
+          }
+        }
+      ]
+    },
+    "newgame": {
+      "designSize": [
+        960,
+        540
+      ],
+      "elements": [
+        {
+          "id": "topBarSubtitle",
+          "type": "text",
+          "anchor": "Top",
+          "offset": [
+            -348,
+            13
+          ],
+          "size": [
+            97,
+            8
+          ],
+          "z": 1,
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 6,
+          "content": "Choose your Loadout"
+        },
+        {
+          "id": "raceHeader",
+          "type": "text",
+          "anchor": "Left",
+          "offset": [
+            10,
+            -221
+          ],
+          "size": [
+            209,
+            15
+          ],
+          "z": 1,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "content": "① Race"
+        },
+        {
+          "id": "coreHeader",
+          "type": "text",
+          "anchor": "Center",
+          "offset": [
+            0,
+            -221
+          ],
+          "size": [
+            476,
+            15
+          ],
+          "z": 1,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "content": "② Core Rune"
+        },
+        {
+          "id": "loadoutHeader",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -11,
+            -221
+          ],
+          "size": [
+            207,
+            15
+          ],
+          "z": 1,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "content": "Loadout"
+        },
         {
           "id": "previewFigure",
           "type": "figure",
@@ -1913,12 +3537,276 @@
           "fontPx": 8
         },
         {
+          "id": "previewName",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            749,
+            67
+          ],
+          "size": [
+            76,
+            16
+          ],
+          "z": 1,
+          "binds": "preview.name",
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 13,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          }
+        },
+        {
+          "id": "previewRole",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            749,
+            83
+          ],
+          "size": [
+            56,
+            7
+          ],
+          "z": 1,
+          "binds": "preview.role",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 5,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          }
+        },
+        {
+          "id": "previewAttrRow",
+          "type": "list",
+          "anchor": "Right",
+          "offset": [
+            -11,
+            -25
+          ],
+          "size": [
+            207,
+            35
+          ],
+          "z": 1,
+          "binds": "preview.attrs",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "previewAttrTile",
+            "flow": "horizontal",
+            "gap": 4,
+            "size": [
+              38,
+              35
+            ]
+          }
+        },
+        {
+          "id": "previewHpTile",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -11,
+            -25
+          ],
+          "size": [
+            41,
+            35
+          ],
+          "z": 1,
+          "binds": "preview.hp",
+          "color": "ink",
+          "fill": "panel",
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "previewLayoutRow",
+          "type": "panel",
+          "anchor": "Right",
+          "offset": [
+            -11,
+            12
+          ],
+          "size": [
+            207,
+            27
+          ],
+          "z": 1,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "previewBudgetTile",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -152,
+            12
+          ],
+          "size": [
+            66,
+            27
+          ],
+          "z": 1,
+          "binds": "preview.budget",
+          "color": "ink",
+          "fill": "panelDeep",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "previewActionsTile",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -82,
+            12
+          ],
+          "size": [
+            66,
+            27
+          ],
+          "z": 1,
+          "binds": "preview.techniques",
+          "color": "ink",
+          "fill": "panelDeep",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "previewBaysTile",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -11,
+            12
+          ],
+          "size": [
+            66,
+            27
+          ],
+          "z": 1,
+          "binds": "preview.bays",
+          "color": "ink",
+          "fill": "panelDeep",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "previewApex",
+          "type": "panel",
+          "anchor": "Right",
+          "offset": [
+            -11,
+            58
+          ],
+          "size": [
+            207,
+            49
+          ],
+          "z": 1,
+          "binds": "preview.apex",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "previewApexLabel",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -10,
+            38
+          ],
+          "size": [
+            198,
+            7
+          ],
+          "z": 1,
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 5,
+          "content": "APEX"
+        },
+        {
+          "id": "previewApexName",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -10,
+            50
+          ],
+          "size": [
+            198,
+            14
+          ],
+          "z": 1,
+          "binds": "preview.apexName",
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 13
+        },
+        {
+          "id": "previewApexDesc",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -10,
+            71
+          ],
+          "size": [
+            198,
+            19
+          ],
+          "z": 1,
+          "binds": "preview.apexDesc",
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 6
+        },
+        {
           "id": "beginBtn",
           "type": "button",
           "anchor": "TopLeft",
           "offset": [
             824,
-            506
+            505
           ],
           "size": [
             116,
@@ -2041,12 +3929,18 @@
           "z": 5,
           "binds": "preview",
           "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "borderDim",
+            "to": "panelDeep",
+            "dir": "vertical"
+          },
           "font": "display",
           "fontPx": 8
         },
         {
           "id": "topBar",
-          "type": "text",
+          "type": "panel",
           "anchor": "Top",
           "offset": [
             0,
@@ -2059,8 +3953,32 @@
           "z": 8,
           "binds": "selection",
           "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "slot",
+            "to": "panelCard",
+            "dir": "vertical"
+          },
           "font": "display",
-          "fontPx": 8
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          },
+          "frame": {
+            "token": "panel",
+            "asset": "ui/frame/panel",
+            "slice": [
+              60,
+              60,
+              60,
+              60
+            ]
+          }
         },
         {
           "id": "confirmBar",
@@ -2077,13 +3995,32 @@
           "z": 9,
           "binds": "selection",
           "color": "ink",
-          "border": {
-            "color": "borderMid",
-            "w": 1,
-            "style": "solid"
+          "fill": {
+            "type": "gradient",
+            "from": "panel",
+            "to": "panelDeep",
+            "dir": "vertical"
           },
           "font": "display",
-          "fontPx": 8
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          },
+          "frame": {
+            "token": "panel",
+            "asset": "ui/frame/panel",
+            "slice": [
+              60,
+              60,
+              60,
+              60
+            ]
+          }
         }
       ]
     }
@@ -2097,146 +4034,202 @@
       "parts": [
         {
           "rect": [
+            1,
+            1,
+            53,
+            77
+          ],
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "slot",
+            "to": "ground",
+            "dir": "vertical"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "binds": "race.headImage"
+        },
+        {
+          "rect": [
+            10,
+            22,
+            35,
+            35
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/sprites/body/human_grunt/head_healthy.png",
+          "shadow": {
+            "token": "soft",
+            "dx": 0,
+            "dy": 3,
+            "blur": 4,
+            "color": "outline",
+            "opacity": 0.45
+          }
+        },
+        {
+          "rect": [
             61,
-            5,
+            7,
             44,
-            17
+            14
           ],
           "color": "inkBright",
           "font": "display",
           "fontPx": 13.5,
+          "binds": "race.name",
           "sample": "Human"
         },
         {
           "rect": [
-            167,
-            12,
-            30,
-            6
+            162,
+            10,
+            39,
+            11
           ],
           "color": "panelDeep",
+          "fill": "amber",
+          "border": {
+            "color": "amber",
+            "w": 1,
+            "style": "solid"
+          },
           "font": "mono",
           "fontPx": 4.5,
+          "binds": "race.selection",
           "sample": "✓ CHOSEN"
         },
         {
           "rect": [
             61,
             22,
-            59,
+            140,
             6
           ],
           "color": "muted",
           "font": "mono",
           "fontPx": 4.5,
+          "binds": "race.tag",
           "sample": "THE FOUNDER LINE"
         },
         {
           "rect": [
-            72,
-            39,
-            5,
-            10
+            62,
+            41,
+            23,
+            8
           ],
           "color": "ink",
           "font": "mono",
           "fontPx": 7.5,
+          "binds": "race.attrs.value",
           "sample": "3"
         },
         {
           "rect": [
-            70,
+            62,
             49,
-            7,
+            23,
             5
           ],
           "color": "mutedDim",
           "font": "mono",
           "fontPx": 3.75,
+          "binds": "race.attrs.key",
           "sample": "STR"
         },
         {
           "rect": [
-            100,
-            39,
-            5,
-            10
+            91,
+            41,
+            23,
+            8
           ],
           "color": "ink",
           "font": "mono",
           "fontPx": 7.5,
+          "binds": "race.attrs.value",
           "sample": "3"
         },
         {
           "rect": [
-            99,
+            91,
             49,
-            7,
+            23,
             5
           ],
           "color": "mutedDim",
           "font": "mono",
           "fontPx": 3.75,
+          "binds": "race.attrs.key",
           "sample": "INT"
         },
         {
           "rect": [
-            129,
-            39,
-            5,
-            10
+            120,
+            41,
+            23,
+            8
           ],
           "color": "ink",
           "font": "mono",
           "fontPx": 7.5,
+          "binds": "race.attrs.value",
           "sample": "3"
         },
         {
           "rect": [
-            128,
+            120,
             49,
-            7,
+            23,
             5
           ],
           "color": "mutedDim",
           "font": "mono",
           "fontPx": 3.75,
+          "binds": "race.attrs.key",
           "sample": "DEX"
         },
         {
           "rect": [
-            157,
-            39,
-            5,
-            10
+            148,
+            41,
+            23,
+            8
           ],
           "color": "ink",
           "font": "mono",
           "fontPx": 7.5,
+          "binds": "race.attrs.value",
           "sample": "3"
         },
         {
           "rect": [
-            156,
+            148,
             49,
-            7,
+            23,
             5
           ],
           "color": "mutedDim",
           "font": "mono",
           "fontPx": 3.75,
+          "binds": "race.attrs.key",
           "sample": "CON"
         },
         {
           "rect": [
-            184,
-            38,
-            9,
-            10
+            177,
+            40,
+            23,
+            8
           ],
           "color": "gold",
           "font": "mono",
           "fontPx": 7.5,
+          "binds": "race.hp",
           "sample": "20"
         },
         {
@@ -2255,13 +4248,14 @@
           "rect": [
             61,
             60,
-            128,
+            140,
             13
           ],
           "color": "mutedWarm",
           "font": "mono",
           "fontPx": 4.75,
-          "sample": "No innate edge or lack"
+          "binds": "race.blurb",
+          "sample": "No innate edge or lack — fits any core i"
         }
       ]
     },
@@ -2273,14 +4267,23 @@
       "parts": [
         {
           "rect": [
-            66,
-            25,
-            20,
-            29
+            50,
+            12,
+            52,
+            52
           ],
           "color": "ink",
           "font": "display",
-          "fontPx": 22,
+          "fontPx": 8,
+          "shadow": {
+            "token": "soft",
+            "dx": 0,
+            "dy": 3,
+            "blur": 4,
+            "color": "outline",
+            "opacity": 0.45
+          },
+          "binds": "core.icon",
           "sample": "✚"
         },
         {
@@ -2298,37 +4301,40 @@
         {
           "rect": [
             8,
-            80,
-            33,
-            16
+            82,
+            136,
+            13
           ],
           "color": "inkBright",
           "font": "display",
           "fontPx": 12.5,
+          "binds": "core.name",
           "sample": "Grunt"
         },
         {
           "rect": [
             8,
             97,
-            54,
+            136,
             6
           ],
           "color": "muted",
           "font": "mono",
           "fontPx": 4.75,
+          "binds": "core.role",
           "sample": "THE GENERALIST"
         },
         {
           "rect": [
-            24,
-            110,
-            11,
-            12
+            10,
+            112,
+            38,
+            9
           ],
           "color": "amber",
           "font": "mono",
           "fontPx": 9,
+          "binds": "core.budget",
           "sample": "20"
         },
         {
@@ -2345,14 +4351,15 @@
         },
         {
           "rect": [
-            73,
-            110,
-            5,
-            12
+            57,
+            112,
+            38,
+            9
           ],
           "color": "inkWarm",
           "font": "mono",
           "fontPx": 9,
+          "binds": "core.actionSlots",
           "sample": "4"
         },
         {
@@ -2369,14 +4376,15 @@
         },
         {
           "rect": [
-            120,
-            110,
-            5,
-            12
+            103,
+            112,
+            38,
+            9
           ],
           "color": "inkWarm",
           "font": "mono",
           "fontPx": 9,
+          "binds": "core.bays",
           "sample": "1"
         },
         {
@@ -2406,38 +4414,1121 @@
         {
           "rect": [
             14,
-            143,
-            44,
-            9
+            144,
+            131,
+            8
           ],
           "color": "inkBright",
           "font": "display",
           "fontPx": 7.5,
+          "binds": "core.apexName",
           "sample": "Hollow Vessel"
         },
         {
           "rect": [
             14,
             154,
-            128,
-            13
+            131,
+            14
           ],
           "color": "muted",
           "font": "mono",
           "fontPx": 4.75,
-          "sample": "You are healed for your unspent budget points after each encounter."
+          "binds": "core.apexDescription",
+          "sample": "You are healed for your unspent budget p"
         },
         {
           "rect": [
-            57,
-            184,
-            39,
+            8,
+            179,
+            136,
+            17
+          ],
+          "color": "panelDeep",
+          "fill": "good",
+          "border": {
+            "color": "good",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 5.5,
+          "binds": "core.selection",
+          "sample": "✓ CORE SET"
+        }
+      ]
+    },
+    "poolRow": {
+      "size": [
+        309,
+        15
+      ],
+      "parts": [
+        {
+          "rect": [
+            9,
+            0,
+            12,
+            9
+          ],
+          "color": "inkWarm",
+          "font": "mono",
+          "fontPx": 6.5,
+          "binds": "pool.attr.key",
+          "sample": "STR"
+        },
+        {
+          "rect": [
+            0,
+            9,
+            48,
+            6
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 4.5,
+          "binds": "pool.attr.part",
+          "sample": "Arms"
+        },
+        {
+          "rect": [
+            54,
+            0,
+            13,
+            15
+          ],
+          "color": "ink",
+          "font": "mono",
+          "fontPx": 11,
+          "binds": "pool.attr.alloc",
+          "sample": "10"
+        },
+        {
+          "rect": [
+            69,
+            4,
+            5,
+            10
+          ],
+          "color": "border",
+          "font": "mono",
+          "fontPx": 7.5,
+          "sample": "/"
+        },
+        {
+          "rect": [
+            76,
+            0,
+            13,
+            15
+          ],
+          "color": "lockText",
+          "font": "mono",
+          "fontPx": 11,
+          "binds": "pool.attr.available",
+          "sample": "10"
+        }
+      ]
+    },
+    "techCard": {
+      "size": [
+        94,
+        136
+      ],
+      "parts": [
+        {
+          "rect": [
+            6,
+            5,
+            15,
+            15
+          ],
+          "color": "outline",
+          "fill": "str",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 7.5,
+          "binds": "technique.icon",
+          "sample": "⚔"
+        },
+        {
+          "rect": [
+            69,
+            9,
+            20,
+            8
+          ],
+          "color": "good",
+          "border": {
+            "color": "good",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 4,
+          "binds": "technique.state",
+          "sample": "READY"
+        },
+        {
+          "rect": [
+            6,
+            24,
+            21,
+            11
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8.5,
+          "binds": "technique.name",
+          "sample": "Swing"
+        },
+        {
+          "rect": [
+            69,
+            25,
+            20,
+            9
+          ],
+          "color": "str",
+          "font": "mono",
+          "fontPx": 6.5,
+          "binds": "technique.cost",
+          "sample": "STR"
+        },
+        {
+          "rect": [
+            85,
+            25,
+            4,
+            9
+          ],
+          "color": "str",
+          "font": "mono",
+          "fontPx": 6.5,
+          "sample": "1"
+        },
+        {
+          "rect": [
+            1,
+            38,
+            92,
+            80
+          ],
+          "color": "parch",
+          "font": "display",
+          "fontPx": 8.25,
+          "binds": "technique.description",
+          "sample": "A committed swing of your blade for  dam"
+        },
+        {
+          "rect": [
+            60,
+            56,
+            5,
+            10
+          ],
+          "color": "hit",
+          "font": "mono",
+          "fontPx": 7.84,
+          "sample": "1"
+        },
+        {
+          "rect": [
+            6,
+            118,
+            83,
+            4
+          ],
+          "color": "ink",
+          "fill": "good",
+          "font": "display",
+          "fontPx": 8,
+          "binds": "technique.chargePct"
+        },
+        {
+          "rect": [
+            6,
+            125,
+            83,
+            6
+          ],
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 4.5,
+          "binds": "technique.cooldownLabel",
+          "sample": "ready"
+        }
+      ]
+    },
+    "minionBay": {
+      "size": [
+        100,
+        136
+      ],
+      "parts": [
+        {
+          "rect": [
+            71,
+            9,
+            23,
+            8
+          ],
+          "color": "mintActive",
+          "border": {
+            "color": "mintActive",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 4,
+          "binds": "bay.state",
+          "sample": "ACTIVE"
+        },
+        {
+          "rect": [
+            6,
+            24,
+            31,
+            11
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8.5,
+          "binds": "bay.name",
+          "sample": "Skeleton"
+        },
+        {
+          "rect": [
+            75,
+            25,
+            20,
+            9
+          ],
+          "color": "int",
+          "font": "mono",
+          "fontPx": 6.5,
+          "sample": "INT",
+          "binds": "bay.cost"
+        },
+        {
+          "rect": [
+            91,
+            25,
+            4,
+            9
+          ],
+          "color": "int",
+          "font": "mono",
+          "fontPx": 6.5,
+          "sample": "2"
+        },
+        {
+          "rect": [
+            1,
+            38,
+            98,
+            97
+          ],
+          "color": "parch",
+          "font": "display",
+          "fontPx": 8.25,
+          "binds": "bay.description",
+          "sample": "A raised thrall that strikes for  damage"
+        },
+        {
+          "rect": [
+            45,
+            56,
+            5,
+            10
+          ],
+          "color": "hit",
+          "font": "mono",
+          "fontPx": 7.84,
+          "sample": "1"
+        }
+      ]
+    },
+    "legendRow": {
+      "size": [
+        107,
+        8
+      ],
+      "parts": [
+        {
+          "rect": [
+            0,
+            0,
+            8,
+            8
+          ],
+          "color": "parch",
+          "fill": "slot",
+          "border": {
+            "color": "mutedDim",
+            "w": 1,
+            "style": "dashed"
+          },
+          "font": "mono",
+          "fontPx": 4.5,
+          "sample": "?"
+        }
+      ]
+    },
+    "beaconNode": {
+      "size": [
+        28,
+        28
+      ],
+      "parts": [
+        {
+          "rect": [
+            0,
+            0,
+            28,
+            28
+          ],
+          "color": "ink",
+          "fill": "slot",
+          "border": {
+            "color": "good",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "binds": "node.type"
+        },
+        {
+          "rect": [
+            9,
+            9,
+            9,
+            11
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 11,
+          "binds": "node.glyph",
+          "sample": "◉"
+        },
+        {
+          "rect": [
+            7,
+            31,
+            14,
+            7
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 5,
+          "binds": "node.label",
+          "sample": "CAMP"
+        }
+      ],
+      "binds": "node"
+    },
+    "attrBar": {
+      "size": [
+        431,
+        13
+      ],
+      "parts": [
+        {
+          "rect": [
+            12,
+            2,
+            17,
+            9
+          ],
+          "color": "inkWarm",
+          "font": "mono",
+          "fontPx": 7,
+          "binds": "attrs.key",
+          "sample": "STR"
+        },
+        {
+          "rect": [
+            35,
+            3,
+            23,
+            7
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 5,
+          "binds": "attrs.part",
+          "sample": "Arms"
+        },
+        {
+          "rect": [
+            63,
+            2,
+            26,
+            9
+          ],
+          "color": "ink",
+          "fill": "str",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "binds": "attrs.pip"
+        },
+        {
+          "rect": [
+            90,
+            2,
+            26,
+            9
+          ],
+          "color": "ink",
+          "fill": "str",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "binds": "attrs.pip"
+        },
+        {
+          "rect": [
+            118,
+            2,
+            26,
+            9
+          ],
+          "color": "ink",
+          "fill": "str",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "binds": "attrs.pip"
+        },
+        {
+          "rect": [
+            145,
+            2,
+            26,
+            9
+          ],
+          "color": "ink",
+          "fill": "str",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "binds": "attrs.pip"
+        },
+        {
+          "rect": [
+            172,
+            2,
+            26,
+            9
+          ],
+          "color": "ink",
+          "fill": "str",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "binds": "attrs.pip"
+        },
+        {
+          "rect": [
+            199,
+            2,
+            26,
+            9
+          ],
+          "color": "ink",
+          "fill": "str",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "binds": "attrs.pip"
+        },
+        {
+          "rect": [
+            227,
+            2,
+            26,
+            9
+          ],
+          "color": "ink",
+          "fill": "str",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "binds": "attrs.pip"
+        },
+        {
+          "rect": [
+            254,
+            2,
+            26,
+            9
+          ],
+          "color": "ink",
+          "fill": "str",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "binds": "attrs.pip"
+        },
+        {
+          "rect": [
+            281,
+            2,
+            26,
+            9
+          ],
+          "color": "ink",
+          "fill": "slot",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "binds": "attrs.pip"
+        },
+        {
+          "rect": [
+            308,
+            2,
+            26,
+            9
+          ],
+          "color": "ink",
+          "fill": "slot",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "binds": "attrs.pip"
+        },
+        {
+          "rect": [
+            336,
+            2,
+            26,
+            9
+          ],
+          "color": "ink",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "binds": "attrs.pip"
+        },
+        {
+          "rect": [
+            363,
+            2,
+            26,
+            9
+          ],
+          "color": "ink",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "binds": "attrs.pip"
+        },
+        {
+          "rect": [
+            404,
+            0,
+            6,
+            13
+          ],
+          "color": "ink",
+          "font": "mono",
+          "fontPx": 10,
+          "binds": "attrs.alloc",
+          "sample": "8"
+        },
+        {
+          "rect": [
+            412,
+            3,
+            4,
+            9
+          ],
+          "color": "border",
+          "font": "mono",
+          "fontPx": 7,
+          "sample": "/"
+        },
+        {
+          "rect": [
+            419,
+            0,
+            12,
+            13
+          ],
+          "color": "lockText",
+          "font": "mono",
+          "fontPx": 10,
+          "binds": "attrs.available",
+          "sample": "10"
+        }
+      ]
+    },
+    "invTab": {
+      "size": [
+        40,
+        18
+      ],
+      "parts": [
+        {
+          "rect": [
+            12,
+            5,
+            16,
+            8
+          ],
+          "color": "inkBright",
+          "font": "mono",
+          "fontPx": 6,
+          "sample": "GEAR"
+        }
+      ]
+    },
+    "invCard": {
+      "size": [
+        204,
+        31
+      ],
+      "parts": [
+        {
+          "rect": [
+            16,
+            10,
+            9,
+            4
+          ],
+          "color": "panelDeep",
+          "font": "mono",
+          "fontPx": 4,
+          "binds": "invItems.badgeLabel",
+          "sample": "STR"
+        },
+        {
+          "rect": [
+            18,
+            14,
+            4,
             7
           ],
           "color": "panelDeep",
           "font": "mono",
+          "fontPx": 7,
+          "binds": "invItems.badgeNum",
+          "sample": "3"
+        },
+        {
+          "rect": [
+            40,
+            10,
+            125,
+            10
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "binds": "invItems.name",
+          "sample": "Sword"
+        },
+        {
+          "rect": [
+            172,
+            10,
+            24,
+            12
+          ],
+          "color": "rareEpic",
+          "fill": "rareEpic",
+          "border": {
+            "color": "rareEpic",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 5,
+          "binds": "invItems.rarity",
+          "sample": "EPIC"
+        }
+      ]
+    },
+    "runeGroup": {
+      "size": [
+        236,
+        78
+      ],
+      "parts": [
+        {
+          "rect": [
+            0,
+            0,
+            22,
+            7
+          ],
+          "color": "parch",
+          "font": "mono",
           "fontPx": 5.5,
-          "sample": "✓ CORE SET"
+          "sample": "MARKS"
+        },
+        {
+          "rect": [
+            0,
+            14,
+            236,
+            64
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "binds": "g.runes",
+          "sample": "6"
+        },
+        {
+          "rect": [
+            7,
+            23,
+            11,
+            11
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "binds": "g.runes.icon"
+        },
+        {
+          "rect": [
+            20,
+            37,
+            3,
+            0
+          ],
+          "color": "panelDeep",
+          "fill": "parch",
+          "font": "mono",
+          "fontPx": 4.5,
+          "binds": "g.runes.countLabel"
+        },
+        {
+          "rect": [
+            26,
+            20,
+            158,
+            9
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 7.5,
+          "binds": "g.runes.name",
+          "sample": "Master INT Mark"
+        },
+        {
+          "rect": [
+            26,
+            30,
+            158,
+            8
+          ],
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 5.25,
+          "binds": "g.runes.effect",
+          "sample": "Increases INT by ."
+        },
+        {
+          "rect": [
+            196,
+            21,
+            33,
+            6
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 4.5,
+          "binds": "g.runes.state",
+          "sample": "✓ EQUIPPED"
+        },
+        {
+          "rect": [
+            222,
+            29,
+            7,
+            8
+          ],
+          "color": "amber",
+          "font": "mono",
+          "fontPx": 6,
+          "sample": "p",
+          "binds": "g.runes.cost"
+        },
+        {
+          "rect": [
+            7,
+            57,
+            11,
+            11
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "binds": "g.runes.icon"
+        },
+        {
+          "rect": [
+            14,
+            65,
+            8,
+            6
+          ],
+          "color": "panelDeep",
+          "fill": "parch",
+          "font": "mono",
+          "fontPx": 4.5,
+          "binds": "g.runes.countLabel",
+          "sample": "×3"
+        },
+        {
+          "rect": [
+            26,
+            53,
+            159,
+            9
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 7.5,
+          "binds": "g.runes.name",
+          "sample": "Ember Mote"
+        },
+        {
+          "rect": [
+            26,
+            64,
+            159,
+            8
+          ],
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 5.25,
+          "binds": "g.runes.effect",
+          "sample": "Increases STR by ."
+        },
+        {
+          "rect": [
+            197,
+            55,
+            32,
+            6
+          ],
+          "color": "amber",
+          "font": "mono",
+          "fontPx": 4.5,
+          "binds": "g.runes.state",
+          "sample": "EQUIPPABLE"
+        },
+        {
+          "rect": [
+            222,
+            63,
+            7,
+            8
+          ],
+          "color": "amber",
+          "font": "mono",
+          "fontPx": 6,
+          "sample": "p",
+          "binds": "g.runes.cost"
+        }
+      ]
+    },
+    "loadoutCard": {
+      "size": [
+        131,
+        89
+      ],
+      "parts": [
+        {
+          "rect": [
+            54,
+            22,
+            24,
+            24
+          ],
+          "color": "panelDeep",
+          "fill": "str",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 13,
+          "binds": "loadout.glyph",
+          "sample": "⚔"
+        },
+        {
+          "rect": [
+            57,
+            49,
+            17,
+            9
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 7,
+          "binds": "loadout.name",
+          "sample": "Swing"
+        },
+        {
+          "rect": [
+            59,
+            60,
+            14,
+            6
+          ],
+          "color": "str",
+          "font": "mono",
+          "fontPx": 4.5,
+          "binds": "loadout.attr",
+          "sample": "STR 1"
+        }
+      ]
+    },
+    "cityNode": {
+      "size": [
+        8,
+        8
+      ],
+      "parts": [
+        {
+          "rect": [
+            -47,
+            7,
+            95,
+            6
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 4.5,
+          "binds": "city.tier",
+          "sample": "Tier 1 · TAKEN ✓"
+        },
+        {
+          "rect": [
+            -47,
+            13,
+            95,
+            10
+          ],
+          "color": "parch",
+          "font": "display",
+          "fontPx": 9,
+          "binds": "city.name",
+          "sample": "Ashford"
+        }
+      ],
+      "binds": "city"
+    },
+    "previewAttrTile": {
+      "size": [
+        38,
+        35
+      ],
+      "parts": [
+        {
+          "rect": [
+            16,
+            4,
+            6,
+            6
+          ],
+          "color": "ink",
+          "fill": "str",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "binds": "attr.color"
+        },
+        {
+          "rect": [
+            1,
+            13,
+            35,
+            10
+          ],
+          "color": "ink",
+          "font": "mono",
+          "fontPx": 10,
+          "binds": "attr.value",
+          "sample": "3"
+        },
+        {
+          "rect": [
+            1,
+            25,
+            35,
+            6
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 4.5,
+          "binds": "attr.key",
+          "sample": "STR"
         }
       ]
     }
@@ -2518,6 +5609,120 @@
       "fixedFootprint": true,
       "anchor": "monoNumber",
       "max": 20
+    },
+    "shadows": {
+      "soft": {
+        "dx": 0,
+        "dy": 3,
+        "blur": 4,
+        "color": "outline",
+        "opacity": 0.45
+      },
+      "panel": {
+        "dx": 0,
+        "dy": 4,
+        "blur": 10,
+        "color": "outline",
+        "opacity": 0.5
+      },
+      "title": {
+        "dx": 0,
+        "dy": 2,
+        "blur": 3,
+        "color": "outline",
+        "opacity": 0.65
+      }
+    },
+    "frames": {
+      "panel": {
+        "asset": "ui/frame/panel",
+        "slice": [
+          60,
+          60,
+          60,
+          60
+        ]
+      },
+      "card": {
+        "asset": "ui/frame/card",
+        "slice": [
+          36,
+          36,
+          36,
+          36
+        ]
+      }
+    },
+    "interactionStates": {
+      "button": {
+        "normal": "ui/button/button_normal",
+        "hover": "ui/button/button_hover",
+        "down": "ui/button/button_down",
+        "disabled": "ui/button/button_disabled",
+        "on": "ui/button/button_on"
+      },
+      "actionCard": {
+        "ready": {
+          "border": "good",
+          "fill": "panelCard",
+          "opacity": 1
+        },
+        "locked": {
+          "border": "borderDim",
+          "borderStyle": "dashed",
+          "fill": "panelCard",
+          "opacity": 0.82,
+          "pattern": "diagonalHatch"
+        },
+        "targeting": {
+          "border": "str",
+          "pulse": true,
+          "fill": "panelDeep",
+          "opacity": 1
+        },
+        "cooldown": {
+          "border": "borderDim",
+          "fill": "panelCard",
+          "opacity": 1
+        },
+        "held": {
+          "border": "gold",
+          "fill": "panelDeep",
+          "opacity": 1
+        }
+      },
+      "pickerCard": {
+        "idle": {
+          "border": "borderDim",
+          "fill": "panelDeep"
+        },
+        "hover": {
+          "border": "border",
+          "fill": "panelCard"
+        },
+        "selected": {
+          "border": "amber",
+          "fill": "panelCard",
+          "badge": "✓ CHOSEN"
+        },
+        "locked": {
+          "border": "borderFaint",
+          "fill": "panelDeep",
+          "opacity": 0.55,
+          "badge": "LOCKED"
+        }
+      },
+      "row": {
+        "hover": {
+          "overlay": "rgba(255,255,255,.04)"
+        },
+        "selected": {
+          "border": "good"
+        },
+        "disabled": {
+          "opacity": 0.5
+        }
+      }
     }
   }
 }
