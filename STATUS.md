@@ -21,11 +21,11 @@ POC is NOT complete; the "DONE" claim below is RETRACTED until these clear.**
   crash is gone in the live draw, not just headless.
 - Fresh design renders landed (`design/01–06`, 06-30) and are now COMMITTED as the rebuild reference.
   Audited each live shot vs its PNG (scratch-dir smoke). Punch list:
-  * 03 MAP: top-left SUPPLIES + MUSTERED-SUPPORT panels (pip bars + flavor) DONE. BIGGER CHART DONE:
-    nodes now SPREAD to fill an inset chart region via `Core.Layout.GraphLayout` (pure, tested) instead
-    of a fixed 150px origin -- wider, viewport-independent (camp left -> castle right). Smoke-verified.
-    REMAINING: the right-side "THE CASTLE - exit" panel, and swapping the hand-set ChartRegion for the
-    manifest `chart` region once the full map screen is manifest-driven.
+  * 03 MAP: DONE (all design/03 elements present + smoke-verified) -- top-left SUPPLIES + MUSTERED-
+    SUPPORT panels (pip bars + flavor); BIGGER CHART (nodes SPREAD to fill an inset region via
+    `Core.Layout.GraphLayout`, viewport-independent, camp left -> castle right); right-side "THE CASTLE /
+    the exit" panel. FOLLOW-UP (not a fidelity gap): swap the hand-set ChartRegion + panel positions for
+    the manifest regions once the whole map screen is manifest-driven.
   * 02 BUILD: matches except the already-known DEFERRED items — INVENTORY tabs (GEAR/TECH/MINIONS) +
     rarity item cards, and a RUNE BAG of MARKS/PATHS/KEYSTONES cards (current screen shows rune LADDERS).
     Both input-coupled (need input wiring + mid-run stash).

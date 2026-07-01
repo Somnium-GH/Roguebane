@@ -518,10 +518,25 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawWarParty(300, 64, 300);
         DrawChart();
         DrawMapLegend(756, 64); // top-right; clears the header, war party, and the merchant panel below
+        DrawCastlePanel(740, 158);
         if (Exp.AtMerchant) DrawMerchant(560, 300);
         DrawGearBar(20, H - 44);
 
         DrawStateOverlay();
+    }
+
+    // design/03 right-side card: the run's destination. The castle is the structural boss the whole
+    // leg presses toward (its layers fall in order; banked support rallies on it). Display-only.
+    private void DrawCastlePanel(int x, int y)
+    {
+        Panel(x, y, 200, 132);
+        Sprite(_assets.Node(NodeType.Castle), x + 10, y + 12, 26, 26, Color.White);
+        Text(_assets.Mono, "THE CASTLE", x + 44, y + 14, Ink);
+        Text(_assets.Mono, "the exit", x + 44, y + 30, Amber);
+        Text(_assets.Mono, "STRUCTURED FOE", x + 12, y + 56, Muted);
+        Text(_assets.Mono, "gate / wall / keep", x + 12, y + 74, Muted);
+        Text(_assets.Mono, "banked support", x + 12, y + 96, Muted);
+        Text(_assets.Mono, "rallies here", x + 12, y + 114, Muted);
     }
 
     // design/03 signature: the two top-left gauges as PANELS with pip bars + flavor (the jump budget
