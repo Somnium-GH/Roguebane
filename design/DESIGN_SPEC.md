@@ -280,21 +280,20 @@ Nested layers, macro → micro:
   Run-map, Campaign spine, March, Flee.)*
 - **Two registers:** world/combat bolder/more atmospheric; the **build screen clean + legible** — same
   high-fidelity bar, less flourish.
-- **Combat layout:** three zones, **you | battlefield | foe** (foe zone holds **1–3 structured
-  enemies** — a skirmish line, or the castle's layered **gate / wall / keep**; the layout stacks them
-  in the foe column. The single-enemy framing was a simplification).
+- **Combat layout:** three zones, **you | battlefield | foe** (the foe zone holds **ONE structured
+  enemy** — possibly multi-PART, e.g. the castle's layered **gate / wall / keep** as parts of one foe).
+  Combat is single-enemy (§8/§18); the multi-foe experiment is **retired** — the code MAY keep the
+  capability latent if it stays neat, but the DESIGN is one foe (body-part aim is already the focus;
+  more foes at once is too much — the FTL lesson).
   - *You* = cutaway (Head×1, Chest×1, Arms×2, Legs×2), each showing condition + stat; armor overlays.
-  - **The attribute pool is a prominent element** (reserved vs free, incl. shield reservations). NOTE:
-    design/01's *most*-prominent bottom-panel pool was drawn for ONE foe. With 1–3 full-height foes the
-    foe column owns the bottom band, and **keeping foes large is required for clear limb-band PART-aim**
-    (the core mechanic) — shrinking them to free a bottom pool would cramp aiming. LOCKED resolution:
-    multi-foe combat keeps foes large + the attribute pool in the YOU panel (present, not bottom-dominant);
-    design/01's prominent bottom pool is the single-foe ideal. Revisit if a 1-foe mode is added.
+  - **The attribute pool is a prominent element** (reserved vs free, incl. shield reservations) — with a
+    single foe, **design/01's prominent bottom-panel pool IS the layout**: the bottom band is free, and
+    the one foe stays large enough for clear limb-band PART-aim (the core mechanic).
   - *Action bar* = technique cards with parallel charge timers + state (ready/charging/held/dry), a
     per-technique target tag, and the **AUTO** lit/unlit toggle. **No fire button.**
   - *Battlefield* = autonomous minion(s) + the rallied-support auto-fire stream.
-  - *Foe* = the structured enemy/enemies (1–3) with targetable PARTS + the targeting reticle; each
-    carries its own creature figure (ogre/troll/bandit/skeleton wired; wraith/gargoyle art pending).
+  - *Foe* = the ONE structured enemy with targetable PARTS + the targeting reticle; it carries its
+    creature figure (ogre/troll/bandit/skeleton wired; wraith/gargoyle art pending).
   - Corrections from old wireframes: parallel action bar (not one-hand); **no poise/stagger bar**;
     minions in **bays**; **no TEMPO/PERIL header**.
 
