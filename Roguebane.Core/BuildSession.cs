@@ -6,21 +6,21 @@ namespace Roguebane.Core;
 // pieces it composes.
 public sealed class BuildSession
 {
+    private readonly IReadOnlyList<Race> _races;
     private readonly IReadOnlyList<CoreRune> _chassis;
     private readonly IReadOnlyList<Technique> _palette;
     private readonly HashSet<string> _selected = new();
     private RuneLoadout _runes;
 
-    // The chosen Race supplies attrs + HP (§7). Race selection (the NewGame two-step) is not wired to
-    // input yet, so default to Human; the shell sets it once the race column lands.
-    public Race Race { get; set; } = Content.Races.Human;
-
     public BuildSession(
+        IReadOnlyList<Race> races,
         IReadOnlyList<CoreRune> chassis,
         IReadOnlyList<IReadOnlyList<Mark>> paths,
         IReadOnlyList<Technique> palette)
     {
+        if (races.Count == 0) throw new ArgumentException("a build needs at least one race", nameof(races));
         if (chassis.Count == 0) throw new ArgumentException("a build needs at least one chassis", nameof(chassis));
+        _races = races;
         _chassis = chassis;
         Paths = paths;
         _palette = palette;
@@ -45,6 +45,20 @@ public sealed class BuildSession
     public RuneLoadout Runes => _runes;
     public IReadOnlyList<IReadOnlyList<Mark>> Paths { get; }
     public IReadOnlyList<Technique> Palette => _palette;
+
+    // The chosen Race supplies the body's attrs + HP (§7) — the NewGame two-step's first column.
+    public int RaceIndex { get; private set; }
+    public int RaceCount => _races.Count;
+    public Race Race => _races[RaceIndex];
+    public IReadOnlyList<Race> RaceRoster => _races;
+
+    // Cycling the race swaps the body's attrs only; the core keeps its budget + fixed kit, so the rune
+    // allocation and slotted techniques are untouched (all race<->core combos are allowed, design/05).
+    public void CycleRace(int direction)
+    {
+        var n = _races.Count;
+        RaceIndex = ((RaceIndex + direction) % n + n) % n;
+    }
 
     // Cycling the chassis resets the rune allocation — a fresh budget for the new body.
     public void CycleCoreRune(int direction)

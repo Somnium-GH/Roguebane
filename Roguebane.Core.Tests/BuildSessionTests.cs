@@ -33,6 +33,24 @@ public class BuildSessionTests
     }
 
     [Fact]
+    public void CyclingRaceSwapsBodyAttrsAndKeepsTheCoreBudget()
+    {
+        var build = New();
+        var races = Races.Roster;
+        Assert.Same(races[0], build.Race);               // Human first
+        var budgetBefore = build.Runes.Available;
+        var conBefore = build.Preview().Capacity(Stat.Con);
+
+        build.CycleRace(1);
+        Assert.Same(races[1], build.Race);               // Elf
+        Assert.Equal(build.Runes.Available, budgetBefore);        // core budget untouched by a race swap
+        Assert.NotEqual(conBefore, build.Preview().Capacity(Stat.Con)); // Elf con 2 vs Human con 3
+
+        build.CycleRace(-1); // wraps back to Human
+        Assert.Same(races[0], build.Race);
+    }
+
+    [Fact]
     public void ClimbingAPathSpendsBudgetAndStopsAtTheKeystone()
     {
         var build = New(); // Grunt: budget 24, discount 1

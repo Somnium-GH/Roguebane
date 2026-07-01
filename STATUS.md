@@ -236,6 +236,13 @@ Decisions:
   the base-vs-full-CON-total decision (§ HP model) — NEEDS HUMAN confirm before I pick. (b) Race is not
   user-selectable yet (two-step Race->Core NewGame off the manifest raceCard is the next slice; assets +
   binds are landed). (c) figure repoint bare->human_/elf_ + retire bare dirs (CD-coordinated).]
+  [SLICE 3 DONE (race selection MODEL): BuildSession now holds the race roster + `RaceIndex`/`RaceCount`/
+  `RaceRoster`/`Race` + `CycleRace(dir)` (mirrors the CoreRune cycle). A race swap changes body attrs ONLY
+  — core budget + slotted kit untouched (all combos allowed, design/05). Sessions.NewBuild feeds
+  Races.Roster; ctor now takes races first. Tested (CyclingRaceSwapsBodyAttrsAndKeepsTheCoreBudget: Elf
+  con != Human con, budget unchanged, wraps). 271 green; Game builds. REMAINING (Game-side, next): render
+  the manifest raceCard column + route input to CycleRace, then thread the composed `<race>_<core>` figure
+  via `preview.fig` — turns the two-step Race->Core NewGame ON.]
 - **ALL race×core combos allowed** (no gating this pass).
 - **Retire the bare asset set:** compose NewGame/Equipment/Loadout figures from the MODULAR race parts
   (`preview.fig`); drop the bare body dirs + flat `chassis/*` thumbnails (mgcb in sync).

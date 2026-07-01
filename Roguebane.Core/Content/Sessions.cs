@@ -63,6 +63,7 @@ public static class Sessions
     }
 
     public static BuildSession NewBuild() => new(
+        Races.Roster,
         CoreRunes.Roster,
         new[] { Paths.VesselLadder, Paths.ResonanceLadder },
         Techniques.All);
