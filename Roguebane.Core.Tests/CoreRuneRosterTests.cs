@@ -2,7 +2,8 @@ using Roguebane.Core.Content;
 
 namespace Roguebane.Core.Tests;
 
-// G3: the five chassis exist as data with legible, distinct stat identities, selectable at New Run.
+// G3: the cores exist as data with distinct ids + display identities, selectable at New Run. Their
+// identity is now budget/bays/equipment — attrs are the Race's (§7), so no stat-identity assertions.
 public class CoreRuneRosterTests
 {
     [Fact]
@@ -26,34 +27,6 @@ public class CoreRuneRosterTests
         }
         Assert.Equal("THE WALL", CoreRunes.Warden.Archetype);
         Assert.Equal("Grunt", CoreRunes.Grunt.Title);
-    }
-
-    [Fact]
-    public void EveryCoreRuneMintsAStandardSixPartBody()
-    {
-        foreach (var chassis in CoreRunes.Roster)
-        {
-            var body = chassis.NewBody();
-            Assert.Equal(6, body.Parts.Count); // Head, Chest, Arms x2, Legs x2
-            foreach (var stat in new[] { Stat.Str, Stat.Int, Stat.Dex, Stat.Con })
-                Assert.True(body.Capacity(stat) > 0, $"{chassis.Id} has no {stat}");
-        }
-    }
-
-    [Fact]
-    public void IdentitiesAreLegibleInTheStatBases()
-    {
-        var warden = CoreRunes.Warden.NewBody();
-        var reaver = CoreRunes.Reaver.NewBody();
-        var summoner = CoreRunes.Summoner.NewBody();
-
-        // The Wall out-tanks the glass-cannon Duelist.
-        Assert.True(warden.Capacity(Stat.Con) > reaver.Capacity(Stat.Con));
-        // The Duelist out-strikes the Wall on both offensive stats.
-        Assert.True(reaver.Capacity(Stat.Str) > warden.Capacity(Stat.Str));
-        Assert.True(reaver.Capacity(Stat.Dex) > warden.Capacity(Stat.Dex));
-        // The Binder is INT-led like a caster.
-        Assert.True(summoner.Capacity(Stat.Int) > summoner.Capacity(Stat.Str));
     }
 
     [Fact]

@@ -800,11 +800,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 Text(_assets.Mono, "SELECTED", r.X + r.Width - 74, r.Y + 8, Amber);
             }
 
-            DrawHumanoid(c.NewBody(), c.FigureKey, r.X + r.Width / 2, r.Y + 168, 140);
+            DrawHumanoid(_build.Race.NewBody(), c.FigureKey(_build.Race), r.X + r.Width / 2, r.Y + 168, 140);
             Text(_assets.Mono, c.Title.ToUpper(), r.X + 12, r.Y + 176, Ink);
             Text(_assets.Mono, c.Archetype, r.X + 12, r.Y + 192, Amber);
 
-            var body = c.NewBody();
+            var body = _build.Race.NewBody();
             var sy = r.Y + 216;
             void Row(string k, int v)
             {
@@ -865,9 +865,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
         Panel(40, 90, 240, 410);
         Text(_assets.Mono, _build.CoreRune.Title.ToUpper(), 56, 100, Muted);
         var figBox = _ui.ElementRect("build", "paperDoll") ?? new Rectangle(100, 104, 120, 215);
-        DrawFigureIn(preview, _build.CoreRune.FigureKey, "build", "paperDoll", 160, 470, 360);
+        DrawFigureIn(preview, _build.CoreRune.FigureKey(_build.Race), "build", "paperDoll", 160, 470, 360);
         DrawAnatomyTags(figBox);
-        DrawAttributeReadout(preview, _build.CoreRune.NewBody(), 56, 318, KitDemand());
+        DrawAttributeReadout(preview, _build.Race.NewBody(), 56, 318, KitDemand());
 
         DrawLadders(320, 100);
         DrawCoreBlock(700, 90);
@@ -886,7 +886,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private void DrawCoreBlock(int x, int y)
     {
         var c = _build.CoreRune;
-        var baseBody = c.NewBody();
+        var baseBody = _build.Race.NewBody();
         Panel(x, y, 220, 190);
         Text(_assets.Display, "CURRENT CORE", x + 12, y + 10, Ink);
         Text(_assets.Mono, c.Archetype, x + 12, y + 28, Amber); // design/05 archetype tagline

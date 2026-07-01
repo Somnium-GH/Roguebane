@@ -30,9 +30,9 @@ public class CoreRuneThesisTests
         Assert.Equal(7, runes.Spent);
         Assert.True(runes.Spent > 0);
 
-        // and the Grunt was never built for it: a feeble head vs the Adept's caster INT
-        Assert.True(CoreRunes.Grunt.NewBody().Capacity(Stat.Int)
-            < CoreRunes.Adept.NewBody().Capacity(Stat.Int));
+        // "never built for it" is now a BUDGET gap, not a stat gap — attrs are race-only (§7). The
+        // Grunt's edge is its fatter, cheaper budget, not a different body.
+        Assert.True(CoreRunes.Grunt.RuneBudget > CoreRunes.Adept.RuneBudget);
     }
 
     [Fact]

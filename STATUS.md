@@ -223,12 +223,19 @@ Decisions:
   Elf 2/3/4/2 HP14. (Retires the per-core `StandardBody` attr blocks — attrs are race-only now, §7.)
   [SLICE 1 DONE: `Race` type (Race.cs — attrs + Hp + NewBody laying the standard Head/Chest/Arms x2/Legs
   x2 anatomy) + `Content.Races` (Human 3/3/3/3 HP20, Elf 2/3/4/2 HP14, Roster) + RaceTests. 276 green.
-  Isolated keystone data; nothing consumes it yet. NEXT SLICE (the rewire, staged to keep green): strip
-  `StandardBody`/`BodyParts` from CoreRune + all 6 cores (cores carry NO attrs), assemble the body from
-  the chosen Race in Forge/BuildSession, source Fighter HP from Race (Human 20 / Elf 14) instead of the
-  CON-scale, thread the real race into `CoreRune.FigureKey` (drop the hardcoded `human_`), and re-baseline
-  the balance sim (cores no longer differ by stat — expect BalanceSim/Build assertions to move). Bigger +
-  balance-perturbing → its own commit(s).]
+  Isolated keystone data.
+  [SLICE 2 DONE (the rewire): CoreRune carries NO attrs — dropped `BodyParts`/`StandardBody` from CoreRune
+  + all 6 cores; body now minted from the RACE (`CoreRune.NewBody(Race, RuneLoadout)` = race anatomy +
+  rune-grant parts). Forge.Assemble/Embark/EmbarkCampaign take a `Race`; `BuildSession.Race` (default
+  Human, settable) threads it; `CoreRune.FigureKey(Race)` => `<race>_<core>` (hardcoded `human_` gone).
+  Game core-grid + build previews render off `_build.Race`. Tests: deleted CoreRuneBodyTests + the two
+  stat-identity RosterTests cases (core stat-identity is retired); the thesis "never built for it" is now
+  a BUDGET gap not a stat gap. 270 Core green; newgame/build/combat smoke clean. The balance sim was
+  UNAFFECTED (Sessions.Demo uses a bespoke DemoBody, not a core).
+  STILL DEFERRED: (a) HP-from-race — PlayerFighter still CON-scales baseHp:8; wiring race.Hp (20/14) needs
+  the base-vs-full-CON-total decision (§ HP model) — NEEDS HUMAN confirm before I pick. (b) Race is not
+  user-selectable yet (two-step Race->Core NewGame off the manifest raceCard is the next slice; assets +
+  binds are landed). (c) figure repoint bare->human_/elf_ + retire bare dirs (CD-coordinated).]
 - **ALL race×core combos allowed** (no gating this pass).
 - **Retire the bare asset set:** compose NewGame/Equipment/Loadout figures from the MODULAR race parts
   (`preview.fig`); drop the bare body dirs + flat `chassis/*` thumbnails (mgcb in sync).

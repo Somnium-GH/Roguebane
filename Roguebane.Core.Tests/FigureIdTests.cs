@@ -10,16 +10,18 @@ public class FigureIdTests
     [Fact]
     public void EmbarkCarriesTheCoreRuneFigureId()
     {
+        var race = Races.Human;
         var chassis = CoreRunes.Roster[0];
-        var exp = Forge.Embark(chassis, chassis.NewLoadout(), chassis.Kit, Maps.StandardLeg());
-        Assert.Equal(chassis.FigureKey, exp.FigureId); // human_<core>
+        var exp = Forge.Embark(race, chassis, chassis.NewLoadout(), chassis.Kit, Maps.StandardLeg());
+        Assert.Equal(chassis.FigureKey(race), exp.FigureId); // human_<core>
     }
 
     [Fact]
     public void CampaignLegsKeepTheFigureId()
     {
+        var race = Races.Human;
         var chassis = CoreRunes.Roster[0];
-        var camp = Forge.EmbarkCampaign(chassis, chassis.NewLoadout(), chassis.Kit, Maps.StandardLegs(2));
-        Assert.Equal(chassis.FigureKey, camp.Current.FigureId);
+        var camp = Forge.EmbarkCampaign(race, chassis, chassis.NewLoadout(), chassis.Kit, Maps.StandardLegs(2));
+        Assert.Equal(chassis.FigureKey(race), camp.Current.FigureId);
     }
 }

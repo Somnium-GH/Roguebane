@@ -44,7 +44,7 @@ public class RuneGrantsTests
         foreach (var rung in Paths.TempestLadder) runes.TryTake(rung);
 
         // Player picked only Jab; the Tempest keystone hands them Maelstrom on top.
-        var session = Forge.Assemble(chassis, runes, new[] { Techniques.Jab }, Sieges.StandardRun());
+        var session = Forge.Assemble(Races.Human, chassis, runes, new[] { Techniques.Jab }, Sieges.StandardRun());
 
         Assert.Contains(session.Equipment, t => t.Id == "jab");
         Assert.Contains(session.Equipment, t => t.Id == "maelstrom");
@@ -57,7 +57,7 @@ public class RuneGrantsTests
         var runes = chassis.NewLoadout();
         foreach (var rung in Paths.TempestLadder) runes.TryTake(rung);
 
-        var session = Forge.Assemble(chassis, runes, new[] { Paths.Maelstrom }, Sieges.StandardRun());
+        var session = Forge.Assemble(Races.Human, chassis, runes, new[] { Paths.Maelstrom }, Sieges.StandardRun());
 
         Assert.Single(session.Equipment, t => t.Id == "maelstrom");
     }

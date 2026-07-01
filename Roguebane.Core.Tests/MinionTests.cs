@@ -102,7 +102,7 @@ public class MinionTests
     public void TheSummonerFieldsItsMinionsWhichChipTheFrontFoeUnaided()
     {
         var chassis = CoreRunes.Summoner;
-        var exp = Forge.Embark(chassis, chassis.NewLoadout(), chassis.Kit, Maps.StandardLeg(autoResolveCastle: false));
+        var exp = Forge.Embark(Races.Human, chassis, chassis.NewLoadout(), chassis.Kit, Maps.StandardLeg(autoResolveCastle: false));
         Assert.True(exp.MinionCount > 0); // bays filled at assembly
 
         exp.Enter("a2");
@@ -117,7 +117,7 @@ public class MinionTests
     public void TheMinionKitIsCappedByTheCoreRuneBays()
     {
         var reaver = CoreRunes.Reaver; // zero bays
-        var exp = Forge.Embark(reaver, reaver.NewLoadout(), reaver.Kit, Maps.StandardLeg(autoResolveCastle: false));
+        var exp = Forge.Embark(Races.Human, reaver, reaver.NewLoadout(), reaver.Kit, Maps.StandardLeg(autoResolveCastle: false));
         Assert.Equal(0, exp.MinionCount); // no bays -> nothing fielded
     }
 

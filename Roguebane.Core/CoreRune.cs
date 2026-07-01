@@ -1,13 +1,12 @@
 namespace Roguebane.Core;
 
-// A chassis is data: the body you socket into. Its parts (Head, Chest, Arms x2, Legs x2) carry
-// the stat shares, plus a rune budget and a per-rung discount. The thesis lives in the tension
-// between these: a fat-budget, cheap-rune chassis can climb to a keystone it was never built for.
-// DefaultEquipment is the FIXED starting kit it ships with — the action bar is never empty and there
-// is no build-time "pick a technique" gate; finds grow the kit mid-run.
+// A CoreRune is data: the LAYOUT you socket a Race's body into. It carries NO attrs (those are the
+// Race's, §7) — only a rune budget, a per-rung discount, bays, and the fixed starting equipment/minions.
+// The thesis lives in the tension between budget and discount: a fat-budget, cheap-rune core can climb
+// to a keystone it was never built for. DefaultEquipment is the FIXED starting kit (the action bar is
+// never empty, no build-time "pick a technique" gate; finds grow the kit mid-run).
 public sealed record CoreRune(
     string Id,
-    IReadOnlyList<BodyPart> BodyParts,
     int RuneBudget,
     int RuneDiscount = 0,
     int Bays = 1,
@@ -19,28 +18,20 @@ public sealed record CoreRune(
     // Display name for the cards ("grunt" -> "Grunt"); the Id stays the lowercase content key.
     public string Title => string.IsNullOrEmpty(Id) ? Id : char.ToUpperInvariant(Id[0]) + Id[1..];
 
-    // The manifest figure key. Figures are uniform `<race>_<core>` (no bare "unprefixed = human" case);
-    // Race isn't a built axis yet, so default to human_<core>. When Race lands, thread the race here.
-    public string FigureKey => "human_" + Id;
+    // The manifest figure key for a race+core pairing: uniform `<race>_<core>` (no bare case).
+    public string FigureKey(Race race) => race.Id + "_" + Id;
 
     public IReadOnlyList<Technique> Kit => DefaultEquipment ?? Array.Empty<Technique>();
 
-    // The minions the chassis fields from the start (summoned into its bays at assembly), the minion
+    // The minions the core fields from the start (summoned into its bays at assembly), the minion
     // analogue of the fixed technique Kit. Rune grants add more on top, capped by Bays.
     public IReadOnlyList<Minion> MinionKit => DefaultMinions ?? Array.Empty<Minion>();
 
-    public Body NewBody()
+    // The socketed body: the RACE supplies the anatomy + attrs, then each held rune rung sockets its
+    // extension parts on top. Climbing a chassis-extending keystone widens the live pool.
+    public Body NewBody(Race race, RuneLoadout runes)
     {
-        var body = new Body();
-        foreach (var part in BodyParts) body.Add(part);
-        return body;
-    }
-
-    // The socketed body including everything the allocated runes grant: chassis parts first, then
-    // each held rung's extension parts. Climbing a chassis-extending keystone widens the live pool.
-    public Body NewBody(RuneLoadout runes)
-    {
-        var body = NewBody();
+        var body = race.NewBody();
         foreach (var mark in runes.HeldMarks)
             foreach (var part in mark.Granted)
                 body.Add(part);

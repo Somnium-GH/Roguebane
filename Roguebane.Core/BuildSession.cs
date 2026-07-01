@@ -11,6 +11,10 @@ public sealed class BuildSession
     private readonly HashSet<string> _selected = new();
     private RuneLoadout _runes;
 
+    // The chosen Race supplies attrs + HP (§7). Race selection (the NewGame two-step) is not wired to
+    // input yet, so default to Human; the shell sets it once the race column lands.
+    public Race Race { get; set; } = Content.Races.Human;
+
     public BuildSession(
         IReadOnlyList<CoreRune> chassis,
         IReadOnlyList<IReadOnlyList<Mark>> paths,
@@ -70,15 +74,15 @@ public sealed class BuildSession
     public IReadOnlyList<Technique> Equipment =>
         _palette.Where(t => _selected.Contains(t.Id)).ToList();
 
-    // The body as it stands now: chassis parts plus everything the allocated runes grant.
-    public Body Preview() => CoreRune.NewBody(_runes);
+    // The body as it stands now: the race's anatomy/attrs plus everything the allocated runes grant.
+    public Body Preview() => CoreRune.NewBody(Race, _runes);
 
-    public Session Launch(Run run) => Forge.Assemble(CoreRune, _runes, Equipment, run);
+    public Session Launch(Run run) => Forge.Assemble(Race, CoreRune, _runes, Equipment, run);
 
     // Launch into the real map+combat loop: mint the chosen body and embark on the leg.
-    public Expedition Embark(CityMap map) => Forge.Embark(CoreRune, _runes, Equipment, map);
+    public Expedition Embark(CityMap map) => Forge.Embark(Race, CoreRune, _runes, Equipment, map);
 
     // March the whole campaign: the chosen body carries through every leg to the Capital.
     public Campaign Redeploy(IReadOnlyList<Func<CityMap>> legs) =>
-        Forge.EmbarkCampaign(CoreRune, _runes, Equipment, legs);
+        Forge.EmbarkCampaign(Race, CoreRune, _runes, Equipment, legs);
 }

@@ -32,7 +32,7 @@ public static class Sessions
         var chassis = CoreRunes.Grunt;
         var runes = chassis.NewLoadout();
         foreach (var rung in Paths.VesselLadder) runes.TryTake(rung);
-        return Forge.Assemble(chassis, runes, Techniques.All, Sieges.StandardRun());
+        return Forge.Assemble(Races.Human, chassis, runes, Techniques.All, Sieges.StandardRun());
     }
 
     // The pre-run build screen's backbone: choose between the five chassis, climb either rune ladder,

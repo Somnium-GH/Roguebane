@@ -6,12 +6,13 @@ namespace Roguebane.Core;
 public static class Forge
 {
     public static Session Assemble(
+        Race race,
         CoreRune chassis,
         RuneLoadout runes,
         IReadOnlyList<Technique> equipment,
         Run run)
     {
-        var body = chassis.NewBody(runes);
+        var body = chassis.NewBody(race, runes);
         // Session is the legacy linear-run + balance-sim path (unattended): keep default-front auto-fire.
         // The interactive targeting FSM lives on the Expedition/Campaign mints below (requireAim).
         var caster = new Caster(body, run.Current.CurrentTarget, MagicCapacity(body));
@@ -20,30 +21,32 @@ public static class Forge
 
     // The same mint, dropped into the real map+combat loop instead of a linear run.
     public static Expedition Embark(
+        Race race,
         CoreRune chassis,
         RuneLoadout runes,
         IReadOnlyList<Technique> equipment,
         CityMap map)
     {
-        var body = chassis.NewBody(runes);
+        var body = chassis.NewBody(race, runes);
         var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, bayCap: chassis.Bays);
         SummonKit(caster, chassis, runes);
         return new Expedition(PlayerFighter(body), caster, WithRuneGrants(equipment, runes), map,
-            figureId: chassis.FigureKey);
+            figureId: chassis.FigureKey(race));
     }
 
     // The same mint, marching a multi-leg campaign to the Capital instead of one leg.
     public static Campaign EmbarkCampaign(
+        Race race,
         CoreRune chassis,
         RuneLoadout runes,
         IReadOnlyList<Technique> equipment,
         IReadOnlyList<Func<CityMap>> legs)
     {
-        var body = chassis.NewBody(runes);
+        var body = chassis.NewBody(race, runes);
         var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, bayCap: chassis.Bays);
         SummonKit(caster, chassis, runes);
         return new Campaign(PlayerFighter(body), caster, WithRuneGrants(equipment, runes), legs,
-            figureId: chassis.FigureKey);
+            figureId: chassis.FigureKey(race));
     }
 
     // Field the chassis's minion kit plus any rune-granted minions into its bays at assembly, so the
