@@ -1437,8 +1437,23 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     private void Panel(int x, int y, int w, int h)
     {
+        DrawShadow(x, y, w, h, dx: 2, dy: 3, blur: 3, opacity: 0.40f); // §10 depth under the chrome
         Rect(x, y, w, h, new Color(Panel0, 220));
         Border(x, y, w, h, Border0);
+    }
+
+    // §10 drop shadow, ENGINE-drawn (never baked into art -> resolution-independent): the element
+    // silhouette offset by (dx,dy), softened by `blur` concentric rings of decaying alpha, UNDER the
+    // element. Drawn outer-faint -> inner-dark so the core reads solid and the edge fades.
+    private void DrawShadow(int x, int y, int w, int h, int dx, int dy, int blur, float opacity)
+    {
+        if (w <= 0 || h <= 0) return;
+        var peak = (int)(Math.Clamp(opacity, 0f, 1f) * 255);
+        for (var i = blur; i >= 0; i--)
+        {
+            var a = peak * (blur - i + 1) / (blur + 1); // outer rings fainter
+            Rect(x + dx - i, y + dy - i, w + 2 * i, h + 2 * i, new Color(0, 0, 0, a));
+        }
     }
 
     // A skinned button whose state is driven by input (manifest: drives-from input/interaction).
