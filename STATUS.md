@@ -1,8 +1,16 @@
 # Status
 
 ## Current target
-**RE-OPENED by play (human): starting a run CRASHES, and screens don't match the NEW design renders —
-POC is NOT complete; the "DONE" claim below is RETRACTED until these clear.**
+**RE-OPEN RESOLVED (both threads cleared) — POC functionally complete again.**
+1) RUN-START CRASH: fixed + LIVE-draw verified (detail below). 2) SCREENS MATCH DESIGN: all four live
+screens done + smoke-verified vs the committed 06-30 renders — 01 combat (locked s13 layout), 02 build
+(matches modulo the deferred inventory-tabs / rune-bag cards), 03 map (rebuilt: supply/support panels,
+spread beacon chart, castle panel), 05 new-run (dedicated Choose-Your-Core grid). Flow: NewRun -> Build
+-> March. REMAINING (deliberate, not blockers): the design/02 INVENTORY TABS (GEAR/TECH/MINIONS) +
+RUNE-BAG cards (input-coupled — need drag-equip + mid-run stash), and the Phase-3 arc (see below). NEXT
+ARC IS A PRIORITY FORK — asked the human (Phase 3 combat-depth vs finish design/02 inventory vs
+manifest-drive the hand-coded screens).
+Original re-open detail (kept as record):
 - TOP — RUN-START CRASH: FIXED (confirmed via crash.log). Root cause: `DrawGearBar` drew an em-dash `—`
   into the ASCII-only mono font (SpriteFont THROWS on unknown glyphs) on the MAP screen. Fixed
   CENTRALLY — `Game1.Text` now runs `Safe()` (maps common typographic chars → ASCII, replaces anything
