@@ -17,7 +17,13 @@ public class CoreCampaignTests
         while (c.Current.State == ExpeditionState.Fighting && guard++ < 10000)
         {
             if (c.Enemy is { } foe)
-                foreach (var t in c.Current.Equipment) if (c.IsActive(t)) c.Aim(t, foe);
+            {
+                // Decent play: aim at the foe's STR arm when it has one, so smashing it cascades the
+                // foe's strike off (its own body rule) -- disabling offense, not just chipping HP.
+                var arm = foe.Frame?.Parts.FirstOrDefault(p => p.Stat == Stat.Str);
+                foreach (var t in c.Current.Equipment)
+                    if (c.IsActive(t)) { if (arm is not null) c.Aim(t, foe, arm); else c.Aim(t, foe); }
+            }
             c.Tick();
         }
         if (c.State == CampaignState.Redeploying) c.Redeploy(); // a cleared node holds -> back to the chart
@@ -52,11 +58,13 @@ public class CoreCampaignTests
     }
 
     [Fact]
-    public void MostCoresWinTheCampaignWithTheirOwnKit()
+    public void EveryCoreWinsTheCampaignWithPartAimPlay()
     {
-        // The run is winnable for real, not just with the synthetic sim body: a MAJORITY of cores clear
-        // it with their default kit. (Shield-less glass archetypes are the risky exceptions -- see STATUS.)
-        var wins = CoreRunes.Roster.Count(core => RunCampaign(core) == CampaignState.Won);
-        Assert.True(wins * 2 > CoreRunes.Roster.Count, $"only {wins}/{CoreRunes.Roster.Count} cores win");
+        // The run is winnable for real (not just with the synthetic sim body): with the INTENDED §8 play
+        // -- part-aim the foe's STR arm to cascade its strike off, disabling offense -- EVERY core clears
+        // the campaign on its own default kit. Even the shield-less glass/caster cores, at design-scale
+        // race stats, because disabling the boss beats out-tanking it.
+        foreach (var core in CoreRunes.Roster)
+            Assert.Equal(CampaignState.Won, RunCampaign(core));
     }
 }

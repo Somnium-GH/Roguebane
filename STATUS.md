@@ -11,17 +11,17 @@ attrs→Forge/BuildSession assemble from Race→CycleRace selection→NewGame ra
 fidelity ENGINE set (drop-shadow + gradient + 1080-class fonts via 2× supersample); rune-ladder test
 retired; merchant per-HP heal price; comment hygiene.
 
-CORE PLAYABILITY now under test: CoreCampaignTests drives EVERY core (assembled from a Race + its own
-kit) through a full campaign — no hang/crash, and a MAJORITY of cores win. Two real fixes came out of it:
-1) RANGER pure-bow kit was UNWINNABLE (bow Shot is Charge-gated, INT-pooled, no mid-fight refill → dry
-after ~3 shots → fight stalled) — kit now pairs Shot with a Charge-free DEX melee (Lunge).
-2) At design/05's 3/3/3/3-HP20 race seeds only 2/6 cores won — most core kits have ONE attack + the weak
-race body couldn't out-grind foes tuned for the STRONG sim DemoBody. PLAY-TUNED the race attrs up
-(Human 4/4/5/6 HP30, Elf 3/4/6/4 HP22 — still low-scale, sim-safe: DemoBody unaffected, BalanceSim stays
-green) -> 4/6 cores now win. RESIDUAL: `adept` + `reaver` (the SHIELD-LESS glass/caster archetypes, no
-Brace) still lose — their high-risk identity needs either a per-core DPS/kit lift or a defensive option;
-a play-balance touchpoint. Race/foe numbers are placeholder — dial the FEEL in play; RaceTests/ConHpTests
-now reference the Race values (not literals) so tuning won't redden the build.
+CORE PLAYABILITY now under test + VERIFIED: CoreCampaignTests drives EVERY core (assembled from a Race +
+its own kit) through a full campaign — no hang/crash, and EVERY core WINS at the design-scale race stats
+(Human 3/3/3/3 HP20, Elf 2/3/4/2 HP14). Findings this thread:
+1) RANGER pure-bow kit was UNWINNABLE (bow Shot is Charge-gated/INT-pooled/no mid-fight refill → dry after
+   ~3 shots → fight stalled) — kit now pairs Shot with a Charge-free DEX melee (Lunge). [real fix]
+2) The apparent "4/6 cores lose" was a TEST-STRATEGY artifact, not a balance bug: the harness aimed at the
+   foe's whole HP. Real §8 play PART-AIMS the castle's STR arm, which cascades its BossStrike off (its own
+   body rule) — disabling the boss's offense beats out-tanking it. With arm-aim, ALL 6 cores win at the
+   ORIGINAL design race numbers. So the interim race buff was UNNECESSARY and is REVERTED (design/05 stats
+   restored). Kept: RaceTests/ConHpTests now reference Race values (not literals) so future tuning won't
+   redden the build. Foe/castle numbers remain placeholder — dial the FEEL in play.
 
 OPEN — needs a HUMAN decision before I build (do NOT guess):
 - **#4 Equipment between-fights MUTATION model** — read-side data exists (Expedition.Player/Equipment/

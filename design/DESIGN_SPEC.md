@@ -121,10 +121,10 @@ limited. *(Supersedes the earlier "sustained CON-block, flat-while-held, capped"
 ## 7. Race + Core rune, and the three-layer architecture [LOCKED]
 Identity is **two axes** (FTL ship + layout):
 - **RACE** — sets **starting attributes + base HP** (the ONLY source of base attrs; Core runes add none).
-  Start with **Human + Elf**. Placeholder blocks (design/05 seeds, PLAY-TUNED so real cores are winnable —
-  see CoreCampaignTests): **Human** STR4/INT4/DEX5/CON6, HP30 (balanced, no edge); **Elf** STR3/INT4/DEX6/
-  CON4, HP22 (keen + fleet, frailer). Still low-scale + tunable; the earlier 3/3/3/3-HP20 seeds left most
-  cores unable to out-grind the sim-tuned foes. **All race×core combos allowed for the POC** (§17 #4).
+  Start with **Human + Elf**. Placeholder blocks from design/05 (tune later): **Human** STR3/INT3/DEX3/
+  CON3, HP20 (balanced, no edge); **Elf** STR2/INT3/DEX4/CON2, HP14 (keen + fleet, frail). Verified
+  winnable for EVERY core at these low-scale stats with the intended PART-AIM play (disable the boss's
+  arm), CoreCampaignTests. **All race×core combos allowed for the POC** (restriction matrix deferred, §17 #4).
 - **CORE RUNE** (the Shadowbane "Core rune") — sets **LAYOUT**: rune budget, action-bar size (#
   techniques), # minion bays, and **apex effects/bonuses stronger than a keystone**. **Races GATE which
   core runes they may take** (an SB-style restriction matrix). New Run = pick Race → pick Core rune

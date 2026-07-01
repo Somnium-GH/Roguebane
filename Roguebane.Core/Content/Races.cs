@@ -5,10 +5,10 @@ namespace Roguebane.Core.Content;
 public static class Races
 {
     // Balanced generalist, the sturdier body.
-    public static readonly Race Human = new("human", Str: 4, Int: 4, Dex: 5, Con: 6, Hp: 30, Title: "Human");
+    public static readonly Race Human = new("human", Str: 3, Int: 3, Dex: 3, Con: 3, Hp: 20, Title: "Human");
 
     // Dex-leaning and frail — answers before the wall matters, but thin.
-    public static readonly Race Elf = new("elf", Str: 3, Int: 4, Dex: 6, Con: 4, Hp: 22, Title: "Elf");
+    public static readonly Race Elf = new("elf", Str: 2, Int: 3, Dex: 4, Con: 2, Hp: 14, Title: "Elf");
 
     // Roster order matches design/05's Race column.
     public static readonly IReadOnlyList<Race> Roster = new[] { Human, Elf };
