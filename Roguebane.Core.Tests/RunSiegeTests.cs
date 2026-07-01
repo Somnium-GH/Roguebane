@@ -25,11 +25,11 @@ public class RunSiegeTests
     {
         // Single-foe canon: a control point folds its old layers into ONE foe; it IS the target until down.
         var cp = Sieges.ControlPoint("cp", 12, 5); // -> one foe, hp 17
-        var foe = Assert.Single(cp.Foes);
-        Assert.Equal(foe, cp.CurrentTarget);
+        var foe = cp.Enemy!;
+        Assert.Same(foe, cp.Enemy);
 
         foe.Damage(foe.MaxHp);
-        Assert.Null(cp.CurrentTarget); // cleared -> nothing to aim at
+        Assert.True(cp.Enemy!.Down); // downed -> nothing live to aim at
         Assert.True(cp.Cleared);
     }
 
@@ -37,8 +37,8 @@ public class RunSiegeTests
     public void TheCastleIsOneRestoringBoss()
     {
         var castle = Sieges.Castle();
-        var boss = Assert.Single(castle.Foes);
-        Assert.Equal(boss, castle.CurrentTarget);
+        var boss = castle.Enemy!;
+        Assert.Same(boss, castle.Enemy);
         Assert.False(boss.Down); // one tough boss, not a layered front
     }
 
@@ -118,8 +118,5 @@ public class RunSiegeTests
         Assert.Equal(StepsToClear(), StepsToClear());
     }
 
-    private static void ClearAll(Encounter e)
-    {
-        foreach (var f in e.Foes) f.Damage(f.MaxHp);
-    }
+    private static void ClearAll(Encounter e) => e.Enemy.Damage(e.Enemy.MaxHp);
 }

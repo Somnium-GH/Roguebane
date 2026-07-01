@@ -31,7 +31,7 @@ public class CombatTargetingTests
     {
         var (exp, ctrl) = Fighting();
         ctrl.CardPress(exp, 0);                 // power
-        exp.Aim(Card0(exp), exp.Foes[0]);       // give it a target
+        exp.Aim(Card0(exp), exp.Enemy!);       // give it a target
         Assert.NotNull(exp.AimOf(Card0(exp)));
 
         ctrl.CardPress(exp, 0);                 // active -> enter TARGETING
@@ -46,9 +46,9 @@ public class CombatTargetingTests
         var (exp, ctrl) = Fighting();
         ctrl.CardPress(exp, 0);
         ctrl.CardPress(exp, 0);                 // enter targeting
-        ctrl.FoePress(exp, exp.Foes[0]);
+        ctrl.FoePress(exp, exp.Enemy!);
 
-        Assert.Same(exp.Foes[0], exp.AimOf(Card0(exp)));
+        Assert.Same(exp.Enemy!, exp.AimOf(Card0(exp)));
         Assert.Equal(-1, ctrl.Targeting);       // aimed -> exit targeting
     }
 
@@ -56,10 +56,10 @@ public class CombatTargetingTests
     public void FoePressWithALimbPartAimsThatLimb()
     {
         var (exp, ctrl) = Fighting();
-        var head = exp.Foes[0].Frame!.Parts.First(p => p.Stat == Stat.Int);
+        var head = exp.Enemy!.Frame!.Parts.First(p => p.Stat == Stat.Int);
         ctrl.CardPress(exp, 0);
         ctrl.CardPress(exp, 0);
-        ctrl.FoePress(exp, exp.Foes[0], head);
+        ctrl.FoePress(exp, exp.Enemy!, head);
 
         Assert.Same(head, exp.PartOf(Card0(exp)));
     }
@@ -69,7 +69,7 @@ public class CombatTargetingTests
     {
         var (exp, ctrl) = Fighting();
         ctrl.CardPress(exp, 0);                 // powered but NOT targeting
-        ctrl.FoePress(exp, exp.Foes[0]);
+        ctrl.FoePress(exp, exp.Enemy!);
         Assert.Null(exp.AimOf(Card0(exp)));     // ignored
     }
 
@@ -91,7 +91,7 @@ public class CombatTargetingTests
     {
         var (exp, ctrl) = Fighting();
         ctrl.CardPress(exp, 0);
-        exp.Aim(Card0(exp), exp.Foes[0]);
+        exp.Aim(Card0(exp), exp.Enemy!);
         ctrl.CardPress(exp, 0);                 // enter targeting (clears aim)
         ctrl.CancelTargeting();
 

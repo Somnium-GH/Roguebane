@@ -19,7 +19,7 @@ public class ExpeditionTests
 
     private static void AimAll(Expedition exp)
     {
-        var foe = exp.Foes.FirstOrDefault(f => !f.Down);
+        var foe = exp.Enemy;
         if (foe is null) return;
         foreach (var t in exp.Equipment) if (exp.IsActive(t)) exp.Aim(t, foe);
     }
@@ -43,7 +43,7 @@ public class ExpeditionTests
         Assert.False(exp.IsAuto()); // AUTO off by default
 
         exp.Enter("a2");                     // a skirmish; foe HP only ever moves by the player's hand
-        var foe = exp.Foes[0];
+        var foe = exp.Enemy!;
         var hp = foe.Hp;
 
         for (var i = 0; i < 200; i++) exp.Tick(); // long past Jab's cooldown
@@ -59,7 +59,7 @@ public class ExpeditionTests
         var exp = Sessions.Expedition();
         exp.Toggle(Techniques.Jab);
         exp.Enter("a2");
-        var foe = exp.Foes[0];
+        var foe = exp.Enemy!;
         var hp = foe.Hp;
 
         exp.Aim(Techniques.Jab, foe);
@@ -76,7 +76,7 @@ public class ExpeditionTests
         var exp = Sessions.Expedition();
         exp.Toggle(Techniques.Jab);
         exp.Enter("a2");
-        exp.Aim(Techniques.Jab, exp.Foes[0]);
+        exp.Aim(Techniques.Jab, exp.Enemy!);
 
         exp.ClearAim(Techniques.Jab);
         Assert.True(exp.IsActive(Techniques.Jab));   // still active
@@ -100,7 +100,7 @@ public class ExpeditionTests
         var exp = FullLoadout();
         exp.Enter("a2");
         Assert.NotNull(exp.Battle!.Encounter);
-        Assert.NotEmpty(exp.Battle.Encounter.Foes); // the shell paints these
+        Assert.NotNull(exp.Battle.Encounter.Enemy); // the shell paints these
     }
 
     [Fact]

@@ -9,13 +9,13 @@ public class SiegeFigureTests
     public void AFieldSkirmishIsOneRaiderFigure()
     {
         var enc = Sieges.ArmedPoint("skirmish", 6, 6);
-        Assert.Equal("bandit", Assert.Single(enc.Foes).Figure);
+        Assert.Equal("bandit", enc.Enemy!.Figure);
     }
 
     [Fact]
     public void TheCastleBossIsAHeavyFigure()
     {
         var enc = Sieges.ArmedCastle();
-        Assert.Equal("ogre", Assert.Single(enc.Foes).Figure);
+        Assert.Equal("ogre", enc.Enemy!.Figure);
     }
 }

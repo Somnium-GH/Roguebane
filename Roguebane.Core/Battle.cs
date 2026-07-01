@@ -33,9 +33,9 @@ public sealed class Battle
         _caster.UseRng(_rng);
 
         if (_player is null) return;
-        foreach (var foe in encounter.Foes)
+        var foe = encounter.Enemy;
+        if (foe.Frame is not null && foe.Arsenal.Count > 0)
         {
-            if (foe.Frame is null || foe.Arsenal.Count == 0) continue;
             var offense = new Caster(foe.Frame, _player);
             offense.UseRng(_rng);
             foreach (var tech in foe.Arsenal) offense.Activate(tech); // foes fire unattended (auto on)
@@ -45,7 +45,7 @@ public sealed class Battle
 
     public BattleOutcome Outcome { get; private set; } = BattleOutcome.Ongoing;
 
-    // The encounter under way — the render shell reads its foes and current target to paint combat.
+    // The encounter under way — the render shell reads its one Enemy to paint combat.
     public Encounter Encounter => _encounter;
 
     public void Step()
@@ -53,7 +53,7 @@ public sealed class Battle
         if (Outcome != BattleOutcome.Ongoing) return;
 
         _encounter.BossRestoreTick();
-        if (_encounter.CurrentTarget is { } target)
+        if (_encounter.Enemy is { Down: false } target)
         {
             _caster.Retarget(target);
             var rallied = _support.Fire();           // player's banked auto-fire lands on the front

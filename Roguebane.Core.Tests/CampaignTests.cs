@@ -18,7 +18,7 @@ public class CampaignTests
 
     private static void AimAll(Campaign c)
     {
-        var foe = c.Foes.FirstOrDefault(f => !f.Down);
+        var foe = c.Enemy;
         if (foe is null) return;
         foreach (var t in Techniques.All) if (c.IsActive(t)) c.Aim(t, foe);
     }

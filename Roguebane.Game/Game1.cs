@@ -115,9 +115,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
                 // Show the targeting surface: card 0 LOCKED on a foe's head (F1:H + limb band) with AUTO
                 // on, card 1 in TARGETING, plus the filled minion-bay lane. A few ticks charge the cards.
-                if (Exp.Foes.Count > 0)
+                if (Exp.Enemy is { } foe)
                 {
-                    var foe = Exp.Foes[^1];
                     var head = foe.Frame?.Parts.FirstOrDefault(p => p.Stat == Stat.Int);
                     if (head is not null) _campaign.Aim(Exp.Equipment[0], foe, head);
                     else _campaign.Aim(Exp.Equipment[0], foe);
@@ -253,9 +252,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
         // RIGHT-press the battlefield cancels. A charged + targeted module fires on its own (no button).
         if (_ctrl.IsTargeting(Exp))
         {
-            var foes = Exp.Foes;
-            for (var i = 0; i < foes.Count; i++)
-                if (!foes[i].Down && Click(FoeRect(i))) _ctrl.FoePress(Exp, foes[i], FoePartAt(foes[i], _cursor));
+            if (Exp.Enemy is { Down: false } foe && Click(FoeRect(0)))
+                _ctrl.FoePress(Exp, foe, FoePartAt(foe, _cursor));
             if (_rclicked && !rclickOnCard) _ctrl.CancelTargeting();
         }
         else _ctrl.Sync(Exp); // module deactivated/gone -> leave targeting
@@ -359,10 +357,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private int FoeIndexOf(ICombatTarget? target)
     {
         if (target is null) return -1;
-        var foes = Exp.Foes;
-        for (var i = 0; i < foes.Count; i++)
-            if (ReferenceEquals(foes[i], target)) return i;
-        return -1;
+        return ReferenceEquals(Exp.Enemy, target) ? 0 : -1; // single-foe: the lone enemy is index 0
     }
 
     // Anatomical part bands stacked on the foe sprite, top->bottom: head, arms, chest, legs. A

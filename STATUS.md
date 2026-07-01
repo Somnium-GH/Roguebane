@@ -186,6 +186,13 @@ across the 30-file audit:
   `citymap` (game side now; Claude Design renames the manifest ids in sync — CD payload).
 - **Drop the compat surfaces** earlier passes kept: the `Foes`/`CurrentTarget` 1-element shim (single-foe
   is canon) and the bare `<core>` figure keys (→ `human_<core>`).
+  [FOES/CURRENTTARGET DONE: removed `Encounter.Foes` + `Encounter.CurrentTarget`; callers read `Enemy` (the
+  one foe) and gate on `Enemy.Down` for a live target. `Expedition.Foes`/`Campaign.Foes` -> `Enemy` (Foe?,
+  null between fights); Battle builds foe-offense from the single `Enemy` + retargets on `Enemy is { Down:
+  false }`; Sessions/Forge use `run.Current.Enemy`. Game1's 3 foe-list sites collapsed to the single Enemy
+  (FoeIndexOf -> 0/-1). Tests repointed `.Foes[0]`->`.Enemy!`, `Single(.Foes)`/`CurrentTarget`->`.Enemy`,
+  `Empty(exp.Foes)`->`Null(exp.Enemy)`. 271 green; combat/citymap smoke clean. FigureKey bare->human_ was
+  already handled by the Race rewire's `FigureKey(Race)`.]
 - **aether**: confirm ZERO remaining refs (design cleaned).
 - VOCAB LOCKED: **Race** (attrs+HP), **CoreRune** (layout, was Chassis), **Loadout** = Race+CoreRune (the
   assembled identity — the freed-up term; retire "Core" as a label), **Equipment** = the installed-things

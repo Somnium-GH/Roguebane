@@ -2,8 +2,8 @@ namespace Roguebane.Core;
 
 // One encounter = ONE enemy (canon, §8/§13): a single structured, possibly multi-PART foe (a human,
 // a creature, or the castle boss). The only targeting is PART aim within that one enemy — there is no
-// multi-foe list or front. A boss may restore its own parts/HP by its own means (a DPS race). The
-// `Foes`/`CurrentTarget` surface is kept as a thin single-element compat for the render shell.
+// multi-foe list or front. A boss may restore its own parts/HP by its own means (a DPS race). Callers
+// read `Enemy` (the one foe) and gate on `Enemy.Down` where they need a live target.
 public sealed class Encounter
 {
     public string Name { get; }
@@ -41,12 +41,7 @@ public sealed class Encounter
     public int SupportAmount { get; }
     public int SupportEvery { get; }
 
-    // Thin compat surface for the render shell / drivers (one enemy).
-    public IReadOnlyList<Foe> Foes => new[] { _foe };
-
     public bool Cleared => _foe.Down;
-
-    public Foe? CurrentTarget => _foe.Down ? null : _foe;
 
     // The boss restoring itself by its own means (self-repair) — distinct from player rallied support.
     public void BossRestoreTick()

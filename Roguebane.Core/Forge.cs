@@ -15,7 +15,7 @@ public static class Forge
         var body = chassis.NewBody(race, runes);
         // Session is the legacy linear-run + balance-sim path (unattended): keep default-front auto-fire.
         // The interactive targeting FSM lives on the Expedition/Campaign mints below (requireAim).
-        var caster = new Caster(body, run.Current.CurrentTarget, MagicCapacity(body));
+        var caster = new Caster(body, run.Current.Enemy, MagicCapacity(body));
         return new Session(PlayerFighter(body), caster, WithRuneGrants(equipment, runes), run);
     }
 

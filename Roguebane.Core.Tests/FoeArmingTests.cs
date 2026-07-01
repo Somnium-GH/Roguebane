@@ -20,7 +20,7 @@ public class FoeArmingTests
     public void ArmedFoesCarryAFrameAndArsenal()
     {
         var enc = Sieges.ArmedPoint("cp", 6);
-        var foe = enc.Foes[0];
+        var foe = enc.Enemy!;
         Assert.NotNull(foe.Frame);
         Assert.NotEmpty(foe.Arsenal);
     }
@@ -43,7 +43,7 @@ public class FoeArmingTests
     public void SmashingAFoesArmCascadesItsStrikeOff()
     {
         var enc = Sieges.ArmedPoint("cp", 100);
-        var foe = enc.Foes[0];
+        var foe = enc.Enemy!;
         Assert.NotNull(foe.Frame);
         // Erode the arm below the strike's reserve -> the foe can no longer power it.
         foe.Frame!.Damage(foe.Frame.Parts[0], 4);
@@ -54,7 +54,7 @@ public class FoeArmingTests
     [Fact]
     public void ArmedFoesExposeDistinctTargetableParts()
     {
-        var foe = Sieges.ArmedPoint("cp", 10).Foes[0];
+        var foe = Sieges.ArmedPoint("cp", 10).Enemy!;
         var stats = foe.Frame!.Parts.Select(p => p.Stat).ToHashSet();
         Assert.Contains(Stat.Str, stats);
         Assert.Contains(Stat.Int, stats);
@@ -65,7 +65,7 @@ public class FoeArmingTests
     [Fact]
     public void PartAimErodesTheChosenFoePart()
     {
-        var foe = Sieges.ArmedPoint("cp", 10).Foes[0];
+        var foe = Sieges.ArmedPoint("cp", 10).Enemy!;
         var head = foe.Frame!.Parts.First(p => p.Stat == Stat.Int); // capacity 2
 
         var body = new Body();

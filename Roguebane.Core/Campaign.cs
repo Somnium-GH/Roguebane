@@ -64,7 +64,7 @@ public sealed class Campaign
     public void Redeploy() => Current.Redeploy(); // leave a cleared fight -> back to the chart
 
     // FTL targeting surface (delegates to the current leg's expedition).
-    public IReadOnlyList<Foe> Foes => Current.Foes;
+    public Foe? Enemy => Current.Enemy;
     public void Aim(Technique technique, ICombatTarget target) => Current.Aim(technique, target);
     public void Aim(Technique technique, ICombatTarget target, BodyPart part) => Current.Aim(technique, target, part);
     public void ClearAim(Technique technique) => Current.ClearAim(technique);

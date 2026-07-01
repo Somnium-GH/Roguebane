@@ -23,7 +23,7 @@ public class RunStartTests
         Assert.Equal("camp", exp.Map.CurrentId);
         Assert.NotEmpty(exp.Options); // charted jumps to draw on the chart
         Assert.Null(exp.Battle);      // no fight yet
-        Assert.Empty(exp.Foes);
+        Assert.Null(exp.Enemy);
     }
 
     [Fact]

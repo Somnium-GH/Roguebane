@@ -106,7 +106,7 @@ public class MinionTests
         Assert.True(exp.MinionCount > 0); // bays filled at assembly
 
         exp.Enter("a2");
-        var foe = exp.Foes[0];
+        var foe = exp.Enemy!;
         var hp = foe.Hp;
 
         for (var i = 0; i < 200; i++) exp.Tick(); // no technique is aimed -> only the minions act

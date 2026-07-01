@@ -20,7 +20,7 @@ public static class Sessions
     {
         var body = DemoBody();
         var run = Sieges.StandardRun();
-        var caster = new Caster(body, run.Current.CurrentTarget); // Session = sim/legacy: default-front auto-fire
+        var caster = new Caster(body, run.Current.Enemy); // Session = sim/legacy: default-front auto-fire
         return new Session(Forge.PlayerFighter(body), caster, Techniques.All, run);
     }
 

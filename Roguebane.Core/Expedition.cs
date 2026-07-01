@@ -125,10 +125,10 @@ public sealed class Expedition
         else _caster.Activate(technique, auto: true); // discharges on cadence ONCE it has a target
     }
 
-    // FTL targeting surface for the shell: the live foes, per-technique aim, and the AUTO toggle.
-    // A powered technique fires automatically when charged AND targeted (no fire button). AUTO off
-    // (default) is one-shot — it clears the target after the shot; AUTO on keeps firing at the target.
-    public IReadOnlyList<Foe> Foes => Battle?.Encounter.Foes ?? Array.Empty<Foe>();
+    // FTL targeting surface for the shell: the one live enemy (null between fights), per-technique aim,
+    // and the AUTO toggle. A powered technique fires automatically when charged AND targeted (no fire
+    // button). AUTO off (default) is one-shot — clears the target after the shot; AUTO on keeps firing.
+    public Foe? Enemy => Battle?.Encounter.Enemy;
     public void Aim(Technique technique, ICombatTarget target) => _caster.Aim(technique, target);
     public void Aim(Technique technique, ICombatTarget target, BodyPart part) => _caster.Aim(technique, target, part);
     public void ClearAim(Technique technique) => _caster.ClearAim(technique); // right-click clears the target
