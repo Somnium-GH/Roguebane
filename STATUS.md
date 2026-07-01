@@ -185,6 +185,20 @@ Decisions:
   manifest, but do NOT implement the apex EFFECTS — they aren't in DESIGN_SPEC yet (pending human; show
   text only — no-undesigned-mechanics guardrail).
 
+## ⇒ NEXT SLICE — Claude Design manifest+asset LANDING (uncommitted in the working tree)
+CD dropped a big payload mid-turn (2026-07-01): a NEW `layout.json` (figures renamed bare `<core>` ->
+`human_<core>`/`elf_<core>`, screens restructured — combat lost its old `backdrop` element), new
+`sprites/body/human_*` + `elf_*` PNGs (UNTRACKED), `Content.mgcb` + `ASSET_MANIFEST.md` + node/map icons,
++ refreshed `design/*.png`. This RED-lights 12 manifest-schema tests (they assert CD's OLD literal keys).
+The Loadout->Equipment rename was committed IN ISOLATION (436a68c, green) by stashing this payload; it is
+now popped back into the tree. MIGRATION PLAN (human-directed): 1) re-point the 12 manifest tests to
+assert the CONTRACT/SCHEMA (or a test-owned fixture), NOT CD's literal keys — CD owns layout.json's
+contents (so a figure/screen/template rename never breaks a test again). 2) repoint game FigureId refs
+bare `<core>` -> `human_<core>`. 3) VERIFY the content pipeline builds + smokes with the new sprites/mgcb.
+4) commit CD's asset landing + the schema tests together, green. Manifest LOOKUP screen ids are STILL old
+(`combat`/`build`/`newrun`/`runmap`/`campaign`) — CD hasn't renamed those yet (their TODO); per-part
+`binds` also NOT in this manifest yet (still the arc blocker).
+
 ## Current target
 **RE-OPEN RESOLVED (both threads cleared) — POC functionally complete again.**
 1) RUN-START CRASH: fixed + LIVE-draw verified (detail below). 2) SCREENS MATCH DESIGN: all four live
