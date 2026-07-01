@@ -90,6 +90,10 @@ REDEFINED it (see DESIGN_SPEC §6b/§10/§14/§17/§18). Directives:
    ChargeCost removed (Maelstrom isn't piercing); comment updated.]
 3. **`Minion.AltCost` paying Charge** is off-definition (Charge = shield-pierce, not summon fuel). §9's
    alt-cost example is HP — reconcile alt-cost summons to a DESIGNED cost (HP or a stat), not Charge.
+   [DONE: Caster.Summon no longer spends Charge for a MinionGate.AltCost summon; comment + tests updated
+   (AltCostSummonDoesNotSpendCharge). No alt-cost minion is authored + HP isn't reachable in Caster, so
+   the summon is an UN-COSTED placeholder for now — wire the real HP/stat spend when an alt-cost minion
+   ships. 278 Core green.]
 4. **BOWS (new, shield-ignoring):** spec + implement a bow weapon type (DEX, §6) whose attacks bypass the
    shield pool and cost Charge; add tests. At least ONE starting Core rune ships a bow in its default
    loadout [WHICH core = needs-human; suggest the DEX Reaver or a ranged identity]. Bow ASSET (sprite +

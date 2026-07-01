@@ -122,15 +122,15 @@ public class MinionTests
     }
 
     [Fact]
-    public void AltCostMinionSpendsChargeNotStat()
+    public void AltCostSummonDoesNotSpendCharge()
     {
-        var body = IntBody(0);
+        // Charge is the shield-pierce resource now, NOT summon fuel (§9). An alt-cost summon leaves
+        // Charge untouched (its real HP/stat cost is TBD until an alt-cost minion is authored).
+        var body = IntBody(0);            // no INT to reserve
         var caster = new Caster(body, null, maxCharge: 3);
         var imp = new Minion("imp", Stat.Int, 0, 1, MinionGate.AltCost, AltCost: 2);
 
-        Assert.True(caster.Summon(imp, bayCap: 3)); // pays 2 charge
-        Assert.Equal(1, caster.Charge);
-        var imp2 = new Minion("imp2", Stat.Int, 0, 1, MinionGate.AltCost, AltCost: 2);
-        Assert.False(caster.Summon(imp2, bayCap: 3)); // only 1 charge left
+        Assert.True(caster.Summon(imp, bayCap: 3)); // succeeds without a stat reservation
+        Assert.Equal(3, caster.Charge);             // Charge untouched
     }
 }

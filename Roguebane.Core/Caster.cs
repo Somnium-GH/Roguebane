@@ -210,7 +210,9 @@ public sealed class Caster
         switch (minion.Gate)
         {
             case MinionGate.None: break; // ungated loyal ally — no cost
-            case MinionGate.AltCost when !TrySpendCharge(minion.AltCost): return false;
+            // Alt-cost is a DESIGNED cost (HP or a stat, §9) — NOT Charge; Charge is the shield-pierce
+            // resource now. No alt-cost minion is authored yet + HP isn't reachable here, so it is an
+            // un-costed placeholder until one ships (then wire the real HP/stat spend).
             case MinionGate.AltCost: break;
             default: if (!_self.Activate(Reservation(minion))) return false; break;
         }
