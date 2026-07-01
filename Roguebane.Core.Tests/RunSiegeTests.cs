@@ -5,7 +5,7 @@ namespace Roguebane.Core.Tests;
 public class RunSiegeTests
 {
     private static Encounter Stronghold(int frontHp, int restoreAmount, int restoreEvery) =>
-        new("hold", new[] { new Foe("wall", frontHp) }, structural: true, restoreAmount, restoreEvery);
+        new("hold", new Foe("wall", frontHp), restoreAmount, restoreEvery);
 
     private static Caster Attacker(params Technique[] techniques)
     {
@@ -21,27 +21,25 @@ public class RunSiegeTests
         new("drain", Stat.Int, 2, TechniqueKind.Sustained, Cooldown: 0, Power: 2);
 
     [Fact]
-    public void ControlPointFocusesTheWeakestFoe()
+    public void AnEncounterIsOneEnemy()
     {
-        var cp = Sieges.ControlPoint("cp", 12, 5); // index 0 is tougher
-        var weak = cp.Foes[1];
-        var tough = cp.Foes[0];
+        // Single-foe canon: a control point folds its old layers into ONE foe; it IS the target until down.
+        var cp = Sieges.ControlPoint("cp", 12, 5); // -> one foe, hp 17
+        var foe = Assert.Single(cp.Foes);
+        Assert.Equal(foe, cp.CurrentTarget);
 
-        Assert.Equal(weak, cp.CurrentTarget);
-        weak.Damage(5);
-        Assert.Equal(tough, cp.CurrentTarget);
+        foe.Damage(foe.MaxHp);
+        Assert.Null(cp.CurrentTarget); // cleared -> nothing to aim at
+        Assert.True(cp.Cleared);
     }
 
     [Fact]
-    public void CastleBreaksTheFrontLayerBeforeTheNext()
+    public void TheCastleIsOneRestoringBoss()
     {
         var castle = Sieges.Castle();
-        var gate = castle.Foes[0];
-        var wall = castle.Foes[1];
-
-        Assert.Equal(gate, castle.CurrentTarget);
-        gate.Damage(gate.MaxHp);
-        Assert.Equal(wall, castle.CurrentTarget); // strictly the next layer
+        var boss = Assert.Single(castle.Foes);
+        Assert.Equal(boss, castle.CurrentTarget);
+        Assert.False(boss.Down); // one tough boss, not a layered front
     }
 
     [Fact]

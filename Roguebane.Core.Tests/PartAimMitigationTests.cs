@@ -22,7 +22,7 @@ public class PartAimMitigationTests
 
     // A tanky, SMART part-aiming foe: it keeps swinging at the player's largest live stat.
     private static Encounter PartAimingFoe() =>
-        new("e", new[] { Foes.Armed("brute", 200, aim: FoeAim.Smart) }, structural: false, foePartAim: true);
+        new("e", Foes.Armed("brute", 200, aim: FoeAim.Smart), foePartAim: true);
 
     private static Body RunUnder(Technique? defense, ulong seed)
     {

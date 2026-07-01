@@ -12,12 +12,11 @@ public class SupportTests
     }
 
     [Fact]
-    public void SupportAutoFiresOnTheFrontIntermittently()
+    public void SupportAutoFiresOnTheEnemyIntermittently()
     {
         // amount 3 every 2 ticks, no boss restore, an idle caster: only rallied support lands.
-        var foe = new Foe("gate", 100);
-        var encounter = new Encounter("siege", new[] { foe }, structural: true,
-            supportAmount: 3, supportEvery: 2);
+        var foe = new Foe("boss", 100);
+        var encounter = new Encounter("siege", foe, supportAmount: 3, supportEvery: 2);
         var battle = new Battle(IdleCaster(), encounter);
 
         battle.Step(); // tick 1, no fire
@@ -31,28 +30,25 @@ public class SupportTests
     }
 
     [Fact]
-    public void SupportHitsTheCurrentFrontAndAdvancesWithIt()
+    public void SupportDropsTheEnemyThenStops()
     {
-        var gate = new Foe("gate", 3);
-        var keep = new Foe("keep", 100);
-        var encounter = new Encounter("siege", new[] { gate, keep }, structural: true,
-            supportAmount: 3, supportEvery: 1);
+        var foe = new Foe("boss", 3);
+        var encounter = new Encounter("siege", foe, supportAmount: 3, supportEvery: 1);
         var battle = new Battle(IdleCaster(), encounter);
 
-        battle.Step(); // 3 onto gate -> gate down
-        Assert.True(gate.Down);
-        battle.Step(); // now lands on the keep
-        Assert.Equal(97, keep.Hp);
+        battle.Step(); // 3 onto the one enemy -> down
+        Assert.True(foe.Down);
+        Assert.Equal(BattleOutcome.Cleared, battle.Outcome); // nothing left to fire on
     }
 
     [Fact]
     public void SupportRacesAgainstBossRestoreNotForIt()
     {
-        // support 2/tick vs boss restore 1/tick: net player gain, the front falls without the
-        // player lifting a finger — support helps the player, the inverse of the old code.
+        // support 2/tick vs boss restore 1/tick: net player gain, the enemy falls without the player
+        // lifting a finger — support helps the player, the inverse of the old code.
         var foe = new Foe("wall", 10);
-        var encounter = new Encounter("siege", new[] { foe }, structural: true,
-            restoreAmount: 1, restoreEvery: 1, supportAmount: 2, supportEvery: 1);
+        var encounter = new Encounter("siege", foe, restoreAmount: 1, restoreEvery: 1,
+            supportAmount: 2, supportEvery: 1);
         var battle = new Battle(IdleCaster(), encounter);
 
         for (var i = 0; i < 100 && battle.Outcome == BattleOutcome.Ongoing; i++) battle.Step();

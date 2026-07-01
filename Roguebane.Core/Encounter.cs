@@ -1,21 +1,21 @@
 namespace Roguebane.Core;
 
-// One encounter, interpreted from data. A control point is non-structural (focus the weakest
-// foe). A castle is structural (break the front before the next layer); its boss may restore the
-// standing front by its own means — a DPS race.
+// One encounter = ONE enemy (canon, §8/§13): a single structured, possibly multi-PART foe (a human,
+// a creature, or the castle boss). The only targeting is PART aim within that one enemy — there is no
+// multi-foe list or front. A boss may restore its own parts/HP by its own means (a DPS race). The
+// `Foes`/`CurrentTarget` surface is kept as a thin single-element compat for the render shell.
 public sealed class Encounter
 {
     public string Name { get; }
 
-    private readonly List<Foe> _foes;
+    private readonly Foe _foe;
     private readonly int _restoreAmount;
     private readonly int _restoreEvery;
     private int _tick;
 
     public Encounter(
         string name,
-        IReadOnlyList<Foe> foes,
-        bool structural,
+        Foe foe,
         int restoreAmount = 0,
         int restoreEvery = 0,
         int supportAmount = 0,
@@ -23,8 +23,7 @@ public sealed class Encounter
         bool foePartAim = false)
     {
         Name = name;
-        _foes = foes.ToList();
-        Structural = structural;
+        _foe = foe;
         _restoreAmount = restoreAmount;
         _restoreEvery = restoreEvery;
         SupportAmount = supportAmount;
@@ -32,39 +31,29 @@ public sealed class Encounter
         FoePartAim = foePartAim;
     }
 
-    public bool Structural { get; }
+    // The one enemy of this encounter.
+    public Foe Enemy => _foe;
 
-    // Whether foes erode the player's PARTS (§8) instead of chipping restorable HP. STAGED OFF for
-    // live content: persistent part erosion with no part-heal yet (Phase 3 #4) strips the loadout and
-    // makes the run unwinnable. Flip on per-encounter once part-heals ship. The mechanism itself is
-    // live + tested regardless of this gate.
+    // Whether the foe erodes the player's PARTS (§8) instead of chipping restorable HP.
     public bool FoePartAim { get; }
 
-    // Player-allied rallied support available at this encounter (auto-fire on the front).
+    // Player-allied rallied support available at this encounter (auto-fire on the enemy).
     public int SupportAmount { get; }
     public int SupportEvery { get; }
 
-    public IReadOnlyList<Foe> Foes => _foes;
+    // Thin compat surface for the render shell / drivers (one enemy).
+    public IReadOnlyList<Foe> Foes => new[] { _foe };
 
-    public bool Cleared => _foes.All(f => f.Down);
+    public bool Cleared => _foe.Down;
 
-    public Foe? CurrentTarget
-    {
-        get
-        {
-            var alive = _foes.Where(f => !f.Down).ToList();
-            if (alive.Count == 0) return null;
-            if (Structural) return alive[0]; // strict front: layers fall in order
-            return alive.OrderBy(f => f.Hp).ThenBy(_foes.IndexOf).First(); // focus weakest
-        }
-    }
+    public Foe? CurrentTarget => _foe.Down ? null : _foe;
 
-    // The boss restoring its own front by its own means — distinct from player rallied support.
+    // The boss restoring itself by its own means (self-repair) — distinct from player rallied support.
     public void BossRestoreTick()
     {
         _tick++;
         if (_restoreEvery <= 0 || _restoreAmount <= 0) return;
         if (_tick % _restoreEvery != 0) return;
-        if (CurrentTarget is { } front) front.Restore(_restoreAmount);
+        if (!_foe.Down) _foe.Restore(_restoreAmount);
     }
 }

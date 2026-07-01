@@ -23,8 +23,7 @@ public class FoeOffenseTests
     private static Technique Strike(int power, int reserve = 1) =>
         new("strike", Stat.Str, reserve, TechniqueKind.Sustained, Cooldown: 0, Power: power);
 
-    private static Encounter Solo(Foe foe) =>
-        new("e", new[] { foe }, structural: false, foePartAim: true);
+    private static Encounter Solo(Foe foe) => new("e", foe, foePartAim: true);
 
     [Fact]
     public void AnArmedFoeErodesThePlayersPart()

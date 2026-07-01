@@ -2,20 +2,20 @@ using Roguebane.Core.Content;
 
 namespace Roguebane.Core.Tests;
 
-// Encounters assign creature figures so the shipped foe figure sets get used (variety, not all-ogre).
+// Single-foe canon: an encounter is ONE enemy, drawn with a shipped creature figure.
 public class SiegeFigureTests
 {
     [Fact]
-    public void FieldRaidersRotateAcrossSlots()
+    public void AFieldSkirmishIsOneRaiderFigure()
     {
         var enc = Sieges.ArmedPoint("skirmish", 6, 6);
-        Assert.Equal(new[] { "bandit", "skeleton" }, enc.Foes.Select(f => f.Figure).ToArray());
+        Assert.Equal("bandit", Assert.Single(enc.Foes).Figure);
     }
 
     [Fact]
-    public void CastleDefendersAreHeavyFigures()
+    public void TheCastleBossIsAHeavyFigure()
     {
         var enc = Sieges.ArmedCastle();
-        Assert.Equal(new[] { "ogre", "troll", "ogre" }, enc.Foes.Select(f => f.Figure).ToArray());
+        Assert.Equal("ogre", Assert.Single(enc.Foes).Figure);
     }
 }
