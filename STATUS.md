@@ -231,11 +231,15 @@ from primitives. Route each to Claude Design. (Art direction: DESIGN_SPEC §13.)
 - G1: foe->player PART aim MECHANISM shipped + headless-tested (FoeTargeting SMART/RANDOM/INEPT; Foe.Aim
   data; Battle wires it via the Encounter.FoePartAim opt-in). STAGED OFF in all live content
   (FoePartAim=false): persistent part erosion with NO part-heal yet (Phase 3 #4) strips the loadout and
-  makes the run unwinnable (verified — campaign flips to a DPS stalemate). IN-COMBAT PART-HEAL now EXISTS
-  (Phase 3 #4): a `Heals` technique mends the caster's most-damaged part (Caster.Discharge branch +
-  Body.MostDamagedPart), content `Techniques.Bandage` (CON, ~8s), tested. RECONCILE remaining: put a heal
-  in the affected kits + flip FoePartAim on per-encounter, then balance (Needs-human) — the mechanism is
-  no longer the blocker. Real content foes still unarmed beyond the light feel-pass arming.
+  makes the run unwinnable (verified — campaign flips to a DPS stalemate). IN-COMBAT PART-HEAL + SHIELDS now EXIST + are wired
+  (Phase 3 #4/#3): `Techniques.Bandage` (CON heal) + `Techniques.Stoneskin` (INT shield source), both
+  opt-in. GO-LIVE EXPERIMENT RUN (reverted): flip skirmish FoePartAim on + a heal in the toggled loadout
+  -> campaign WINS (thesis holds); WITHOUT a defensive source -> campaign LOSES. So going live REQUIRES a
+  heal/shield in the kit, which raises skirmishes past the LOCKED "LIGHT/winnable" envelope -> a
+  difficulty/design decision (heal-required vs keep-it-light), NOT just number tuning = Needs-human. The
+  thesis is PINNED headlessly by `PartAimMitigationTests` (heal + shield each slow the part-strip; bare
+  build is stripped). Staying staged off is correct until that decision. Real content foes still unarmed
+  beyond the light feel-pass arming.
 
 ## Roadmap
 - Phase 1 [DONE]: Core skeleton, rune economy, chassis, techniques + deterministic combat tick,
