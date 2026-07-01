@@ -280,10 +280,22 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     // Chart layout: a node's screen rect from its grid coords (Col = depth, Row = lane). Shared by
     // the chart render and the click hit-test so a beacon is selectable exactly where it is drawn.
-    private static readonly Point ChartOrigin = new(150, 150);
-    private const int ChartColW = 150, ChartRowH = 110, ChartIcon = 48;
-    private static Rectangle NodeRect(MapNode n) =>
-        new(ChartOrigin.X + n.Col * ChartColW, ChartOrigin.Y + n.Row * ChartRowH, ChartIcon, ChartIcon);
+    // The chart's region, inset to clear the supply panels (top), legend (right) and gear bar (bottom).
+    private static readonly Rectangle ChartRegion = new(44, 200, 676, 210);
+    private const int ChartIcon = 48;
+
+    // Node position = f(region, grid extents) via GraphLayout — nodes SPREAD to fill the region, so the
+    // chart is viewport-independent instead of pinned to a fixed pixel origin.
+    private Rectangle NodeRect(MapNode n)
+    {
+        var nodes = Exp.Map.Nodes;
+        var cols = nodes.Max(x => x.Col) + 1;
+        var rows = nodes.Max(x => x.Row) + 1;
+        var cell = GraphLayout.Cell(
+            new LayoutRect(ChartRegion.X, ChartRegion.Y, ChartRegion.Width, ChartRegion.Height),
+            cols, rows, n.Col, n.Row, ChartIcon, ChartIcon);
+        return new Rectangle(cell.X, cell.Y, cell.W, cell.H);
+    }
 
     private bool Pressed(KeyboardState keys, Keys key) => keys.IsKeyDown(key) && _prevKeys.IsKeyUp(key);
 

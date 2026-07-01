@@ -21,10 +21,11 @@ POC is NOT complete; the "DONE" claim below is RETRACTED until these clear.**
   crash is gone in the live draw, not just headless.
 - Fresh design renders landed (`design/01–06`, 06-30) and are now COMMITTED as the rebuild reference.
   Audited each live shot vs its PNG (scratch-dir smoke). Punch list:
-  * 03 MAP: top-left SUPPLIES + MUSTERED-SUPPORT panels (pip bars + flavor) DONE + smoke-verified
-    (supplies/support moved off the compact top-bar; war-party track relocated to clear them). REMAINING:
-    the BIGGER beacon chart (design wants a denser graph vs the current 5-node diamond) + a right-side
-    "THE CASTLE — exit" panel. Both land cleanly via the manifest `type:"graph"` rebuild below.
+  * 03 MAP: top-left SUPPLIES + MUSTERED-SUPPORT panels (pip bars + flavor) DONE. BIGGER CHART DONE:
+    nodes now SPREAD to fill an inset chart region via `Core.Layout.GraphLayout` (pure, tested) instead
+    of a fixed 150px origin -- wider, viewport-independent (camp left -> castle right). Smoke-verified.
+    REMAINING: the right-side "THE CASTLE - exit" panel, and swapping the hand-set ChartRegion for the
+    manifest `chart` region once the full map screen is manifest-driven.
   * 02 BUILD: matches except the already-known DEFERRED items — INVENTORY tabs (GEAR/TECH/MINIONS) +
     rarity item cards, and a RUNE BAG of MARKS/PATHS/KEYSTONES cards (current screen shows rune LADDERS).
     Both input-coupled (need input wiring + mid-run stash).
@@ -45,7 +46,9 @@ POC is NOT complete; the "DONE" claim below is RETRACTED until these clear.**
   list/graph containers) -- pinned by LayoutManifestTests against the real manifest (chart=graph/beaconNode,
   build action bar=horizontal/techCard, newrun=coreCard). RENDER half remains: the Game consumer must
   iterate map/campaign nodes (graph) + bound lists and STAMP the item template at each cell (CardTemplate
-  already places a template at an origin; wire data -> positions).
+  already places a template at an origin; wire data -> positions). GraphLayout.Cell now does the graph
+  NODE positioning (spread grid coords to fill a region) -- the runmap chart uses it; campaign/newrun
+  can reuse it for their `type:"graph"` containers.
   cityNode is labels-only; castle stays the generic node icon (procedural castle parked — not
   mission-critical). REVIEW FIXES:
   * coreCard figure is HARDCODED (`image: …/chassis/grunt.png` sample) — BIND each card's image to its
