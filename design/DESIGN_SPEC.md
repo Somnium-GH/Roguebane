@@ -214,8 +214,9 @@ Minions yes; **party no** — one main character.
   *bypassing shields* (§6b) — cheap in attributes but logistically fragile (run dry → no piercing until
   you refill). It is NOT a generic "magic" cost; ordinary (blockable) techniques cost no Charge.
 - **BOWS are always shield-ignoring [LOCKED]:** a bow's attacks bypass the shield pool and therefore draw
-  Charge. (Bows don't exist yet — a NEW weapon type to spec + asset + test; at least one starting Core
-  rune should ship a bow in its default loadout.)
+  Charge. BUILT: `Armory.Bow` is a DEX stat-stick; its consulting verb `Armory.Shot` is ShieldPiercing
+  (ChargeCost 1) — power/cost come from the wielded bow. The **Ranger** core ships it (a `DefaultWeapons`
+  bow wielded at assembly + `Shot` on its bar). Numbers (bow power 2, reserve 2, Shot cd 3) placeholder.
 - **[OPEN]** whether shield-piercing needs any extra "damaging resolution" beyond the bypass — keep it
   simple for now (bypass + Charge cost, nothing more).
 

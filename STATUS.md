@@ -30,8 +30,8 @@ contract. 274 Core green; all screens smoke-clean with the new assets.
 
 STILL BLOCKED / TODO on the Claude Design side:
 - WIRE the landed assets into the renderer: nine-slice FRAME blitter (assets now exist); consume the
-  manifest `fill:{gradient}` + a per-element `shadow` field; the bow WEAPON (art now exists — still
-  needs the Core bow type, charge #4) + Ranger figure repoint.
+  manifest `fill:{gradient}` + a per-element `shadow` field. The Core bow type is DONE (charge #4) —
+  Game TODO: mount `bow.png` on the archer figure + a `shot` technique icon; Ranger figure repoint.
 - Manifest screen-id renames (newrun/build/runmap→newgame/equipment/citymap); per-PART `binds`
   (manifest-drive arc blocker); the TWO divergent `Content.mgcb` still need a single source of truth.
 
@@ -196,6 +196,14 @@ REDEFINED it (see DESIGN_SPEC §6b/§10/§14/§17/§18). Directives:
    shield pool and cost Charge; add tests. At least ONE starting Core rune ships a bow in its default
    loadout [WHICH core = needs-human; suggest the DEX Reaver or a ranged identity]. Bow ASSET (sprite +
    hand-mount pivot) is a Claude Design need — mark BLOCKED on art, use a placeholder meanwhile.
+   [DONE (art landed 2026-07-01): `Armory.Bow` (DEX stat-stick, reserve 2, power 2) + `Armory.Shot`
+   (Timered cd3, Consults primary DEX weapon, ShieldPiercing, ChargeCost 1). CoreRune gained a
+   `DefaultWeapons` kit wielded in NewBody; the **RANGER** ships the bow (its identity IS the marksman —
+   no needs-human guess) with Shot+Brace+Bandage on the bar. This makes the player's Charge pool LIVE (was
+   dormant). Tests: BowTests (Shot bypasses shields + spends charge using bow power; Ranger assembles
+   wielding the bow). DESIGN_SPEC §6 bow note updated (no longer "don't exist yet"). 276 Core green;
+   newgame/combat smoke clean. Numbers placeholder. TODO (Game): mount the bow.png on the figure + a
+   `shot` technique icon.]
 5. **AUDIT — no undesigned mechanics (new CLAUDE.md + loop guardrail):** sweep code + sample/test content
    for invented mechanics/effects/resources/conditions absent from DESIGN_SPEC. Known: the Charge misuse
    above; the aether-referencing Hollow Vessel effect (spec §11 effect is OPEN — code grants placeholder

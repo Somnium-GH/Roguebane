@@ -54,15 +54,15 @@ public static class CoreRunes
         Archetype: "THE DUELIST",
         Flavor: "No shield, twin blades. Glass-cannon STR-DEX - ends parts before they answer.");
 
-    // The Marksman: ranged core. Its primary is meant to be a shield-piercing BOW (charge #4, blocked on
-    // art) — until that lands the equipment uses an existing DEX attack (Lunge) so it compiles; swap the
-    // bow Shot in when it ships. Data-only stress test of the content-is-DATA invariant.
+    // The Marksman: ranged core. Its primary is the shield-piercing BOW (charge #4) — it wields a Bow
+    // and its Shot verb bypasses shields for Charge. A pure data build: a weapon kit + a consulting verb.
     public static readonly CoreRune Ranger = new(
         "ranger",
         RuneBudget: 12,
         RuneDiscount: 0,
         Bays: 0,
-        DefaultEquipment: new[] { Techniques.Lunge, Techniques.Brace, Techniques.Bandage },
+        DefaultEquipment: new[] { Armory.Shot, Techniques.Brace, Techniques.Bandage },
+        DefaultWeapons: new[] { Armory.Bow },
         Archetype: "THE MARKSMAN",
         Flavor: "Strikes from range with a shield-piercing bow; high DEX, thin armour - answers first.");
 

@@ -12,6 +12,7 @@ public sealed record CoreRune(
     int Bays = 1,
     IReadOnlyList<Technique>? DefaultEquipment = null,
     IReadOnlyList<Minion>? DefaultMinions = null,
+    IReadOnlyList<Weapon>? DefaultWeapons = null, // wielded at assembly so a consulting verb has a stick
     string Archetype = "",  // the one-line identity ("THE GENERALIST") shown on the New Run / build cards
     string Flavor = "")     // the card's short pitch (design/05)
 {
@@ -27,14 +28,19 @@ public sealed record CoreRune(
     // analogue of the fixed technique Kit. Rune grants add more on top, capped by Bays.
     public IReadOnlyList<Minion> MinionKit => DefaultMinions ?? Array.Empty<Minion>();
 
+    // The weapons the core wields from the start (a bow for the Marksman) — a consulting verb (Shot)
+    // reads its power/cost from these. Wielded at assembly if the body can lift them (stat threshold).
+    public IReadOnlyList<Weapon> WeaponKit => DefaultWeapons ?? Array.Empty<Weapon>();
+
     // The socketed body: the RACE supplies the anatomy + attrs, then each held rune rung sockets its
-    // extension parts on top. Climbing a chassis-extending keystone widens the live pool.
+    // extension parts on top, and the core's starting weapons are wielded into its hands.
     public Body NewBody(Race race, RuneLoadout runes)
     {
         var body = race.NewBody();
         foreach (var mark in runes.HeldMarks)
             foreach (var part in mark.Granted)
                 body.Add(part);
+        foreach (var weapon in WeaponKit) body.Wield(weapon);
         return body;
     }
 
