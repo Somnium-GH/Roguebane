@@ -25,6 +25,19 @@ public sealed class ManifestUi
         return new Rectangle(r.X, r.Y, r.W, r.H);
     }
 
+    // The cell rects for a list container (its `item` stamped `count` times), or null if the manifest,
+    // screen, element, or item is missing — so the caller falls back to its legacy layout.
+    public System.Collections.Generic.IReadOnlyList<Rectangle>? ListCells(string screen, string id, int count)
+    {
+        var m = _layout.Manifest;
+        if (m is null || !m.Screens.TryGetValue(screen, out var s)) return null;
+        var e = s.Elements.FirstOrDefault(x => x.Id == id);
+        if (e?.Item is null) return null;
+        var region = ScreenLayout.Resolve(s, e);
+        return ListLayout.Cells(region, e.Item, count)
+            .Select(r => new Rectangle(r.X, r.Y, r.W, r.H)).ToList();
+    }
+
     public Color Color(string name, Color fallback)
     {
         var style = _layout.Manifest?.Style;

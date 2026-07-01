@@ -167,7 +167,13 @@ public class Game1 : Microsoft.Xna.Framework.Game
     }
 
     // New Run (design/05): the core grid. Pick with arrows or a card click; BEGIN goes to the loadout.
-    private static Rectangle NewRunCardRect(int i) => new(14 + i * 188, 66, 176, 420);
+    // Card positions come from the manifest `coreCards` list container (region + item), falling back to
+    // a hand grid if the manifest is absent — the first screen container driven off layout.json.
+    private Rectangle NewRunCardRect(int i)
+    {
+        var cells = _ui.ListCells("newrun", "coreCards", _build.Roster.Count);
+        return cells is not null && i < cells.Count ? cells[i] : new Rectangle(14 + i * 188, 66, 176, 420);
+    }
     private static readonly Rectangle NewRunBeginRect = new(W - 258, H - 44, 240, 34);
 
     private void UpdateNewRun(KeyboardState keys)

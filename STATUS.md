@@ -9,7 +9,9 @@ spread beacon chart, castle panel), 05 new-run (dedicated Choose-Your-Core grid)
 -> March. REMAINING (deliberate, not blockers): the design/02 INVENTORY TABS (GEAR/TECH/MINIONS) +
 RUNE-BAG cards (input-coupled — need drag-equip + mid-run stash), and the Phase-3 arc (see below). NEXT
 ARC IS A PRIORITY FORK — asked the human (Phase 3 combat-depth vs finish design/02 inventory vs
-manifest-drive the hand-coded screens).
+manifest-drive the hand-coded screens). HUMAN PICKED: MANIFEST-DRIVE the screens. Arc STARTED -- see the
+manifest section below (ListLayout added; the New Run coreCards grid is the first container driven off
+layout.json).
 Original re-open detail (kept as record):
 - TOP — RUN-START CRASH: FIXED (confirmed via crash.log). Root cause: `DrawGearBar` drew an em-dash `—`
   into the ASCII-only mono font (SpriteFont THROWS on unknown glyphs) on the MAP screen. Fixed
@@ -60,7 +62,12 @@ Original re-open detail (kept as record):
   iterate map/campaign nodes (graph) + bound lists and STAMP the item template at each cell (CardTemplate
   already places a template at an origin; wire data -> positions). GraphLayout.Cell now does the graph
   NODE positioning (spread grid coords to fill a region) -- the runmap chart uses it; campaign/newrun
-  can reuse it for their `type:"graph"` containers.
+  can reuse it for their `type:"graph"` containers. ListLayout.Cells does the LIST positioning
+  (horizontal/vertical, cell+gap); ManifestUi.ListCells resolves a container's region + item -> cell
+  rects (tolerant, null-fallback). FIRST MANIFEST-DRIVEN CONTAINER: the New Run coreCards grid now reads
+  its card positions from layout.json (falls back to a hand grid if absent). NEXT: drive more containers
+  (build techCard/invCard lists, the runmap `chart` graph region) and render item TEMPLATES from the
+  manifest via CardTemplate, not just positions.
   cityNode is labels-only; castle stays the generic node icon (procedural castle parked — not
   mission-critical). REVIEW FIXES:
   * coreCard figure is HARDCODED (`image: …/chassis/grunt.png` sample) — BIND each card's image to its
