@@ -96,8 +96,9 @@ public sealed class TemplatePart
     public string Color { get; init; } = "";
     public string Font { get; init; } = "";
     public double FontPx { get; init; }
-    public string Sample { get; init; } = ""; // which datum fills this slot (name/cost/desc/…)
+    public string Sample { get; init; } = ""; // placeholder text shown in the design mock
     public string? Image { get; init; }       // an IMAGE slot instead of text (e.g. a card's figure)
+    public string? Binds { get; init; }        // which live datum fills this slot at render (vs the sample)
 }
 
 public sealed class Style

@@ -69,10 +69,14 @@ Original re-open detail (kept as record):
   BEGINS" + serif title "Choose Your Core") read content + rects from layout.json (dropped the hand top
   bar -> matches design/05's centred header). SKIPPED (manifest quirks): the newrun SUBTITLE content is
   truncated in layout.json (kept hand copy, manifest position); the beginBtn is only 120px in the
-  manifest -> clips "BEGIN THE MARCH", kept the wider hand button. NEXT: render item TEMPLATES from the
-  manifest via CardTemplate (blocked on PER-PART data binding -- template parts carry only a `sample`
-  placeholder, no per-part `binds`; add that to bind real data), then position-drive a whole screen
-  (build is dense -> drive it as a unit, not piecemeal, to avoid mixed coord systems).
+  manifest -> clips "BEGIN THE MARCH", kept the wider hand button. PER-PART BINDS MODEL DONE: `TemplatePart`/`PlacedPart` now
+  carry an optional `Binds` (the live datum vs the design `sample`); CardTemplate.Place threads it;
+  unit-tested. NEXT (template render): a consumer that stamps a template's PlacedParts -- image parts ->
+  sprite from Binds, text parts -> resolve Binds to live data (else the sample) -- driven off the
+  manifest. BLOCKED on Claude Design authoring per-part `binds` in the templates (they ship only
+  `sample` today; see Asset gaps). Once bound, render coreCard/legendRow/etc. from the manifest instead
+  of hand-code. Separately: position-drive a whole screen as a unit (build is dense -> wholesale, not
+  piecemeal, to avoid mixed coord systems).
   cityNode is labels-only; castle stays the generic node icon (procedural castle parked — not
   mission-critical). REVIEW FIXES:
   * coreCard figure is HARDCODED (`image: …/chassis/grunt.png` sample) — BIND each card's image to its
@@ -200,6 +204,12 @@ from primitives. Route each to Claude Design. (Art direction: DESIGN_SPEC §13.)
   raiders bandit/skeleton, castle ogre/troll). STILL UNUSED: wraith (PARTIAL art — only 12 of the
   21 part files, renders with gaps) and gargoyle (24 files, nonstandard part layout) — both need art
   completion/normalization before wiring.
+- MANIFEST per-part `binds` (blocks manifest template-render): the templates (coreCard/legendRow/…) ship
+  parts with only a `sample` placeholder, no per-part `binds` key — so the consumer can't map each part
+  to live data. Author `binds` per part (figure/title/archetype/str/…) so cards render from the manifest.
+  Model side is ready (`TemplatePart.Binds`). Also: newrun + campaign SUBTITLE `content` is truncated in
+  layout.json (shell keeps a hand copy); the newrun `beginBtn` is 120px — clips "BEGIN THE MARCH" (shell
+  keeps a wider hand button). Widen/repair when convenient.
 
 ## Debt (active — with reconcile trigger)
 - BUILD screen attribute readout + gate markers DONE. Still lacks inventory tabs (gear/tech/minions) +

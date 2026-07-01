@@ -34,6 +34,29 @@ public class CardTemplateTests
     }
 
     [Fact]
+    public void PlaceCarriesImageAndPerPartBinds()
+    {
+        // A card part can be an image slot or a text slot, and names the live datum it binds at render.
+        var t = new Template
+        {
+            Size = new[] { 100, 40 },
+            Parts = new[]
+            {
+                new TemplatePart { Rect = new[] { 2, 3, 20, 20 }, Image = "fig.png", Binds = "figure" },
+                new TemplatePart { Rect = new[] { 30, 4, 60, 8 }, Sample = "Name", Binds = "title" },
+            },
+        };
+
+        var placed = CardTemplate.Place(t, 100, 200);
+
+        Assert.Equal(new LayoutRect(102, 203, 20, 20), placed[0].Rect);
+        Assert.Equal("fig.png", placed[0].Image);
+        Assert.Equal("figure", placed[0].Binds);
+        Assert.Equal("title", placed[1].Binds);
+        Assert.Null(placed[1].Image);
+    }
+
+    [Fact]
     public void PlaceTranslatesPartsByTheOrigin()
     {
         var tech = Manifest().Templates["techCard"];
