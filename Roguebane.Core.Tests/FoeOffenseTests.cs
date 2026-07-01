@@ -1,8 +1,8 @@
 namespace Roguebane.Core.Tests;
 
-// G1 (foe-fights-back): a structured, armed foe runs its own caster on the player; it erodes the
-// player's PARTS (§8, not raw HP — HP only via part-overkill); the player can lose; and smashing the
-// foe's parts cascades its attacks off — the mirror of player degradation.
+// G1 (foe-fights-back): a structured, armed foe runs its own caster on the player; each hit takes a
+// player PART and HP together (§8); the player can lose; and smashing the foe's parts cascades its
+// attacks off — the mirror of player degradation.
 public class FoeOffenseTests
 {
     // A single-part body: every personality picks the lone standing part, so these stay deterministic.

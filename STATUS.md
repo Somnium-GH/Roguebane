@@ -62,9 +62,17 @@ LAYOUT_CONTRACT §10-11 (fidelity primitives + 1080). Priority order:
      coverage stays in MitigationTests. 271 Core green; Game builds. Plate armour now INERT -> flagged
      NEEDS HUMAN in Shops.cs (give plate a role or retire the kind).]
    - **ENEMY HEAL**: must run on a real tuned technique (same system as the player), can't out-tick the
-     player's healing — not a fast free regen.
+     player's healing — not a fast free regen. [MECHANISM READY: a heal in a foe's Arsenal is run by its
+     own offense caster and repairs the foe's PARTS (§10), proven in FoeSymmetryTests. STILL LIVE + off-
+     model: Encounter.BossRestoreTick is a free HP tick (Sieges.Castle/ArmedCastle restoreAmount/Every) —
+     removing it + moving the castle to a real part-heal reshapes the DPS-race the BALANCE SIM asserts
+     (BalanceSimTests: glass build must lose the castle race). NEEDS HUMAN: the castle needs PARTS to heal
+     + re-tuned thesis numbers. Not guessed here.]
    - **SYMMETRY**: enemies act through the SAME technique/attribute/shield/heal framework as the player
-     (shared sim). Refactor toward this; exceptions few + obvious.
+     (shared sim). Refactor toward this; exceptions few + obvious. [PROVEN + LOCKED: FoeSymmetryTests show
+     a foe's own offense caster runs the §10 part-heal AND the §6b shield on the foe body, mid-Battle,
+     identical to the player — no code change, the framework already is symmetric. Only remaining
+     asymmetry = the castle free-restore tick above (flagged needs-human).]
    - BUG (no clean repro yet): firing after a weapon charges while UNTARGETED misbehaves — watch as the
      targeting FSM is refined.
 7. Carry-over review fixes (already tracked below): coreCard per-core figure bind, add `✦ ◉ ✓` glyphs,
