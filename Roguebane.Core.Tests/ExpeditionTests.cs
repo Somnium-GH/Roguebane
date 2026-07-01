@@ -144,24 +144,6 @@ public class ExpeditionTests
         Assert.Equal(gold - 3, exp.Gold);
     }
 
-    [Fact]
-    public void PotionsAreBoughtAtMerchantsAndRepairPartsOutOfCombat()
-    {
-        var exp = FullLoadout();
-        exp.Enter("a1"); FightToEnd(exp); // bank + spoils
-        // wound a part directly to observe repair
-        var arm = exp.Player.Body.Parts.First(p => p.Stat == Stat.Str);
-        exp.Player.Body.Damage(arm, 2);
-        var hurt = exp.Player.Body.Contribution(arm);
-
-        exp.Enter("b");
-        Assert.True(exp.BuyPotion());
-        Assert.Equal(1, exp.Potions);
-
-        Assert.True(exp.UsePotion()); // out of combat (Choosing)
-        Assert.Equal(0, exp.Potions);
-        Assert.True(exp.Player.Body.Contribution(arm) > hurt); // part repaired
-    }
 
     [Fact]
     public void TheMerchantSellsAWeaponIntoTheStashPack()
@@ -220,17 +202,6 @@ public class ExpeditionTests
         exp.Enter("a1"); // a fight, not a merchant
         Assert.False(exp.BuyWeapon(Armory.Dagger));
         Assert.False(exp.BuyArmor(Shops.Plate));
-    }
-
-    [Fact]
-    public void PotionsCannotBeUsedMidFight()
-    {
-        var exp = FullLoadout();
-        exp.Enter("a1"); FightToEnd(exp);
-        exp.Enter("b"); exp.BuyPotion();
-        exp.Enter("c2"); // a fight starts
-        Assert.Equal(ExpeditionState.Fighting, exp.State);
-        Assert.False(exp.UsePotion()); // sealed during combat
     }
 
     [Fact]

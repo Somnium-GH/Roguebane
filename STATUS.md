@@ -41,7 +41,11 @@ LAYOUT_CONTRACT §10-11 (fidelity primitives + 1080). Priority order:
      the war party — remove any forward-only restriction. [DONE: RunMap edges are now traversable both
      ways (undirected Adjacent()); MoveTo still spends a supply + advances the war party; tested.]
    - Merchant = **HP HEALING only** (gold → HP at 1 HP per randomized cost, loot-bounded). No potion
-     purchases (potions are heal-body-part techniques).
+     purchases (potions are heal-body-part techniques). [DONE (removal): the whole potion ITEM economy is
+     gone — Stash.Potions/AddPotion/TryUsePotion, Expedition.BuyPotion/UsePotion/Potions, the merchant
+     P/U buttons + the potion readout; merchant keeps BuyHeal (H, gold->HP). Tests reconciled (279 Core).
+     TUNING TODO: the "1 HP per randomized cost, loot-bounded" incremental buy — BuyHeal is still flat
+     gold->full-HP at cost 3; needs a per-HP randomized price + a run rng.]
    - **AUTO-attack is GLOBAL, not per-weapon**: on = a fired weapon re-fires on its next charge at the
      kept target. Fix the per-weapon coupling.
    - **DAMAGE**: every hit applies part damage AND hp damage simultaneously; only a shield block or full
@@ -69,6 +73,42 @@ DrawFoe draws the ONE enemy LARGE on the right (name tag + HP + limb bands); the
 ATTRIBUTE POOL panel is back (pips moved out of the YOU panel); the ACTION BAR moved bottom-right with
 adaptive card pitch (ActionCardRect fits N cards beside the pool, before the AUTO/PAUSE/RETREAT verbs).
 Smoke-verified vs design/01. Multi-foe capability fully dropped.]
+
+**CHARGE = the shield-pierce resource (2026-06-30).** Human kept + NAMED the resource **Charge** and
+REDEFINED it (see DESIGN_SPEC §6b/§10/§14/§17/§18). Directives:
+1. **Charge fuels SHIELD-IGNORING techniques only** — drop the old "magic-tier verb costs charge" rule.
+   A technique that ignores the shield pool requires + spends Charge per use (dry → holds the pierce). Add
+   a `ShieldPiercing`/`IgnoresShield` concept to Technique; wire the Charge spend to THAT, not to "magic."
+   Shield-piercing damage bypasses the shield pool entirely.
+2. **Fix `Paths.Maelstrom`** — it carries `ChargeCost:1` as a "magic-tier verb" (old rule). Remove the
+   charge cost unless it is actually shield-piercing; drop the "draws the finite charge" comment.
+3. **`Minion.AltCost` paying Charge** is off-definition (Charge = shield-pierce, not summon fuel). §9's
+   alt-cost example is HP — reconcile alt-cost summons to a DESIGNED cost (HP or a stat), not Charge.
+4. **BOWS (new, shield-ignoring):** spec + implement a bow weapon type (DEX, §6) whose attacks bypass the
+   shield pool and cost Charge; add tests. At least ONE starting Core rune ships a bow in its default
+   loadout [WHICH core = needs-human; suggest the DEX Reaver or a ranged identity]. Bow ASSET (sprite +
+   hand-mount pivot) is a Claude Design need — mark BLOCKED on art, use a placeholder meanwhile.
+5. **AUDIT — no undesigned mechanics (new CLAUDE.md + loop guardrail):** sweep code + sample/test content
+   for invented mechanics/effects/resources/conditions absent from DESIGN_SPEC. Known: the Charge misuse
+   above; the aether-referencing Hollow Vessel effect (spec §11 effect is OPEN — code grants placeholder
+   +CON; leave as neutral sample, do NOT invent 'regenerating aether'); the Vessel/Resonance/Tempest/
+   Conclave sample NAMES (placeholder — mechanically fine, rename only if cheap). Neutralize/flag, don't
+   invent.
+
+**STRESS TEST — add the RANGER Core rune (2026-06-30).** Human wants to exercise the "content is DATA,
+not code" invariant by adding a 6th core. Add **Ranger** as DATA ONLY — a new `Chassrium` entry + append
+to `Roster`; NO new classes. **REPORT in STATUS whether anything beyond data was required** — any code or
+test-shape ripple is the finding (it tells us how leak-free the extensibility really is).
+- Spec (placeholder stats, tune later): id `ranger`, Archetype "THE MARKSMAN", `StandardBody` str4/int3/
+  dex8/con4, RuneBudget 12, RuneDiscount 0, Bays 0. Flavor ~ "Strikes from range with a shield-piercing
+  bow; high DEX, thin armour — answers before the wall matters."
+- LOADOUT: Ranger's primary is the **bow** (shield-ignoring, Charge — the bow work above). SEQUENCE: land
+  the bow first, then Ranger's default loadout = bow Shot + Brace + Bandage. If Ranger is added before the
+  bow exists, use existing techniques so it compiles, then swap the bow in.
+- Race-gating: allow Human + Elf (both plausible archers); the race↔core matrix is OPEN (§17) — don't
+  over-build gating if it isn't wired yet.
+- FIGURE ART: Ranger needs a figure sprite (`human_ranger`, `elf_ranger`) — a Claude Design need; NewGame
+  will show a fallback/placeholder card until it lands (expected, not a bug).
 
 ## Current target
 **RE-OPEN RESOLVED (both threads cleared) — POC functionally complete again.**

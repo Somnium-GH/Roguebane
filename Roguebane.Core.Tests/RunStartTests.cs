@@ -36,11 +36,10 @@ public class RunStartTests
         Assert.True(exp.Player.Hp <= exp.Player.MaxHp);
         Assert.NotEmpty(exp.Player.Body.Parts);
 
-        // Run-resource readouts (supplies / war-party / support / gold / potions).
+        // Run-resource readouts (supplies / war-party / support / gold).
         Assert.True(exp.Map.WarPartyDistance > 0);
         Assert.True(exp.Map.SupportBank >= 0);
         Assert.True(exp.Gold >= 0);
-        Assert.True(exp.Potions >= 0);
 
         // Bay lane + loadout/gear bar sources are readable (the crash was drawing the gear bar).
         Assert.True(exp.Bays >= 0);

@@ -1,20 +1,16 @@
 namespace Roguebane.Core;
 
-// The persistent run economy — gold, carried consumables, and the gear pack (unequipped weapons +
-// armor). Lives above a single Expedition so it carries across the legs of a campaign.
+// The persistent run economy — gold and the gear pack (unequipped weapons + armor). Lives above a
+// single Expedition so it carries across the legs of a campaign. (Potions are gone: part-heals are
+// in-combat techniques now, not buyable items — 2026-06-30 directive.)
 public sealed class Stash
 {
     public int Gold { get; private set; }
-    public int Potions { get; private set; }
 
     private readonly List<Weapon> _weapons = new(); // carried but not wielded
     private readonly List<Armor> _armor = new();    // carried but not worn
 
-    public Stash(int gold = 0, int potions = 0)
-    {
-        Gold = gold;
-        Potions = potions;
-    }
+    public Stash(int gold = 0) => Gold = gold;
 
     // The gear pack: gear acquired (found/bought) sits here until equipped onto the body, and returns
     // here when unequipped or displaced. (Acquisition wiring — drops/shop — is a separate slice.)
@@ -39,15 +35,6 @@ public sealed class Stash
         if (cost < 0) throw new ArgumentOutOfRangeException(nameof(cost));
         if (Gold < cost) return false;
         Gold -= cost;
-        return true;
-    }
-
-    public void AddPotion() => Potions++;
-
-    public bool TryUsePotion()
-    {
-        if (Potions == 0) return false;
-        Potions--;
         return true;
     }
 }

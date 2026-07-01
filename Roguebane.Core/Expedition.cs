@@ -47,15 +47,11 @@ public sealed class Expedition
     public IReadOnlyList<Technique> Loadout => _loadout;
     public IReadOnlyList<MapNode> Options => Map.Options;
 
-    // The economy: spoils from cleared nodes buy repair potions at merchants. Potions restore PARTS
-    // (the healing split — never HP); HP refills only via the merchant service. The Stash carries
-    // gold and potions across the legs of a campaign.
+    // The economy: spoils from cleared nodes fund the merchant's HP service (part-heals are in-combat
+    // techniques, not buyable). The Stash carries gold + the gear pack across the legs of a campaign.
     public Stash Stash => _stash;
     public int Gold => _stash.Gold;
-    public int Potions => _stash.Potions;
 
-    private const int PotionCost = 4;
-    private const int PotionRepair = 2; // restored to every damaged part — low scale
     private const int HealCost = 3;
 
     private static int Spoils(NodeType type) => type switch
@@ -102,22 +98,6 @@ public sealed class Expedition
         State == ExpeditionState.Choosing && Gearing.EquipArmor(_stash, _player.Body, armor);
     public bool UnequipArmor(Stat group) =>
         State == ExpeditionState.Choosing && Gearing.UnequipArmor(_stash, _player.Body, group);
-
-    // Spend spoils on a repair potion (carried for later) at a merchant.
-    public bool BuyPotion()
-    {
-        if (!AtMerchant || !_stash.TrySpend(PotionCost)) return false;
-        _stash.AddPotion();
-        return true;
-    }
-
-    // Use a carried potion to repair the body — out of combat only (between jumps / fights).
-    public bool UsePotion()
-    {
-        if (State != ExpeditionState.Choosing || !_stash.TryUsePotion()) return false;
-        foreach (var part in _player.Body.Parts) _player.Body.Repair(part, PotionRepair);
-        return true;
-    }
 
     // Pay a merchant for the out-of-combat HP service.
     public bool BuyHeal()
@@ -169,7 +149,7 @@ public sealed class Expedition
 
         var node = Map.Current;
         if (node.Type == NodeType.Merchant)
-            return true; // stay at the merchant: BuyPotion / BuyHeal / UsePotion are the verbs here
+            return true; // stay at the merchant: BuyHeal / buy gear are the verbs here
 
         Battle = new Battle(_caster, Maps.EncounterFor(node, Map.SupportBank), _player, Seed(node.Id));
         State = ExpeditionState.Fighting;

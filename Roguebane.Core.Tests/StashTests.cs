@@ -3,8 +3,8 @@ using Roguebane.Core.Content;
 
 namespace Roguebane.Core.Tests;
 
-// The Stash is the persistent run economy (gold / potions / gear pack). These pin its invariants
-// directly — the spend/use guards and the carry-pack add/remove — independent of the Expedition.
+// The Stash is the persistent run economy (gold / gear pack). These pin its invariants directly —
+// the spend guards and the carry-pack add/remove — independent of the Expedition.
 public class StashTests
 {
     [Fact]
@@ -23,15 +23,6 @@ public class StashTests
         var s = new Stash();
         Assert.Throws<ArgumentOutOfRangeException>(() => s.AddGold(-1));
         Assert.Throws<ArgumentOutOfRangeException>(() => s.TrySpend(-1));
-    }
-
-    [Fact]
-    public void PotionsUseDownToEmpty()
-    {
-        var s = new Stash(potions: 1);
-        Assert.True(s.TryUsePotion());
-        Assert.Equal(0, s.Potions);
-        Assert.False(s.TryUsePotion()); // empty
     }
 
     [Fact]

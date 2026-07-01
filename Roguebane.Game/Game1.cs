@@ -277,9 +277,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         if (Exp.AtMerchant)
         {
-            if (Pressed(keys, Keys.P) || Click(MerchPotionRect)) Exp.BuyPotion();
-            if (Pressed(keys, Keys.H) || Click(MerchHealRect)) Exp.BuyHeal();
-            if (Pressed(keys, Keys.U) || Click(MerchUseRect)) Exp.UsePotion();
+            if (Pressed(keys, Keys.H) || Click(MerchHealRect)) Exp.BuyHeal(); // HP healing only (no potions)
 
             // Buy a gear chip into the Stash pack (weapons first, then armor — same order as drawn).
             var ws = Exp.OfferedWeapons;
@@ -400,10 +398,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         Stat.Int => 'H', Stat.Str => 'A', Stat.Con => 'C', Stat.Dex => 'L', _ => '?',
     };
-    // Merchant verb buttons + gear chips — mirror DrawMerchant's panel origin (560,300) + offsets.
-    private static readonly Rectangle MerchPotionRect = new(574, 344, 330, 30);
-    private static readonly Rectangle MerchUseRect = new(574, 378, 330, 30);
-    private static readonly Rectangle MerchHealRect = new(574, 412, 330, 30);
+    // Merchant verb button + gear chips — mirror DrawMerchant's panel origin (560,300) + offsets.
+    private static readonly Rectangle MerchHealRect = new(574, 344, 330, 30);
     private static Rectangle MerchGearRect(int i) => new(574 + i * 112, 472, 104, 30);
 
     private void ToggleFullscreen()
@@ -745,10 +741,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         Panel(x, y, 360, 220);
         Text(_assets.Display, "MERCHANT", x + 14, y + 10, Ink);
-        DrawButton($"P  buy potion (4)   x{Exp.Potions}", x + 14, y + 44, 330, 30,
-            Exp.Gold >= 4, Keys.P);
-        DrawButton("U  use potion  (repair)", x + 14, y + 78, 330, 30, Exp.Potions > 0, Keys.U);
-        DrawButton("H  heal hp     (3)", x + 14, y + 112, 330, 30,
+        // HP healing only — part-heals are in-combat techniques now, not buyable potions.
+        DrawButton("H  heal hp     (3)", x + 14, y + 44, 330, 30,
             Exp.Gold >= 3 && Exp.Player.Hp < Exp.Player.MaxHp, Keys.H);
 
         // The gear stock as a compact row of buy chips (name + price); dim when unaffordable / sold.
@@ -769,19 +763,12 @@ public class Game1 : Microsoft.Xna.Framework.Game
         }
     }
 
-    // The run's resource readout: supplies, war-party distance, banked support, gold, potions.
-    // Compact top-bar counts: gold + potions only. Supplies and mustered support moved to their
-    // design/03 panels (DrawSupplyPanels); the war-party distance reads off its own track.
+    // The compact top-bar readout: gold only. Supplies + mustered support are in their design/03 panels
+    // (DrawSupplyPanels); the war-party distance reads off its own track; potions are gone.
     private void DrawRunResources(int x, int y)
     {
-        DrawStat(_assets.Resource("spoils"), Exp.Gold, x);
-        DrawStat(_assets.Resource("hp"), Exp.Potions, x + 110);
-
-        void DrawStat(Texture2D? icon, int value, int sx)
-        {
-            Sprite(icon, sx, y, 22, 22, Color.White);
-            Text(_assets.Mono, value.ToString(), sx + 26, y + 4, Ink);
-        }
+        Sprite(_assets.Resource("spoils"), x, y, 22, 22, Color.White);
+        Text(_assets.Mono, Exp.Gold.ToString(), x + 26, y + 4, Ink);
     }
 
     // New Run screen (design/05): the roster as a card grid — figure, identity, stat block, flavor —
