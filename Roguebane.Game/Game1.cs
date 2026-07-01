@@ -88,7 +88,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         {
             _build.CycleChassis(3);          // -> the Summoner (3 bays; fields Skeleton+Shade) for the bay lane
             _build.Toggle(Techniques.Jab);   // add a STR card for variety on the bar
-            _campaign = _build.March(Maps.StandardLegs(3));
+            _campaign = _build.Redeploy(Maps.StandardLegs(3));
             _screen = Screen.Run;
             foreach (var t in Exp.Loadout) _campaign.Toggle(t); // power the bar (both shots)
             // (build/newrun smoke handled after this block)
@@ -216,7 +216,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         var march = (Pressed(keys, Keys.Enter) && !keys.IsKeyDown(Keys.LeftAlt)) || Click(RedeployRect);
         if (march)
         {
-            _campaign = _build.March(Maps.StandardLegs(3));
+            _campaign = _build.Redeploy(Maps.StandardLegs(3));
             // Techniques start INACTIVE: the bar is slotted but nothing is reserved/aimed/firing until
             // the player clicks a card. (No auto-arm — that bug had the whole bar auto-targeting.)
             _screen = Screen.Run;
@@ -225,7 +225,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     private void UpdateRun(KeyboardState keys, GameTime gameTime)
     {
-        if (_campaign.State != CampaignState.Marching) return; // settled: hold the end overlay
+        if (_campaign.State != CampaignState.Redeploying) return; // settled: hold the end overlay
         if (Exp.State == ExpeditionState.Fighting) UpdateCombat(keys, gameTime);
         else if (Exp.State == ExpeditionState.Cleared)
         {
@@ -237,7 +237,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private void UpdateCombat(KeyboardState keys, GameTime gameTime)
     {
         if (Pressed(keys, Keys.Space) || Click(PauseRect)) _paused = !_paused;
-        if (Pressed(keys, Keys.F) || Click(RetreatRect)) Exp.Flee();
+        if (Pressed(keys, Keys.F) || Click(RetreatRect)) Exp.Retreat();
         if (Pressed(keys, Keys.Tab) || Click(AutoRect)) _ctrl.ToggleAuto(Exp); // ONE global toggle
 
         // The targeting FSM lives in Core (CombatTargeting); the shell only feeds it press intents.
@@ -1373,7 +1373,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private void DrawStateOverlay()
     {
         // A cleared fight: dim the field, name the win, and offer REDEPLOY (no silent return to the map).
-        if (_campaign.State == CampaignState.Marching && Exp.State == ExpeditionState.Cleared)
+        if (_campaign.State == CampaignState.Redeploying && Exp.State == ExpeditionState.Cleared)
         {
             Rect(0, 0, W, H, new Color(20, 45, 30, 120));
             var s = _assets.Display.MeasureString("NODE CLEARED");
@@ -1394,7 +1394,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
             Rect(0, 0, W, H, o.tint);
             var size = _assets.Display.MeasureString(o.label);
             Text(_assets.Display, o.label, (int)(W / 2 - size.X / 2), H / 2 - 12, Ink);
-            if (_campaign.State != CampaignState.Marching)
+            if (_campaign.State != CampaignState.Redeploying)
                 Text(_assets.Mono, "Esc to quit", W / 2 - 40, H / 2 + 20, Muted);
         }
     }

@@ -244,7 +244,7 @@ public class ExpeditionTests
 
         var fled = FullLoadout();
         fled.Enter("a1");
-        fled.Flee();
+        fled.Retreat();
         Assert.Equal(0, fled.Map.SupportBank); // abandoned mid-fight -> nothing banked
     }
 

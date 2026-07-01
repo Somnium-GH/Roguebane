@@ -83,7 +83,7 @@ public sealed class Battle
         if (_encounter.Cleared) Outcome = BattleOutcome.Cleared;
     }
 
-    public void Flee()
+    public void Retreat()
     {
         if (Outcome == BattleOutcome.Ongoing) Outcome = BattleOutcome.Fled;
     }

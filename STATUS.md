@@ -132,7 +132,10 @@ across the 30-file audit:
   chassis/` dir + entries; design docs. Figure keys also go `human_<core>` (earlier directive).
 - **RunMap → CityMap** (`RunMap.cs`→`CityMap.cs`, RunMap*Tests, all refs).
 - Finish the Core-API renames the shell pass left as-is (no compat): **Expedition.Flee → Retreat**,
-  **BuildSession.March → Redeploy**, **CampaignState.Marching → Redeploying**.
+  **BuildSession.March → Redeploy**, **CampaignState.Marching → Redeploying**. [DONE: renamed everywhere
+  (Battle/Session/Expedition.Flee -> Retreat; BuildSession.March -> Redeploy; CampaignState.Marching ->
+  Redeploying) across Core + Game1 + tests, incl. residual test labels; RunMapOutcome.Marching left
+  (that's the RunMap->CityMap rename's scope). 280 Core green, smoke clean.]
 - **NewRun residuals → NewGame**; manifest LOOKUP ids `newrun`/`build`/`runmap` → `newgame`/`equipment`/
   `citymap` (game side now; Claude Design renames the manifest ids in sync — CD payload).
 - **Drop the compat surfaces** earlier passes kept: the `Foes`/`CurrentTarget` 1-element shim (single-foe

@@ -97,13 +97,13 @@ public class BuildSessionTests
     }
 
     [Fact]
-    public void MarchSendsTheChosenBodyDownTheCampaignSpine()
+    public void RedeploySendsTheChosenBodyDownTheCampaignSpine()
     {
         var build = New();
 
-        var campaign = build.March(Maps.StandardLegs(3));
+        var campaign = build.Redeploy(Maps.StandardLegs(3));
 
-        Assert.Equal(CampaignState.Marching, campaign.State);
+        Assert.Equal(CampaignState.Redeploying, campaign.State);
         Assert.Equal(3, campaign.LegCount);
         Assert.Equal(0, campaign.LegIndex);
         Assert.Contains(campaign.Current.Loadout, t => t.Id == "jab"); // kit

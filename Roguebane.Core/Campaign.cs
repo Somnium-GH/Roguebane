@@ -2,7 +2,7 @@ namespace Roguebane.Core;
 
 public enum CampaignState
 {
-    Marching, // a leg is underway
+    Redeploying, // a leg is underway
     Won,      // the Capital fell — the campaign is won
     Lost,     // a leg was lost
 }
@@ -22,7 +22,7 @@ public sealed class Campaign
     private int _legIndex;
 
     public Expedition Current { get; private set; }
-    public CampaignState State { get; private set; } = CampaignState.Marching;
+    public CampaignState State { get; private set; } = CampaignState.Redeploying;
 
     public Campaign(
         Fighter player,
@@ -53,7 +53,7 @@ public sealed class Campaign
     // Top-level passthroughs so a driver talks to the campaign, not the swapping leg underneath.
     public bool Enter(string nodeId)
     {
-        if (State != CampaignState.Marching) return false;
+        if (State != CampaignState.Redeploying) return false;
         var ok = Current.Enter(nodeId); // can lose here (war party overrun on the jump)
         Advance();
         return ok;
@@ -76,7 +76,7 @@ public sealed class Campaign
 
     public void Tick()
     {
-        if (State != CampaignState.Marching) return;
+        if (State != CampaignState.Redeploying) return;
         Current.Tick();
         Advance();
     }

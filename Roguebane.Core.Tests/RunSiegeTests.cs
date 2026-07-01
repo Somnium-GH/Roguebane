@@ -67,13 +67,13 @@ public class RunSiegeTests
     }
 
     [Fact]
-    public void FleeEndsTheBattleWithoutClearingIt()
+    public void RetreatEndsTheBattleWithoutClearingIt()
     {
         var hold = Stronghold(frontHp: 50, restoreAmount: 0, restoreEvery: 0);
         var battle = new Battle(Attacker(Drain), hold);
 
         battle.Step();
-        battle.Flee();
+        battle.Retreat();
         battle.Step();
 
         Assert.Equal(BattleOutcome.Fled, battle.Outcome);

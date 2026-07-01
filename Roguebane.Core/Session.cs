@@ -43,10 +43,10 @@ public sealed class Session
         else _caster.Activate(technique);
     }
 
-    public void Flee()
+    public void Retreat()
     {
         if (State != SessionState.Fighting) return;
-        Battle.Flee();
+        Battle.Retreat();
         State = SessionState.Fled;
     }
 

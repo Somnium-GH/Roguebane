@@ -193,10 +193,10 @@ public sealed class Expedition
     }
 
     // RETREAT: break off an ACTIVE fight and fall back to the chart (the war party keeps coming).
-    public void Flee()
+    public void Retreat()
     {
         if (State != ExpeditionState.Fighting) return;
-        Battle?.Flee();
+        Battle?.Retreat();
         State = ExpeditionState.Choosing;
     }
 }

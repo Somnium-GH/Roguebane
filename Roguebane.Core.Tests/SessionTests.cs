@@ -30,10 +30,10 @@ public class SessionTests
     }
 
     [Fact]
-    public void FleeEndsTheSession()
+    public void RetreatEndsTheSession()
     {
         var s = Sessions.Demo();
-        s.Flee();
+        s.Retreat();
         Assert.Equal(SessionState.Fled, s.State);
 
         for (var i = 0; i < 5; i++) s.Tick(); // inert once fled

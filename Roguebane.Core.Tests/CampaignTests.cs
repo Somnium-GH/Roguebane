@@ -48,7 +48,7 @@ public class CampaignTests
 
         ClearLeg(c);
 
-        Assert.Equal(CampaignState.Marching, c.State);
+        Assert.Equal(CampaignState.Redeploying, c.State);
         Assert.Equal(1, c.LegIndex);
         Assert.Equal("camp", c.Current.Map.CurrentId); // a fresh leg
     }

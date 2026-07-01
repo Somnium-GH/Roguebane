@@ -79,6 +79,6 @@ public sealed class BuildSession
     public Expedition Embark(RunMap map) => Forge.Embark(Chassis, _runes, Loadout, map);
 
     // March the whole campaign: the chosen body carries through every leg to the Capital.
-    public Campaign March(IReadOnlyList<Func<RunMap>> legs) =>
+    public Campaign Redeploy(IReadOnlyList<Func<RunMap>> legs) =>
         Forge.EmbarkCampaign(Chassis, _runes, Loadout, legs);
 }

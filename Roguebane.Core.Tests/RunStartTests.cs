@@ -3,7 +3,7 @@ using Roguebane.Core.Content;
 namespace Roguebane.Core.Tests;
 
 // Regression for the run-start CRASH (a stray glyph drawn on the freshly-started MAP screen). Drives
-// the shell's exact start path -- build a chassis, March a campaign -- and locks the render-facing
+// the shell's exact start path -- build a chassis, Redeploy a campaign -- and locks the render-facing
 // contract the map screen reads at run-start, so a future regression that guts that state fails here
 // headlessly instead of only at draw time. (The glyph fold itself is covered by GlyphSafeTests.)
 public class RunStartTests
@@ -11,7 +11,7 @@ public class RunStartTests
     private static Expedition StartedRun()
     {
         var build = Sessions.NewBuild();
-        var campaign = build.March(Maps.StandardLegs(3));
+        var campaign = build.Redeploy(Maps.StandardLegs(3));
         return campaign.Current; // the leg the run screen renders (Exp in the shell)
     }
 
