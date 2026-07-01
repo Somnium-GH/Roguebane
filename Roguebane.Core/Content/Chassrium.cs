@@ -19,7 +19,9 @@ public static class Chassrium
         StandardBody("grunt", str: 4, intel: 3, dex: 4, con: 4),
         RuneBudget: 24,
         RuneDiscount: 1,
-        DefaultLoadout: new[] { Techniques.Jab, Techniques.Brace });
+        DefaultLoadout: new[] { Techniques.Jab, Techniques.Brace },
+        Archetype: "THE GENERALIST",
+        Flavor: "No edge, no hole. A fat budget of cheap runes climbs into any keystone you pay for.");
 
     // A caster specialist: high INT, tight budget.
     public static readonly Chassis Adept = new(
@@ -27,7 +29,9 @@ public static class Chassrium
         StandardBody("adept", str: 4, intel: 10, dex: 4, con: 5),
         RuneBudget: 10,
         RuneDiscount: 0,
-        DefaultLoadout: new[] { Techniques.Ember, Techniques.Drain });
+        DefaultLoadout: new[] { Techniques.Ember, Techniques.Drain },
+        Archetype: "THE SCHOLAR",
+        Flavor: "Frail chest, one arm - but a deep INT head for spells and the widest action bar.");
 
     // The Wall: STR-CON tank built to hold the line — fat chest, modest budget, no bays.
     public static readonly Chassis Warden = new(
@@ -36,7 +40,9 @@ public static class Chassrium
         RuneBudget: 12,
         RuneDiscount: 0,
         Bays: 0,
-        DefaultLoadout: new[] { Techniques.Cleave, Techniques.Brace });
+        DefaultLoadout: new[] { Techniques.Cleave, Techniques.Brace },
+        Archetype: "THE WALL",
+        Flavor: "Armour on every limb, no bay, fewer actions - soaks blows and holds the line.");
 
     // The Binder: an INT core that fights through summons — three bays, INT funds them all.
     public static readonly Chassis Summoner = new(
@@ -46,7 +52,9 @@ public static class Chassrium
         RuneDiscount: 0,
         Bays: 3,
         DefaultLoadout: new[] { Techniques.Ember, Techniques.Brace },
-        DefaultMinions: new[] { Minions.Skeleton, Minions.Shade }); // a Binder fields summons from the off
+        DefaultMinions: new[] { Minions.Skeleton, Minions.Shade }, // a Binder fields summons from the off
+        Archetype: "THE BINDER",
+        Flavor: "Three bays - fights through a war-party of summons while staying back. INT funds them all.");
 
     // The Duelist: glass-cannon STR-DEX, thin chest, no bays — ends parts before they answer.
     public static readonly Chassis Reaver = new(
@@ -55,7 +63,9 @@ public static class Chassrium
         RuneBudget: 12,
         RuneDiscount: 0,
         Bays: 0,
-        DefaultLoadout: new[] { Techniques.Lunge, Techniques.Jab });
+        DefaultLoadout: new[] { Techniques.Lunge, Techniques.Jab },
+        Archetype: "THE DUELIST",
+        Flavor: "No shield, twin blades. Glass-cannon STR-DEX - ends parts before they answer.");
 
     // Roster order matches design/05's Choose-Your-Core line-up. Stat/budget values are placeholder
     // (tuning is a "Needs human" touchpoint); slot/bay/action-count shapes wait on those systems.

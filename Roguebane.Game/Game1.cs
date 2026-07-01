@@ -755,7 +755,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
         var preview = _build.Preview();
         Panel(40, 90, 240, 410);
-        Text(_assets.Mono, _build.Chassis.Id.ToUpper(), 56, 100, Muted);
+        Text(_assets.Mono, _build.Chassis.Title.ToUpper(), 56, 100, Muted);
         var figBox = _ui.ElementRect("build", "paperDoll") ?? new Rectangle(100, 104, 120, 215);
         DrawFigureIn(preview, _build.Chassis.Id, "build", "paperDoll", 160, 470, 360);
         DrawAnatomyTags(figBox);
@@ -781,6 +781,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         var baseBody = c.NewBody();
         Panel(x, y, 220, 190);
         Text(_assets.Display, "CURRENT CORE", x + 12, y + 10, Ink);
+        Text(_assets.Mono, c.Archetype, x + 12, y + 28, Amber); // design/05 archetype tagline
         var row = y + 44;
         void Line(string k, string v) { Text(_assets.Mono, k, x + 12, row, Muted);
             Text(_assets.Mono, v, x + 150, row, Ink); row += 22; }

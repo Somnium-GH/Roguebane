@@ -12,8 +12,13 @@ public sealed record Chassis(
     int RuneDiscount = 0,
     int Bays = 1,
     IReadOnlyList<Technique>? DefaultLoadout = null,
-    IReadOnlyList<Minion>? DefaultMinions = null)
+    IReadOnlyList<Minion>? DefaultMinions = null,
+    string Archetype = "",  // the one-line identity ("THE GENERALIST") shown on the New Run / build cards
+    string Flavor = "")     // the card's short pitch (design/05)
 {
+    // Display name for the cards ("grunt" -> "Grunt"); the Id stays the lowercase content key.
+    public string Title => string.IsNullOrEmpty(Id) ? Id : char.ToUpperInvariant(Id[0]) + Id[1..];
+
     public IReadOnlyList<Technique> Kit => DefaultLoadout ?? Array.Empty<Technique>();
 
     // The minions the chassis fields from the start (summoned into its bays at assembly), the minion

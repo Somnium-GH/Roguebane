@@ -14,6 +14,20 @@ public class ChassisRosterTests
     }
 
     [Fact]
+    public void EveryChassisCarriesADisplayIdentity()
+    {
+        // design/05 cards need a title, an archetype tagline, and a flavor pitch per core.
+        foreach (var c in Chassrium.Roster)
+        {
+            Assert.False(string.IsNullOrEmpty(c.Archetype), $"{c.Id} archetype");
+            Assert.False(string.IsNullOrEmpty(c.Flavor), $"{c.Id} flavor");
+            Assert.Equal(char.ToUpperInvariant(c.Id[0]), c.Title[0]); // "grunt" -> "Grunt"
+        }
+        Assert.Equal("THE WALL", Chassrium.Warden.Archetype);
+        Assert.Equal("Grunt", Chassrium.Grunt.Title);
+    }
+
+    [Fact]
     public void EveryChassisMintsAStandardSixPartBody()
     {
         foreach (var chassis in Chassrium.Roster)
