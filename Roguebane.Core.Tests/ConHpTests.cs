@@ -1,9 +1,26 @@
+using Roguebane.Core.Content;
+
 namespace Roguebane.Core.Tests;
 
 // CON->HP: a CON-scaled fighter's MaxHp is a natural base plus 2 HP per CON. Smashing the chest
-// drops CON, shrinking MaxHp and capping current HP down to it.
+// drops CON, shrinking MaxHp and capping current HP down to it. The base comes from the RACE (§7).
 public class ConHpTests
 {
+    [Fact]
+    public void AssembledPlayerHpIsTheRaceBasePlusConBonus()
+    {
+        // §7: the RACE supplies the HP base; CON adds the bonus on top. Human 20 base + 2*CON(3) = 26.
+        var human = Forge.Assemble(Races.Human, CoreRunes.Grunt, CoreRunes.Grunt.NewLoadout(),
+            CoreRunes.Grunt.Kit, Sieges.StandardRun());
+        Assert.Equal(20 + 2 * Races.Human.Con, human.Player.MaxHp);
+
+        // The frailer Elf (14 base, CON 2) ends up lower: 14 + 4 = 18.
+        var elf = Forge.Assemble(Races.Elf, CoreRunes.Grunt, CoreRunes.Grunt.NewLoadout(),
+            CoreRunes.Grunt.Kit, Sieges.StandardRun());
+        Assert.Equal(14 + 2 * Races.Elf.Con, elf.Player.MaxHp);
+        Assert.True(elf.Player.MaxHp < human.Player.MaxHp);
+    }
+
     private static (Body body, BodyPart chest) BodyWithChest(int con)
     {
         var body = new Body();

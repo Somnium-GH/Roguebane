@@ -239,10 +239,8 @@ Decisions:
   stat-identity RosterTests cases (core stat-identity is retired); the thesis "never built for it" is now
   a BUDGET gap not a stat gap. 270 Core green; newgame/build/combat smoke clean. The balance sim was
   UNAFFECTED (Sessions.Demo uses a bespoke DemoBody, not a core).
-  STILL DEFERRED: (a) HP-from-race — PlayerFighter still CON-scales baseHp:8; wiring race.Hp (20/14) needs
-  the base-vs-full-CON-total decision (§ HP model) — NEEDS HUMAN confirm before I pick. (b) Race is not
-  user-selectable yet (two-step Race->Core NewGame off the manifest raceCard is the next slice; assets +
-  binds are landed). (c) figure repoint bare->human_/elf_ + retire bare dirs (CD-coordinated).]
+  STILL DEFERRED: (a) HP-from-race — [RESOLVED + DONE, see SLICE 5 below]. (b) Race is not user-selectable
+  yet [DONE, slice 4]. (c) figure repoint bare->human_/elf_ + retire bare dirs (CD-coordinated).]
   [SLICE 3 DONE (race selection MODEL): BuildSession now holds the race roster + `RaceIndex`/`RaceCount`/
   `RaceRoster`/`Race` + `CycleRace(dir)` (mirrors the CoreRune cycle). A race swap changes body attrs ONLY
   — core budget + slotted kit untouched (all combos allowed, design/05). Sessions.NewBuild feeds
@@ -255,6 +253,15 @@ Decisions:
   Forge). Smoke + screenshot verified (Human 3/3/3/3, elf assets present). Game-only (no headless test);
   the FULL design/05 three-column Race|Core|Loadout redesign + the manifest `raceCard` template are the
   remaining polish — this is the minimal strip that turns the axis on.]
+  [SLICE 5 DONE (HP-from-race): HUMAN DECISION (2026-07-01) — race.Hp is the natural BASE; CON is a bonus
+  ON TOP (1 CON = 2 HP). Chest damage shrinks the bonus (HP caps down); a chest HEAL does NOT refund lost
+  HP — HP lost in a fight is PERMANENT, restored only by the vendor / post-fight recovery (active heals +
+  potions repair PARTS only). The existing Fighter already models exactly this (dynamic MaxHp = base +
+  2*CON, CapToMax on damage, no auto-refund on repair — already locked by ConHpTests.RepairingConDoes-
+  NotRefundHpAlreadyLost). So the only change: PlayerFighter now takes the Race and uses race.Hp as the
+  base (Forge.Assemble/Embark/EmbarkCampaign). Human MaxHp = 20 + 2*3 = 26; Elf = 14 + 2*2 = 18. Test:
+  AssembledPlayerHpIsTheRaceBasePlusConBonus. The bespoke DemoBody sim path keeps the baseHp:8 overload.
+  272 Core green; Game builds.]
 - **ALL race×core combos allowed** (no gating this pass).
 - **Retire the bare asset set:** compose NewGame/Equipment/Loadout figures from the MODULAR race parts
   (`preview.fig`); drop the bare body dirs + flat `chassis/*` thumbnails (mgcb in sync).
@@ -288,6 +295,18 @@ bare `<core>` -> `human_<core>`. 3) VERIFY the content pipeline builds + smokes 
 4) commit CD's asset landing + the schema tests together, green. Manifest LOOKUP screen ids are STILL old
 (`combat`/`build`/`newrun`/`runmap`/`campaign`) — CD hasn't renamed those yet (their TODO); per-part
 `binds` also NOT in this manifest yet (still the arc blocker).
+
+**FIDELITY DRAW = PRIORITY + CD-review follow-ups (2026-06-30).** Hi-fi chrome is the human's top priority
+and it's GATED on the engine draw — bump the fidelity primitives to the FRONT of the queue:
+- **Implement the engine DRAW for `shadow` + 9-slice `frame` + gradient `fill`** (LAYOUT_CONTRACT §10). CD
+  has wired shadow + frame on the pipeline side (data present in the manifest); gradient capture is
+  coming. Until the engine draws these, ALL hi-fi chrome renders flat — this is the critical path.
+- **#8 consumer safety-net:** the template renderer must de-dupe overlapping parts — when two share ~the
+  same rect, prefer the `binds` entry, ignore the sample-only twin. (CD also de-dupes at source.)
+- **binds LANDED** on all 5 screens' templates → manifest-drive coreCard/preview render unblocked (when
+  content lands). But the NewGame **Loadout panel internals + section headers are NOT in the manifest yet**
+  — CD is re-instrumenting them (LAYOUT_CONTRACT §9 completeness). Build the Race/Core columns now; leave
+  the Loadout panel a placeholder until CD's re-instrumented drop — do NOT hand-fake its internals.
 
 ## Current target
 **RE-OPEN RESOLVED (both threads cleared) — POC functionally complete again.**

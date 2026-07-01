@@ -16,7 +16,7 @@ public static class Forge
         // Session is the legacy linear-run + balance-sim path (unattended): keep default-front auto-fire.
         // The interactive targeting FSM lives on the Expedition/Campaign mints below (requireAim).
         var caster = new Caster(body, run.Current.Enemy, MagicCapacity(body));
-        return new Session(PlayerFighter(body), caster, WithRuneGrants(equipment, runes), run);
+        return new Session(PlayerFighter(body, race), caster, WithRuneGrants(equipment, runes), run);
     }
 
     // The same mint, dropped into the real map+combat loop instead of a linear run.
@@ -30,7 +30,7 @@ public static class Forge
         var body = chassis.NewBody(race, runes);
         var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, bayCap: chassis.Bays);
         SummonKit(caster, chassis, runes);
-        return new Expedition(PlayerFighter(body), caster, WithRuneGrants(equipment, runes), map,
+        return new Expedition(PlayerFighter(body, race), caster, WithRuneGrants(equipment, runes), map,
             figureId: chassis.FigureKey(race));
     }
 
@@ -45,7 +45,7 @@ public static class Forge
         var body = chassis.NewBody(race, runes);
         var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, bayCap: chassis.Bays);
         SummonKit(caster, chassis, runes);
-        return new Campaign(PlayerFighter(body), caster, WithRuneGrants(equipment, runes), legs,
+        return new Campaign(PlayerFighter(body, race), caster, WithRuneGrants(equipment, runes), legs,
             figureId: chassis.FigureKey(race));
     }
 
@@ -64,8 +64,12 @@ public static class Forge
         IReadOnlyList<Technique> equipment, RuneLoadout runes) =>
         equipment.Concat(runes.GrantedTechniques).GroupBy(t => t.Id).Select(g => g.First()).ToList();
 
-    // The player's HP life total: a natural base plus a CON bonus (1 CON = 2 HP). Smashing the chest
-    // drops CON, so MaxHp shrinks and current HP caps down — the locked CON->HP model.
+    // The player's HP life total: the RACE's HP is the natural base, plus a CON bonus (1 CON = 2 HP)
+    // that shrinks as the chest is smashed — and never refunds when the chest is repaired (HP lost in a
+    // fight is permanent; only the vendor / post-fight recovery restores it). §6/§7 CON->HP model.
+    public static Fighter PlayerFighter(Body body, Race race) => Fighter.Scaled(body, baseHp: race.Hp);
+
+    // Bespoke-body overload for the sim/legacy Session path (DemoBody has no Race). Placeholder base.
     public static Fighter PlayerFighter(Body body) => Fighter.Scaled(body, baseHp: 8);
 
     // The magic resource pool scales with INT — the head funds spellcraft. (Name/tuning deferred.)

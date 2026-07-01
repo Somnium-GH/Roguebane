@@ -89,8 +89,11 @@ allocation economy.
 | **CON** | Chest (×1) | **bonus HP** (1 CON = 2 HP on a natural base); stun resist; powers shields (§6b) | body-extending runes |
 
 - **WIS** merged into INT; **CHA** dropped (§18).
-- **CON → HP:** CON grants BONUS HP atop a natural base (1:2). Chest damage drops CON → the bonus
-  shrinks → MAX HP drops and current HP caps down with it.
+- **CON → HP [LOCKED]:** CON grants BONUS HP atop a natural base (1:2). The base is the **RACE's HP**
+  (§7). Chest damage drops CON → the bonus shrinks → MAX HP drops and current HP caps down with it. That
+  loss is **PERMANENT within the fight**: repairing the chest brings CON (and the MAX ceiling) back, but
+  does **NOT refund** the HP already lost — HP is restored only out of combat (vendor / post-fight, §10).
+  Active heals + potions repair PARTS only, never HP.
 - **Part multiplicity & damage:** `Head×1, Chest×1, Arms×2, Legs×2`. Paired parts take damage
   independently and each carry a SHARE of their stat (one arm = ½ STR). Weapons held in hands; lose an
   arm → lose its STR share → can fall below an equip threshold and that gear **drops off**. The cascade
