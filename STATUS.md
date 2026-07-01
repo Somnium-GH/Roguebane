@@ -1,5 +1,31 @@
 # Status
 
+## ⇒ AT A GLANCE (updated 2026-07-01) — read this first; detail is in the sections below
+State: build GREEN (273 Core tests); all four screens smoke-clean; POC loop plays NewGame→Equipment→
+Redeploy→fight→merchant. The self-contained, spec'd, Core-testable directive backlog is DONE.
+
+SHIPPED this arc (detail inline below): shell rename; SINGLE-FOE canon + `Foes`/`CurrentTarget` shim
+dropped; Charge = shield-pierce (#1-3,#5 audit); §8 DAMAGE model (part+HP together, no overkill/block)
++ dead-code sweep; foe SYMMETRY locked; global AUTO; **RACE split end-to-end** (Race type→cores carry no
+attrs→Forge/BuildSession assemble from Race→CycleRace selection→NewGame race chips→HP-from-race);
+fidelity ENGINE set (drop-shadow + gradient + 1080-class fonts via 2× supersample); rune-ladder test
+retired; merchant per-HP heal price; comment hygiene.
+
+OPEN — needs a HUMAN decision before I build (do NOT guess):
+- **#4 Equipment between-fights MUTATION model** — read-side data exists (Expedition.Player/Equipment/
+  Minions/Gold; gear-equip already works on the CityMap). Undecided: what a dedicated between-fights
+  Equipment SCREEN may CHANGE (re-slot techniques? equip stash? rune-bag?). Unblocks the #3 button.
+- **CASTLE thesis + ENEMY HEAL live-wiring** — mechanism proven (FoeSymmetryTests); the last off-model
+  bit is `Encounter.BossRestoreTick` (free HP tick). Removing it needs the castle to gain PARTS + a
+  RE-TUNED DPS-race (BalanceSimTests assert glass-loses / AllSix-wins). Balance numbers are yours.
+- **PLATE armour role** — inert since §8 (flagged in Shops.cs): give it a role (shield source?) or retire.
+
+BLOCKED on Claude Design assets/manifest:
+- nine-slice FRAME assets; per-element manifest `shadow`/`fill` fields; manifest screen-id renames
+  (newrun/build/runmap→newgame/equipment/citymap); per-PART `binds` (manifest-drive arc blocker);
+  BOW sprite + Ranger `human_ranger`/`elf_ranger` figures; the TWO divergent `Content.mgcb`
+  (game-side hand-synced vs CD's) need a single source of truth.
+
 ## ⇒ HUMAN DIRECTIVES — 2026-06-30 (do these FIRST; they revise shipped work and WIN)
 Rationale now in canon: DESIGN_SPEC (damage/symmetry/heal/flow/nomenclature §8/§10/§12/§13) +
 LAYOUT_CONTRACT §10-11 (fidelity primitives + 1080). Priority order:
