@@ -45,6 +45,21 @@ public class ListLayoutTests
     }
 
     [Fact]
+    public void GridWrapsLeftToRightThenTopToBottom()
+    {
+        var item = new Item { Template = "coreCard", Flow = "grid", Gap = 10, Size = new[] { 176, 200 } };
+        var region = new LayoutRect(0, 0, 400, 600); // stepX 186 -> 2 columns fit
+        var cells = ListLayout.Cells(region, item, 5);
+
+        Assert.Equal(5, cells.Count);
+        Assert.Equal(new LayoutRect(0, 0, 176, 200), cells[0]);       // col0 row0
+        Assert.Equal(186, cells[1].X); Assert.Equal(0, cells[1].Y);   // col1 row0
+        Assert.Equal(0, cells[2].X); Assert.Equal(210, cells[2].Y);   // col0 row1 (200 + 10 gap)
+        Assert.Equal(186, cells[3].X); Assert.Equal(210, cells[3].Y); // col1 row1
+        Assert.Equal(0, cells[4].X); Assert.Equal(420, cells[4].Y);   // col0 row2
+    }
+
+    [Fact]
     public void FallsBackToTheTemplateSizeWhenTheItemOmitsIt()
     {
         // A terse list item (no own size) that reuses its template's footprint: the caller passes the

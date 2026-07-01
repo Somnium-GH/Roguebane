@@ -1593,8 +1593,39 @@ public class Game1 : Microsoft.Xna.Framework.Game
             case "button":
                 DrawButton(e.Content ?? "", r.X, r.Y, r.Width, r.Height, true, Keys.None);
                 break;
+            case "list" when e.Item is not null:
+                DrawManifestList(e, r);
+                break;
         }
     }
+
+    // A list container: stamp its item template into each cell (ListLayout). Parts are drawn from their
+    // SAMPLE for now (proves the template path); live per-datum `binds` are wired in the next slice.
+    private void DrawManifestList(Element e, Rectangle r)
+    {
+        var m = _ui.Manifest;
+        if (m is null || e.Item is null || !m.Templates.TryGetValue(e.Item.Template, out var tmpl)) return;
+        var region = new LayoutRect(r.X, r.Y, r.Width, r.Height);
+        foreach (var cell in ListLayout.Cells(region, e.Item, ListCountFor(e.Binds), tmpl.Size))
+            foreach (var pp in CardTemplate.Place(tmpl, cell.X, cell.Y))
+            {
+                if (!string.IsNullOrEmpty(pp.Image))
+                    Sprite(_assets.Texture(pp.Image!), pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H, Color.White);
+                else if (!string.IsNullOrEmpty(pp.Sample))
+                    Text(pp.Font == "display" ? _assets.Display : _assets.Mono,
+                        pp.Sample!, pp.Rect.X, pp.Rect.Y, _ui.Color(pp.Color ?? "ink", Ink));
+            }
+    }
+
+    // How many items a bound list stamps: known live rosters resolve to their real count; others fall back
+    // to a small sample count so the layout still renders.
+    private static int ListCountFor(string? bind) => bind switch
+    {
+        "races" => Roguebane.Core.Content.Races.Roster.Count,
+        "cores" => Roguebane.Core.Content.CoreRunes.Roster.Count,
+        "preview.attrs" => 4,
+        _ => 3,
+    };
 
     private void DrawFrameTex(Texture2D tex, int[] slice, Rectangle r)
     {

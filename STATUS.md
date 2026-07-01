@@ -53,8 +53,15 @@ FIDELITY DRAW (shadow/frame/gradient, §10) feeds all of the above — same crit
   screen straight from the manifest (safe — live screens untouched). Verified via RB_MF=newgame: the framed
   panels (topBar/race/core/preview/confirm), the subtitle, and the column headers render at manifest
   positions. (Headers show "?" for the circled-number glyphs — the ASCII SpriteFont can't draw ①②③; a
-  separate font/glyph task.) NEXT: bound content — lists via `ListLayout`+`CardTemplate` per-datum `binds`,
-  the composed figure, graphs; then CUT NewGame's live screen over + verify vs design/05-newgame.png.]
+  separate font/glyph task.)
+  SLICE 3 DONE — LIST rendering: `DrawManifestElement` now stamps a list's item TEMPLATE into each cell
+  (`ListLayout.Cells` + `CardTemplate.Place`), drawing each part's text/image. Added GRID flow to ListLayout
+  (wraps left→right then top→bottom, fits the region width; Core-tested GridWrapsLeftToRightThenTopToBottom).
+  Verified RB_MF=newgame: race cards (2, vertical) + core cards (6, grid) lay out per template. STILL sample
+  content — parts draw their `sample` text (the raceCard/coreCard binds reference richer data than the
+  Race/CoreRune models carry: tag/blurb/apex/per-attr tiles). NEXT: the LIVE bind RESOLVER (map `race.name`
+  →Race.Name, `core.title`→core.Title, per-attr tiles, selection, etc.) + text clipping so values fit; the
+  composed figure via `preview.fig`; graphs. Then CUT NewGame's live screen over + diff vs design/05.]
 
 FLOW: Equipment reachable BETWEEN fights — from the post-combat Cleared/Redeploy state + CityMap +
 CampaignMap — editing the CURRENT loadout (core fixed), NOT a core-picker.

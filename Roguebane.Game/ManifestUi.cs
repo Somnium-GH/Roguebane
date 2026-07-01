@@ -14,6 +14,7 @@ public sealed class ManifestUi
     public ManifestUi(LayoutRegistry layout) => _layout = layout;
 
     public bool Has => _layout.Manifest is not null;
+    public LayoutManifest? Manifest => _layout.Manifest; // templates/styles for the generic renderer
 
     // The typed screen definition (its elements + design size), or null if absent — for the generic
     // manifest-driven renderer to iterate.
