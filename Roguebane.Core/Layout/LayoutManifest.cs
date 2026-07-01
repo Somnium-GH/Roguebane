@@ -92,8 +92,19 @@ public sealed class Element
     public string? Font { get; init; }
     public double? FontPx { get; init; }
     public Border? Border { get; init; }
+    public Frame? Frame { get; init; }     // a nine-slice frame asset wrapping this element (§10)
     public string? Content { get; init; } // a literal text element (no data binding)
     public Item? Item { get; init; }       // a repeated child: list (horizontal/vertical) or graph
+}
+
+// A nine-slice frame (§10): a painted `asset` whose `slice` margins [L,T,R,B] fix the 4 corners and
+// tile/stretch the 4 edges + centre, so ONE frame texture wraps any element size. `token` names the
+// style.frames entry it derives from (informational).
+public sealed class Frame
+{
+    public string? Token { get; init; }
+    public string Asset { get; init; } = "";
+    public int[] Slice { get; init; } = [];
 }
 
 // How a container repeats a template: per bound datum (list) or per map/campaign node (graph). The
@@ -138,4 +149,5 @@ public sealed class Style
     public JsonElement Fonts { get; init; }
     public Dictionary<string, string> PartStates { get; init; } = new();
     public JsonElement Pip { get; init; }
+    public Dictionary<string, Frame> Frames { get; init; } = new(); // the reusable nine-slice frame set
 }

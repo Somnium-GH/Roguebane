@@ -106,4 +106,18 @@ public class LayoutManifestTests
         Assert.NotEmpty(Real().Style.Palette);
         Assert.All(Real().Style.Palette.Values, v => Assert.StartsWith("#", v));
     }
+
+    [Fact]
+    public void EveryFrameCarriesAnAssetAndFourSliceMargins()
+    {
+        // §10 nine-slice: the style frame library + any element frame must give the blitter an asset
+        // path and 4 slice margins [L,T,R,B]. (Empty is fine -- the game just skips framing then.)
+        var elementFrames = Real().Screens.Values
+            .SelectMany(s => s.Elements).Select(e => e.Frame).Where(f => f is not null)!;
+        foreach (var f in Real().Style.Frames.Values.Concat(elementFrames!))
+        {
+            Assert.False(string.IsNullOrEmpty(f!.Asset));
+            Assert.Equal(4, f.Slice.Length);
+        }
+    }
 }

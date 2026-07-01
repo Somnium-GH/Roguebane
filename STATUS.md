@@ -29,9 +29,12 @@ terse item omits its own `size` (CD's `buildMinions`); manifest schema-tests rel
 contract. 274 Core green; all screens smoke-clean with the new assets.
 
 STILL BLOCKED / TODO on the Claude Design side:
-- WIRE the landed assets into the renderer: nine-slice FRAME blitter (assets now exist); consume the
-  manifest `fill:{gradient}` + a per-element `shadow` field. The Core bow type is DONE (charge #4) —
-  Game TODO: mount `bow.png` on the archer figure + a `shot` technique icon; Ranger figure repoint.
+- WIRE the landed assets into the renderer: nine-slice FRAME blit — CORE GEOMETRY DONE (`NineSlice.Patches`
+  + `Frame`/`Style.Frames` manifest model + tests); GAME TODO = blit each Src->Dst using `ui/frame/{panel,
+  card}` (needs those two entries in the GAME-side mgcb + an AssetRegistry frame loader + Panel() wiring).
+  Also consume the manifest `fill:{gradient}` + a per-element `shadow` field. The Core bow type is DONE
+  (charge #4) — Game TODO: mount `bow.png` on the archer figure + a `shot` technique icon; Ranger figure
+  repoint.
 - Manifest screen-id renames (newrun/build/runmap→newgame/equipment/citymap); per-PART `binds`
   (manifest-drive arc blocker); the TWO divergent `Content.mgcb` still need a single source of truth.
 
