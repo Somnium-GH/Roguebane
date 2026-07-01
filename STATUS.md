@@ -150,6 +150,40 @@ across the 30-file audit:
   Apply: `DefaultLoadout` → `DefaultEquipment`; the plain "Loadout"-as-gear term → Equipment; reserve
   "Loadout" for Race+CoreRune (`BuildSession` produces a Loadout — rename as fits). `RuneLoadout` is the
   rune bag — keep Rune-prefixed (or → `RuneBag`), NOT plain Loadout. Keep tests green throughout.
+  [DONE (gear-term pass): `DefaultLoadout`->`DefaultEquipment` and the standalone `Loadout` property/field/
+  param -> `Equipment` across Core + Game + tests (word-boundary sed, so `RuneLoadout` + the manifest
+  `loadoutCard`/`loadoutList` ids + `DrawLoadoutStrip` are untouched). 280 Core green. NOT yet: reserving
+  "Loadout" for the Race+CoreRune combo (that type doesn't exist until the CoreRune split); `RuneLoadout`
+  kept as-is; `DrawLoadoutStrip` (internal render name) left.]
+
+**ASSETS LANDED — race + New Run (2026-06-30).** Claude Design delivered: modular figures for BOTH races
+× all 5 cores (`elf_*`/`human_*`, complete part×state sets), their `figures.*` manifest entries, and the
+NewGame manifest now carries a `raceCard` template + `races` bind + a `preview.fig`. UNBLOCK:
+- Build the **two-step Race→Core NewGame** off the manifest (raceCard + coreCard) — turn the race path ON
+  (retire the single-core-only flag / "race behind the flag"). [UX + race stats + race↔core matrix are
+  PENDING HUMAN — being interviewed now; don't invent them.]
+- The `human_<core>` rename is now actionable (assets + manifest present): repoint FigureId refs
+  bare→`human_`/`elf_`, then RETIRE the bare body dirs + flat `chassis/*` thumbnails (keep mgcb in sync).
+- coreCard per-core figure bind (review fix): now doable (figures + `preview.fig` exist).
+STILL BLOCKED (NOT landed — the CD issues doc is mid-WIP, only caught up to race+NewRun): fidelity 9-slice
+FRAMES; the Ranger core figure + bow asset; the CityMap node framing/shadow fix; interaction states —
+keep those gated. (binds: 24 element-level binds present incl. `preview.fig`/`races`; verify per-PART
+template binds when wiring the coreCard render.)
+
+**NEW RUN DESIGN LANDED + decisions (2026-06-30).** design/05 is now the SINGLE-screen NewGame: three
+columns — **Race** (head sprites + attr/HP card; Human/Elf) | **Core Rune** (rune icon + budget/actions/
+bays + APEX card; the 5 cores) | **Loadout** (assembled Race+CoreRune: composed figure + combined stats +
+apex) | BEGIN THE RUN. Build NewGame off this design + the manifest (raceCard + coreCard + `preview.fig`).
+Decisions:
+- **RACE DATA SPLIT:** attrs+HP come from RACE ONLY (cores add none). Extract a `Race` (attrs+HP); the
+  CoreRune keeps budget/actions/bays/apex/default-equipment. Placeholder race blocks: Human 3/3/3/3 HP20;
+  Elf 2/3/4/2 HP14. (Retires the per-core `StandardBody` attr blocks — attrs are race-only now, §7.)
+- **ALL race×core combos allowed** (no gating this pass).
+- **Retire the bare asset set:** compose NewGame/Equipment/Loadout figures from the MODULAR race parts
+  (`preview.fig`); drop the bare body dirs + flat `chassis/*` thumbnails (mgcb in sync).
+- Apex effect TEXT (Hollow Vessel/Unbroken Aegis/Overchannel/Legion/Bloodrush) may be DISPLAYED from the
+  manifest, but do NOT implement the apex EFFECTS — they aren't in DESIGN_SPEC yet (pending human; show
+  text only — no-undesigned-mechanics guardrail).
 
 ## Current target
 **RE-OPEN RESOLVED (both threads cleared) — POC functionally complete again.**

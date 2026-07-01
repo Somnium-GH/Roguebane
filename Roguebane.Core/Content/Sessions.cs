@@ -26,7 +26,7 @@ public static class Sessions
 
     // The real composable flow end to end: pick the Grunt chassis, climb its Vessel ladder to the
     // Hollow Vessel keystone (chassis extension it was never built for), mint the body with that
-    // extra CON folded in, and drop it into the standard run with the full technique loadout.
+    // extra CON folded in, and drop it into the standard run with the full technique equipment.
     public static Session Forged()
     {
         var chassis = Chassrium.Grunt;

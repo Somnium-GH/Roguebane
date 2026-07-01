@@ -1,7 +1,7 @@
 namespace Roguebane.Core;
 
 // The pre-run build flow as a headless model: cycle the chassis, climb rune ladders, toggle the
-// technique loadout, preview the minted body, then launch into a run. The shell renders this and
+// technique equipment, preview the minted body, then launch into a run. The shell renders this and
 // turns input into these intents; all rules (rune economy, body minting, assembly) stay in the
 // pieces it composes.
 public sealed class BuildSession
@@ -24,7 +24,7 @@ public sealed class BuildSession
         SeedKit();
     }
 
-    // The current chassis ships a FIXED starting loadout (data) — pre-slot it so the bar is never
+    // The current chassis ships a FIXED starting equipment (data) — pre-slot it so the bar is never
     // empty and Launch needs no "pick a technique" gate. Only techniques on the palette are slotted.
     private void SeedKit()
     {
@@ -67,18 +67,18 @@ public sealed class BuildSession
 
     public bool IsSelected(Technique technique) => _selected.Contains(technique.Id);
 
-    public IReadOnlyList<Technique> Loadout =>
+    public IReadOnlyList<Technique> Equipment =>
         _palette.Where(t => _selected.Contains(t.Id)).ToList();
 
     // The body as it stands now: chassis parts plus everything the allocated runes grant.
     public Body Preview() => Chassis.NewBody(_runes);
 
-    public Session Launch(Run run) => Forge.Assemble(Chassis, _runes, Loadout, run);
+    public Session Launch(Run run) => Forge.Assemble(Chassis, _runes, Equipment, run);
 
     // Launch into the real map+combat loop: mint the chosen body and embark on the leg.
-    public Expedition Embark(CityMap map) => Forge.Embark(Chassis, _runes, Loadout, map);
+    public Expedition Embark(CityMap map) => Forge.Embark(Chassis, _runes, Equipment, map);
 
     // March the whole campaign: the chosen body carries through every leg to the Capital.
     public Campaign Redeploy(IReadOnlyList<Func<CityMap>> legs) =>
-        Forge.EmbarkCampaign(Chassis, _runes, Loadout, legs);
+        Forge.EmbarkCampaign(Chassis, _runes, Equipment, legs);
 }

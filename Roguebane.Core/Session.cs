@@ -8,13 +8,13 @@ public enum SessionState
     Lost,
 }
 
-// The playable wiring the render shell reads: a body, a loadout, and a run whose encounters are
+// The playable wiring the render shell reads: a body, a equipment, and a run whose encounters are
 // fought one at a time. All rules stay in the pieces it composes — Session only sequences them on
 // the fixed tick and exposes intents (toggle technique, flee, pause) for input to call.
 public sealed class Session
 {
     private readonly Caster _caster;
-    private readonly IReadOnlyList<Technique> _loadout;
+    private readonly IReadOnlyList<Technique> _equipment;
 
     public Fighter Player { get; }
     public Run Run { get; }
@@ -22,16 +22,16 @@ public sealed class Session
     public bool Paused { get; private set; }
     public SessionState State { get; private set; } = SessionState.Fighting;
 
-    public Session(Fighter player, Caster caster, IReadOnlyList<Technique> loadout, Run run)
+    public Session(Fighter player, Caster caster, IReadOnlyList<Technique> equipment, Run run)
     {
         Player = player;
         _caster = caster;
-        _loadout = loadout;
+        _equipment = equipment;
         Run = run;
         Battle = new Battle(caster, run.Current, player);
     }
 
-    public IReadOnlyList<Technique> Loadout => _loadout;
+    public IReadOnlyList<Technique> Equipment => _equipment;
 
     public bool IsActive(Technique technique) => _caster.IsActive(technique);
 

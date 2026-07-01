@@ -15,13 +15,13 @@ public sealed class CombatTargeting
 
     // A module is actively picking a target only while its card is still powered.
     public bool IsTargeting(Expedition e) =>
-        Targeting >= 0 && Targeting < e.Loadout.Count && e.IsActive(e.Loadout[Targeting]);
+        Targeting >= 0 && Targeting < e.Equipment.Count && e.IsActive(e.Equipment[Targeting]);
 
     // Left-press a card: POWER an inactive module, or (on an active one) enter TARGETING and clear its target.
     public void CardPress(Expedition e, int i)
     {
-        if (i < 0 || i >= e.Loadout.Count) return;
-        var t = e.Loadout[i];
+        if (i < 0 || i >= e.Equipment.Count) return;
+        var t = e.Equipment[i];
         if (!e.IsActive(t)) e.Toggle(t);
         else { Targeting = i; e.ClearAim(t); }
     }
@@ -29,8 +29,8 @@ public sealed class CombatTargeting
     // Right-press a card: UNPOWER an active module (drops its target); leave targeting if it was this card.
     public void CardRightPress(Expedition e, int i)
     {
-        if (i < 0 || i >= e.Loadout.Count) return;
-        var t = e.Loadout[i];
+        if (i < 0 || i >= e.Equipment.Count) return;
+        var t = e.Equipment[i];
         if (e.IsActive(t)) e.Toggle(t);
         if (Targeting == i) Targeting = -1;
     }
@@ -39,7 +39,7 @@ public sealed class CombatTargeting
     public void FoePress(Expedition e, ICombatTarget foe, BodyPart? part = null)
     {
         if (!IsTargeting(e)) return;
-        var t = e.Loadout[Targeting];
+        var t = e.Equipment[Targeting];
         if (part is not null) e.Aim(t, foe, part); else e.Aim(t, foe);
         Targeting = -1;
     }

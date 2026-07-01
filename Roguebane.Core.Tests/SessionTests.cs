@@ -44,7 +44,7 @@ public class SessionTests
     public void AFullLoadoutClearsTheRunAndWins()
     {
         var s = Sessions.Demo();
-        foreach (var t in s.Loadout) s.Toggle(t);
+        foreach (var t in s.Equipment) s.Toggle(t);
 
         var steps = 0;
         while (s.State == SessionState.Fighting && steps < 5000)
@@ -63,7 +63,7 @@ public class SessionTests
         static int RunToWin()
         {
             var s = Sessions.Demo();
-            foreach (var t in s.Loadout) s.Toggle(t);
+            foreach (var t in s.Equipment) s.Toggle(t);
             var steps = 0;
             while (s.State == SessionState.Fighting && steps < 5000)
             {

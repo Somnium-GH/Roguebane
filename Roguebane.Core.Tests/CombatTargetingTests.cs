@@ -14,7 +14,7 @@ public class CombatTargetingTests
         return (exp, new CombatTargeting());
     }
 
-    private static Technique Card0(Expedition e) => e.Loadout[0];
+    private static Technique Card0(Expedition e) => e.Equipment[0];
 
     [Fact]
     public void PoweringDoesNotEnterTargeting()

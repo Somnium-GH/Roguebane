@@ -3,7 +3,7 @@ namespace Roguebane.Core;
 // A chassis is data: the body you socket into. Its parts (Head, Chest, Arms x2, Legs x2) carry
 // the stat shares, plus a rune budget and a per-rung discount. The thesis lives in the tension
 // between these: a fat-budget, cheap-rune chassis can climb to a keystone it was never built for.
-// DefaultLoadout is the FIXED starting kit it ships with — the action bar is never empty and there
+// DefaultEquipment is the FIXED starting kit it ships with — the action bar is never empty and there
 // is no build-time "pick a technique" gate; finds grow the kit mid-run.
 public sealed record Chassis(
     string Id,
@@ -11,7 +11,7 @@ public sealed record Chassis(
     int RuneBudget,
     int RuneDiscount = 0,
     int Bays = 1,
-    IReadOnlyList<Technique>? DefaultLoadout = null,
+    IReadOnlyList<Technique>? DefaultEquipment = null,
     IReadOnlyList<Minion>? DefaultMinions = null,
     string Archetype = "",  // the one-line identity ("THE GENERALIST") shown on the New Run / build cards
     string Flavor = "")     // the card's short pitch (design/05)
@@ -19,7 +19,7 @@ public sealed record Chassis(
     // Display name for the cards ("grunt" -> "Grunt"); the Id stays the lowercase content key.
     public string Title => string.IsNullOrEmpty(Id) ? Id : char.ToUpperInvariant(Id[0]) + Id[1..];
 
-    public IReadOnlyList<Technique> Kit => DefaultLoadout ?? Array.Empty<Technique>();
+    public IReadOnlyList<Technique> Kit => DefaultEquipment ?? Array.Empty<Technique>();
 
     // The minions the chassis fields from the start (summoned into its bays at assembly), the minion
     // analogue of the fixed technique Kit. Rune grants add more on top, capped by Bays.

@@ -90,7 +90,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
             _build.Toggle(Techniques.Jab);   // add a STR card for variety on the bar
             _campaign = _build.Redeploy(Maps.StandardLegs(3));
             _screen = Screen.Run;
-            foreach (var t in Exp.Loadout) _campaign.Toggle(t); // power the bar (both shots)
+            foreach (var t in Exp.Equipment) _campaign.Toggle(t); // power the bar (both shots)
             // (build/newrun smoke handled after this block)
             void Resolve() { for (var i = 0; i < 200 && Exp.State == ExpeditionState.Fighting; i++) _campaign.Tick(); }
 
@@ -119,10 +119,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 {
                     var foe = Exp.Foes[^1];
                     var head = foe.Frame?.Parts.FirstOrDefault(p => p.Stat == Stat.Int);
-                    if (head is not null) _campaign.Aim(Exp.Loadout[0], foe, head);
-                    else _campaign.Aim(Exp.Loadout[0], foe);
+                    if (head is not null) _campaign.Aim(Exp.Equipment[0], foe, head);
+                    else _campaign.Aim(Exp.Equipment[0], foe);
                     _campaign.SetAuto(true);
-                    if (Exp.Loadout.Count > 1) _ctrl.CardPress(Exp, 1);
+                    if (Exp.Equipment.Count > 1) _ctrl.CardPress(Exp, 1);
                 }
                 for (var i = 0; i < 6; i++) _campaign.Tick(); // castle survives -> stay in combat
             }
@@ -168,7 +168,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         base.Update(gameTime);
     }
 
-    // New Run (design/05): the core grid. Pick with arrows or a card click; BEGIN goes to the loadout.
+    // New Run (design/05): the core grid. Pick with arrows or a card click; BEGIN goes to the equipment.
     // Card positions come from the manifest `coreCards` list container (region + item), falling back to
     // a hand grid if the manifest is absent — the first screen container driven off layout.json.
     private Rectangle NewGameCardRect(int i)
@@ -186,7 +186,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
             if (Click(NewGameCardRect(i))) _build.CycleChassis(i - _build.ChassisIndex);
 
         var go = (Pressed(keys, Keys.Enter) && !keys.IsKeyDown(Keys.LeftAlt)) || Click(NewGameBeginRect);
-        if (go) _screen = Screen.Equipment; // on to the loadout screen for the chosen core
+        if (go) _screen = Screen.Equipment; // on to the equipment screen for the chosen core
     }
 
     private void UpdateEquipment(KeyboardState keys)
@@ -243,7 +243,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         // The targeting FSM lives in Core (CombatTargeting); the shell only feeds it press intents.
         // Card LEFT-press powers/enters-targeting; card RIGHT-press unpowers.
         var rclickOnCard = false;
-        for (var i = 0; i < TechniqueKeys.Length && i < Exp.Loadout.Count; i++)
+        for (var i = 0; i < TechniqueKeys.Length && i < Exp.Equipment.Count; i++)
         {
             if (Pressed(keys, TechniqueKeys[i]) || Click(ActionCardRect(i))) _ctrl.CardPress(Exp, i);
             if (RightClick(ActionCardRect(i))) { rclickOnCard = true; _ctrl.CardRightPress(Exp, i); }
@@ -300,7 +300,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 || Click(NodeRect(options[i])))
             {
                 _campaign.Enter(options[i].Id); // may win the leg and roll to the next city
-                foreach (var t in Exp.Loadout)  // keep the bar armed into the next fight/leg
+                foreach (var t in Exp.Equipment)  // keep the bar armed into the next fight/leg
                     if (!_campaign.IsActive(t)) _campaign.Toggle(t);
                 break;
             }
@@ -340,11 +340,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private static Rectangle LadderRowRect(int p, int rungs) => new(320, 100 + p * 56, rungs * 56, 48);
     private static readonly Rectangle RedeployRect = new(40, H - 52, 300, 44);
     // The action bar sits bottom-RIGHT (design/01), right of the attribute pool and left of the combat
-    // verb buttons. Card pitch adapts to the loadout size so N cards fit the region.
+    // verb buttons. Card pitch adapts to the equipment size so N cards fit the region.
     private const int ActBarX = 366, ActBarY = H - 84, ActBarW = 314;
     private Rectangle ActionCardRect(int i)
     {
-        var n = Math.Max(1, Exp.Loadout.Count);
+        var n = Math.Max(1, Exp.Equipment.Count);
         var pitch = Math.Min(80, ActBarW / n);
         var card = Math.Max(42, pitch - 6);
         return new(ActBarX + i * pitch, ActBarY, card, 60);
@@ -899,10 +899,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
         Line("con", baseBody.Capacity(Stat.Con).ToString());
         Line("bays", c.Bays.ToString());
         Line("budget", c.RuneBudget.ToString());
-        Line("actions", _build.Loadout.Count.ToString());
+        Line("actions", _build.Equipment.Count.ToString());
     }
 
-    // The action-bar loadout strip: the chassis's FIXED starting kit, pre-slotted (no pick gate).
+    // The action-bar equipment strip: the chassis's FIXED starting kit, pre-slotted (no pick gate).
     // Mirrors the combat action bar so the player reads the bar they will fight with.
     // Build-screen MINION BAYS preview (design/02): a slot per chassis bay, filled with the kit's
     // minion sprite (or empty outline), so the player previews the retinue they'll field. Mirrors the
@@ -937,7 +937,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private void DrawLoadoutStrip(int x, int y)
     {
         Text(_assets.Mono, "ACTION BAR", x, y - 18, Muted);
-        var kit = _build.Loadout;
+        var kit = _build.Equipment;
         if (kit.Count == 0) { Text(_assets.Mono, "-", x, y, Muted); return; }
         for (var i = 0; i < kit.Count; i++)
         {
@@ -1078,7 +1078,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private Dictionary<Stat, int> KitDemand()
     {
         var d = new Dictionary<Stat, int>();
-        foreach (var t in _build.Loadout) d[t.Stat] = d.GetValueOrDefault(t.Stat) + t.Reserve;
+        foreach (var t in _build.Equipment) d[t.Stat] = d.GetValueOrDefault(t.Stat) + t.Reserve;
         foreach (var m in _build.Chassis.MinionKit) d[m.Stat] = d.GetValueOrDefault(m.Stat) + m.Reserve;
         return d;
     }
@@ -1301,14 +1301,14 @@ public class Game1 : Microsoft.Xna.Framework.Game
         Text(_assets.Mono, rallied > 0 ? "RALLIED +" + rallied : "banked", x, y + 16, rallied > 0 ? Amber : Muted);
     }
 
-    // The action bar (design/01, bottom-right): one card per loadout technique — icon, stat cost, active
+    // The action bar (design/01, bottom-right): one card per equipment technique — icon, stat cost, active
     // ring, cooldown wipe, target tag. Card geometry comes from ActionCardRect so hit-tests line up.
     private void DrawActionBar()
     {
         Text(_assets.Mono, "ACTION BAR", ActBarX, ActBarY - 16, Muted);
-        for (var i = 0; i < Exp.Loadout.Count; i++)
+        for (var i = 0; i < Exp.Equipment.Count; i++)
         {
-            var t = Exp.Loadout[i];
+            var t = Exp.Equipment[i];
             var r = ActionCardRect(i);
             var st = Exp.Status(t);
             var sz = r.Height - 22;            // icon square

@@ -12,7 +12,7 @@ public class ExpeditionTests
     private static Expedition FullLoadout()
     {
         var exp = Sessions.Expedition();
-        foreach (var t in exp.Loadout) exp.Toggle(t);
+        foreach (var t in exp.Equipment) exp.Toggle(t);
         exp.SetAuto(true); // global AUTO on so the re-aimed targets persist
         return exp;
     }
@@ -21,7 +21,7 @@ public class ExpeditionTests
     {
         var foe = exp.Foes.FirstOrDefault(f => !f.Down);
         if (foe is null) return;
-        foreach (var t in exp.Loadout) if (exp.IsActive(t)) exp.Aim(t, foe);
+        foreach (var t in exp.Equipment) if (exp.IsActive(t)) exp.Aim(t, foe);
     }
 
     // Fight to completion, then REDEPLOY back to the chart (a cleared node now holds at Cleared until

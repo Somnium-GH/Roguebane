@@ -38,7 +38,7 @@ public class ForgeTests
         var session = Forge.Assemble(chassis, runes, Techniques.All, Sieges.StandardRun());
 
         Assert.Equal(SessionState.Fighting, session.State);
-        Assert.Equal(Techniques.All.Count, session.Loadout.Count);
+        Assert.Equal(Techniques.All.Count, session.Equipment.Count);
         Assert.Equal(chassis.NewBody().Capacity(Stat.Con) + 6, session.Player.Body.Capacity(Stat.Con));
     }
 
@@ -46,7 +46,7 @@ public class ForgeTests
     public void AForgedSessionFightsTheRunToAResult()
     {
         var session = Sessions.Forged();
-        foreach (var t in session.Loadout) session.Toggle(t);
+        foreach (var t in session.Equipment) session.Toggle(t);
 
         var ticks = 0;
         while (session.State == SessionState.Fighting && ticks < 5000)

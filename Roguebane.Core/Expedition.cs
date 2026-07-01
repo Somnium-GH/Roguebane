@@ -13,13 +13,13 @@ public enum ExpeditionState
 
 // The real game loop: a run across the map with combat at its nodes. The player picks a charted
 // jump (spending a supply and letting the war party march a step), fights what they land on, and
-// presses for the castle before being overrun. The same body/caster/loadout carries between fights —
+// presses for the castle before being overrun. The same body/caster/equipment carries between fights —
 // parts erode and HP only refills at a merchant — so the run is a war of attrition under the clock.
 public sealed class Expedition
 {
     private readonly Fighter _player;
     private readonly Caster _caster;
-    private readonly IReadOnlyList<Technique> _loadout;
+    private readonly IReadOnlyList<Technique> _equipment;
     private readonly Stash _stash;
     private readonly List<Weapon> _stockWeapons = new(Shops.Weapons); // this merchant's gear stock (per leg)
     private readonly List<Armor> _stockArmor = new(Shops.Armor);
@@ -28,12 +28,12 @@ public sealed class Expedition
     public Battle? Battle { get; private set; }
     public ExpeditionState State { get; private set; } = ExpeditionState.Choosing;
 
-    public Expedition(Fighter player, Caster caster, IReadOnlyList<Technique> loadout, CityMap map,
+    public Expedition(Fighter player, Caster caster, IReadOnlyList<Technique> equipment, CityMap map,
         Stash? stash = null, string figureId = "grunt")
     {
         _player = player;
         _caster = caster;
-        _loadout = loadout;
+        _equipment = equipment;
         Map = map;
         _stash = stash ?? new Stash();
         FigureId = figureId;
@@ -44,7 +44,7 @@ public sealed class Expedition
     public string FigureId { get; }
 
     public Fighter Player => _player;
-    public IReadOnlyList<Technique> Loadout => _loadout;
+    public IReadOnlyList<Technique> Equipment => _equipment;
     public IReadOnlyList<MapNode> Options => Map.Options;
 
     // The economy: spoils from cleared nodes fund the merchant's HP service (part-heals are in-combat

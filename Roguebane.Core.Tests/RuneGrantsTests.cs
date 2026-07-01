@@ -46,8 +46,8 @@ public class RuneGrantsTests
         // Player picked only Jab; the Tempest keystone hands them Maelstrom on top.
         var session = Forge.Assemble(chassis, runes, new[] { Techniques.Jab }, Sieges.StandardRun());
 
-        Assert.Contains(session.Loadout, t => t.Id == "jab");
-        Assert.Contains(session.Loadout, t => t.Id == "maelstrom");
+        Assert.Contains(session.Equipment, t => t.Id == "jab");
+        Assert.Contains(session.Equipment, t => t.Id == "maelstrom");
     }
 
     [Fact]
@@ -59,6 +59,6 @@ public class RuneGrantsTests
 
         var session = Forge.Assemble(chassis, runes, new[] { Paths.Maelstrom }, Sieges.StandardRun());
 
-        Assert.Single(session.Loadout, t => t.Id == "maelstrom");
+        Assert.Single(session.Equipment, t => t.Id == "maelstrom");
     }
 }

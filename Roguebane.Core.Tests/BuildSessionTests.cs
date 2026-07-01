@@ -63,7 +63,7 @@ public class BuildSessionTests
 
         Assert.True(build.IsSelected(Techniques.Jab)); // kit
         // palette order (jab, cleave, lunge, ember, drain, brace, bandage); the Grunt kit adds bandage
-        Assert.Equal(new[] { "jab", "lunge", "drain", "brace", "bandage" }, build.Loadout.Select(t => t.Id));
+        Assert.Equal(new[] { "jab", "lunge", "drain", "brace", "bandage" }, build.Equipment.Select(t => t.Id));
 
         build.Toggle(Techniques.Jab); // a kit item can still be dropped
         Assert.False(build.IsSelected(Techniques.Jab));
@@ -80,7 +80,7 @@ public class BuildSessionTests
         var session = build.Launch(run);
 
         Assert.Equal(SessionState.Fighting, session.State);
-        Assert.Equal(4, session.Loadout.Count); // kit (jab, brace, bandage) + lunge
+        Assert.Equal(4, session.Equipment.Count); // kit (jab, brace, bandage) + lunge
         Assert.Equal(3, session.Run.Nodes.Count); // cp1, cp2, castle
     }
 
@@ -92,7 +92,7 @@ public class BuildSessionTests
         var exp = build.Embark(Maps.StandardLeg(autoResolveCastle: false));
 
         Assert.Equal(ExpeditionState.Choosing, exp.State);
-        Assert.Contains(exp.Loadout, t => t.Id == "jab"); // shipped in the kit, no pick needed
+        Assert.Contains(exp.Equipment, t => t.Id == "jab"); // shipped in the kit, no pick needed
         Assert.Equal("camp", exp.Map.CurrentId);
     }
 
@@ -106,7 +106,7 @@ public class BuildSessionTests
         Assert.Equal(CampaignState.Redeploying, campaign.State);
         Assert.Equal(3, campaign.LegCount);
         Assert.Equal(0, campaign.LegIndex);
-        Assert.Contains(campaign.Current.Loadout, t => t.Id == "jab"); // kit
+        Assert.Contains(campaign.Current.Equipment, t => t.Id == "jab"); // kit
     }
 
     // The launch gate is gone: every chassis ships a non-empty fixed kit, so the bar is never empty
@@ -118,7 +118,7 @@ public class BuildSessionTests
         for (var i = 0; i < build.ChassisCount; i++)
         {
             Assert.NotEmpty(build.Chassis.Kit);
-            Assert.NotEmpty(build.Loadout); // seeded, no manual pick
+            Assert.NotEmpty(build.Equipment); // seeded, no manual pick
             build.CycleChassis(1);
         }
     }
@@ -127,9 +127,9 @@ public class BuildSessionTests
     public void CyclingChassisReseedsTheKit()
     {
         var build = New(); // Grunt: jab, brace, bandage
-        Assert.Equal(new[] { "jab", "brace", "bandage" }, build.Loadout.Select(t => t.Id));
+        Assert.Equal(new[] { "jab", "brace", "bandage" }, build.Equipment.Select(t => t.Id));
 
         build.CycleChassis(1); // Warden: cleave, brace, bandage
-        Assert.Equal(new[] { "cleave", "brace", "bandage" }, build.Loadout.Select(t => t.Id));
+        Assert.Equal(new[] { "cleave", "brace", "bandage" }, build.Equipment.Select(t => t.Id));
     }
 }
