@@ -104,6 +104,13 @@ REDEFINED it (see DESIGN_SPEC §6b/§10/§14/§17/§18). Directives:
    +CON; leave as neutral sample, do NOT invent 'regenerating aether'); the Vessel/Resonance/Tempest/
    Conclave sample NAMES (placeholder — mechanically fine, rename only if cheap). Neutralize/flag, don't
    invent.
+   [DONE (sweep): CLEAN — no undesigned mechanics found. `aether` = ZERO refs (design cleaned). Rune
+   Grants only socket chassis-extension PARTS (vessel-core +CON, resonant-core +INT) + unlock techniques/
+   minions — all DESIGNED (§11); the Hollow-Vessel grant is a NEUTRAL placeholder (+CON part), no
+   regenerating-aether. No status/condition system invented (§8 disable/stun/silence are design-only, not
+   in code; `PruneSilenced` is a method, not a status). Resources = only Charge(§6b)/HP/stats/shields —
+   no mana/rage/etc. Only fix: stale "magic resource/charge" COMMENTS on Caster (Charge is the shield-
+   pierce resource now) -> corrected. Vessel/Resonance/Tempest sample NAMES left (mechanically fine).]
 
 **STRESS TEST — add the RANGER Core rune (2026-06-30).** Human wants to exercise the "content is DATA,
 not code" invariant by adding a 6th core. Add **Ranger** as DATA ONLY — a new `Chassrium` entry + append

@@ -53,7 +53,8 @@ public sealed class Caster
     // Battle hands every caster the fight's shared PRNG so chance rolls are deterministic.
     public void UseRng(Rng rng) => _rng = rng;
 
-    // The finite magic resource is refilled out of combat (loot / rest), not regenerated mid-fight.
+    // Charge (the finite shield-pierce resource, §6b) is refilled out of combat (loot / rest), not
+    // regenerated mid-fight.
     public void Recharge() => _charge = MaxCharge;
 
     public void Recharge(int amount)
@@ -259,7 +260,7 @@ public sealed class Caster
 
     // Resolve a technique's aim and land one discharge: hits its own foe (and PART) while that foe
     // stands, else falls back to the caster's front (whole-HP). Holds fire if there's no target or
-    // the magic charge is dry; resets a Timered cooldown on a landed hit.
+    // (for a shield-piercing technique) its Charge is dry; resets a Timered cooldown on a landed hit.
     private bool Discharge(Run run)
     {
         // A part-heal ignores targets: it mends the caster's own most-damaged part. Holds fire (and
