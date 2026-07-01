@@ -78,23 +78,6 @@ public sealed class Body
 
     public Armor? ArmorOn(Stat group) => _armor.GetValueOrDefault(group);
 
-    // Flat plate protection on a part, but only while the part still stands — the effect rides the
-    // part's condition. Other armor kinds (leather evasion, spell-ward) are not flat protection.
-    public int Protection(BodyPart part) =>
-        Contribution(part) > 0 && _armor.TryGetValue(part.Stat, out var a) && a.Kind == ArmorKind.Plate
-            ? a.Value : 0;
-
-    // A localized incoming hit: plate blunts it, the part's stat erodes (running the cascade), and
-    // the unabsorbed remainder (overkill) is returned for the caller's HP pool to take.
-    public int AbsorbPartHit(BodyPart part, int amount)
-    {
-        if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));
-        var effective = Math.Max(0, amount - Protection(part));
-        var absorbed = Math.Min(Contribution(part), effective);
-        if (absorbed > 0) Damage(part, absorbed);
-        return effective - absorbed;
-    }
-
     // The part with the most stat missing (Capacity - live contribution), or null if every part is
     // whole. Drives a part-heal's target — mend where it hurts most; ties resolve by part order.
     public BodyPart? MostDamagedPart()
@@ -121,10 +104,6 @@ public sealed class Body
         for (var i = _actives.Count - 1; i >= 0 && Reserved(stat) > Capacity(stat); i--)
             if (_actives[i].Stat == stat) _actives.RemoveAt(i);
     }
-
-    // A held block (a defensive active) reserves CON and absorbs up to the CON it reserves, capped.
-    // Raise it = power it; drop it = the CON returns to the pool.
-    public int BlockMitigation(int cap) => Math.Min(Reserved(Stat.Con), cap);
 
     // §6b SHIELDS: a shield source maintains a regenerating pool of 1-damage layers on the body — the
     // OUTERMOST mitigation, absorbing incoming damage before armor/parts/HP. The owning caster raises

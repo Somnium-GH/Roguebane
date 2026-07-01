@@ -83,22 +83,6 @@ public class BodyTests
         Assert.False(body.IsActive(plate)); // now the torso is exposed
     }
 
-    [Fact]
-    public void AHeldBlockAbsorbsUpToTheConItReserves()
-    {
-        var body = Build(out _, out _); // CON 6
-        Assert.Equal(0, body.BlockMitigation(cap: 3)); // nothing held => nothing absorbed
-
-        var brace = new Active("brace", Stat.Con, 5);
-        Assert.True(body.Activate(brace));
-        Assert.Equal(3, body.BlockMitigation(cap: 3)); // min(reserved 5, cap 3)
-
-        body.Deactivate(brace);
-        Assert.Equal(0, body.BlockMitigation(cap: 3)); // dropped => CON returns to the pool
-
-        body.Activate(new Active("light", Stat.Con, 2));
-        Assert.Equal(2, body.BlockMitigation(cap: 3)); // a lighter block absorbs only what it powers
-    }
 
     [Fact]
     public void AttackPowerIsStrPlusAQuarterDex()

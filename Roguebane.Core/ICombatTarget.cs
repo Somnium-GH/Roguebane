@@ -1,13 +1,12 @@
 namespace Roguebane.Core;
 
-// One combat grammar everywhere: anything a technique can hit — a foe, a castle layer, or the
-// PLAYER — is a structured thing with an optional Frame of targetable parts and an HP life total.
-// A part-aimed hit erodes the part's stat first and only spills into HP once the part bottoms out
-// (the §10 split); an unstructured target (Frame == null) just takes HP.
+// One combat grammar everywhere: anything a technique can hit — a foe, a castle, or the PLAYER — is a
+// structured thing with an optional Frame of targetable parts and an HP life total. §8: a hit erodes the
+// aimed part's stat (via Frame.Damage) AND takes HP (Damage) simultaneously, same power — the attacker
+// (Caster.Hit) applies both; there is no part-vs-HP split here.
 public interface ICombatTarget
 {
     bool Down { get; }
     Body? Frame { get; }
-    void Damage(int amount);                  // HP life total
-    void DamagePart(BodyPart part, int amount); // localized: stat first, overkill to HP
+    void Damage(int amount); // HP life total
 }

@@ -46,17 +46,6 @@ public sealed class Foe : ICombatTarget
         Hp = Math.Max(0, Hp - amount);
     }
 
-    // Localized damage: erode the targeted part's stat first; overkill (or any hit once the part
-    // is already gone) spills into the HP life total.
-    public void DamagePart(BodyPart part, int amount)
-    {
-        if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));
-        if (Frame is null) { Damage(amount); return; }
-
-        var overkill = Frame.AbsorbPartHit(part, amount); // armor blunts, the part erodes
-        if (overkill > 0) Damage(overkill);
-    }
-
     public void Restore(int amount)
     {
         if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));

@@ -288,9 +288,8 @@ public sealed class Caster
         return true;
     }
 
-    // Apply a hit through the defender's mitigation layer: leather EVASION (a dodge roll on the
-    // struck part-group) can negate it; a whole-HP hit is then blunted by the CON block. Part hits
-    // run plate protection inside DamagePart. (Block on part hits is deferred — foes hit HP today.)
+    // Apply a hit through the defender's §8 mitigation: a full leather EVASION dodge (on the struck
+    // part-group) negates it, else a shield pool absorbs; whatever lands hits the part AND HP together.
     private void Hit(ICombatTarget target, BodyPart? part, int power, bool pierce = false)
     {
         var frame = target.Frame;

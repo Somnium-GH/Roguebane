@@ -49,13 +49,6 @@ public sealed class Fighter : ICombatTarget
         _hp = Math.Max(0, _hp - amount);
     }
 
-    public void DamagePart(BodyPart part, int amount)
-    {
-        if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));
-        var overkill = Body.AbsorbPartHit(part, amount); // armor blunts; the part erodes (cascade)
-        CapToMax();                                       // a chest hit may have just lowered MaxHp
-        if (overkill > 0) Damage(overkill);
-    }
 
     // Persist the cap so a later CON repair can't refund HP the fighter no longer had. Battle calls
     // this each tick after damage resolves.

@@ -55,9 +55,12 @@ LAYOUT_CONTRACT §10-11 (fidelity primitives + 1080). Priority order:
      RE-CAST as the CON SHIELD SOURCE (ShieldLayers 4 / regen 15) — the "replace flat block with shields"
      step — so kits keep a mitigation and the campaign stays winnable under the deadlier model (verified:
      CampaignTests win). Tests reconciled: PartAim/FoeOffense/FoeArming -> part+HP-no-overkill; Mitigation
-     block-test -> shield-test. 277 Core green; combat smoke clean. DEAD CODE to sweep later (unused now):
-     Body.BlockMitigation, Fighter/Foe.DamagePart + Body.AbsorbPartHit, plate `Protection` (plate no longer
-     mitigates per §8 — reconcile armour: leather=evasion stays, plate needs a new role or retires).]
+     block-test -> shield-test. 277 Core green; combat smoke clean.]
+     [DEAD-CODE SWEPT (follow-up): removed Body.BlockMitigation / Body.AbsorbPartHit / Body.Protection,
+     Fighter.DamagePart, Foe.DamagePart, and DamagePart from ICombatTarget (Hit is now the sole damage
+     path). Deleted ArmorTests.cs (all plate-protection) + the BodyTests block test; leather-evasion
+     coverage stays in MitigationTests. 271 Core green; Game builds. Plate armour now INERT -> flagged
+     NEEDS HUMAN in Shops.cs (give plate a role or retire the kind).]
    - **ENEMY HEAL**: must run on a real tuned technique (same system as the player), can't out-tick the
      player's healing — not a fast free regen.
    - **SYMMETRY**: enemies act through the SAME technique/attribute/shield/heal framework as the player

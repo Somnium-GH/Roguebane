@@ -3,14 +3,23 @@ The built-in /loop re-fires for the next task. SHORT runs = clean context. Do NO
 or grind 30+ min — that pollutes context. One good slice, commit, stop.
 
 Per run:
-1. READ `STATUS.md`. Human edits may revise ALREADY-SHIPPED work (a checked item is NOT locked).
+1. SYNC then READ. `git pull --rebase` FIRST so any external changes land before you work (STATUS,
+   design, or code may have been updated outside the loop). Then READ `STATUS.md`.
+   Human edits may revise ALREADY-SHIPPED work (a checked item is NOT locked).
    Those revisions WIN — do them first. Else pick the SINGLE most valuable item not in "Needs human".
+   A RENAME revision is CLEAN: chase every usage, delete the old names + any compat shims (no back-compat
+   unless a feature flag is explicitly asked — see CLAUDE.md).
 2. BUILD that one item for real — a working slice, not a stub. Honor `CLAUDE.md`. Dep not built yet?
    Build the real partial that compiles+runs; log the rest as Debt. Stub only as last resort (log it).
-3. VERIFY by type:
+   NEVER invent undesigned mechanics (resources/effects/conditions/content absent from `DESIGN_SPEC`) —
+   surface them (Needs human), don't add them, even in sample/test content.
+3. VERIFY by type. Build must be GREEN (`dotnet build` clean) before commit — a red build is never done.
+   On ANY runtime crash, READ `bin/Debug/net9.0/crash.log` (Program.cs writes the full exception+stack)
+   and fix from the stack — don't guess.
    - Core logic → headless tests. NEVER commit red.
-   - UI/screen → build+run, save an RB_SMOKE shot; READ the shot + the matching `design/NN-*.png` +
-     the checklist in `design/SCREENS.md`; fix until it MATCHES. You can see images — actually look.
+   - UI/screen → build+run, save an RB_SMOKE shot AND confirm `crash.log` is clean; READ the shot + the
+     matching `design/NN-*.png` + the `design/SCREENS.md` checklist; fix until it MATCHES — actually look.
+     Smoke renders ONE state, so also drive empty/edge states (that's how the em-dash crash slipped past).
      Required ART missing/wrong (designer gap, not your code) and not composable from primitives →
      log under "Asset gaps (Needs Claude Design)" in STATUS, mark BLOCKED, move on.
    - Interactive behavior → DRIVE the input→state flow and ASSERT the spec. A screenshot shows LOOK,
@@ -19,6 +28,8 @@ Per run:
    context; route around it. Can't go green after a real try? Park it the same way. Don't thrash.
 5. COMMIT one small semantic slice. Update `STATUS.md`: check off, fix Debt + "Needs human", set the
    next target. Keep STATUS LEAN (prune resolved/stale lines). If the slice changed LOCKED design, also
-   reconcile `design/DESIGN_SPEC.md` (the canon). Then STOP — one task done.
+   reconcile `design/DESIGN_SPEC.md` (the canon). PUSH the commit when you can (remote reachable); never
+   force-push. If the step-1 pull or the push hits a CONFLICT you can't resolve cleanly, park it in
+   "Needs human" rather than forcing. Then STOP — one task done.
 
 When everything left is in "Needs human", say so in one line instead of picking work.

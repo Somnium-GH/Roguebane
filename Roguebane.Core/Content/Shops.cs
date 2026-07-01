@@ -5,7 +5,10 @@ namespace Roguebane.Core.Content;
 // "Needs human" balance touchpoint); the mechanic is what matters here.
 public static class Shops
 {
-    public static readonly Armor Plate = new("plate", Stat.Con, ArmorKind.Plate, 2);     // chest plate: flat protection
+    // NEEDS HUMAN: plate is INERT since §8 (flat protection retired -- only shields + evasion mitigate).
+    // Kept equippable so the shop mechanic still demos; give plate a new role (e.g. a shield source) or
+    // retire the kind before ship.
+    public static readonly Armor Plate = new("plate", Stat.Con, ArmorKind.Plate, 2);
     public static readonly Armor Hide = new("hide", Stat.Dex, ArmorKind.Leather, 25);    // leg leather: 25% evasion
 
     public static readonly IReadOnlyList<Weapon> Weapons = new[] { Armory.Sword, Armory.Dagger };
