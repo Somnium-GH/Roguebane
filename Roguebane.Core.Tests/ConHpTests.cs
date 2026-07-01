@@ -9,15 +9,16 @@ public class ConHpTests
     [Fact]
     public void AssembledPlayerHpIsTheRaceBasePlusConBonus()
     {
-        // §7: the RACE supplies the HP base; CON adds the bonus on top. Human 20 base + 2*CON(3) = 26.
+        // §7: the RACE supplies the HP BASE; CON adds the bonus on top (2/CON). Reference the race values
+        // so a numbers tune doesn't redden the test.
         var human = Forge.Assemble(Races.Human, CoreRunes.Grunt, CoreRunes.Grunt.NewLoadout(),
             CoreRunes.Grunt.Kit, Sieges.StandardRun());
-        Assert.Equal(20 + 2 * Races.Human.Con, human.Player.MaxHp);
+        Assert.Equal(Races.Human.Hp + 2 * Races.Human.Con, human.Player.MaxHp);
 
-        // The frailer Elf (14 base, CON 2) ends up lower: 14 + 4 = 18.
+        // The frailer Elf ends up lower.
         var elf = Forge.Assemble(Races.Elf, CoreRunes.Grunt, CoreRunes.Grunt.NewLoadout(),
             CoreRunes.Grunt.Kit, Sieges.StandardRun());
-        Assert.Equal(14 + 2 * Races.Elf.Con, elf.Player.MaxHp);
+        Assert.Equal(Races.Elf.Hp + 2 * Races.Elf.Con, elf.Player.MaxHp);
         Assert.True(elf.Player.MaxHp < human.Player.MaxHp);
     }
 

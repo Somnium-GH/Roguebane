@@ -3,35 +3,38 @@ using Roguebane.Core.Content;
 namespace Roguebane.Core.Tests;
 
 // §7 race split (design/05): attrs + HP come from the Race ALONE; its body lays those attrs into the
-// standard Head/Chest/Arms x2/Legs x2 anatomy. A CoreRune contributes no attrs.
+// standard Head/Chest/Arms x2/Legs x2 anatomy. A CoreRune contributes no attrs. Assertions reference the
+// Race's own values (not literals) so the placeholder numbers can be TUNED without reddening the build.
 public class RaceTests
 {
     [Fact]
     public void RaceBodyCarriesItsAttrsAcrossTheStandardAnatomy()
     {
-        var body = Races.Human.NewBody(); // 3/3/3/3
+        var r = Races.Human;
+        var body = r.NewBody();
 
-        Assert.Equal(6, body.Parts.Count);          // head, chest, 2 arms, 2 legs
-        Assert.Equal(3, body.Capacity(Stat.Str));   // arms split 3
-        Assert.Equal(3, body.Capacity(Stat.Int));
-        Assert.Equal(3, body.Capacity(Stat.Dex));   // legs split 3
-        Assert.Equal(3, body.Capacity(Stat.Con));
+        Assert.Equal(6, body.Parts.Count);                 // head, chest, 2 arms, 2 legs
+        Assert.Equal(r.Str, body.Capacity(Stat.Str));      // arms split STR, no loss
+        Assert.Equal(r.Int, body.Capacity(Stat.Int));
+        Assert.Equal(r.Dex, body.Capacity(Stat.Dex));      // legs split DEX, no loss
+        Assert.Equal(r.Con, body.Capacity(Stat.Con));
     }
 
     [Fact]
     public void OddAttrsSplitAcrossTheTwoLimbsWithoutLoss()
     {
-        var body = Races.Elf.NewBody(); // dex 4 -> 2+2, str 2 -> 1+1
-        Assert.Equal(4, body.Capacity(Stat.Dex));
-        Assert.Equal(2, body.Capacity(Stat.Str));
+        // Whatever the numbers, the two-limb split must sum back exactly (odd totals included).
+        var odd = new Race("odd", Str: 3, Int: 2, Dex: 5, Con: 2, Hp: 10);
+        var body = odd.NewBody();
+        Assert.Equal(3, body.Capacity(Stat.Str)); // 1 + 2
+        Assert.Equal(5, body.Capacity(Stat.Dex)); // 2 + 3
     }
 
     [Fact]
     public void ElfIsDexLeaningAndFrailerThanHuman()
     {
-        Assert.True(Races.Elf.Dex > Races.Human.Dex);
+        Assert.True(Races.Elf.Dex > Races.Human.Dex);  // the keen archer
+        Assert.True(Races.Elf.Con < Races.Human.Con);  // the frailer body
         Assert.True(Races.Elf.Hp < Races.Human.Hp);
-        Assert.Equal(14, Races.Elf.Hp);
-        Assert.Equal(20, Races.Human.Hp);
     }
 }

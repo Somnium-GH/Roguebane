@@ -52,9 +52,11 @@ public class CoreCampaignTests
     }
 
     [Fact]
-    public void TheLoopIsBeatableWithARealCore()
+    public void MostCoresWinTheCampaignWithTheirOwnKit()
     {
-        // At least one core clears the whole campaign with its default kit -> the run is winnable for real.
-        Assert.Contains(CoreRunes.Roster, core => RunCampaign(core) == CampaignState.Won);
+        // The run is winnable for real, not just with the synthetic sim body: a MAJORITY of cores clear
+        // it with their default kit. (Shield-less glass archetypes are the risky exceptions -- see STATUS.)
+        var wins = CoreRunes.Roster.Count(core => RunCampaign(core) == CampaignState.Won);
+        Assert.True(wins * 2 > CoreRunes.Roster.Count, $"only {wins}/{CoreRunes.Roster.Count} cores win");
     }
 }
