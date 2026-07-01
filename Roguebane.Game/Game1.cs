@@ -33,6 +33,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private Campaign _campaign = null!;
     private bool _paused;
     private bool _loadoutOpen; // between-fights Equipment view over the CityMap (read + re-slot techniques)
+    private string? _mfScreen;  // dev: RB_MF=<screenId> renders that screen straight from the manifest (RESCUE arc)
     private readonly CombatTargeting _ctrl = new(); // the targeting FSM (headless, in Core); shell just feeds it intents
     private KeyboardState _prevKeys;
     private KeyboardState _keys; // current frame's keys, read in Draw for button pressed-state
@@ -84,6 +85,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
         // (humanoid + robed) can be RB_SMOKE-verified, not just the default.
         if (_smoke && int.TryParse(Environment.GetEnvironmentVariable("RB_CHASSIS"), out var ci))
             _build.CycleCoreRune(ci - _build.CoreRuneIndex);
+
+        _mfScreen = Environment.GetEnvironmentVariable("RB_MF"); // dev: render this screen from the manifest
 
         if (_smokeScreen is "combat" or "map" or "loadout") // march the real loop for the screenshot
         {
@@ -456,7 +459,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
         // §11 supersample: paint design-space (960x540) into the SSx target via a scale matrix, so glyphs
         // rasterize at 1080-class density; coordinates are unchanged.
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Matrix.CreateScale(SS));
-        if (_screen == Screen.NewGame) DrawNewGameScreen();
+        if (_mfScreen is not null) DrawManifestScreen(_mfScreen); // dev: render a screen straight from the manifest
+        else if (_screen == Screen.NewGame) DrawNewGameScreen();
         else if (_screen == Screen.Equipment) DrawEquipmentScreen();
         else DrawRunScreen();
         _spriteBatch.End();
@@ -1552,6 +1556,62 @@ public class Game1 : Microsoft.Xna.Framework.Game
             _spriteBatch.Draw(tex, new Rectangle(p.Dst.X, p.Dst.Y, p.Dst.W, p.Dst.H),
                 new Rectangle(p.Src.X, p.Src.Y, p.Src.W, p.Src.H), Color.White);
         return true;
+    }
+
+    // ===== Generic manifest-driven screen renderer (RESCUE arc) =====
+    // Draw a screen's elements straight from layout.json, in Z order. Static types (panel/text/icon/
+    // button) render fully here; bound types (list/figure/graph/bar) draw only their chrome for now and
+    // get live content in later slices. Each element: shadow -> frame OR fill -> border -> content (§10).
+    private void DrawManifestScreen(string screenId)
+    {
+        var s = _ui.ScreenDef(screenId);
+        if (s is null) return;
+        foreach (var e in s.Elements.OrderBy(x => x.Z))
+            DrawManifestElement(e, ManifestUi.Rect(s, e));
+    }
+
+    private void DrawManifestElement(Element e, Rectangle r)
+    {
+        if (e.Shadow is { } sh)
+            DrawShadow(r.X, r.Y, r.Width, r.Height, sh.Dx, sh.Dy, sh.Blur, (float)sh.Opacity);
+        if (e.Frame is { } fr && fr.Slice.Length == 4 && _assets.Texture(fr.Asset) is { } ftex)
+            DrawFrameTex(ftex, fr.Slice, r);
+        else if (e.Fill is { } fill)
+            DrawFill(r, fill);
+        if (e.Border is { } b)
+            Border(r.X, r.Y, r.Width, r.Height, _ui.Color(b.Color ?? "border", Border0));
+
+        switch (e.Type)
+        {
+            case "text" when !string.IsNullOrEmpty(e.Content):
+                Text(e.Font == "display" ? _assets.Display : _assets.Mono,
+                    e.Content!, r.X, r.Y, _ui.Color(e.Color ?? "ink", Ink));
+                break;
+            case "icon" when !string.IsNullOrEmpty(e.Image):
+                Sprite(_assets.Texture(e.Image!), r.X, r.Y, r.Width, r.Height, Color.White);
+                break;
+            case "button":
+                DrawButton(e.Content ?? "", r.X, r.Y, r.Width, r.Height, true, Keys.None);
+                break;
+        }
+    }
+
+    private void DrawFrameTex(Texture2D tex, int[] slice, Rectangle r)
+    {
+        var dst = new LayoutRect(r.X, r.Y, r.Width, r.Height);
+        foreach (var p in NineSlice.Patches(tex.Width, tex.Height, slice, dst))
+            _spriteBatch.Draw(tex, new Rectangle(p.Dst.X, p.Dst.Y, p.Dst.W, p.Dst.H),
+                new Rectangle(p.Src.X, p.Src.Y, p.Src.W, p.Src.H), Color.White);
+    }
+
+    private void DrawFill(Rectangle r, Fill fill)
+    {
+        if (fill.IsGradient)
+            DrawGradient(r.X, r.Y, r.Width, r.Height,
+                _ui.Color(fill.From ?? "panel", PanelTop), _ui.Color(fill.To ?? "border", PanelBot),
+                fill.Dir == "horizontal" ? GradientDir.Horizontal : GradientDir.Vertical);
+        else if (!string.IsNullOrEmpty(fill.Token))
+            Rect(r.X, r.Y, r.Width, r.Height, _ui.Color(fill.Token!, Panel0));
     }
 
     private enum GradientDir { Vertical, Horizontal }

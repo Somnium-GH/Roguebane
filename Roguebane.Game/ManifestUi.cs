@@ -15,6 +15,18 @@ public sealed class ManifestUi
 
     public bool Has => _layout.Manifest is not null;
 
+    // The typed screen definition (its elements + design size), or null if absent — for the generic
+    // manifest-driven renderer to iterate.
+    public Screen? ScreenDef(string screen) =>
+        _layout.Manifest is { } m && m.Screens.TryGetValue(screen, out var s) ? s : null;
+
+    // Resolve an element's design-space rect within its screen.
+    public static Rectangle Rect(Screen screen, Element e)
+    {
+        var r = ScreenLayout.Resolve(screen, e);
+        return new Rectangle(r.X, r.Y, r.W, r.H);
+    }
+
     public Rectangle? ElementRect(string screen, string id)
     {
         var m = _layout.Manifest;

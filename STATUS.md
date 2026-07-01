@@ -44,9 +44,17 @@ FIDELITY DRAW (shadow/frame/gradient, §10) feeds all of the above — same crit
   [PROGRESS — manifest MODEL now covers every fidelity field: `Element.Fill` (string token OR gradient
   object), `Element.Frame` (nine-slice asset+slice), `Element.Shadow` ({dx,dy,blur,color,opacity}),
   `Element.Border`; `Style.Frames` library. All parse from the real layout.json + are contract-tested
-  (LayoutManifestTests, 287 Core green). NEXT: the Game-side generic element-draw path — iterate a screen's
-  `elements`, draw each by `type`, honoring its shadow→frame/fill→border→content order + item templates.
-  Then cut the screens over (NewGame first).]
+  (LayoutManifestTests, 287 Core green).
+  SLICE 2 DONE — the Game-side GENERIC ELEMENT RENDERER exists: `DrawManifestScreen(id)` iterates a screen's
+  `elements` by Z and `DrawManifestElement` draws each in §10 order — SHADOW -> FRAME (nine-slice from
+  `frame.asset`+slice) OR FILL (gradient/token) -> BORDER -> content. Static types render fully now
+  (panel/text/icon/button); bound types (list/figure/graph/bar) draw only their chrome pending live
+  `binds`. `ManifestUi.ScreenDef`/`Rect` expose the screen+rects. Dev hook: `RB_MF=<screenId>` renders that
+  screen straight from the manifest (safe — live screens untouched). Verified via RB_MF=newgame: the framed
+  panels (topBar/race/core/preview/confirm), the subtitle, and the column headers render at manifest
+  positions. (Headers show "?" for the circled-number glyphs — the ASCII SpriteFont can't draw ①②③; a
+  separate font/glyph task.) NEXT: bound content — lists via `ListLayout`+`CardTemplate` per-datum `binds`,
+  the composed figure, graphs; then CUT NewGame's live screen over + verify vs design/05-newgame.png.]
 
 FLOW: Equipment reachable BETWEEN fights — from the post-combat Cleared/Redeploy state + CityMap +
 CampaignMap — editing the CURRENT loadout (core fixed), NOT a core-picker.
