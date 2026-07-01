@@ -4,8 +4,7 @@ namespace Roguebane.Core.Tests;
 
 public class RunSiegeTests
 {
-    private static Encounter Stronghold(int frontHp, int restoreAmount, int restoreEvery) =>
-        new("hold", new Foe("wall", frontHp), restoreAmount, restoreEvery);
+    private static Encounter Stronghold(int frontHp) => new("hold", new Foe("wall", frontHp));
 
     private static Caster Attacker(params Technique[] techniques)
     {
@@ -34,31 +33,22 @@ public class RunSiegeTests
     }
 
     [Fact]
-    public void TheCastleIsOneRestoringBoss()
+    public void TheCastleIsAnArmedMendingBoss()
     {
-        var castle = Sieges.Castle();
-        var boss = castle.Enemy!;
-        Assert.Same(boss, castle.Enemy);
-        Assert.False(boss.Down); // one tough boss, not a layered front
+        // §8: no free restore -- the castle is a STRUCTURED, armed boss whose Arsenal carries a real
+        // heal technique (run by its own offense caster) alongside its strike.
+        var boss = Sieges.Castle().Enemy!;
+        Assert.NotNull(boss.Frame);                         // structured (part-aimable)
+        Assert.Contains(boss.Arsenal, t => t.Heals);        // a real mend technique, not a free tick
+        Assert.Contains(boss.Arsenal, t => t.Power > 0);    // and a strike
+        Assert.False(boss.Down);
     }
 
     [Fact]
-    public void RalliedRestoreStallsAWeakAttacker()
+    public void EnoughDamageClearsAHold()
     {
-        var hold = Stronghold(frontHp: 10, restoreAmount: 3, restoreEvery: 1); // +3/tick
-        var battle = new Battle(Attacker(Drain), hold);                        // -2/tick
-
-        for (var i = 0; i < 100; i++) battle.Step();
-
-        Assert.False(hold.Cleared);
-        Assert.Equal(BattleOutcome.Ongoing, battle.Outcome);
-    }
-
-    [Fact]
-    public void EnoughDamageOutRacesTheRestore()
-    {
-        var hold = Stronghold(frontHp: 10, restoreAmount: 1, restoreEvery: 1); // +1/tick
-        var battle = new Battle(Attacker(Drain), hold);                        // -2/tick
+        var hold = Stronghold(frontHp: 10);
+        var battle = new Battle(Attacker(Drain), hold); // -2/tick
 
         for (var i = 0; i < 100 && battle.Outcome == BattleOutcome.Ongoing; i++) battle.Step();
 
@@ -69,7 +59,7 @@ public class RunSiegeTests
     [Fact]
     public void RetreatEndsTheBattleWithoutClearingIt()
     {
-        var hold = Stronghold(frontHp: 50, restoreAmount: 0, restoreEvery: 0);
+        var hold = Stronghold(frontHp: 50);
         var battle = new Battle(Attacker(Drain), hold);
 
         battle.Step();
@@ -104,7 +94,7 @@ public class RunSiegeTests
     {
         static int StepsToClear()
         {
-            var hold = Stronghold(frontHp: 10, restoreAmount: 1, restoreEvery: 1);
+            var hold = Stronghold(frontHp: 10);
             var battle = new Battle(Attacker(Drain), hold);
             var steps = 0;
             while (battle.Outcome == BattleOutcome.Ongoing && steps < 1000)

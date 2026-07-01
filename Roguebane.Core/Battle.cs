@@ -52,7 +52,6 @@ public sealed class Battle
     {
         if (Outcome != BattleOutcome.Ongoing) return;
 
-        _encounter.BossRestoreTick();
         if (_encounter.Enemy is { Down: false } target)
         {
             _caster.Retarget(target);

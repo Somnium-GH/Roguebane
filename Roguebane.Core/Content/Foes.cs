@@ -24,4 +24,23 @@ public static class Foes
         frame.Add(new BodyPart($"{id}-chest", Stat.Con, 2));
         return new Foe(id, hp, frame, new[] { Strike }, figure, aim);
     }
+
+    // The castle boss's heavier strike: a real timered attack (STR arm), harder + faster than a raider's.
+    private static readonly Technique BossStrike =
+        new("boss-strike", Stat.Str, Reserve: 1, TechniqueKind.Timered, Cooldown: 25, Power: 3);
+
+    // A structured boss that MENDS itself through a REAL technique (§8 symmetry, never a free HP tick):
+    // its Arsenal carries the §10 part-heal (Bandage) alongside BossStrike, run by its OWN offense caster
+    // — so smashing its arm is answered by a mend, sustaining its offense. A slow build takes too many
+    // strikes to break it in time; a fast (and shielded) build clears it first. Numbers placeholder.
+    public static Foe ArmedHealing(string id, int hp, int arm = 4, string figure = "ogre",
+        FoeAim aim = FoeAim.Smart)
+    {
+        var frame = new Body();
+        frame.Add(new BodyPart($"{id}-arm", Stat.Str, arm));  // powers BossStrike
+        frame.Add(new BodyPart($"{id}-head", Stat.Int, 2));
+        frame.Add(new BodyPart($"{id}-legs", Stat.Dex, 2));
+        frame.Add(new BodyPart($"{id}-chest", Stat.Con, 3));  // powers the mend (Bandage reserves CON)
+        return new Foe(id, hp, frame, new[] { BossStrike, Techniques.Bandage }, figure, aim);
+    }
 }

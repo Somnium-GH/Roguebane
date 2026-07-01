@@ -42,13 +42,11 @@ public class SupportTests
     }
 
     [Fact]
-    public void SupportRacesAgainstBossRestoreNotForIt()
+    public void SupportChipsTheEnemyForThePlayer()
     {
-        // support 2/tick vs boss restore 1/tick: net player gain, the enemy falls without the player
-        // lifting a finger — support helps the player, the inverse of the old code.
+        // Rallied support fires FOR the player: 2/tick on a 10-HP foe clears it even from an idle caster.
         var foe = new Foe("wall", 10);
-        var encounter = new Encounter("siege", foe, restoreAmount: 1, restoreEvery: 1,
-            supportAmount: 2, supportEvery: 1);
+        var encounter = new Encounter("siege", foe, supportAmount: 2, supportEvery: 1);
         var battle = new Battle(IdleCaster(), encounter);
 
         for (var i = 0; i < 100 && battle.Outcome == BattleOutcome.Ongoing; i++) battle.Step();

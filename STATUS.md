@@ -15,9 +15,9 @@ OPEN — needs a HUMAN decision before I build (do NOT guess):
 - **#4 Equipment between-fights MUTATION model** — read-side data exists (Expedition.Player/Equipment/
   Minions/Gold; gear-equip already works on the CityMap). Undecided: what a dedicated between-fights
   Equipment SCREEN may CHANGE (re-slot techniques? equip stash? rune-bag?). Unblocks the #3 button.
-- **CASTLE thesis + ENEMY HEAL live-wiring** — mechanism proven (FoeSymmetryTests); the last off-model
-  bit is `Encounter.BossRestoreTick` (free HP tick). Removing it needs the castle to gain PARTS + a
-  RE-TUNED DPS-race (BalanceSimTests assert glass-loses / AllSix-wins). Balance numbers are yours.
+- **CASTLE thesis + ENEMY HEAL** — DONE: free HP tick removed; castle is an armed structured boss that
+  mends via a real §10 technique; BalanceSim thesis preserved (glass loses / AllSix wins). Numbers
+  (castle HP/strike) are placeholder — tune the FEEL in play (a play-tuning touchpoint, not a blocker).
 - **PLATE armour role** — inert since §8 (flagged in Shops.cs): give it a role (shield source?) or retire.
 
 CD LANDING (2026-07-01, mid-loop external drop — now committed): a big Claude-Design payload arrived —
@@ -161,12 +161,15 @@ LAYOUT_CONTRACT §10-11 (fidelity primitives + 1080). Priority order:
      coverage stays in MitigationTests. 271 Core green; Game builds. Plate armour now INERT -> flagged
      NEEDS HUMAN in Shops.cs (give plate a role or retire the kind).]
    - **ENEMY HEAL**: must run on a real tuned technique (same system as the player), can't out-tick the
-     player's healing — not a fast free regen. [MECHANISM READY: a heal in a foe's Arsenal is run by its
-     own offense caster and repairs the foe's PARTS (§10), proven in FoeSymmetryTests. STILL LIVE + off-
-     model: Encounter.BossRestoreTick is a free HP tick (Sieges.Castle/ArmedCastle restoreAmount/Every) —
-     removing it + moving the castle to a real part-heal reshapes the DPS-race the BALANCE SIM asserts
-     (BalanceSimTests: glass build must lose the castle race). NEEDS HUMAN: the castle needs PARTS to heal
-     + re-tuned thesis numbers. Not guessed here.]
+     player's healing — not a fast free regen. [DONE: removed the free `Encounter.BossRestoreTick` +
+     restoreAmount/Every entirely. The castle is now a STRUCTURED, armed boss (`Foes.ArmedHealing`) whose
+     Arsenal carries a real §10 part-heal (Bandage) run by its OWN offense caster alongside a BossStrike —
+     it mends its smashed parts on a technique, never a free tick. THESIS PRESERVED without the tick: the
+     castle's whole-HP strike race means a slow, UNSHIELDED build (GlassEmber) takes too many strikes and
+     falls, while a fast, SHIELDED loadout (AllSix, carries Brace) clears it first — BalanceSimTests stay
+     green (glass loses, AllSix wins fastest), CampaignTests win. Tests: TheCastleIsAnArmedMendingBoss;
+     the restore-mechanic tests retired. Numbers (castle HP 40, BossStrike power 3 / cd 25) placeholder —
+     tune the FEEL in play. 279 Core green; combat smoke clean.]
    - **SYMMETRY**: enemies act through the SAME technique/attribute/shield/heal framework as the player
      (shared sim). Refactor toward this; exceptions few + obvious. [PROVEN + LOCKED: FoeSymmetryTests show
      a foe's own offense caster runs the §10 part-heal AND the §6b shield on the foe body, mid-Battle,
