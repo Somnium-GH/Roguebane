@@ -798,7 +798,12 @@ public class Game1 : Microsoft.Xna.Framework.Game
         Sprite(_assets.Node(map.Sees(map.Current)), x - 8, y - 8, 20, 20, Color.White); // camp end
         var frac = map.MarchLength > 0 ? (float)map.WarPartyDistance / map.MarchLength : 0f;
         var mx = x + (int)((1f - frac) * (w - 22));
-        Sprite(_assets.Node(NodeType.Castle), mx, y - 10, 24, 24, Blood); // the closing war party
+        // The closing war-party host: its own icon, swapping to the "near" variant when it's about to
+        // reach camp (the loss timer). Falls back to the castle glyph if the art is missing.
+        var near = map.WarPartyDistance <= 2;
+        var host = _assets.Texture("icons/map/enemy_host" + (near ? "_near" : ""));
+        if (host is not null) Sprite(host, mx, y - 12, 28, 28, Color.White);
+        else Sprite(_assets.Node(NodeType.Castle), mx, y - 10, 24, 24, Blood);
         Text(_assets.Mono, map.WarPartyDistance + " to camp", x + w + 12, y - 6, Blood);
     }
 

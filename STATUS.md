@@ -47,8 +47,11 @@ STILL BLOCKED / TODO on the Claude Design side:
   orphans it found: the 6 `icons/rune/core_*` glyphs (now DRAWN in the Equipment CURRENT CORE panel) + the
   2 `icons/map/enemy_host*` war-party icons (pending a map feature). Guard now GREEN. Real fix (a single
   mgcb source of truth) still wants a CD/human call, but the guard stops silent blank-asset regressions.
+- WAR-PARTY icon DONE: the CityMap's closing war party now draws `icons/map/enemy_host` (swaps to
+  `enemy_host_near` when <=2 to camp), replacing the Blood-tinted castle placeholder. Both `enemy_host*`
+  landed assets are now used.
 - Still Game TODO: a `shot` technique icon (none exists — falls to `swing`/crossed-swords; CD asset need);
-  consume the manifest `fill:{gradient}` + a per-element `shadow` field; wire the enemy_host war-party icon.
+  consume the manifest `fill:{gradient}` + a per-element `shadow` field.
 - Manifest screen-id renames (newrun/build/runmap→newgame/equipment/citymap); per-PART `binds`
   (manifest-drive arc blocker); the TWO divergent `Content.mgcb` still need a single source of truth.
 
