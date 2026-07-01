@@ -53,8 +53,13 @@ STILL BLOCKED / TODO on the Claude Design side:
 - WAR-PARTY icon DONE: the CityMap's closing war party now draws `icons/map/enemy_host` (swaps to
   `enemy_host_near` when <=2 to camp), replacing the Blood-tinted castle placeholder. Both `enemy_host*`
   landed assets are now used.
+- CARD FRAME wired: Panel() now picks the nine-slice frame by SIZE — PANEL frame (60px corners) for large
+  panels (w>=220,h>=170), the lighter CARD frame (36px corners, the previously-UNUSED `card.png`) for
+  card-sized elements (w>=100,h>=80: the NewGame core cards + THE CASTLE panel, etc.), gradient for small
+  cards/thin bars. Both frame assets now used; screenshot-verified newgame/map/combat.
 - Still Game TODO: a `shot` technique icon (none exists — falls to `swing`/crossed-swords; CD asset need);
-  consume the manifest `fill:{gradient}` + a per-element `shadow` field.
+  consume the manifest per-element `fill:{gradient}`/`shadow`/`frame` overrides (needs the hand-drawn
+  panels re-based on the manifest element path first).
 - Manifest screen-id renames (newrun/build/runmap→newgame/equipment/citymap); per-PART `binds`
   (manifest-drive arc blocker); the TWO divergent `Content.mgcb` still need a single source of truth.
 

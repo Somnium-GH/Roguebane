@@ -1532,9 +1532,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private void Panel(int x, int y, int w, int h)
     {
         DrawShadow(x, y, w, h, dx: 2, dy: 3, blur: 3, opacity: 0.40f); // §10 depth under the chrome
-        // The carved nine-slice frame suits LARGE panels (its 60px corners need room); small cards +
-        // thin bars keep the clean gradient chrome so the frame's corner ornament isn't crushed.
+        // Carved nine-slice frames by size: the PANEL frame (60px corners) for large panels, the lighter
+        // CARD frame (36px corners) for card-sized elements, and the clean gradient for small cards/bars
+        // (whose corner ornament would be crushed by either frame).
         if (w >= 220 && h >= 170 && DrawFrame(x, y, w, h, "panel", PanelSlice)) return;
+        if (w >= 100 && h >= 80 && DrawFrame(x, y, w, h, "card", CardSlice)) return;
         DrawGradient(x, y, w, h, PanelTop, PanelBot, GradientDir.Vertical);
         Border(x, y, w, h, Border0);
     }
