@@ -288,7 +288,10 @@ OPEN (park; decide as the phase starts):
 - Race roster beyond Human/Elf; full Core-rune roster; the race<->core-rune restriction matrix.
 
 Suggested order: (1) single-enemy + part-aim simplification; (2) Chassis->Race+CoreRune rename + race-gated
-New Run; (3) shield-levels system; (4) part-repair heals [MECHANISM DONE: in-combat `Heals` technique +
+New Run; (3) shield-levels system [POOL MODEL DONE: `ShieldPool` — regenerating 1-dmg layers, absorb +
+CON-scalable regen cadence, tested. NEXT (disruptive): wire it as a shield SOURCE (passive technique
+maintaining a pool) into Caster.Hit mitigation, REPLACING the flat CON block — updates MitigationTests +
+FoeOffense + rebalances kits, so do with care / human balance eyes]; (4) part-repair heals [MECHANISM DONE: in-combat `Heals` technique +
 Body.MostDamagedPart + Techniques.Bandage, tested; still needs kit placement + balance]; (5) defensive-
 source defaults in starting kits; (6) enemy-HP scaling. DESIGN_SPEC touch points: §4/§6/§7/§10/§11/§16.
 
