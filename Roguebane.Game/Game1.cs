@@ -577,7 +577,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         Text(_assets.Mono, "SUPPLIES", x + 12, y + 8, Muted);
         Text(_assets.Mono, $"{map.Supplies}/{map.MaxSupplies}", x + 200, y + 8, map.Supplies > 0 ? Ink : Blood);
         DrawPipStrip(x + 12, y + 28, map.Supplies, map.MaxSupplies, map.Supplies > 0 ? Amber : Blood);
-        Text(_assets.Mono, "1 supply spent per jump", x + 12, y + 44, Muted);
+        Text(_assets.Mono, "1 supply per deployment", x + 12, y + 44, Muted);
 
         var sy = y + 72;
         Panel(x, sy, 250, 64);

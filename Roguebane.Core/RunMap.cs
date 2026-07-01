@@ -64,7 +64,13 @@ public sealed class RunMap
         if (Outcome == RunMapOutcome.Marching && Current.Type == NodeType.ResourceHold) SupportBank++;
     }
 
-    public IReadOnlyList<MapNode> Options => Current.Next.Select(id => _nodes[id]).ToList();
+    // Movement is ANY-DIRECTION along the chart's edges: a link is traversable both ways, so the player
+    // may double back (e.g. to a merchant). Each move still spends a supply and advances the war party.
+    private bool Adjacent(string nodeId) =>
+        _nodes.ContainsKey(nodeId) &&
+        (Current.Next.Contains(nodeId) || _nodes[nodeId].Next.Contains(CurrentId));
+
+    public IReadOnlyList<MapNode> Options => _order.Where(n => Adjacent(n.Id)).ToList();
 
     public MapNode Node(string id) => _nodes[id];
 
@@ -75,7 +81,7 @@ public sealed class RunMap
     public NodeType Sees(MapNode node)
     {
         if (node.Visited) return node.Type;
-        var adjacent = Current.Next.Contains(node.Id);
+        var adjacent = Adjacent(node.Id);
         return node.Type switch
         {
             NodeType.ResourceHold => NodeType.ResourceHold, // visible afar
@@ -87,7 +93,7 @@ public sealed class RunMap
     }
 
     public bool CanMoveTo(string nodeId) =>
-        Outcome == RunMapOutcome.Marching && Supplies > 0 && Current.Next.Contains(nodeId);
+        Outcome == RunMapOutcome.Marching && Supplies > 0 && Adjacent(nodeId);
 
     // Jump to a charted neighbour: spend a supply, the war party advances a step, then resolve the
     // node we land on. In standalone navigation (no combat driver) a resource-hold banks and the castle

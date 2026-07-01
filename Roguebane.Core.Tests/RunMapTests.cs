@@ -53,6 +53,16 @@ public class RunMapTests
     }
 
     [Fact]
+    public void MovementIsAnyDirectionAlongTheEdges()
+    {
+        var map = Maps.StandardLeg();
+        Assert.True(map.MoveTo("a2"));        // camp -> a2 (forward)
+        Assert.Contains(map.Options, n => n.Id == "camp"); // camp is offered again (backtrack)
+        Assert.True(map.MoveTo("camp"));      // a2 -> camp (backward along the same edge)
+        Assert.Equal("camp", map.CurrentId);
+    }
+
+    [Fact]
     public void ResourceHoldsBankSupportForTheCastle()
     {
         var map = Maps.StandardLeg();

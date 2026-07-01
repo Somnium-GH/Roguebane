@@ -27,9 +27,10 @@ LAYOUT_CONTRACT §10-11 (fidelity primitives + 1080). Priority order:
    nineSlice (blit CD frame assets), gradient fill; build SpriteFonts at **1080-class** density. Frame
    ASSETS come from Claude Design (blocked until delivered — do shadow/gradient + fonts meanwhile).
 6. **BUG BATCH:**
-   - CityMap supplies label "spent per jump" → **"per deployment"** (drop the FTL wording).
+   - CityMap supplies label "spent per jump" → **"per deployment"** (drop the FTL wording). [DONE]
    - CityMap movement **ANY-DIRECTION**: any move (incl. back to a merchant) costs 1 supply AND advances
-     the war party — remove any forward-only restriction.
+     the war party — remove any forward-only restriction. [DONE: RunMap edges are now traversable both
+     ways (undirected Adjacent()); MoveTo still spends a supply + advances the war party; tested.]
    - Merchant = **HP HEALING only** (gold → HP at 1 HP per randomized cost, loot-bounded). No potion
      purchases (potions are heal-body-part techniques).
    - **AUTO-attack is GLOBAL, not per-weapon**: on = a fired weapon re-fires on its next charge at the
