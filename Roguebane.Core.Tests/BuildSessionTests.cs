@@ -7,6 +7,14 @@ public class BuildSessionTests
     private static BuildSession New() => Sessions.NewBuild();
 
     [Fact]
+    public void RosterExposesTheWholeLineUpForTheCoreGrid()
+    {
+        var build = New();
+        Assert.Equal(Chassrium.Roster.Count, build.Roster.Count);
+        Assert.Same(build.Chassis, build.Roster[build.ChassisIndex]);
+    }
+
+    [Fact]
     public void CyclingChassisWrapsAndResetsRunes()
     {
         var build = New();

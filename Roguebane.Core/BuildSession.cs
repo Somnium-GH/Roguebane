@@ -37,6 +37,7 @@ public sealed class BuildSession
     public int ChassisIndex { get; private set; }
     public int ChassisCount => _chassis.Count;
     public Chassis Chassis => _chassis[ChassisIndex];
+    public IReadOnlyList<Chassis> Roster => _chassis; // the whole line-up, for the New Run core grid
     public RuneLoadout Runes => _runes;
     public IReadOnlyList<IReadOnlyList<Mark>> Paths { get; }
     public IReadOnlyList<Technique> Palette => _palette;

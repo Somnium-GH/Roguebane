@@ -30,12 +30,13 @@ POC is NOT complete; the "DONE" claim below is RETRACTED until these clear.**
     rarity item cards, and a RUNE BAG of MARKS/PATHS/KEYSTONES cards (current screen shows rune LADDERS).
     Both input-coupled (need input wiring + mid-run stash).
   * 01 COMBAT: divergence from design/01 is a LOCKED decision (s13 multi-foe layout) — NOT a defect.
-  * 05 NEW RUN: a dedicated "Choose Your Core" 5-card grid (figure + stat block + flavor + SELECT, one
-    ringed, BEGIN THE MARCH). Build merges this into the BUILD screen's inline selector — rebuild it off
-    `screens.newrun` + `design/05` (single-core for now; race step behind the flag). DATA FOUNDATION DONE:
-    each Chassis now carries Title + Archetype ("THE GENERALIST"...) + Flavor (design/05 copy), tested +
-    shown on the build CURRENT-CORE block. REMAINING: the dedicated new-run Screen state that stamps a
-    coreCard per roster core (via CardTemplate.Place + GraphLayout/list) with SELECT/BEGIN input.
+  * 05 NEW RUN: DONE + smoke-verified. Dedicated Screen.NewRun "Choose Your Core" 5-card grid -- each
+    card draws its OWN core figure + Title + Archetype + stat block + wrapped Flavor; the current core is
+    ringed SELECTED; BEGIN THE MARCH -> the loadout (build) screen. Flow is now NewRun -> Build -> March
+    (shell starts on NewRun; RB_SCREEN=newrun smokes it). Input: arrows / card-click select, Enter/click
+    Begin. Single-core (race step still behind the flag). NOTE: this screen is HAND-CODED (draws figures
+    directly by core id), so it sidesteps the manifest coreCard template's hardcoded-grunt image -- that
+    review-fix only matters if/when the screen is re-based on the manifest coreCard.
   * PALETTE: NOT a uniform shift — 05 reads warm-dusk, 02/03 read cooler/navy; renders vary, so leave
     the palette as-is (warm-muted-dusk, DESIGN_SPEC §13) until a palette decision actually locks.
 - MANIFEST validated COMPLETE (human review of the full 3305-line `layout.json`; parses clean — an

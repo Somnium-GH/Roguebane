@@ -19,7 +19,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     private static readonly Keys[] PathKeys = { Keys.Q, Keys.W };
 
-    private enum Screen { Build, Run }
+    private enum Screen { NewRun, Build, Run }
 
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch = null!;
@@ -28,7 +28,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private readonly LayoutRegistry _layout = new();
     private ManifestUi _ui = null!;
 
-    private Screen _screen = Screen.Build;
+    private Screen _screen = Screen.NewRun;
     private BuildSession _build = null!;
     private Campaign _campaign = null!;
     private bool _paused;
@@ -89,6 +89,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
             _campaign = _build.March(Maps.StandardLegs(3));
             _screen = Screen.Run;
             foreach (var t in Exp.Loadout) _campaign.Toggle(t); // power the bar (both shots)
+            // (build/newrun smoke handled after this block)
             void Resolve() { for (var i = 0; i < 200 && Exp.State == ExpeditionState.Fighting; i++) _campaign.Tick(); }
 
             if (_smokeScreen == "map") // stop at the merchant so the shot shows the gear stock + gear bar
@@ -124,6 +125,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 for (var i = 0; i < 6; i++) _campaign.Tick(); // castle survives -> stay in combat
             }
         }
+        else if (_smokeScreen == "build") _screen = Screen.Build; // else fall through to the New Run grid
 
         base.Initialize();
     }
@@ -155,12 +157,28 @@ public class Game1 : Microsoft.Xna.Framework.Game
         _clicked = mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released;
         _rclicked = mouse.RightButton == ButtonState.Pressed && _prevMouse.RightButton == ButtonState.Released;
 
-        if (_screen == Screen.Build) UpdateBuild(keys);
+        if (_screen == Screen.NewRun) UpdateNewRun(keys);
+        else if (_screen == Screen.Build) UpdateBuild(keys);
         else UpdateRun(keys, gameTime);
 
         _prevKeys = keys;
         _prevMouse = mouse;
         base.Update(gameTime);
+    }
+
+    // New Run (design/05): the core grid. Pick with arrows or a card click; BEGIN goes to the loadout.
+    private static Rectangle NewRunCardRect(int i) => new(14 + i * 188, 66, 176, 420);
+    private static readonly Rectangle NewRunBeginRect = new(W - 258, H - 44, 240, 34);
+
+    private void UpdateNewRun(KeyboardState keys)
+    {
+        if (Pressed(keys, Keys.Left)) _build.CycleChassis(-1);
+        if (Pressed(keys, Keys.Right)) _build.CycleChassis(1);
+        for (var i = 0; i < _build.Roster.Count; i++)
+            if (Click(NewRunCardRect(i))) _build.CycleChassis(i - _build.ChassisIndex);
+
+        var go = (Pressed(keys, Keys.Enter) && !keys.IsKeyDown(Keys.LeftAlt)) || Click(NewRunBeginRect);
+        if (go) _screen = Screen.Build; // on to the loadout screen for the chosen core
     }
 
     private void UpdateBuild(KeyboardState keys)
@@ -398,7 +416,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
         GraphicsDevice.SetRenderTarget(_scene);
         GraphicsDevice.Clear(new Color(0x17, 0x11, 0x0b)); // panel-dark base from the locked palette
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp); // HD pixel: crisp integer edges
-        if (_screen == Screen.Build) DrawBuildScreen();
+        if (_screen == Screen.NewRun) DrawNewRunScreen();
+        else if (_screen == Screen.Build) DrawBuildScreen();
         else DrawRunScreen();
         _spriteBatch.End();
 
@@ -739,6 +758,70 @@ public class Game1 : Microsoft.Xna.Framework.Game
             Sprite(icon, sx, y, 22, 22, Color.White);
             Text(_assets.Mono, value.ToString(), sx + 26, y + 4, Ink);
         }
+    }
+
+    // New Run screen (design/05): the roster as a card grid — figure, identity, stat block, flavor —
+    // one ringed as SELECTED. Reads the BuildSession roster; picking cycles the chassis it will build.
+    private void DrawNewRunScreen()
+    {
+        Stretch(_assets.Background("build_alcove"), 0, 0, W, H);
+        Panel(0, 0, W, 40);
+        Text(_assets.Display, "CHOOSE YOUR CORE", 16, 8, Ink);
+        Text(_assets.Mono, "the Core is the body you wear all run", 356, 14, Muted);
+
+        var roster = _build.Roster;
+        for (var i = 0; i < roster.Count; i++)
+        {
+            var c = roster[i];
+            var r = NewRunCardRect(i);
+            var selected = i == _build.ChassisIndex;
+            Panel(r.X, r.Y, r.Width, r.Height);
+            if (selected)
+            {
+                Border(r.X, r.Y, r.Width, r.Height, Amber);
+                Text(_assets.Mono, "SELECTED", r.X + r.Width - 74, r.Y + 8, Amber);
+            }
+
+            DrawHumanoid(c.NewBody(), c.Id, r.X + r.Width / 2, r.Y + 168, 140);
+            Text(_assets.Mono, c.Title.ToUpper(), r.X + 12, r.Y + 176, Ink);
+            Text(_assets.Mono, c.Archetype, r.X + 12, r.Y + 192, Amber);
+
+            var body = c.NewBody();
+            var sy = r.Y + 216;
+            void Row(string k, int v)
+            {
+                Text(_assets.Mono, k, r.X + 12, sy, Muted);
+                Text(_assets.Mono, v.ToString(), r.X + r.Width - 30, sy, Ink);
+                sy += 15;
+            }
+            Row("str", body.Capacity(Stat.Str)); Row("int", body.Capacity(Stat.Int));
+            Row("dex", body.Capacity(Stat.Dex)); Row("con", body.Capacity(Stat.Con));
+            Row("bays", c.Bays); Row("budget", c.RuneBudget);
+
+            DrawWrapped(c.Flavor, r.X + 12, sy + 8, r.Width - 24, Muted);
+        }
+
+        DrawButton("BEGIN THE MARCH", NewRunBeginRect.X, NewRunBeginRect.Y,
+            NewRunBeginRect.Width, NewRunBeginRect.Height, true, Keys.Enter);
+    }
+
+    // Greedy word-wrap for mono copy inside a width; steps ~14px per line.
+    private void DrawWrapped(string text, int x, int y, int w, Color col)
+    {
+        var line = "";
+        var ly = y;
+        foreach (var word in text.Split(' '))
+        {
+            var trial = line.Length == 0 ? word : line + " " + word;
+            if (line.Length > 0 && _assets.Mono.MeasureString(trial).X > w)
+            {
+                Text(_assets.Mono, line, x, ly, col);
+                ly += 14;
+                line = word;
+            }
+            else line = trial;
+        }
+        if (line.Length > 0) Text(_assets.Mono, line, x, ly, col);
     }
 
     // Build screen (design/02): chassis anatomy + attribute readout on the left, the chassis line-up
