@@ -7,6 +7,9 @@ LAYOUT_CONTRACT §10-11 (fidelity primitives + 1080). Priority order:
 1. **RENAME everywhere** (Screen enum + titles + labels; keep in sync with `layout.json` ids — Claude
    Design renames the manifest side in parallel): NewRun→**NewGame**, Build→**Equipment**,
    RunMap→**CityMap**, Campaign→**CampaignMap**, Combat→**Encounter**; Flee→**Retreat**, March→**Redeploy**.
+   Also make FIGURE keys uniform **`human_<core>`** (like `elf_<core>`) — retire bare `<core>`, no
+   "unprefixed = human" special case. Do it ADDITIVELY (add `human_` PNGs/keys, repoint FigureId refs,
+   then drop the bare ones); coordinate with Claude Design (asset + manifest side).
    [DONE for the shell: Screen enum {NewGame, Equipment, Run}; screen Draw/Update methods + rects renamed
    (DrawEncounterScreen/DrawCityMapScreen/DrawNewGameScreen/DrawEquipmentScreen, RetreatRect/RedeployRect);
    display titles/verbs EQUIPMENT / REDEPLOY / BEGIN / RETREAT; smoke-verified. Core API (BuildSession.
@@ -20,6 +23,12 @@ LAYOUT_CONTRACT §10-11 (fidelity primitives + 1080). Priority order:
    **Equipment reachable between fights** — a button on Encounter (enabled only when NOT fighting) + on
    CityMap + CampaignMap (generic button OK). Redeploy timing/DEX-lockout is DESIGN-SPEC'd but NOT built
    yet — **flow only** now.
+   [REDEPLOY TRANSITION DONE: new ExpeditionState.Cleared — a won fight banks its hold then HOLDS at
+   Cleared (no silent auto-return); Expedition.Redeploy() (Cleared->Choosing) + Campaign.Redeploy();
+   tested (can't jump until redeployed). Shell keeps the Encounter view on Cleared with a "NODE CLEARED /
+   REDEPLOY" overlay (SPACE or click). Retreat (Flee) still only during a fight. STILL TODO: the
+   Equipment-reachable-between-fights button — coupled to #4 (Equipment must become a between-fights
+   screen reading the RUN state, not the pre-run BuildSession); do it with the #4 redo.]
 4. **EQUIPMENT screen** (was Build): full redo off `screens.equipment` (design/02). **REMOVE the
    rune-ladder TEST** ("Q vessel / W resonance") — throwaway rune-test, retire it. Between-fights screen,
    not a post-NewGame gate.
@@ -46,9 +55,12 @@ LAYOUT_CONTRACT §10-11 (fidelity primitives + 1080). Priority order:
 7. Carry-over review fixes (already tracked below): coreCard per-core figure bind, add `✦ ◉ ✓` glyphs,
    normalize element `type`. (#3 truncated subtitles still parked.)
 
-**NEEDS HUMAN — doc drift to reconcile:** DESIGN_SPEC §8 still says combat is **single-enemy [LOCKED]**,
-but §13 + the shipped build are **multi-foe** (s13). Do NOT silently pick — flag to the human which is
-canon. (Raised with Doug 2026-06-30.)
+**RESOLVED 2026-06-30 — SINGLE-FOE is canon.** Human picked single enemy (body-part aim is already
+enough focus; the FTL lesson). DESIGN_SPEC §13 reverted to single-foe; §8/§18 already said single.
+DIRECTIVE: revert the shipped MULTI-foe Encounter to **SINGLE-foe** (design/01 layout — one structured,
+possibly multi-part enemy; the prominent bottom attribute pool returns). Do NOT maintain a multi-foe
+branch; KEEP the multi-foe capability latent ONLY if it stays neat (else drop it) — don't spend effort
+preserving it.
 
 ## Current target
 **RE-OPEN RESOLVED (both threads cleared) — POC functionally complete again.**

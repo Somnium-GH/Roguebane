@@ -227,6 +227,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         if (_campaign.State != CampaignState.Marching) return; // settled: hold the end overlay
         if (Exp.State == ExpeditionState.Fighting) UpdateCombat(keys, gameTime);
+        else if (Exp.State == ExpeditionState.Cleared)
+        {
+            if (Pressed(keys, Keys.Space) || Click(ClearedRedeployRect)) _campaign.Redeploy(); // back to the chart
+        }
         else UpdateChoosing(keys);
     }
 
@@ -498,7 +502,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // (design/03), the battlefield when a fight is under way (design/01).
     private void DrawRunScreen()
     {
-        if (Exp.State == ExpeditionState.Fighting) DrawEncounterScreen();
+        // A cleared fight HOLDS on the battlefield (with the Redeploy overlay) — no auto-return to the
+        // chart. The chart shows only once the player has redeployed (Choosing).
+        if (Exp.State is ExpeditionState.Fighting or ExpeditionState.Cleared) DrawEncounterScreen();
         else DrawCityMapScreen();
     }
 
@@ -1370,8 +1376,21 @@ public class Game1 : Microsoft.Xna.Framework.Game
         if (on || hovered) Border(r.X, r.Y, r.Width, r.Height, Amber);
     }
 
+    private static readonly Rectangle ClearedRedeployRect = new(W / 2 - 90, H / 2 + 24, 180, 34);
+
     private void DrawStateOverlay()
     {
+        // A cleared fight: dim the field, name the win, and offer REDEPLOY (no silent return to the map).
+        if (_campaign.State == CampaignState.Marching && Exp.State == ExpeditionState.Cleared)
+        {
+            Rect(0, 0, W, H, new Color(20, 45, 30, 120));
+            var s = _assets.Display.MeasureString("NODE CLEARED");
+            Text(_assets.Display, "NODE CLEARED", (int)(W / 2 - s.X / 2), H / 2 - 40, Ink);
+            DrawButton("REDEPLOY", ClearedRedeployRect.X, ClearedRedeployRect.Y,
+                ClearedRedeployRect.Width, ClearedRedeployRect.Height, true, Keys.Space);
+            return;
+        }
+
         (Color tint, string label)? overlay = _campaign.State switch
         {
             CampaignState.Won => (new Color(40, 120, 60, 130), "THE CAPITAL FALLS"),

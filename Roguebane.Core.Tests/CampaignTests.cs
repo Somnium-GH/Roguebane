@@ -37,6 +37,7 @@ public class CampaignTests
         c.Enter(node);
         var guard = 0;
         while (c.Current.State == ExpeditionState.Fighting && guard++ < 10000) { AimAll(c); c.Tick(); }
+        c.Redeploy(); // a cleared node holds at Cleared -> redeploy back to the chart before the next jump
     }
 
     [Fact]

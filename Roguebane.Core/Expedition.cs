@@ -6,6 +6,7 @@ public enum ExpeditionState
 {
     Choosing, // at a beacon, picking the next jump
     Fighting, // a battle is underway at the current node
+    Cleared,  // the fight is won but not yet left — the player must REDEPLOY to return to the chart
     Won,      // the castle fell
     Lost,     // the player fell, or the war party overran the camp
 }
@@ -197,12 +198,21 @@ public sealed class Expedition
                 _stash.AddGold(Spoils(Map.Current.Type)); // spoils for taking the node
                 _caster.Recharge();                       // magic refills in the lull after a fight
                 if (Map.AtCastle) { Map.CrackCastle(); State = ExpeditionState.Won; }
-                else { Map.BankHold(); State = ExpeditionState.Choosing; } // a cleared hold banks support
+                // A cleared node banks its hold, then HOLDS at Cleared — the shell shows the result and
+                // the player must REDEPLOY to return to the chart (no silent auto-return to the map).
+                else { Map.BankHold(); State = ExpeditionState.Cleared; }
                 break;
         }
     }
 
-    // Break off the current fight and fall back to the chart (the war party keeps coming).
+    // Leave a cleared fight and return to the chart to pick the next jump. Only valid post-clear
+    // (Redeploy = out of combat); a no-op otherwise.
+    public void Redeploy()
+    {
+        if (State == ExpeditionState.Cleared) State = ExpeditionState.Choosing;
+    }
+
+    // RETREAT: break off an ACTIVE fight and fall back to the chart (the war party keeps coming).
     public void Flee()
     {
         if (State != ExpeditionState.Fighting) return;

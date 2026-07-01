@@ -61,6 +61,7 @@ public sealed class Campaign
 
     public void Toggle(Technique technique) => Current.Toggle(technique);
     public bool IsActive(Technique technique) => Current.IsActive(technique);
+    public void Redeploy() => Current.Redeploy(); // leave a cleared fight -> back to the chart
 
     // FTL targeting surface (delegates to the current leg's expedition).
     public IReadOnlyList<Foe> Foes => Current.Foes;

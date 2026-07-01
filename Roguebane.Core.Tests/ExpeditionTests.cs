@@ -24,10 +24,13 @@ public class ExpeditionTests
         foreach (var t in exp.Loadout) if (exp.IsActive(t)) exp.Aim(t, foe);
     }
 
+    // Fight to completion, then REDEPLOY back to the chart (a cleared node now holds at Cleared until
+    // the player redeploys). The one test that checks the Cleared state inlines the fight instead.
     private static void FightToEnd(Expedition exp)
     {
         var guard = 0;
         while (exp.State == ExpeditionState.Fighting && guard++ < 10000) { AimAll(exp); exp.Tick(); }
+        exp.Redeploy();
     }
 
     // FSM pin: powering a technique reserves + charges it but does NOT target. With no aim it holds at
@@ -101,12 +104,17 @@ public class ExpeditionTests
     }
 
     [Fact]
-    public void ClearingASkirmishReturnsToChoosing()
+    public void ClearingASkirmishHoldsAtClearedUntilRedeploy()
     {
         var exp = FullLoadout();
         exp.Enter("a2");
-        FightToEnd(exp);
-        Assert.Equal(ExpeditionState.Choosing, exp.State);
+        var guard = 0;
+        while (exp.State == ExpeditionState.Fighting && guard++ < 10000) { AimAll(exp); exp.Tick(); }
+        Assert.Equal(ExpeditionState.Cleared, exp.State); // no silent auto-return to the map
+
+        Assert.False(exp.Enter("b")); // can't jump until redeployed
+        exp.Redeploy();
+        Assert.Equal(ExpeditionState.Choosing, exp.State); // now back on the chart
     }
 
     [Fact]
