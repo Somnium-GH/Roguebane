@@ -32,6 +32,13 @@ public static class Techniques
     public static readonly Technique Bandage =
         new("bandage", Stat.Con, Reserve: 1, TechniqueKind.Timered, Cooldown: 80, Power: 1, Heals: true);
 
+    // A §6b SHIELD SOURCE: a passive INT spell that holds a pool of 3 stone layers, each eating one hit,
+    // one regenerating ~every 3s (faster with CON). Reserves INT while held. Opt-in content (not in
+    // `All`): dormant until placed in a kit, so it perturbs no current balance. Numbers are placeholder.
+    public static readonly Technique Stoneskin =
+        new("stoneskin", Stat.Int, Reserve: 2, TechniqueKind.Sustained, Cooldown: 0, Power: 0,
+            ShieldLayers: 3, ShieldRegen: 30);
+
     public static readonly IReadOnlyList<Technique> All =
         new[] { Jab, Cleave, Lunge, Ember, Drain, Brace };
 }

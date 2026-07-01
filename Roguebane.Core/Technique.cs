@@ -21,5 +21,7 @@ public sealed record Technique(
     int Power,
     int ChargeCost = 0,
     WeaponUse Consults = WeaponUse.None,
-    bool Heals = false); // a REPAIR technique: on discharge it mends the caster's own most-damaged part
-                         // (by Power) instead of striking a target (the §10 part-heal). No target needed.
+    bool Heals = false, // a REPAIR technique: on discharge it mends the caster's own most-damaged part
+                        // (by Power) instead of striking a target (the §10 part-heal). No target needed.
+    int ShieldLayers = 0, // >0 marks a SHIELD SOURCE (§6b): a passive that maintains this many 1-dmg
+    int ShieldRegen = 0); // layers on the body, one regenerating every ShieldRegen ticks (CON-scaled).

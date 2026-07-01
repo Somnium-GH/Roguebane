@@ -179,13 +179,20 @@ public sealed class Caster
         if (reservation.Reserve <= 0) return false; // nothing to swing (no weapon to consult)
         if (!_self.Activate(reservation)) return false;
         _active[technique.Id] = new Run { Tech = technique, Countdown = EffectiveCooldown(technique), Auto = auto };
+        if (technique.ShieldLayers > 0) _self.RaiseShield(technique.Id, technique.ShieldLayers, ShieldRegenTicks(technique));
         return true;
     }
+
+    // A shield source regenerates a layer faster the more CON the body carries (§6b: CON scales regen
+    // for ALL sources). Placeholder scaling — the actual numbers are a Needs-human balance pass.
+    private int ShieldRegenTicks(Technique t) =>
+        Math.Max(1, t.ShieldRegen * 10 / (10 + _self.Capacity(Stat.Con)));
 
     public void Deactivate(Technique technique)
     {
         if (!_active.Remove(technique.Id)) return;
         _self.Deactivate(Reservation(technique));
+        if (technique.ShieldLayers > 0) _self.DropShield(technique.Id);
     }
 
     public int MinionCount => _bays.Count;
@@ -221,6 +228,7 @@ public sealed class Caster
     {
         Tick++;
         PruneSilenced();
+        _self.TickShields(); // regenerate held shield layers on the combat tick (§6b)
 
         foreach (var run in _active.Values)
         {
@@ -286,6 +294,14 @@ public sealed class Caster
         if (frame is not null && _rng is not null && _rng.Chance(frame.EvasionPercent(part)))
             return; // dodged
 
+        // §6b shields are the OUTERMOST layer: they eat damage before armor/block/parts. Body-wide,
+        // so they apply to both whole-HP and part-aimed hits; a fully-absorbed hit lands nothing.
+        if (frame is not null)
+        {
+            power = frame.AbsorbShields(power);
+            if (power <= 0) return;
+        }
+
         if (part is null)
         {
             var blocked = frame?.BlockMitigation(BlockCap) ?? 0;
@@ -299,7 +315,10 @@ public sealed class Caster
     {
         foreach (var run in _active.Values.ToList())
             if (!_self.IsActive(Reservation(run.Tech)))
+            {
                 _active.Remove(run.Tech.Id);
+                if (run.Tech.ShieldLayers > 0) _self.DropShield(run.Tech.Id); // a smashed source sheds its shield
+            }
 
         // A drained stat dismisses a STAT-gated minion the same way it silences a technique. Ungated
         // and alt-cost minions hold no reservation, so the cascade leaves them standing.

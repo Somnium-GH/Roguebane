@@ -11,6 +11,7 @@ public sealed class Body
     private readonly List<Active> _actives = new(); // engagement order; cascade sheds newest first
     private readonly Dictionary<Stat, Armor> _armor = new(); // one piece per part-group (keyed by Stat)
     private readonly List<Weapon> _hands = new(); // up to two; anatomical hand count
+    private readonly Dictionary<string, ShieldPool> _shields = new(); // §6b shield sources, keyed by source id
 
     public IReadOnlyList<BodyPart> Parts => _parts;
     public IReadOnlyList<Active> Actives => _actives;
@@ -124,6 +125,31 @@ public sealed class Body
     // A held block (a defensive active) reserves CON and absorbs up to the CON it reserves, capped.
     // Raise it = power it; drop it = the CON returns to the pool.
     public int BlockMitigation(int cap) => Math.Min(Reserved(Stat.Con), cap);
+
+    // §6b SHIELDS: a shield source maintains a regenerating pool of 1-damage layers on the body — the
+    // OUTERMOST mitigation, absorbing incoming damage before armor/parts/HP. The owning caster raises
+    // one per active shield technique, ticks them each combat step, and drops them when the source ends.
+    public void RaiseShield(string id, int layers, int regenEvery)
+    {
+        if (!_shields.ContainsKey(id)) _shields[id] = new ShieldPool(layers, regenEvery);
+    }
+
+    public void DropShield(string id) => _shields.Remove(id);
+
+    public void TickShields() { foreach (var pool in _shields.Values) pool.Tick(); }
+
+    public int ShieldPoints => _shields.Values.Sum(p => p.Points);
+
+    // Absorb incoming damage across the standing shield layers; returns the unabsorbed remainder.
+    public int AbsorbShields(int damage)
+    {
+        foreach (var pool in _shields.Values)
+        {
+            if (damage <= 0) break;
+            damage = pool.Absorb(damage);
+        }
+        return damage;
+    }
 
     // Leather EVASION: a dodge chance (percent) on the struck part-group, riding its condition. A
     // whole-HP hit (no part) consults the legs (DEX) leather — body footing/dodge — while the legs

@@ -288,10 +288,14 @@ OPEN (park; decide as the phase starts):
 - Race roster beyond Human/Elf; full Core-rune roster; the race<->core-rune restriction matrix.
 
 Suggested order: (1) single-enemy + part-aim simplification; (2) Chassis->Race+CoreRune rename + race-gated
-New Run; (3) shield-levels system [POOL MODEL DONE: `ShieldPool` — regenerating 1-dmg layers, absorb +
-CON-scalable regen cadence, tested. NEXT (disruptive): wire it as a shield SOURCE (passive technique
-maintaining a pool) into Caster.Hit mitigation, REPLACING the flat CON block — updates MitigationTests +
-FoeOffense + rebalances kits, so do with care / human balance eyes]; (4) part-repair heals [MECHANISM DONE: in-combat `Heals` technique +
+New Run; (3) shield-levels system [WIRED (dormant): `ShieldPool` layers live ON the body
+(Body.RaiseShield/DropShield/TickShields/AbsorbShields); Caster raises a pool per active shield SOURCE,
+ticks it each Step (CON-scaled regen), sheds it when the source's stat is smashed; Caster.Hit absorbs
+through shields FIRST (outermost, before armor/block/parts, for whole-HP AND part hits). Content
+`Techniques.Stoneskin` (INT, 3 layers) is opt-in (NOT in `All`) so no current balance shifts. Tested.
+REMAINING (disruptive, human balance eyes): REPLACE the flat CON block (Brace) with a CON shield source
++ retire Body.BlockMitigation + place shield sources in starting kits + tune the placeholder numbers
+(layers/regen — OPEN #8)]; (4) part-repair heals [MECHANISM DONE: in-combat `Heals` technique +
 Body.MostDamagedPart + Techniques.Bandage, tested; still needs kit placement + balance]; (5) defensive-
 source defaults in starting kits; (6) enemy-HP scaling. DESIGN_SPEC touch points: §4/§6/§7/§10/§11/§16.
 
