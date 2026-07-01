@@ -35,12 +35,13 @@ STILL BLOCKED / TODO on the Claude Design side:
   (w>=220 & h>=170 — its 60px corners need room) and keeps the gradient chrome for small cards + thin bars.
   Screenshot-verified on build/combat. TODO next: apply the smaller `card` frame to cards via the manifest
   per-element `frame` (Panel is hand-called, not manifest-driven yet).
-- RANGER FIGURE + BOW mgcb SYNC DONE: added the `human_ranger`/`elf_ranger` body sprites (42 entries) and
-  `sprites/gear/bow` to the GAME-side mgcb (they landed in CD's Roguebane.Content but the game builds its
-  own mgcb). The Ranger figure now RENDERS (green archer, verified RB_CHASSIS=5). The bow is fully wired
-  (asset loads, manifest gear.bow pivot [36,132], human_ranger handR socket, Ranger wields it per
-  RangerShipsAndWieldsTheBow) but its ON-FIGURE position isn't visually confirmed on the build paperDoll
-  — likely a socket/pivot/z tune (CD figure-data). FLAG for check.
+- RANGER FIGURE + BOW mgcb SYNC DONE + BOW RENDER CONFIRMED: added the `human_ranger`/`elf_ranger` body
+  sprites (42 entries) and `sprites/gear/bow` to the GAME-side mgcb (they landed in CD's Roguebane.Content
+  but the game builds its own mgcb). The Ranger figure renders (green archer, RB_CHASSIS=5) and the BOW
+  mounts correctly at the human_ranger handR socket (gear.bow pivot [36,132]) — confirmed via a red-tint
+  diagnostic: the bow draws as a tall sprite on the figure's right arm. It blended into the body at first,
+  so added a SPRITE-SHAPED DROP SHADOW under mounted weapons (the weapon's own alpha, offset + darkened,
+  drawn under it) — now the bow (and any wielded weapon) reads against the figure. Screenshot-confirmed.
 - Still Game TODO: a `shot` technique icon (none exists — falls to `swing`/crossed-swords, misleading;
   CD asset need); consume the manifest `fill:{gradient}` + a per-element `shadow` field. The recurring
   root cause is the TWO divergent mgcb (game hand-synced vs CD's) — still needs a single source of truth.

@@ -1238,7 +1238,12 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 ? gd.Pivot : new[] { tex.Width / 2, tex.Height / 2 };
             var gx = SX(anchor[0]) - (int)(gp[0] * f);
             var gy = SY(anchor[1]) - (int)(gp[1] * f);
-            Sprite(tex, gx, gy, (int)(tex.Width * f), (int)(tex.Height * f), color);
+            var gw = (int)(tex.Width * f); var gh = (int)(tex.Height * f);
+            // Sprite-shaped drop shadow so a wielded weapon reads against the figure (a thin bow blends
+            // into the body otherwise): the weapon's own alpha, offset + darkened, then the weapon on top.
+            var off = Math.Max(1, (int)(2 * f));
+            _spriteBatch.Draw(tex, new Rectangle(gx + off, gy + off, gw, gh), new Color(0, 0, 0, 110));
+            Sprite(tex, gx, gy, gw, gh, color);
         }
     }
 
