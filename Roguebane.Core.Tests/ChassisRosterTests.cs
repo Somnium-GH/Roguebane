@@ -6,11 +6,12 @@ namespace Roguebane.Core.Tests;
 public class ChassisRosterTests
 {
     [Fact]
-    public void RosterHasFiveDistinctChassis()
+    public void RosterCoresAreDistinct()
     {
         var ids = Chassrium.Roster.Select(c => c.Id).ToList();
-        Assert.Equal(5, ids.Count);
-        Assert.Equal(ids.Count, ids.Distinct().Count());
+        Assert.True(ids.Count >= 6);                            // grunt/warden/adept/summoner/reaver/ranger
+        Assert.Equal(ids.Count, ids.Distinct().Count());       // no dupes
+        Assert.Contains("ranger", ids);                        // the data-only 6th core
     }
 
     [Fact]

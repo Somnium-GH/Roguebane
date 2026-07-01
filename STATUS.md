@@ -105,6 +105,12 @@ REDEFINED it (see DESIGN_SPEC §6b/§10/§14/§17/§18). Directives:
 not code" invariant by adding a 6th core. Add **Ranger** as DATA ONLY — a new `Chassrium` entry + append
 to `Roster`; NO new classes. **REPORT in STATUS whether anything beyond data was required** — any code or
 test-shape ripple is the finding (it tells us how leak-free the extensibility really is).
+[DONE. FINDING: adding Ranger required ZERO production-code changes — pure data (Chassrium entry +
+Roster append). Loadout uses Lunge+Brace+Bandage (bow not built yet). Ripples: exactly ONE test hardcoded
+"five" (RosterHasFiveDistinctChassis -> RosterCoresAreDistinct, count-agnostic); NewGame grid overflows
+(sized for 5 cards, the 6th clips off-right) — ACCEPTED by human (redesign coming), not fixed. Verdict:
+content-is-DATA holds cleanly; the only leak is a hardcoded count in a test + a fixed-width shell grid.
+Figure art human_ranger/elf_ranger still a Claude Design need (placeholder card until it lands).]
 - Spec (placeholder stats, tune later): id `ranger`, Archetype "THE MARKSMAN", `StandardBody` str4/int3/
   dex8/con4, RuneBudget 12, RuneDiscount 0, Bays 0. Flavor ~ "Strikes from range with a shield-piercing
   bow; high DEX, thin armour — answers before the wall matters."
