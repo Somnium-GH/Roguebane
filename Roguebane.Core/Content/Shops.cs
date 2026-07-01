@@ -1,6 +1,6 @@
 namespace Roguebane.Core.Content;
 
-// What a merchant offers beyond the potion/heal services: a small gear stock (weapons + armor) the
+// What a merchant offers beyond its HP-heal service: a small gear stock (weapons + armor) the
 // player can buy into the Stash pack and equip later. The set and prices are placeholder-sane (a
 // "Needs human" balance touchpoint); the mechanic is what matters here.
 public static class Shops

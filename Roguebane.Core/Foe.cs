@@ -4,10 +4,9 @@ namespace Roguebane.Core;
 // only loses HP to incoming Power and recovers only by its own means.
 //
 // A foe is also a STRUCTURED thing with targetable parts (one combat grammar everywhere): an
-// optional Frame carries the same Body-of-parts the player has. A part-aimed hit erodes that
-// part's stat first (localized degradation) and only spills into HP once the part bottoms out
-// (the §10 split: stat damage to the targeted part; HP from overkill). A foe with no Frame is an
-// unstructured HP pool (control-point fodder).
+// optional Frame carries the same Body-of-parts the player has. §8: a part-aimed hit erodes that
+// part's stat AND takes HP simultaneously (same power, no part-vs-HP split, no overkill path). A foe
+// with no Frame is an unstructured HP pool (control-point fodder).
 public sealed class Foe : ICombatTarget
 {
     public string Id { get; }

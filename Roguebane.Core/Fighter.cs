@@ -3,9 +3,9 @@ namespace Roguebane.Core;
 // The player as a combat target. The player IS the socketed Body; on top of the part/stat layer
 // sits an HP life total. On the CON->HP model the max is a natural BASE plus a CON bonus (1 CON = 2
 // HP): chest damage drops CON, so MaxHp shrinks and current HP caps down to it (a full-HP fighter
-// taking a chest hit loses the bonus immediately). A part hit erodes that part's stat through the
-// Body — the SAME cascade that sheds gear runs against incoming damage — and overkill spills into
-// HP. HP is only restored out of combat (shop / non-skirmish), never mid-fight.
+// taking a chest hit loses the bonus immediately, permanently — a chest repair never refunds it). §8:
+// every hit erodes the aimed part's stat AND takes HP simultaneously — the SAME cascade that sheds gear
+// runs against the part damage; there is no overkill spill. HP is only restored out of combat.
 public sealed class Fighter : ICombatTarget
 {
     private const int ConToHp = 2; // bonus HP per point of CON (may vary by chassis later)

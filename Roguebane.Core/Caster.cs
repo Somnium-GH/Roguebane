@@ -15,7 +15,6 @@ public sealed class Caster
         public bool Auto = true;     // AUTO: discharge on cadence when ready. Off => hold for a Fire() command.
     }
 
-    private const int BlockCap = 3;  // a held CON block absorbs at most this much off an HP hit (low scale)
     private const int HasteRate = 2; // % cooldown reduction per point of DEX (action speed)
     private const int HasteCap = 28; // ...capped so haste stays non-OP near 20 DEX
 
@@ -231,7 +230,7 @@ public sealed class Caster
         {
             if (run.Tech.Kind == TechniqueKind.Sustained)
             {
-                Discharge(run); // a held output: fires every tick (e.g. the CON block reserve)
+                Discharge(run); // a held output: fires every tick (e.g. a shield source keeping its pool up)
                 continue;
             }
 

@@ -169,7 +169,12 @@ REDEFINED it (see DESIGN_SPEC §6b/§10/§14/§17/§18). Directives:
    in code; `PruneSilenced` is a method, not a status). Resources = only Charge(§6b)/HP/stats/shields —
    no mana/rage/etc. Only fix: stale "magic resource/charge" COMMENTS on Caster (Charge is the shield-
    pierce resource now) -> corrected. Vessel/Resonance/Tempest sample NAMES left (mechanically fine).]
-
+   [COMMENT HYGIENE (follow-up): swept comments that still described RETIRED mechanics after this session's
+   refactors — the §8 change killed "overkill spill / §10 part-vs-HP split" (Fighter/Foe now say part+HP
+   together); the shield revamp killed "the CON block" (Techniques/Caster now say §6b shield source);
+   potions are gone (Campaign/Shops); removed the dead `Caster.BlockCap` const (unused since the §8 sweep).
+   Comment-only + one dead const; 273 Core green. NOT swept: "chassis" as descriptive prose in comments
+   (the TYPE is CoreRune; prose left — lower urgency, larger churn).]
 **STRESS TEST — add the RANGER Core rune (2026-06-30).** Human wants to exercise the "content is DATA,
 not code" invariant by adding a 6th core. Add **Ranger** as DATA ONLY — a new `Chassrium` entry + append
 to `Roster`; NO new classes. **REPORT in STATUS whether anything beyond data was required** — any code or

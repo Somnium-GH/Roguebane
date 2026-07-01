@@ -3,9 +3,9 @@ namespace Roguebane.Core.Content;
 // Six techniques on the four-stat model, all interpreted by the one tick loop. Cooldowns are in
 // COMBAT TICKS at the fixed 10 ticks/sec clock (value/10 = seconds): weak attacks ~4-6s, strong
 // ~12-15s, small damage (1-3) so a fight runs 30s+ and stays watchable. DEX further shortens these
-// at cast time (haste). Brace alone is Sustained (a held reservation, power 0 — the CON block); the
-// damage techniques auto-repeat on their real-second cadence. STR swings, DEX strikes, INT bolts
-// (silenced if the head drains), CON braces.
+// at cast time (haste). Brace alone is Sustained (a held CON reservation, power 0 — the §6b shield
+// source); the damage techniques auto-repeat on their real-second cadence. STR swings, DEX strikes,
+// INT bolts (silenced if the head drains), CON braces.
 public static class Techniques
 {
     public static readonly Technique Jab =

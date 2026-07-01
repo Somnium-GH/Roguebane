@@ -8,7 +8,7 @@ public enum CampaignState
 }
 
 // The campaign spine: a march through several legs (cities) to the Capital. One body, caster,
-// loadout and Stash carry the whole way — spoils, potions and part damage persist between legs —
+// loadout and Stash carry the whole way — spoils and part damage persist between legs —
 // but each leg brings a FRESH war party and a tougher castle. Win a leg to advance; win the last
 // to take the Capital; lose any leg and the march is over.
 public sealed class Campaign
@@ -94,7 +94,7 @@ public sealed class Campaign
                 break;
             case ExpeditionState.Won:
                 _legIndex++;
-                _player.Heal(_player.MaxHp); // rest at the city: HP restored, parts persist (use potions)
+                _player.Heal(_player.MaxHp); // rest at the city: HP restored, parts persist
                 Current = NewLeg();
                 break;
         }
