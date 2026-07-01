@@ -95,20 +95,12 @@ public sealed class Caster
 
     public bool IsActive(Technique technique) => _active.ContainsKey(technique.Id);
 
-    // FTL firing model: a Timered technique charges down to ready, then HOLDS (Ready) until fired —
-    // on command (Fire) or, if Auto, automatically every cadence. Toggle Auto per technique.
-    public void SetAuto(Technique technique, bool auto)
-    {
-        if (_active.TryGetValue(technique.Id, out var run)) run.Auto = auto;
-    }
-
-    public bool IsAuto(Technique technique) =>
-        _active.TryGetValue(technique.Id, out var run) && run.Auto;
-
-    // The GLOBAL player AUTO toggle: ON => no module clears its target after firing (every powered +
-    // targeted module keeps charging and firing at the SAME target); OFF (default) => one-shot, each
-    // module clears its target after the shot. One switch governs the whole bar. Distinct from the
-    // per-technique engine Auto flag above (discharge-on-cadence).
+    // The ONE AUTO toggle (global, player-facing): ON => no module clears its target after firing (every
+    // powered + targeted module keeps charging and firing at the SAME target); OFF (default) => one-shot,
+    // each module clears its target after the shot and then holds. One switch governs the whole bar —
+    // there is no per-weapon AUTO. (Run.Auto below is a separate engine-only primitive: whether an
+    // UNATTENDED caster — foe offense, minions, balance sim — discharges on cadence; always on for the
+    // player, whose holding comes from requireAim, not from a per-technique flag.)
     public void SetAutoAll(bool keepTargets) => _keepTargets = keepTargets;
     public bool AutoAll => _keepTargets;
 
@@ -171,8 +163,10 @@ public sealed class Caster
         return Math.Max(1, t.Cooldown * (100 - haste) / 100);
     }
 
-    // Engine primitive: auto defaults ON (an unattended caster — foe offense, balance sim — fires on
-    // cadence). The PLAYER path activates with auto:false so a technique charges and HOLDS until fired.
+    // Engine primitive (NOT the player AUTO toggle): auto defaults ON so any caster discharges on
+    // cadence. The player also activates auto:on — a player technique holds only because requireAim
+    // gives it no target until aimed, not because of a per-technique flag. auto:false is an engine/test
+    // convenience for an unattended caster that should charge but not fire.
     public bool Activate(Technique technique, bool auto = true)
     {
         if (_active.ContainsKey(technique.Id)) return true;

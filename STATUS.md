@@ -47,7 +47,13 @@ LAYOUT_CONTRACT §10-11 (fidelity primitives + 1080). Priority order:
      TUNING TODO: the "1 HP per randomized cost, loot-bounded" incremental buy — BuyHeal is still flat
      gold->full-HP at cost 3; needs a per-HP randomized price + a run rng.]
    - **AUTO-attack is GLOBAL, not per-weapon**: on = a fired weapon re-fires on its next charge at the
-     kept target. Fix the per-weapon coupling.
+     kept target. Fix the per-weapon coupling. [DONE: production AUTO was already the one global toggle
+     (Expedition/Campaign.SetAuto -> Caster.SetAutoAll(keepTargets); PlayerTargetingFsmTests.GlobalAuto-
+     GovernsEveryModule proves on=keep+refire, off=one-shot-then-clear across every module). The vestigial
+     per-weapon coupling -- Caster.SetAuto(Technique,bool) + IsAuto(Technique), used by ONE engine test --
+     is removed, so there is no per-technique AUTO surface left. Run.Auto stays as the engine-only cadence
+     primitive (unattended foes/minions; always on for the player, whose holding comes from requireAim).
+     Stale comments corrected. Removed the redundant CasterFiringTests toggle test. 273 green; Game builds.]
    - **DAMAGE**: every hit applies part damage AND hp damage simultaneously; only a shield block or full
      evade mitigates. Ensure the impl applies both. [DONE (§8 LOCKED): Caster.Hit now does full evade ->
      shield absorb -> then BOTH raw part-erode (Frame.Damage, no plate blunt, no overkill maths) AND HP

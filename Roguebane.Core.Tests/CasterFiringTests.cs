@@ -67,20 +67,4 @@ public class CasterFiringTests
         Assert.Equal(100, front.Hp);   // default front untouched
         Assert.True(flank.Hp < 100);   // the aimed flank took the hit
     }
-
-    [Fact]
-    public void TogglingAutoOffMidFightStopsTheRepeat()
-    {
-        var foe = new Foe("dummy", 1000);
-        var c = new Caster(Body(), foe);
-        c.Activate(Techniques.Jab, auto: true);
-
-        for (var i = 0; i < 60; i++) c.Step();
-        var after = foe.Hp;
-        Assert.True(after < 1000); // auto-fired at least once
-
-        c.SetAuto(Techniques.Jab, false);
-        for (var i = 0; i < 200; i++) c.Step();
-        Assert.Equal(after, foe.Hp); // held — no further auto discharges
-    }
 }
