@@ -445,6 +445,12 @@ the contract-based manifest tests absorb the re-extract — do NOT re-pin conten
   parked).
 
 ## Current target
+**SEE `⇒ AT A GLANCE` at the TOP for live state.** Every HUMAN DIRECTIVE + flagged item is CLOSED; the
+directive backlog is done end-to-end (build GREEN, all screens smoke-clean, POC plays start to finish).
+What remains is CD-gated (shot icon, per-part binds, mgcb source of truth) or PLAY-TUNING (placeholder
+numbers). The historical detail below is kept as record.
+
+<!-- superseded record -->
 **RE-OPEN RESOLVED (both threads cleared) — POC functionally complete again.**
 1) RUN-START CRASH: fixed + LIVE-draw verified (detail below). 2) SCREENS MATCH DESIGN: all four live
 screens done + smoke-verified vs the committed 06-30 renders — 01 combat (locked s13 layout), 02 build
@@ -668,8 +674,8 @@ from primitives. Route each to Claude Design. (Art direction: DESIGN_SPEC §13.)
 - Combat surface: PART-level aim UI DONE (limb bands + part-aim); minion-bay lane DONE. Still no
   rallied-support lane.
 - Part-group EVASION already localizes on PART hits (Caster.Hit reads EvasionPercent(part)); it is live
-  wherever foe part-aim is on. CON block is still WHOLE-HP only — localizing it on PART hits reconciles
-  with the Phase 3 SHIELDS revamp (current code is still the old flat block).
+  wherever foe part-aim is on. [RESOLVED: the CON flat block is RETIRED (§8) — only shields + full evade
+  mitigate now; Brace + plate are §6b shield sources, so there is no flat block left to localize.]
 - INT beams are fast Timered bolts (Sustained=every-tick was a firehose at 10/s); for a true channel, add a
   per-tick damage-scaled sustained kind. (Speculative — defer until a channel weapon is authored.)
 - Leather armor evasion now FUNCTIONAL + content (Shops.Hide) + tested. SpellWard still deferred (no spell model).
@@ -695,9 +701,12 @@ from primitives. Route each to Claude Design. (Art direction: DESIGN_SPEC §13.)
   Debt above + the targeting FSM fix. Visual truth = design/ PNGs + design/SCREENS.md; look = DESIGN_SPEC
   §13. Keep "FTL" out of shipped UI text.
 
-## Phase 3 — combat depth + Race/CoreRune rename [SCOPED, not started]
-Big slice after the current combat polish. Do it in SMALL /loop slices. Reconcile DESIGN_SPEC sections
-DURING the phase with SURGICAL edits (do NOT rewrite/clobber). LOCKED below; OPEN parked at the foot.
+## Phase 3 — combat depth + Race/CoreRune rename [DONE — shipped across this session]
+DELIVERED: single-enemy combat (§8 canon + Foes/CurrentTarget shim dropped), the §8 part+HP damage model
++ dead-code sweep, the §6b SHIELD revamp (Brace/Stoneskin/plate shield sources; flat block retired), foe
+SYMMETRY (foe heal/shield via its own caster), Charge = shield-pierce + the BOW, and the full Race/CoreRune
+rename + the RACE attr/HP split end to end. Details in the directive blocks above + git log. The reference
+notes below are the original Phase-3 scoping, kept as the design record.
 
 LOCKED:
 - SINGLE-ENEMY combat: always vs ONE enemy (it may be multi-PART: a human foe, an atypical creature, the
