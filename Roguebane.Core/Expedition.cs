@@ -52,7 +52,7 @@ public sealed class Expedition
     public Stash Stash => _stash;
     public int Gold => _stash.Gold;
 
-    private const int HealCost = 3;
+    private const ulong HealSalt = 0x4845414C; // decorrelate the heal-price roll from combat seeds
 
     private static int Spoils(NodeType type) => type switch
     {
@@ -99,11 +99,20 @@ public sealed class Expedition
     public bool UnequipArmor(Stat group) =>
         State == ExpeditionState.Choosing && Gearing.UnequipArmor(_stash, _player.Body, group);
 
-    // Pay a merchant for the out-of-combat HP service.
+    // The merchant's HP service price (§10): gold per 1 HP, randomized within a loot-bounded range and
+    // STABLE per merchant node (same node id => same price, so the run stays reproducible).
+    public int HealPricePerHp => 1 + new Rng(Seed(Map.Current.Id) ^ HealSalt).Next(2); // 1..2 gold / HP
+
+    // Pay a merchant for the out-of-combat HP service: buy as much HP as the gold affords at the per-HP
+    // price, capped at the missing HP. Heals PARTS never happen here — HP only, out of combat (§10).
     public bool BuyHeal()
     {
-        if (!AtMerchant || _player.Hp >= _player.MaxHp || !_stash.TrySpend(HealCost)) return false;
-        _player.Heal(_player.MaxHp);
+        if (!AtMerchant) return false;
+        var missing = _player.MaxHp - _player.Hp;
+        if (missing <= 0) return false;
+        var buy = Math.Min(missing, Gold / HealPricePerHp);
+        if (buy <= 0 || !_stash.TrySpend(buy * HealPricePerHp)) return false;
+        _player.Heal(buy);
         return true;
     }
 

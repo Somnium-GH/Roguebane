@@ -740,9 +740,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         Panel(x, y, 360, 220);
         Text(_assets.Display, "MERCHANT", x + 14, y + 10, Ink);
-        // HP healing only — part-heals are in-combat techniques now, not buyable potions.
-        DrawButton("H  heal hp     (3)", x + 14, y + 44, 330, 30,
-            Exp.Gold >= 3 && Exp.Player.Hp < Exp.Player.MaxHp, Keys.H);
+        // HP healing only — part-heals are in-combat techniques now, not buyable potions. Per-HP price
+        // is set by the merchant (§10): buying restores as much HP as the gold affords.
+        DrawButton($"H  heal hp  ({Exp.HealPricePerHp}/hp)", x + 14, y + 44, 330, 30,
+            Exp.Gold >= Exp.HealPricePerHp && Exp.Player.Hp < Exp.Player.MaxHp, Keys.H);
 
         // The gear stock as a compact row of buy chips (name + price); dim when unaffordable / sold.
         Text(_assets.Mono, "GEAR", x + 14, y + 150, Muted);

@@ -130,18 +130,33 @@ public class ExpeditionTests
     }
 
     [Fact]
-    public void MerchantHpServiceCostsGoldAndTopsUp()
+    public void MerchantHpServiceChargesPerHpAndTopsUp()
     {
         var exp = FullLoadout();
         exp.Enter("a2"); FightToEnd(exp); // earns spoils
         exp.Player.Damage(2);             // carry a wound in
         exp.Enter("b");
 
-        Assert.True(exp.Gold >= 3);
+        var price = exp.HealPricePerHp;
+        Assert.InRange(price, 1, 2);                 // §10: 1 HP per randomized, loot-bounded cost
+        var before = exp.Player.Hp;
         var gold = exp.Gold;
+        var missing = exp.Player.MaxHp - before;
+        var expectHealed = Math.Min(missing, gold / price);
+        Assert.True(expectHealed > 0);               // can afford at least some HP
+
         Assert.True(exp.BuyHeal());
-        Assert.Equal(exp.Player.MaxHp, exp.Player.Hp);
-        Assert.Equal(gold - 3, exp.Gold);
+        Assert.Equal(before + expectHealed, exp.Player.Hp); // healed what the gold bought
+        Assert.Equal(gold - expectHealed * price, exp.Gold); // paid per HP
+    }
+
+    [Fact]
+    public void MerchantHealPriceIsStablePerNode()
+    {
+        var exp = FullLoadout();
+        exp.Enter("a2"); FightToEnd(exp);
+        exp.Enter("b");
+        Assert.Equal(exp.HealPricePerHp, exp.HealPricePerHp); // same merchant => same price, reproducible
     }
 
 

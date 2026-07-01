@@ -72,6 +72,13 @@ LAYOUT_CONTRACT §10-11 (fidelity primitives + 1080). Priority order:
      P/U buttons + the potion readout; merchant keeps BuyHeal (H, gold->HP). Tests reconciled (279 Core).
      TUNING TODO: the "1 HP per randomized cost, loot-bounded" incremental buy — BuyHeal is still flat
      gold->full-HP at cost 3; needs a per-HP randomized price + a run rng.]
+     [BUYHEAL TUNED (§10): merchant now charges PER HP. `HealPricePerHp` = 1..2 gold/HP, rolled from the
+     merchant NODE seed (reuses the deterministic `Seed(nodeId)` + Rng, XOR a heal salt) so it's stable
+     per merchant + reproducible — no new rng plumbing. BuyHeal() buys as much HP as the gold affords at
+     that price, capped at the missing HP (spends healed*price). Tests: MerchantHpServiceChargesPerHpAnd-
+     TopsUp (per-HP charge + top-up), MerchantHealPriceIsStablePerNode. Shell button shows "({price}/hp)".
+     273 Core green; citymap smoke clean. Price RANGE (1..2) is placeholder — tune vs spoils (2..10/node)
+     in play.]
    - **AUTO-attack is GLOBAL, not per-weapon**: on = a fired weapon re-fires on its next charge at the
      kept target. Fix the per-weapon coupling. [DONE: production AUTO was already the one global toggle
      (Expedition/Campaign.SetAuto -> Caster.SetAutoAll(keepTargets); PlayerTargetingFsmTests.GlobalAuto-
