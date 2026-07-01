@@ -23,7 +23,7 @@ public static class Forge
         Chassis chassis,
         RuneLoadout runes,
         IReadOnlyList<Technique> loadout,
-        RunMap map)
+        CityMap map)
     {
         var body = chassis.NewBody(runes);
         var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, bayCap: chassis.Bays);
@@ -37,7 +37,7 @@ public static class Forge
         Chassis chassis,
         RuneLoadout runes,
         IReadOnlyList<Technique> loadout,
-        IReadOnlyList<Func<RunMap>> legs)
+        IReadOnlyList<Func<CityMap>> legs)
     {
         var body = chassis.NewBody(runes);
         var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, bayCap: chassis.Bays);

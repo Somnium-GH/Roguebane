@@ -1,6 +1,6 @@
 namespace Roguebane.Core;
 
-public enum RunMapOutcome
+public enum CityMapOutcome
 {
     Marching,
     CastleCracked, // the leg is won — the war party disbands
@@ -14,7 +14,7 @@ public enum RunMapOutcome
 //
 // Fog (working default): resource-holds and the castle read from afar; a merchant resolves one jump
 // out; everything else stays `?` until adjacent or visited.
-public sealed class RunMap
+public sealed class CityMap
 {
     private readonly Dictionary<string, MapNode> _nodes;
     private readonly IReadOnlyList<MapNode> _order;
@@ -26,11 +26,11 @@ public sealed class RunMap
     public int WarPartyDistance { get; private set; } // steps from camp; 0 = camp overrun
     public int MarchLength { get; }                    // the war party's start distance (track scale)
     public int SupportBank { get; private set; }
-    public RunMapOutcome Outcome { get; private set; } = RunMapOutcome.Marching;
+    public CityMapOutcome Outcome { get; private set; } = CityMapOutcome.Marching;
 
     // autoResolveCastle: standalone navigation treats castle arrival as an instant crack (POC). A
     // combat driver (Expedition) passes false and instead calls CrackCastle() when the siege clears.
-    public RunMap(IReadOnlyList<MapNode> nodes, string startId, int supplies, int marchLength,
+    public CityMap(IReadOnlyList<MapNode> nodes, string startId, int supplies, int marchLength,
         bool autoResolveCastle = true)
     {
         if (nodes.Count == 0) throw new ArgumentException("a map needs nodes", nameof(nodes));
@@ -54,14 +54,14 @@ public sealed class RunMap
     // The combat driver won the siege: disband the war party and win the leg.
     public void CrackCastle()
     {
-        if (Outcome == RunMapOutcome.Marching && AtCastle) Outcome = RunMapOutcome.CastleCracked;
+        if (Outcome == CityMapOutcome.Marching && AtCastle) Outcome = CityMapOutcome.CastleCracked;
     }
 
     // The combat driver CLEARED the current resource-hold: bank its rallied support now (not on arrival,
     // so a hold abandoned mid-fight banks nothing). Standalone navigation banks in MoveTo instead.
     public void BankHold()
     {
-        if (Outcome == RunMapOutcome.Marching && Current.Type == NodeType.ResourceHold) SupportBank++;
+        if (Outcome == CityMapOutcome.Marching && Current.Type == NodeType.ResourceHold) SupportBank++;
     }
 
     // Movement is ANY-DIRECTION along the chart's edges: a link is traversable both ways, so the player
@@ -93,7 +93,7 @@ public sealed class RunMap
     }
 
     public bool CanMoveTo(string nodeId) =>
-        Outcome == RunMapOutcome.Marching && Supplies > 0 && Adjacent(nodeId);
+        Outcome == CityMapOutcome.Marching && Supplies > 0 && Adjacent(nodeId);
 
     // Jump to a charted neighbour: spend a supply, the war party advances a step, then resolve the
     // node we land on. In standalone navigation (no combat driver) a resource-hold banks and the castle
@@ -106,24 +106,24 @@ public sealed class RunMap
         CurrentId = nodeId;
         Current.MarkVisited();
         AdvanceWarParty();
-        if (Outcome != RunMapOutcome.Marching) return true;
+        if (Outcome != CityMapOutcome.Marching) return true;
 
         if (_autoResolveCastle) // standalone nav: there is no fight to win, so resolve on arrival
             switch (Current.Type)
             {
                 case NodeType.ResourceHold: SupportBank++; break;
-                case NodeType.Castle: Outcome = RunMapOutcome.CastleCracked; break;
+                case NodeType.Castle: Outcome = CityMapOutcome.CastleCracked; break;
             }
 
         // Out of supplies short of the castle: the march can't continue and the war party arrives.
-        if (Supplies == 0 && Outcome == RunMapOutcome.Marching && !AtCastle)
-            Outcome = RunMapOutcome.Overrun;
+        if (Supplies == 0 && Outcome == CityMapOutcome.Marching && !AtCastle)
+            Outcome = CityMapOutcome.Overrun;
         return true;
     }
 
     private void AdvanceWarParty()
     {
         WarPartyDistance--;
-        if (WarPartyDistance <= 0) Outcome = RunMapOutcome.Overrun;
+        if (WarPartyDistance <= 0) Outcome = CityMapOutcome.Overrun;
     }
 }

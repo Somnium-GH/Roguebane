@@ -3,7 +3,7 @@ using Roguebane.Core.Content;
 namespace Roguebane.Core.Tests;
 
 // G4 (map) + G5 (war-party race): branching traversal, supplies, fog, support banking, two-way race.
-public class RunMapTests
+public class CityMapTests
 {
     [Fact]
     public void MovingSpendsASupplyAndAdvancesTheWarParty()
@@ -99,7 +99,7 @@ public class RunMapTests
         Assert.True(map.MoveTo("b"));
         Assert.True(map.MoveTo("c1"));
         Assert.True(map.MoveTo("castle"));
-        Assert.Equal(RunMapOutcome.CastleCracked, map.Outcome);
+        Assert.Equal(CityMapOutcome.CastleCracked, map.Outcome);
         Assert.False(map.MoveTo("castle")); // the march is over
     }
 
@@ -113,12 +113,12 @@ public class RunMapTests
             new MapNode("x", NodeType.Skirmish, "castle"),
             new MapNode("castle", NodeType.Castle),
         };
-        var map = new RunMap(nodes, "camp", supplies: 8, marchLength: 2);
+        var map = new CityMap(nodes, "camp", supplies: 8, marchLength: 2);
 
         Assert.True(map.MoveTo("x"));        // war party 2 -> 1
-        Assert.Equal(RunMapOutcome.Marching, map.Outcome);
+        Assert.Equal(CityMapOutcome.Marching, map.Outcome);
         Assert.True(map.MoveTo("castle"));   // war party 1 -> 0 first: overrun wins the race
-        Assert.Equal(RunMapOutcome.Overrun, map.Outcome);
+        Assert.Equal(CityMapOutcome.Overrun, map.Outcome);
     }
 
     [Fact]
@@ -130,9 +130,9 @@ public class RunMapTests
             new MapNode("x", NodeType.Skirmish, "castle"),
             new MapNode("castle", NodeType.Castle),
         };
-        var map = new RunMap(nodes, "camp", supplies: 1, marchLength: 9);
+        var map = new CityMap(nodes, "camp", supplies: 1, marchLength: 9);
 
         Assert.True(map.MoveTo("x")); // last supply spent, not at the castle
-        Assert.Equal(RunMapOutcome.Overrun, map.Outcome);
+        Assert.Equal(CityMapOutcome.Overrun, map.Outcome);
     }
 }

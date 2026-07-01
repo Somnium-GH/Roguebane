@@ -16,7 +16,7 @@ public sealed class Campaign
     private readonly Fighter _player;
     private readonly Caster _caster;
     private readonly IReadOnlyList<Technique> _loadout;
-    private readonly IReadOnlyList<Func<RunMap>> _legs;
+    private readonly IReadOnlyList<Func<CityMap>> _legs;
     private readonly Stash _stash;
     private readonly string _figureId;
     private int _legIndex;
@@ -28,7 +28,7 @@ public sealed class Campaign
         Fighter player,
         Caster caster,
         IReadOnlyList<Technique> loadout,
-        IReadOnlyList<Func<RunMap>> legs,
+        IReadOnlyList<Func<CityMap>> legs,
         Stash? stash = null,
         string figureId = "grunt")
     {

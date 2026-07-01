@@ -53,7 +53,7 @@ public static class Sessions
     {
         var body = DemoBody();
         var caster = new Caster(body, requireAim: true);
-        var legs = new Func<RunMap>[]
+        var legs = new Func<CityMap>[]
         {
             () => Maps.StandardLeg(autoResolveCastle: false),
             () => Maps.StandardLeg(autoResolveCastle: false),

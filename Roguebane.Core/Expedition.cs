@@ -24,11 +24,11 @@ public sealed class Expedition
     private readonly List<Weapon> _stockWeapons = new(Shops.Weapons); // this merchant's gear stock (per leg)
     private readonly List<Armor> _stockArmor = new(Shops.Armor);
 
-    public RunMap Map { get; }
+    public CityMap Map { get; }
     public Battle? Battle { get; private set; }
     public ExpeditionState State { get; private set; } = ExpeditionState.Choosing;
 
-    public Expedition(Fighter player, Caster caster, IReadOnlyList<Technique> loadout, RunMap map,
+    public Expedition(Fighter player, Caster caster, IReadOnlyList<Technique> loadout, CityMap map,
         Stash? stash = null, string figureId = "grunt")
     {
         _player = player;
@@ -145,7 +145,7 @@ public sealed class Expedition
         if (State != ExpeditionState.Choosing) return false;
         if (!Map.MoveTo(nodeId)) return false;
 
-        if (Map.Outcome == RunMapOutcome.Overrun) { State = ExpeditionState.Lost; return true; }
+        if (Map.Outcome == CityMapOutcome.Overrun) { State = ExpeditionState.Lost; return true; }
 
         var node = Map.Current;
         if (node.Type == NodeType.Merchant)

@@ -5,7 +5,7 @@ namespace Roguebane.Core.Tests;
 
 // MaxSupplies pins the starting jump budget so the shell can show remaining/max; it must not move
 // as supplies are spent.
-public class RunMapSupplyTests
+public class CityMapSupplyTests
 {
     [Fact]
     public void MaxSuppliesHoldsTheStartingBudgetAsSuppliesAreSpent()

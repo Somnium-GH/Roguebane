@@ -130,7 +130,10 @@ across the 30-file audit:
   Expedition/Minion/Mark/RuneLoadout + tests: Chassis{Thesis,Roster,Body}Tests, FigureIdTests,
   RunStartTests, MinionTests…); `layout.json` `chassis/*` figure keys; `Content.mgcb` `sprites/char/
   chassis/` dir + entries; design docs. Figure keys also go `human_<core>` (earlier directive).
-- **RunMap → CityMap** (`RunMap.cs`→`CityMap.cs`, RunMap*Tests, all refs).
+- **RunMap → CityMap** (`RunMap.cs`→`CityMap.cs`, RunMap*Tests, all refs). [DONE: class RunMap->CityMap,
+  RunMapOutcome->CityMapOutcome, files RunMap.cs/RunMapTests/RunMapSupplyTests -> CityMap*; all refs
+  (Core + tests) renamed; no Game refs needed it (shell uses Exp.Map). CityMapOutcome.Marching kept (the
+  map's in-progress outcome — only CampaignState.Marching became Redeploying). 280 Core green.]
 - Finish the Core-API renames the shell pass left as-is (no compat): **Expedition.Flee → Retreat**,
   **BuildSession.March → Redeploy**, **CampaignState.Marching → Redeploying**. [DONE: renamed everywhere
   (Battle/Session/Expedition.Flee -> Retreat; BuildSession.March -> Redeploy; CampaignState.Marching ->
