@@ -7,6 +7,11 @@ LAYOUT_CONTRACT §10-11 (fidelity primitives + 1080). Priority order:
 1. **RENAME everywhere** (Screen enum + titles + labels; keep in sync with `layout.json` ids — Claude
    Design renames the manifest side in parallel): NewRun→**NewGame**, Build→**Equipment**,
    RunMap→**CityMap**, Campaign→**CampaignMap**, Combat→**Encounter**; Flee→**Retreat**, March→**Redeploy**.
+   [DONE for the shell: Screen enum {NewGame, Equipment, Run}; screen Draw/Update methods + rects renamed
+   (DrawEncounterScreen/DrawCityMapScreen/DrawNewGameScreen/DrawEquipmentScreen, RetreatRect/RedeployRect);
+   display titles/verbs EQUIPMENT / REDEPLOY / BEGIN / RETREAT; smoke-verified. Core API (BuildSession.
+   March, CampaignState.Marching, Expedition.Flee) left as-is. Manifest LOOKUP ids still "newrun"/"build"/
+   "runmap" — flip to new ids WHEN Claude Design renames the manifest. RB_SCREEN dev values unchanged.]
 2. **EVERY SCREEN off the manifest.** You did New Run then wandered to shield work — systematically render
    ALL screens (Equipment, CityMap, CampaignMap especially), ONE per pass, verified vs its design PNG,
    BEFORE new gameplay features.

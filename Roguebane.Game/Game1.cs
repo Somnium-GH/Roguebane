@@ -19,7 +19,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     private static readonly Keys[] PathKeys = { Keys.Q, Keys.W };
 
-    private enum Screen { NewRun, Build, Run }
+    // Screen names per the 2026-06-30 rename directive. (Manifest lookup ids stay "newrun"/"build"/
+    // "runmap" until Claude Design renames the manifest side in parallel.)
+    private enum Screen { NewGame, Equipment, Run }
 
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch = null!;
@@ -28,7 +30,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private readonly LayoutRegistry _layout = new();
     private ManifestUi _ui = null!;
 
-    private Screen _screen = Screen.NewRun;
+    private Screen _screen = Screen.NewGame;
     private BuildSession _build = null!;
     private Campaign _campaign = null!;
     private bool _paused;
@@ -125,7 +127,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 for (var i = 0; i < 6; i++) _campaign.Tick(); // castle survives -> stay in combat
             }
         }
-        else if (_smokeScreen == "build") _screen = Screen.Build; // else fall through to the New Run grid
+        else if (_smokeScreen == "build") _screen = Screen.Equipment; // else fall through to the New Run grid
 
         base.Initialize();
     }
@@ -157,8 +159,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
         _clicked = mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released;
         _rclicked = mouse.RightButton == ButtonState.Pressed && _prevMouse.RightButton == ButtonState.Released;
 
-        if (_screen == Screen.NewRun) UpdateNewRun(keys);
-        else if (_screen == Screen.Build) UpdateBuild(keys);
+        if (_screen == Screen.NewGame) UpdateNewGame(keys);
+        else if (_screen == Screen.Equipment) UpdateEquipment(keys);
         else UpdateRun(keys, gameTime);
 
         _prevKeys = keys;
@@ -169,25 +171,25 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // New Run (design/05): the core grid. Pick with arrows or a card click; BEGIN goes to the loadout.
     // Card positions come from the manifest `coreCards` list container (region + item), falling back to
     // a hand grid if the manifest is absent — the first screen container driven off layout.json.
-    private Rectangle NewRunCardRect(int i)
+    private Rectangle NewGameCardRect(int i)
     {
         var cells = _ui.ListCells("newrun", "coreCards", _build.Roster.Count);
         return cells is not null && i < cells.Count ? cells[i] : new Rectangle(14 + i * 188, 66, 176, 420);
     }
-    private static readonly Rectangle NewRunBeginRect = new(W - 258, H - 44, 240, 34);
+    private static readonly Rectangle NewGameBeginRect = new(W - 258, H - 44, 240, 34);
 
-    private void UpdateNewRun(KeyboardState keys)
+    private void UpdateNewGame(KeyboardState keys)
     {
         if (Pressed(keys, Keys.Left)) _build.CycleChassis(-1);
         if (Pressed(keys, Keys.Right)) _build.CycleChassis(1);
         for (var i = 0; i < _build.Roster.Count; i++)
-            if (Click(NewRunCardRect(i))) _build.CycleChassis(i - _build.ChassisIndex);
+            if (Click(NewGameCardRect(i))) _build.CycleChassis(i - _build.ChassisIndex);
 
-        var go = (Pressed(keys, Keys.Enter) && !keys.IsKeyDown(Keys.LeftAlt)) || Click(NewRunBeginRect);
-        if (go) _screen = Screen.Build; // on to the loadout screen for the chosen core
+        var go = (Pressed(keys, Keys.Enter) && !keys.IsKeyDown(Keys.LeftAlt)) || Click(NewGameBeginRect);
+        if (go) _screen = Screen.Equipment; // on to the loadout screen for the chosen core
     }
 
-    private void UpdateBuild(KeyboardState keys)
+    private void UpdateEquipment(KeyboardState keys)
     {
         if (Pressed(keys, Keys.Left)) _build.CycleChassis(-1);
         if (Pressed(keys, Keys.Right)) _build.CycleChassis(1);
@@ -211,7 +213,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
         // March the campaign. The chassis ships a fixed kit so the bar is never empty — no gate.
         // Alt+Enter is the fullscreen toggle, not a march.
-        var march = (Pressed(keys, Keys.Enter) && !keys.IsKeyDown(Keys.LeftAlt)) || Click(MarchRect);
+        var march = (Pressed(keys, Keys.Enter) && !keys.IsKeyDown(Keys.LeftAlt)) || Click(RedeployRect);
         if (march)
         {
             _campaign = _build.March(Maps.StandardLegs(3));
@@ -231,7 +233,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private void UpdateCombat(KeyboardState keys, GameTime gameTime)
     {
         if (Pressed(keys, Keys.Space) || Click(PauseRect)) _paused = !_paused;
-        if (Pressed(keys, Keys.F) || Click(FleeRect)) Exp.Flee();
+        if (Pressed(keys, Keys.F) || Click(RetreatRect)) Exp.Flee();
         if (Pressed(keys, Keys.Tab) || Click(AutoRect)) _ctrl.ToggleAuto(Exp); // ONE global toggle
 
         // The targeting FSM lives in Core (CombatTargeting); the shell only feeds it press intents.
@@ -334,11 +336,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private static Rectangle ChassisRect(int i) => new(180 + i * 110 - 2, 4, 100, 32);
     private static Rectangle PaletteRect(int i) => new(320 + i * 52, 300, 48, 48); // fits 7 before the bay preview
     private static Rectangle LadderRowRect(int p, int rungs) => new(320, 100 + p * 56, rungs * 56, 48);
-    private static readonly Rectangle MarchRect = new(40, H - 52, 300, 44);
+    private static readonly Rectangle RedeployRect = new(40, H - 52, 300, 44);
     private static Rectangle ActionCardRect(int i) => new(52 + i * 84, H - 84, 76, 60);
     private static Rectangle FoeRect(int i) => new(560, 90 + i * 150, 144, 132);
     private static readonly Rectangle PauseRect = new(W - 156, H - 84, 110, 26);
-    private static readonly Rectangle FleeRect = new(W - 156, H - 50, 110, 26);
+    private static readonly Rectangle RetreatRect = new(W - 156, H - 50, 110, 26);
     private static readonly Rectangle AutoRect = new(W - 272, H - 50, 110, 26);
 
     // Which foe a target points at (for the per-card target tag), or -1 for the default front / none.
@@ -422,8 +424,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
         GraphicsDevice.SetRenderTarget(_scene);
         GraphicsDevice.Clear(new Color(0x17, 0x11, 0x0b)); // panel-dark base from the locked palette
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp); // HD pixel: crisp integer edges
-        if (_screen == Screen.NewRun) DrawNewRunScreen();
-        else if (_screen == Screen.Build) DrawBuildScreen();
+        if (_screen == Screen.NewGame) DrawNewGameScreen();
+        else if (_screen == Screen.Equipment) DrawEquipmentScreen();
         else DrawRunScreen();
         _spriteBatch.End();
 
@@ -496,13 +498,13 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // (design/03), the battlefield when a fight is under way (design/01).
     private void DrawRunScreen()
     {
-        if (Exp.State == ExpeditionState.Fighting) DrawCombatScreen();
-        else DrawMapScreen();
+        if (Exp.State == ExpeditionState.Fighting) DrawEncounterScreen();
+        else DrawCityMapScreen();
     }
 
     // Combat screen (design/01): backdrop, run resources up top, you on the left (part composite +
     // HP + attribute pips), the foe on the right, the action bar along the bottom.
-    private void DrawCombatScreen()
+    private void DrawEncounterScreen()
     {
         Stretch(_assets.Background("combat_field"), 0, 0, W, H);
         Panel(0, 0, W, 40);
@@ -531,11 +533,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     // Run-map screen (design/03): the resources, the current beacon, and the charted jumps as cards
     // (fog-aware icons). At a merchant the shop verbs are live instead of a fight ahead.
-    private void DrawMapScreen()
+    private void DrawCityMapScreen()
     {
         Stretch(_assets.Background("map_chart"), 0, 0, W, H);
         Panel(0, 0, W, 40);
-        Text(_assets.Display, "MARCH", 16, 8, Ink);
+        Text(_assets.Display, "REDEPLOY", 16, 8, Ink);
         DrawRunResources(200, 10);
         DrawSpine(720, 12);
 
@@ -768,7 +770,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     // New Run screen (design/05): the roster as a card grid — figure, identity, stat block, flavor —
     // one ringed as SELECTED. Reads the BuildSession roster; picking cycles the chassis it will build.
-    private void DrawNewRunScreen()
+    private void DrawNewGameScreen()
     {
         Stretch(_assets.Background("build_alcove"), 0, 0, W, H);
         // design/05 centred header, driven from the manifest (content + position; fallback centred).
@@ -786,7 +788,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         for (var i = 0; i < roster.Count; i++)
         {
             var c = roster[i];
-            var r = NewRunCardRect(i);
+            var r = NewGameCardRect(i);
             var selected = i == _build.ChassisIndex;
             Panel(r.X, r.Y, r.Width, r.Height);
             if (selected)
@@ -814,8 +816,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
             DrawWrapped(c.Flavor, r.X + 12, sy + 8, r.Width - 24, Muted);
         }
 
-        DrawButton("BEGIN THE MARCH", NewRunBeginRect.X, NewRunBeginRect.Y,
-            NewRunBeginRect.Width, NewRunBeginRect.Height, true, Keys.Enter);
+        DrawButton("BEGIN", NewGameBeginRect.X, NewGameBeginRect.Y,
+            NewGameBeginRect.Width, NewGameBeginRect.Height, true, Keys.Enter);
     }
 
     // Draw text horizontally centred on cx at y (measures the font-safe form so centring matches draw).
@@ -846,11 +848,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     // Build screen (design/02): chassis anatomy + attribute readout on the left, the chassis line-up
     // up top, rune ladders and the technique palette on the right. All read from the BuildSession.
-    private void DrawBuildScreen()
+    private void DrawEquipmentScreen()
     {
         Stretch(_assets.Background("build_alcove"), 0, 0, W, H);
         Panel(0, 0, W, 40);
-        Text(_assets.Display, "BUILD", 16, 8, Ink);
+        Text(_assets.Display, "EQUIPMENT", 16, 8, Ink);
         var runes = _build.Runes;
         Text(_assets.Mono, $"runes {runes.Spent}/{runes.Budget}", 760, 12, Amber);
 
@@ -870,7 +872,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawPalette(320, 300);
         DrawLoadoutStrip(320, 400);
 
-        DrawButton("ENTER  begin the march", 40, H - 52, 300, 44, true, Keys.Enter);
+        DrawButton("ENTER  redeploy", 40, H - 52, 300, 44, true, Keys.Enter);
         // Control hint — rune-climbing + technique toggling aren't obvious; helps POC playtesting.
         Text(_assets.Mono, "click a rune rung to climb a path   1-9 toggle techniques",
             360, H - 30, Muted);
@@ -1341,7 +1343,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         // targeted module fires on its own. AUTO is ONE global toggle, shown lit (ON) or normal (OFF).
         DrawToggleButton("AUTO", AutoRect, Exp.IsAuto(), Hover(AutoRect));
         DrawHotButton(_paused ? "RESUME" : "PAUSE", PauseRect, Hover(PauseRect));
-        DrawHotButton("FLEE", FleeRect, Hover(FleeRect));
+        DrawHotButton("RETREAT", RetreatRect, Hover(RetreatRect));
     }
 
     // A compact skinned button at a fixed rect with a hover highlight (combat pause/flee).

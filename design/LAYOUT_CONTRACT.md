@@ -168,3 +168,30 @@ DETERMINISTIC: same dc.html → same DOM → same computed layout → byte-ident
 the single source; the manifest is a mechanical projection of it. (Persistent-generator rule, applied to
 screens: never hand-author the manifest. If the dc.html is screenshotted manually today, script the
 render+extract so both the PNG and the manifest come from one run.)
+
+## 10. Fidelity primitives — shadow, frame, fill (the chrome depth the flat renderer lacks)
+The game currently draws chrome with only fill-rect + 1px border — flat, no depth. That is the whole
+"not sleek" gap. Add three techniques; the manifest references them by field/type. APPROACH = MIX:
+shadows + gradients are ENGINE-drawn (cheap, resolution-independent, never baked into art); ornate
+FRAMES are painted ASSETS blitted nine-slice.
+- **Drop shadow** — any element may carry
+  `"shadow": { "dx":N, "dy":N, "blur":N, "color":"outline", "opacity":0.55 }`. The game draws the
+  element silhouette offset by (dx,dy), softened by `blur` via a reusable soft-shadow texture, UNDER the
+  element. Engine-drawn only — baking a shadow into a PNG breaks on resize and bloats the set.
+- **9-slice frame** — element `"type":"frame"` (or a `"frame"` field on a panel/card) references a frame
+  ASSET + slice margins: `"frame": { "asset":"ui/frame/panel", "slice":[L,T,R,B] }`. Blit nine-patch:
+  4 corners fixed + crisp, 4 edges tiled along their axis, center filled — so ONE painted frame wraps any
+  size. This is the ornate/carved/rounded-border path; primitives can't do it. Card frames may add a
+  rarity `"tint"` or per-rarity asset variants.
+- **Gradient fill** — `"fill"` may be a flat token OR
+  `{ "type":"gradient", "from":"panel", "to":"border", "dir":"vertical|horizontal|diagonal" }`; the
+  engine interpolates corner colours. Subtle fades → gradient; painted texture → the 9-slice center.
+- **Frame library** — the reusable set lives under `style.frames` (`panel`, `card`, `button`, …), each
+  `{ "asset":"ui/frame/<name>", "slice":[L,T,R,B] }`; elements reference by token. Claude Design paints
+  the small hi-fi set + records slice margins; the engine loads each once and nine-patch-blits.
+
+## 11. Resolution target
+Render/author target = **1080-class (1920×1080)**. The manifest DESIGN-SPACE stays the 960×540 reference
+grid (§1/§3), rendered ×2 to 1080 (the "2× design scale" of §9) — so coordinates are unchanged. What
+1080 governs is DENSITY: author part PNGs, frame assets, and SpriteFonts at 1080-class density so they
+read crisp, NOT upscaled from 540. The shadow/frame/gradient primitives (§10) are resolution-independent.

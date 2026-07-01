@@ -2,7 +2,10 @@
 *Single source of design truth. STATUS.md is build-STATE and points here; this is the design canon —
 keep it current as decisions lock. Last full reconciliation: folded in Race+CoreRune, single-enemy
 combat, the targeting/firing FSM, the shield revamp, DEX haste, CON bonus-HP, combat pacing, the
-campaign-map topology, foe personalities, heal techniques, and the layout-manifest pipeline.*
+campaign-map topology, foe personalities, heal techniques, and the layout-manifest pipeline. Latest
+pass (2026-06-30): the simultaneous part+HP damage rule, combat symmetry (one shared AI framework),
+merchant HP-healing + potions-as-techniques, any-direction CityMap movement, the Retreat/Redeploy flow,
+the fidelity primitives (LAYOUT_CONTRACT §10), and the screen nomenclature.*
 
 ## 0. How to read this — READ FIRST
 Status tags: **[LOCKED]** decided, build on it · **[OPEN]** genuinely undecided, do NOT invent (see
@@ -134,7 +137,10 @@ Three layers over the shared attribute pool:
 resource fight) — which may be **multi-PART**. The only targeting is **part aim within that one enemy**;
 there is no multi-foe list and no default/front target.
 
-- **Persistent damage** subtracts from the part's stat (graded, §6); restored only by a heal (§10).
+- **Every hit deals BOTH [LOCKED]:** part damage (subtracts from the targeted part's stat, graded §6,
+  persistent) **and** HP damage — simultaneously, from the same hit. There is NO part-vs-HP split and no
+  HP-only-on-overkill path. The ONLY mitigations are a **shield block** (points absorb it, §6b) or a
+  **full evade** (nothing lands). Restored: parts by a heal (§10); HP only out of combat (§10).
 - **Disable** switches a part off temporarily (disarm/silence/blind/stun/shieldbreak) and returns its
   reserved attribute; recovers over time. **Silence-on-head is emergent** (head damage drains INT →
   spells can't stay reserved; a head *disable* is the hard off).
@@ -152,9 +158,17 @@ charges, targets, or fires until powered.
 - **AUTO** (one global lit/unlit toggle, OFF by default): its only job is to **keep the target after a
   shot** so a module keeps firing at it. OFF = fire once, then clear.
 
-**Foes erode the player's PARTS too** (mirroring §6; HP only via penetrating/bypass or part-overkill).
-Which limb a foe targets = a **per-foe TARGETING PERSONALITY** (data): **SMART** (best for its build) ·
-**RANDOM** · **INEPT** (botches a good pick).
+**Foes erode the player the same way** — a foe hit deals the same simultaneous part+HP damage, mitigated
+only by the player's shields/evasion. Which limb a foe targets = a **per-foe TARGETING PERSONALITY**
+(data): **SMART** (best for its build) · **RANDOM** · **INEPT** (botches a good pick).
+
+**Symmetry — ONE shared framework [LOCKED].** The AI drives foes through the SAME technique + attribute +
+shield + heal systems the player uses; a foe is just a *body with a loadout and an actor policy*.
+Anything the player can do, a foe can (and vice versa). Keep asymmetric exceptions **few and obvious**
+(e.g. a canonical troll-regen) and model even those as a **real technique**, never a hardcoded special
+case — so both sides stay in one balanced envelope and the sim serves attacker and defender alike.
+**Enemy healing** is exactly this: a foe heal runs on a real, tuned technique (cooldown + amount
+comparable to the player's), never a free fast tick that out-paces the player's own healing.
 
 **Non-human enemies (future):** distinctive single-enemy part-maps — hydra (redundant heads), golem
 (no head → blind-immune), dragon (wings = positioning), scorpion (severable stinger), mounts (two
@@ -173,10 +187,13 @@ Minions yes; **party no** — one main character.
 
 ## 10. HP, healing, the magic/charge resource [LOCKED core; details OPEN]
 - **HP** is a small life total, separate from the part/stat layer; **permanent within an encounter**.
-- **Healing repairs PARTS, never HP ("repair systems") [LOCKED]:** via **Potion** (item; strong ones
-  rare), **Bandage** (CON ability), **Cure Wounds** (INT spell); amount scales with the attribute
-  invested. **HP** is restored only **out of combat** (shop service / non-skirmish encounter). Starting
-  with no heal is a smaller penalty than starting with no shield source.
+- **Healing repairs PARTS, never HP ("repair systems") [LOCKED]:** part-heals are **techniques** (action-
+  bar verbs) — **Bandage** (CON), **Cure Wounds** (INT), and **Potion**-flavored heals — amount scales
+  with the attribute invested. **"Potions" are NOT purchasable items; a potion is one FLAVOR of heal-
+  body-part technique** (found/slotted like any technique), never bought at a shop. **HP** is restored
+  only **OUT OF COMBAT, at a merchant**: pay gold to heal HP at **1 HP per (randomized) cost**, the cost
+  balanced within loot-rate bounds. Starting with no heal is a smaller penalty than starting with no
+  shield source.
 - **A finite, refillable magic/charge resource** (name TBD) fuels magic-tier effects + weapon affixes,
   refilled via loot/gold, distinct from the attribute pool — which is *why* magic is logistically
   fragile despite being cheap in attributes.
@@ -212,11 +229,15 @@ Nested layers, macro → micro:
   resupply — affordable, free, or useless). All the while the **enemy war party advances** toward your
   camp + Capital; reaching them = **LOSE**. Beat a city's castle → roads onward open; complexity climbs
   to the Capital. **[OPEN]** city count; procgen vs authored; exact supply costs.
-- **Layer 2 — the leg (node graph to one castle):** a beacon chart crossed node-by-node, supplies per
-  jump, half-blind fog (resource-holds + castle visible afar, merchant resolves 1 jump out, else hidden
-  until adjacent), flee to bail a node.
-- **Layer 3 — node types:** skirmish (combat); resource-hold (win to **bank support**); merchant (shop +
-  out-of-combat HP service); unknown (fogged); the castle (exit).
+- **Layer 2 — the leg = the CityMap (node graph to one castle):** a beacon chart crossed node-by-node.
+  **Movement is ANY-DIRECTION [LOCKED]:** move to any linked node, forward OR back (e.g. return to a
+  merchant to heal). **Every move costs 1 supply AND advances the war party one step** — that reciprocal
+  cost is the whole tradeoff; backtracking is allowed but never free. Half-blind fog (resource-holds +
+  castle visible afar, merchant resolves 1 jump out, else hidden until adjacent). **Retreat** bails an
+  active fight (§8; flow below).
+- **Layer 3 — node types:** skirmish (combat); resource-hold (win to **bank support**); merchant
+  (out-of-combat **HP healing** — gold → HP at 1 HP per randomized cost, §10; **no potion sales** —
+  potions are techniques); unknown (fogged); the castle (exit).
 - **Layer 4 — encounter resolution:** every node is the one combat grammar (§8); the **castle is that
   grammar at max scale** (gate/wall/catapult/ballista + boss-tier, map-scaled damage; its "systems"
   are its parts).
@@ -228,6 +249,14 @@ Nested layers, macro → micro:
   **UI:** a **top-edge track, castle (right) → camp (left)**, advancing each move.
 - **The core tension (a race):** supplies cap how far you roam; banked support is your finale damage;
   the war-party clock caps your time. Tune so banking *a little* is viable and only **greed** loses.
+- **Flow — Redeploy / Retreat, Equipment between fights [LOCKED; timing OPEN]:** **Retreat** = the
+  in-combat action to bail an active fight; **Redeploy** = the out-of-combat action to advance (a move on
+  the CityMap). **A resolved fight does NOT auto-return to the map** — the player explicitly Redeploys.
+  **Equipment (loadout) is reachable between fights** — a button on the Encounter screen (only when not
+  fighting) and on the CityMap / CampaignMap. Redeploy is **timed**: a lockout that **DEX shortens**
+  (haste, §6) — design-locked, *not yet built (flow first)*. **[OPEN]** an FTL-style commit-to-
+  destination (pick where you Redeploy/Retreat to in the same act) — deferred; for now Redeploy just
+  routes to the CityMap.
 - **[OPEN]** a crafting system fed by siege resources.
 
 ## 13. Presentation — the designer's core [LOCKED]
@@ -241,11 +270,14 @@ Nested layers, macro → micro:
   containers/templates, the shared style block) come from the generator-emitted manifest — see
   `design/LAYOUT_CONTRACT.md` + `design/SCREENS.md`. **Aspect-independent fill:** background
   scale-to-cover; HUD anchored to real edges; the pixel stage integer-scaled + centered (no bars).
-- **Screens** (design/ PNGs 01-05): (1) **Build/loadout** cutaway (race+core anatomy, rune budget +
-  ladder, equipped gear, action loadout — sealed in combat); (2) **Combat** cutaway taking localized
-  part damage; (3) **Run-map/chart** (design/03 — the fog-aware node graph + merchant, between fights);
-  the **campaign spine** (design/04) rides the run header. New-Run (design/05) is the build screen as
-  picker until race art lands. (Shell states today: Build + Run, the latter showing chart or combat.)
+- **Screens & canonical names [LOCKED]** (design/ PNGs 01-05): **NewGame** (design/05 — pick Race→Core;
+  role badges, per-card select, portrait boxes), **Equipment** (design/02 — the loadout cutaway:
+  race+core anatomy, rune budget + ladder, equipped gear, action loadout; a **between-fights** screen
+  reachable from Encounter/CityMap/CampaignMap, **NOT** a post-NewGame gate), **Encounter** (design/01 —
+  combat cutaway taking localized part damage), **CityMap** (design/03 — the fog-aware leg node graph +
+  merchant), **CampaignMap** (design/04 — the Layer-1 city route). Actions: **Retreat** (in combat) /
+  **Redeploy** (out of combat). *(Old names, do not resurface: New Run, Build/Chassis, Combat/Siege,
+  Run-map, Campaign spine, March, Flee.)*
 - **Two registers:** world/combat bolder/more atmospheric; the **build screen clean + legible** — same
   high-fidelity bar, less flourish.
 - **Combat layout:** three zones, **you | battlefield | foe** (foe zone holds **1–3 structured
@@ -306,6 +338,8 @@ points there so the canon stays design-focused.
 10. The five Core-rune stat blocks (design/05) are placeholder — tune later.
 11. Part→stat friction (legs = accuracy, arms = STR) — low-pri revisit only if it nags.
 12. Action speed beyond DEX haste — none planned; revisit only if needed.
+13. Redeploy lockout tuning (the DEX→lockout curve) and the FTL-style commit-to-destination on
+    Redeploy/Retreat (§12) — both deferred; flow ships first.
 
 ## 18. DROPPED — must not resurface
 - **"Chassis" as the identity model** → split into **Race + Core rune** (§7).
@@ -337,3 +371,10 @@ points there so the canon stays design-focused.
 - **Integer-only / letterbox-only scaling that bars out** → aspect-independent fill (cover bg + anchored
   HUD + integer pixel stage), §13.
 - **C++/SDL, editor-centric / ECS / Godot** → MonoGame DesktopGL, code-first, no ECS, §15.
+- **HP damaged only via penetrating/bypass or part-overkill** → every hit deals part damage AND HP
+  damage at once, mitigated only by a shield block or a full evade, §8.
+- **Potions as purchasable shop items; a merchant that sells potions/lets you drink to heal** → a
+  "potion" is one flavor of heal-body-part TECHNIQUE (found/slotted, never bought); the merchant sells
+  only out-of-combat HP healing (gold → HP at 1 HP per randomized cost), §10/§12.
+- **Auto-attack as a per-weapon setting** → AUTO is ONE GLOBAL toggle; when on, a fired weapon re-fires
+  on its next charge at the kept target, §8.
