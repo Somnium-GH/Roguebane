@@ -48,6 +48,9 @@ public sealed class Body
         _intact[part.Id] = Math.Max(0, Contribution(part) - amount);
         Cascade(part.Stat);
         _hands.RemoveAll(w => Capacity(w.Stat) < w.Reserve); // gear falls off below its threshold
+        // Plate's shield RIDES its part-group (§6): break the group and the worn shield is gone with it.
+        if (Capacity(part.Stat) == 0 && _armor.TryGetValue(part.Stat, out var a) && a.Kind == ArmorKind.Plate)
+            DropShield(PlateShieldId(part.Stat));
     }
 
     public IReadOnlyList<Weapon> Hands => _hands;
@@ -71,10 +74,25 @@ public sealed class Body
         _ => Array.Empty<Weapon>(),
     };
 
-    // Armor rides on a part-group (its Stat). One piece per group — equipping replaces.
-    public void Equip(Armor piece) => _armor[piece.Group] = piece;
+    private const int PlateRegenEvery = 40; // plate is a slow-recovering worn buffer, not free tanking
+    private static string PlateShieldId(Stat group) => "plate-" + group;
 
-    public void Unequip(Stat group) => _armor.Remove(group);
+    // Armor rides on a part-group (its Stat). One piece per group — equipping replaces. §8/§6: PLATE is
+    // a worn SHIELD SOURCE (the flat-protection role retired) — equipping it raises a shield pool (Value
+    // layers) while the group stands; leather stays evasion. Shields + full evade are the only mitigations.
+    public void Equip(Armor piece)
+    {
+        Unequip(piece.Group); // drop a prior piece's plate shield before replacing
+        _armor[piece.Group] = piece;
+        if (piece.Kind == ArmorKind.Plate && piece.Value > 0 && Capacity(piece.Group) > 0)
+            RaiseShield(PlateShieldId(piece.Group), piece.Value, PlateRegenEvery);
+    }
+
+    public void Unequip(Stat group)
+    {
+        if (_armor.TryGetValue(group, out var a) && a.Kind == ArmorKind.Plate) DropShield(PlateShieldId(group));
+        _armor.Remove(group);
+    }
 
     public Armor? ArmorOn(Stat group) => _armor.GetValueOrDefault(group);
 

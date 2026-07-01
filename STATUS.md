@@ -18,7 +18,10 @@ OPEN — needs a HUMAN decision before I build (do NOT guess):
 - **CASTLE thesis + ENEMY HEAL** — DONE: free HP tick removed; castle is an armed structured boss that
   mends via a real §10 technique; BalanceSim thesis preserved (glass loses / AllSix wins). Numbers
   (castle HP/strike) are placeholder — tune the FEEL in play (a play-tuning touchpoint, not a blocker).
-- **PLATE armour role** — inert since §8 (flagged in Shops.cs): give it a role (shield source?) or retire.
+- **PLATE armour role** — DONE: plate is now a worn SHIELD SOURCE (§8/§6b). Equipping it raises `Value`
+  shield layers on its group (Body.Equip), slow-regen (40 ticks), shed when the group breaks or on
+  unequip. Leather stays evasion. Tests: PlateArmorTests (raise/absorb/shed-on-break/unequip/leather-none).
+  DESIGN_SPEC §6 armour updated. 284 Core green. Layer count / regen placeholder.
 
 CD LANDING (2026-07-01, mid-loop external drop — now committed): a big Claude-Design payload arrived —
 `ui/frame/` NINE-SLICE assets, `sprites/gear/bow.png`, `sprites/body/{human,elf}_ranger/` figures,

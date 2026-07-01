@@ -99,9 +99,10 @@ allocation economy.
   arm → lose its STR share → can fall below an equip threshold and that gear **drops off**. The cascade
   *is* the combat depth.
 - **Armor [LIGHT effect layer — not attribute gear]:** one piece per part-group; does NOT grant or gate
-  attributes. Effect keyed to TYPE: heavy/plate → flat **protection (1–4)** off the stat-damage to its
-  part; **leather (DEX)** → **evasion**; head spell-armor → spell/blind protection. Rides the part's
-  condition (break the part → effect gone). Weapons/shields gate on their stat to wield.
+  attributes. Effect keyed to TYPE: heavy/**plate → a worn SHIELD SOURCE** (raises `Value` §6b shield
+  layers on its group while it stands; the flat-protection role is retired since §8 — shields + full evade
+  are the only mitigations); **leather (DEX)** → **evasion**; head spell-armor → spell/blind protection.
+  Rides the part's condition (break the part → effect/shield gone). Weapons/shields gate on their stat.
 
 ### 6b. Blocks & the shield system [LOCKED]
 A **shield SOURCE is a PASSIVE technique** that **reserves its stat** in the action bar and is **ON by
