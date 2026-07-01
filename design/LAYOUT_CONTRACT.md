@@ -169,6 +169,19 @@ the single source; the manifest is a mechanical projection of it. (Persistent-ge
 screens: never hand-author the manifest. If the dc.html is screenshotted manually today, script the
 render+extract so both the PNG and the manifest come from one run.)
 
+**INSTRUMENTATION COMPLETENESS [required — the golden rule of capture].** The extractor captures ONLY
+tagged nodes (`data-el`) and declared template items — **untagged DOM is invisible and silently
+dropped.** So EVERY visually meaningful node must be instrumented: tag it `data-el` (a static label /
+figure) or make it a `data-template` item (repeating), and add `data-binds` wherever it shows a LIVE
+value. This INCLUDES the internals of a **bound panel** — binding a panel does NOT auto-capture its
+children; each tile / label / figure inside it still needs its own tag or template (e.g. the NewGame
+Loadout panel's attr/HP/layout tiles + apex block, and the "① Race / ② Core Rune / Loadout" headers).
+Do NOT rely on the extractor to "descend" into untagged content — that path is banned (it scoops up
+wrapper noise and duplicates). **SELF-AUDIT every screen before shipping:** diff the emitted
+`layout.json` screen against the mockup — every element the mockup draws MUST appear; anything missing
+wasn't instrumented → fix it. Never ship a lossy export; if something genuinely can't be captured, flag
+it (don't silently drop it).
+
 ## 10. Fidelity primitives — shadow, frame, fill (the chrome depth the flat renderer lacks)
 The game currently draws chrome with only fill-rect + 1px border — flat, no depth. That is the whole
 "not sleek" gap. Add three techniques; the manifest references them by field/type. APPROACH = MIX:
