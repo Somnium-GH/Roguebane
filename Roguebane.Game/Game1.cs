@@ -32,6 +32,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private BuildSession _build = null!;
     private Campaign _campaign = null!;
     private bool _paused;
+    private bool _loadoutOpen; // between-fights Equipment view over the CityMap (read + re-slot techniques)
     private readonly CombatTargeting _ctrl = new(); // the targeting FSM (headless, in Core); shell just feeds it intents
     private KeyboardState _prevKeys;
     private KeyboardState _keys; // current frame's keys, read in Draw for button pressed-state
@@ -84,7 +85,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         if (_smoke && int.TryParse(Environment.GetEnvironmentVariable("RB_CHASSIS"), out var ci))
             _build.CycleCoreRune(ci - _build.CoreRuneIndex);
 
-        if (_smokeScreen is "combat" or "map") // march the real loop for the screenshot
+        if (_smokeScreen is "combat" or "map" or "loadout") // march the real loop for the screenshot
         {
             _build.CycleCoreRune(3);          // -> the Summoner (3 bays; fields Skeleton+Shade) for the bay lane
             _build.Toggle(Techniques.Jab);   // add a STR card for variety on the bar
@@ -96,7 +97,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
             if (_smokeScreen == "map") // stop at the merchant so the shot shows the gear stock + gear bar
             {
-                _campaign.Enter("a1"); Resolve(); // earn some gold first
+                _campaign.Enter("a1"); Resolve(); _campaign.Redeploy(); // earn gold, then back to the chart
                 _campaign.Enter("b");             // the merchant
                 Exp.BuyWeapon(Armory.Dagger);     // dagger 2 -> pack
                 Exp.EquipWeapon(Armory.Dagger);   // -> EQUIPPED
@@ -124,6 +125,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
                     if (Exp.Equipment.Count > 1) _ctrl.CardPress(Exp, 1);
                 }
                 for (var i = 0; i < 6; i++) _campaign.Tick(); // castle survives -> stay in combat
+            }
+            else if (_smokeScreen == "loadout") // between-fights Equipment overlay, open over the chart
+            {
+                _campaign.Enter("a1"); Resolve(); _campaign.Redeploy(); // clear a node -> back at the chart (Choosing)
+                _loadoutOpen = true;
             }
         }
         else if (_smokeScreen == "build") _screen = Screen.Equipment; // else fall through to the New Run grid
@@ -276,6 +282,17 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // On the chart: number keys pick a charted jump; at a merchant, the shop verbs are live.
     private void UpdateChoosing(KeyboardState keys)
     {
+        // Between-fights Equipment view: opens over the map (E), re-slots techniques (click a card ->
+        // power/unpower via the existing Toggle), closes with Esc/BACK. While open it eats map input.
+        if (_loadoutOpen)
+        {
+            for (var i = 0; i < Exp.Equipment.Count; i++)
+                if (Click(LoadoutCardRect(i))) _campaign.Toggle(Exp.Equipment[i]);
+            if (Pressed(keys, Keys.Escape) || Click(LoadoutBackRect)) _loadoutOpen = false;
+            return;
+        }
+        if (Pressed(keys, Keys.E) || Click(EquipOpenRect)) { _loadoutOpen = true; return; }
+
         if (Exp.AtMerchant)
         {
             if (Pressed(keys, Keys.H) || Click(MerchHealRect)) Exp.BuyHeal(); // HP healing only (no potions)
@@ -398,6 +415,12 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // Merchant verb button + gear chips — mirror DrawMerchant's panel origin (560,300) + offsets.
     private static readonly Rectangle MerchHealRect = new(574, 344, 330, 30);
     private static Rectangle MerchGearRect(int i) => new(574 + i * 112, 472, 104, 30);
+
+    // Between-fights Equipment: open button (CityMap) + the overlay's technique cards & close button.
+    private static readonly Rectangle EquipOpenRect = new(16, 190, 150, 30); // left column, clear of the merchant panel
+    private static readonly Rectangle LoadoutPanel = new(180, 70, 600, 400);
+    private static readonly Rectangle LoadoutBackRect = new(600, 430, 150, 30);
+    private static Rectangle LoadoutCardRect(int i) => new(430 + (i % 5) * 62, 240 + (i / 5) * 62, 56, 56);
 
     private void ToggleFullscreen()
     {
@@ -559,8 +582,51 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawCastlePanel(740, 158);
         if (Exp.AtMerchant) DrawMerchant(560, 300);
         DrawGearBar(20, H - 44);
+        if (!_loadoutOpen)
+            DrawButton("EQUIPMENT [E]", EquipOpenRect.X, EquipOpenRect.Y,
+                EquipOpenRect.Width, EquipOpenRect.Height, true, Keys.E);
 
         DrawStateOverlay();
+        if (_loadoutOpen) DrawLoadoutOverlay();
+    }
+
+    // Between-fights Equipment (design #4, flow-only slice): a read view of the RUN's loadout over the
+    // CityMap, with technique RE-SLOTTING via the existing Toggle (power/unpower on the bar). Mid-run
+    // gear/rune changes stay deferred (that's the design-open part); gear-equip already lives on the map.
+    private static readonly IReadOnlyDictionary<Stat, int> EmptyDemand =
+        new System.Collections.Generic.Dictionary<Stat, int>();
+
+    private void DrawLoadoutOverlay()
+    {
+        Rect(0, 0, W, H, new Color(0, 0, 0, 160)); // dim the chart behind
+        var p = LoadoutPanel;
+        Panel(p.X, p.Y, p.Width, p.Height);
+        Text(_assets.Display, "LOADOUT", p.X + 16, p.Y + 12, Ink);
+        Text(_assets.Mono, "between fights - click a technique to power / unpower it",
+            p.X + 16, p.Y + 44, Muted);
+
+        var body = Exp.Player.Body;
+        DrawHumanoid(body, Exp.FigureId, p.X + 116, p.Y + 250, 190);
+        Text(_assets.Mono, $"HP {Exp.Player.Hp}/{Exp.Player.MaxHp}", p.X + 16, p.Y + 72, Ink);
+        Text(_assets.Mono, $"GOLD {Exp.Gold}", p.X + 150, p.Y + 72, Amber);
+        DrawAttributeReadout(body, body, p.X + 16, p.Y + 100, EmptyDemand);
+
+        Text(_assets.Mono, "TECHNIQUES", 430, 218, Muted);
+        for (var i = 0; i < Exp.Equipment.Count; i++)
+        {
+            var t = Exp.Equipment[i];
+            var r = LoadoutCardRect(i);
+            var on = Exp.IsActive(t);
+            Panel(r.X, r.Y, r.Width, r.Height);
+            Sprite(_assets.Technique(t.Id), r.X + 6, r.Y + 6, r.Width - 12, r.Height - 12,
+                on ? Color.White : new Color(120, 110, 100));
+            Border(r.X, r.Y, r.Width, r.Height, on ? Amber : Hover(r) ? Ink : Border0);
+            Text(_assets.Mono, t.Reserve.ToString(), r.Right - 12, r.Bottom - 12, StatColor(t.Stat));
+        }
+        Text(_assets.Mono, "MINIONS  " + Exp.MinionCount, 430, p.Bottom - 58, Muted);
+
+        DrawButton("BACK [Esc]", LoadoutBackRect.X, LoadoutBackRect.Y,
+            LoadoutBackRect.Width, LoadoutBackRect.Height, true, Keys.Escape);
     }
 
     // design/03 right-side card: the run's destination. The castle is the structural boss the whole
