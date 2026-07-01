@@ -20,4 +20,6 @@ public sealed record Technique(
     int Cooldown,
     int Power,
     int ChargeCost = 0,
-    WeaponUse Consults = WeaponUse.None);
+    WeaponUse Consults = WeaponUse.None,
+    bool Heals = false); // a REPAIR technique: on discharge it mends the caster's own most-damaged part
+                         // (by Power) instead of striking a target (the §10 part-heal). No target needed.

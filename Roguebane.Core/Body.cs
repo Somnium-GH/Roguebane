@@ -94,6 +94,20 @@ public sealed class Body
         return effective - absorbed;
     }
 
+    // The part with the most stat missing (Capacity - live contribution), or null if every part is
+    // whole. Drives a part-heal's target — mend where it hurts most; ties resolve by part order.
+    public BodyPart? MostDamagedPart()
+    {
+        BodyPart? worst = null;
+        var most = 0;
+        foreach (var p in _parts)
+        {
+            var missing = p.Capacity - Contribution(p);
+            if (missing > most) { most = missing; worst = p; }
+        }
+        return worst;
+    }
+
     // Healing restores PARTS, never HP: a repaired part feeds its stat back into the pool.
     public void Repair(BodyPart part, int amount)
     {

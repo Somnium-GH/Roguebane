@@ -252,6 +252,18 @@ public sealed class Caster
     // the magic charge is dry; resets a Timered cooldown on a landed hit.
     private bool Discharge(Run run)
     {
+        // A part-heal ignores targets: it mends the caster's own most-damaged part. Holds fire (and
+        // keeps its cooldown ready) when nothing is hurt, so it fires the instant a part takes damage.
+        if (run.Tech.Heals)
+        {
+            var wound = _self.MostDamagedPart();
+            if (wound is null) return false;
+            if (run.Tech.ChargeCost > 0 && !TrySpendCharge(run.Tech.ChargeCost)) return false;
+            _self.Repair(wound, EffectivePower(run.Tech));
+            if (run.Tech.Kind == TechniqueKind.Timered) run.Countdown = EffectiveCooldown(run.Tech);
+            return true;
+        }
+
         var onAim = run.Aimed is { Down: false };
         // Player doctrine (requireAim): no live aim => HOLD, never falling back to the default front.
         var target = onAim ? run.Aimed : (_requireAim ? null : _default);

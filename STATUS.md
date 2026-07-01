@@ -77,6 +77,9 @@ Original re-open detail (kept as record):
   `sample` today; see Asset gaps). Once bound, render coreCard/legendRow/etc. from the manifest instead
   of hand-code. Separately: position-drive a whole screen as a unit (build is dense -> wholesale, not
   piecemeal, to avoid mixed coord systems).
+  ARC STATUS: clean position-drive wins delivered (New Run grid + centred header). Remaining steps are
+  design-data-GATED (per-part binds) or a risky wholesale rewrite of screens that already match design.
+  Arc PAUSED pending Claude Design binds; loop pivoted to unblocked roadmap work (Phase 3 #4 part-heals).
   cityNode is labels-only; castle stays the generic node icon (procedural castle parked — not
   mission-critical). REVIEW FIXES:
   * coreCard figure is HARDCODED (`image: …/chassis/grunt.png` sample) — BIND each card's image to its
@@ -228,9 +231,11 @@ from primitives. Route each to Claude Design. (Art direction: DESIGN_SPEC §13.)
 - G1: foe->player PART aim MECHANISM shipped + headless-tested (FoeTargeting SMART/RANDOM/INEPT; Foe.Aim
   data; Battle wires it via the Encounter.FoePartAim opt-in). STAGED OFF in all live content
   (FoePartAim=false): persistent part erosion with NO part-heal yet (Phase 3 #4) strips the loadout and
-  makes the run unwinnable (verified — campaign flips to a DPS stalemate). RECONCILE: flip FoePartAim on
-  per-encounter once part-heals ship; authored personalities already sit dormant in Sieges. Real content
-  foes still unarmed beyond the light feel-pass arming (power envelope = human).
+  makes the run unwinnable (verified — campaign flips to a DPS stalemate). IN-COMBAT PART-HEAL now EXISTS
+  (Phase 3 #4): a `Heals` technique mends the caster's most-damaged part (Caster.Discharge branch +
+  Body.MostDamagedPart), content `Techniques.Bandage` (CON, ~8s), tested. RECONCILE remaining: put a heal
+  in the affected kits + flip FoePartAim on per-encounter, then balance (Needs-human) — the mechanism is
+  no longer the blocker. Real content foes still unarmed beyond the light feel-pass arming.
 
 ## Roadmap
 - Phase 1 [DONE]: Core skeleton, rune economy, chassis, techniques + deterministic combat tick,
@@ -283,8 +288,9 @@ OPEN (park; decide as the phase starts):
 - Race roster beyond Human/Elf; full Core-rune roster; the race<->core-rune restriction matrix.
 
 Suggested order: (1) single-enemy + part-aim simplification; (2) Chassis->Race+CoreRune rename + race-gated
-New Run; (3) shield-levels system; (4) part-repair heals; (5) defensive-source defaults in starting kits;
-(6) enemy-HP scaling. DESIGN_SPEC touch points to reconcile as each lands: §4/§6/§7/§10/§11/§16.
+New Run; (3) shield-levels system; (4) part-repair heals [MECHANISM DONE: in-combat `Heals` technique +
+Body.MostDamagedPart + Techniques.Bandage, tested; still needs kit placement + balance]; (5) defensive-
+source defaults in starting kits; (6) enemy-HP scaling. DESIGN_SPEC touch points: §4/§6/§7/§10/§11/§16.
 
 ## Layout & assembly system (manifest-driven) [FOUNDATION — do before the fidelity rebuild]
 Fixes the EXPLODED figure and makes ALL layout pixel-perfect + viewport-independent by consuming the
