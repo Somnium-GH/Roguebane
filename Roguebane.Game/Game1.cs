@@ -17,8 +17,6 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private static readonly Keys[] TechniqueKeys =
         { Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6 };
 
-    private static readonly Keys[] PathKeys = { Keys.Q, Keys.W };
-
     // Screen names per the 2026-06-30 rename directive. (Manifest lookup ids stay "newrun"/"build"/
     // "runmap" until Claude Design renames the manifest side in parallel.)
     private enum Screen { NewGame, Equipment, Run }
@@ -202,20 +200,14 @@ public class Game1 : Microsoft.Xna.Framework.Game
         if (Pressed(keys, Keys.Left)) _build.CycleCoreRune(-1);
         if (Pressed(keys, Keys.Right)) _build.CycleCoreRune(1);
 
-        for (var i = 0; i < PathKeys.Length && i < _build.Paths.Count; i++)
-            if (Pressed(keys, PathKeys[i]))
-                _build.Climb(_build.Paths[i]);
-
         for (var i = 0; i < TechniqueKeys.Length && i < _build.Palette.Count; i++)
             if (Pressed(keys, TechniqueKeys[i]))
                 _build.Toggle(_build.Palette[i]);
 
-        // Mouse: click a chassis, a ladder row to climb, a palette card to toggle, the march CTA.
+        // Mouse: click a chassis, a palette card to toggle, the march CTA. (The throwaway rune-ladder
+        // test is retired; the real rune-bag UI, design/02, is the deferred replacement.)
         for (var i = 0; i < _build.CoreRuneCount; i++)
             if (Click(CoreRuneRect(i))) _build.CycleCoreRune(i - _build.CoreRuneIndex);
-        for (var p = 0; p < _build.Paths.Count; p++)
-            if (_build.Paths[p].Count > 0 && Click(LadderRowRect(p, _build.Paths[p].Count)))
-                _build.Climb(_build.Paths[p]);
         for (var i = 0; i < _build.Palette.Count; i++)
             if (Click(PaletteRect(i))) _build.Toggle(_build.Palette[i]);
 
@@ -344,7 +336,6 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // + hover). Mirrors the coordinates used in the Draw* methods.
     private static Rectangle CoreRuneRect(int i) => new(180 + i * 110 - 2, 4, 100, 32);
     private static Rectangle PaletteRect(int i) => new(320 + i * 52, 300, 48, 48); // fits 7 before the bay preview
-    private static Rectangle LadderRowRect(int p, int rungs) => new(320, 100 + p * 56, rungs * 56, 48);
     private static readonly Rectangle RedeployRect = new(40, H - 52, 300, 44);
     // The action bar sits bottom-RIGHT (design/01), right of the attribute pool and left of the combat
     // verb buttons. Card pitch adapts to the equipment size so N cards fit the region.
@@ -886,16 +877,14 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawAnatomyTags(figBox);
         DrawAttributeReadout(preview, _build.Race.NewBody(), 56, 318, KitDemand());
 
-        DrawLadders(320, 100);
         DrawCoreBlock(700, 90);
         DrawMinionPreview(700, 320);
         DrawPalette(320, 300);
         DrawLoadoutStrip(320, 400);
 
         DrawButton("ENTER  redeploy", 40, H - 52, 300, 44, true, Keys.Enter);
-        // Control hint — rune-climbing + technique toggling aren't obvious; helps POC playtesting.
-        Text(_assets.Mono, "click a rune rung to climb a path   1-9 toggle techniques",
-            360, H - 30, Muted);
+        // Control hint (rune-bag UI deferred; techniques toggle for now).
+        Text(_assets.Mono, "1-9 toggle techniques", 360, H - 30, Muted);
     }
 
     // CURRENT CORE stat block (design/02): the chassis's identity at a glance — base attributes,
@@ -983,33 +972,6 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     // Rune ladders: a row per path, a rune glyph per rung (keystone glyph at the top), filled rungs
     // tinted, the rest dim. Climbing in order spends the budget toward a keystone.
-    private void DrawLadders(int x, int y)
-    {
-        for (var p = 0; p < _build.Paths.Count; p++)
-        {
-            var ladder = _build.Paths[p];
-            if (ladder.Count == 0) continue;
-            var held = _build.Runes.CurrentRank(ladder[0].Path);
-            var top = y + p * 56;
-            for (var r = 0; r < ladder.Count; r++)
-            {
-                var left = x + r * 56;
-                var filled = r < held;
-                var keystone = ladder[r].Keystone;
-                // drop renamed rune/path -> path_major (top path rune); marks below it.
-                var glyph = _assets.Rune(keystone ? "keystone" : r == ladder.Count - 1 ? "path_major" : "mark");
-                Sprite(glyph, left, top, 48, 48, filled ? Color.White : new Color(110, 95, 80));
-                if (keystone) Border(left - 2, top - 2, 52, 52, Amber);
-                // Per-rung budget cost (discount-aware), so each rune reads as a priced card.
-                Text(_assets.Mono, _build.Runes.EffectiveCost(ladder[r]).ToString(), left + 2, top - 12,
-                    filled ? Amber : Muted);
-            }
-            if (Hover(LadderRowRect(p, ladder.Count))) Border(320, top, ladder.Count * 56, 48, Ink);
-            // The ladder's path named once, to the right of its rungs (the key that climbs it).
-            var nameX = x + ladder.Count * 56 + 8;
-            Text(_assets.Mono, "Q W".Split(' ')[Math.Min(p, 1)] + " " + ladder[0].Path, nameX, top + 16, Muted);
-        }
-    }
 
     private void DrawPalette(int x, int y)
     {

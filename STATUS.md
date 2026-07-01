@@ -32,6 +32,13 @@ LAYOUT_CONTRACT §10-11 (fidelity primitives + 1080). Priority order:
 4. **EQUIPMENT screen** (was Build): full redo off `screens.equipment` (design/02). **REMOVE the
    rune-ladder TEST** ("Q vessel / W resonance") — throwaway rune-test, retire it. Between-fights screen,
    not a post-NewGame gate.
+   [RUNE-LADDER TEST REMOVED: dropped the on-screen ladder UI from the Equipment screen — PathKeys (Q/W)
+   input, the ladder click-to-climb, DrawLadders + LadderRowRect, and the "click a rune rung" hint. The
+   Core rune economy (BuildSession.Paths/Climb, RuneLoadout, Marks) is UNTOUCHED — only the placeholder
+   screen harness went; the real rune-bag cards (design/02) are the deferred replacement. Screen still
+   shows figure/attrs/CURRENT-CORE/techniques/action-bar/bays; build+newgame+combat smoke clean, 272 Core
+   green. STILL TODO for #4: make Equipment read the RUN state (not pre-run BuildSession) as a between-
+   fights screen + the design/02 rune-bag + inventory tabs — unlocks the #3 Equipment-reachable button.]
 5. **FIDELITY** (LAYOUT_CONTRACT §10-11): add renderer support for `shadow` (engine-drawn), `frame`/
    nineSlice (blit CD frame assets), gradient fill; build SpriteFonts at **1080-class** density. Frame
    ASSETS come from Claude Design (blocked until delivered — do shadow/gradient + fonts meanwhile).
