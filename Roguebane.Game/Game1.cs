@@ -1407,6 +1407,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private static readonly Color Blood = new(0xb2, 0x3b, 0x32);
     private static readonly Color Panel0 = new(0x1d, 0x15, 0x0e);
     private static readonly Color Border0 = new(0x5a, 0x46, 0x36);
+    // §10 gradient chrome: panels fade a touch lighter at the top -> Panel0 at the base (soft lit depth).
+    private static readonly Color PanelTop = new(0x2b, 0x21, 0x17, 220);
+    private static readonly Color PanelBot = new(0x1d, 0x15, 0x0e, 220);
 
     private static Color StatColor(Stat s)
     {
@@ -1438,8 +1441,23 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private void Panel(int x, int y, int w, int h)
     {
         DrawShadow(x, y, w, h, dx: 2, dy: 3, blur: 3, opacity: 0.40f); // §10 depth under the chrome
-        Rect(x, y, w, h, new Color(Panel0, 220));
+        DrawGradient(x, y, w, h, PanelTop, PanelBot, GradientDir.Vertical); // §10 soft lit fade
         Border(x, y, w, h, Border0);
+    }
+
+    private enum GradientDir { Vertical, Horizontal }
+
+    // §10 gradient fill, ENGINE-drawn: interpolate `from`->`to` across the rect in 1px strips (the
+    // PointClamp sampler rules out a stretched-texture lerp). Diagonal isn't needed yet -> vertical.
+    private void DrawGradient(int x, int y, int w, int h, Color from, Color to, GradientDir dir)
+    {
+        if (w <= 0 || h <= 0) return;
+        if (dir == GradientDir.Horizontal)
+            for (var i = 0; i < w; i++)
+                Rect(x + i, y, 1, h, Color.Lerp(from, to, w <= 1 ? 0f : (float)i / (w - 1)));
+        else
+            for (var i = 0; i < h; i++)
+                Rect(x, y + i, w, 1, Color.Lerp(from, to, h <= 1 ? 0f : (float)i / (h - 1)));
     }
 
     // §10 drop shadow, ENGINE-drawn (never baked into art -> resolution-independent): the element

@@ -46,8 +46,13 @@ LAYOUT_CONTRACT §10-11 (fidelity primitives + 1080). Priority order:
    softened by `blur` concentric decaying-alpha rings, UNDER the element (no baked art, resolution-
    independent per §10). Applied a subtle default in the `Panel()` helper (dx2/dy3/blur3/op.40) so all
    chrome + cards gain depth; screenshot-verified across build/combat/newgame/citymap (reads as depth,
-   not muddy). Game-only. STILL TODO: read per-element `shadow` from the manifest when CD authors those
-   fields; GRADIENT fill primitive; 1080-class SpriteFonts. FRAMES blocked on CD assets.]
+   not muddy). Game-only.]
+   [GRADIENT DONE: engine `DrawGradient(x,y,w,h,from,to,dir)` — interpolates `from`->`to` in 1px strips
+   (PointClamp sampler rules out a stretched-texture lerp; vertical/horizontal, diagonal deferred).
+   Panel() now fades PanelTop (a touch lighter) -> PanelBot (Panel0) vertically under the border, so the
+   flat chrome reads as soft-lit depth alongside the shadow. Screenshot-verified. Reusable for a manifest
+   `fill:{type:gradient}` field when CD authors one. STILL TODO: per-element manifest `shadow`/`fill`
+   fields; 1080-class SpriteFonts. FRAMES blocked on CD assets.]
 6. **BUG BATCH:**
    - CityMap supplies label "spent per jump" → **"per deployment"** (drop the FTL wording). [DONE]
    - CityMap movement **ANY-DIRECTION**: any move (incl. back to a merchant) costs 1 supply AND advances
