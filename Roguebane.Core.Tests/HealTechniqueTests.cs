@@ -68,9 +68,9 @@ public class HealTechniqueTests
     }
 
     [Fact]
-    public void BandageContentIsAHealAndNotInTheDefaultPalette()
+    public void BandageIsAHealAndNowInThePalette()
     {
         Assert.True(Content.Techniques.Bandage.Heals);
-        Assert.DoesNotContain(Content.Techniques.Bandage, Content.Techniques.All);
+        Assert.Contains(Content.Techniques.Bandage, Content.Techniques.All); // live: kits carry the heal
     }
 }

@@ -39,6 +39,8 @@ public static class Techniques
         new("stoneskin", Stat.Int, Reserve: 2, TechniqueKind.Sustained, Cooldown: 0, Power: 0,
             ShieldLayers: 3, ShieldRegen: 30);
 
+    // Bandage is now in the palette + the starting kits (below): every build fights with a part-heal so
+    // it can survive live foe part-aim on skirmishes; a build that drops it pays the intended penalty.
     public static readonly IReadOnlyList<Technique> All =
-        new[] { Jab, Cleave, Lunge, Ember, Drain, Brace };
+        new[] { Jab, Cleave, Lunge, Ember, Drain, Brace, Bandage };
 }

@@ -19,7 +19,7 @@ public static class Chassrium
         StandardBody("grunt", str: 4, intel: 3, dex: 4, con: 4),
         RuneBudget: 24,
         RuneDiscount: 1,
-        DefaultLoadout: new[] { Techniques.Jab, Techniques.Brace },
+        DefaultLoadout: new[] { Techniques.Jab, Techniques.Brace, Techniques.Bandage },
         Archetype: "THE GENERALIST",
         Flavor: "No edge, no hole. A fat budget of cheap runes climbs into any keystone you pay for.");
 
@@ -29,7 +29,7 @@ public static class Chassrium
         StandardBody("adept", str: 4, intel: 10, dex: 4, con: 5),
         RuneBudget: 10,
         RuneDiscount: 0,
-        DefaultLoadout: new[] { Techniques.Ember, Techniques.Drain },
+        DefaultLoadout: new[] { Techniques.Ember, Techniques.Drain, Techniques.Bandage },
         Archetype: "THE SCHOLAR",
         Flavor: "Frail chest, one arm - but a deep INT head for spells and the widest action bar.");
 
@@ -40,7 +40,7 @@ public static class Chassrium
         RuneBudget: 12,
         RuneDiscount: 0,
         Bays: 0,
-        DefaultLoadout: new[] { Techniques.Cleave, Techniques.Brace },
+        DefaultLoadout: new[] { Techniques.Cleave, Techniques.Brace, Techniques.Bandage },
         Archetype: "THE WALL",
         Flavor: "Armour on every limb, no bay, fewer actions - soaks blows and holds the line.");
 
@@ -51,7 +51,7 @@ public static class Chassrium
         RuneBudget: 12,
         RuneDiscount: 0,
         Bays: 3,
-        DefaultLoadout: new[] { Techniques.Ember, Techniques.Brace },
+        DefaultLoadout: new[] { Techniques.Ember, Techniques.Brace, Techniques.Bandage },
         DefaultMinions: new[] { Minions.Skeleton, Minions.Shade }, // a Binder fields summons from the off
         Archetype: "THE BINDER",
         Flavor: "Three bays - fights through a war-party of summons while staying back. INT funds them all.");
@@ -63,7 +63,7 @@ public static class Chassrium
         RuneBudget: 12,
         RuneDiscount: 0,
         Bays: 0,
-        DefaultLoadout: new[] { Techniques.Lunge, Techniques.Jab },
+        DefaultLoadout: new[] { Techniques.Lunge, Techniques.Jab, Techniques.Bandage },
         Archetype: "THE DUELIST",
         Flavor: "No shield, twin blades. Glass-cannon STR-DEX - ends parts before they answer.");
 

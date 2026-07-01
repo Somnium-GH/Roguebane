@@ -26,15 +26,17 @@ public class FoeArmingTests
     }
 
     [Fact]
-    public void ArmedFoesChipAPassivePlayer()
+    public void ArmedFoesErodeAPassivePlayersParts()
     {
-        // Live content stays on the restorable-HP path (part-aim STAGED OFF until part-heals, §8/Phase 3).
-        var player = Fighter.Scaled(PlayerBody(), baseHp: 8); // MaxHp 16
-        var enc = Sieges.ArmedPoint("cp", 100, 100);          // tanky so they keep swinging
+        // §8 foe part-aim is LIVE on skirmishes: foes erode the player's PARTS (the live stat pool
+        // shrinks), not restorable HP. A passive, healless player just gets stripped.
+        var player = Fighter.Scaled(PlayerBody(), baseHp: 8);
+        var before = player.Body.Parts.Sum(p => player.Body.Contribution(p));
+        var enc = Sieges.ArmedPoint("cp", 100, 100); // tanky so they keep swinging
         var battle = new Battle(new Caster(player.Body), enc, player);
 
-        for (var i = 0; i < 200; i++) battle.Step(); // player has no techniques -> only takes hits
-        Assert.True(player.Hp < player.MaxHp);
+        for (var i = 0; i < 200; i++) battle.Step(); // no techniques, no heal -> only takes hits
+        Assert.True(player.Body.Parts.Sum(p => player.Body.Contribution(p)) < before);
     }
 
     [Fact]

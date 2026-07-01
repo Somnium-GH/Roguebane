@@ -62,7 +62,8 @@ public class BuildSessionTests
         build.Toggle(Techniques.Lunge);
 
         Assert.True(build.IsSelected(Techniques.Jab)); // kit
-        Assert.Equal(new[] { "jab", "lunge", "drain", "brace" }, build.Loadout.Select(t => t.Id)); // palette order
+        // palette order (jab, cleave, lunge, ember, drain, brace, bandage); the Grunt kit adds bandage
+        Assert.Equal(new[] { "jab", "lunge", "drain", "brace", "bandage" }, build.Loadout.Select(t => t.Id));
 
         build.Toggle(Techniques.Jab); // a kit item can still be dropped
         Assert.False(build.IsSelected(Techniques.Jab));
@@ -79,7 +80,7 @@ public class BuildSessionTests
         var session = build.Launch(run);
 
         Assert.Equal(SessionState.Fighting, session.State);
-        Assert.Equal(3, session.Loadout.Count); // kit (jab, brace) + lunge
+        Assert.Equal(4, session.Loadout.Count); // kit (jab, brace, bandage) + lunge
         Assert.Equal(3, session.Run.Nodes.Count); // cp1, cp2, castle
     }
 
@@ -125,10 +126,10 @@ public class BuildSessionTests
     [Fact]
     public void CyclingChassisReseedsTheKit()
     {
-        var build = New(); // Grunt: jab, brace
-        Assert.Equal(new[] { "jab", "brace" }, build.Loadout.Select(t => t.Id));
+        var build = New(); // Grunt: jab, brace, bandage
+        Assert.Equal(new[] { "jab", "brace", "bandage" }, build.Loadout.Select(t => t.Id));
 
-        build.CycleChassis(1); // Warden: cleave, brace
-        Assert.Equal(new[] { "cleave", "brace" }, build.Loadout.Select(t => t.Id));
+        build.CycleChassis(1); // Warden: cleave, brace, bandage
+        Assert.Equal(new[] { "cleave", "brace", "bandage" }, build.Loadout.Select(t => t.Id));
     }
 }

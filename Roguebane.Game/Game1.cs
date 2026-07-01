@@ -332,7 +332,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // Interactive layout rects — single source of truth shared by Update (hit-test) and Draw (paint
     // + hover). Mirrors the coordinates used in the Draw* methods.
     private static Rectangle ChassisRect(int i) => new(180 + i * 110 - 2, 4, 100, 32);
-    private static Rectangle PaletteRect(int i) => new(320 + i * 64, 300, 56, 56);
+    private static Rectangle PaletteRect(int i) => new(320 + i * 52, 300, 48, 48); // fits 7 before the bay preview
     private static Rectangle LadderRowRect(int p, int rungs) => new(320, 100 + p * 56, rungs * 56, 48);
     private static readonly Rectangle MarchRect = new(40, H - 52, 300, 44);
     private static Rectangle ActionCardRect(int i) => new(52 + i * 84, H - 84, 76, 60);
@@ -995,12 +995,12 @@ public class Game1 : Microsoft.Xna.Framework.Game
         for (var i = 0; i < _build.Palette.Count; i++)
         {
             var t = _build.Palette[i];
-            var left = x + i * 64;
+            var left = x + i * 52;
             var selected = _build.IsSelected(t);
-            Panel(left, y, 56, 56);
-            Sprite(_assets.Technique(t.Id), left + 4, y + 4, 48, 48, Color.White);
-            Text(_assets.Mono, (i + 1).ToString(), left + 4, y + 42, Muted);
-            Border(left, y, 56, 56, selected ? Amber : Hover(PaletteRect(i)) ? Ink : Border0);
+            Panel(left, y, 48, 48);
+            Sprite(_assets.Technique(t.Id), left + 3, y + 3, 42, 42, Color.White);
+            Text(_assets.Mono, (i + 1).ToString(), left + 3, y + 36, Muted);
+            Border(left, y, 48, 48, selected ? Amber : Hover(PaletteRect(i)) ? Ink : Border0);
         }
     }
 

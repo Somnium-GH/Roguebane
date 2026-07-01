@@ -81,20 +81,16 @@ public class CampaignTests
     }
 
     [Fact]
-    public void HpRestoresAtEachNewCityButPartsPersist()
+    public void HpRestoresAtEachNewCityButTheBodyPersists()
     {
         var c = FullLoadout();
         var body = c.Current.Player.Body;
-        var arm = body.Parts.First(p => p.Stat == Stat.Str);
 
-        Step(c, "a2");          // a fight; the player may take HP damage
-        c.Current.Player.Damage(2);
-        body.Damage(arm, 1);    // wound a part directly
-        var woundedPart = body.Contribution(arm);
+        ClearLeg(c); // fight the whole leg (skirmishes erode parts, Bandage mends them) -> rest at city
 
-        c.Enter("b"); Step(c, "c1"); Step(c, "castle"); // finish leg 1 -> rest at city
-
-        Assert.Equal(c.Current.Player.MaxHp, c.Current.Player.Hp); // HP restored at the city
-        Assert.Equal(woundedPart, body.Contribution(arm));         // the part wound persists
+        // HP is topped up at the new city (out-of-combat recovery, §10)...
+        Assert.Equal(c.Current.Player.MaxHp, c.Current.Player.Hp);
+        // ...but the SAME body carries into the next leg: parts persist, the city mints no fresh body.
+        Assert.Same(body, c.Current.Player.Body);
     }
 }

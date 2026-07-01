@@ -30,14 +30,16 @@ public static class Sieges
     // back (the live-run encounters). Threat stays low — runs remain winnable.
     public static Encounter ArmedPoint(string name, params int[] foeHp)
     {
-        // Authored §8 personalities (dormant until Encounter.FoePartAim flips on with part-heals):
-        // rough field fodder botches its pick, the rest swing at random.
+        // §8 foe part-aim is LIVE on skirmishes: field raiders erode the player's PARTS (rough fodder
+        // botches its pick, the rest swing at random). Survivable because the kits now carry a part-heal
+        // (Bandage); a build without a defensive source pays the intended penalty. The castle stays a
+        // whole-HP DPS race (ArmedCastle) so the boss thesis holds.
         var foes = foeHp
             .Select((hp, i) => Foes.Armed($"{name}-{i}", hp,
                 figure: RaiderFigures[i % RaiderFigures.Length],
                 aim: i % 2 == 0 ? FoeAim.Inept : FoeAim.Random))
             .ToList();
-        return new Encounter(name, foes, structural: false);
+        return new Encounter(name, foes, structural: false, foePartAim: true);
     }
 
     // Armed castle: layered, armed defenders plus the boss-restore / rallied-support DPS race.

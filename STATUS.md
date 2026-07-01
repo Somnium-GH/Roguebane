@@ -1,5 +1,49 @@
 # Status
 
+## ⇒ HUMAN DIRECTIVES — 2026-06-30 (do these FIRST; they revise shipped work and WIN)
+Rationale now in canon: DESIGN_SPEC (damage/symmetry/heal/flow/nomenclature §8/§10/§12/§13) +
+LAYOUT_CONTRACT §10-11 (fidelity primitives + 1080). Priority order:
+
+1. **RENAME everywhere** (Screen enum + titles + labels; keep in sync with `layout.json` ids — Claude
+   Design renames the manifest side in parallel): NewRun→**NewGame**, Build→**Equipment**,
+   RunMap→**CityMap**, Campaign→**CampaignMap**, Combat→**Encounter**; Flee→**Retreat**, March→**Redeploy**.
+2. **EVERY SCREEN off the manifest.** You did New Run then wandered to shield work — systematically render
+   ALL screens (Equipment, CityMap, CampaignMap especially), ONE per pass, verified vs its design PNG,
+   BEFORE new gameplay features.
+3. **FLOW.** Encounter must NOT auto-return to the map — add an explicit **Redeploy** transition.
+   **Retreat** = only during an active fight (bail it); **Redeploy** = only out of combat (advance).
+   **Equipment reachable between fights** — a button on Encounter (enabled only when NOT fighting) + on
+   CityMap + CampaignMap (generic button OK). Redeploy timing/DEX-lockout is DESIGN-SPEC'd but NOT built
+   yet — **flow only** now.
+4. **EQUIPMENT screen** (was Build): full redo off `screens.equipment` (design/02). **REMOVE the
+   rune-ladder TEST** ("Q vessel / W resonance") — throwaway rune-test, retire it. Between-fights screen,
+   not a post-NewGame gate.
+5. **FIDELITY** (LAYOUT_CONTRACT §10-11): add renderer support for `shadow` (engine-drawn), `frame`/
+   nineSlice (blit CD frame assets), gradient fill; build SpriteFonts at **1080-class** density. Frame
+   ASSETS come from Claude Design (blocked until delivered — do shadow/gradient + fonts meanwhile).
+6. **BUG BATCH:**
+   - CityMap supplies label "spent per jump" → **"per deployment"** (drop the FTL wording).
+   - CityMap movement **ANY-DIRECTION**: any move (incl. back to a merchant) costs 1 supply AND advances
+     the war party — remove any forward-only restriction.
+   - Merchant = **HP HEALING only** (gold → HP at 1 HP per randomized cost, loot-bounded). No potion
+     purchases (potions are heal-body-part techniques).
+   - **AUTO-attack is GLOBAL, not per-weapon**: on = a fired weapon re-fires on its next charge at the
+     kept target. Fix the per-weapon coupling.
+   - **DAMAGE**: every hit applies part damage AND hp damage simultaneously; only a shield block or full
+     evade mitigates. Ensure the impl applies both.
+   - **ENEMY HEAL**: must run on a real tuned technique (same system as the player), can't out-tick the
+     player's healing — not a fast free regen.
+   - **SYMMETRY**: enemies act through the SAME technique/attribute/shield/heal framework as the player
+     (shared sim). Refactor toward this; exceptions few + obvious.
+   - BUG (no clean repro yet): firing after a weapon charges while UNTARGETED misbehaves — watch as the
+     targeting FSM is refined.
+7. Carry-over review fixes (already tracked below): coreCard per-core figure bind, add `✦ ◉ ✓` glyphs,
+   normalize element `type`. (#3 truncated subtitles still parked.)
+
+**NEEDS HUMAN — doc drift to reconcile:** DESIGN_SPEC §8 still says combat is **single-enemy [LOCKED]**,
+but §13 + the shipped build are **multi-foe** (s13). Do NOT silently pick — flag to the human which is
+canon. (Raised with Doug 2026-06-30.)
+
 ## Current target
 **RE-OPEN RESOLVED (both threads cleared) — POC functionally complete again.**
 1) RUN-START CRASH: fixed + LIVE-draw verified (detail below). 2) SCREENS MATCH DESIGN: all four live
@@ -7,10 +51,14 @@ screens done + smoke-verified vs the committed 06-30 renders — 01 combat (lock
 (matches modulo the deferred inventory-tabs / rune-bag cards), 03 map (rebuilt: supply/support panels,
 spread beacon chart, castle panel), 05 new-run (dedicated Choose-Your-Core grid). Flow: NewRun -> Build
 -> March. REMAINING (deliberate, not blockers): the design/02 INVENTORY TABS (GEAR/TECH/MINIONS) +
-RUNE-BAG cards (input-coupled — need drag-equip + mid-run stash), and the Phase-3 arc (see below). NEXT
-ARC IS A PRIORITY FORK — asked the human (Phase 3 combat-depth vs finish design/02 inventory vs
-manifest-drive the hand-coded screens). HUMAN PICKED: MANIFEST-DRIVE the screens. Arc STARTED -- see the
-manifest section below (ListLayout added; the New Run coreCards grid is the first container driven off
+RUNE-BAG cards (input-coupled — need drag-equip + mid-run stash), and the Phase-3 arc (see below). ARC
+HISTORY: human picked MANIFEST-DRIVE (New Run grid + centred header driven off layout.json; then gated
+on Claude Design authoring per-part `binds`) -> pivoted to Phase-3 primitives (part-heal, shields) ->
+human picked GO FOE-PART-AIM LIVE: DONE this pass (skirmishes erode parts, kits carry Bandage, campaign
+winnable; see G1 in Debt). NEXT candidates: tune the skirmish numbers in play; kit a shield source;
+replace flat block with shields; the big refactors (#1 single-enemy, #2 Race+CoreRune); or resume
+manifest-drive when binds land.
+(older manifest-arc detail kept below: ListLayout added; the New Run coreCards grid is the first container driven off
 layout.json).
 Original re-open detail (kept as record):
 - TOP — RUN-START CRASH: FIXED (confirmed via crash.log). Root cause: `DrawGearBar` drew an em-dash `—`
@@ -228,18 +276,15 @@ from primitives. Route each to Claude Design. (Art direction: DESIGN_SPEC §13.)
 - Mouse is click + hover only — no drag-to-equip, tooltips, rebinding; PAUSE/FLEE are plain rects (U6).
 - Rune grants = chassis-extension PARTS only; add more data-driven Mark effect kinds when a non-extension
   keystone is authored.
-- G1: foe->player PART aim MECHANISM shipped + headless-tested (FoeTargeting SMART/RANDOM/INEPT; Foe.Aim
-  data; Battle wires it via the Encounter.FoePartAim opt-in). STAGED OFF in all live content
-  (FoePartAim=false): persistent part erosion with NO part-heal yet (Phase 3 #4) strips the loadout and
-  makes the run unwinnable (verified — campaign flips to a DPS stalemate). IN-COMBAT PART-HEAL + SHIELDS now EXIST + are wired
-  (Phase 3 #4/#3): `Techniques.Bandage` (CON heal) + `Techniques.Stoneskin` (INT shield source), both
-  opt-in. GO-LIVE EXPERIMENT RUN (reverted): flip skirmish FoePartAim on + a heal in the toggled loadout
-  -> campaign WINS (thesis holds); WITHOUT a defensive source -> campaign LOSES. So going live REQUIRES a
-  heal/shield in the kit, which raises skirmishes past the LOCKED "LIGHT/winnable" envelope -> a
-  difficulty/design decision (heal-required vs keep-it-light), NOT just number tuning = Needs-human. The
-  thesis is PINNED headlessly by `PartAimMitigationTests` (heal + shield each slow the part-strip; bare
-  build is stripped). Staying staged off is correct until that decision. Real content foes still unarmed
-  beyond the light feel-pass arming.
+- G1: foe->player PART aim is now LIVE on SKIRMISHES (human signed off the difficulty shift). ArmedPoint
+  encounters set FoePartAim=true -> field raiders erode the player's PARTS (Inept/Random personalities);
+  the ArmedCastle stays a whole-HP DPS race (boss thesis intact). Every chassis kit + the palette now
+  carry `Bandage` (part-heal) so builds survive; a build that drops it pays the intended penalty.
+  Campaign verified WINNABLE (CampaignTests green); FoeArming/BuildSession/Heal/Campaign tests reconciled
+  to the new behavior; the build palette re-laid to fit 7 techniques. This LEAVES the old "LIGHT/winnable
+  without precautions" envelope by design -- skirmishes now demand a defensive source. REMAINING: tune
+  the numbers (foe cadence/power vs Bandage rate — placeholder-sane); optionally flip SMART castle part-
+  aim or armed real-content foes later. Shields (Stoneskin) are wired + available but not yet in kits.
 
 ## Roadmap
 - Phase 1 [DONE]: Core skeleton, rune economy, chassis, techniques + deterministic combat tick,
@@ -299,9 +344,10 @@ through shields FIRST (outermost, before armor/block/parts, for whole-HP AND par
 `Techniques.Stoneskin` (INT, 3 layers) is opt-in (NOT in `All`) so no current balance shifts. Tested.
 REMAINING (disruptive, human balance eyes): REPLACE the flat CON block (Brace) with a CON shield source
 + retire Body.BlockMitigation + place shield sources in starting kits + tune the placeholder numbers
-(layers/regen — OPEN #8)]; (4) part-repair heals [MECHANISM DONE: in-combat `Heals` technique +
-Body.MostDamagedPart + Techniques.Bandage, tested; still needs kit placement + balance]; (5) defensive-
-source defaults in starting kits; (6) enemy-HP scaling. DESIGN_SPEC touch points: §4/§6/§7/§10/§11/§16.
+(layers/regen — OPEN #8)]; (4) part-repair heals [DONE + LIVE:
+in-combat `Heals` technique + Techniques.Bandage, now in every chassis kit; foe part-aim flipped on for
+skirmishes]; (5) defensive-source defaults in starting kits [PARTIAL: heal (Bandage) is in all kits; a
+shield source (Stoneskin) exists but is not yet kitted]; (6) enemy-HP scaling. Touch points: §4/§6/§7/§10/§11/§16.
 
 ## Layout & assembly system (manifest-driven) [FOUNDATION — do before the fidelity rebuild]
 Fixes the EXPLODED figure and makes ALL layout pixel-perfect + viewport-independent by consuming the
