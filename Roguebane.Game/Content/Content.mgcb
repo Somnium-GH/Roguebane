@@ -5877,3 +5877,91 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/sprites/body/elf_ranger/torso_healthy.png;sprites/body/elf_ranger/torso_healthy
+
+#begin icons/rune/core_grunt
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/icons/rune/core_grunt.png;icons/rune/core_grunt
+
+#begin icons/rune/core_warden
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/icons/rune/core_warden.png;icons/rune/core_warden
+
+#begin icons/rune/core_adept
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/icons/rune/core_adept.png;icons/rune/core_adept
+
+#begin icons/rune/core_summoner
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/icons/rune/core_summoner.png;icons/rune/core_summoner
+
+#begin icons/rune/core_reaver
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/icons/rune/core_reaver.png;icons/rune/core_reaver
+
+#begin icons/rune/core_ranger
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/icons/rune/core_ranger.png;icons/rune/core_ranger
+
+#begin icons/map/enemy_host
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/icons/map/enemy_host.png;icons/map/enemy_host
+
+#begin icons/map/enemy_host_near
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/icons/map/enemy_host_near.png;icons/map/enemy_host_near

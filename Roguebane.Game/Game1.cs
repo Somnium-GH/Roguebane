@@ -967,6 +967,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         Panel(x, y, 220, 190);
         Text(_assets.Display, "CURRENT CORE", x + 12, y + 10, Ink);
         Text(_assets.Mono, c.Archetype, x + 12, y + 28, Amber); // design/05 archetype tagline
+        Sprite(_assets.Rune("core_" + c.Id), x + 184, y + 40, 26, 26, Color.White); // core identity glyph
         var row = y + 44;
         void Line(string k, string v) { Text(_assets.Mono, k, x + 12, row, Muted);
             Text(_assets.Mono, v, x + 150, row, Ink); row += 22; }

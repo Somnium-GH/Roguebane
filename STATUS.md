@@ -42,9 +42,13 @@ STILL BLOCKED / TODO on the Claude Design side:
   diagnostic: the bow draws as a tall sprite on the figure's right arm. It blended into the body at first,
   so added a SPRITE-SHAPED DROP SHADOW under mounted weapons (the weapon's own alpha, offset + darkened,
   drawn under it) — now the bow (and any wielded weapon) reads against the figure. Screenshot-confirmed.
-- Still Game TODO: a `shot` technique icon (none exists — falls to `swing`/crossed-swords, misleading;
-  CD asset need); consume the manifest `fill:{gradient}` + a per-element `shadow` field. The recurring
-  root cause is the TWO divergent mgcb (game hand-synced vs CD's) — still needs a single source of truth.
+- MGCB DIVERGENCE now has a GUARD: `tools/check_mgcb_coverage.py` reports any Roguebane.Content png NOT
+  built by the game-side mgcb (run after a CD asset drop; exit 1 lists gaps). Ran it -> synced the 8
+  orphans it found: the 6 `icons/rune/core_*` glyphs (now DRAWN in the Equipment CURRENT CORE panel) + the
+  2 `icons/map/enemy_host*` war-party icons (pending a map feature). Guard now GREEN. Real fix (a single
+  mgcb source of truth) still wants a CD/human call, but the guard stops silent blank-asset regressions.
+- Still Game TODO: a `shot` technique icon (none exists — falls to `swing`/crossed-swords; CD asset need);
+  consume the manifest `fill:{gradient}` + a per-element `shadow` field; wire the enemy_host war-party icon.
 - Manifest screen-id renames (newrun/build/runmap→newgame/equipment/citymap); per-PART `binds`
   (manifest-drive arc blocker); the TWO divergent `Content.mgcb` still need a single source of truth.
 
