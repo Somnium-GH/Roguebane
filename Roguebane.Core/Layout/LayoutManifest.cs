@@ -93,8 +93,21 @@ public sealed class Element
     public double? FontPx { get; init; }
     public Border? Border { get; init; }
     public Frame? Frame { get; init; }     // a nine-slice frame asset wrapping this element (§10)
+    public Shadow? Shadow { get; init; }   // an engine-drawn drop shadow under this element (§10)
     public string? Content { get; init; } // a literal text element (no data binding)
     public Item? Item { get; init; }       // a repeated child: list (horizontal/vertical) or graph
+}
+
+// An engine-drawn drop shadow (§10): the element silhouette offset by (Dx,Dy), softened by Blur, in the
+// `Color` token at `Opacity`. `Token` names the style preset it derives from (informational).
+public sealed class Shadow
+{
+    public string? Token { get; init; }
+    public int Dx { get; init; }
+    public int Dy { get; init; }
+    public int Blur { get; init; }
+    public string? Color { get; init; }
+    public double Opacity { get; init; }
 }
 
 // A nine-slice frame (§10): a painted `asset` whose `slice` margins [L,T,R,B] fix the 4 corners and

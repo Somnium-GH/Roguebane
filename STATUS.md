@@ -16,6 +16,19 @@ handling: typed elements (panel/text/bar/pip/card/icon/figure/list/graph); `fill
 gradient draw (§10); containers that stamp an item template per datum with per-part `binds` (live data
 else `sample`); graph/`nodePoint`; the shared `style` block. A screenshot ≠ correct — drive the state.
 
+PHASE 0 — foundation, do FIRST (a code audit confirms PURE plumbing: the Core `Layout/` types +
+NineSlice/StageComposer/DrawFrame already exist; they're parsed but IGNORED per element):
+- `Core.Layout.BindingResolver` (pure, headless-tested): resolve a binds path (`race.Hp`, `core.Title`,
+  `item.name`, `Body.pool`, `preview.fig`) → live value / figure-key, falling back to the part `sample`.
+- Game `DrawScreenElement(element, region)`: DISPATCH on `element.type` and apply the element's OWN
+  `shadow`/`fill`/`frame` — TODAY only the hardcoded `Panel()` helper draws chrome, so every element
+  ignores its manifest style; that's the root of the "wrong look / extra borders".
+- Game `DrawTemplateCard(template, region, resolver)` + `DrawContainer(element, items, template)`: stamp a
+  template per datum (`ListLayout`/`GraphLayout` already give the cells) resolving per-part binds.
+These four REPLACE the hand-drawn per-screen code; each slice below then points its screen at the manifest
+and deletes the legacy hand-layout. (Only external dep: NewGame's Loadout-panel per-part binds need CD's
+re-instrument drop — already in flight.)
+
 SLICES (one screen/pass, verify vs its design PNG):
 1. **NewGame** (worst delta): render `screens.newgame` — ONE screen, 3 columns: Race (head cards) | the
    6 Core-rune cards (rune icons `icons/rune/core_<id>` + apex) | Loadout preview (composed figure +
@@ -28,6 +41,12 @@ SLICES (one screen/pass, verify vs its design PNG):
 4. **CityMap**: render `screens.citymap` (node graph, supplies, war-party RIGHT→LEFT, Equipment button).
 5. **CampaignMap**: BUILD it (not implemented yet) from `screens.campaignmap`.
 FIDELITY DRAW (shadow/frame/gradient, §10) feeds all of the above — same critical path, do it first.
+  [PROGRESS — manifest MODEL now covers every fidelity field: `Element.Fill` (string token OR gradient
+  object), `Element.Frame` (nine-slice asset+slice), `Element.Shadow` ({dx,dy,blur,color,opacity}),
+  `Element.Border`; `Style.Frames` library. All parse from the real layout.json + are contract-tested
+  (LayoutManifestTests, 287 Core green). NEXT: the Game-side generic element-draw path — iterate a screen's
+  `elements`, draw each by `type`, honoring its shadow→frame/fill→border→content order + item templates.
+  Then cut the screens over (NewGame first).]
 
 FLOW: Equipment reachable BETWEEN fights — from the post-combat Cleared/Redeploy state + CityMap +
 CampaignMap — editing the CURRENT loadout (core fixed), NOT a core-picker.

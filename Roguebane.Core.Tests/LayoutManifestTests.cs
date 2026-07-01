@@ -120,4 +120,19 @@ public class LayoutManifestTests
             Assert.Equal(4, f.Slice.Length);
         }
     }
+
+    [Fact]
+    public void EveryElementShadowParsesWithSaneFields()
+    {
+        // §10 drop shadow: any element shadow must give the renderer usable numbers -- a non-negative
+        // blur and an opacity in [0,1]. The manifest carries at least one (a titled text shadow).
+        var shadows = Real().Screens.Values.SelectMany(s => s.Elements)
+            .Select(e => e.Shadow).Where(sh => sh is not null).ToList();
+        Assert.NotEmpty(shadows);
+        Assert.All(shadows, sh =>
+        {
+            Assert.True(sh!.Blur >= 0);
+            Assert.InRange(sh.Opacity, 0.0, 1.0);
+        });
+    }
 }
