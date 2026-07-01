@@ -64,10 +64,15 @@ Original re-open detail (kept as record):
   NODE positioning (spread grid coords to fill a region) -- the runmap chart uses it; campaign/newrun
   can reuse it for their `type:"graph"` containers. ListLayout.Cells does the LIST positioning
   (horizontal/vertical, cell+gap); ManifestUi.ListCells resolves a container's region + item -> cell
-  rects (tolerant, null-fallback). FIRST MANIFEST-DRIVEN CONTAINER: the New Run coreCards grid now reads
-  its card positions from layout.json (falls back to a hand grid if absent). NEXT: drive more containers
-  (build techCard/invCard lists, the runmap `chart` graph region) and render item TEMPLATES from the
-  manifest via CardTemplate, not just positions.
+  rects (tolerant, null-fallback). ManifestUi.ElementContent returns an element's literal `content`.
+  NEW RUN is now POSITION-manifest-driven: coreCards grid + the centred header (eyebrow "A NEW RUN
+  BEGINS" + serif title "Choose Your Core") read content + rects from layout.json (dropped the hand top
+  bar -> matches design/05's centred header). SKIPPED (manifest quirks): the newrun SUBTITLE content is
+  truncated in layout.json (kept hand copy, manifest position); the beginBtn is only 120px in the
+  manifest -> clips "BEGIN THE MARCH", kept the wider hand button. NEXT: render item TEMPLATES from the
+  manifest via CardTemplate (blocked on PER-PART data binding -- template parts carry only a `sample`
+  placeholder, no per-part `binds`; add that to bind real data), then position-drive a whole screen
+  (build is dense -> drive it as a unit, not piecemeal, to avoid mixed coord systems).
   cityNode is labels-only; castle stays the generic node icon (procedural castle parked — not
   mission-critical). REVIEW FIXES:
   * coreCard figure is HARDCODED (`image: …/chassis/grunt.png` sample) — BIND each card's image to its

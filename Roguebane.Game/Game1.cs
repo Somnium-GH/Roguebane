@@ -771,9 +771,16 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private void DrawNewRunScreen()
     {
         Stretch(_assets.Background("build_alcove"), 0, 0, W, H);
-        Panel(0, 0, W, 40);
-        Text(_assets.Display, "CHOOSE YOUR CORE", 16, 8, Ink);
-        Text(_assets.Mono, "the Core is the body you wear all run", 356, 14, Muted);
+        // design/05 centred header, driven from the manifest (content + position; fallback centred).
+        var eyebrow = _ui.ElementRect("newrun", "eyebrow");
+        var title = _ui.ElementRect("newrun", "title");
+        var sub = _ui.ElementRect("newrun", "subtitle");
+        DrawCentered(_assets.Mono, _ui.ElementContent("newrun", "eyebrow") ?? "A NEW RUN BEGINS",
+            Muted, eyebrow?.Center.X ?? 480, eyebrow?.Y ?? 8);
+        DrawCentered(_assets.Display, _ui.ElementContent("newrun", "title") ?? "CHOOSE YOUR CORE",
+            Ink, title?.Center.X ?? 480, title?.Y ?? 18);
+        // manifest subtitle content is truncated in layout.json -> keep hand copy, positioned by manifest.
+        DrawCentered(_assets.Mono, "the Core is the body you wear all run", Muted, 480, sub?.Y ?? 58);
 
         var roster = _build.Roster;
         for (var i = 0; i < roster.Count; i++)
@@ -809,6 +816,13 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
         DrawButton("BEGIN THE MARCH", NewRunBeginRect.X, NewRunBeginRect.Y,
             NewRunBeginRect.Width, NewRunBeginRect.Height, true, Keys.Enter);
+    }
+
+    // Draw text horizontally centred on cx at y (measures the font-safe form so centring matches draw).
+    private void DrawCentered(SpriteFont font, string text, Color col, int cx, int y)
+    {
+        var w = font.MeasureString(Safe(font, text)).X;
+        Text(font, text, (int)(cx - w / 2), y, col);
     }
 
     // Greedy word-wrap for mono copy inside a width; steps ~14px per line.

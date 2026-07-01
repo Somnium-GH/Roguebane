@@ -38,6 +38,14 @@ public sealed class ManifestUi
             .Select(r => new Rectangle(r.X, r.Y, r.W, r.H)).ToList();
     }
 
+    // The literal `content` string of a text element, or null if the manifest/element is missing.
+    public string? ElementContent(string screen, string id)
+    {
+        var m = _layout.Manifest;
+        if (m is null || !m.Screens.TryGetValue(screen, out var s)) return null;
+        return s.Elements.FirstOrDefault(x => x.Id == id)?.Content;
+    }
+
     public Color Color(string name, Color fallback)
     {
         var style = _layout.Manifest?.Style;
