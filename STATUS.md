@@ -29,12 +29,14 @@ terse item omits its own `size` (CD's `buildMinions`); manifest schema-tests rel
 contract. 274 Core green; all screens smoke-clean with the new assets.
 
 STILL BLOCKED / TODO on the Claude Design side:
-- WIRE the landed assets into the renderer: nine-slice FRAME blit — CORE GEOMETRY DONE (`NineSlice.Patches`
-  + `Frame`/`Style.Frames` manifest model + tests); GAME TODO = blit each Src->Dst using `ui/frame/{panel,
-  card}` (needs those two entries in the GAME-side mgcb + an AssetRegistry frame loader + Panel() wiring).
-  Also consume the manifest `fill:{gradient}` + a per-element `shadow` field. The Core bow type is DONE
-  (charge #4) — Game TODO: mount `bow.png` on the archer figure + a `shot` technique icon; Ranger figure
-  repoint.
+- NINE-SLICE FRAMES DONE (§10 fidelity now COMPLETE: shadow + gradient + 1080 fonts + frames): added the
+  two `ui/frame/{panel,card}` entries to the game-side mgcb, an `AssetRegistry.Frame` loader, and
+  `DrawFrame` (blits `NineSlice.Patches` Src->Dst). `Panel()` uses the carved panel frame for LARGE panels
+  (w>=220 & h>=170 — its 60px corners need room) and keeps the gradient chrome for small cards + thin bars.
+  Screenshot-verified on build/combat. TODO next: apply the smaller `card` frame to cards via the manifest
+  per-element `frame` (Panel is hand-called, not manifest-driven yet).
+- Still Game TODO: consume the manifest `fill:{gradient}` + a per-element `shadow` field; mount `bow.png`
+  on the archer figure + a `shot` technique icon; Ranger figure repoint.
 - Manifest screen-id renames (newrun/build/runmap→newgame/equipment/citymap); per-PART `binds`
   (manifest-drive arc blocker); the TWO divergent `Content.mgcb` still need a single source of truth.
 

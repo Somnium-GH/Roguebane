@@ -1515,11 +1515,30 @@ public class Game1 : Microsoft.Xna.Framework.Game
         return Roguebane.Core.GlyphSafe.Sanitize(s, set);
     }
 
+    private static readonly int[] PanelSlice = { 60, 60, 60, 60 }; // style.frames.panel (240px asset)
+    private static readonly int[] CardSlice = { 36, 36, 36, 36 };  // style.frames.card (144px asset)
+
     private void Panel(int x, int y, int w, int h)
     {
         DrawShadow(x, y, w, h, dx: 2, dy: 3, blur: 3, opacity: 0.40f); // §10 depth under the chrome
-        DrawGradient(x, y, w, h, PanelTop, PanelBot, GradientDir.Vertical); // §10 soft lit fade
+        // The carved nine-slice frame suits LARGE panels (its 60px corners need room); small cards +
+        // thin bars keep the clean gradient chrome so the frame's corner ornament isn't crushed.
+        if (w >= 220 && h >= 170 && DrawFrame(x, y, w, h, "panel", PanelSlice)) return;
+        DrawGradient(x, y, w, h, PanelTop, PanelBot, GradientDir.Vertical);
         Border(x, y, w, h, Border0);
+    }
+
+    // §10 nine-slice frame: blit a painted frame asset around the rect -- fixed corners, stretched edges
+    // + centre (geometry from Core.NineSlice). False if the asset isn't loaded (caller keeps its fallback).
+    private bool DrawFrame(int x, int y, int w, int h, string name, int[] slice)
+    {
+        var tex = _assets.Frame(name);
+        if (tex is null) return false;
+        var dst = new Roguebane.Core.Layout.LayoutRect(x, y, w, h);
+        foreach (var p in Roguebane.Core.Layout.NineSlice.Patches(tex.Width, tex.Height, slice, dst))
+            _spriteBatch.Draw(tex, new Rectangle(p.Dst.X, p.Dst.Y, p.Dst.W, p.Dst.H),
+                new Rectangle(p.Src.X, p.Src.Y, p.Src.W, p.Src.H), Color.White);
+        return true;
     }
 
     private enum GradientDir { Vertical, Horizontal }

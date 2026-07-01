@@ -41,6 +41,7 @@ public sealed class AssetRegistry
     public Texture2D? Resource(string id) => Texture("icons/resource/" + id);
     public Texture2D? Rune(string tier) => Texture("icons/rune/" + tier);
     public Texture2D? Background(string id) => Texture("bg/" + id);
+    public Texture2D? Frame(string name) => Texture("ui/frame/" + name); // §10 nine-slice chrome
     public Texture2D? CoreRuneFigure(string id) => Texture("sprites/char/chassis/" + id);
     public Texture2D? Minion(string id) => Texture("sprites/minion/" + id);
 
