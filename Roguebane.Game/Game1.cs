@@ -342,7 +342,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private static Rectangle LadderRowRect(int p, int rungs) => new(320, 100 + p * 56, rungs * 56, 48);
     private static readonly Rectangle RedeployRect = new(40, H - 52, 300, 44);
     private static Rectangle ActionCardRect(int i) => new(52 + i * 84, H - 84, 76, 60);
-    private static Rectangle FoeRect(int i) => new(560, 90 + i * 150, 144, 132);
+    // Single-foe (canon): ONE enemy, drawn large on the right. The index is vestigial (always 0).
+    private static Rectangle FoeRect(int i = 0) => new(632, 96, 224, 252);
     private static readonly Rectangle PauseRect = new(W - 156, H - 84, 110, 26);
     private static readonly Rectangle RetreatRect = new(W - 156, H - 50, 110, 26);
     private static readonly Rectangle AutoRect = new(W - 272, H - 50, 110, 26);
@@ -529,7 +530,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawFighter(40, 90);
         DrawBays(300, 120);
         DrawSupport(300, 220);
-        DrawFoes(560, 90);
+        DrawFoe();
         DrawActionBar(40, H - 92);
         // Control hint — the targeting scheme is non-obvious (no fire button); helps POC playtesting.
         // Kept left of the foe column (x<540) so it never collides with the bottom foe's HP bar.
@@ -1219,35 +1220,34 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // limb bands, and the band under the cursor highlights. There is NO persistent locked-aim ring —
     // which module targets which foe/limb reads off the action-bar card tags (F1:H). AUTO never touches
     // this; it is purely a button state.
-    private void DrawFoes(int x, int y)
+    // The ONE enemy (single-foe canon, design/01): drawn large on the right with its creature figure,
+    // targetable PART bands, a name tag, and an HP bar beneath. Part-aim clicks a limb band.
+    private void DrawFoe()
     {
-        var encounter = Exp.Battle!.Encounter;
-        var targeting = _ctrl.IsTargeting(Exp);
-        for (var i = 0; i < encounter.Foes.Count; i++)
+        var foe = Exp.Battle!.Encounter.Enemy;
+        var r = FoeRect();
+        var tint = foe.Down ? new Color(70, 60, 55) : Color.White;
+
+        if (foe.Frame is not null)
+            DrawHumanoid(foe.Frame, foe.Figure, r.X + r.Width / 2, r.Y + r.Height, r.Height, tint, allowBare: false);
+        else
+            Sprite(_assets.Reticle("focus"), r.X + r.Width / 2 - 64, r.Y + 40, 128, 128, tint); // inert marker
+
+        if (!foe.Down && _ctrl.IsTargeting(Exp))
         {
-            var foe = encounter.Foes[i];
-            var top = y + i * 150;
-            var tint = foe.Down ? new Color(70, 60, 55) : Color.White;
-            // Compose the foe from its creature figure (no bare art for foes -> force the plain row).
-            // Foe box is shorter than the 150 pitch so figures + HP bars don't bleed into the next foe.
-            const int foeH = 132;
-            if (foe.Frame is not null) DrawHumanoid(foe.Frame, foe.Figure, x + 72, top + foeH, foeH, tint, allowBare: false);
-            else Sprite(_assets.Reticle("focus"), x + 24, top, 96, 96, tint); // inert foe: a marker
-            if (!foe.Down && targeting)
+            if (foe.Frame is not null) // limb bands + the band under the cursor (hover highlight)
             {
-                Sprite(_assets.Reticle("focus"), x + 24, top, 84, 84, new Color(Ink, 110)); // pick-prompt
-                if (foe.Frame is not null) // limb bands + the band under the cursor (the hover highlight)
-                {
-                    const int band = foeH / 4;
-                    for (var b = 1; b < 4; b++) Rect(x, top + b * band, 144, 1, new Color(Ink, 90));
-                    if (FoePartAt(foe, _cursor) is { } hov)
-                        Border(x, top + PartBand(hov.Stat) * band, 144, band, Ink);
-                }
+                var band = r.Height / 4;
+                for (var b = 1; b < 4; b++) Rect(r.X, r.Y + b * band, r.Width, 1, new Color(Ink, 90));
+                if (FoePartAt(foe, _cursor) is { } hov)
+                    Border(r.X, r.Y + PartBand(hov.Stat) * band, r.Width, band, Ink);
             }
-            else if (!foe.Down && Hover(FoeRect(i))) Border(x, top, 144, foeH, Ink);
-            Text(_assets.Mono, foe.Figure.ToUpperInvariant(), x + 2, top + 2, foe.Down ? Muted : Ink); // creature tag
-            DrawBar(x, top + foeH, 144, _assets.Resource("hp"), foe.Hp, foe.MaxHp, Blood);
+            else Border(r.X, r.Y, r.Width, r.Height, new Color(Ink, 110));
         }
+        else if (!foe.Down && Hover(r)) Border(r.X, r.Y, r.Width, r.Height, Ink);
+
+        Text(_assets.Mono, foe.Figure.ToUpperInvariant(), r.X + 4, r.Y - 16, foe.Down ? Muted : Ink);
+        DrawBar(r.X, r.Y + r.Height + 4, r.Width, _assets.Resource("hp"), foe.Hp, foe.MaxHp, Blood);
     }
 
     // The minion-bay lane: one slot per chassis bay, filled with its summoned occupant (its sprite,
