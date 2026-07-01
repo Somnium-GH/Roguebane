@@ -6,13 +6,13 @@ namespace Roguebane.Core;
 // pieces it composes.
 public sealed class BuildSession
 {
-    private readonly IReadOnlyList<Chassis> _chassis;
+    private readonly IReadOnlyList<CoreRune> _chassis;
     private readonly IReadOnlyList<Technique> _palette;
     private readonly HashSet<string> _selected = new();
     private RuneLoadout _runes;
 
     public BuildSession(
-        IReadOnlyList<Chassis> chassis,
+        IReadOnlyList<CoreRune> chassis,
         IReadOnlyList<IReadOnlyList<Mark>> paths,
         IReadOnlyList<Technique> palette)
     {
@@ -30,24 +30,24 @@ public sealed class BuildSession
     {
         _selected.Clear();
         var ids = _palette.Select(t => t.Id).ToHashSet(StringComparer.Ordinal);
-        foreach (var t in Chassis.Kit)
+        foreach (var t in CoreRune.Kit)
             if (ids.Contains(t.Id)) _selected.Add(t.Id);
     }
 
-    public int ChassisIndex { get; private set; }
-    public int ChassisCount => _chassis.Count;
-    public Chassis Chassis => _chassis[ChassisIndex];
-    public IReadOnlyList<Chassis> Roster => _chassis; // the whole line-up, for the New Run core grid
+    public int CoreRuneIndex { get; private set; }
+    public int CoreRuneCount => _chassis.Count;
+    public CoreRune CoreRune => _chassis[CoreRuneIndex];
+    public IReadOnlyList<CoreRune> Roster => _chassis; // the whole line-up, for the New Run core grid
     public RuneLoadout Runes => _runes;
     public IReadOnlyList<IReadOnlyList<Mark>> Paths { get; }
     public IReadOnlyList<Technique> Palette => _palette;
 
     // Cycling the chassis resets the rune allocation — a fresh budget for the new body.
-    public void CycleChassis(int direction)
+    public void CycleCoreRune(int direction)
     {
         var n = _chassis.Count;
-        ChassisIndex = ((ChassisIndex + direction) % n + n) % n;
-        _runes = Chassis.NewLoadout();
+        CoreRuneIndex = ((CoreRuneIndex + direction) % n + n) % n;
+        _runes = CoreRune.NewLoadout();
         SeedKit(); // a fresh chassis brings its own fixed kit
     }
 
@@ -71,14 +71,14 @@ public sealed class BuildSession
         _palette.Where(t => _selected.Contains(t.Id)).ToList();
 
     // The body as it stands now: chassis parts plus everything the allocated runes grant.
-    public Body Preview() => Chassis.NewBody(_runes);
+    public Body Preview() => CoreRune.NewBody(_runes);
 
-    public Session Launch(Run run) => Forge.Assemble(Chassis, _runes, Equipment, run);
+    public Session Launch(Run run) => Forge.Assemble(CoreRune, _runes, Equipment, run);
 
     // Launch into the real map+combat loop: mint the chosen body and embark on the leg.
-    public Expedition Embark(CityMap map) => Forge.Embark(Chassis, _runes, Equipment, map);
+    public Expedition Embark(CityMap map) => Forge.Embark(CoreRune, _runes, Equipment, map);
 
     // March the whole campaign: the chosen body carries through every leg to the Capital.
     public Campaign Redeploy(IReadOnlyList<Func<CityMap>> legs) =>
-        Forge.EmbarkCampaign(Chassis, _runes, Equipment, legs);
+        Forge.EmbarkCampaign(CoreRune, _runes, Equipment, legs);
 }

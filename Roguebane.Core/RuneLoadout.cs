@@ -21,7 +21,7 @@ public sealed class RuneLoadout
 
     public int Available => Budget - Spent;
 
-    // Chassis with cheap runes pay less per rung; refund (already < base cost) is untouched.
+    // CoreRune with cheap runes pay less per rung; refund (already < base cost) is untouched.
     public int EffectiveCost(Mark mark) => Math.Max(0, mark.Cost - _discount);
 
     // Held rungs in a stable order — the assembler folds their grants onto the body deterministically.

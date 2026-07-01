@@ -130,6 +130,13 @@ across the 30-file audit:
   Expedition/Minion/Mark/RuneLoadout + tests: Chassis{Thesis,Roster,Body}Tests, FigureIdTests,
   RunStartTests, MinionTests…); `layout.json` `chassis/*` figure keys; `Content.mgcb` `sprites/char/
   chassis/` dir + entries; design docs. Figure keys also go `human_<core>` (earlier directive).
+  [CODE DONE: `s/Chassis/CoreRune/g` + `Chassrium->CoreRunes` across Core+Game+tests (80 refs); files
+  Chassis.cs->CoreRune.cs, Chassrium.cs->CoreRunes.cs, Chassis{Body,Roster,Thesis}Tests->CoreRune*.
+  Case-sensitive, so the LOWERCASE content asset keys are PRESERVED (`_assets.CoreRuneFigure` still loads
+  `sprites/char/chassis/<id>`; the RB_SMOKE `"chassis/grunt"` probe label unchanged). 278 Core green,
+  build/newrun smoke clean. NOT renamed (CD-coordinated content, deferred): the `chassis/*` ASSET dir +
+  keys in mgcb/layout.json — flip with CD. `BuildSession.CoreRune`/`CoreRuneIndex`/`CycleCoreRune` etc.
+  all renamed. Race axis + Chassrium->Races-split still not built (needs the Race type).]
 - **RunMap → CityMap** (`RunMap.cs`→`CityMap.cs`, RunMap*Tests, all refs). [DONE: class RunMap->CityMap,
   RunMapOutcome->CityMapOutcome, files RunMap.cs/RunMapTests/RunMapSupplyTests -> CityMap*; all refs
   (Core + tests) renamed; no Game refs needed it (shell uses Exp.Map). CityMapOutcome.Marching kept (the

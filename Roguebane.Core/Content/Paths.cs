@@ -8,7 +8,7 @@ public static class Paths
 
     public static readonly Mark VesselI = new(Vessel, Rank: 1, Cost: 4, Refund: 2);
     public static readonly Mark VesselII = new(Vessel, Rank: 2, Cost: 6, Refund: 3);
-    // Chassis-extending keystone: a Hollow Vessel sockets extra CON onto the body (the vessel core).
+    // CoreRune-extending keystone: a Hollow Vessel sockets extra CON onto the body (the vessel core).
     public static readonly Mark HollowVessel = new(Vessel, Rank: 3, Cost: 8, Refund: 0, Keystone: true,
         Grants: new[] { new BodyPart("vessel-core", Stat.Con, 6) });
 

@@ -3,35 +3,35 @@ using Roguebane.Core.Content;
 namespace Roguebane.Core.Tests;
 
 // G3: the five chassis exist as data with legible, distinct stat identities, selectable at New Run.
-public class ChassisRosterTests
+public class CoreRuneRosterTests
 {
     [Fact]
     public void RosterCoresAreDistinct()
     {
-        var ids = Chassrium.Roster.Select(c => c.Id).ToList();
+        var ids = CoreRunes.Roster.Select(c => c.Id).ToList();
         Assert.True(ids.Count >= 6);                            // grunt/warden/adept/summoner/reaver/ranger
         Assert.Equal(ids.Count, ids.Distinct().Count());       // no dupes
         Assert.Contains("ranger", ids);                        // the data-only 6th core
     }
 
     [Fact]
-    public void EveryChassisCarriesADisplayIdentity()
+    public void EveryCoreRuneCarriesADisplayIdentity()
     {
         // design/05 cards need a title, an archetype tagline, and a flavor pitch per core.
-        foreach (var c in Chassrium.Roster)
+        foreach (var c in CoreRunes.Roster)
         {
             Assert.False(string.IsNullOrEmpty(c.Archetype), $"{c.Id} archetype");
             Assert.False(string.IsNullOrEmpty(c.Flavor), $"{c.Id} flavor");
             Assert.Equal(char.ToUpperInvariant(c.Id[0]), c.Title[0]); // "grunt" -> "Grunt"
         }
-        Assert.Equal("THE WALL", Chassrium.Warden.Archetype);
-        Assert.Equal("Grunt", Chassrium.Grunt.Title);
+        Assert.Equal("THE WALL", CoreRunes.Warden.Archetype);
+        Assert.Equal("Grunt", CoreRunes.Grunt.Title);
     }
 
     [Fact]
-    public void EveryChassisMintsAStandardSixPartBody()
+    public void EveryCoreRuneMintsAStandardSixPartBody()
     {
-        foreach (var chassis in Chassrium.Roster)
+        foreach (var chassis in CoreRunes.Roster)
         {
             var body = chassis.NewBody();
             Assert.Equal(6, body.Parts.Count); // Head, Chest, Arms x2, Legs x2
@@ -43,9 +43,9 @@ public class ChassisRosterTests
     [Fact]
     public void IdentitiesAreLegibleInTheStatBases()
     {
-        var warden = Chassrium.Warden.NewBody();
-        var reaver = Chassrium.Reaver.NewBody();
-        var summoner = Chassrium.Summoner.NewBody();
+        var warden = CoreRunes.Warden.NewBody();
+        var reaver = CoreRunes.Reaver.NewBody();
+        var summoner = CoreRunes.Summoner.NewBody();
 
         // The Wall out-tanks the glass-cannon Duelist.
         Assert.True(warden.Capacity(Stat.Con) > reaver.Capacity(Stat.Con));
@@ -59,6 +59,6 @@ public class ChassisRosterTests
     [Fact]
     public void NewBuildOffersTheWholeRoster()
     {
-        Assert.Equal(Chassrium.Roster.Count, Sessions.NewBuild().ChassisCount);
+        Assert.Equal(CoreRunes.Roster.Count, Sessions.NewBuild().CoreRuneCount);
     }
 }

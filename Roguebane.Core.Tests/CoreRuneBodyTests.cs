@@ -2,12 +2,12 @@ using Roguebane.Core.Content;
 
 namespace Roguebane.Core.Tests;
 
-public class ChassisBodyTests
+public class CoreRuneBodyTests
 {
     [Fact]
-    public void ChassisMintsABodyWithPairedStatShares()
+    public void CoreRuneMintsABodyWithPairedStatShares()
     {
-        var body = Chassrium.Grunt.NewBody();
+        var body = CoreRunes.Grunt.NewBody();
 
         Assert.Equal(4, body.Capacity(Stat.Str)); // two arms, 2 + 2
         Assert.Equal(4, body.Capacity(Stat.Dex)); // two legs, 2 + 2
@@ -20,7 +20,7 @@ public class ChassisBodyTests
     public void OddStatSharesSplitWithoutLoss()
     {
         // Adept STR 4 across two arms — and any odd total must still sum back exactly.
-        var odd = new Chassis("odd", new[]
+        var odd = new CoreRune("odd", new[]
         {
             new BodyPart("odd-arm-l", Stat.Str, 2),
             new BodyPart("odd-arm-r", Stat.Str, 3),
@@ -32,17 +32,17 @@ public class ChassisBodyTests
     [Fact]
     public void TheSpecialistOutclassesTheGruntOnItsSignatureStat()
     {
-        Assert.True(Chassrium.Adept.NewBody().Capacity(Stat.Int)
-            > Chassrium.Grunt.NewBody().Capacity(Stat.Int));
+        Assert.True(CoreRunes.Adept.NewBody().Capacity(Stat.Int)
+            > CoreRunes.Grunt.NewBody().Capacity(Stat.Int));
     }
 
     [Fact]
     public void AMintedBodyGatesGearOnItsStats()
     {
-        var grunt = Chassrium.Grunt.NewBody(); // INT 3
+        var grunt = CoreRunes.Grunt.NewBody(); // INT 3
         Assert.False(grunt.Activate(new Active("focus-tome", Stat.Int, 5))); // needs more INT than it has
 
-        var adept = Chassrium.Adept.NewBody(); // INT 10
+        var adept = CoreRunes.Adept.NewBody(); // INT 10
         Assert.True(adept.Activate(new Active("focus-tome", Stat.Int, 5)));
     }
 }

@@ -39,7 +39,7 @@ public class RuneGrantsTests
     [Fact]
     public void ForgeFoldsRuneGrantedTechniquesIntoTheLoadout()
     {
-        var chassis = Chassrium.Grunt;
+        var chassis = CoreRunes.Grunt;
         var runes = chassis.NewLoadout();
         foreach (var rung in Paths.TempestLadder) runes.TryTake(rung);
 
@@ -53,7 +53,7 @@ public class RuneGrantsTests
     [Fact]
     public void ForgeDoesNotDuplicateAGrantedTechniqueAlreadyChosen()
     {
-        var chassis = Chassrium.Grunt;
+        var chassis = CoreRunes.Grunt;
         var runes = chassis.NewLoadout();
         foreach (var rung in Paths.TempestLadder) runes.TryTake(rung);
 

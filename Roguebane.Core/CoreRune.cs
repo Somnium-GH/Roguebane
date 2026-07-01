@@ -5,7 +5,7 @@ namespace Roguebane.Core;
 // between these: a fat-budget, cheap-rune chassis can climb to a keystone it was never built for.
 // DefaultEquipment is the FIXED starting kit it ships with — the action bar is never empty and there
 // is no build-time "pick a technique" gate; finds grow the kit mid-run.
-public sealed record Chassis(
+public sealed record CoreRune(
     string Id,
     IReadOnlyList<BodyPart> BodyParts,
     int RuneBudget,

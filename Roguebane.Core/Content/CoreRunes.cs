@@ -1,6 +1,6 @@
 namespace Roguebane.Core.Content;
 
-public static class Chassrium
+public static class CoreRunes
 {
     // Head=INT, Chest=CON, Arms x2 split STR, Legs x2 split DEX. Low scale: ~20 is huge.
     private static IReadOnlyList<BodyPart> StandardBody(string id, int str, int intel, int dex, int con) => new[]
@@ -14,7 +14,7 @@ public static class Chassrium
     };
 
     // Low all-round base, fat budget, cheap runes — built for nothing in particular.
-    public static readonly Chassis Grunt = new(
+    public static readonly CoreRune Grunt = new(
         "grunt",
         StandardBody("grunt", str: 4, intel: 3, dex: 4, con: 4),
         RuneBudget: 24,
@@ -24,7 +24,7 @@ public static class Chassrium
         Flavor: "No edge, no hole. A fat budget of cheap runes climbs into any keystone you pay for.");
 
     // A caster specialist: high INT, tight budget.
-    public static readonly Chassis Adept = new(
+    public static readonly CoreRune Adept = new(
         "adept",
         StandardBody("adept", str: 4, intel: 10, dex: 4, con: 5),
         RuneBudget: 10,
@@ -34,7 +34,7 @@ public static class Chassrium
         Flavor: "Frail chest, one arm - but a deep INT head for spells and the widest action bar.");
 
     // The Wall: STR-CON tank built to hold the line — fat chest, modest budget, no bays.
-    public static readonly Chassis Warden = new(
+    public static readonly CoreRune Warden = new(
         "warden",
         StandardBody("warden", str: 6, intel: 3, dex: 3, con: 9),
         RuneBudget: 12,
@@ -45,7 +45,7 @@ public static class Chassrium
         Flavor: "Armour on every limb, no bay, fewer actions - soaks blows and holds the line.");
 
     // The Binder: an INT core that fights through summons — three bays, INT funds them all.
-    public static readonly Chassis Summoner = new(
+    public static readonly CoreRune Summoner = new(
         "summoner",
         StandardBody("summoner", str: 3, intel: 9, dex: 4, con: 4),
         RuneBudget: 12,
@@ -57,7 +57,7 @@ public static class Chassrium
         Flavor: "Three bays - fights through a war-party of summons while staying back. INT funds them all.");
 
     // The Duelist: glass-cannon STR-DEX, thin chest, no bays — ends parts before they answer.
-    public static readonly Chassis Reaver = new(
+    public static readonly CoreRune Reaver = new(
         "reaver",
         StandardBody("reaver", str: 7, intel: 3, dex: 7, con: 3),
         RuneBudget: 12,
@@ -70,7 +70,7 @@ public static class Chassrium
     // The Marksman: high-DEX ranged core. Its primary is meant to be a shield-piercing BOW (charge #4,
     // blocked on art) — until that lands the equipment uses an existing DEX attack (Lunge) so it compiles;
     // swap the bow Shot in when it ships. Data-only stress test of the content-is-DATA invariant.
-    public static readonly Chassis Ranger = new(
+    public static readonly CoreRune Ranger = new(
         "ranger",
         StandardBody("ranger", str: 4, intel: 3, dex: 8, con: 4),
         RuneBudget: 12,
@@ -82,6 +82,6 @@ public static class Chassrium
 
     // Roster order matches design/05's Choose-Your-Core line-up. Stat/budget values are placeholder
     // (tuning is a "Needs human" touchpoint); slot/bay/action-count shapes wait on those systems.
-    public static readonly IReadOnlyList<Chassis> Roster =
+    public static readonly IReadOnlyList<CoreRune> Roster =
         new[] { Grunt, Warden, Adept, Summoner, Reaver, Ranger };
 }

@@ -75,9 +75,9 @@ public class MinionTests
     [Fact]
     public void SummonerHasThreeBaysTheWardenNone()
     {
-        Assert.Equal(3, Chassrium.Summoner.Bays);
-        Assert.Equal(0, Chassrium.Warden.Bays);
-        Assert.Equal(1, Chassrium.Grunt.Bays);
+        Assert.Equal(3, CoreRunes.Summoner.Bays);
+        Assert.Equal(0, CoreRunes.Warden.Bays);
+        Assert.Equal(1, CoreRunes.Grunt.Bays);
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public class MinionTests
     [Fact]
     public void TheSummonerFieldsItsMinionsWhichChipTheFrontFoeUnaided()
     {
-        var chassis = Chassrium.Summoner;
+        var chassis = CoreRunes.Summoner;
         var exp = Forge.Embark(chassis, chassis.NewLoadout(), chassis.Kit, Maps.StandardLeg(autoResolveCastle: false));
         Assert.True(exp.MinionCount > 0); // bays filled at assembly
 
@@ -114,9 +114,9 @@ public class MinionTests
     }
 
     [Fact]
-    public void TheMinionKitIsCappedByTheChassisBays()
+    public void TheMinionKitIsCappedByTheCoreRuneBays()
     {
-        var reaver = Chassrium.Reaver; // zero bays
+        var reaver = CoreRunes.Reaver; // zero bays
         var exp = Forge.Embark(reaver, reaver.NewLoadout(), reaver.Kit, Maps.StandardLeg(autoResolveCastle: false));
         Assert.Equal(0, exp.MinionCount); // no bays -> nothing fielded
     }

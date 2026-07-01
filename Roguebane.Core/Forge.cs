@@ -6,7 +6,7 @@ namespace Roguebane.Core;
 public static class Forge
 {
     public static Session Assemble(
-        Chassis chassis,
+        CoreRune chassis,
         RuneLoadout runes,
         IReadOnlyList<Technique> equipment,
         Run run)
@@ -20,7 +20,7 @@ public static class Forge
 
     // The same mint, dropped into the real map+combat loop instead of a linear run.
     public static Expedition Embark(
-        Chassis chassis,
+        CoreRune chassis,
         RuneLoadout runes,
         IReadOnlyList<Technique> equipment,
         CityMap map)
@@ -34,7 +34,7 @@ public static class Forge
 
     // The same mint, marching a multi-leg campaign to the Capital instead of one leg.
     public static Campaign EmbarkCampaign(
-        Chassis chassis,
+        CoreRune chassis,
         RuneLoadout runes,
         IReadOnlyList<Technique> equipment,
         IReadOnlyList<Func<CityMap>> legs)
@@ -49,7 +49,7 @@ public static class Forge
     // Field the chassis's minion kit plus any rune-granted minions into its bays at assembly, so the
     // summoner archetype actually fights through its summons in a real run (capped by Bays; each pays
     // its own gate — INT reservation, charge, or free). Summon is idempotent, so a duplicate id no-ops.
-    private static void SummonKit(Caster caster, Chassis chassis, RuneLoadout runes)
+    private static void SummonKit(Caster caster, CoreRune chassis, RuneLoadout runes)
     {
         foreach (var minion in chassis.MinionKit.Concat(runes.GrantedMinions))
             caster.Summon(minion, chassis.Bays);

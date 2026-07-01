@@ -7,7 +7,7 @@ public class ForgeTests
     [Fact]
     public void HeldRuneGrantsWidenTheMintedPool()
     {
-        var chassis = Chassrium.Grunt;
+        var chassis = CoreRunes.Grunt;
         var baseCon = chassis.NewBody().Capacity(Stat.Con);
 
         var runes = chassis.NewLoadout();
@@ -21,7 +21,7 @@ public class ForgeTests
     [Fact]
     public void UnallocatedRunesGrantNothing()
     {
-        var chassis = Chassrium.Grunt;
+        var chassis = CoreRunes.Grunt;
         var runes = chassis.NewLoadout(); // nothing taken
 
         var minted = chassis.NewBody(runes);
@@ -29,9 +29,9 @@ public class ForgeTests
     }
 
     [Fact]
-    public void AssembleThreadsChassisRunesTechniquesAndRunIntoASession()
+    public void AssembleThreadsCoreRuneRunesTechniquesAndRunIntoASession()
     {
-        var chassis = Chassrium.Grunt;
+        var chassis = CoreRunes.Grunt;
         var runes = chassis.NewLoadout();
         foreach (var rung in Paths.VesselLadder) runes.TryTake(rung);
 

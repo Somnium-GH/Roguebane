@@ -10,26 +10,26 @@ public class BuildSessionTests
     public void RosterExposesTheWholeLineUpForTheCoreGrid()
     {
         var build = New();
-        Assert.Equal(Chassrium.Roster.Count, build.Roster.Count);
-        Assert.Same(build.Chassis, build.Roster[build.ChassisIndex]);
+        Assert.Equal(CoreRunes.Roster.Count, build.Roster.Count);
+        Assert.Same(build.CoreRune, build.Roster[build.CoreRuneIndex]);
     }
 
     [Fact]
-    public void CyclingChassisWrapsAndResetsRunes()
+    public void CyclingCoreRuneWrapsAndResetsRunes()
     {
         var build = New();
-        var roster = Chassrium.Roster;
-        Assert.Same(roster[0], build.Chassis);
+        var roster = CoreRunes.Roster;
+        Assert.Same(roster[0], build.CoreRune);
 
-        build.CycleChassis(1);
-        Assert.Same(roster[1], build.Chassis);
+        build.CycleCoreRune(1);
+        Assert.Same(roster[1], build.CoreRune);
         Assert.Equal(roster[1].RuneBudget, build.Runes.Available); // fresh budget
 
-        build.CycleChassis(-1); // back to the first
-        Assert.Same(roster[0], build.Chassis);
+        build.CycleCoreRune(-1); // back to the first
+        Assert.Same(roster[0], build.CoreRune);
 
-        build.CycleChassis(-1); // wraps to the last
-        Assert.Same(roster[^1], build.Chassis);
+        build.CycleCoreRune(-1); // wraps to the last
+        Assert.Same(roster[^1], build.CoreRune);
     }
 
     [Fact]
@@ -112,24 +112,24 @@ public class BuildSessionTests
     // The launch gate is gone: every chassis ships a non-empty fixed kit, so the bar is never empty
     // and Launch is never blocked.
     [Fact]
-    public void EveryChassisShipsANonEmptyKitThatLandsInTheLoadout()
+    public void EveryCoreRuneShipsANonEmptyKitThatLandsInTheLoadout()
     {
         var build = New();
-        for (var i = 0; i < build.ChassisCount; i++)
+        for (var i = 0; i < build.CoreRuneCount; i++)
         {
-            Assert.NotEmpty(build.Chassis.Kit);
+            Assert.NotEmpty(build.CoreRune.Kit);
             Assert.NotEmpty(build.Equipment); // seeded, no manual pick
-            build.CycleChassis(1);
+            build.CycleCoreRune(1);
         }
     }
 
     [Fact]
-    public void CyclingChassisReseedsTheKit()
+    public void CyclingCoreRuneReseedsTheKit()
     {
         var build = New(); // Grunt: jab, brace, bandage
         Assert.Equal(new[] { "jab", "brace", "bandage" }, build.Equipment.Select(t => t.Id));
 
-        build.CycleChassis(1); // Warden: cleave, brace, bandage
+        build.CycleCoreRune(1); // Warden: cleave, brace, bandage
         Assert.Equal(new[] { "cleave", "brace", "bandage" }, build.Equipment.Select(t => t.Id));
     }
 }

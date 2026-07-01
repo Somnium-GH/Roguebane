@@ -82,11 +82,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
         // Smoke: RB_CHASSIS=<index> selects a chassis on the build screen, so every chassis figure
         // (humanoid + robed) can be RB_SMOKE-verified, not just the default.
         if (_smoke && int.TryParse(Environment.GetEnvironmentVariable("RB_CHASSIS"), out var ci))
-            _build.CycleChassis(ci - _build.ChassisIndex);
+            _build.CycleCoreRune(ci - _build.CoreRuneIndex);
 
         if (_smokeScreen is "combat" or "map") // march the real loop for the screenshot
         {
-            _build.CycleChassis(3);          // -> the Summoner (3 bays; fields Skeleton+Shade) for the bay lane
+            _build.CycleCoreRune(3);          // -> the Summoner (3 bays; fields Skeleton+Shade) for the bay lane
             _build.Toggle(Techniques.Jab);   // add a STR card for variety on the bar
             _campaign = _build.Redeploy(Maps.StandardLegs(3));
             _screen = Screen.Run;
@@ -180,10 +180,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     private void UpdateNewGame(KeyboardState keys)
     {
-        if (Pressed(keys, Keys.Left)) _build.CycleChassis(-1);
-        if (Pressed(keys, Keys.Right)) _build.CycleChassis(1);
+        if (Pressed(keys, Keys.Left)) _build.CycleCoreRune(-1);
+        if (Pressed(keys, Keys.Right)) _build.CycleCoreRune(1);
         for (var i = 0; i < _build.Roster.Count; i++)
-            if (Click(NewGameCardRect(i))) _build.CycleChassis(i - _build.ChassisIndex);
+            if (Click(NewGameCardRect(i))) _build.CycleCoreRune(i - _build.CoreRuneIndex);
 
         var go = (Pressed(keys, Keys.Enter) && !keys.IsKeyDown(Keys.LeftAlt)) || Click(NewGameBeginRect);
         if (go) _screen = Screen.Equipment; // on to the equipment screen for the chosen core
@@ -191,8 +191,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     private void UpdateEquipment(KeyboardState keys)
     {
-        if (Pressed(keys, Keys.Left)) _build.CycleChassis(-1);
-        if (Pressed(keys, Keys.Right)) _build.CycleChassis(1);
+        if (Pressed(keys, Keys.Left)) _build.CycleCoreRune(-1);
+        if (Pressed(keys, Keys.Right)) _build.CycleCoreRune(1);
 
         for (var i = 0; i < PathKeys.Length && i < _build.Paths.Count; i++)
             if (Pressed(keys, PathKeys[i]))
@@ -203,8 +203,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 _build.Toggle(_build.Palette[i]);
 
         // Mouse: click a chassis, a ladder row to climb, a palette card to toggle, the march CTA.
-        for (var i = 0; i < _build.ChassisCount; i++)
-            if (Click(ChassisRect(i))) _build.CycleChassis(i - _build.ChassisIndex);
+        for (var i = 0; i < _build.CoreRuneCount; i++)
+            if (Click(CoreRuneRect(i))) _build.CycleCoreRune(i - _build.CoreRuneIndex);
         for (var p = 0; p < _build.Paths.Count; p++)
             if (_build.Paths[p].Count > 0 && Click(LadderRowRect(p, _build.Paths[p].Count)))
                 _build.Climb(_build.Paths[p]);
@@ -335,7 +335,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     // Interactive layout rects — single source of truth shared by Update (hit-test) and Draw (paint
     // + hover). Mirrors the coordinates used in the Draw* methods.
-    private static Rectangle ChassisRect(int i) => new(180 + i * 110 - 2, 4, 100, 32);
+    private static Rectangle CoreRuneRect(int i) => new(180 + i * 110 - 2, 4, 100, 32);
     private static Rectangle PaletteRect(int i) => new(320 + i * 52, 300, 48, 48); // fits 7 before the bay preview
     private static Rectangle LadderRowRect(int p, int rungs) => new(320, 100 + p * 56, rungs * 56, 48);
     private static readonly Rectangle RedeployRect = new(40, H - 52, 300, 44);
@@ -492,7 +492,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
             ("reticle/focus", _assets.Reticle("focus")),
             ("button/normal", _assets.Button("normal")),
             ("bg/combat_field", _assets.Background("combat_field")),
-            ("chassis/grunt", _assets.ChassisFigure("grunt")),
+            ("chassis/grunt", _assets.CoreRuneFigure("grunt")),
         };
         var bound = 0;
         foreach (var (name, tex) in probes)
@@ -792,7 +792,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         {
             var c = roster[i];
             var r = NewGameCardRect(i);
-            var selected = i == _build.ChassisIndex;
+            var selected = i == _build.CoreRuneIndex;
             Panel(r.X, r.Y, r.Width, r.Height);
             if (selected)
             {
@@ -859,15 +859,15 @@ public class Game1 : Microsoft.Xna.Framework.Game
         var runes = _build.Runes;
         Text(_assets.Mono, $"runes {runes.Spent}/{runes.Budget}", 760, 12, Amber);
 
-        DrawChassisSelector(180, 6);
+        DrawCoreRuneSelector(180, 6);
 
         var preview = _build.Preview();
         Panel(40, 90, 240, 410);
-        Text(_assets.Mono, _build.Chassis.Title.ToUpper(), 56, 100, Muted);
+        Text(_assets.Mono, _build.CoreRune.Title.ToUpper(), 56, 100, Muted);
         var figBox = _ui.ElementRect("build", "paperDoll") ?? new Rectangle(100, 104, 120, 215);
-        DrawFigureIn(preview, _build.Chassis.FigureKey, "build", "paperDoll", 160, 470, 360);
+        DrawFigureIn(preview, _build.CoreRune.FigureKey, "build", "paperDoll", 160, 470, 360);
         DrawAnatomyTags(figBox);
-        DrawAttributeReadout(preview, _build.Chassis.NewBody(), 56, 318, KitDemand());
+        DrawAttributeReadout(preview, _build.CoreRune.NewBody(), 56, 318, KitDemand());
 
         DrawLadders(320, 100);
         DrawCoreBlock(700, 90);
@@ -885,7 +885,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // bays, rune budget, and how many techniques are slotted on the action bar.
     private void DrawCoreBlock(int x, int y)
     {
-        var c = _build.Chassis;
+        var c = _build.CoreRune;
         var baseBody = c.NewBody();
         Panel(x, y, 220, 190);
         Text(_assets.Display, "CURRENT CORE", x + 12, y + 10, Ink);
@@ -909,7 +909,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // combat bay lane; display-only.
     private void DrawMinionPreview(int x, int y)
     {
-        var c = _build.Chassis;
+        var c = _build.CoreRune;
         if (c.Bays <= 0) return;
         Text(_assets.Mono, "MINION BAYS", x, y - 18, Muted);
         var kit = c.MinionKit;
@@ -950,17 +950,17 @@ public class Game1 : Microsoft.Xna.Framework.Game
         }
     }
 
-    private void DrawChassisSelector(int x, int y)
+    private void DrawCoreRuneSelector(int x, int y)
     {
-        for (var i = 0; i < _build.ChassisCount; i++)
+        for (var i = 0; i < _build.CoreRuneCount; i++)
         {
             var left = x + i * 110;
-            var selected = i == _build.ChassisIndex;
-            var id = Chassrium.Roster[i].Id;
-            Sprite(_assets.ChassisFigure(id), left, y, 28, 28, selected ? Color.White : new Color(150, 140, 130));
+            var selected = i == _build.CoreRuneIndex;
+            var id = CoreRunes.Roster[i].Id;
+            Sprite(_assets.CoreRuneFigure(id), left, y, 28, 28, selected ? Color.White : new Color(150, 140, 130));
             Text(_assets.Mono, id, left + 32, y + 8, selected ? Ink : Muted);
             if (selected) Border(left - 2, y - 2, 100, 32, Amber);
-            else if (Hover(ChassisRect(i))) Border(left - 2, y - 2, 100, 32, Ink);
+            else if (Hover(CoreRuneRect(i))) Border(left - 2, y - 2, 100, 32, Ink);
         }
     }
 
@@ -1079,11 +1079,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         var d = new Dictionary<Stat, int>();
         foreach (var t in _build.Equipment) d[t.Stat] = d.GetValueOrDefault(t.Stat) + t.Reserve;
-        foreach (var m in _build.Chassis.MinionKit) d[m.Stat] = d.GetValueOrDefault(m.Stat) + m.Reserve;
+        foreach (var m in _build.CoreRune.MinionKit) d[m.Stat] = d.GetValueOrDefault(m.Stat) + m.Reserve;
         return d;
     }
 
-    // Chassis-anatomy callouts (design/02): a stat tag at each body region so the chassis structure
+    // CoreRune-anatomy callouts (design/02): a stat tag at each body region so the chassis structure
     // — which part sources which stat — reads at a glance on the figure (the core thesis). Tags sit
     // just outside the figure box: head top, arms mid-sides, chest centre, legs lower.
     private void DrawAnatomyTags(Rectangle b)

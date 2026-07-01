@@ -8,9 +8,9 @@ namespace Roguebane.Core.Tests;
 public class FigureIdTests
 {
     [Fact]
-    public void EmbarkCarriesTheChassisFigureId()
+    public void EmbarkCarriesTheCoreRuneFigureId()
     {
-        var chassis = Chassrium.Roster[0];
+        var chassis = CoreRunes.Roster[0];
         var exp = Forge.Embark(chassis, chassis.NewLoadout(), chassis.Kit, Maps.StandardLeg());
         Assert.Equal(chassis.FigureKey, exp.FigureId); // human_<core>
     }
@@ -18,7 +18,7 @@ public class FigureIdTests
     [Fact]
     public void CampaignLegsKeepTheFigureId()
     {
-        var chassis = Chassrium.Roster[0];
+        var chassis = CoreRunes.Roster[0];
         var camp = Forge.EmbarkCampaign(chassis, chassis.NewLoadout(), chassis.Kit, Maps.StandardLegs(2));
         Assert.Equal(chassis.FigureKey, camp.Current.FigureId);
     }

@@ -29,7 +29,7 @@ public static class Sessions
     // extra CON folded in, and drop it into the standard run with the full technique equipment.
     public static Session Forged()
     {
-        var chassis = Chassrium.Grunt;
+        var chassis = CoreRunes.Grunt;
         var runes = chassis.NewLoadout();
         foreach (var rung in Paths.VesselLadder) runes.TryTake(rung);
         return Forge.Assemble(chassis, runes, Techniques.All, Sieges.StandardRun());
@@ -63,7 +63,7 @@ public static class Sessions
     }
 
     public static BuildSession NewBuild() => new(
-        Chassrium.Roster,
+        CoreRunes.Roster,
         new[] { Paths.VesselLadder, Paths.ResonanceLadder },
         Techniques.All);
 }
