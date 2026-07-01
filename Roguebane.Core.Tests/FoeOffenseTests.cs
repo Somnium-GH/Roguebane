@@ -34,22 +34,24 @@ public class FoeOffenseTests
 
         battle.Step();
 
-        Assert.Equal(2, player.Body.Capacity(Stat.Con)); // chest 4 -> 2 (the localized hit)
-        Assert.Equal(10, player.Hp);                     // HP untouched while the part absorbs
+        // §8: the one hit erodes the aimed part AND takes HP, simultaneously.
+        Assert.Equal(2, player.Body.Capacity(Stat.Con)); // chest 4 -> 2 (part)
+        Assert.Equal(8, player.Hp);                      // and 2 HP, same hit
     }
 
     [Fact]
-    public void OverkillPastABrokenPartSpillsIntoHpAndLoses()
+    public void EveryFoeHitTakesPartAndHpUntilTheFighterFalls()
     {
         var player = new Fighter(ChestOnly(1), maxHp: 3);
         var foe = new Foe("brute", 20, FoeFrame(3), new[] { Strike(2) });
         var battle = new Battle(new Caster(player.Body), Solo(foe), player);
 
-        battle.Step();           // chest 1 -> 0, overkill 1 spills: HP 3 -> 2
-        Assert.Equal(2, player.Hp);
+        battle.Step();           // §8: chest 1 -> 0 AND HP 3 -> 1 (no overkill maths)
+        Assert.Equal(0, player.Body.Capacity(Stat.Con));
+        Assert.Equal(1, player.Hp);
         Assert.Equal(BattleOutcome.Ongoing, battle.Outcome);
 
-        battle.Step();           // part gone -> the swing lands on HP: 2 -> 0
+        battle.Step();           // chest gone -> no standing part -> the hit lands on HP: 1 -> 0 (lost)
         Assert.Equal(BattleOutcome.Lost, battle.Outcome);
     }
 
@@ -69,7 +71,7 @@ public class FoeOffenseTests
         playerCaster.Aim(smash, foe, arm);
         var battle = new Battle(playerCaster, Solo(foe), player);
 
-        battle.Step(); // player smashes arm 4 -> 2 (strike still powered); foe erodes chest 4 -> 1
+        battle.Step(); // player smashes arm 4 -> 2 (strike still powered); foe's strike takes chest 4 -> 1 AND HP 20 -> 17
         Assert.Equal(1, player.Body.Capacity(Stat.Con));
 
         battle.Step(); // arm 2 -> 0 before it acts -> strike cascades off, no player hit this tick
@@ -77,7 +79,7 @@ public class FoeOffenseTests
 
         battle.Step();
         Assert.Equal(1, player.Body.Capacity(Stat.Con)); // disarmed foe erodes nothing further
-        Assert.Equal(20, player.Hp);                     // never overkilled into HP
+        Assert.Equal(17, player.Hp);                     // only the one landed strike hit HP (§8: part+HP)
     }
 
     [Fact]

@@ -297,22 +297,19 @@ public sealed class Caster
         if (frame is not null && _rng is not null && _rng.Chance(frame.EvasionPercent(part)))
             return; // dodged
 
-        // §6b shields are the OUTERMOST layer: they eat damage before armor/block/parts. Body-wide,
-        // so they apply to both whole-HP and part-aimed hits; a fully-absorbed hit lands nothing.
-        // A SHIELD-PIERCING hit (Charge-fuelled) skips the pool entirely.
+        // §6b shields are the ONLY damage mitigation now (alongside a full evade above): points absorb
+        // the hit before it lands. A SHIELD-PIERCING hit (Charge-fuelled) skips the pool entirely.
         if (frame is not null && !pierce)
         {
             power = frame.AbsorbShields(power);
             if (power <= 0) return;
         }
 
-        if (part is null)
-        {
-            var blocked = frame?.BlockMitigation(BlockCap) ?? 0;
-            var dealt = Math.Max(0, power - blocked);
-            if (dealt > 0) target.Damage(dealt);
-        }
-        else target.DamagePart(part, power);
+        // §8 [LOCKED]: every hit deals BOTH — the targeted PART's stat AND HP — simultaneously, the same
+        // power, from the one hit. No part-vs-HP split, no HP-only-on-overkill path, no flat CON block or
+        // plate blunt (shields + full evade are the ONLY mitigations).
+        if (part is not null) frame?.Damage(part, power);
+        target.Damage(power);
     }
 
     private void PruneSilenced()

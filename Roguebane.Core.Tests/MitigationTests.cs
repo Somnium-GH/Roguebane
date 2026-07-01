@@ -2,8 +2,8 @@ using Roguebane.Core.Content;
 
 namespace Roguebane.Core.Tests;
 
-// Mitigation on the incoming-hit path: leather EVASION can dodge a hit (seeded), and a held CON
-// block blunts a whole-HP hit. Both are felt against an attacking Caster.
+// Mitigation on the incoming-hit path (§8: shields + full evade are the ONLY mitigations). Leather
+// EVASION can fully dodge a hit (seeded); a shield source absorbs hits before they land.
 public class MitigationTests
 {
     private static Body Humanoid()
@@ -51,14 +51,20 @@ public class MitigationTests
     }
 
     [Fact]
-    public void AHeldConBlockBluntsTheHit()
+    public void AShieldSourceAbsorbsHitsBeforeHp()
     {
-        var body = Humanoid();
-        body.Activate(new Active("block", Stat.Con, 2)); // reserve 2 CON -> blocks 2 off each HP hit
-        var (attacker, target) = Duel(body);
+        // §8: the CON flat block is gone; a shield source is the mitigation. Its layers eat Jab hits
+        // (the defender's caster isn't ticked here, so the layers drain and don't regen) -> the shielded
+        // build takes strictly less than a bare one.
+        var shieldedBody = Humanoid();
+        new Caster(shieldedBody).Activate(Techniques.Stoneskin); // INT-powered 3-layer shield
+        var (atkS, tgtS) = Duel(shieldedBody);
+        var shielded = DamageOver(atkS, tgtS, 300);
 
-        // Jab is power 2; block 2 => every hit fully absorbed.
-        Assert.Equal(0, DamageOver(attacker, target, 300));
+        var (atkB, tgtB) = Duel(Humanoid());
+        var bare = DamageOver(atkB, tgtB, 300);
+
+        Assert.True(shielded < bare, $"shield should reduce damage taken ({shielded} vs {bare})");
     }
 
     [Fact]

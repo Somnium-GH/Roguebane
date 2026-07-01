@@ -76,6 +76,6 @@ public class FoeArmingTests
 
         for (var i = 0; i < 60; i++) c.Step(); // one Jab (Power 2) lands on the head
         Assert.Equal(0, foe.Frame.Contribution(head)); // head stat eroded to 0
-        Assert.Equal(10, foe.Hp);                       // fully absorbed -> HP untouched
+        Assert.Equal(8, foe.Hp);                        // §8: the same hit also took 2 HP
     }
 }

@@ -49,7 +49,15 @@ LAYOUT_CONTRACT §10-11 (fidelity primitives + 1080). Priority order:
    - **AUTO-attack is GLOBAL, not per-weapon**: on = a fired weapon re-fires on its next charge at the
      kept target. Fix the per-weapon coupling.
    - **DAMAGE**: every hit applies part damage AND hp damage simultaneously; only a shield block or full
-     evade mitigates. Ensure the impl applies both.
+     evade mitigates. Ensure the impl applies both. [DONE (§8 LOCKED): Caster.Hit now does full evade ->
+     shield absorb -> then BOTH raw part-erode (Frame.Damage, no plate blunt, no overkill maths) AND HP
+     (target.Damage), same power. The flat CON block + plate protection are GONE from the hit path. Brace
+     RE-CAST as the CON SHIELD SOURCE (ShieldLayers 4 / regen 15) — the "replace flat block with shields"
+     step — so kits keep a mitigation and the campaign stays winnable under the deadlier model (verified:
+     CampaignTests win). Tests reconciled: PartAim/FoeOffense/FoeArming -> part+HP-no-overkill; Mitigation
+     block-test -> shield-test. 277 Core green; combat smoke clean. DEAD CODE to sweep later (unused now):
+     Body.BlockMitigation, Fighter/Foe.DamagePart + Body.AbsorbPartHit, plate `Protection` (plate no longer
+     mitigates per §8 — reconcile armour: leather=evasion stays, plate needs a new role or retires).]
    - **ENEMY HEAL**: must run on a real tuned technique (same system as the player), can't out-tick the
      player's healing — not a fast free regen.
    - **SYMMETRY**: enemies act through the SAME technique/attribute/shield/heal framework as the player

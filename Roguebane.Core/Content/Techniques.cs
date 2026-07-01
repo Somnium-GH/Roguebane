@@ -23,8 +23,12 @@ public static class Techniques
     public static readonly Technique Drain =
         new("drain", Stat.Int, Reserve: 2, TechniqueKind.Timered, Cooldown: 60, Power: 2);  // ~6s
 
+    // The CON shield source (was the flat "block", retired with §8): a held passive that reserves CON
+    // and maintains a regenerating pool of shield layers — the §6b mitigation that now stands between a
+    // hit and the body (§8: shields + full evade are the only mitigations). Numbers placeholder.
     public static readonly Technique Brace =
-        new("brace", Stat.Con, Reserve: 2, TechniqueKind.Sustained, Cooldown: 0, Power: 0); // held block
+        new("brace", Stat.Con, Reserve: 2, TechniqueKind.Sustained, Cooldown: 0, Power: 0,
+            ShieldLayers: 4, ShieldRegen: 15);
 
     // The §10 in-combat part-heal (CON): mends the most-damaged part ~1 every 8s, reserving CON while
     // held. Kept OUT of `All` for now so it stays opt-in content (no balance shift to the default
