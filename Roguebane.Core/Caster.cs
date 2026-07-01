@@ -143,7 +143,7 @@ public sealed class Caster
         var cooldown = EffectiveCooldown(t);
         if (!_active.TryGetValue(t.Id, out var run))
             return new TechStatus(false, cooldown, cooldown, t.Kind == TechniqueKind.Sustained, false, false, false);
-        var dry = t.ChargeCost > 0 && _charge < t.ChargeCost;
+        var dry = t.ShieldPiercing && _charge < Math.Max(1, t.ChargeCost); // only pierce draws charge
         var ready = run.Tech.Kind == TechniqueKind.Timered && run.Countdown <= 0;
         // Card's "auto" reflects the GLOBAL player AUTO (keep-targets), not the engine cadence flag.
         return new TechStatus(true, run.Countdown, cooldown, t.Kind == TechniqueKind.Sustained, dry, ready, _keepTargets);
@@ -266,7 +266,6 @@ public sealed class Caster
         {
             var wound = _self.MostDamagedPart();
             if (wound is null) return false;
-            if (run.Tech.ChargeCost > 0 && !TrySpendCharge(run.Tech.ChargeCost)) return false;
             _self.Repair(wound, EffectivePower(run.Tech));
             if (run.Tech.Kind == TechniqueKind.Timered) run.Countdown = EffectiveCooldown(run.Tech);
             return true;
@@ -278,9 +277,10 @@ public sealed class Caster
         if (target is null || target.Down) return false;
 
         var part = onAim ? run.Part : null;
-        if (run.Tech.ChargeCost > 0 && !TrySpendCharge(run.Tech.ChargeCost)) return false;
+        // CHARGE = shield-pierce fuel: only a shield-piercing technique spends it; dry => HOLD the pierce.
+        if (run.Tech.ShieldPiercing && !TrySpendCharge(Math.Max(1, run.Tech.ChargeCost))) return false;
 
-        Hit(target, part, EffectivePower(run.Tech));
+        Hit(target, part, EffectivePower(run.Tech), run.Tech.ShieldPiercing);
         if (run.Tech.Kind == TechniqueKind.Timered) run.Countdown = EffectiveCooldown(run.Tech);
         return true;
     }
@@ -288,7 +288,7 @@ public sealed class Caster
     // Apply a hit through the defender's mitigation layer: leather EVASION (a dodge roll on the
     // struck part-group) can negate it; a whole-HP hit is then blunted by the CON block. Part hits
     // run plate protection inside DamagePart. (Block on part hits is deferred — foes hit HP today.)
-    private void Hit(ICombatTarget target, BodyPart? part, int power)
+    private void Hit(ICombatTarget target, BodyPart? part, int power, bool pierce = false)
     {
         var frame = target.Frame;
         if (frame is not null && _rng is not null && _rng.Chance(frame.EvasionPercent(part)))
@@ -296,7 +296,8 @@ public sealed class Caster
 
         // §6b shields are the OUTERMOST layer: they eat damage before armor/block/parts. Body-wide,
         // so they apply to both whole-HP and part-aimed hits; a fully-absorbed hit lands nothing.
-        if (frame is not null)
+        // A SHIELD-PIERCING hit (Charge-fuelled) skips the pool entirely.
+        if (frame is not null && !pierce)
         {
             power = frame.AbsorbShields(power);
             if (power <= 0) return;

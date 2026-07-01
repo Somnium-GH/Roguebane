@@ -80,8 +80,14 @@ REDEFINED it (see DESIGN_SPEC §6b/§10/§14/§17/§18). Directives:
    A technique that ignores the shield pool requires + spends Charge per use (dry → holds the pierce). Add
    a `ShieldPiercing`/`IgnoresShield` concept to Technique; wire the Charge spend to THAT, not to "magic."
    Shield-piercing damage bypasses the shield pool entirely.
+   [DONE: Technique.ShieldPiercing added; Caster spends Charge (ChargeCost, min 1) ONLY for piercing
+   techniques and its Hit skips AbsorbShields when piercing; ChargeDry indicator + heal branch re-tied
+   (heals no longer cost charge). Tested (bypass pool, spend/hold-dry/recharge, non-piercing ignores
+   charge). NOTE: no LIVE content is piercing yet — bows (#4) are the intended user; the player's granted
+   Charge capacity is dormant until a piercing technique/weapon ships.]
 2. **Fix `Paths.Maelstrom`** — it carries `ChargeCost:1` as a "magic-tier verb" (old rule). Remove the
-   charge cost unless it is actually shield-piercing; drop the "draws the finite charge" comment.
+   charge cost unless it is actually shield-piercing; drop the "draws the finite charge" comment. [DONE:
+   ChargeCost removed (Maelstrom isn't piercing); comment updated.]
 3. **`Minion.AltCost` paying Charge** is off-definition (Charge = shield-pierce, not summon fuel). §9's
    alt-cost example is HP — reconcile alt-cost summons to a DESIGNED cost (HP or a stat), not Charge.
 4. **BOWS (new, shield-ignoring):** spec + implement a bow weapon type (DEX, §6) whose attacks bypass the
@@ -109,6 +115,29 @@ test-shape ripple is the finding (it tells us how leak-free the extensibility re
   over-build gating if it isn't wired yet.
 - FIGURE ART: Ranger needs a figure sprite (`human_ranger`, `elf_ranger`) — a Claude Design need; NewGame
   will show a fallback/placeholder card until it lands (expected, not a bug).
+
+**TERMINOLOGY RENAME — clean, NO backwards-compat (2026-06-30).** New rule (CLAUDE.md + loop.md): renames
+update ALL usages; NO aliases/mapping/compat shims unless a feature flag is explicitly requested. Apply
+across the 30-file audit:
+- **Chassis → CoreRune** everywhere: record `Chassis`→`CoreRune`, `Chassis.cs`→`CoreRune.cs`,
+  `Content/Chassrium.cs`→`Content/CoreRunes.cs`; ~254 refs across ~30 files (Forge/BuildSession/Fighter/
+  Expedition/Minion/Mark/RuneLoadout + tests: Chassis{Thesis,Roster,Body}Tests, FigureIdTests,
+  RunStartTests, MinionTests…); `layout.json` `chassis/*` figure keys; `Content.mgcb` `sprites/char/
+  chassis/` dir + entries; design docs. Figure keys also go `human_<core>` (earlier directive).
+- **RunMap → CityMap** (`RunMap.cs`→`CityMap.cs`, RunMap*Tests, all refs).
+- Finish the Core-API renames the shell pass left as-is (no compat): **Expedition.Flee → Retreat**,
+  **BuildSession.March → Redeploy**, **CampaignState.Marching → Redeploying**.
+- **NewRun residuals → NewGame**; manifest LOOKUP ids `newrun`/`build`/`runmap` → `newgame`/`equipment`/
+  `citymap` (game side now; Claude Design renames the manifest ids in sync — CD payload).
+- **Drop the compat surfaces** earlier passes kept: the `Foes`/`CurrentTarget` 1-element shim (single-foe
+  is canon) and the bare `<core>` figure keys (→ `human_<core>`).
+- **aether**: confirm ZERO remaining refs (design cleaned).
+- VOCAB LOCKED: **Race** (attrs+HP), **CoreRune** (layout, was Chassis), **Loadout** = Race+CoreRune (the
+  assembled identity — the freed-up term; retire "Core" as a label), **Equipment** = the installed-things
+  layer (weapons/armor/runes/techniques/bays; WAS called "Loadout"), configured on the Equipment screen.
+  Apply: `DefaultLoadout` → `DefaultEquipment`; the plain "Loadout"-as-gear term → Equipment; reserve
+  "Loadout" for Race+CoreRune (`BuildSession` produces a Loadout — rename as fits). `RuneLoadout` is the
+  rune bag — keep Rune-prefixed (or → `RuneBag`), NOT plain Loadout. Keep tests green throughout.
 
 ## Current target
 **RE-OPEN RESOLVED (both threads cleared) — POC functionally complete again.**
