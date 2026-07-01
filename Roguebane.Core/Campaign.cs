@@ -30,7 +30,7 @@ public sealed class Campaign
         IReadOnlyList<Technique> loadout,
         IReadOnlyList<Func<CityMap>> legs,
         Stash? stash = null,
-        string figureId = "grunt")
+        string figureId = "human_grunt")
     {
         if (legs.Count == 0) throw new ArgumentException("a campaign needs at least one leg", nameof(legs));
         _player = player;

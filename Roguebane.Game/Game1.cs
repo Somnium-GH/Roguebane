@@ -800,7 +800,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 Text(_assets.Mono, "SELECTED", r.X + r.Width - 74, r.Y + 8, Amber);
             }
 
-            DrawHumanoid(c.NewBody(), c.Id, r.X + r.Width / 2, r.Y + 168, 140);
+            DrawHumanoid(c.NewBody(), c.FigureKey, r.X + r.Width / 2, r.Y + 168, 140);
             Text(_assets.Mono, c.Title.ToUpper(), r.X + 12, r.Y + 176, Ink);
             Text(_assets.Mono, c.Archetype, r.X + 12, r.Y + 192, Amber);
 
@@ -865,7 +865,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         Panel(40, 90, 240, 410);
         Text(_assets.Mono, _build.Chassis.Title.ToUpper(), 56, 100, Muted);
         var figBox = _ui.ElementRect("build", "paperDoll") ?? new Rectangle(100, 104, 120, 215);
-        DrawFigureIn(preview, _build.Chassis.Id, "build", "paperDoll", 160, 470, 360);
+        DrawFigureIn(preview, _build.Chassis.FigureKey, "build", "paperDoll", 160, 470, 360);
         DrawAnatomyTags(figBox);
         DrawAttributeReadout(preview, _build.Chassis.NewBody(), 56, 318, KitDemand());
 

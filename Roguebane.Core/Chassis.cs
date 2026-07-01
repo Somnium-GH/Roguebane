@@ -19,6 +19,10 @@ public sealed record Chassis(
     // Display name for the cards ("grunt" -> "Grunt"); the Id stays the lowercase content key.
     public string Title => string.IsNullOrEmpty(Id) ? Id : char.ToUpperInvariant(Id[0]) + Id[1..];
 
+    // The manifest figure key. Figures are uniform `<race>_<core>` (no bare "unprefixed = human" case);
+    // Race isn't a built axis yet, so default to human_<core>. When Race lands, thread the race here.
+    public string FigureKey => "human_" + Id;
+
     public IReadOnlyList<Technique> Kit => DefaultEquipment ?? Array.Empty<Technique>();
 
     // The minions the chassis fields from the start (summoned into its bays at assembly), the minion

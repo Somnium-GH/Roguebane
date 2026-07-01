@@ -85,7 +85,7 @@ allocation economy.
 |---|---|---|---|
 | **STR** | Arms (×2) | attack power (1.0×); STR actives | STR weapons; wields the shield OBJECT (heavy = STR) |
 | **INT** | Head (×1) | spell power; keeps spell actives + passives up | spells need INT reserved *(absorbs old WIS)* |
-| **DEX** | Legs (×2) | evasion; accuracy; +0.25× attack; **HASTE** (shortens cooldowns ~1.5–2%/pt, cap ~28%) | DEX weapons |
+| **DEX** | Legs (×2) | evasion; accuracy; +0.25× attack; **HASTE** (shortens cooldowns ~1.5–2%/pt, cap ~28%) | DEX weapons; **bows** (shield-ignoring, §10) |
 | **CON** | Chest (×1) | **bonus HP** (1 CON = 2 HP on a natural base); stun resist; powers shields (§6b) | body-extending runes |
 
 - **WIS** merged into INT; **CHA** dropped (§18).
@@ -110,22 +110,33 @@ source sets the amount/regen and its stat:
   low cap), **bind** (STR, low cap), **shield-wall** (CON, scales with rallied troops).
 CON is the through-line: it powers the CON block source AND scales shield-point regen for all sources.
 Every class should have a viable block source; a build with none must compensate (heavy heals, or high
-damage + evasion). *(Supersedes the earlier "sustained CON-block, flat-while-held, capped" model, §18.)*
+damage + evasion). **Counterplay — shield-piercing:** some techniques, and ALL **bows** (§10), IGNORE the
+shield pool entirely; that bypass is gated by the **Charge** resource (§10) — powerful but logistically
+limited. *(Supersedes the earlier "sustained CON-block, flat-while-held, capped" model, §18.)*
 
 ## 7. Race + Core rune, and the three-layer architecture [LOCKED]
 Identity is **two axes** (FTL ship + layout):
-- **RACE** — sets **starting attributes + base HP**. Start with **Human + Elf** (more later). [roster OPEN]
+- **RACE** — sets **starting attributes + base HP** (the ONLY source of base attrs; Core runes add none).
+  Start with **Human + Elf**. Placeholder blocks from design/05 (tune later): **Human** STR3/INT3/DEX3/
+  CON3, HP20 (balanced, no edge); **Elf** STR2/INT3/DEX4/CON2, HP14 (keen + fleet, frail). **All
+  race×core combos allowed for the POC** (restriction matrix deferred, §17 #4).
 - **CORE RUNE** (the Shadowbane "Core rune") — sets **LAYOUT**: rune budget, action-bar size (#
   techniques), # minion bays, and **apex effects/bonuses stronger than a keystone**. **Races GATE which
   core runes they may take** (an SB-style restriction matrix). New Run = pick Race → pick Core rune
-  (race-allowed). *(This replaces the old single "Chassis" concept — §18. The five archetypes
-  Grunt/Warden/Adept/Summoner/Reaver are CORE RUNES; Race is the new orthogonal axis.)*
+  (race-allowed). *(This replaces the old single "Chassis" concept — §18. The archetypes
+  Grunt/Warden/Adept/Summoner/Reaver/**Ranger** are CORE RUNES; Race is the new orthogonal axis. (Ranger =
+  the DEX marksman, the reference build for the bow / shield-pierce economy, §10 — added to stress-test
+  the data-only core-rune path.)*
 
 Three layers over the shared attribute pool:
-1. **Race + Core rune (Core).** Defines anatomy + budget (above the rune economy; not bought).
-2. **Loadout (installed things).** Weapons (in hands), armor (per-group slots), minion-bay contents,
-   shield sources, runes — configured **between fights**, sealed in combat. Each Core rune ships a
-   **FIXED default loadout** (grown by finds; no build-time "pick a technique" gate).
+1. **Race + Core rune = the LOADOUT.** Race sets base attrs+HP; the Core rune sets layout (budget / bays /
+   action-bar size / apex). Together they are your **Loadout** — the assembled identity you take into a
+   run (above the rune economy; not bought). *(This is the freed-up "Loadout" term; the old "Core" label
+   retires.)*
+2. **Equipment (installed things).** Weapons (in hands), armor (per-group slots), minion-bay contents,
+   shield sources, runes — configured **between fights** on the **Equipment screen**, sealed in combat.
+   Each Core rune ships a **FIXED default Equipment set** (grown by finds; no build-time "pick a
+   technique" gate). *(Was called "Loadout"; renamed to Equipment to match its screen.)*
 3. **Action bar (verbs).** **Techniques** — live actions; each **consults equipped gear and reserves
    attributes**; **timered** (charge→fire) or **passive/sustained** (holds its reservation).
 
@@ -185,7 +196,7 @@ Minions yes; **party no** — one main character.
 - **[OPEN]** CON-as-minion-resource (CON funds minions → a no-INT cleric-caster); minion-type acquisition.
 - No separate muster/upkeep — the cost of fielding a minion **is** its gate (§18).
 
-## 10. HP, healing, the magic/charge resource [LOCKED core; details OPEN]
+## 10. HP, healing, and Charge (the shield-pierce resource) [LOCKED core; details OPEN]
 - **HP** is a small life total, separate from the part/stat layer; **permanent within an encounter**.
 - **Healing repairs PARTS, never HP ("repair systems") [LOCKED]:** part-heals are **techniques** (action-
   bar verbs) — **Bandage** (CON), **Cure Wounds** (INT), and **Potion**-flavored heals — amount scales
@@ -194,10 +205,16 @@ Minions yes; **party no** — one main character.
   only **OUT OF COMBAT, at a merchant**: pay gold to heal HP at **1 HP per (randomized) cost**, the cost
   balanced within loot-rate bounds. Starting with no heal is a smaller penalty than starting with no
   shield source.
-- **A finite, refillable magic/charge resource** (name TBD) fuels magic-tier effects + weapon affixes,
-  refilled via loot/gold, distinct from the attribute pool — which is *why* magic is logistically
-  fragile despite being cheap in attributes.
-- **[OPEN]** its name; consume-per-use vs deplete-via-allocation; POC presence.
+- **CHARGE — the shield-pierce resource [LOCKED; name = Charge]:** a finite, refillable pool, distinct
+  from the attribute pool, refilled via loot/gold **out of combat** (not regenerated mid-fight). **Blanket
+  rule: a SHIELD-IGNORING technique requires Charge and spends it per use.** Charge is the economy of
+  *bypassing shields* (§6b) — cheap in attributes but logistically fragile (run dry → no piercing until
+  you refill). It is NOT a generic "magic" cost; ordinary (blockable) techniques cost no Charge.
+- **BOWS are always shield-ignoring [LOCKED]:** a bow's attacks bypass the shield pool and therefore draw
+  Charge. (Bows don't exist yet — a NEW weapon type to spec + asset + test; at least one starting Core
+  rune should ship a bow in its default loadout.)
+- **[OPEN]** whether shield-piercing needs any extra "damaging resolution" beyond the bypass — keep it
+  simple for now (bypass + Charge cost, nothing more).
 
 ## 11. The rune system [LOCKED core; some numbers OPEN]
 The build economy. **No fixed rune slots** — runes are bought from a **point budget set by the Core
@@ -210,7 +227,9 @@ rune** (grown by progression). The *shape* of the rune loadout is itself a build
 - **Paths (identity traits)** — modular, **minor → major** magnitude (major = bigger number + a
   qualitative kicker). Simple trait lines, not branching trees.
 - **Keystones** — apex, play-defining, real downsides; **rare by price** (no hard cap), prereq-gated.
-  POC keystone **Hollow Vessel** (unspent budget converts live into regenerating attribute/aether).
+  POC keystone **Hollow Vessel** (unspent budget converts live into a regenerating resource) — **[effect
+  OPEN: the old "aether" target is retired; redefine (vs Charge or a regenerating attribute) before it's
+  real. Code currently grants a placeholder +CON — sample content, not the designed effect.]**
 - **Prerequisite ladder [LOCKED]:** big runes need a minimum in an attribute, met by RACE base
   (efficient) **or** by spending budget on Marks to climb (mostly-refunded-but-leaks tax). Native
   qualification beats climbing.
@@ -270,9 +289,11 @@ Nested layers, macro → micro:
   containers/templates, the shared style block) come from the generator-emitted manifest — see
   `design/LAYOUT_CONTRACT.md` + `design/SCREENS.md`. **Aspect-independent fill:** background
   scale-to-cover; HUD anchored to real edges; the pixel stage integer-scaled + centered (no bars).
-- **Screens & canonical names [LOCKED]** (design/ PNGs 01-05): **NewGame** (design/05 — pick Race→Core;
-  role badges, per-card select, portrait boxes), **Equipment** (design/02 — the loadout cutaway:
-  race+core anatomy, rune budget + ladder, equipped gear, action loadout; a **between-fights** screen
+- **Screens & canonical names [LOCKED]** (design/ PNGs 01-05): **NewGame** (design/05 — ONE screen,
+  three columns: **Race** (head sprites + attr/HP card) | **Core Rune** (rune icon + budget/actions/bays +
+  APEX card) | **Loadout** (the assembled Race+CoreRune: composed figure + combined stats + apex); BEGIN
+  THE RUN), **Equipment** (design/02 — the Equipment cutaway:
+  race+core anatomy, rune budget + ladder, equipped gear, action bar; a **between-fights** screen
   reachable from Encounter/CityMap/CampaignMap, **NOT** a post-NewGame gate), **Encounter** (design/01 —
   combat cutaway taking localized part damage), **CityMap** (design/03 — the fog-aware leg node graph +
   merchant), **CampaignMap** (design/04 — the Layer-1 city route). Actions: **Retreat** (in combat) /
@@ -299,7 +320,8 @@ Nested layers, macro → micro:
 
 ## 14. Economy / resources summary [LOCKED, modulo §10]
 - **Attributes (STR/INT/DEX/CON):** live pool; from RACE base + carrying parts + Marks; no gold buy.
-- **Magic/charge resource (name TBD):** finite, refillable; fuels magic-tier effects + affixes.
+- **Charge:** finite, refillable (loot/gold, out of combat); spent by SHIELD-IGNORING techniques (incl.
+  all bows) to bypass the shield pool (§6b/§10). NOT a generic magic cost.
 - **HP:** small life total; restored only out of combat.
 - **Parts:** localized; damage subtracts the part's stat; heals repair parts.
 - **Shield points:** consumed 1:1 by damage; regen on a CON-scaled timer (§6b).
@@ -324,9 +346,11 @@ points there so the canon stays design-focused.
 
 ## 17. OPEN questions — do NOT invent answers
 1. Game name (§2).
-2. Magic/charge resource (§10) — name; consume-per-use vs deplete-via-allocation; POC presence.
+2. Charge (§10) — RESOLVED: name = Charge, consume-per-use, IN the POC (the shield-pierce economy).
+   Still open: whether shield-piercing needs an extra damaging-resolution beyond the bypass.
 3. Keystone taxonomy; budget math (≈55%/≈120%); gold buying low-tier runes (§11).
-4. Race roster beyond Human/Elf; full Core-rune roster; the **race↔core-rune restriction matrix** (§7).
+4. Race roster beyond Human/Elf; full Core-rune roster; the **race↔core-rune restriction matrix** (§7)
+   — POC: ALL combos allowed; the matrix is a later content pass.
 5. Minion-type acquisition; **CON-as-minion-resource** (§9).
 6. Campaign specifics (§12) — city count, procgen vs authored, supply costs; war-party arrival = instant
    loss vs **camp-defense last stand**; crafting from siege resources (floated).
@@ -334,11 +358,13 @@ points there so the canon stays design-focused.
 8. Shield numbers — per-source point caps + regen rates; the shield-wall troops→points formula (§6b).
 9. Balance/feel tuning overall (stat bases, budgets, spoils/prices, supplies vs march length, foe HP,
    damage, DEX-haste rate/cap, CON→HP ratio, evasion %, castle cadences) — the "play it and tune" pass.
-10. The five Core-rune stat blocks (design/05) are placeholder — tune later.
+10. The Core-rune stat blocks (design/05 + the new Ranger) are placeholder — tune later.
 11. Part→stat friction (legs = accuracy, arms = STR) — low-pri revisit only if it nags.
 12. Action speed beyond DEX haste — none planned; revisit only if needed.
 13. Redeploy lockout tuning (the DEX→lockout curve) and the FTL-style commit-to-destination on
     Redeploy/Retreat (§12) — both deferred; flow ships first.
+14. The term **"apex effect"** (a core rune's signature effect) is PLACEHOLDER, not Doug's word — he'll
+    rename it later; don't treat it as final.
 
 ## 18. DROPPED — must not resurface
 - **"Chassis" as the identity model** → split into **Race + Core rune** (§7).
@@ -366,7 +392,9 @@ points there so the canon stays design-focused.
 - **Armor on the action bar; armor that gates/grants attributes** → per-group slots; light effect layer
   (flat protection or evasion), §6/§13.
 - **Verbs bound to weapons** → weapons grant zero verbs; techniques consult gear, §7.
-- **Multiple consumable stockpiles** → one magic/charge resource + gated bays, §10.
+- **Multiple consumable stockpiles** → one **Charge** resource + gated bays, §10.
+- **Charge as a generic "magic-tier" cost (any spell/magic verb draws it)** → Charge is spent ONLY by
+  SHIELD-IGNORING techniques (all bows + designated pierce verbs) — the shield-pierce economy, §10.
 - **Integer-only / letterbox-only scaling that bars out** → aspect-independent fill (cover bg + anchored
   HUD + integer pixel stage), §13.
 - **C++/SDL, editor-centric / ECS / Godot** → MonoGame DesktopGL, code-first, no ECS, §15.

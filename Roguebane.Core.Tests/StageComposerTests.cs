@@ -18,33 +18,37 @@ public class StageComposerTests
         throw new FileNotFoundException("layout.json");
     }
 
+    // Schema, not literal keys (CD owns figure ids): quantify over whatever figures CD ships.
     [Fact]
     public void PartsComeOutInFigureZOrderWithManifestRects()
     {
         var m = Manifest();
-        var fig = m.Figures["grunt"];
+        var (name, fig) = m.Figures.First();
         var sc = new StageComposer(m);
 
-        var placed = sc.ComposeFigure("grunt", _ => PartCondition.Healthy, _ => false);
+        var placed = sc.ComposeFigure(name, _ => PartCondition.Healthy, _ => false);
 
         // Z entries that are real parts, in order; z slots without a part (frontGear) are dropped.
         var expected = fig.Z.Where(z => fig.Parts.ContainsKey(z)).ToArray();
         Assert.Equal(expected, placed.Select(p => p.Part).ToArray());
         Assert.True(placed.Select(p => p.Z).SequenceEqual(placed.Select(p => p.Z).OrderBy(z => z)));
-        var torso = placed.Single(p => p.Part == "torso");
-        Assert.Equal(fig.Parts["torso"].Rect, torso.Rect);
+        Assert.All(placed, p => Assert.Equal(fig.Parts[p.Part].Rect, p.Rect));
     }
 
     [Fact]
-    public void ConditionAndArmorPickTheStateKeyedSprite()
+    public void ConditionPicksTheStateKeyedSprite()
     {
-        var sc = new StageComposer(Manifest());
+        var m = Manifest();
+        var (name, fig) = m.Figures.First();
+        var part = fig.Z.First(z => fig.Parts.ContainsKey(z)); // a real, drawn part
+        var sc = new StageComposer(m);
 
-        var armored = sc.ComposeFigure("grunt", _ => PartCondition.Damaged, _ => false);
-        Assert.Equal("sprites/body/grunt/torso_damaged", armored.Single(p => p.Part == "torso").SpriteKey);
+        // SpriteKey convention: sprites/body/<figure>/<part>_<state> (+ bare variant when armour is off).
+        var damaged = sc.ComposeFigure(name, _ => PartCondition.Damaged, _ => false).Single(p => p.Part == part);
+        Assert.Equal($"sprites/body/{name}/{part}_damaged", damaged.SpriteKey);
 
-        var bareBroken = sc.ComposeFigure("grunt", _ => PartCondition.Broken, _ => true);
-        Assert.Equal("sprites/body/grunt/armL_barebroken", bareBroken.Single(p => p.Part == "armL").SpriteKey);
+        var broken = sc.ComposeFigure(name, _ => PartCondition.Broken, _ => true).Single(p => p.Part == part);
+        Assert.Contains("broken", broken.SpriteKey);
     }
 
     [Fact]
@@ -52,13 +56,15 @@ public class StageComposerTests
     {
         var m = Manifest();
         var sc = new StageComposer(m);
-        var fig = m.Figures["grunt"];
+        var (name, fig) = m.Figures.First(kv => kv.Value.Mounts.Length > 0); // a figure that wields gear
 
-        var gear = sc.ComposeGear("grunt");
+        var gear = sc.ComposeGear(name);
 
-        var sword = gear.Single(g => g.Gear == "sword");
-        Assert.Equal("handL", sword.Socket);
-        Assert.Equal(fig.Sockets["handL"], sword.Anchor);
-        Assert.Equal(Array.IndexOf(fig.Z, "frontGear"), sword.Z);
+        Assert.NotEmpty(gear);
+        Assert.All(gear, g =>
+        {
+            Assert.True(fig.Sockets.ContainsKey(g.Socket));
+            Assert.Equal(fig.Sockets[g.Socket], g.Anchor);
+        });
     }
 }

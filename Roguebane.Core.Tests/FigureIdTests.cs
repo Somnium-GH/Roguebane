@@ -12,7 +12,7 @@ public class FigureIdTests
     {
         var chassis = Chassrium.Roster[0];
         var exp = Forge.Embark(chassis, chassis.NewLoadout(), chassis.Kit, Maps.StandardLeg());
-        Assert.Equal(chassis.Id, exp.FigureId);
+        Assert.Equal(chassis.FigureKey, exp.FigureId); // human_<core>
     }
 
     [Fact]
@@ -20,6 +20,6 @@ public class FigureIdTests
     {
         var chassis = Chassrium.Roster[0];
         var camp = Forge.EmbarkCampaign(chassis, chassis.NewLoadout(), chassis.Kit, Maps.StandardLegs(2));
-        Assert.Equal(chassis.Id, camp.Current.FigureId);
+        Assert.Equal(chassis.FigureKey, camp.Current.FigureId);
     }
 }

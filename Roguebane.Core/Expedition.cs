@@ -29,7 +29,7 @@ public sealed class Expedition
     public ExpeditionState State { get; private set; } = ExpeditionState.Choosing;
 
     public Expedition(Fighter player, Caster caster, IReadOnlyList<Technique> equipment, CityMap map,
-        Stash? stash = null, string figureId = "grunt")
+        Stash? stash = null, string figureId = "human_grunt")
     {
         _player = player;
         _caster = caster;

@@ -17,8 +17,10 @@ public class CardTemplateTests
     [Fact]
     public void EveryTemplateParsesWithSizeAndStyledParts()
     {
+        // Schema, not literal keys: whatever templates CD ships, each is sized and every part fills its
+        // slot with a text datum (sample), an image, or a live binds.
         var templates = Manifest().Templates;
-        Assert.Contains("techCard", templates.Keys);
+        Assert.NotEmpty(templates);
         foreach (var (name, t) in templates)
         {
             Assert.True(t.Size.Length == 2, $"{name} size");
@@ -26,9 +28,8 @@ public class CardTemplateTests
             foreach (var p in t.Parts)
             {
                 Assert.Equal(4, p.Rect.Length);
-                // A part fills its slot with a text datum (sample) OR an image (e.g. a card's figure).
-                Assert.False(string.IsNullOrEmpty(p.Sample) && string.IsNullOrEmpty(p.Image),
-                    $"{name} part needs a sample or an image");
+                Assert.False(string.IsNullOrEmpty(p.Sample) && string.IsNullOrEmpty(p.Image)
+                    && string.IsNullOrEmpty(p.Binds), $"{name} part needs a sample, image, or binds");
             }
         }
     }
@@ -59,7 +60,7 @@ public class CardTemplateTests
     [Fact]
     public void PlaceTranslatesPartsByTheOrigin()
     {
-        var tech = Manifest().Templates["techCard"];
+        var tech = Manifest().Templates.Values.First(); // any real template
         var first = tech.Parts[0];
 
         var placed = CardTemplate.Place(tech, 100, 200);

@@ -1,7 +1,7 @@
 # Roguebane — agent guide
 
 Small roguelike where the player IS the socketed thing. MonoGame (C#). The POC exists to test
-one thing: can a player exploit a chassis's structure to build something it wasn't built for,
+one thing: can a player exploit a Core rune's structure to build something it wasn't built for,
 and does it feel good.
 
 ## Architecture invariants (non-negotiable)
@@ -17,6 +17,9 @@ and does it feel good.
 
 ## Definition of done (every task)
 - Core changes have headless tests in `Core.Tests`. Economy/thesis math is asserted, not assumed.
+- Tests must NOT pin Claude-Design-authored manifest content (`layout.json` keys/elements) — that file is
+  regenerated externally. Assert the CONTRACT/schema (parse, required types/screens/templates) or a
+  test-owned fixture, so a CD re-drop never reddens the build.
 - Tests green before commit. One task = one small, semantically-named commit.
 - Prefer real partial work over stubs. Any compromise is logged as Debt with a reconciliation
   path. Anything needing a human goes to "Needs human" — never silently dropped.
@@ -24,6 +27,10 @@ and does it feel good.
 ## Hygiene (keep it lean)
 - Comments explain WHY, never WHAT. If a comment restates code, delete it.
 - No speculative abstraction — build for the task in front of you.
+- No UNDESIGNED mechanics: code + sample/test content must not invent resources, effects, conditions, or
+  content mechanics absent from `DESIGN_SPEC` and agreed. Need one? Surface it (Needs human), don't add it.
+- CLEAN RENAMES: when a name changes, update ALL usages — no aliases, mapping layers, or back-compat
+  shims — UNLESS feature-flagging is explicitly requested. Old names must not linger.
 - No redundant docs. `STATUS.md` is the single source of state. This file stays under ~60 lines.
 - No third-party IP in the product. Avoid design-reference names but if they should be present they would only live in
   design docs only — never in code, identifiers, assets, content data, or user-facing text.

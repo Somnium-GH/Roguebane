@@ -29,7 +29,7 @@ public static class Forge
         var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, bayCap: chassis.Bays);
         SummonKit(caster, chassis, runes);
         return new Expedition(PlayerFighter(body), caster, WithRuneGrants(equipment, runes), map,
-            figureId: chassis.Id);
+            figureId: chassis.FigureKey);
     }
 
     // The same mint, marching a multi-leg campaign to the Capital instead of one leg.
@@ -43,7 +43,7 @@ public static class Forge
         var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, bayCap: chassis.Bays);
         SummonKit(caster, chassis, runes);
         return new Campaign(PlayerFighter(body), caster, WithRuneGrants(equipment, runes), legs,
-            figureId: chassis.Id);
+            figureId: chassis.FigureKey);
     }
 
     // Field the chassis's minion kit plus any rune-granted minions into its bays at assembly, so the

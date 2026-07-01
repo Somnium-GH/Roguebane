@@ -60,9 +60,19 @@ dependency; **OPEN** = binding or content undecided (see foot).
 The flat-bevel roster (see `proto/roster_gen.js`, `ART_RULES.md`, `LAYOUT_CONTRACT.md`) emits **per-figure**
 parts — each figure has its own `head/torso/armL/armR/legL/legR/boots` (robe figures: `torso`(robe)/`armL`/`armR`/`head`;
 some carry `back`(wings) or `frontGear`), every part as `<part>_<state>.png` for `healthy·damaged·broken`.
-Figures: `grunt warden adept summoner reaver skeleton bandit wraith ogre troll gargoyle`. Flattened
+Figures: `human_grunt human_warden human_adept human_summoner human_reaver` (the 5 human cores) plus the
+non-human core permutations and standalone foes `skeleton bandit wraith ogre troll gargoyle`. Flattened
 thumbnails live in `proto/roster/<figure>.png`. Damage = darken + hairline crack (broken adds a corner
 chip), shown by shading/cracks never color.
+
+**RACE × CORE axis.** Identity = a race BASE-BODY (skin/hair ramp, ears, build) × a core kit
+(the archetype, formerly "chassis"). EVERY playable race emits its 5 cores as decomposed figures keyed
+`<race>_<core>` (LAYOUT_CONTRACT §1 — no bare core ids): humans are `human_grunt human_warden
+human_adept human_summoner human_reaver`; Elf adds `elf_grunt elf_warden elf_adept elf_summoner
+elf_reaver` (leaner build, pointed ears baked into `head`, cooler/paler skin ramp; same part set +
+damage/bare states + layout.json entry as the human cores). Standalone foes (`skeleton bandit wraith
+ogre troll gargoyle`) keep bare ids — they have no race axis. Adding a race = one entry in the `RACE`
+table in `roster_gen.js`, then rerun the driver.
 
 **`Content/layout.json`** is the coordinate source of truth (per `LAYOUT_CONTRACT.md`): `figures.<id>` =
 `{size, pivot, z, parts:{<part>:{rect:[x,y,w,h]}}, sockets:{handL,handR,neck,shoulderL,shoulderR}, mounts}`
@@ -152,6 +162,7 @@ control uses the shared `ui/button/button_{on,normal}` chrome.
 | `icons/rune/{mark,path_minor,path_major,keystone}` | rune tier glyph — shape encodes tier: diamond(4)/pentagon(5)/hexagon(6)/octagon(8) | Build | `rune.tier` | 120×120 | 4 | hi-fi · deterministic polygon per tier (`ui_atoms_gen.js`) |
 | `icons/node/{camp,resource,merchant,unknown,castle}` | map token | Run Map | `node.type` + `node.revealed` (→`unknown`) | 220 (castle 413) | 5 | hi-fi · captured WITH a smooth high-res emboss (gloss + soft bevel) from the RunMap nodes; transparent corners via dual-bg recovery (ASSET_GEN_METHOD.md) |
 | `icons/resource/{supplies,support,spoils,hp}` | resource glyph | Run Map, Spine, Combat | resource readouts | 48×48 | 4 | placeholder |
+| `icons/map/{enemy_host,enemy_host_near}` | enemy war-party marker — a LEFT-facing mounted knight + red war banner + barding; rides the leading edge of the Run Map DOOM BAR as the horde marches from the castle (right) toward your camp (left). Reaching camp = you lose; `enemy_host_near` brightens the red as it closes | Run Map (doom bar) | `enemy.advance` distance + near-camp danger flag | 60×52 | 2 | world-art · deterministic flat-bevel (ART_RULES) via `proto/party_gen.js` |
 
 ## ui/ — pips, reticles, buttons (PNG32, transparent; buttons 9-sliceable)
 

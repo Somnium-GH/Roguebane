@@ -47,10 +47,14 @@ public class ScreenLayoutTests
             dir = Path.GetDirectoryName(dir);
         var m = LayoutManifest.Parse(File.ReadAllText(Path.Combine(dir!, "Roguebane.Content", "layout.json")));
 
-        var combat = m.Screens["combat"];
-        var backdrop = combat.Elements.Single(e => e.Id == "backdrop");
-        var r = ScreenLayout.Resolve(combat, backdrop);
-        Assert.Equal(combat.DesignSize[0], r.W); // full-width band
-        Assert.True(r.Y >= 0 && r.Y + r.H <= combat.DesignSize[1]); // stays on screen
+        // Schema check (no literal ids): resolve every placed element of every screen; the anchor math
+        // preserves the element's size and yields a rect.
+        foreach (var s in m.Screens.Values)
+            foreach (var e in s.Elements)
+            {
+                var r = ScreenLayout.Resolve(s, e);
+                Assert.Equal(e.Size[0], r.W);
+                Assert.Equal(e.Size[1], r.H);
+            }
     }
 }

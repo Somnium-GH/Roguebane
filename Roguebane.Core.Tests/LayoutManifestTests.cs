@@ -2,12 +2,13 @@ using Roguebane.Core.Layout;
 
 namespace Roguebane.Core.Tests;
 
-// Pins the layout.json parser against the REAL manifest shipped in Roguebane.Content,
-// so schema drift from Claude Design breaks a test rather than the shell at runtime.
+// Pins the layout.json CONTRACT / SCHEMA, NOT Claude Design's literal keys -- CD owns that file's
+// contents, so a figure/screen/template/element RENAME must never break a test; only a real schema
+// violation should. Assertions quantify over whatever CD authored ("every figure ...", "every item's
+// template resolves ...") rather than naming specific ids.
 public class LayoutManifestTests
 {
-    private static LayoutManifest Real()
-        => LayoutManifest.Parse(File.ReadAllText(LocateManifest()));
+    private static LayoutManifest Real() => LayoutManifest.Parse(File.ReadAllText(LocateManifest()));
 
     private static string LocateManifest()
     {
@@ -33,83 +34,73 @@ public class LayoutManifestTests
     }
 
     [Fact]
-    public void FigureCarriesPartsSocketsZAndPivot()
+    public void EveryFigureCarriesSizePivotZPartsAndSockets()
     {
-        var grunt = Real().Figures["grunt"];
-        Assert.Equal(2, grunt.Size.Length);
-        Assert.Equal(2, grunt.Pivot.Length);
-        Assert.Contains("torso", grunt.Z);
-        Assert.Equal(4, grunt.Parts["torso"].Rect.Length); // x,y,w,h
-        Assert.True(grunt.Sockets.ContainsKey("handL"));
-        Assert.Equal(2, grunt.Sockets["handL"].Length);
+        Assert.All(Real().Figures.Values, f =>
+        {
+            Assert.Equal(2, f.Size.Length);
+            Assert.Equal(2, f.Pivot.Length);
+            Assert.NotEmpty(f.Z);
+            Assert.All(f.Parts.Values, p => Assert.Equal(4, p.Rect.Length)); // x,y,w,h
+            Assert.All(f.Sockets.Values, s => Assert.Equal(2, s.Length));     // x,y
+        });
     }
 
     [Fact]
-    public void FigureMountsBindGearToSockets()
+    public void EveryFigureMountBindsGearToASocket()
     {
-        var mounts = Real().Figures["grunt"].Mounts;
-        Assert.Contains(mounts, x => x.Gear == "sword" && x.Socket == "handL");
+        Assert.All(Real().Figures.Values.SelectMany(f => f.Mounts), m =>
+        {
+            Assert.False(string.IsNullOrEmpty(m.Gear));
+            Assert.False(string.IsNullOrEmpty(m.Socket));
+        });
     }
 
     [Fact]
-    public void GearCarriesPivot()
+    public void EveryGearCarriesAPivot()
     {
-        Assert.Equal(2, Real().Gear["sword"].Pivot.Length);
+        Assert.All(Real().Gear.Values, g => Assert.Equal(2, g.Pivot.Length));
     }
 
     [Fact]
-    public void ScreenCarriesDesignSizeAndPlacedElements()
+    public void EveryScreenHasADesignSizeAndPlacedElements()
     {
-        var combat = Real().Screens["combat"];
-        Assert.Equal(new[] { 960, 540 }, combat.DesignSize);
-        var backdrop = combat.Elements.Single(e => e.Id == "backdrop");
-        Assert.Equal(2, backdrop.Offset.Length);
-        Assert.Equal(2, backdrop.Size.Length);
-        Assert.Equal("encounter.scene", backdrop.Binds);
+        Assert.All(Real().Screens.Values, s =>
+        {
+            Assert.Equal(2, s.DesignSize.Length);
+            Assert.NotEmpty(s.Elements);
+            Assert.All(s.Elements, e =>
+            {
+                Assert.Equal(2, e.Offset.Length);
+                Assert.Equal(2, e.Size.Length);
+            });
+        });
     }
 
     [Fact]
-    public void GraphContainerCarriesItsItemTemplate()
+    public void EveryItemContainerResolvesToARealTemplateWithASizedCell()
     {
-        // The runmap chart is a graph container: the consumer stamps beaconNode per map node.
-        var chart = Real().Screens["runmap"].Elements.Single(e => e.Id == "chart");
-        Assert.Equal("graph", chart.Type);
-        Assert.Equal("map", chart.Binds);
-        Assert.NotNull(chart.Item);
-        Assert.Equal("beaconNode", chart.Item!.Template);
-        Assert.Equal("graph", chart.Item.Flow);
+        var templates = Real().Templates.Keys.ToHashSet();
+        var items = Real().Screens.Values.SelectMany(s => s.Elements).Where(e => e.Item is not null).ToList();
+        Assert.NotEmpty(items); // the manifest drives at least one list/graph from run data
+        Assert.All(items, e =>
+        {
+            Assert.Contains(e.Item!.Template, templates); // the stamped template exists
+            Assert.Equal(2, e.Item.Size.Length);          // a sized cell to stamp per datum
+        });
     }
 
     [Fact]
-    public void ListContainerCarriesFlowGapAndCellSize()
+    public void EveryTemplatePartCarriesARect()
     {
-        // The build action bar stamps a techCard per loadout technique, laid out horizontally.
-        var lists = Real().Screens["build"].Elements.Where(e => e.Item is { Flow: "horizontal" }).ToList();
-        Assert.NotEmpty(lists);
-        Assert.All(lists, e => Assert.False(string.IsNullOrEmpty(e.Item!.Template)));
-        Assert.Contains(lists, e => e.Item!.Size.Length == 2); // most cells are sized
-        Assert.Contains(lists, e => e.Item!.Gap > 0);
+        Assert.All(Real().Templates.Values.SelectMany(t => t.Parts),
+            p => Assert.Equal(4, p.Rect.Length));
     }
 
     [Fact]
-    public void NewRunStampsACoreCard()
+    public void PaletteValuesAreHexColors()
     {
-        var cores = Real().Screens["newrun"].Elements.Single(e => e.Item is { Template: "coreCard" });
-        Assert.Equal(2, cores.Item!.Size.Length); // a sized cell to stamp per core
-    }
-
-    [Fact]
-    public void LiteralTextElementsCarryContent()
-    {
-        // A `content` element is fixed copy (no data binding) — e.g. the runmap castle note.
-        Assert.Contains(Real().Screens["runmap"].Elements, e => !string.IsNullOrEmpty(e.Content));
-    }
-
-    [Fact]
-    public void PaletteResolvesNamedColors()
-    {
-        var palette = Real().Style.Palette;
-        Assert.StartsWith("#", palette["amber"]);
-        Assert.StartsWith("#", palette["ink"]);
+        Assert.NotEmpty(Real().Style.Palette);
+        Assert.All(Real().Style.Palette.Values, v => Assert.StartsWith("#", v));
     }
 }

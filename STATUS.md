@@ -185,7 +185,20 @@ Decisions:
   manifest, but do NOT implement the apex EFFECTS — they aren't in DESIGN_SPEC yet (pending human; show
   text only — no-undesigned-mechanics guardrail).
 
-## ⇒ NEXT SLICE — Claude Design manifest+asset LANDING (uncommitted in the working tree)
+## ⇒ Claude Design manifest+asset LANDING — MIGRATED (2026-07-01)
+DONE: 1) the 12 manifest-schema tests re-pointed to assert the CONTRACT (quantify over "every figure /
+screen / template / item" — CD renames never break a test again; only a real schema violation does).
+2) game player-figure refs -> `human_<core>` via new `Chassis.FigureKey` ("human_"+Id; thread Race here
+when it lands); Forge/Expedition/Campaign/Game1/FigureIdTests updated. 3) CONTENT-PIPELINE gap FOUND +
+FIXED: two divergent mgcb exist — the game builds `Roguebane.Game/Content/Content.mgcb` (was 291 bare-key
+entries) but CD edited `Roguebane.Content/Content.mgcb` (386, human_/elf_). Added the 198 human_/elf_
+entries to the ACTIVE game mgcb (game-side build wiring for CD's sprites; bare kept for now) -> human_grunt
+sprites build + the figure renders (hi-fi). 278 Core green; build/newrun/combat smoke clean.
+FLAG for CD/human: the two mgcb DIVERGE (game one is hand-synced) — pick a single source of truth or a
+sync step. Ranger has NO human_ranger/elf_ranger figure yet (CD need) — its card falls back. Manifest
+screen ids STILL old (combat/build/newrun/runmap/campaign) + per-part `binds` still absent (arc blocker).
+
+## OLD next-slice note (superseded by the MIGRATED block above)
 CD dropped a big payload mid-turn (2026-07-01): a NEW `layout.json` (figures renamed bare `<core>` ->
 `human_<core>`/`elf_<core>`, screens restructured — combat lost its old `backdrop` element), new
 `sprites/body/human_*` + `elf_*` PNGs (UNTRACKED), `Content.mgcb` + `ASSET_MANIFEST.md` + node/map icons,
