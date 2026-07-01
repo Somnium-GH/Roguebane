@@ -221,6 +221,14 @@ Decisions:
 - **RACE DATA SPLIT:** attrs+HP come from RACE ONLY (cores add none). Extract a `Race` (attrs+HP); the
   CoreRune keeps budget/actions/bays/apex/default-equipment. Placeholder race blocks: Human 3/3/3/3 HP20;
   Elf 2/3/4/2 HP14. (Retires the per-core `StandardBody` attr blocks — attrs are race-only now, §7.)
+  [SLICE 1 DONE: `Race` type (Race.cs — attrs + Hp + NewBody laying the standard Head/Chest/Arms x2/Legs
+  x2 anatomy) + `Content.Races` (Human 3/3/3/3 HP20, Elf 2/3/4/2 HP14, Roster) + RaceTests. 276 green.
+  Isolated keystone data; nothing consumes it yet. NEXT SLICE (the rewire, staged to keep green): strip
+  `StandardBody`/`BodyParts` from CoreRune + all 6 cores (cores carry NO attrs), assemble the body from
+  the chosen Race in Forge/BuildSession, source Fighter HP from Race (Human 20 / Elf 14) instead of the
+  CON-scale, thread the real race into `CoreRune.FigureKey` (drop the hardcoded `human_`), and re-baseline
+  the balance sim (cores no longer differ by stat — expect BalanceSim/Build assertions to move). Bigger +
+  balance-perturbing → its own commit(s).]
 - **ALL race×core combos allowed** (no gating this pass).
 - **Retire the bare asset set:** compose NewGame/Equipment/Loadout figures from the MODULAR race parts
   (`preview.fig`); drop the bare body dirs + flat `chassis/*` thumbnails (mgcb in sync).
