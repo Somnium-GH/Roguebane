@@ -177,12 +177,21 @@ public class Game1 : Microsoft.Xna.Framework.Game
     }
     private static readonly Rectangle NewGameBeginRect = new(W - 258, H - 44, 240, 34);
 
+    // Race selector chips (design/05's Race column, minimal strip form until the 3-column redesign):
+    // bottom-left, clear of the manifest-driven core-card grid and the bottom-right BEGIN button.
+    private static Rectangle NewGameRaceRect(int i) => new(24 + i * 104, H - 48, 96, 40);
+
     private void UpdateNewGame(KeyboardState keys)
     {
         if (Pressed(keys, Keys.Left)) _build.CycleCoreRune(-1);
         if (Pressed(keys, Keys.Right)) _build.CycleCoreRune(1);
         for (var i = 0; i < _build.Roster.Count; i++)
             if (Click(NewGameCardRect(i))) _build.CycleCoreRune(i - _build.CoreRuneIndex);
+
+        // Race axis: Tab cycles, or click a chip. Attrs/HP + the composed figure follow the choice.
+        if (Pressed(keys, Keys.Tab)) _build.CycleRace(1);
+        for (var i = 0; i < _build.RaceCount; i++)
+            if (Click(NewGameRaceRect(i))) _build.CycleRace(i - _build.RaceIndex);
 
         var go = (Pressed(keys, Keys.Enter) && !keys.IsKeyDown(Keys.LeftAlt)) || Click(NewGameBeginRect);
         if (go) _screen = Screen.Equipment; // on to the equipment screen for the chosen core
@@ -812,6 +821,19 @@ public class Game1 : Microsoft.Xna.Framework.Game
             Row("bays", c.Bays); Row("budget", c.RuneBudget);
 
             DrawWrapped(c.Flavor, r.X + 12, sy + 8, r.Width - 24, Muted);
+        }
+
+        // Race selector: the chosen race drives every card's attrs/HP + the composed figure above.
+        Text(_assets.Mono, "RACE  [tab]", 24, H - 64, Muted);
+        for (var i = 0; i < _build.RaceCount; i++)
+        {
+            var rr = NewGameRaceRect(i);
+            var race = _build.RaceRoster[i];
+            var sel = i == _build.RaceIndex;
+            Panel(rr.X, rr.Y, rr.Width, rr.Height);
+            if (sel) Border(rr.X, rr.Y, rr.Width, rr.Height, Amber);
+            Text(_assets.Mono, race.Name.ToUpper(), rr.X + 8, rr.Y + 6, sel ? Amber : Ink);
+            Text(_assets.Mono, "hp" + race.Hp, rr.X + 8, rr.Y + 22, Muted);
         }
 
         DrawButton("BEGIN", NewGameBeginRect.X, NewGameBeginRect.Y,

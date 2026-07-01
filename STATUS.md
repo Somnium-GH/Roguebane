@@ -247,9 +247,14 @@ Decisions:
   `RaceRoster`/`Race` + `CycleRace(dir)` (mirrors the CoreRune cycle). A race swap changes body attrs ONLY
   — core budget + slotted kit untouched (all combos allowed, design/05). Sessions.NewBuild feeds
   Races.Roster; ctor now takes races first. Tested (CyclingRaceSwapsBodyAttrsAndKeepsTheCoreBudget: Elf
-  con != Human con, budget unchanged, wraps). 271 green; Game builds. REMAINING (Game-side, next): render
-  the manifest raceCard column + route input to CycleRace, then thread the composed `<race>_<core>` figure
-  via `preview.fig` — turns the two-step Race->Core NewGame ON.]
+  con != Human con, budget unchanged, wraps). 271 green; Game builds.
+  [SLICE 4 DONE (race axis ON in the shell): NewGame now has a RACE selector — bottom-left chips
+  (HUMAN hp20 / ELF hp14, clear of the manifest core-card grid + BEGIN) + input (Tab cycles, click a chip)
+  -> `_build.CycleRace`. Every core card's attr block + composed `<race>_<core>` figure already read
+  `_build.Race`, so the pick propagates through the grid and threads into the run (BuildSession.Race ->
+  Forge). Smoke + screenshot verified (Human 3/3/3/3, elf assets present). Game-only (no headless test);
+  the FULL design/05 three-column Race|Core|Loadout redesign + the manifest `raceCard` template are the
+  remaining polish — this is the minimal strip that turns the axis on.]
 - **ALL race×core combos allowed** (no gating this pass).
 - **Retire the bare asset set:** compose NewGame/Equipment/Loadout figures from the MODULAR race parts
   (`preview.fig`); drop the bare body dirs + flat `chassis/*` thumbnails (mgcb in sync).
