@@ -6,6 +6,13 @@
     <Spacing>0</Spacing>
     <UseKerning>true</UseKerning>
     <Style>Bold</Style>
-    <CharacterRegions><CharacterRegion><Start>&#32;</Start><End>&#126;</End></CharacterRegion></CharacterRegions>
+    <DefaultCharacter>?</DefaultCharacter>
+    <CharacterRegions>
+      <CharacterRegion><Start>&#32;</Start><End>&#126;</End></CharacterRegion>
+      <CharacterRegion><Start>&#9312;</Start><End>&#9314;</End></CharacterRegion><!-- circled 1-3 -->
+      <CharacterRegion><Start>&#10003;</Start><End>&#10003;</End></CharacterRegion><!-- check -->
+      <CharacterRegion><Start>&#10010;</Start><End>&#10010;</End></CharacterRegion><!-- heavy cross -->
+      <CharacterRegion><Start>&#9673;</Start><End>&#9673;</End></CharacterRegion><!-- fisheye -->
+    </CharacterRegions>
   </Asset>
 </XnaContent>

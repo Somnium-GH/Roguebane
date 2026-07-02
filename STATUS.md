@@ -161,8 +161,10 @@ ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered 
   renders a LIVE screen to a PNG headless.
 - A RUNNING game locks the default build output → build to a SCRATCH dir and run THAT instance.
 - On ANY crash READ `bin/Debug/net9.0/crash.log` (Program.cs writes the full exception + stack).
-- SpriteFonts are ASCII-only and THROW on unknown glyphs — `Core.GlyphSafe.Sanitize` folds them; ①②③/✚
-  still render "?" (glyph-font task). Swap system fonts → bundled open fonts before distribution.
+- SpriteFont CharacterRegions now include ①②③ ✓ ✚ ◉ (+ DefaultCharacter "?") — the state chips render
+  real glyphs on the system fonts (crude at small sizes; the bundled-TTF swap improves them).
+  `Core.GlyphSafe.Sanitize` still guards anything outside the regions. TTF swap awaits Doug's
+  download approval (IM Fell English + JetBrains Mono).
 
 ## Debt (active — with reconcile trigger)
 - Equipment: no inventory tabs (GEAR/TECH/MINIONS) + drag-to-equip + equipped-gear-on-anatomy + real
