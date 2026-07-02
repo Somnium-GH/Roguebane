@@ -25,7 +25,9 @@ FLAGGED FIXES (from live screenshots):
 - **AUTO-ATTACK button isn't wired** — believed ALREADY WIRED at the Encounter cut-over (slice 14:
   the combat.autoAttack element click toggles the one global AUTO, and its label reads
   "AUTO-ATTACK ON" when lit). If the screenshot predates that build, re-test; else report repro.
-- **Resource-count readout top-right** on every IN-RUN screen (not pre-run): supplies / gold / charge / summons.
+- ~~Resource-count readout top-right~~ DONE (2026-07-02) for supplies / gold / charge (the drop's new
+  charge icon renders) on Encounter + CityMap + Equipment, InRun-gated. SUMMONS joins when its §9
+  resource model lands (not yet built).
 - **War-party indicator:** castle icon RIGHT, camp icon LEFT; the bar "loads" LEFT→RIGHT (reconcile the
   fill direction with §12 castle-right→camp-left advance).
 - **Targeting reticles don't sit on the foe's body parts** — fix reticle placement on the limb bands;

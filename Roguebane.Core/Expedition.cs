@@ -120,6 +120,8 @@ public sealed class Expedition
 
     // Bay occupants (the summoned minions) + total bays for the combat minion-bay lane.
     public int MinionCount => _caster.MinionCount;
+    public int Charge => _caster.Charge;       // the shield-pierce resource (§6b) — readout + spend
+    public int MaxCharge => _caster.MaxCharge;
     public IReadOnlyList<Minion> Minions => _caster.Minions;
     public int Bays => _caster.BayCap;
 

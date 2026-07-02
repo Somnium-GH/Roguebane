@@ -484,7 +484,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Matrix.CreateScale(SS));
         if (_mfScreen is not null) DrawManifestScreen(_mfScreen); // dev: render a screen straight from the manifest
         else if (_screen == Screen.NewGame) DrawManifestScreen("newgame"); // LIVE cut-over (design/05)
-        else if (_screen == Screen.Equipment) DrawManifestScreen("equipment"); // LIVE cut-over (design/02)
+        else if (_screen == Screen.Equipment) { DrawManifestScreen("equipment"); DrawResourceStrip(); } // LIVE cut-over (design/02)
         else DrawRunScreen();
         _spriteBatch.End();
 
@@ -569,7 +569,31 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         Stretch(_assets.Background("combat_field"), 0, 0, W, H);
         DrawManifestScreen("encounter");
+        DrawResourceStrip();
         DrawStateOverlay();
+    }
+
+    // 2026-07-02 directive: the run's resource counts — supplies / gold / charge (Summons joins when
+    // its §9 model lands) — read top-right on every IN-RUN screen, under the status strip.
+    private void DrawResourceStrip()
+    {
+        if (!InRun) return;
+        var items = new (string icon, string val)[]
+        {
+            ("supplies", Exp.Map.Supplies + "/" + Exp.Map.MaxSupplies),
+            ("spoils", Exp.Gold.ToString()),
+            ("charge", Exp.Charge + "/" + Exp.MaxCharge),
+        };
+        var x = W - 8;
+        for (var i = items.Length - 1; i >= 0; i--)
+        {
+            var (icon, val) = items[i];
+            x -= (int)MeasureText(_assets.Mono, val).X;
+            Text(_assets.Mono, val, x, 34, Ink);
+            x -= 20;
+            Sprite(_assets.Resource(icon), x, 32, 16, 16, Color.White);
+            x -= 10;
+        }
     }
 
     // Run-map screen (design/03): the resources, the current beacon, and the charted jumps as cards
@@ -592,6 +616,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawButton("EQUIPMENT [E]", EquipOpenRect.X, EquipOpenRect.Y,
             EquipOpenRect.Width, EquipOpenRect.Height, true, Keys.E);
 
+        DrawResourceStrip();
         DrawStateOverlay();
     }
 
