@@ -1517,6 +1517,21 @@ public class Game1 : Microsoft.Xna.Framework.Game
         _spriteBatch.DrawString(font, Safe(font, s), new Vector2(x, y), color, 0f, Vector2.Zero,
             1f / SS, SpriteEffects.None, 0f);
 
+    // The DESIGN-space px each built font draws at through Text() (its SSx size / SS): mono 28/2=14,
+    // display 40/2=20. A manifest `fontPx` is honoured by scaling relative to this base.
+    private const float MonoDesignPx = 14f, DisplayDesignPx = 20f;
+
+    // Draw text at a manifest-specified `fontPx` (design px): scale the built glyph so its on-screen size
+    // is fontPx, keeping the 1/SS supersample factor. Falls back to the plain size when fontPx <= 0.
+    private void TextPx(SpriteFont font, string s, int x, int y, Color color, double fontPx)
+    {
+        if (fontPx <= 0) { Text(font, s, x, y, color); return; }
+        var basePx = font == _assets.Display ? DisplayDesignPx : MonoDesignPx;
+        var scale = (1f / SS) * (float)(fontPx / basePx);
+        _spriteBatch.DrawString(font, Safe(font, s), new Vector2(x, y), color, 0f, Vector2.Zero,
+            scale, SpriteEffects.None, 0f);
+    }
+
     // Design-space text size: MeasureString is at the SSx raster, so scale back by 1/SS to match Text().
     private Vector2 MeasureText(SpriteFont font, string s) => font.MeasureString(Safe(font, s)) / SS;
 
@@ -1584,8 +1599,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
         switch (e.Type)
         {
             case "text" when !string.IsNullOrEmpty(e.Content):
-                Text(e.Font == "display" ? _assets.Display : _assets.Mono,
-                    e.Content!, r.X, r.Y, _ui.Color(e.Color ?? "ink", Ink));
+                TextPx(e.Font == "display" ? _assets.Display : _assets.Mono,
+                    e.Content!, r.X, r.Y, _ui.Color(e.Color ?? "ink", Ink), e.FontPx ?? 0);
                 break;
             case "icon" when !string.IsNullOrEmpty(e.Image):
                 Sprite(_assets.Texture(e.Image!), r.X, r.Y, r.Width, r.Height, Color.White);
@@ -1631,8 +1646,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
                     _ => datum is not null ? ResolveBind(datum, pp.Binds) : null,
                 } ?? pp.Sample;
                 if (!string.IsNullOrEmpty(text))
-                    Text(pp.Font == "display" ? _assets.Display : _assets.Mono,
-                        text!, pp.Rect.X, pp.Rect.Y, _ui.Color(pp.Color ?? "ink", Ink));
+                    TextPx(pp.Font == "display" ? _assets.Display : _assets.Mono,
+                        text!, pp.Rect.X, pp.Rect.Y, _ui.Color(pp.Color ?? "ink", Ink), pp.FontPx);
             }
         }
     }

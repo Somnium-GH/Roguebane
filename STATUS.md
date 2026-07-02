@@ -69,9 +69,11 @@ FIDELITY DRAW (shadow/frame/gradient, §10) feeds all of the above — same crit
   card now shows its LIVE 2/3/4/2 HP14 (vs Human 3/3/3/3 HP20). Race cards are now fully data-bound
   (name + all attrs + HP). STILL sample: `race.tag`/`race.blurb`/`core.apexName`/`core.apexDescription`/
   `core.icon` (missing DISPLAY data — add flavour text to Race/CoreRune, no apex EFFECTS per guardrail).
-  KNOWN ISSUE: text overflows the small tiles — the renderer maps `font` to only mono/display and ignores
-  `fontPx`, so a big-`fontPx` label in a small tile spills (a FONT-SYSTEM slice: more sizes or a scaled
-  DrawString). NEXT: display data + fontPx/clipping; composed figure via `preview.fig`; graphs; then CUT
+  SLICE 6 DONE — fontPx: `TextPx(font,...,fontPx)` scales the built glyph so its on-screen size is the
+  manifest `fontPx` (relative to the font's design base — mono 14 / display 20 — keeping the 1/SS
+  supersample). Wired into element text + card parts. The overflow is GONE: cards now read cleanly —
+  big names, small BUDGET/ACTIONS/BAYS + STR/INT/DEX/CON labels, sized values, apex name + wrapped desc —
+  matching design/05's card structure. NEXT: display data + composed figure via `preview.fig`; graphs; then CUT
   NewGame's live screen over + diff vs design/05.]
 
 FLOW: Equipment reachable BETWEEN fights — from the post-combat Cleared/Redeploy state + CityMap +
