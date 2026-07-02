@@ -1246,6 +1246,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 }
                 else if (!ef.Down && Hover(r)) Border(r.X, r.Y, r.Width, r.Height, Ink);
                 break;
+            case "graph" when e.Binds == "map" && InRun && e.Item is not null:
+                DrawManifestGraph(e, r);
+                break;
             case "figure" when e.Binds == "encounter.minions" && InRun:
                 // The fielded retinue on the battlefield: each minion's sprite, feet on the box floor.
                 for (var mi = 0; mi < Exp.Minions.Count; mi++)
@@ -1257,6 +1260,54 @@ public class Game1 : Microsoft.Xna.Framework.Game
                     else Rect(mx + 4, r.Y + 8, mw - 8, r.Height - 16, new Color(Amber, 70));
                 }
                 break;
+        }
+    }
+
+    // The city chart (design/03): map nodes spread over the graph element's region via GraphLayout —
+    // links first (dashed when uncharted), then a beacon per node (fog-aware icon), the current node
+    // ringed and reachable jumps numbered. Same live rules as the legacy chart, manifest geometry.
+    private void DrawManifestGraph(Element e, Rectangle region)
+    {
+        var map = Exp.Map;
+        var nodes = map.Nodes;
+        var cols = nodes.Max(x => x.Col) + 1;
+        var rows = nodes.Max(x => x.Row) + 1;
+        var cw = e.Item!.Size.Length == 2 ? e.Item.Size[0] : 28;
+        var ch = e.Item.Size.Length == 2 ? e.Item.Size[1] : 28;
+        Rectangle Cell(MapNode n) => RectOf(GraphLayout.Cell(
+            new LayoutRect(region.X, region.Y, region.Width, region.Height), cols, rows, n.Col, n.Row, cw, ch));
+
+        foreach (var node in nodes)
+        {
+            var from = Cell(node);
+            foreach (var nid in node.Next)
+            {
+                var to = Cell(map.Node(nid));
+                var charted = node.Visited; // a link out of a charted beacon is itself charted
+                Line(from.X + cw / 2, from.Y + ch / 2, to.X + cw / 2, to.Y + ch / 2, 2,
+                    charted ? new Color(150, 130, 95) : new Color(90, 78, 66), dashed: !charted);
+            }
+        }
+
+        var options = map.Options;
+        foreach (var node in nodes)
+        {
+            var r = Cell(node);
+            var seen = map.Sees(node);
+            var isCurrent = ReferenceEquals(node, map.Current);
+            Sprite(_assets.Node(seen), r.X, r.Y, cw, ch, isCurrent ? Color.White : new Color(210, 200, 190));
+
+            var oi = IndexOf(options, node);
+            if (isCurrent)
+            {
+                Border(r.X - 3, r.Y - 3, cw + 6, ch + 6, Amber);
+                Text(_assets.Mono, "you are here", r.X - 8, r.Y + ch + 2, Amber);
+            }
+            else if (oi >= 0) // a reachable onward jump
+            {
+                Border(r.X - 2, r.Y - 2, cw + 4, ch + 4, Hover(r) ? Ink : new Color(150, 130, 95));
+                Text(_assets.Mono, $"[{oi + 1}] {seen.ToString().ToLower()}", r.X - 6, r.Y + ch + 2, Ink);
+            }
         }
     }
 

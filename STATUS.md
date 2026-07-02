@@ -70,21 +70,19 @@ SLICES (one screen/pass, pixel-verify vs its design PNG):
    minionField element. Deleted: DrawFighter/AttributePool/Pips/Foe/Bays/Support/ActionBar + hot/
    toggle buttons + hand rects (~10 helpers). LOST at cut-over (manifest lacks the element — Needs-CD/
    design): per-card AIM TAG (F1:H read), banked/rallied SUPPORT pips (rally lane already in Debt).
-   Prior state (still true) — `design/01` run-state binds:
-   (guarded by `InRun`; samples pre-march): hero figure = LIVE body (conditions/gear) + `Body.hp`;
-   foe figure/HP from `encounter.foe` (down-tint); `pool` rows read the live body — reservations show
-   (verified: STR 2/3 with a reserve held); `loadout.techniques`/`loadout.bays` cards with stat-token
-   glyph tiles + costs. Verified RB_MF=encounter over a live castle fight.
-   FSM STATE BINDS DONE (this pass): technique.state chip (DRY/HELD/READY/COOLDOWN — idle shows NO
-   chip, never the sample), technique.cooldownLabel (ready/held/remaining seconds at tick 10/s),
-   technique.chargePct (fill bar width = live progress fraction), bay.state (fielded minion = ACTIVE).
-   Verified live: cooldown chips + 3.9s/2.0s/held labels + partial charge bars over a castle fight.
-   REMAINING for cut-over: combat input on manifest geometry (card press/aim, foe part bands, auto/
-   flee), targeting/aiming card state, minionField multi-figure.
-   Gaps: technique/minion DESCRIPTIONS have no data (display-data pass, like ApexDesc); AUTO-ATTACK/
-   FLEE/HELD chip labels + foe/hero HP-label text flattened by extraction (Needs-CD); techCard cost
+   Live binds (all verified over a live castle fight): hero/foe figures + HP, pool rows w/ live
+   reservations, technique/bay cards (stat glyph tiles, costs), FSM state chips (DRY/HELD/READY/
+   COOLDOWN, idle = no chip), cooldown labels, charge-progress fill widths, bay ACTIVE.
+   Gaps: technique/minion DESCRIPTIONS have no data (display-data pass, like ApexDesc); techCard cost
    NUMBER is a bindless sample part (Needs-CD).
-4. **CityMap** — `design/03` (node graph, supplies, war-party RIGHT→LEFT, Equipment button).
+4. **CityMap** (in progress) — `design/03`. THIS PASS: the manifest `chart` graph element renders LIVE
+   via `DrawManifestGraph` (GraphLayout spread over the element region): fog-aware beacon icons,
+   charted solid / uncharted dashed links, the current node ringed "you are here", reachable jumps
+   numbered. Verified RB_MF=citymap at a live merchant node. Supplies/support/doom/legend panels render
+   their manifest chrome (inner pips/rows were flattened by extraction — Needs-CD).
+   REMAINING for cut-over: map input on manifest geometry (node clicks); a home for the merchant panel,
+   gear bar + EQUIPMENT button (design/03 shows none of them — surface where they live, Needs-CD/human,
+   before deleting the legacy citymap screen).
 5. **CampaignMap** — BUILD it (not implemented) from `design/04`.
 FLOW: Equipment reachable BETWEEN fights — from the post-combat Cleared/Redeploy state + CityMap +
 CampaignMap — editing the CURRENT loadout (core fixed).
