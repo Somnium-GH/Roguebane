@@ -88,8 +88,10 @@ receiving models (mid-run palette/bay/rune mutation) stay the design-open gate. 
   (generic element renderer, list/graph stamping, bind resolvers, fidelity primitives — 640 lines)
   lives in `Game1.ManifestRenderer.cs`; the legacy CityMap screen (chart/panels/gear bar/merchant
   stopgap/spine — 289 lines, retires wholesale at the citymap cut-over) lives in `Game1.CityMap.cs`.
-  Partial splits, behavior identical; Game1.cs 1867→973. NEXT: true class extraction where coupling
-  allows (draw primitives → a canvas type).
+  The palette + raw draw primitives (rect/border/line/sprite/glyph-safe text/panel/bar/button — 205
+  lines, no game knowledge) live in `Game1.Canvas.cs`. Partial splits, behavior identical; Game1.cs
+  1867→780 (loop/input/state + encounter shell). Splits are DONE for now — true class extraction
+  (canvas as a real type) only if a concrete need shows; don't refactor for its own sake.
 
 ## ⇒ HOW TO WORK THIS ARC — read EVERY pass (pixel-perfect · no drift · no premature "done")
 ONE screen per pass. The goal is: every screen renders 100% from `layout.json` and matches its
