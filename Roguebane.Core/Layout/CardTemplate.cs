@@ -4,7 +4,7 @@ namespace Roguebane.Core.Layout;
 // card's origin, carrying the style (colour/font/size) and which datum (sample) fills the slot.
 public readonly record struct PlacedPart(
     LayoutRect Rect, string Color, string Font, double FontPx, string Sample,
-    string? Image = null, string? Binds = null);
+    string? Image = null, string? Binds = null, Fill? Fill = null, Border? Border = null);
 
 public static class CardTemplate
 {
@@ -15,7 +15,7 @@ public static class CardTemplate
         foreach (var p in t.Parts)
             parts.Add(new PlacedPart(
                 new LayoutRect(x + p.Rect[0], y + p.Rect[1], p.Rect[2], p.Rect[3]),
-                p.Color, p.Font, p.FontPx, p.Sample, p.Image, p.Binds));
+                p.Color, p.Font, p.FontPx, p.Sample, p.Image, p.Binds, p.Fill, p.Border));
         return parts;
     }
 }

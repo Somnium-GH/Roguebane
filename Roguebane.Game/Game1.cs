@@ -1535,6 +1535,37 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // Design-space text size: MeasureString is at the SSx raster, so scale back by 1/SS to match Text().
     private Vector2 MeasureText(SpriteFont font, string s) => font.MeasureString(Safe(font, s)) / SS;
 
+    // Manifest text inside a rect: greedy word-wrap to the rect width, capped at the lines the rect
+    // HEIGHT can hold (a one-line-high rect never wraps, so names/values stay single-line).
+    private void TextPxWrapped(SpriteFont font, string s, Rectangle r, Color color, double fontPx)
+    {
+        var basePx = font == _assets.Display ? DisplayDesignPx : MonoDesignPx;
+        var sc = fontPx <= 0 ? 1f : (float)(fontPx / basePx);
+        var lineH = MeasureText(font, "Ay").Y * sc;
+        var maxLines = Math.Max(1, (int)Math.Round(r.Height / lineH)); // a near-2-line box (0.9x) still wraps
+        if (maxLines == 1 || MeasureText(font, s).X * sc <= r.Width)
+        {
+            TextPx(font, s, r.X, r.Y, color, fontPx);
+            return;
+        }
+        var line = "";
+        var ly = (float)r.Y;
+        var lines = 0;
+        foreach (var word in s.Split(' '))
+        {
+            var trial = line.Length == 0 ? word : line + " " + word;
+            if (line.Length > 0 && MeasureText(font, trial).X * sc > r.Width)
+            {
+                TextPx(font, line, r.X, (int)ly, color, fontPx);
+                ly += lineH;
+                if (++lines >= maxLines) return;
+                line = word;
+            }
+            else line = trial;
+        }
+        if (line.Length > 0) TextPx(font, line, r.X, (int)ly, color, fontPx);
+    }
+
     // SpriteFonts are ASCII-only and THROW on an unknown glyph. The fold-to-ASCII policy + algorithm
     // live in Core.GlyphSafe (headless-tested); here we just cache each font's glyph set and call it.
     private readonly System.Collections.Generic.Dictionary<SpriteFont, System.Collections.Generic.HashSet<char>> _fontGlyphs = new();
@@ -1581,26 +1612,40 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         var s = _ui.ScreenDef(screenId);
         if (s is null) return;
-        foreach (var e in s.Elements.OrderBy(x => x.Z))
+        // Manifest z is DEPTH (extracted container panels carry high z, leaf content z=1) — draw
+        // back-to-front, so a filled panel never paints over the content it contains.
+        foreach (var e in s.Elements.OrderByDescending(x => x.Z))
             DrawManifestElement(e, ManifestUi.Rect(s, e));
     }
 
     private void DrawManifestElement(Element e, Rectangle r)
     {
-        if (e.Shadow is { } sh)
+        // A TEXT element's shadow is a text shadow (offset glyph copy, drawn with the text below) —
+        // rect-shadowing it would paint a solid box behind the words.
+        if (e.Shadow is { } sh && e.Type != "text")
             DrawShadow(r.X, r.Y, r.Width, r.Height, sh.Dx, sh.Dy, sh.Blur, (float)sh.Opacity);
+        // §10: fill is the element's BACKGROUND, the nine-slice frame is chrome layered on it — an
+        // element may carry both (topBar), so draw fill first, then frame.
+        if (e.Fill is { } fill)
+            DrawFill(r, fill);
         if (e.Frame is { } fr && fr.Slice.Length == 4 && _assets.Texture(fr.Asset) is { } ftex)
             DrawFrameTex(ftex, fr.Slice, r);
-        else if (e.Fill is { } fill)
-            DrawFill(r, fill);
         if (e.Border is { } b)
             Border(r.X, r.Y, r.Width, r.Height, _ui.Color(b.Color ?? "border", Border0));
 
         switch (e.Type)
         {
-            case "text" when !string.IsNullOrEmpty(e.Content):
-                TextPx(e.Font == "display" ? _assets.Display : _assets.Mono,
-                    e.Content!, r.X, r.Y, _ui.Color(e.Color ?? "ink", Ink), e.FontPx ?? 0);
+            case "text":
+                var txt = e.Content ?? ResolveScreenBind(e.Binds);
+                if (!string.IsNullOrEmpty(txt))
+                {
+                    var font = e.Font == "display" ? _assets.Display : _assets.Mono;
+                    var px = e.FontPx ?? 0;
+                    if (e.Shadow is { } tsh)
+                        TextPxWrapped(font, txt!, new Rectangle(r.X + tsh.Dx, r.Y + tsh.Dy, r.Width, r.Height),
+                            _ui.Color(tsh.Color ?? "outline", Color.Black) * (float)tsh.Opacity, px);
+                    TextPxWrapped(font, txt!, r, _ui.Color(e.Color ?? "ink", Ink), px);
+                }
                 break;
             case "icon" when !string.IsNullOrEmpty(e.Image):
                 Sprite(_assets.Texture(e.Image!), r.X, r.Y, r.Width, r.Height, Color.White);
@@ -1611,8 +1656,27 @@ public class Game1 : Microsoft.Xna.Framework.Game
             case "list" when e.Item is not null:
                 DrawManifestList(e, r);
                 break;
+            case "figure" when e.Binds == "preview.fig":
+                // Composed loadout figure: feet at the box bottom-centre, scaled to the box height.
+                DrawHumanoid(_build.Preview(), _build.CoreRune.FigureKey(_build.Race),
+                    r.X + r.Width / 2, r.Y + r.Height, r.Height);
+                break;
         }
     }
+
+    // Screen-level (non-list) binds -> display text: the NewGame Loadout preview reads the BuildSession.
+    private string? ResolveScreenBind(string? bind) => bind switch
+    {
+        "preview.name" => _build.Race.Name + " " + _build.CoreRune.Title,
+        "preview.role" => _build.CoreRune.Archetype,
+        "preview.hp" => _build.Race.Hp.ToString(),
+        "preview.budget" => _build.CoreRune.RuneBudget.ToString(),
+        "preview.techniques" => _build.CoreRune.Kit.Count.ToString(),
+        "preview.bays" => _build.CoreRune.Bays.ToString(),
+        "preview.apexName" => _build.CoreRune.ApexName,
+        "preview.apexDesc" => _build.CoreRune.ApexDesc,
+        _ => null,
+    };
 
     // A list container: stamp its item template into each cell (ListLayout), filling each part from the
     // i-th LIVE datum's `binds` (falling back to the manifest `sample` where a bind isn't mapped yet).
@@ -1633,6 +1697,20 @@ public class Game1 : Microsoft.Xna.Framework.Game
             int valIx = 0, keyIx = 0;
             foreach (var pp in CardTemplate.Place(tmpl, cell.X, cell.Y))
             {
+                // Part-level chrome: STATE-driven parts (.selection/.state/.chargePct/.rarity) need live
+                // gating — a later slice; drawing them unconditionally would ring every card "selected".
+                var stateBound = pp.Binds is { } sb && (sb.EndsWith(".selection") || sb.EndsWith(".state")
+                    || sb.EndsWith(".chargePct") || sb.EndsWith(".rarity"));
+                if (!stateBound)
+                {
+                    // attr.color binds the swatch's fill TOKEN to the datum (str/int/dex/con).
+                    var fillTok = pp.Binds == "attr.color" && datum is not null
+                        ? ResolveBind(datum, pp.Binds) : null;
+                    if (fillTok is not null) DrawFill(RectOf(pp.Rect), new Fill { Token = fillTok });
+                    else if (pp.Fill is { } pf) DrawFill(RectOf(pp.Rect), pf);
+                    if (pp.Border is { } pb)
+                        Border(pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H, _ui.Color(pb.Color, Border0));
+                }
                 var img = pp.Image;
                 if (!string.IsNullOrEmpty(img))
                 {
@@ -1643,11 +1721,12 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 {
                     "race.attrs.value" => AttrTile(datum, valIx++)?.value,
                     "race.attrs.key" => AttrTile(datum, keyIx++)?.key,
+                    "attr.color" => null, // the swatch is pure fill, no text
                     _ => datum is not null ? ResolveBind(datum, pp.Binds) : null,
                 } ?? pp.Sample;
                 if (!string.IsNullOrEmpty(text))
-                    TextPx(pp.Font == "display" ? _assets.Display : _assets.Mono,
-                        text!, pp.Rect.X, pp.Rect.Y, _ui.Color(pp.Color ?? "ink", Ink), pp.FontPx);
+                    TextPxWrapped(pp.Font == "display" ? _assets.Display : _assets.Mono,
+                        text!, RectOf(pp.Rect), _ui.Color(pp.Color ?? "ink", Ink), pp.FontPx);
             }
         }
     }
@@ -1664,13 +1743,29 @@ public class Game1 : Microsoft.Xna.Framework.Game
         }
         : null;
 
+    private static Rectangle RectOf(LayoutRect r) => new(r.X, r.Y, r.W, r.H);
+
     // The live data a bound list stamps one card per, or null for an unmapped bind (falls back to samples).
-    private static System.Collections.Generic.IReadOnlyList<object>? ListData(string? bind) => bind switch
+    private System.Collections.Generic.IReadOnlyList<object>? ListData(string? bind) => bind switch
     {
         "races" => Roguebane.Core.Content.Races.Roster.Cast<object>().ToList(),
         "cores" => Roguebane.Core.Content.CoreRunes.Roster.Cast<object>().ToList(),
+        "preview.attrs" => PreviewAttrs(),
         _ => null,
     };
+
+    // The Loadout preview's 4 attribute tiles: key/value/swatch-token per stat, from the LIVE build.
+    private System.Collections.Generic.IReadOnlyList<object> PreviewAttrs()
+    {
+        var b = _build.Preview();
+        return new object[]
+        {
+            ("STR", b.Capacity(Stat.Str).ToString(), "str"),
+            ("INT", b.Capacity(Stat.Int).ToString(), "int"),
+            ("DEX", b.Capacity(Stat.Dex).ToString(), "dex"),
+            ("CON", b.Capacity(Stat.Con).ToString(), "con"),
+        };
+    }
 
     // Resolve a template part's `binds` against a live datum -> display text, or null to use the sample.
     // Missing-data binds (race tag/blurb, per-attr tiles, apex text) return null pending their data.
@@ -1695,14 +1790,17 @@ public class Game1 : Microsoft.Xna.Framework.Game
             "core.apexDescription" => c.ApexDesc,
             _ => null,
         },
+        ValueTuple<string, string, string> a => bind switch // (key, value, swatch-token) attr tile
+        {
+            "attr.key" => a.Item1,
+            "attr.value" => a.Item2,
+            "attr.color" => a.Item3,
+            _ => null,
+        },
         _ => null,
     };
 
-    private static int ListCountFor(string? bind) => bind switch
-    {
-        "preview.attrs" => 4,
-        _ => 3,
-    };
+    private static int ListCountFor(string? bind) => 3; // sample-count fallback for unmapped binds
 
     private void DrawFrameTex(Texture2D tex, int[] slice, Rectangle r)
     {

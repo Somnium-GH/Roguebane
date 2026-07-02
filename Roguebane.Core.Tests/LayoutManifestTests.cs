@@ -101,6 +101,22 @@ public class LayoutManifestTests
     }
 
     [Fact]
+    public void TemplatePartChromeParses()
+    {
+        // Part-level fill/border (attr swatches, slot backgrounds): any part carrying a fill must give
+        // the renderer a token or a from/to gradient; any part border must carry a colour. The manifest
+        // drives at least one such part (quantified — no CD ids pinned).
+        var parts = Real().Templates.Values.SelectMany(t => t.Parts).ToList();
+        var filled = parts.Where(p => p.Fill is not null).ToList();
+        Assert.NotEmpty(filled);
+        Assert.All(filled, p => Assert.True(
+            !string.IsNullOrEmpty(p.Fill!.Token) ||
+            (!string.IsNullOrEmpty(p.Fill.From) && !string.IsNullOrEmpty(p.Fill.To))));
+        Assert.All(parts.Where(p => p.Border is not null),
+            p => Assert.False(string.IsNullOrEmpty(p.Border!.Color)));
+    }
+
+    [Fact]
     public void PaletteValuesAreHexColors()
     {
         Assert.NotEmpty(Real().Style.Palette);
