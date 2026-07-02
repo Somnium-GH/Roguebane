@@ -27,6 +27,11 @@ public static class FigureBinding
     // Only these have a BARE (unarmored) sprite row; others always draw their plain art.
     private static readonly HashSet<string> BareCapable = new() { "armL", "armR", "legL", "legR" };
 
+    // Which stat a VISUAL part sources (null for non-anatomy parts) — lets the shell anchor targeting
+    // reticles on the figure's actual limb rects (§8 placement directive).
+    public static Stat? StatOf(string visualPart) =>
+        PartStat.TryGetValue(visualPart, out var s) ? s : null;
+
     public static PartCondition Condition(Body body, string visualPart)
     {
         if (!PartStat.TryGetValue(visualPart, out var stat)) return PartCondition.Healthy;

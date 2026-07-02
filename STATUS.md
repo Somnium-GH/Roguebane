@@ -31,8 +31,11 @@ FLAGGED FIXES (from live screenshots):
 - ~~War-party indicator~~ DONE (2026-07-02): camp token LEFT, castle RIGHT, the covered-ground fill
   loads LEFT→RIGHT, and the host token slides right→left toward camp (it previously moved AWAY from
   camp — inverted fraction). The manifest doom bar (icons already camp-left/castle-right) matches.
-- **Targeting reticles don't sit on the foe's body parts** — fix reticle placement on the limb bands;
-  needs matching reticle assets + (Needs-CD) demonstrative "how-it-mounts" design screens.
+- ~~Targeting reticles don't sit on the foe's body parts~~ ENGINE DONE (2026-07-02): reticles anchor
+  on the figure's ACTUAL limb rects via the manifest transform (`FigureBinding.StatOf` + a screen-rect
+  union, both arms as one group) — AIMING centres on the hovered part while picking, FOCUS marks each
+  locked part-aim (verified on the aimed head). Band strips remain the click hit-test. REMAINING
+  Needs-CD: the demonstrative "how-it-mounts" design screens to pixel-match against.
 - **SHIELD BAR + active-shield BUG:** shields are ALWAYS PASSIVE (reserve-the-stat) — an active-cast
   shield ability is a BUG; make shield sources passive-only (§6b). Add a **SHIELD BAR**: PIPS
   (filled/empty) + a per-pip **REGEN progress bar** (time-to-next-pip) while the source is active, wired

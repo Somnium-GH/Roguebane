@@ -435,6 +435,26 @@ public class Game1 : Microsoft.Xna.Framework.Game
         return new Rectangle(r.X, r.Y + PartBand(stat) * band, r.Width, band);
     }
 
+    // The SCREEN rect a foe stat-group occupies (union of its visual part rects, e.g. both arms),
+    // via the same manifest transform DrawHumanoid uses — so reticles land on the drawn limbs.
+    private Rectangle? FoePartScreenRect(Foe foe, Stat stat, Rectangle box)
+    {
+        var manifest = _layout.Manifest;
+        if (manifest is null || !manifest.Figures.TryGetValue(foe.Figure, out var fig)) return null;
+        var f = (float)box.Height / fig.Size[1];
+        int cx = box.X + box.Width / 2, cy = box.Y + box.Height;
+        var px = fig.Pivot[0]; var py = fig.Pivot[1];
+        Rectangle? acc = null;
+        foreach (var (name, part) in fig.Parts)
+        {
+            if (FigureBinding.StatOf(name) != stat) continue;
+            var rr = new Rectangle(cx + (int)((part.Rect[0] - px) * f), cy + (int)((part.Rect[1] - py) * f),
+                (int)(part.Rect[2] * f), (int)(part.Rect[3] * f));
+            acc = acc is null ? rr : Rectangle.Union(acc.Value, rr);
+        }
+        return acc;
+    }
+
     // The foe PART under a screen point (structured foe only), else null = whole-HP aim.
     private BodyPart? FoePartAt(Foe foe, Point p)
     {
@@ -1208,20 +1228,35 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 if (ef.Frame is { } frame)
                     DrawHumanoid(frame, ef.Figure, r.X + r.Width / 2, r.Y + r.Height, r.Height,
                         ef.Down ? new Color(70, 60, 55) : Color.White, allowBare: false);
-                // Part-aim affordance while a module is picking (design/01): limb bands over the
-                // structured foe, the band under the cursor highlighted. No persistent aim ring.
+                // Part-aim affordances (2026-07-02 directive: reticles sit ON the foe's body parts).
+                // While a module is picking, the AIMING reticle centres on the hovered limb's ACTUAL
+                // part rects (band strips remain the click hit-test); a locked part-aim shows the
+                // FOCUS reticle on its part.
                 if (!ef.Down && _ctrl.IsTargeting(Exp))
                 {
                     if (ef.Frame is not null)
                     {
                         var band = r.Height / 4;
                         for (var bd = 1; bd < 4; bd++) Rect(r.X, r.Y + bd * band, r.Width, 1, new Color(Ink, 90));
-                        if (FoePartAt(ef, _cursor) is { } hov)
-                            Border(r.X, r.Y + PartBand(hov.Stat) * band, r.Width, band, Ink);
+                        if (FoePartAt(ef, _cursor) is { } hov && FoePartScreenRect(ef, hov.Stat, r) is { } pr)
+                        {
+                            Border(pr.X, pr.Y, pr.Width, pr.Height, Ink);
+                            if (_assets.Reticle("aiming") is { } aim)
+                                Sprite(aim, pr.X + pr.Width / 2 - 24, pr.Y + pr.Height / 2 - 24, 48, 48, Color.White);
+                        }
                     }
                     else Border(r.X, r.Y, r.Width, r.Height, new Color(Ink, 110));
                 }
                 else if (!ef.Down && Hover(r)) Border(r.X, r.Y, r.Width, r.Height, Ink);
+                // Locked part-aims read as FOCUS reticles on their parts (deduped by stat).
+                if (!ef.Down && ef.Frame is not null && _assets.Reticle("focus") is { } focus)
+                {
+                    var shown = new System.Collections.Generic.HashSet<Stat>();
+                    foreach (var t in Exp.Equipment)
+                        if (Exp.PartOf(t) is { } aimed && shown.Add(aimed.Stat)
+                            && FoePartScreenRect(ef, aimed.Stat, r) is { } fr2)
+                            Sprite(focus, fr2.X + fr2.Width / 2 - 20, fr2.Y + fr2.Height / 2 - 20, 40, 40, Color.White);
+                }
                 break;
             case "graph" when e.Binds == "map" && InRun && e.Item is not null:
                 DrawManifestGraph(e, r);
