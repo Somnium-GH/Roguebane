@@ -123,8 +123,8 @@ STRAIGHT to CityMap, no build gate / no Enter-through. (2) Equipment must open a
 CampaignMap). (4) MERCHANT is an IMPROVISED un-designed POPOVER stopgap — the heal+gear-shop MECHANIC is
 designed (§12/§14), the SCREEN is not; spec with Doug + a CD design PNG before building it (design-open,
 DESIGN_SPEC §17). Do NOT expand the popover as if it were the design. See DESIGN_SPEC §12.
-IMMEDIATE small tasks (not CD): bind `core.icon` → `icons/rune/core_<id>` (icons exist); and the
-**FONT task** below. (mgcb icon entries: DONE 2026-07-02.)
+IMMEDIATE small tasks (not CD): the **FONT task** below — Doug's download approval or a manual TTF
+drop into `Roguebane.Content/fonts/` is the gate. (core.icon bind + mgcb icon entries: DONE 2026-07-02.)
 **FONT task (ours, no CD — fixes the "wrong font" AND the "?" glyphs in ONE move):** `display.spritefont`
 + `mono.spritefont` still name SYSTEM **Consolas/Georgia** with an **ASCII-only** char region
 (`&#32;`–`&#126;`) — that's why every screen shows the wrong font AND why ①②③ ✚ ◉ ✓ render "?". Bundle

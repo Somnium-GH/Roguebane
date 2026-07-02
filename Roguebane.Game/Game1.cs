@@ -1492,6 +1492,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 // imageBind (CD #15): a Content path template whose {bind} placeholders resolve
                 // from the bound item — the part blits that PNG instead of text/fill glyphs.
                 var img = pp.Image;
+                if (pp.Binds == "core.icon" && datum is Roguebane.Core.CoreRune ci)
+                    img = "icons/rune/core_" + ci.Id; // identity token PNG, not the sample glyph
                 if (pp.ImageBind is { } ib && datum is not null)
                     img = System.Text.RegularExpressions.Regex.Replace(ib, @"\{(.+?)\}",
                         mm => ResolveBind(datum, mm.Groups[1].Value) ?? "");
