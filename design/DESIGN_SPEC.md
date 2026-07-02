@@ -128,7 +128,8 @@ Identity is **two axes** (FTL ship + layout):
   winnable for EVERY core at these low-scale stats with the intended PART-AIM play (disable the boss's
   arm), CoreCampaignTests. **All race×core combos allowed for the POC** (restriction matrix deferred, §17 #4).
 - **CORE RUNE** (the Shadowbane "Core rune") — sets **LAYOUT**: rune budget, action-bar size (#
-  techniques), # minion bays, and **apex effects/bonuses stronger than a keystone**. **Races GATE which
+  techniques), # minion bays, and a **Core Effect** (its signature effect, stronger than a keystone —
+renamed from "apex"). **Races GATE which
   core runes they may take** (an SB-style restriction matrix). New Run = pick Race → pick Core rune
   (race-allowed). *(This replaces the old single "Chassis" concept — §18. The archetypes
   Grunt/Warden/Adept/Summoner/Reaver/**Ranger** are CORE RUNES; Race is the new orthogonal axis. (Ranger =
@@ -205,8 +206,16 @@ Minions yes; **party no** — one main character.
 - **Gating is data-driven [LOCKED]:** default **INT-gated** (reserve INT). A Core rune / minion may
   OVERRIDE: a different gate stat; **ungated** (core-rune-granted loyal allies — e.g. a knight's retinue);
   or an **alternate cost** (e.g. a caster who summons by spending HP). Encode as `{stat | none | alt-cost}`.
-- **[OPEN]** CON-as-minion-resource (CON funds minions → a no-INT cleric-caster); minion-type acquisition.
-- No separate muster/upkeep — the cost of fielding a minion **is** its gate (§18).
+- **Minions cost BOTH [LOCKED 2026-07-02]:** RESERVE the gate stat (real-time, as above) AND spend the
+  **SUMMONS** resource to field one. Reserve = the ongoing opportunity cost (competes with your kit);
+  Summons = the deploy cost (finite, merchant/loot-refilled, §14). Neither alone: without a resource,
+  "ignore the reserve" is too big a freebie and makes any high-gate minion instant-and-free.
+- **Summons is paid ONCE, at SUMMON [LOCKED]:** a minion that goes **idle/disabled** (its gate stat
+  dropped) is STILL summoned — reactivating it when the stat recovers is **FREE**, no re-pay. Only
+  summoning a FRESH minion costs Summons — including **re-summoning a KILLED one** (death = pay again).
+- **CON-as-minion-resource: DROPPED** — the resource is **Summons** (not an attribute); the gate stays a
+  reserved stat (default INT, overridable). **[OPEN]** minion-type acquisition + the stat→role table
+  (which stat gates which minion + what it does; §17 #5).
 
 ## 10. HP, healing, and Charge (the shield-pierce resource) [LOCKED core; details OPEN]
 - **HP** is a small life total, separate from the part/stat layer; **permanent within an encounter**.
@@ -246,9 +255,11 @@ rune** (grown by progression). The *shape* of the rune loadout is itself a build
   POC keystone **Hollow Vessel** (unspent budget converts live into a regenerating resource) — **[effect
   OPEN: the old "aether" target is retired; redefine (vs Charge or a regenerating attribute) before it's
   real. Code currently grants a placeholder +CON — sample content, not the designed effect.]**
-  Each CoreRune also carries a **DISPLAY-ONLY apex label + blurb** (`ApexName`/`ApexDesc`, e.g. Grunt =
-  *Hollow Vessel*) the build cards render (§13). This is card TEXT only — the apex EFFECTS are not
-  implemented; the wording is placeholder until the effects above lock.
+  Each CoreRune carries a **Core Effect** (renamed from "apex"; card label + blurb = `CoreEffectName`/
+  `CoreEffectDesc`, e.g. Grunt = *Hollow Vessel*) the build cards render (§13). Most are DISPLAY-ONLY card
+  text for now — the effects aren't built. **EXCEPTION — the Summoner's Core Effect is REAL + LOCKED
+  (2026-07-02):** on **Redeploy, surviving minions' Summons are refunded** (its economy edge, §9/§14; the
+  design/05 *Legion* label/blurb gets reconciled to this by CD). Build it right after HiFi (see STATUS).
 - **Prerequisite ladder [LOCKED]:** big runes need a minimum in an attribute, met by RACE base
   (efficient) **or** by spending budget on Marks to climb (mostly-refunded-but-leaks tax). Native
   qualification beats climbing.
@@ -345,6 +356,8 @@ Nested layers, macro → micro:
 - **Attributes (STR/INT/DEX/CON):** live pool; from RACE base + carrying parts + Marks; no gold buy.
 - **Charge:** finite, refillable (loot/gold, out of combat); spent by SHIELD-IGNORING techniques (incl.
   all bows) to bypass the shield pool (§6b/§10). NOT a generic magic cost.
+- **Summons:** finite, refillable (merchant/loot); SPENT to field a minion, on top of reserving its gate
+  stat (§9). The Summoner's Core Effect refunds it for surviving minions on Redeploy (§11).
 - **HP:** small life total; restored only out of combat.
 - **Parts:** localized; damage subtracts the part's stat; heals repair parts.
 - **Shield points:** consumed 1:1 by damage; regen on a CON-scaled timer (§6b).
@@ -386,8 +399,10 @@ points there so the canon stays design-focused.
 12. Action speed beyond DEX haste — none planned; revisit only if needed.
 13. Redeploy lockout tuning (the DEX→lockout curve) and the FTL-style commit-to-destination on
     Redeploy/Retreat (§12) — both deferred; flow ships first.
-14. The term **"apex effect"** (a core rune's signature effect) is PLACEHOLDER, not Doug's word — he'll
-    rename it later; don't treat it as final.
+14. RESOLVED 2026-07-02 — a core rune's signature effect is the **Core Effect** (renamed from the
+    placeholder "apex"). Sweep `apex`→`Core Effect` across docs + code (`ApexName/ApexDesc` →
+    `CoreEffectName/CoreEffectDesc`) + the manifest `apex*` binds/labels. (Leave §11's keystone
+    "apex-tier" wording — different meaning.)
 15. Figure MORPH model + MULTI-SLOT equipment (§7): figures = human base + race morph + core-rune morph +
     equipped-gear parts (a morph model, not per-race×core×gear art); a piece may cover multiple part slots
     (robe = all/most). Exact morph mechanics + the multi-slot slot model — design BEFORE building the
@@ -418,7 +433,8 @@ points there so the canon stays design-focused.
 - **"Spread"/divisor strength; stamina-per-swing** → attribute reservation, §5.
 - **One-hand-at-a-time / serial player actions** → parallel-by-allocation, §5.
 - **Poise / stagger bar; a TEMPO/PERIL combat header** → dropped (§13).
-- **Separate muster/upkeep resource for minions** → cost is the gate, §9.
+- ~~Separate muster/upkeep resource for minions → cost is the gate~~ — **RE-INTRODUCED 2026-07-02** as
+  **Summons**: a minion is gated by a reserved stat AND costs Summons to field/re-summon (§9/§14).
 - **Weapon durability / maintenance** → covered by the disable layer, §8.
 - **Party members / companions** → minions only, §9.
 - **Summoning as an action-bar technique** → bays with instant toggle, §9.

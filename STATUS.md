@@ -100,7 +100,9 @@ SLICES (one screen/pass, pixel-verify vs its design PNG):
    the known chrome family PLUS two fresh Needs-CD items — `poolRow` has NO pip parts (the design's
    per-stat pip strips can't render; `ui/pip/*` assets exist), and the re-dropped manifest LOST the
    "Attribute Pool"/"Action Bar" panel titles that design/01 shows (they were elements before the
-   re-drop). No renderer-side bugs found.
+   re-drop). No renderer-side bugs found. Equipment walked vs the new design/02 too (2026-07-02):
+   clean — same known gaps; one family addition: attrBar pips are FLAT FILL parts where the design
+   shows the textured `ui/pip/*` states (hatch/reserved) — pips-as-imageBind would close both screens.
    DISPLAY COPY DONE: `Technique.Desc`/`Minion.Desc` (+`DescText`) ship card copy for all 8 techniques
    + both minions; `{power}` resolves from the data at render so copy can't contradict tuning. Bound
    via technique.description/bay.description; Core-tested (290 green).
