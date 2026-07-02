@@ -291,10 +291,11 @@ Nested layers, macro → micro:
   in-combat action to bail an active fight; **Redeploy** = the out-of-combat action to advance (a move on
   the CityMap). **A resolved fight does NOT auto-return to the map** — the player explicitly Redeploys.
   **Equipment access:** NewGame leads STRAIGHT into the run (CityMap) — Equipment is NOT a post-NewGame
-  gate. **Hotkey `i` toggles the Equipment screen** anywhere (also a button on Encounter/CityMap/
-  CampaignMap); `i`/Esc exits. Out of combat it's **editable**; DURING combat it opens as a **read-only
-  PAUSE** — view/reason about equipment state (incl. RED disabled gear) but change nothing (edits only out
-  of combat). Redeploy is **timed**: a lockout that **DEX shortens**
+  gate (do NOT let Enter pass through an old build screen). Equipment opens as a **FULL SCREEN**
+  (design/02), NEVER a popover. Reach it via the **`e`** hotkey or an **"open Equipment" button** on
+  Encounter (DISABLED during combat), CityMap, and CampaignMap; a **BACK/close** control on the Equipment
+  screen returns to the CALLER. Out of combat = **editable** (current core). In combat the access is
+  disabled (a read-only in-combat view is a deferred idea, not now). Redeploy is **timed**: a lockout that **DEX shortens**
   (haste, §6) — design-locked, *not yet built (flow first)*. **[OPEN]** an FTL-style commit-to-
   destination (pick where you Redeploy/Retreat to in the same act) — deferred; for now Redeploy just
   routes to the CityMap.
@@ -394,6 +395,9 @@ points there so the canon stays design-focused.
 16. ITEM-RANKING / auto-unequip priority (§6): when a broken part drops an attribute below MULTIPLE items'
     requirements, a rule/ranking decides which gear disables first — needs design + tuning. Feeds the
     gear system (design-open).
+17. MERCHANT SCREEN: the merchant node's MECHANIC is designed (§12 out-of-combat HP heal + §14 gear shop),
+    but a merchant SCREEN was never specced — the game currently improvises a POPOVER. Spec it with Doug,
+    then CD designs it (design PNG → manifest → render, like every screen). The popover is a stopgap.
 
 ## 18. DROPPED — must not resurface
 - **"Chassis" as the identity model** → split into **Race + Core rune** (§7).

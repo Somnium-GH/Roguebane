@@ -29,6 +29,10 @@ and does it feel good.
 - No speculative abstraction — build for the task in front of you.
 - No UNDESIGNED mechanics: code + sample/test content must not invent resources, effects, conditions, or
   content mechanics absent from `DESIGN_SPEC` and agreed. Need one? Surface it (Needs human), don't add it.
+- PLACEHOLDERS ok, but ALWAYS FLAGGED: an improvised stopgap (an un-designed screen / UI / asset built to
+  unblock) is fine — but flag it as a placeholder needing design (Needs human / Needs Claude Design);
+  NEVER ship it silently as if it were the design. An unflagged placeholder is indistinguishable from
+  finished work — that's how drift hides. (The merchant popover was the miss: built, not flagged.)
 - CLEAN RENAMES: when a name changes, update ALL usages — no aliases, mapping layers, or back-compat
   shims — UNLESS feature-flagging is explicitly requested. Old names must not linger.
 - No redundant docs. `STATUS.md` is the single source of state. This file stays under ~60 lines.

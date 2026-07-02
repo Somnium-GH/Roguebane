@@ -1277,6 +1277,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private void DrawManifestGraph(Element e, Rectangle region)
     {
         var map = Exp.Map;
+        Template? tmplNode = null;
+        _ui.Manifest?.Templates.TryGetValue(e.Item!.Template, out tmplNode);
         var nodes = map.Nodes;
         var cols = nodes.Max(x => x.Col) + 1;
         var rows = nodes.Max(x => x.Row) + 1;
@@ -1303,7 +1305,13 @@ public class Game1 : Microsoft.Xna.Framework.Game
             var r = Cell(node);
             var seen = map.Sees(node);
             var isCurrent = ReferenceEquals(node, map.Current);
-            Sprite(_assets.Node(seen), r.X, r.Y, cw, ch, isCurrent ? Color.White : new Color(210, 200, 190));
+            // The icon comes from the template's imageBind path ("icons/node/{node.type}"), resolved
+            // with the FOG-AWARE type so an unrevealed beacon blits the unknown token.
+            var tex = _assets.Node(seen);
+            var iconBind = tmplNode?.Parts.FirstOrDefault(pt => pt.ImageBind is not null)?.ImageBind;
+            if (iconBind is not null)
+                tex = _assets.Texture(iconBind.Replace("{node.type}", AssetRegistry.NodeToken(seen))) ?? tex;
+            Sprite(tex, r.X, r.Y, cw, ch, isCurrent ? Color.White : new Color(210, 200, 190));
 
             var oi = IndexOf(options, node);
             if (isCurrent)
@@ -1481,7 +1489,12 @@ public class Game1 : Microsoft.Xna.Framework.Game
                     if (pp.Border is { } pb)
                         Border(pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H, _ui.Color(pb.Color, Border0));
                 }
+                // imageBind (CD #15): a Content path template whose {bind} placeholders resolve
+                // from the bound item — the part blits that PNG instead of text/fill glyphs.
                 var img = pp.Image;
+                if (pp.ImageBind is { } ib && datum is not null)
+                    img = System.Text.RegularExpressions.Regex.Replace(ib, @"\{(.+?)\}",
+                        mm => ResolveBind(datum, mm.Groups[1].Value) ?? "");
                 if (!string.IsNullOrEmpty(img))
                 {
                     Sprite(_assets.Texture(img!), pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H, Color.White);

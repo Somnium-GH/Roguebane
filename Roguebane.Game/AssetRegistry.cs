@@ -53,9 +53,12 @@ public sealed class AssetRegistry
     public Texture2D? Reticle(string role) => Texture("ui/reticle/" + role);
     public Texture2D? Button(string state) => Texture("ui/button/button_" + state);
 
+    // The node-type -> icon token, shared with imageBind path templates ("icons/node/{node.type}").
+    public static string NodeToken(NodeType type) => NodeName[type];
+
     private static readonly Dictionary<NodeType, string> NodeName = new()
     {
-        [NodeType.Skirmish] = "unknown", // no dedicated skirmish icon shipped — stopgap (asset gap)
+        [NodeType.Skirmish] = "skirmish", // dedicated icon landed 2026-07-01 (stopgap "?" retired)
         [NodeType.ResourceHold] = "resource",
         [NodeType.Merchant] = "merchant",
         [NodeType.Unknown] = "unknown",

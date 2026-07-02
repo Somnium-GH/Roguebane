@@ -180,6 +180,39 @@
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/icons/node/unknown.png;icons/node/unknown
 
+#begin icons/node/skirmish
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/icons/node/skirmish.png;icons/node/skirmish
+
+#begin icons/resource/charge
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/icons/resource/charge.png;icons/resource/charge
+
+#begin icons/technique/shot
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/icons/technique/shot.png;icons/technique/shot
+
 #begin icons/resource/hp
 /importer:TextureImporter
 /processor:TextureProcessor

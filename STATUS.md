@@ -115,14 +115,23 @@ SLICES (one screen/pass, pixel-verify vs its design PNG):
    the cityNode template (Needs-CD). MODEL gap: §12 Layer 1 locks a forward-biased city GRAPH but
    Campaign is still a linear leg list — graph model + campaign-level supplies/WAIT is its own Core
    pass (surface before building). No screen-flow entry yet (not reachable in game; RB_MF only).
-FLOW [FIX — blocks progress today]: **NewGame → CityMap directly** — Equipment is NOT a post-NewGame gate
-(that wrong gating is why you can't reach the run map). **Hotkey `i` toggles Equipment** anywhere (+
-buttons on Encounter/CityMap/CampaignMap); **`i`/Esc exits** (there's currently no exit). Out of combat =
-editable (current core; not a core-picker); IN combat = opens as a **read-only PAUSE** (view equipment
-state incl. RED disabled gear; no changes). See DESIGN_SPEC §12.
-IMMEDIATE small tasks (not CD): bind `core.icon` → `icons/rune/core_<id>` (icons exist); add the glyph
-codepoints (①②③ ✚ ◉ ✓ — the "?" on NewGame/Equipment) to the SpriteFont regions (the font task). These
-close most of the visible "?" gaps without CD.
+FLOW [FIX — still wrong today]: (1) BUG — Enter still passes through the OLD build screen; NewGame must go
+STRAIGHT to CityMap, no build gate / no Enter-through. (2) Equipment must open as a **FULL SCREEN**
+(design/02) — KILL the redundant "LOADOUT" popover; route ALL access to the real screen. (3) Hotkey **`e`**
+(was `i`) + an "open Equipment" BUTTON on Encounter (DISABLED in combat), CityMap, CampaignMap; a
+**BACK/close** on Equipment returns to the CALLER (CityMap already shows EQUIPMENT [E]; add Encounter +
+CampaignMap). (4) MERCHANT is an IMPROVISED un-designed POPOVER stopgap — the heal+gear-shop MECHANIC is
+designed (§12/§14), the SCREEN is not; spec with Doug + a CD design PNG before building it (design-open,
+DESIGN_SPEC §17). Do NOT expand the popover as if it were the design. See DESIGN_SPEC §12.
+IMMEDIATE small tasks (not CD): bind `core.icon` → `icons/rune/core_<id>` (icons exist); add the new
+icons (skirmish/charge/shot) to `Content.mgcb`; and the **FONT task** below.
+**FONT task (ours, no CD — fixes the "wrong font" AND the "?" glyphs in ONE move):** `display.spritefont`
++ `mono.spritefont` still name SYSTEM **Consolas/Georgia** with an **ASCII-only** char region
+(`&#32;`–`&#126;`) — that's why every screen shows the wrong font AND why ①②③ ✚ ◉ ✓ render "?". Bundle
+the DECIDED fonts (**IM Fell English** display + **JetBrains Mono** mono — free/open; add the `.ttf` to
+Content), point each `.spritefont` `FontName` at them, and widen `CharacterRegions` to include
+①②③(U+2460–2462) ✓(2713) ✚(271A) ◉(25C9) (+ accents for i18n later). Bake an icon only for a glyph the
+font truly lacks. (Supersedes the old "swap fonts before distribution" needs-human note.)
 
 ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered above:
 - **`imageBind`** (NEW manifest field, CD #15): resolve its path template (e.g. `icons/node/{node.type}`)

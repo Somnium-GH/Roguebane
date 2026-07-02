@@ -154,6 +154,8 @@ public sealed class TemplatePart
     public string Sample { get; init; } = ""; // placeholder text shown in the design mock
     public string? Image { get; init; }       // an IMAGE slot instead of text (e.g. a card's figure)
     public string? Binds { get; init; }        // which live datum fills this slot at render (vs the sample)
+    public string? ImageBind { get; init; }    // an IMAGE slot resolved per datum: a Content path template
+                                               // whose {bind} placeholders fill from the bound item (CD #15)
     public Fill? Fill { get; init; }           // part-level chrome (attr swatches, slot backgrounds)
     public Border? Border { get; init; }
 }
