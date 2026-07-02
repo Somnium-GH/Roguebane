@@ -32,6 +32,13 @@ FLAGGED FIXES (from live screenshots):
   (filled/empty) + a per-pip **REGEN progress bar** (time-to-next-pip) while the source is active, wired
   to `ShieldPool` (layers + CON-scaled regen). Pool scales beyond 4 → render a VARIABLE N of pips
   gracefully. CD designs the bar (best-stab, Doug refines tomorrow); loop wires it.
+- **CityMap start node = CAMP:** the first node reads as "skirmish" once you leave it — it should be CAMP
+  (your origin), not a skirmish.
+- ~~Friendly/self vs enemy TARGET-SIDE bug~~ DONE (2026-07-02): `Technique.Side` {Enemy|Self} added
+  (Bandage declares Self — its heal already auto-picks the caster's most-damaged part at discharge);
+  `IsPassive` derives from ShieldLayers>0 so a source can't be authored active. CardPress now: a powered
+  SELF tech never enters targeting; a powered PASSIVE source toggles OFF (§6b) — never the FSM.
+  Core-tested (296 green). The SHIELD BAR UI waits on CD's bar design.
 
 RENAME **apex → Core Effect** — CODE DONE (2026-07-02): `CoreEffectName/CoreEffectDesc` + all code
 comments/tests swept (keystone "apex-tier" untouched). REMAINING: the manifest's `apex*` bind names are

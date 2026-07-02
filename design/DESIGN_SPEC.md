@@ -181,6 +181,12 @@ there is no multi-foe list and no default/front target.
 charges, targets, or fires until powered.
 - Left-click an **inactive** module → **power it** (reserve stat, begin charging).
 - Left-click an **active** module → enter **TARGETING** (reticle up); this **clears** its current target.
+- **Target SIDE [LOCKED]:** each technique declares whether it targets the **ENEMY** or the **SELF/ally**.
+  Enemy techniques use the foe part-aim below. **Self/heal techniques (Bandage, Cure Wounds) target your
+  OWN body** (auto-pick, e.g. most-damaged part) and can NEVER be aimed at the foe. **Passive sources
+  (shields) target NOTHING** — they just reserve+hold (§6b), so they never enter the targeting/fire FSM;
+  a shield source MUST be flagged passive. (Bug seen: Bandage aimed at enemy parts; a shield acting
+  active — both are target-side/passive-flag misses.)
 - In targeting, left-click a foe **PART** → set the target (charge proceeds).
 - **Charged + targeted → FIRES** (hit/miss by the seeded rolls). **No fire button**, no front fallback;
   charged + untargeted just **holds**.

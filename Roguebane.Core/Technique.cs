@@ -12,6 +12,10 @@ public enum TechniqueKind
 // CHARGE (§6b/§10) is the SHIELD-PIERCE resource: ONLY a ShieldPiercing technique draws it — each
 // discharge bypasses the defender's shield pool and spends ChargeCost (>=1) of charge; dry => it HOLDS
 // the pierce but keeps its reservation. ChargeCost on a non-piercing technique is inert (do not author).
+// Which side a technique targets (§8 [LOCKED]): ENEMY techniques use the foe part-aim; SELF techniques
+// act on the caster's own body (auto-pick, e.g. most-damaged part) and can never be aimed at the foe.
+public enum TargetSide { Enemy, Self }
+
 public sealed record Technique(
     string Id,
     Stat Stat,
@@ -26,8 +30,13 @@ public sealed record Technique(
     int ShieldLayers = 0, // >0 marks a SHIELD SOURCE (§6b): a passive that maintains this many 1-dmg
     int ShieldRegen = 0,  // layers on the body, one regenerating every ShieldRegen ticks (CON-scaled).
     bool ShieldPiercing = false, // ignores the shield pool; costs Charge per use (§6b Charge = pierce).
-    string Desc = "") // DISPLAY-ONLY card copy (design/01); {power} resolves from the data at render
+    string Desc = "", // DISPLAY-ONLY card copy (design/01); {power} resolves from the data at render
                       // so the text can never contradict a tuning pass.
+    TargetSide Side = TargetSide.Enemy) // §8 target side; heals declare Self
 {
+    // A shield source is ALWAYS PASSIVE (§6b [LOCKED]): it reserves + holds, never targets or fires —
+    // derived from the data so a source can't be authored active by mistake.
+    public bool IsPassive => ShieldLayers > 0;
+
     public string DescText => Desc.Replace("{power}", Power.ToString());
 }

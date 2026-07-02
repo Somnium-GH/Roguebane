@@ -41,7 +41,7 @@ public static class Techniques
     // palette); it is the reconcile trigger for live foe part-aim (G1, staged off until heals exist).
     public static readonly Technique Bandage =
         new("bandage", Stat.Con, Reserve: 1, TechniqueKind.Timered, Cooldown: 80, Power: 1, Heals: true,
-            Desc: "Binds your most-damaged part, mending {power} each pass.");
+            Desc: "Binds your most-damaged part, mending {power} each pass.", Side: TargetSide.Self);
 
     // A §6b SHIELD SOURCE: a passive INT spell that holds a pool of 3 stone layers, each eating one hit,
     // one regenerating ~every 3s (faster with CON). Reserves INT while held. Opt-in content (not in

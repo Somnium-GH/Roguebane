@@ -121,4 +121,37 @@ public class CombatTargetingTests
         ctrl.Sync(exp);
         Assert.Equal(-1, ctrl.Targeting);
     }
+
+    // §8 target-side rules: SELF techniques and PASSIVE shield sources never enter the targeting FSM.
+    private static int IndexOf(Expedition e, Technique t)
+    {
+        for (var i = 0; i < e.Equipment.Count; i++) if (e.Equipment[i].Id == t.Id) return i;
+        return -1;
+    }
+
+    [Fact]
+    public void PressingAPoweredSelfTechniqueNeverTargets()
+    {
+        var (exp, ctrl) = Fighting();
+        var ix = IndexOf(exp, Techniques.Bandage);
+        Assert.True(ix >= 0); // the seeded kit fields the heal
+        ctrl.CardPress(exp, ix);                // power
+        ctrl.CardPress(exp, ix);                // active self-tech -> must NOT enter targeting
+        Assert.True(exp.IsActive(exp.Equipment[ix]));
+        Assert.Equal(-1, ctrl.Targeting);
+    }
+
+    [Fact]
+    public void PressingAPoweredShieldSourceTogglesItOffWithoutTargeting()
+    {
+        var (exp, ctrl) = Fighting();
+        var ix = IndexOf(exp, Techniques.Brace);
+        Assert.True(ix >= 0);
+        Assert.True(Techniques.Brace.IsPassive);
+        ctrl.CardPress(exp, ix);                // power (reserve + hold, §6b)
+        Assert.True(exp.IsActive(exp.Equipment[ix]));
+        ctrl.CardPress(exp, ix);                // press again -> toggle OFF, never the FSM
+        Assert.False(exp.IsActive(exp.Equipment[ix]));
+        Assert.Equal(-1, ctrl.Targeting);
+    }
 }
