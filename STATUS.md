@@ -42,16 +42,16 @@ cell, grid flow); LIVE bind resolver (`race.*`/`core.*` → live data, else `sam
 `fontPx` scaling; display data (`Race.Tag/Blurb`, `CoreRune.ApexName/Desc` — DISPLAY-ONLY, no apex EFFECTS).
 
 SLICES (one screen/pass, pixel-verify vs its design PNG):
-1. **NewGame** (in progress) — DONE this pass: z draws back-to-front (manifest z = depth; panels no longer
-   paint over content); fill+frame both draw (§10 bg + chrome); text shadows = offset glyph copy (was a
-   solid box); word-wrap inside element/part rects (height-capped); template-part fill/border draw
-   (attr swatches; state-bound `.selection/.state/.chargePct/.rarity` chrome gated OFF pending live
-   state); Loadout preview column fully LIVE (`preview.fig` composed figure + name/role/hp/budget/
-   techniques/bays/apexName/apexDesc + 4 attr tiles w/ colour swatches from BuildSession).
-   REMAINING: selection-state gating (chips/rings/CORE SET) + input wiring; then CUT the LIVE NewGame
-   over (DELETE old 5-card + `RACE [tab]` screen) and full diff vs `design/05-newgame.png`.
-   Blocked-by-manifest (Needs-CD below): card bg/chrome parts, tile bgs+labels, `align`, button labels,
-   ①②③/✚ glyph font.
+1. **NewGame** — CUT OVER: the live screen now renders via `DrawManifestScreen("newgame")`; the old
+   5-card + `RACE [tab]` screen is DELETED. Input reads manifest geometry BY BINDS (races/cores list
+   cells + begin rect — never CD's renameable element ids). `.selection` parts draw only on the chosen
+   card (CHOSEN / CORE SET follow clicks; other state binds still gated). Verified LIVE + state-driven:
+   RB_CHASSIS=2 moves CORE SET to Adept and the whole preview column follows (figure/role/budget/apex).
+   Renderer foundation from this arc: z back-to-front, fill+frame, text-shadow-as-glyph-copy,
+   height-capped word-wrap, template-part fill/border.
+   NOT design-done — remaining deltas are ALL manifest-expressiveness gaps (Needs-CD below): card/tile
+   bg+chrome parts, tile value+label split, `align`, button/chip labels+fills, core-rune icons +
+   ①②③/✚ glyph font, head-image assets, hi-fi bg. Re-walk the full delta list when CD's drop lands.
 2. **Equipment** — a BETWEEN-FIGHTS loadout for the CURRENT core (NO core-switch tabs — that's NewGame):
    render `design/02-equipment` (Attributes bars, Inventory tabs GEAR/TECH/MINIONS + rarity cards, Rune
    Bag, composed figure + stats + apex, Action Bar). Reads RUN state.
@@ -74,8 +74,10 @@ CampaignMap — editing the CURRENT loadout (core fixed).
 - Equipment: no inventory tabs (GEAR/TECH/MINIONS) + drag-to-equip + equipped-gear-on-anatomy + real
   rune-bag cards yet — blocked on gear/minion equip + mid-run gear/rune mutation (design-open).
 - Bow.png not mounted on the figure; `shot` technique needs an icon (Game TODO).
-- `chassis/*` ASSET dir + `Content.mgcb` + `layout.json` figure keys NOT renamed → CoreRune/`human_`
-  (case-preserved so code still loads them) — flip WITH Claude Design's manifest-id rename.
+- The FLAT thumbnail dir `sprites/char/chassis/*` + its `Content.mgcb` entries still use the old name.
+  (The `layout.json` FIGURE keys are ALREADY `human_`/`elf_`, and CD has ALREADY renamed the screen ids
+  to newgame/equipment/citymap/campaignmap/encounter — both done.) Retire the flat `chassis/` dir once
+  cards compose from modular parts (the retire-bare directive).
 - Gradient fill draws vertical/horizontal only; diagonal deferred (PointClamp sampler).
 - Minion `AltCost` summon is an UN-COSTED placeholder — wire the real HP/stat spend when an alt-cost minion ships.
 - Shields (Stoneskin) wired + available but not yet in starting kits; SpellWard deferred (no spell model).
@@ -95,7 +97,11 @@ CampaignMap — editing the CURRENT loadout (core fixed).
 
 ## Asset gaps (Needs Claude Design) — art missing/wrong, not composable from primitives
 - Ranger figure (`human_ranger`/`elf_ranger`) — placeholder card until it lands.
-- Rune-tier/step glyphs (①②③/✚) — need a glyph font or baked rune-glyph asset.
+- Glyph coverage (①②③ step numbers; ✚ ◉ ✓ marks) — the manifest USES these but the ASCII SpriteFont
+  renders "?". FIX = a bounded Game/font task, NOT CD art: add these codepoints to the SpriteFont
+  character regions + use a bundled font that covers them (fold into the planned system→bundled-font
+  swap). This is the ONE real dependency for NewGame pixel-perfect; bake a glyph as an icon only if the
+  chosen font lacks it.
 - Skirmish node icon (map uses the `unknown` "?" stopgap).
 - wraith (partial art, 12/21 files) + gargoyle (nonstandard layout) — need completion/normalization before wiring.
 - HI-FI CHROME pass on all 5 screens + backgrounds at 1080; + the layout-drift corrective (extra inner

@@ -17,8 +17,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private static readonly Keys[] TechniqueKeys =
         { Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6 };
 
-    // Screen names per the 2026-06-30 rename directive. (Manifest lookup ids stay "newrun"/"build"/
-    // "runmap" until Claude Design renames the manifest side in parallel.)
+    // Screen names per the 2026-06-30 rename directive; the manifest side is renamed too
+    // (newgame/equipment/encounter/citymap/campaignmap), so lookups use the new ids everywhere.
     private enum Screen { NewGame, Equipment, Run }
 
     private readonly GraphicsDeviceManager _graphics;
@@ -88,7 +88,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
         _mfScreen = Environment.GetEnvironmentVariable("RB_MF"); // dev: render this screen from the manifest
 
-        if (_smokeScreen is "combat" or "map" or "loadout") // march the real loop for the screenshot
+        if (_smokeScreen is "encounter" or "citymap" or "loadout") // march the real loop for the screenshot
         {
             _build.CycleCoreRune(3);          // -> the Summoner (3 bays; fields Skeleton+Shade) for the bay lane
             _build.Toggle(Techniques.Jab);   // add a STR card for variety on the bar
@@ -98,7 +98,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
             // (build/newrun smoke handled after this block)
             void Resolve() { for (var i = 0; i < 200 && Exp.State == ExpeditionState.Fighting; i++) _campaign.Tick(); }
 
-            if (_smokeScreen == "map") // stop at the merchant so the shot shows the gear stock + gear bar
+            if (_smokeScreen == "citymap") // stop at the merchant so the shot shows the gear stock + gear bar
             {
                 _campaign.Enter("a1"); Resolve(); _campaign.Redeploy(); // earn gold, then back to the chart
                 _campaign.Enter("b");             // the merchant
@@ -106,7 +106,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 Exp.EquipWeapon(Armory.Dagger);   // -> EQUIPPED
                 Exp.Stash.AddArmor(Shops.Plate);  // seed a PACK item for the click-to-equip chip in the shot
             }
-            else if (_smokeScreen == "combat")
+            else if (_smokeScreen == "encounter")
             {
                 // March to the tanky CASTLE fight — the Summoner's minions melt the light skirmishes
                 // en route, so screenshot there (it survives long enough to show a stable combat frame).
@@ -135,7 +135,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 _loadoutOpen = true;
             }
         }
-        else if (_smokeScreen == "build") _screen = Screen.Equipment; // else fall through to the New Run grid
+        else if (_smokeScreen == "equipment") _screen = Screen.Equipment; // else fall through to NewGame
 
         base.Initialize();
     }
@@ -176,34 +176,44 @@ public class Game1 : Microsoft.Xna.Framework.Game
         base.Update(gameTime);
     }
 
-    // New Run (design/05): the core grid. Pick with arrows or a card click; BEGIN goes to the equipment.
-    // Card positions come from the manifest `coreCards` list container (region + item), falling back to
-    // a hand grid if the manifest is absent — the first screen container driven off layout.json.
-    private Rectangle NewGameCardRect(int i)
-    {
-        var cells = _ui.ListCells("newrun", "coreCards", _build.Roster.Count);
-        return cells is not null && i < cells.Count ? cells[i] : new Rectangle(14 + i * 188, 66, 176, 420);
-    }
-    private static readonly Rectangle NewGameBeginRect = new(W - 258, H - 44, 240, 34);
-
-    // Race selector chips (design/05's Race column, minimal strip form until the 3-column redesign):
-    // bottom-left, clear of the manifest-driven core-card grid and the bottom-right BEGIN button.
-    private static Rectangle NewGameRaceRect(int i) => new(24 + i * 104, H - 48, 96, 40);
-
     private void UpdateNewGame(KeyboardState keys)
     {
         if (Pressed(keys, Keys.Left)) _build.CycleCoreRune(-1);
         if (Pressed(keys, Keys.Right)) _build.CycleCoreRune(1);
-        for (var i = 0; i < _build.Roster.Count; i++)
-            if (Click(NewGameCardRect(i))) _build.CycleCoreRune(i - _build.CoreRuneIndex);
+        var cores = ManifestListCells("newgame", "cores", _build.Roster.Count);
+        for (var i = 0; i < cores.Count; i++)
+            if (Click(RectOf(cores[i]))) _build.CycleCoreRune(i - _build.CoreRuneIndex);
 
-        // Race axis: Tab cycles, or click a chip. Attrs/HP + the composed figure follow the choice.
+        // Race axis: Tab cycles, or click a card. Attrs/HP + the composed figure follow the choice.
         if (Pressed(keys, Keys.Tab)) _build.CycleRace(1);
-        for (var i = 0; i < _build.RaceCount; i++)
-            if (Click(NewGameRaceRect(i))) _build.CycleRace(i - _build.RaceIndex);
+        var races = ManifestListCells("newgame", "races", _build.RaceCount);
+        for (var i = 0; i < races.Count; i++)
+            if (Click(RectOf(races[i]))) _build.CycleRace(i - _build.RaceIndex);
 
-        var go = (Pressed(keys, Keys.Enter) && !keys.IsKeyDown(Keys.LeftAlt)) || Click(NewGameBeginRect);
+        var go = (Pressed(keys, Keys.Enter) && !keys.IsKeyDown(Keys.LeftAlt))
+            || (ManifestElementRect("newgame", "begin") is { } b && Click(b));
         if (go) _screen = Screen.Equipment; // on to the equipment screen for the chosen core
+    }
+
+    // Input geometry from the manifest, located by BINDS (the data contract) — never by CD's element
+    // ids, which are CD-owned and renameable. Cells mirror exactly what DrawManifestList draws.
+    private System.Collections.Generic.IReadOnlyList<LayoutRect> ManifestListCells(
+        string screenId, string binds, int count)
+    {
+        var s = _ui.ScreenDef(screenId);
+        var m = _ui.Manifest;
+        var e = s?.Elements.FirstOrDefault(x => x.Binds == binds && x.Item is not null);
+        if (s is null || m is null || e is null || !m.Templates.TryGetValue(e.Item!.Template, out var tmpl))
+            return Array.Empty<LayoutRect>();
+        var r = ManifestUi.Rect(s, e);
+        return ListLayout.Cells(new LayoutRect(r.X, r.Y, r.Width, r.Height), e.Item, count, tmpl.Size);
+    }
+
+    private Rectangle? ManifestElementRect(string screenId, string binds)
+    {
+        var s = _ui.ScreenDef(screenId);
+        var e = s?.Elements.FirstOrDefault(x => x.Binds == binds);
+        return s is null || e is null ? null : ManifestUi.Rect(s, e);
     }
 
     private void UpdateEquipment(KeyboardState keys)
@@ -460,7 +470,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         // rasterize at 1080-class density; coordinates are unchanged.
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Matrix.CreateScale(SS));
         if (_mfScreen is not null) DrawManifestScreen(_mfScreen); // dev: render a screen straight from the manifest
-        else if (_screen == Screen.NewGame) DrawNewGameScreen();
+        else if (_screen == Screen.NewGame) DrawManifestScreen("newgame"); // LIVE cut-over (design/05)
         else if (_screen == Screen.Equipment) DrawEquipmentScreen();
         else DrawRunScreen();
         _spriteBatch.End();
@@ -846,71 +856,6 @@ public class Game1 : Microsoft.Xna.Framework.Game
         Text(_assets.Mono, Exp.Gold.ToString(), x + 26, y + 4, Ink);
     }
 
-    // New Run screen (design/05): the roster as a card grid — figure, identity, stat block, flavor —
-    // one ringed as SELECTED. Reads the BuildSession roster; picking cycles the chassis it will build.
-    private void DrawNewGameScreen()
-    {
-        Stretch(_assets.Background("build_alcove"), 0, 0, W, H);
-        // design/05 centred header, driven from the manifest (content + position; fallback centred).
-        var eyebrow = _ui.ElementRect("newrun", "eyebrow");
-        var title = _ui.ElementRect("newrun", "title");
-        var sub = _ui.ElementRect("newrun", "subtitle");
-        DrawCentered(_assets.Mono, _ui.ElementContent("newrun", "eyebrow") ?? "A NEW RUN BEGINS",
-            Muted, eyebrow?.Center.X ?? 480, eyebrow?.Y ?? 8);
-        DrawCentered(_assets.Display, _ui.ElementContent("newrun", "title") ?? "CHOOSE YOUR CORE",
-            Ink, title?.Center.X ?? 480, title?.Y ?? 18);
-        // manifest subtitle content is truncated in layout.json -> keep hand copy, positioned by manifest.
-        DrawCentered(_assets.Mono, "the Core is the body you wear all run", Muted, 480, sub?.Y ?? 58);
-
-        var roster = _build.Roster;
-        for (var i = 0; i < roster.Count; i++)
-        {
-            var c = roster[i];
-            var r = NewGameCardRect(i);
-            var selected = i == _build.CoreRuneIndex;
-            Panel(r.X, r.Y, r.Width, r.Height);
-            if (selected)
-            {
-                Border(r.X, r.Y, r.Width, r.Height, Amber);
-                Text(_assets.Mono, "SELECTED", r.X + r.Width - 74, r.Y + 8, Amber);
-            }
-
-            DrawHumanoid(_build.Race.NewBody(), c.FigureKey(_build.Race), r.X + r.Width / 2, r.Y + 168, 140);
-            Text(_assets.Mono, c.Title.ToUpper(), r.X + 12, r.Y + 176, Ink);
-            Text(_assets.Mono, c.Archetype, r.X + 12, r.Y + 192, Amber);
-
-            var body = _build.Race.NewBody();
-            var sy = r.Y + 216;
-            void Row(string k, int v)
-            {
-                Text(_assets.Mono, k, r.X + 12, sy, Muted);
-                Text(_assets.Mono, v.ToString(), r.X + r.Width - 30, sy, Ink);
-                sy += 15;
-            }
-            Row("str", body.Capacity(Stat.Str)); Row("int", body.Capacity(Stat.Int));
-            Row("dex", body.Capacity(Stat.Dex)); Row("con", body.Capacity(Stat.Con));
-            Row("bays", c.Bays); Row("budget", c.RuneBudget);
-
-            DrawWrapped(c.Flavor, r.X + 12, sy + 8, r.Width - 24, Muted);
-        }
-
-        // Race selector: the chosen race drives every card's attrs/HP + the composed figure above.
-        Text(_assets.Mono, "RACE  [tab]", 24, H - 64, Muted);
-        for (var i = 0; i < _build.RaceCount; i++)
-        {
-            var rr = NewGameRaceRect(i);
-            var race = _build.RaceRoster[i];
-            var sel = i == _build.RaceIndex;
-            Panel(rr.X, rr.Y, rr.Width, rr.Height);
-            if (sel) Border(rr.X, rr.Y, rr.Width, rr.Height, Amber);
-            Text(_assets.Mono, race.Name.ToUpper(), rr.X + 8, rr.Y + 6, sel ? Amber : Ink);
-            Text(_assets.Mono, "hp" + race.Hp, rr.X + 8, rr.Y + 22, Muted);
-        }
-
-        DrawButton("BEGIN", NewGameBeginRect.X, NewGameBeginRect.Y,
-            NewGameBeginRect.Width, NewGameBeginRect.Height, true, Keys.Enter);
-    }
-
     // Draw text horizontally centred on cx at y (measures the font-safe form so centring matches draw).
     private void DrawCentered(SpriteFont font, string text, Color col, int cx, int y)
     {
@@ -952,8 +897,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
         var preview = _build.Preview();
         Panel(40, 90, 240, 410);
         Text(_assets.Mono, _build.CoreRune.Title.ToUpper(), 56, 100, Muted);
-        var figBox = _ui.ElementRect("build", "paperDoll") ?? new Rectangle(100, 104, 120, 215);
-        DrawFigureIn(preview, _build.CoreRune.FigureKey(_build.Race), "build", "paperDoll", 160, 470, 360);
+        var figBox = _ui.ElementRect("equipment", "paperDoll") ?? new Rectangle(100, 104, 120, 215);
+        DrawFigureIn(preview, _build.CoreRune.FigureKey(_build.Race), "equipment", "paperDoll", 160, 470, 360);
         DrawAnatomyTags(figBox);
         DrawAttributeReadout(preview, _build.Race.NewBody(), 56, 318, KitDemand());
 
@@ -1078,7 +1023,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         var body = Exp.Player.Body;
         Panel(x, y, 220, 250);
         Text(_assets.Mono, "YOU - " + Exp.FigureId.ToUpperInvariant(), x + 12, y + 8, Muted);
-        DrawFigureIn(body, Exp.FigureId, "combat", "heroFigure", x + 110, y + 226, 210);
+        DrawFigureIn(body, Exp.FigureId, "encounter", "heroFigure", x + 110, y + 226, 210);
 
         var hp = Exp.Player;
         DrawBar(x + 16, y + 224, 188, _assets.Resource("hp"), hp.Hp, hp.MaxHp, Blood);
@@ -1688,6 +1633,13 @@ public class Game1 : Microsoft.Xna.Framework.Game
         var count = data?.Count ?? ListCountFor(e.Binds);
         var region = new LayoutRect(r.X, r.Y, r.Width, r.Height);
         var cells = ListLayout.Cells(region, e.Item, count, tmpl.Size);
+        // Which datum is CHOSEN, for `.selection` parts (the ring/chip only the picked card wears).
+        var selIx = e.Binds switch
+        {
+            "races" => _build.RaceIndex,
+            "cores" => _build.CoreRuneIndex,
+            _ => -1,
+        };
         for (var i = 0; i < cells.Count; i++)
         {
             var datum = data is not null && i < data.Count ? data[i] : null;
@@ -1697,9 +1649,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
             int valIx = 0, keyIx = 0;
             foreach (var pp in CardTemplate.Place(tmpl, cell.X, cell.Y))
             {
-                // Part-level chrome: STATE-driven parts (.selection/.state/.chargePct/.rarity) need live
-                // gating — a later slice; drawing them unconditionally would ring every card "selected".
-                var stateBound = pp.Binds is { } sb && (sb.EndsWith(".selection") || sb.EndsWith(".state")
+                if (pp.Binds is { } sel && sel.EndsWith(".selection") && i != selIx)
+                    continue; // only the chosen card wears its selection chip
+                // Part-level chrome: other STATE-driven parts (.state/.chargePct/.rarity) still need
+                // live gating — a later slice; drawing them unconditionally would mislabel every card.
+                var stateBound = pp.Binds is { } sb && (sb.EndsWith(".state")
                     || sb.EndsWith(".chargePct") || sb.EndsWith(".rarity"));
                 if (!stateBound)
                 {
