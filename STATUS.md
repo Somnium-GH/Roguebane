@@ -28,8 +28,9 @@ FLAGGED FIXES (from live screenshots):
 - ~~Resource-count readout top-right~~ DONE (2026-07-02) for supplies / gold / charge (the drop's new
   charge icon renders) on Encounter + CityMap + Equipment, InRun-gated. SUMMONS joins when its §9
   resource model lands (not yet built).
-- **War-party indicator:** castle icon RIGHT, camp icon LEFT; the bar "loads" LEFT→RIGHT (reconcile the
-  fill direction with §12 castle-right→camp-left advance).
+- ~~War-party indicator~~ DONE (2026-07-02): camp token LEFT, castle RIGHT, the covered-ground fill
+  loads LEFT→RIGHT, and the host token slides right→left toward camp (it previously moved AWAY from
+  camp — inverted fraction). The manifest doom bar (icons already camp-left/castle-right) matches.
 - **Targeting reticles don't sit on the foe's body parts** — fix reticle placement on the limb bands;
   needs matching reticle assets + (Needs-CD) demonstrative "how-it-mounts" design screens.
 - **SHIELD BAR + active-shield BUG:** shields are ALWAYS PASSIVE (reserve-the-stat) — an active-cast

@@ -781,16 +781,20 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     // The forward-pressure track: the war party marches on the camp one step per jump. The marker
     // slides toward the camp (left) as the distance closes; reaching it overruns the run.
+    // 2026-07-02 directive: CAMP anchors the LEFT end, the CASTLE the RIGHT; the bar LOADS left->right
+    // as the horde advances, and the host token slides right->left toward camp (§12's castle->camp march).
     private void DrawWarParty(int x, int y, int w)
     {
         var map = Exp.Map;
         Text(_assets.Mono, "WAR PARTY", x + 22, y - 16, Muted);
         Rect(x, y, w, 6, new Color(70, 55, 50));
-        Sprite(_assets.Node(map.Sees(map.Current)), x - 8, y - 8, 20, 20, Color.White); // camp end
         var frac = map.MarchLength > 0 ? (float)map.WarPartyDistance / map.MarchLength : 0f;
-        var mx = x + (int)((1f - frac) * (w - 22));
+        Rect(x, y, (int)((1f - frac) * w), 6, new Color(Blood, 190)); // covered ground loads left->right
+        Sprite(_assets.Node(NodeType.Camp), x - 8, y - 8, 20, 20, Color.White);           // camp LEFT
+        Sprite(_assets.Node(NodeType.Castle), x + w - 12, y - 8, 20, 20, Color.White);    // castle RIGHT
+        var mx = x + (int)(frac * (w - 22)); // distance-to-camp places the host: 1 = castle, 0 = camp
         // The closing war-party host: its own icon, swapping to the "near" variant when it's about to
-        // reach camp (the loss timer). Falls back to the castle glyph if the art is missing.
+        // reach camp (the loss timer). Falls back to a blood-tinted castle glyph if the art is missing.
         var near = map.WarPartyDistance <= 2;
         var host = _assets.Texture("icons/map/enemy_host" + (near ? "_near" : ""));
         if (host is not null) Sprite(host, mx, y - 12, 28, 28, Color.White);
