@@ -1777,12 +1777,20 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     // A skinned button whose state is driven by input (manifest: drives-from input/interaction).
     // Stretch-scaled for now; true 9-slice is polish. Returns nothing — input lives in Update.
+    // CD #11: the 320x88 button skins are 1080-class (2x design), sliced at 12 SOURCE px — corners
+    // land at 12 TARGET px (= 6 design px, dstCornerScale 1/SS) so rivets stay native, never chunky.
+    private static readonly int[] ButtonSlice = { 12, 12, 12, 12 };
+
     private void DrawButton(string label, int x, int y, int w, int h, bool enabled, Keys key)
     {
         var hovered = enabled && Hover(new Rectangle(x, y, w, h));
         var state = !enabled ? "disabled" : _keys.IsKeyDown(key) || hovered ? "down" : "normal";
         var skin = _assets.Button(state);
-        if (skin is not null) Sprite(skin, x, y, w, h, Color.White);
+        if (skin is not null)
+            foreach (var p in NineSlice.Patches(skin.Width, skin.Height, ButtonSlice,
+                         new LayoutRect(x, y, w, h), tile: false, centerFill: true, dstCornerScale: 1.0 / SS))
+                _spriteBatch.Draw(skin, new Rectangle(p.Dst.X, p.Dst.Y, p.Dst.W, p.Dst.H),
+                    new Rectangle(p.Src.X, p.Src.Y, p.Src.W, p.Src.H), Color.White);
         else Panel(x, y, w, h);
         var size = MeasureText(_assets.Mono, label);
         Text(_assets.Mono, label, (int)(x + w / 2 - size.X / 2), (int)(y + h / 2 - size.Y / 2),

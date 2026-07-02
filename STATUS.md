@@ -137,8 +137,10 @@ ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered 
 - **`imageBind`** — DONE (2026-07-02, CD #15): `TemplatePart.ImageBind` parses (contract-tested), the
   list renderer resolves `{bind}` placeholders per datum generically, and the map graph blits the
   fog-aware node token through it — skirmish ⚔ renders live; the "unknown ?" stopgap mapping retired.
-- **Button 9-slice corners = 12px** (CD #11): buttons were repainted to 320×88 (1080-class); the engine's
-  button nine-slice must blit with 12px corners, not 6px.
+- **Button 9-slice corners** — DONE (2026-07-02, CD #11): DrawButton nine-slices the 320×88 skins
+  (was stretch-scaled); source margins 12px, destination corners land at 12 TARGET px via NineSlice's
+  new `dstCornerScale` (1/SS for 2x art) so rivets stay native and a 25px-tall button keeps its face
+  (Core-tested). If CD meant 12 DESIGN px corners instead, flip the scale to 1 — one constant.
 - **Container overflow/scroll** (CD #4): DEFERRED (2 races / 6 cores fit today) — add a scroll/page
   primitive when a list actually overflows; tracked here so it's not lost.
 - **Confirm-to-close (lets Doug clear CD's entries):** on the relevant cutovers, confirm `cityNode` reads

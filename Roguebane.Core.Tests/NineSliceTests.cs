@@ -68,4 +68,18 @@ public class NineSliceTests
         Assert.Equal(8, patches.Count); // 9 minus the omitted centre
         Assert.DoesNotContain(patches, p => p.Src.X == 30 && p.Src.Y == 30);
     }
+
+    [Fact]
+    public void DstCornerScaleShrinksCornersForAboveScaleArt()
+    {
+        // 1080-class skins (2x design): source margins stay 12 but the destination corner lands at
+        // 6 design px, so the middle band keeps most of a small button instead of degenerating.
+        var patches = NineSlice.Patches(320, 88, new[] { 12, 12, 12, 12 },
+            new LayoutRect(0, 0, 116, 25), tile: false, centerFill: true, dstCornerScale: 0.5);
+        var corner = patches.First(p => p.Src.X == 0 && p.Src.Y == 0);
+        Assert.Equal(12, corner.Src.W);
+        Assert.Equal(6, corner.Dst.W);
+        var centre = patches.First(p => p.Src.X == 12 && p.Src.Y == 12);
+        Assert.Equal(13, centre.Dst.H); // 25 - 6 - 6
+    }
 }
