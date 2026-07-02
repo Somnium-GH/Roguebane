@@ -21,8 +21,38 @@ public sealed class Expedition
     private readonly Caster _caster;
     private readonly IReadOnlyList<Technique> _equipment;
     private readonly Stash _stash;
-    private readonly List<Weapon> _stockWeapons = new(Shops.Weapons); // this merchant's gear stock (per leg)
-    private readonly List<Armor> _stockArmor = new(Shops.Armor);
+    // §12 gear stock: rolled ONCE per merchant node from its seed (reproducible), purchases consume
+    // it. Techniques/minions/runes are OFFERED but not yet buyable — their receiving models (mid-run
+    // palette/bay/rune mutation) are the design-open gate.
+    private sealed class GearStock
+    {
+        public required List<Weapon> Weapons;
+        public required List<Armor> Armor;
+        public required List<Technique> Techniques;
+        public required List<Minion> Minions;
+        public required List<Mark> Marks;
+    }
+
+    private const ulong GearSalt = 0x47454152; // "GEAR"
+    private readonly Dictionary<string, GearStock> _gearStock = new();
+
+    private GearStock CurrentStock()
+    {
+        var id = Map.Current.Id;
+        if (_gearStock.TryGetValue(id, out var s)) return s;
+        var roll = MerchantStock.Roll(Seed(id) ^ GearSalt,
+            Armory.All, Shops.ArmorPool, Content.Techniques.All, Content.Minions.All, Paths.AllMarks);
+        s = new GearStock
+        {
+            Weapons = roll.Weapons.ToList(),
+            Armor = roll.Armor.ToList(),
+            Techniques = roll.Techniques.ToList(),
+            Minions = roll.Minions.ToList(),
+            Marks = roll.Marks.ToList(),
+        };
+        _gearStock[id] = s;
+        return s;
+    }
 
     public CityMap Map { get; }
     public Battle? Battle { get; private set; }
@@ -66,23 +96,26 @@ public sealed class Expedition
 
     // The merchant's gear stock and its prices (placeholder-sane: weapon = reserve+power, armor =
     // value+2). Buying spends gold, moves the piece into the Stash pack, and clears it from the stock.
-    public IReadOnlyList<Weapon> OfferedWeapons => _stockWeapons;
-    public IReadOnlyList<Armor> OfferedArmor => _stockArmor;
+    public IReadOnlyList<Weapon> OfferedWeapons => AtMerchant ? CurrentStock().Weapons : Array.Empty<Weapon>();
+    public IReadOnlyList<Armor> OfferedArmor => AtMerchant ? CurrentStock().Armor : Array.Empty<Armor>();
+    public IReadOnlyList<Technique> OfferedTechniques => AtMerchant ? CurrentStock().Techniques : Array.Empty<Technique>();
+    public IReadOnlyList<Minion> OfferedMinions => AtMerchant ? CurrentStock().Minions : Array.Empty<Minion>();
+    public IReadOnlyList<Mark> OfferedMarks => AtMerchant ? CurrentStock().Marks : Array.Empty<Mark>();
     public static int Price(Weapon weapon) => weapon.Reserve + weapon.Power;
     public static int Price(Armor armor) => armor.Value + 2;
 
     public bool BuyWeapon(Weapon weapon)
     {
-        if (!AtMerchant || !_stockWeapons.Contains(weapon) || !_stash.TrySpend(Price(weapon))) return false;
-        _stockWeapons.Remove(weapon);
+        if (!AtMerchant || !CurrentStock().Weapons.Contains(weapon) || !_stash.TrySpend(Price(weapon))) return false;
+        CurrentStock().Weapons.Remove(weapon);
         _stash.AddWeapon(weapon);
         return true;
     }
 
     public bool BuyArmor(Armor armor)
     {
-        if (!AtMerchant || !_stockArmor.Contains(armor) || !_stash.TrySpend(Price(armor))) return false;
-        _stockArmor.Remove(armor);
+        if (!AtMerchant || !CurrentStock().Armor.Contains(armor) || !_stash.TrySpend(Price(armor))) return false;
+        CurrentStock().Armor.Remove(armor);
         _stash.AddArmor(armor);
         return true;
     }

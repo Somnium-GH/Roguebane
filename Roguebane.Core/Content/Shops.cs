@@ -11,5 +11,6 @@ public static class Shops
     public static readonly Armor Hide = new("hide", Stat.Dex, ArmorKind.Leather, 25);    // leg leather: 25% evasion
 
     public static readonly IReadOnlyList<Weapon> Weapons = new[] { Armory.Sword, Armory.Dagger };
-    public static readonly IReadOnlyList<Armor> Armor = new[] { Plate }; // shop stock (Hide arrives via finds, later)
+    public static readonly IReadOnlyList<Armor> Armor = new[] { Plate }; // legacy fixed stock (retiring)
+    public static readonly IReadOnlyList<Armor> ArmorPool = new[] { Plate, Hide }; // §12 stock pool
 }

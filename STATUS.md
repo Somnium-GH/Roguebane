@@ -63,9 +63,11 @@ Summons stock (needs the §9 resource model). The 5-CATEGORY gear stock MODEL is
 `MerchantStock.Roll` — seeded/reproducible, ≤4 of 5 sections, 3 picks per section (pool-capped),
 techniques always-5-when-present + 2nd-rarest, rank-2 runes rarer, keystones NEVER; section weights
 placeholder (shuffle algorithm OPEN §17). Shape Core-tested over a 400-seed sweep (300 green).
-NOT WIRED yet: Expedition still stocks the old weapon/armor lists — wire Roll per merchant node +
-buy verbs for techniques/minions/runes (their RECEIVING models — mid-run palette/bay/rune mutation —
-are the design-open gate; weapons/armor can wire now). The SCREEN LAYOUT waits on a CD design PNG (popover = flagged stopgap).
+WIRED (2026-07-02): Expedition rolls the stock ONCE per merchant node from its seed (GearSalt) —
+weapons/armor buy from the roll (purchases consume it; the static Shops lists are retired from the
+merchant path), and techniques/minions/runes are OFFERED (exposed lists) but not yet buyable — their
+receiving models (mid-run palette/bay/rune mutation) stay the design-open gate. The standard map's
+"b" merchant deterministically stocks dagger+plate so the existing buy/equip tests hold unchanged. The SCREEN LAYOUT waits on a CD design PNG (popover = flagged stopgap).
 
 **AFTER HiFi completes/blocks + all outstanding identified bugs resolved:**
 - **Summoner CoreRune — real Core Effect:** on Redeploy, refund Summons for SURVIVING minions (§11). The

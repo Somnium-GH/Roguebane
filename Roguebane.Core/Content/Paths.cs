@@ -51,4 +51,8 @@ public static class Paths
         Minions: new[] { Minions.Shade });
 
     public static readonly IReadOnlyList<Mark> ConclaveLadder = new[] { ConclaveI, ConclaveII, BoundConclave };
+
+    // Every authored mark across the ladders — the merchant stock pool filters keystones itself.
+    public static readonly IReadOnlyList<Mark> AllMarks =
+        VesselLadder.Concat(ResonanceLadder).Concat(TempestLadder).Concat(ConclaveLadder).ToList();
 }
