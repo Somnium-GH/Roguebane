@@ -27,7 +27,10 @@ buttons light up with the consumer), ~~`border.sides` draw~~ DONE (element + tem
 borders honour named edges + manifest width; contract test pins side names), ~~`colorBind` resolve~~
 DONE (part fills tint from the bound datum's stat — technique/loadout/inv/bay — and element borders
 take a core accent; `CoreRune.Accent` is the data hook, per-core VALUES await design [Needs-human];
-ware.* resolves with the merchant consumer), shield-pip instancing + regen fill, the merchant-screen consumer, summons icon in the resource strip.
+ware.* resolves with the merchant consumer), ~~shield-pip instancing + regen fill~~ DONE (variable-N
+pips via the self-styled shieldPip leaf template, live/spent states, SHIELD n/m header, regen track
+fills toward the next pip from Body.ShieldRegenProgress — Core-tested; dashed spent-borders draw solid
+pending the pixel pass), the merchant-screen consumer, summons icon in the resource strip.
 
 ## ⇒ HUMAN DIRECTIVES — 2026-07-02 (revisions WIN; fold into the render arc / after the current slice)
 
@@ -71,11 +74,9 @@ FLAGGED FIXES (from live screenshots):
   union, both arms as one group) — AIMING centres on the hovered part while picking, FOCUS marks each
   locked part-aim (verified on the aimed head). Band strips remain the click hit-test. REMAINING
   Needs-CD: the demonstrative "how-it-mounts" design screens to pixel-match against.
-- **SHIELD BAR + active-shield BUG:** shields are ALWAYS PASSIVE (reserve-the-stat) — an active-cast
-  shield ability is a BUG; make shield sources passive-only (§6b). Add a **SHIELD BAR**: PIPS
-  (filled/empty) + a per-pip **REGEN progress bar** (time-to-next-pip) while the source is active, wired
-  to `ShieldPool` (layers + CON-scaled regen). Pool scales beyond 4 → render a VARIABLE N of pips
-  gracefully. CD designs the bar (best-stab, Doug refines tomorrow); loop wires it.
+- ~~SHIELD BAR + active-shield BUG~~ DONE (2026-07-02): passivity landed earlier (IsPassive, CardPress
+  toggles); the drop's bar is WIRED — variable-N pips (one per layer, filled-first), live/spent state
+  styles, and the per-pip regen track (Core-tested 304). Dashed spent-borders solid pending pixel pass.
 - ~~CityMap start node = CAMP~~ DONE (2026-07-02): `NodeType.Camp` end-to-end — the origin authors as
   Camp, fog always shows it (your own origin), re-entering it spawns NO fight (safe ground, like the
   merchant), and the chart blits the camp token. Core-tested (297 green).
