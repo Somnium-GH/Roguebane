@@ -8,7 +8,7 @@ public static class Maps
     // c1/c2 -> castle. Row 1 is the centre lane; 0/2 are the upper/lower branches.
     public static IReadOnlyList<MapNode> StandardLegNodes() => new[]
     {
-        new MapNode("camp", NodeType.Skirmish, "a1", "a2").At(0, 1),
+        new MapNode("camp", NodeType.Camp, "a1", "a2").At(0, 1),
         new MapNode("a1", NodeType.ResourceHold, "b").At(1, 0),
         new MapNode("a2", NodeType.Skirmish, "b").At(1, 2),
         new MapNode("b", NodeType.Merchant, "c1", "c2").At(2, 1),

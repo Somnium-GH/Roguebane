@@ -157,8 +157,8 @@ public sealed class Expedition
         if (Map.Outcome == CityMapOutcome.Overrun) { State = ExpeditionState.Lost; return true; }
 
         var node = Map.Current;
-        if (node.Type == NodeType.Merchant)
-            return true; // stay at the merchant: BuyHeal / buy gear are the verbs here
+        if (node.Type is NodeType.Merchant or NodeType.Camp)
+            return true; // no fight here: the merchant's verbs are shop/heal, the camp is safe ground
 
         Battle = new Battle(_caster, Maps.EncounterFor(node, Map.SupportBank), _player, Seed(node.Id));
         State = ExpeditionState.Fighting;

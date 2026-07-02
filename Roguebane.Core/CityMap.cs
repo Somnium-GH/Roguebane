@@ -84,6 +84,7 @@ public sealed class CityMap
         var adjacent = Adjacent(node.Id);
         return node.Type switch
         {
+            NodeType.Camp => NodeType.Camp,                 // your own origin — always known
             NodeType.ResourceHold => NodeType.ResourceHold, // visible afar
             NodeType.Castle => NodeType.Castle,             // visible afar
             NodeType.Merchant when adjacent => NodeType.Merchant, // resolves one jump out

@@ -58,6 +58,7 @@ public sealed class AssetRegistry
 
     private static readonly Dictionary<NodeType, string> NodeName = new()
     {
+        [NodeType.Camp] = "camp",
         [NodeType.Skirmish] = "skirmish", // dedicated icon landed 2026-07-01 (stopgap "?" retired)
         [NodeType.ResourceHold] = "resource",
         [NodeType.Merchant] = "merchant",

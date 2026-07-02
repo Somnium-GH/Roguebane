@@ -135,4 +135,27 @@ public class CityMapTests
         Assert.True(map.MoveTo("x")); // last supply spent, not at the castle
         Assert.Equal(CityMapOutcome.Overrun, map.Outcome);
     }
+
+    // 2026-07-02 directive: the origin is CAMP — safe ground, always known, never a fight.
+    [Fact]
+    public void CampIsItsOwnTypeAlwaysSeenAndNeverAFight()
+    {
+        var map = Maps.StandardLeg();
+        Assert.Equal(NodeType.Camp, map.Node("camp").Type);
+        Assert.Equal(NodeType.Camp, map.Sees(map.Node("camp"))); // never fogged, never "skirmish"
+
+        var exp = Sessions.Expedition();
+        foreach (var t in exp.Equipment) exp.Toggle(t); // arm the kit (no auto-arm by design)
+        exp.SetAuto(true);
+        exp.Enter("a1");                       // out to a fight...
+        var guard = 0;
+        while (exp.State == ExpeditionState.Fighting && guard++ < 10000)
+        {
+            if (exp.Enemy is { } foe) foreach (var t in exp.Equipment) if (exp.IsActive(t)) exp.Aim(t, foe);
+            exp.Tick();
+        }
+        exp.Redeploy();
+        Assert.True(exp.Enter("camp"));        // ...and back home
+        Assert.Equal(ExpeditionState.Choosing, exp.State); // no battle spawned on camp
+    }
 }

@@ -4,6 +4,7 @@ namespace Roguebane.Core;
 // charts close enough to resolve it.
 public enum NodeType
 {
+    Camp,         // the leg's origin — safe ground, never a fight, always known
     Skirmish,     // a fight (control point)
     ResourceHold, // a fight that, once taken, banks rallied support for the castle
     Merchant,     // shop + out-of-combat HP service (economy = G8)
