@@ -37,4 +37,23 @@ public class CoreRuneRosterTests
     {
         Assert.Equal(CoreRunes.Roster.Count, Sessions.NewBuild().CoreRuneCount);
     }
+
+    [Fact]
+    public void EveryTechniqueAndMinionCarriesDisplayCopy()
+    {
+        // Card DESCRIPTIONS are display data (design/01) like the apex copy: every palette technique
+        // (+ the opt-in shield/heal content) and every minion must ship copy, and {power} must resolve
+        // so the rendered text never contradicts the data.
+        var techs = Techniques.All.Concat(new[] { Techniques.Bandage, Techniques.Stoneskin });
+        foreach (var t in techs)
+        {
+            Assert.False(string.IsNullOrEmpty(t.Desc), $"{t.Id} desc");
+            Assert.DoesNotContain("{", t.DescText);
+        }
+        foreach (var m in Minions.All)
+        {
+            Assert.False(string.IsNullOrEmpty(m.Desc), $"{m.Id} desc");
+            Assert.DoesNotContain("{", m.DescText);
+        }
+    }
 }

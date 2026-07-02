@@ -1593,6 +1593,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
             "loadout.attr" => t.Stat.ToString().ToUpperInvariant() + " " + t.Reserve,
             "invItems.badgeLabel" or "technique.cost" => t.Stat.ToString().ToUpperInvariant(),
             "invItems.badgeNum" => t.Reserve.ToString(),
+            "technique.description" => t.DescText,
             _ => null,
         },
         Roguebane.Core.Minion mn => bind switch
@@ -1601,6 +1602,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
             "loadout.attr" => mn.Stat.ToString().ToUpperInvariant() + " " + mn.Reserve,
             "invItems.badgeLabel" or "bay.cost" => mn.Stat.ToString().ToUpperInvariant(),
             "invItems.badgeNum" => mn.Reserve.ToString(),
+            "bay.description" => mn.DescText,
             _ => null,
         },
         _ => null,

@@ -14,4 +14,8 @@ public enum MinionGate { Stat, None, AltCost }
 // powered it auto-fires on whatever the caster is pressing. AltCost holds the (designed, non-Charge)
 // alt cost amount. Minion VARIETY (re-gating onto STR/DEX/CON) rides on this Gate field now.
 public sealed record Minion(
-    string Id, Stat Stat, int Reserve, int Power, MinionGate Gate = MinionGate.Stat, int AltCost = 0);
+    string Id, Stat Stat, int Reserve, int Power, MinionGate Gate = MinionGate.Stat, int AltCost = 0,
+    string Desc = "") // DISPLAY-ONLY card copy (design/01); {power} resolves from the data at render.
+{
+    public string DescText => Desc.Replace("{power}", Power.ToString());
+}

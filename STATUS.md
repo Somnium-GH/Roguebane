@@ -73,8 +73,11 @@ SLICES (one screen/pass, pixel-verify vs its design PNG):
    Live binds (all verified over a live castle fight): hero/foe figures + HP, pool rows w/ live
    reservations, technique/bay cards (stat glyph tiles, costs), FSM state chips (DRY/HELD/READY/
    COOLDOWN, idle = no chip), cooldown labels, charge-progress fill widths, bay ACTIVE.
-   Gaps: technique/minion DESCRIPTIONS have no data (display-data pass, like ApexDesc); techCard cost
-   NUMBER is a bindless sample part (Needs-CD).
+   Gaps: techCard's bindless sample parts (the cost NUMBER + the mid-description damage digit) stamp
+   their sample on every card (Needs-CD: bind them).
+   DISPLAY COPY DONE: `Technique.Desc`/`Minion.Desc` (+`DescText`) ship card copy for all 8 techniques
+   + both minions; `{power}` resolves from the data at render so copy can't contradict tuning. Bound
+   via technique.description/bay.description; Core-tested (290 green).
 4. **CityMap** (in progress) — `design/03`. THIS PASS: the manifest `chart` graph element renders LIVE
    via `DrawManifestGraph` (GraphLayout spread over the element region): fog-aware beacon icons,
    charted solid / uncharted dashed links, the current node ringed "you are here", reachable
