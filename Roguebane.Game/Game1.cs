@@ -1601,7 +1601,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
             case "list" when e.Item is not null:
                 DrawManifestList(e, r);
                 break;
-            case "figure" when e.Binds == "preview.fig":
+            case "figure" when e.Binds is "preview.fig" or "Body":
                 // Composed loadout figure: feet at the box bottom-centre, scaled to the box height.
                 DrawHumanoid(_build.Preview(), _build.CoreRune.FigureKey(_build.Race),
                     r.X + r.Width / 2, r.Y + r.Height, r.Height);
@@ -1620,6 +1620,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
         "preview.bays" => _build.CoreRune.Bays.ToString(),
         "preview.apexName" => _build.CoreRune.ApexName,
         "preview.apexDesc" => _build.CoreRune.ApexDesc,
+        "core" => _build.Race.Name + " " + _build.CoreRune.Title,
+        "runes.budget" => _build.Runes.Available + " free / " + _build.Runes.Budget,
         _ => null,
     };
 
@@ -1644,9 +1646,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
         {
             var datum = data is not null && i < data.Count ? data[i] : null;
             var cell = cells[i];
-            // The per-attr tiles reuse the SAME bind 4x (STR/INT/DEX/CON in template order); count each
-            // occurrence per card to pick the right attribute.
-            int valIx = 0, keyIx = 0;
+            // Positional binds repeat the SAME bind N times per card (attr tiles 4x, attr-bar pips 12x,
+            // in template order); count each occurrence per card to pick the right datum slice.
+            int valIx = 0, keyIx = 0, pipIx = 0;
             foreach (var pp in CardTemplate.Place(tmpl, cell.X, cell.Y))
             {
                 if (pp.Binds is { } sel && sel.EndsWith(".selection") && i != selIx)
@@ -1657,11 +1659,21 @@ public class Game1 : Microsoft.Xna.Framework.Game
                     || sb.EndsWith(".chargePct") || sb.EndsWith(".rarity"));
                 if (!stateBound)
                 {
-                    // attr.color binds the swatch's fill TOKEN to the datum (str/int/dex/con).
-                    var fillTok = pp.Binds == "attr.color" && datum is not null
-                        ? ResolveBind(datum, pp.Binds) : null;
+                    // attr.color binds the swatch's fill TOKEN to the datum (str/int/dex/con);
+                    // attrs.pip picks per PIP INDEX: filled -> the attr's token, allocatable -> slot,
+                    // beyond the cap -> nothing.
+                    string? fillTok = null;
+                    var skipFill = false;
+                    if (pp.Binds == "attr.color" && datum is not null)
+                        fillTok = ResolveBind(datum, pp.Binds);
+                    else if (pp.Binds == "attrs.pip" && datum is ValueTuple<string, string, int, int, string> ab)
+                    {
+                        var p = pipIx++;
+                        fillTok = p < ab.Item3 ? ab.Item5 : p < ab.Item4 ? "slot" : null;
+                        skipFill = fillTok is null;
+                    }
                     if (fillTok is not null) DrawFill(RectOf(pp.Rect), new Fill { Token = fillTok });
-                    else if (pp.Fill is { } pf) DrawFill(RectOf(pp.Rect), pf);
+                    else if (!skipFill && pp.Fill is { } pf) DrawFill(RectOf(pp.Rect), pf);
                     if (pp.Border is { } pb)
                         Border(pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H, _ui.Color(pb.Color, Border0));
                 }
@@ -1705,8 +1717,25 @@ public class Game1 : Microsoft.Xna.Framework.Game
         "races" => Roguebane.Core.Content.Races.Roster.Cast<object>().ToList(),
         "cores" => Roguebane.Core.Content.CoreRunes.Roster.Cast<object>().ToList(),
         "preview.attrs" => PreviewAttrs(),
+        "attrs" => AttrBars(),
+        "loadout" => _build.Equipment.Cast<object>().ToList(),
+        "minions" => _build.CoreRune.MinionKit.Concat(_build.Runes.GrantedMinions).Cast<object>().ToList(),
         _ => null,
     };
+
+    // The Equipment attribute bars: one datum per stat — (key, part label §6, free pool, capacity,
+    // pip colour token). Pre-run nothing is reserved, so free == capacity until actives wire in.
+    private System.Collections.Generic.IReadOnlyList<object> AttrBars()
+    {
+        var b = _build.Preview();
+        return new object[]
+        {
+            ("STR", "Arms", b.Available(Stat.Str), b.Capacity(Stat.Str), "str"),
+            ("INT", "Head", b.Available(Stat.Int), b.Capacity(Stat.Int), "int"),
+            ("DEX", "Legs", b.Available(Stat.Dex), b.Capacity(Stat.Dex), "dex"),
+            ("CON", "Chest", b.Available(Stat.Con), b.Capacity(Stat.Con), "con"),
+        };
+    }
 
     // The Loadout preview's 4 attribute tiles: key/value/swatch-token per stat, from the LIVE build.
     private System.Collections.Generic.IReadOnlyList<object> PreviewAttrs()
@@ -1751,8 +1780,32 @@ public class Game1 : Microsoft.Xna.Framework.Game
             "attr.color" => a.Item3,
             _ => null,
         },
+        ValueTuple<string, string, int, int, string> ab => bind switch // (key, part, free, cap, token) attr bar
+        {
+            "attrs.key" => ab.Item1,
+            "attrs.part" => ab.Item2,
+            "attrs.alloc" => ab.Item3.ToString(),
+            "attrs.available" => ab.Item4.ToString(),
+            _ => null,
+        },
+        Roguebane.Core.Technique t => bind switch
+        {
+            "loadout.name" => DisplayName(t.Id),
+            "loadout.attr" => t.Stat.ToString().ToUpperInvariant() + " " + t.Reserve,
+            _ => null,
+        },
+        Roguebane.Core.Minion mn => bind switch
+        {
+            "loadout.name" => DisplayName(mn.Id),
+            "loadout.attr" => mn.Stat.ToString().ToUpperInvariant() + " " + mn.Reserve,
+            _ => null,
+        },
         _ => null,
     };
+
+    // Content ids are lower-case ("swing", "skeleton"); cards show them capitalised, per design/02.
+    private static string DisplayName(string id) =>
+        id.Length == 0 ? id : char.ToUpperInvariant(id[0]) + id[1..];
 
     private static int ListCountFor(string? bind) => 3; // sample-count fallback for unmapped binds
 
