@@ -73,8 +73,14 @@ FIDELITY DRAW (shadow/frame/gradient, §10) feeds all of the above — same crit
   manifest `fontPx` (relative to the font's design base — mono 14 / display 20 — keeping the 1/SS
   supersample). Wired into element text + card parts. The overflow is GONE: cards now read cleanly —
   big names, small BUDGET/ACTIONS/BAYS + STR/INT/DEX/CON labels, sized values, apex name + wrapped desc —
-  matching design/05's card structure. NEXT: display data + composed figure via `preview.fig`; graphs; then CUT
-  NewGame's live screen over + diff vs design/05.]
+  matching design/05's card structure.
+  SLICE 7 DONE — DISPLAY DATA: added `Race.Tag`/`Race.Blurb` + `CoreRune.ApexName`/`ApexDesc` (all
+  DISPLAY-ONLY, placeholder flavour — NO apex EFFECTS per guardrail; DESIGN_SPEC §11 notes this). Populated
+  both races + all 6 cores (Grunt=Hollow Vessel ... Ranger=Piercing Focus). Wired `ResolveBind`:
+  `race.tag`/`race.blurb`/`core.apexName`/`core.apexDescription`. CoreRuneRosterTests asserts every core's
+  apex name+desc non-empty (288 Core green). NOW every card part except `core.icon` binds to live data.
+  NEXT: composed figure via `preview.fig`; graphs; core.icon glyph (ASCII font can't draw ①②③/✚ → "?"); then
+  CUT NewGame's live screen over + diff vs design/05.]
 
 FLOW: Equipment reachable BETWEEN fights — from the post-combat Cleared/Redeploy state + CityMap +
 CampaignMap — editing the CURRENT loadout (core fixed), NOT a core-picker.
@@ -82,6 +88,13 @@ CampaignMap — editing the CURRENT loadout (core fixed), NOT a core-picker.
 If a screen genuinely can't be driven from the manifest, document the SPECIFIC missing capability (what
 the manifest expresses that the renderer can't draw) as a concrete Needs-human/CD item — never claim
 "exhausted" while these are open.
+
+## BACKLOG (NOT prioritized — later; do not pull ahead of the rescue)
+- **String localization / i18n prep:** externalize ALL user-facing strings behind IDs (no hardcoded UI
+  text); route every drawn string through ONE resolution path — the renderer's `content`/`binds` text
+  resolver (Phase 0) is the natural seam, so just don't hardcode literals there and a locale/string-table
+  layer slots in later at ~zero cost. Also flag: SpriteFonts are ASCII-only (GlyphSafe folds unknowns) —
+  real i18n needs fonts covering the target scripts' glyphs. NOT now — just don't architect against it.
 
 ## ⇒ AT A GLANCE (updated 2026-07-01) — read this first; detail is in the sections below
 State: build GREEN (273 Core tests); all four screens smoke-clean; POC loop plays NewGame→Equipment→

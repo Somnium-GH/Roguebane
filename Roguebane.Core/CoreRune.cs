@@ -14,7 +14,9 @@ public sealed record CoreRune(
     IReadOnlyList<Minion>? DefaultMinions = null,
     IReadOnlyList<Weapon>? DefaultWeapons = null, // wielded at assembly so a consulting verb has a stick
     string Archetype = "",  // the one-line identity ("THE GENERALIST") shown on the New Run / build cards
-    string Flavor = "")     // the card's short pitch (design/05)
+    string Flavor = "",     // the card's short pitch (design/05)
+    string ApexName = "",   // DISPLAY-ONLY apex label (a core's signature effect) — text, NOT a mechanic
+    string ApexDesc = "")   // DISPLAY-ONLY apex blurb — shown on the card; the EFFECT is not implemented (§11)
 {
     // Display name for the cards ("grunt" -> "Grunt"); the Id stays the lowercase content key.
     public string Title => string.IsNullOrEmpty(Id) ? Id : char.ToUpperInvariant(Id[0]) + Id[1..];

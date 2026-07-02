@@ -11,7 +11,9 @@ public sealed record Race(
     int Dex,
     int Con,
     int Hp,
-    string Title = "")
+    string Title = "",
+    string Tag = "",    // DISPLAY-ONLY card sub-label (a race's line/flavour), e.g. "THE FOUNDER LINE"
+    string Blurb = "")  // DISPLAY-ONLY card pitch
 {
     public string Name => string.IsNullOrEmpty(Title) ? Id : Title;
 

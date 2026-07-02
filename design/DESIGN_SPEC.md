@@ -239,6 +239,9 @@ rune** (grown by progression). The *shape* of the rune loadout is itself a build
   POC keystone **Hollow Vessel** (unspent budget converts live into a regenerating resource) — **[effect
   OPEN: the old "aether" target is retired; redefine (vs Charge or a regenerating attribute) before it's
   real. Code currently grants a placeholder +CON — sample content, not the designed effect.]**
+  Each CoreRune also carries a **DISPLAY-ONLY apex label + blurb** (`ApexName`/`ApexDesc`, e.g. Grunt =
+  *Hollow Vessel*) the build cards render (§13). This is card TEXT only — the apex EFFECTS are not
+  implemented; the wording is placeholder until the effects above lock.
 - **Prerequisite ladder [LOCKED]:** big runes need a minimum in an attribute, met by RACE base
   (efficient) **or** by spending budget on Marks to climb (mostly-refunded-but-leaks tax). Native
   qualification beats climbing.

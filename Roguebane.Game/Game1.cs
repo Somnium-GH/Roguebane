@@ -1680,6 +1680,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
         {
             "race.name" => r.Name,
             "race.hp" => r.Hp.ToString(),
+            "race.tag" => r.Tag,
+            "race.blurb" => r.Blurb,
             _ => null,
         },
         Roguebane.Core.CoreRune c => bind switch
@@ -1689,6 +1691,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
             "core.budget" => c.RuneBudget.ToString(),
             "core.bays" => c.Bays.ToString(),
             "core.actionSlots" => c.Kit.Count.ToString(),
+            "core.apexName" => c.ApexName,
+            "core.apexDescription" => c.ApexDesc,
             _ => null,
         },
         _ => null,
