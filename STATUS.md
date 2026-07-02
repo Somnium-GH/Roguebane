@@ -52,6 +52,12 @@ SLICES (one screen/pass, pixel-verify vs its design PNG):
    NOT design-done — remaining deltas are ALL manifest-expressiveness gaps (Needs-CD below): card/tile
    bg+chrome parts, tile value+label split, `align`, button/chip labels+fills, core-rune icons +
    ①②③/✚ glyph font, head-image assets, hi-fi bg. Re-walk the full delta list when CD's drop lands.
+   Race-column pixel-walk (2026-07-01, live vs design/05): positions/values MATCH the manifest; the
+   residual deltas are (a) text ~1.5x wider than the mock — the SYSTEM display font is wider than the
+   design font at the same fontPx (fixed by the bundled-font swap, tracked in Verify mechanics), and
+   (b) the known Needs-CD chrome: no card bg/panel part, no whole-card CHOSEN ring (only the chip is
+   in the template), race.headImage draws its gradient slot but head sprites don't exist, ✓ folds.
+   No renderer-side bugs found in the walk.
 2. **Equipment** — CUT OVER: live screen renders via `DrawManifestScreen("equipment")`; the hand-drawn
    build screen (core selector/core block/palette/loadout strip/anatomy tags) is DELETED. Core switching
    is REMOVED from this screen per design/02 (core is fixed between fights — that choice is NewGame's).
@@ -102,8 +108,14 @@ SLICES (one screen/pass, pixel-verify vs its design PNG):
    the cityNode template (Needs-CD). MODEL gap: §12 Layer 1 locks a forward-biased city GRAPH but
    Campaign is still a linear leg list — graph model + campaign-level supplies/WAIT is its own Core
    pass (surface before building). No screen-flow entry yet (not reachable in game; RB_MF only).
-FLOW: Equipment reachable BETWEEN fights — from the post-combat Cleared/Redeploy state + CityMap +
-CampaignMap — editing the CURRENT loadout (core fixed).
+FLOW [FIX — blocks progress today]: **NewGame → CityMap directly** — Equipment is NOT a post-NewGame gate
+(that wrong gating is why you can't reach the run map). **Hotkey `i` toggles Equipment** anywhere (+
+buttons on Encounter/CityMap/CampaignMap); **`i`/Esc exits** (there's currently no exit). Out of combat =
+editable (current core; not a core-picker); IN combat = opens as a **read-only PAUSE** (view equipment
+state incl. RED disabled gear; no changes). See DESIGN_SPEC §12.
+IMMEDIATE small tasks (not CD): bind `core.icon` → `icons/rune/core_<id>` (icons exist); add the glyph
+codepoints (①②③ ✚ ◉ ✓ — the "?" on NewGame/Equipment) to the SpriteFont regions (the font task). These
+close most of the visible "?" gaps without CD.
 
 ## Verify mechanics
 - `RB_MF=<screenId>` renders a screen STRAIGHT from the manifest (safe — live screens untouched): the

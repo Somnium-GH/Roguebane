@@ -96,8 +96,10 @@ allocation economy.
   Active heals + potions repair PARTS only, never HP.
 - **Part multiplicity & damage:** `Head×1, Chest×1, Arms×2, Legs×2`. Paired parts take damage
   independently and each carry a SHARE of their stat (one arm = ½ STR). Weapons held in hands; lose an
-  arm → lose its STR share → can fall below an equip threshold and that gear **drops off**. The cascade
-  *is* the combat depth.
+  arm → lose its STR share → can fall below a gear's equip threshold, and that gear is then **DISABLED**
+  (no bonus/defense, shown **RED** in Equipment) but stays **ASSIGNED** and **re-activates when the
+  attribute heals** — it does NOT leave the slot. The cascade *is* the combat depth. **[OPEN §17: when an
+  attribute drops below MULTIPLE items' requirements, a rule / ITEM-RANKING decides which disables first.]**
 - **Armor [LIGHT effect layer — not attribute gear]:** one piece per part-group; does NOT grant or gate
   attributes. Effect keyed to TYPE: heavy/**plate → a worn SHIELD SOURCE** (raises `Value` §6b shield
   layers on its group while it stands; the flat-protection role is retired since §8 — shields + full evade
@@ -288,8 +290,11 @@ Nested layers, macro → micro:
 - **Flow — Redeploy / Retreat, Equipment between fights [LOCKED; timing OPEN]:** **Retreat** = the
   in-combat action to bail an active fight; **Redeploy** = the out-of-combat action to advance (a move on
   the CityMap). **A resolved fight does NOT auto-return to the map** — the player explicitly Redeploys.
-  **Equipment (loadout) is reachable between fights** — a button on the Encounter screen (only when not
-  fighting) and on the CityMap / CampaignMap. Redeploy is **timed**: a lockout that **DEX shortens**
+  **Equipment access:** NewGame leads STRAIGHT into the run (CityMap) — Equipment is NOT a post-NewGame
+  gate. **Hotkey `i` toggles the Equipment screen** anywhere (also a button on Encounter/CityMap/
+  CampaignMap); `i`/Esc exits. Out of combat it's **editable**; DURING combat it opens as a **read-only
+  PAUSE** — view/reason about equipment state (incl. RED disabled gear) but change nothing (edits only out
+  of combat). Redeploy is **timed**: a lockout that **DEX shortens**
   (haste, §6) — design-locked, *not yet built (flow first)*. **[OPEN]** an FTL-style commit-to-
   destination (pick where you Redeploy/Retreat to in the same act) — deferred; for now Redeploy just
   routes to the CityMap.
@@ -386,6 +391,9 @@ points there so the canon stays design-focused.
     equipped-gear parts (a morph model, not per-race×core×gear art); a piece may cover multiple part slots
     (robe = all/most). Exact morph mechanics + the multi-slot slot model — design BEFORE building the
     gear-swap system (today gear is starting-set only; GEAR cards are sample/design-open).
+16. ITEM-RANKING / auto-unequip priority (§6): when a broken part drops an attribute below MULTIPLE items'
+    requirements, a rule/ranking decides which gear disables first — needs design + tuning. Feeds the
+    gear system (design-open).
 
 ## 18. DROPPED — must not resurface
 - **"Chassis" as the identity model** → split into **Race + Core rune** (§7).
