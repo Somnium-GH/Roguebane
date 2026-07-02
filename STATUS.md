@@ -83,8 +83,12 @@ receiving models (mid-run palette/bay/rune mutation) stay the design-open gate. 
   real effect (CD reconciles the design/05 Legion label). Core-tested over a live cleared fight
   (301 green). NOTE surfaced: the Shade (INT 3) fails its gate at assembly on a base Human (INT 3,
   Skeleton already reserving 2) — only the Skeleton fields from the off; balance touchpoint.
-- **CONTINGENCY (only if HiFi work is exhausted):** refactor the uber `Game1.cs` — split by responsibility
-  (SRP), codify SOLID where it sensibly applies. The giant class/file is the target.
+- **CONTINGENCY (HiFi is CD-blocked → active):** refactor the uber `Game1.cs` — split by responsibility
+  (SRP), codify SOLID where it sensibly applies. STARTED (2026-07-02): the manifest RENDERER half
+  (generic element renderer, list/graph stamping, bind resolvers, fidelity primitives — 640 lines)
+  lives in `Game1.ManifestRenderer.cs` (partial split, behavior identical; Game1.cs 1867→1245).
+  NEXT candidates: the legacy CityMap draw block; then true class extraction where coupling allows
+  (draw primitives → a canvas type).
 
 ## ⇒ HOW TO WORK THIS ARC — read EVERY pass (pixel-perfect · no drift · no premature "done")
 ONE screen per pass. The goal is: every screen renders 100% from `layout.json` and matches its
