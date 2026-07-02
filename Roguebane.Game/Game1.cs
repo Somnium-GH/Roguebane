@@ -32,6 +32,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     private BuildSession _build = null!;
     private Campaign _campaign = null!;
     private bool _paused;
+    private bool _merchantOpen; // design/07 full-screen merchant; opens on arrival, LEAVE returns to the map
     private Screen _equipReturnTo = Screen.Run; // where BACK leads from the (in-run) Equipment screen
     private string? _mfScreen;  // dev: RB_MF=<screenId> renders that screen straight from the manifest (RESCUE arc)
     private readonly CombatTargeting _ctrl = new(); // the targeting FSM (headless, in Core); shell just feeds it intents
@@ -339,6 +340,34 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             return;
         }
 
+        // The design/07 merchant screen swallows input while open: row clicks buy, LEAVE/Esc returns
+        // to the map (the node stays a merchant; keyboard verbs below still work map-side).
+        if (_merchantOpen && Exp.AtMerchant)
+        {
+            if (Pressed(keys, Keys.Escape)
+                || (ManifestElementRect("merchant", "merchant.leave") is { } lv && Click(lv)))
+                { _merchantOpen = false; return; }
+            var heals = ManifestListCells("merchant", "merchant.healing.offers", 2);
+            if (heals.Count == 2)
+            {
+                if (Click(new Rectangle(heals[0].X, heals[0].Y, heals[0].W, heals[0].H))) Exp.BuyHeal();
+                if (Click(new Rectangle(heals[1].X, heals[1].Y, heals[1].W, heals[1].H))) Exp.BuyFullHeal();
+            }
+            var lots = ManifestListCells("merchant", "merchant.provisions.stock", 3);
+            if (lots.Count == 3)
+            {
+                if (Click(new Rectangle(lots[0].X, lots[0].Y, lots[0].W, lots[0].H))) Exp.BuySupplies();
+                if (Click(new Rectangle(lots[1].X, lots[1].Y, lots[1].W, lots[1].H))) Exp.BuyCharge();
+                if (Click(new Rectangle(lots[2].X, lots[2].Y, lots[2].W, lots[2].H))) Exp.BuySummons();
+            }
+            if (Pressed(keys, Keys.H)) Exp.BuyHeal();
+            if (Pressed(keys, Keys.F)) Exp.BuyFullHeal();
+            if (Pressed(keys, Keys.S)) Exp.BuySupplies();
+            if (Pressed(keys, Keys.C)) Exp.BuyCharge();
+            if (Pressed(keys, Keys.M)) Exp.BuySummons();
+            return; // no map click-through under the stall
+        }
+
         if (Exp.AtMerchant)
         {
             if (Pressed(keys, Keys.H) || Click(MerchHealRect)) Exp.BuyHeal(); // 1 HP per buy (§12)
@@ -370,6 +399,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                 _campaign.Enter(options[i].Id); // may win the leg and roll to the next city
                 foreach (var t in Exp.Equipment)  // keep the bar armed into the next fight/leg
                     if (!_campaign.IsActive(t)) _campaign.Toggle(t);
+                _merchantOpen = Exp.AtMerchant; // arriving at a merchant opens the stall screen
                 break;
             }
     }
@@ -584,6 +614,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         // A cleared fight HOLDS on the battlefield (with the Redeploy overlay) — no auto-return to the
         // chart. The chart shows only once the player has redeployed (Choosing).
         if (Exp.State is ExpeditionState.Fighting or ExpeditionState.Cleared) DrawEncounterScreen();
+        else if (_merchantOpen && Exp.AtMerchant) DrawManifestScreen("merchant"); // design/07 stall
         else DrawCityMapScreen();
     }
 

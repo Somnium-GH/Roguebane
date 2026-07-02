@@ -53,6 +53,13 @@ public partial class Game1
         switch (e.Type)
         {
             case "text":
+                // A *.scene backdrop: the element's authored image IS the content (combat field,
+                // merchant stall) — blit it to the box and skip text entirely.
+                if (e.Binds is { } sceneBind && sceneBind.EndsWith(".scene") && e.Image is { Length: > 0 } bg)
+                {
+                    Sprite(_assets.Texture(NormalizeContentPath(bg)), r.X, r.Y, r.Width, r.Height, Color.White);
+                    break;
+                }
                 // §6b regen readout: the element's fill/border drew the track above; the live progress
                 // toward the NEXT pip fills it in the pips' live token. No text — the bar IS the datum.
                 if (e.Binds == "ShieldPool.regen")
@@ -266,6 +273,10 @@ public partial class Game1
         // §6b shield bar header: standing points / total layers across the body's shield sources.
         "ShieldPool" => InRun && Exp.Player.Body.ShieldLayers > 0
             ? "SHIELD " + Exp.Player.Body.ShieldPoints + "/" + Exp.Player.Body.ShieldLayers : null,
+        // Merchant screen (design/07): header/footer readouts. The pager label waits on the wares slice.
+        "merchant.label" => "MERCHANT",
+        "merchant.leave" => InRun && Exp.AtMerchant ? "LEAVE" : null,
+        "run.gold" => InRun ? "PURSE " + Exp.Gold + "g" : null,
         "combat.paused" => _paused ? "HELD" : null, // badge shows only while the fight is held
         "campaign.taken" => InRun ? _campaign.LegIndex + " / " + _campaign.LegCount : null,
         _ => null,
@@ -449,8 +460,39 @@ public partial class Game1
             ? Enumerable.Range(0, Exp.Player.Body.ShieldLayers)
                 .Select(i => (object)(i < Exp.Player.Body.ShieldPoints)).ToList()
             : new List<object>(),
+        // Merchant (§12, design/07): the heal offers + the seeded provision lots, live-priced.
+        "merchant.healing.offers" => InRun && Exp.AtMerchant
+            ? new List<object>
+            {
+                new MerchantOffer("Mend 1 HP", "a careful binding", Exp.HealPricePerHp),
+                new MerchantOffer("Full repair", "every wound, at a premium", Exp.FullHealPrice),
+            }
+            : new List<object>(),
+        "merchant.provisions.stock" => InRun && Exp.AtMerchant
+            ? new List<object>
+            {
+                new MerchantLot("supplies", "Supplies", Exp.SuppliesStock, Exp.SuppliesPrice),
+                new MerchantLot("charge", "Charge", Exp.ChargeStock, Exp.ChargePrice),
+                new MerchantLot("summons", "Summons", Exp.SummonsStock, Exp.SummonsPrice),
+            }
+            : new List<object>(),
+        // The in-run resource strip as manifest data (id/value/label per chip).
+        "run.resources" => InRun
+            ? new List<object>
+            {
+                new ResourceReadout("supplies", Exp.Map.Supplies + "/" + Exp.Map.MaxSupplies, "SUPPLIES"),
+                new ResourceReadout("spoils", Exp.Gold.ToString(), "GOLD"),
+                new ResourceReadout("charge", Exp.Charge + "/" + Exp.MaxCharge, "CHARGE"),
+                new ResourceReadout("summons", Exp.Summons + "/" + Exp.MaxSummons, "SUMMONS"),
+            }
+            : new List<object>(),
         _ => null,
     };
+
+    // Merchant list data (shell-side view records — the Core sells, the shell narrates).
+    private sealed record MerchantOffer(string Name, string Note, int Price);
+    private sealed record MerchantLot(string Id, string Name, int Qty, int Price);
+    private sealed record ResourceReadout(string Id, string Value, string Label);
 
     // The attribute bars/pool rows: one datum per stat — (key, part label §6, free pool, capacity,
     // pip colour token). In a run the LIVE body supplies them (actives reserve, damage shrinks caps);
@@ -478,6 +520,14 @@ public partial class Game1
             ("DEX", b.Capacity(Stat.Dex).ToString(), "dex"),
             ("CON", b.Capacity(Stat.Con).ToString(), "con"),
         };
+    }
+
+    // Manifest image paths may be authored project-relative ("Content/bg/x.png"); the pipeline wants
+    // the content NAME (no root, no extension).
+    private static string NormalizeContentPath(string p)
+    {
+        if (p.StartsWith("Content/")) p = p["Content/".Length..];
+        return p.EndsWith(".png") ? p[..^4] : p;
     }
 
     // A self-styled LEAF template (no parts): the cell itself is the visual — its fill/border restyled
@@ -583,6 +633,28 @@ public partial class Game1
             "attrs.part" or "pool.attr.part" => ab.Item2,
             "attrs.alloc" or "pool.attr.alloc" => ab.Item3.ToString(),
             "attrs.available" or "pool.attr.available" => ab.Item4.ToString(),
+            _ => null,
+        },
+        MerchantOffer off => bind switch // §12 heal rows (design/07)
+        {
+            "offer.name" => off.Name,
+            "offer.note" => off.Note,
+            "offer.price" => off.Price + "g",
+            _ => null,
+        },
+        MerchantLot lot => bind switch // §12 provision rows: id feeds the imageBind icon path
+        {
+            "lot.id" => lot.Id,
+            "lot.name" => lot.Name,
+            "lot.qty" => "x" + lot.Qty,
+            "lot.price" => lot.Price + "g",
+            _ => null,
+        },
+        ResourceReadout res => bind switch // the in-run resource strip chips
+        {
+            "resource.id" => res.Id,
+            "resource.value" => res.Value,
+            "resource.label" => res.Label,
             _ => null,
         },
         Roguebane.Core.Technique t => bind switch

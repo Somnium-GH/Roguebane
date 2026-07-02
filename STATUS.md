@@ -30,8 +30,12 @@ take a core accent; `CoreRune.Accent` is the data hook, per-core VALUES await de
 ware.* resolves with the merchant consumer), ~~shield-pip instancing + regen fill~~ DONE (variable-N
 pips via the self-styled shieldPip leaf template, live/spent states, SHIELD n/m header, regen track
 fills toward the next pip from Body.ShieldRegenProgress — Core-tested; dashed spent-borders draw solid
-pending the pixel pass), ~~summons icon in the resource strip~~ DONE (the drop's icon + the mgcb
-mirror light the already-wired strip slot), the merchant-screen consumer (LAST in the queue).
+pending the pixel pass), ~~summons icon~~ DONE, merchant-screen consumer PART 1 DONE (2026-07-02):
+the design/07 stall renders FROM THE MANIFEST at merchant nodes — arrival opens it, LEAVE/Esc returns to
+the map; stall backdrop via the new *.scene handler; heal offers + provision lots are live-priced list
+rows with row-click + keyboard buys; run.resources strip is manifest data; PURSE readout. REMAINING
+(part 2): the WARES shelves (shopSection is a NESTED list — needs nested-template stamping), the pager,
+ware.* binds + buys into the stash, then RETIRE the citymap merchant popover stopgap.
 
 ## ⇒ HUMAN DIRECTIVES — 2026-07-02 (revisions WIN; fold into the render arc / after the current slice)
 
