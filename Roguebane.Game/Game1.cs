@@ -1521,10 +1521,31 @@ public class Game1 : Microsoft.Xna.Framework.Game
             {
                 if (pp.Binds is { } sel && sel.EndsWith(".selection") && i != selIx)
                     continue; // only the chosen card wears its selection chip
-                // Part-level chrome: other STATE-driven parts (.state/.chargePct/.rarity) still need
-                // live gating — a later slice; drawing them unconditionally would mislabel every card.
-                var stateBound = pp.Binds is { } sb && (sb.EndsWith(".state")
-                    || sb.EndsWith(".chargePct") || sb.EndsWith(".rarity"));
+                // FSM state parts resolve from the LIVE run — an idle card shows no chip/label at all
+                // (never the sample), so resolve BEFORE chrome and bail when there's nothing to say.
+                string? stateText = null;
+                var isStatePart = pp.Binds is "technique.state" or "bay.state" or "technique.cooldownLabel";
+                if (isStatePart)
+                {
+                    stateText = ResolveStateBind(datum, pp.Binds!);
+                    if (string.IsNullOrEmpty(stateText)) continue;
+                }
+                // Charge/cooldown progress: the fill bar's WIDTH is the resolved fraction.
+                if (pp.Binds == "technique.chargePct")
+                {
+                    if (InRun && datum is Roguebane.Core.Technique ct && pp.Fill is { } cf)
+                    {
+                        var st = Exp.Status(ct);
+                        var pct = st.Ready ? 1f
+                            : st.Active && st.Cooldown > 0 ? 1f - (float)st.Countdown / st.Cooldown : 0f;
+                        if (pct > 0f)
+                            DrawFill(new Rectangle(pp.Rect.X, pp.Rect.Y,
+                                (int)(pp.Rect.W * Math.Clamp(pct, 0f, 1f)), pp.Rect.H), cf);
+                    }
+                    continue;
+                }
+                // Remaining state-driven chrome (.rarity) still needs its model — keep gated.
+                var stateBound = pp.Binds is { } sb && sb.EndsWith(".rarity");
                 if (!stateBound)
                 {
                     // attr.color binds the swatch's fill TOKEN to the datum (str/int/dex/con);
@@ -1556,7 +1577,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
                     Sprite(_assets.Texture(img!), pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H, Color.White);
                     continue;
                 }
-                var text = pp.Binds switch
+                var text = isStatePart ? stateText : pp.Binds switch
                 {
                     "race.attrs.value" => AttrTile(datum, valIx++)?.value,
                     "race.attrs.key" => AttrTile(datum, keyIx++)?.key,
@@ -1698,6 +1719,30 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // Content ids are lower-case ("swing", "skeleton"); cards show them capitalised, per design/02.
     private static string DisplayName(string id) =>
         id.Length == 0 ? id : char.ToUpperInvariant(id[0]) + id[1..];
+
+    // A card's live FSM read (design/01 chips + cooldown label): null = idle, show nothing.
+    // Countdown is in fixed ticks (10/s) -> seconds for the label.
+    private string? ResolveStateBind(object? datum, string bind)
+    {
+        if (!InRun) return null;
+        if (datum is Roguebane.Core.Technique t)
+        {
+            var st = Exp.Status(t);
+            return bind switch
+            {
+                "technique.state" => st.ChargeDry ? "DRY"
+                    : st.Sustained && st.Active ? "HELD"
+                    : st.Ready ? "READY"
+                    : st.Active && st.Countdown > 0 ? "COOLDOWN" : null,
+                "technique.cooldownLabel" => st.Ready ? "ready"
+                    : st.Sustained && st.Active ? "held"
+                    : st.Active && st.Countdown > 0 ? (st.Countdown / 10f).ToString("0.0") + "s" : null,
+                _ => null,
+            };
+        }
+        // A fielded minion is ACTIVE by definition (the bays list holds the live retinue in a run).
+        return datum is Roguebane.Core.Minion && bind == "bay.state" ? "ACTIVE" : null;
+    }
 
     private static int ListCountFor(string? bind) => 3; // sample-count fallback for unmapped binds
 

@@ -67,8 +67,12 @@ SLICES (one screen/pass, pixel-verify vs its design PNG):
    foe figure/HP from `encounter.foe` (down-tint); `pool` rows read the live body — reservations show
    (verified: STR 2/3 with a reserve held); `loadout.techniques`/`loadout.bays` cards with stat-token
    glyph tiles + costs. Verified RB_MF=encounter over a live castle fight.
+   FSM STATE BINDS DONE (this pass): technique.state chip (DRY/HELD/READY/COOLDOWN — idle shows NO
+   chip, never the sample), technique.cooldownLabel (ready/held/remaining seconds at tick 10/s),
+   technique.chargePct (fill bar width = live progress fraction), bay.state (fielded minion = ACTIVE).
+   Verified live: cooldown chips + 3.9s/2.0s/held labels + partial charge bars over a castle fight.
    REMAINING for cut-over: combat input on manifest geometry (card press/aim, foe part bands, auto/
-   flee), state labels (technique.state/chargePct/cooldownLabel — FSM read), minionField multi-figure.
+   flee), targeting/aiming card state, minionField multi-figure.
    Gaps: technique/minion DESCRIPTIONS have no data (display-data pass, like ApexDesc); AUTO-ATTACK/
    FLEE/HELD chip labels + foe/hero HP-label text flattened by extraction (Needs-CD); techCard cost
    NUMBER is a bindless sample part (Needs-CD).
