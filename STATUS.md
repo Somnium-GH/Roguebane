@@ -1,5 +1,12 @@
 # Status
 
+## ✅ layout.json RESTORED (2026-07-01 pm) — the PNG-clobber is fixed by a clean re-drop
+Valid JSON (5690 lines) carrying the newest CD work: `imageBind` (beaconNode → node icons as PNGs, incl.
+skirmish, via `icons/node/{node.type}` — so "skirmish" isn't a literal), frame-v3 `repeat`+`centerFill`,
+`cityNode`, the instrumentation. ONE BUILD GAP: the new icons `icons/node/skirmish`,
+`icons/resource/charge`, `icons/technique/shot` PNGs exist but are NOT in `Content.mgcb` → they won't load
+(tolerant loader → blank, not a crash) until added. **ADD their mgcb entries** (small build task).
+
 *Lean by design. SHIPPED-work history + rationale live in `git log` (detailed commits) and old STATUS
 revisions (`git show <rev>:STATUS.md`) — recoverable, so not duplicated here. Locked design lives in
 `design/DESIGN_SPEC.md`. This file = CURRENT state only. (Whittled 2026-07-01 from ~900 lines; nothing
@@ -116,6 +123,21 @@ state incl. RED disabled gear; no changes). See DESIGN_SPEC §12.
 IMMEDIATE small tasks (not CD): bind `core.icon` → `icons/rune/core_<id>` (icons exist); add the glyph
 codepoints (①②③ ✚ ◉ ✓ — the "?" on NewGame/Equipment) to the SpriteFont regions (the font task). These
 close most of the visible "?" gaps without CD.
+
+ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered above:
+- **`imageBind`** (NEW manifest field, CD #15): resolve its path template (e.g. `icons/node/{node.type}`)
+  against the bound item + BLIT that Content PNG instead of the element's border/fill/glyph. First user:
+  `templates.beaconNode` map markers (incl. the new `skirmish` ⚔) — this is HOW node icons render as PNGs,
+  never the "?" glyph. The renderer must learn it.
+- **Button 9-slice corners = 12px** (CD #11): buttons were repainted to 320×88 (1080-class); the engine's
+  button nine-slice must blit with 12px corners, not 6px.
+- **Container overflow/scroll** (CD #4): DEFERRED (2 races / 6 cores fit today) — add a scroll/page
+  primitive when a list actually overflows; tracked here so it's not lost.
+- **Confirm-to-close (lets Doug clear CD's entries):** on the relevant cutovers, confirm `cityNode` reads
+  `[8,8]` (CampaignMap, CD #12) and the 5 full-bleed HUD bars ship WITHOUT a `frame` (CD #14 regression fix).
+- NOTE: CD #1+7 (shadow/frame/gradient DRAW) is STALE — the foundation renderer already draws them (§10
+  order); only tile/repeat (CD #16, approved above) + a gradient-interpolation check remain. CD can close
+  #1+7's basic-draw.
 
 ## Verify mechanics
 - `RB_MF=<screenId>` renders a screen STRAIGHT from the manifest (safe — live screens untouched): the

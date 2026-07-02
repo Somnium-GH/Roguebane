@@ -1484,13 +1484,13 @@
     },
     "gargoyle": {
       "size": [
-        432,
-        392
+        496,
+        408
       ],
       "race": "human",
       "pivot": [
-        220,
-        384
+        252,
+        400
       ],
       "z": [
         "back",
@@ -1506,88 +1506,88 @@
         "back": {
           "rect": [
             8,
-            104,
-            416,
-            192
+            40,
+            480,
+            240
           ]
         },
         "legL": {
           "rect": [
-            152,
-            296,
+            184,
+            312,
             48,
             64
           ]
         },
         "legR": {
           "rect": [
-            232,
-            296,
+            264,
+            312,
             48,
             64
           ]
         },
         "boots": {
           "rect": [
-            144,
-            360,
+            176,
+            376,
             144,
             24
           ]
         },
         "torso": {
           "rect": [
-            128,
-            120,
+            160,
+            136,
             176,
             176
           ]
         },
         "armL": {
           "rect": [
-            80,
-            120,
+            112,
+            136,
             56,
             128
           ]
         },
         "armR": {
           "rect": [
-            296,
-            120,
+            328,
+            136,
             56,
             128
           ]
         },
         "head": {
           "rect": [
-            160,
+            192,
             8,
             120,
-            128
+            152
           ]
         }
       },
       "sockets": {
         "handL": [
-          108,
-          236
+          140,
+          252
         ],
         "handR": [
-          324,
-          236
+          356,
+          252
         ],
         "neck": [
-          220,
-          132
+          252,
+          148
         ],
         "shoulderL": [
-          108,
-          124
+          140,
+          140
         ],
         "shoulderR": [
-          324,
-          124
+          356,
+          140
         ]
       },
       "mounts": []
@@ -2097,16 +2097,6 @@
             "blur": 10,
             "color": "outline",
             "opacity": 0.5
-          },
-          "frame": {
-            "token": "panel",
-            "asset": "ui/frame/panel",
-            "slice": [
-              40,
-              40,
-              40,
-              40
-            ]
           }
         },
         {
@@ -2717,11 +2707,13 @@
             "token": "card",
             "asset": "ui/frame/card",
             "slice": [
-              24,
-              24,
-              24,
-              24
-            ]
+              36,
+              36,
+              36,
+              36
+            ],
+            "repeat": "tile",
+            "centerFill": true
           }
         },
         {
@@ -2806,16 +2798,6 @@
             "blur": 10,
             "color": "outline",
             "opacity": 0.5
-          },
-          "frame": {
-            "token": "panel",
-            "asset": "ui/frame/panel",
-            "slice": [
-              40,
-              40,
-              40,
-              40
-            ]
           }
         }
       ]
@@ -3101,7 +3083,9 @@
               36,
               36,
               36
-            ]
+            ],
+            "repeat": "tile",
+            "centerFill": true
           }
         },
         {
@@ -3138,7 +3122,9 @@
               36,
               36,
               36
-            ]
+            ],
+            "repeat": "tile",
+            "centerFill": true
           }
         },
         {
@@ -3151,7 +3137,7 @@
           ],
           "size": [
             240,
-            44
+            56
           ],
           "z": 5,
           "binds": "legend",
@@ -3180,7 +3166,9 @@
               60,
               60,
               60
-            ]
+            ],
+            "repeat": "tile",
+            "centerFill": true
           },
           "item": {
             "template": "legendRow",
@@ -3426,16 +3414,6 @@
             "blur": 10,
             "color": "outline",
             "opacity": 0.5
-          },
-          "frame": {
-            "token": "panel",
-            "asset": "ui/frame/panel",
-            "slice": [
-              60,
-              60,
-              60,
-              60
-            ]
           }
         }
       ]
@@ -3968,16 +3946,6 @@
             "blur": 10,
             "color": "outline",
             "opacity": 0.5
-          },
-          "frame": {
-            "token": "panel",
-            "asset": "ui/frame/panel",
-            "slice": [
-              60,
-              60,
-              60,
-              60
-            ]
           }
         },
         {
@@ -4010,16 +3978,6 @@
             "blur": 10,
             "color": "outline",
             "opacity": 0.5
-          },
-          "frame": {
-            "token": "panel",
-            "asset": "ui/frame/panel",
-            "slice": [
-              60,
-              60,
-              60,
-              60
-            ]
           }
         }
       ]
@@ -4801,7 +4759,8 @@
           },
           "font": "display",
           "fontPx": 8,
-          "binds": "node.type"
+          "binds": "node.type",
+          "imageBind": "icons/node/{node.type}"
         },
         {
           "rect": [
@@ -5641,7 +5600,9 @@
           60,
           60,
           60
-        ]
+        ],
+        "repeat": "tile",
+        "centerFill": true
       },
       "card": {
         "asset": "ui/frame/card",
@@ -5650,7 +5611,9 @@
           36,
           36,
           36
-        ]
+        ],
+        "repeat": "tile",
+        "centerFill": true
       }
     },
     "interactionStates": {

@@ -177,6 +177,17 @@
 /processorParam:TextureFormat=Color
 /build:icons/node/resource.png
 
+#begin icons/node/skirmish.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/node/skirmish.png
+
 #begin icons/node/unknown.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -187,6 +198,17 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:icons/node/unknown.png
+
+#begin icons/resource/charge.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/resource/charge.png
 
 #begin icons/resource/hp.png
 /importer:TextureImporter
@@ -385,6 +407,17 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:icons/technique/frenzy.png
+
+#begin icons/technique/shot.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/technique/shot.png
 
 #begin icons/technique/swing.png
 /importer:TextureImporter
