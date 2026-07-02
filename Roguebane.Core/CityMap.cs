@@ -47,6 +47,13 @@ public sealed class CityMap
         _nodes[startId].MarkVisited();
     }
 
+    // Merchant resupply (§12): bought supplies top the budget back up, capped at the starting max.
+    public void AddSupplies(int amount)
+    {
+        if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));
+        Supplies = Math.Min(MaxSupplies, Supplies + amount);
+    }
+
     public MapNode Current => _nodes[CurrentId];
 
     public bool AtCastle => Current.Type == NodeType.Castle;

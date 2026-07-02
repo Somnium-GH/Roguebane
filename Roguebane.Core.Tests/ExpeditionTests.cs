@@ -130,24 +130,56 @@ public class ExpeditionTests
     }
 
     [Fact]
-    public void MerchantHpServiceChargesPerHpAndTopsUp()
+    public void MerchantSellsOneHpBuysAndAPremiumFullHeal()
     {
+        // §12 (2026-07-02): a 1-HP buy at the per-HP price, and a FULL repair at a premium.
         var exp = FullLoadout();
         exp.Enter("a2"); FightToEnd(exp); // earns spoils
-        exp.Player.Damage(2);             // carry a wound in
+        exp.Player.Damage(3);             // carry a wound in
         exp.Enter("b");
 
         var price = exp.HealPricePerHp;
         Assert.InRange(price, 1, 2);                 // §10: 1 HP per randomized, loot-bounded cost
         var before = exp.Player.Hp;
         var gold = exp.Gold;
-        var missing = exp.Player.MaxHp - before;
-        var expectHealed = Math.Min(missing, gold / price);
-        Assert.True(expectHealed > 0);               // can afford at least some HP
-
         Assert.True(exp.BuyHeal());
-        Assert.Equal(before + expectHealed, exp.Player.Hp); // healed what the gold bought
-        Assert.Equal(gold - expectHealed * price, exp.Gold); // paid per HP
+        Assert.Equal(before + 1, exp.Player.Hp);     // exactly one HP per buy
+        Assert.Equal(gold - price, exp.Gold);
+
+        var missing = exp.Player.MaxHp - exp.Player.Hp;
+        Assert.Equal(missing * (price + 1), exp.FullHealPrice); // premium over the per-HP path
+        if (exp.Gold >= exp.FullHealPrice)
+        {
+            gold = exp.Gold;
+            var full = exp.FullHealPrice;
+            Assert.True(exp.BuyFullHeal());
+            Assert.Equal(exp.Player.MaxHp, exp.Player.Hp);
+            Assert.Equal(gold - full, exp.Gold);
+        }
+    }
+
+    [Fact]
+    public void MerchantStocksSeededSuppliesAndCharge()
+    {
+        // §12 resource stock: small seeded quantities, stable per node; buying tops the resource up
+        // (capped) and consumes the stock.
+        var exp = FullLoadout();
+        exp.Enter("a2"); FightToEnd(exp);
+        exp.Enter("b");
+        Assert.Equal(exp.SuppliesStock, exp.SuppliesStock); // seeded => stable
+        Assert.InRange(exp.SuppliesStock, 1, 3);
+        Assert.InRange(exp.ChargeStock, 1, 2);
+
+        var stock = exp.SuppliesStock;
+        var supplies = exp.Map.Supplies;
+        if (exp.Gold >= exp.SuppliesPrice && supplies < exp.Map.MaxSupplies)
+        {
+            Assert.True(exp.BuySupplies());
+            Assert.Equal(supplies + 1, exp.Map.Supplies);
+            Assert.Equal(stock - 1, exp.SuppliesStock);
+        }
+        // Charge starts full in this loadout, so a top-up must refuse rather than overfill.
+        if (exp.Charge >= exp.MaxCharge) Assert.False(exp.BuyCharge());
     }
 
     [Fact]

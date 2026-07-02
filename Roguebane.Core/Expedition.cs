@@ -103,16 +103,57 @@ public sealed class Expedition
     // STABLE per merchant node (same node id => same price, so the run stays reproducible).
     public int HealPricePerHp => 1 + new Rng(Seed(Map.Current.Id) ^ HealSalt).Next(2); // 1..2 gold / HP
 
-    // Pay a merchant for the out-of-combat HP service: buy as much HP as the gold affords at the per-HP
-    // price, capped at the missing HP. Heals PARTS never happen here — HP only, out of combat (§10).
+    // §12 merchant healing: a 1-HP buy at the per-HP price, and a FULL repair at a premium (placeholder
+    // +1 gold per missing HP — tune with the rest of the economy). HP only, out of combat (§10).
     public bool BuyHeal()
     {
         if (!AtMerchant) return false;
+        if (_player.MaxHp - _player.Hp <= 0) return false;
+        if (!_stash.TrySpend(HealPricePerHp)) return false;
+        _player.Heal(1);
+        return true;
+    }
+
+    public int FullHealPrice => (_player.MaxHp - _player.Hp) * (HealPricePerHp + 1);
+
+    public bool BuyFullHeal()
+    {
+        if (!AtMerchant) return false;
         var missing = _player.MaxHp - _player.Hp;
-        if (missing <= 0) return false;
-        var buy = Math.Min(missing, Gold / HealPricePerHp);
-        if (buy <= 0 || !_stash.TrySpend(buy * HealPricePerHp)) return false;
-        _player.Heal(buy);
+        if (missing <= 0 || !_stash.TrySpend(FullHealPrice)) return false;
+        _player.Heal(missing);
+        return true;
+    }
+
+    // §12 merchant RESOURCE stock: small seeded quantities of Supplies and Charge, stable per node so
+    // the run stays reproducible. (Summons joins when its §9 resource model lands.) Prices are
+    // placeholder-sane — the economy tune owns the numbers.
+    private const ulong StockSalt = 0x53544F43; // "STOC"
+    private int StockRoll(int lane, int max) =>
+        new Rng(Seed(Map.Current.Id) ^ StockSalt ^ (ulong)lane).Next(max + 1);
+
+    private int _suppliesBought, _chargeBought; // per-visit consumption (stock is per NODE seed)
+
+    public int SuppliesStock => AtMerchant ? Math.Max(0, 1 + StockRoll(1, 2) - _suppliesBought) : 0;
+    public int ChargeStock => AtMerchant ? Math.Max(0, 1 + StockRoll(2, 1) - _chargeBought) : 0;
+    public int SuppliesPrice => 2 + StockRoll(3, 2); // 2..4 gold per supply
+    public int ChargePrice => 3 + StockRoll(4, 2);   // 3..5 gold per charge
+
+    public bool BuySupplies()
+    {
+        if (!AtMerchant || SuppliesStock <= 0 || Map.Supplies >= Map.MaxSupplies) return false;
+        if (!_stash.TrySpend(SuppliesPrice)) return false;
+        Map.AddSupplies(1);
+        _suppliesBought++;
+        return true;
+    }
+
+    public bool BuyCharge()
+    {
+        if (!AtMerchant || ChargeStock <= 0 || Charge >= MaxCharge) return false;
+        if (!_stash.TrySpend(ChargePrice)) return false;
+        _caster.Recharge(1);
+        _chargeBought++;
         return true;
     }
 

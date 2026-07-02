@@ -341,7 +341,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
         if (Exp.AtMerchant)
         {
-            if (Pressed(keys, Keys.H) || Click(MerchHealRect)) Exp.BuyHeal(); // HP healing only (no potions)
+            if (Pressed(keys, Keys.H) || Click(MerchHealRect)) Exp.BuyHeal(); // 1 HP per buy (§12)
+            if (Pressed(keys, Keys.F)) Exp.BuyFullHeal();                      // full repair at a premium
+            if (Pressed(keys, Keys.S)) Exp.BuySupplies();                      // §12 resource stock
+            if (Pressed(keys, Keys.C)) Exp.BuyCharge();
 
             // Buy a gear chip into the Stash pack (weapons first, then armor — same order as drawn).
             var ws = Exp.OfferedWeapons;
@@ -806,10 +809,17 @@ public class Game1 : Microsoft.Xna.Framework.Game
     {
         Panel(x, y, 360, 220);
         Text(_assets.Display, "MERCHANT", x + 14, y + 10, Ink);
-        // HP healing only — part-heals are in-combat techniques now, not buyable potions. Per-HP price
-        // is set by the merchant (§10): buying restores as much HP as the gold affords.
-        DrawButton($"H  heal hp  ({Exp.HealPricePerHp}/hp)", x + 14, y + 44, 330, 30,
-            Exp.Gold >= Exp.HealPricePerHp && Exp.Player.Hp < Exp.Player.MaxHp, Keys.H);
+        // §12 healing: a 1-HP buy + a premium full repair. Part-heals are in-combat techniques (§10).
+        var hurt = Exp.Player.Hp < Exp.Player.MaxHp;
+        DrawButton($"H  heal 1 hp  ({Exp.HealPricePerHp}g)", x + 14, y + 44, 160, 30,
+            hurt && Exp.Gold >= Exp.HealPricePerHp, Keys.H);
+        DrawButton($"F  full heal  ({Exp.FullHealPrice}g)", x + 184, y + 44, 160, 30,
+            hurt && Exp.Gold >= Exp.FullHealPrice, Keys.F);
+        // §12 resource stock: small seeded quantities of supplies + charge (Summons pends its model).
+        DrawButton($"S  supplies x{Exp.SuppliesStock}  ({Exp.SuppliesPrice}g)", x + 14, y + 80, 160, 26,
+            Exp.SuppliesStock > 0 && Exp.Map.Supplies < Exp.Map.MaxSupplies && Exp.Gold >= Exp.SuppliesPrice, Keys.S);
+        DrawButton($"C  charge x{Exp.ChargeStock}  ({Exp.ChargePrice}g)", x + 184, y + 80, 160, 26,
+            Exp.ChargeStock > 0 && Exp.Charge < Exp.MaxCharge && Exp.Gold >= Exp.ChargePrice, Keys.C);
 
         // The gear stock as a compact row of buy chips (name + price); dim when unaffordable / sold.
         Text(_assets.Mono, "GEAR", x + 14, y + 150, Muted);
