@@ -10,8 +10,8 @@ using Roguebane.Core.Layout;
 namespace Roguebane.Game;
 
 // The LEGACY CityMap screen half of the shell (SRP split, 2026-07-02): the hand-drawn run-map —
-// chart, supply/war-party/legend/castle panels, gear bar, merchant popover (a flagged design
-// stopgap), run resources, and the campaign spine. Retires wholesale when the citymap manifest
+// chart, supply/war-party/legend/castle panels, gear bar, run resources, and the campaign spine
+// (the merchant popover stopgap RETIRED 2026-07-02 — the design/07 stall screen replaced it). Retires wholesale when the citymap manifest
 // cut-over lands (its Needs-CD/human blockers are in STATUS).
 public partial class Game1
 {
@@ -30,7 +30,6 @@ public partial class Game1
         DrawChart();
         DrawMapLegend(756, 64); // top-right; clears the header, war party, and the merchant panel below
         DrawCastlePanel(740, 158);
-        if (Exp.AtMerchant) DrawMerchant(560, 300);
         DrawGearBar(20, H - 44);
         DrawButton("EQUIPMENT [E]", EquipOpenRect.X, EquipOpenRect.Y,
             EquipOpenRect.Width, EquipOpenRect.Height, true, Keys.E);
@@ -220,42 +219,6 @@ public partial class Game1
         if (host is not null) Sprite(host, mx, y - 12, 28, 28, Color.White);
         else Sprite(_assets.Node(NodeType.Castle), mx, y - 10, 24, 24, Blood);
         Text(_assets.Mono, map.WarPartyDistance + " to camp", x + w + 12, y - 6, Blood);
-    }
-
-    private void DrawMerchant(int x, int y)
-    {
-        Panel(x, y, 360, 220);
-        Text(_assets.Display, "MERCHANT", x + 14, y + 10, Ink);
-        // §12 healing: a 1-HP buy + a premium full repair. Part-heals are in-combat techniques (§10).
-        var hurt = Exp.Player.Hp < Exp.Player.MaxHp;
-        DrawButton($"H  heal 1 hp  ({Exp.HealPricePerHp}g)", x + 14, y + 44, 160, 30,
-            hurt && Exp.Gold >= Exp.HealPricePerHp, Keys.H);
-        DrawButton($"F  full heal  ({Exp.FullHealPrice}g)", x + 184, y + 44, 160, 30,
-            hurt && Exp.Gold >= Exp.FullHealPrice, Keys.F);
-        // §12 resource stock: small seeded quantities of supplies + charge (Summons pends its model).
-        DrawButton($"S  supplies x{Exp.SuppliesStock}  ({Exp.SuppliesPrice}g)", x + 14, y + 80, 160, 26,
-            Exp.SuppliesStock > 0 && Exp.Map.Supplies < Exp.Map.MaxSupplies && Exp.Gold >= Exp.SuppliesPrice, Keys.S);
-        DrawButton($"C  charge x{Exp.ChargeStock}  ({Exp.ChargePrice}g)", x + 184, y + 80, 160, 26,
-            Exp.ChargeStock > 0 && Exp.Charge < Exp.MaxCharge && Exp.Gold >= Exp.ChargePrice, Keys.C);
-        DrawButton($"M  summons x{Exp.SummonsStock}  ({Exp.SummonsPrice}g)", x + 14, y + 112, 160, 26,
-            Exp.SummonsStock > 0 && Exp.Summons < Exp.MaxSummons && Exp.Gold >= Exp.SummonsPrice, Keys.M);
-
-        // The gear stock as a compact row of buy chips (name + price); dim when unaffordable / sold.
-        Text(_assets.Mono, "GEAR", x + 14, y + 150, Muted);
-        var ws = Exp.OfferedWeapons;
-        var ars = Exp.OfferedArmor;
-        for (var i = 0; i < ws.Count; i++) GearChip(i, ws[i].Id, Expedition.Price(ws[i]));
-        for (var i = 0; i < ars.Count; i++) GearChip(ws.Count + i, ars[i].Id, Expedition.Price(ars[i]));
-
-        void GearChip(int idx, string name, int price)
-        {
-            var r = MerchGearRect(idx);
-            var ok = Exp.Gold >= price;
-            Panel(r.X, r.Y, r.Width, r.Height);
-            Text(_assets.Mono, name, r.X + 6, r.Y + 6, ok ? Ink : Muted);
-            Text(_assets.Mono, price.ToString(), r.X + r.Width - 16, r.Y + 6, ok ? Amber : Muted);
-            Border(r.X, r.Y, r.Width, r.Height, Hover(r) && ok ? Amber : Border0);
-        }
     }
 
     // The compact top-bar readout: gold only. Supplies + mustered support are in their design/03 panels

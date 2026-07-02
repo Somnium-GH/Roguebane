@@ -365,23 +365,25 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             if (Pressed(keys, Keys.S)) Exp.BuySupplies();
             if (Pressed(keys, Keys.C)) Exp.BuyCharge();
             if (Pressed(keys, Keys.M)) Exp.BuySummons();
+
+            // The wares shelves: page with the footer buttons, buy a card straight off a shelf
+            // (weapons/armor land in the stash; the other categories aren't buyable yet).
+            if (ManifestElementRect("merchant", "merchant.stock.pagePrev") is { } pv && Click(pv))
+                _merchantPage = Math.Max(0, _merchantPage - 1);
+            if (ManifestElementRect("merchant", "merchant.stock.pageNext") is { } nx && Click(nx))
+                _merchantPage = Math.Min(MerchantPageCount() - 1, _merchantPage + 1);
+            foreach (var (item, rect) in WareRects())
+                if (Click(rect))
+                {
+                    if (item is Weapon bw) Exp.BuyWeapon(bw);
+                    else if (item is Armor ba) Exp.BuyArmor(ba);
+                    break; // one purchase per click
+                }
             return; // no map click-through under the stall
         }
 
-        if (Exp.AtMerchant)
-        {
-            if (Pressed(keys, Keys.H) || Click(MerchHealRect)) Exp.BuyHeal(); // 1 HP per buy (§12)
-            if (Pressed(keys, Keys.F)) Exp.BuyFullHeal();                      // full repair at a premium
-            if (Pressed(keys, Keys.S)) Exp.BuySupplies();                      // §12 resource stock
-            if (Pressed(keys, Keys.C)) Exp.BuyCharge();
-            if (Pressed(keys, Keys.M)) Exp.BuySummons();                   // §9 deploy resource
-
-            // Buy a gear chip into the Stash pack (weapons first, then armor — same order as drawn).
-            var ws = Exp.OfferedWeapons;
-            for (var i = 0; i < ws.Count; i++) if (Click(MerchGearRect(i))) { Exp.BuyWeapon(ws[i]); break; }
-            var ars = Exp.OfferedArmor;
-            for (var i = 0; i < ars.Count; i++) if (Click(MerchGearRect(ws.Count + i))) { Exp.BuyArmor(ars[i]); break; }
-        }
+        // Closed the stall but still on the node? H walks back in.
+        if (Exp.AtMerchant && Pressed(keys, Keys.H)) { _merchantOpen = true; return; }
 
         // Equip a carried pack item onto the body (out of combat, any beacon). Weapons then armor —
         // the same order DrawGearBar lays the chips out.
@@ -494,10 +496,6 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             if (FoePartRect(part.Stat).Contains(p)) return part;
         return null;
     }
-
-    // Merchant verb button + gear chips — mirror DrawMerchant's panel origin (560,300) + offsets.
-    private static readonly Rectangle MerchHealRect = new(574, 344, 330, 30);
-    private static Rectangle MerchGearRect(int i) => new(574 + i * 112, 472, 104, 30);
 
     // Between-fights Equipment: open button (CityMap) + the overlay's technique cards & close button.
     private static readonly Rectangle EquipOpenRect = new(16, 190, 150, 30); // left column, clear of the merchant panel

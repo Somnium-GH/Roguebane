@@ -33,9 +33,13 @@ fills toward the next pip from Body.ShieldRegenProgress — Core-tested; dashed 
 pending the pixel pass), ~~summons icon~~ DONE, merchant-screen consumer PART 1 DONE (2026-07-02):
 the design/07 stall renders FROM THE MANIFEST at merchant nodes — arrival opens it, LEAVE/Esc returns to
 the map; stall backdrop via the new *.scene handler; heal offers + provision lots are live-priced list
-rows with row-click + keyboard buys; run.resources strip is manifest data; PURSE readout. REMAINING
-(part 2): the WARES shelves (shopSection is a NESTED list — needs nested-template stamping), the pager,
-ware.* binds + buys into the stash, then RETIRE the citymap merchant popover stopgap.
+rows with row-click + keyboard buys; run.resources strip is manifest data; PURSE readout. Part 2 DONE
+(2026-07-02): WARES shelves render (nested wareCard stamping inside each shopSection's region, geometry
+shared with the click hit-test), pager pages 3 sections at a time, weapons/armor BUY off the shelf into
+the stash (techniques/minions/runes display un-buyable — receiving models stay design-open; their tag/
+buy slots suppress rather than show mock samples), and the CITYMAP MERCHANT POPOVER STOPGAP IS RETIRED
+(H re-opens the stall on the node). The whole engine-TODO queue from the 07-02 drop is now CLEAR —
+remaining merchant work is design-gated (ware pricing/rarity models, pixel-compare vs design/07).
 
 ## ⇒ HUMAN DIRECTIVES — 2026-07-02 (revisions WIN; fold into the render arc / after the current slice)
 

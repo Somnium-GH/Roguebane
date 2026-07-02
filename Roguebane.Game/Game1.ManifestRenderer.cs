@@ -277,6 +277,11 @@ public partial class Game1
         "merchant.label" => "MERCHANT",
         "merchant.leave" => InRun && Exp.AtMerchant ? "LEAVE" : null,
         "run.gold" => InRun ? "PURSE " + Exp.Gold + "g" : null,
+        "merchant.stock.pageLabel" => InRun && Exp.AtMerchant
+            ? "PAGE " + (_merchantPage + 1) + " / " + MerchantPageCount() : null,
+        "merchant.stock.pagePrev" => InRun && Exp.AtMerchant && _merchantPage > 0 ? "<" : null,
+        "merchant.stock.pageNext" => InRun && Exp.AtMerchant
+            && _merchantPage < MerchantPageCount() - 1 ? ">" : null,
         "combat.paused" => _paused ? "HELD" : null, // badge shows only while the fight is held
         "campaign.taken" => InRun ? _campaign.LegIndex + " / " + _campaign.LegCount : null,
         _ => null,
@@ -315,6 +320,22 @@ public partial class Game1
             {
                 if (pp.Binds is { } sel && sel.EndsWith(".selection") && i != selIx)
                     continue; // only the chosen card wears its selection chip
+                // Merchant rows: an UNBOUND part is design-mock filler (the sample price digits) —
+                // never draw it beside live data. A NESTED wares region stamps its own cards.
+                if (datum is MerchantOffer or MerchantLot or ResourceReadout or MerchantSection
+                    && pp.Binds is null) continue;
+                if (pp.Binds == "section.wares" && datum is MerchantSection ws)
+                {
+                    if (_ui.Manifest is { } mm && mm.Templates.TryGetValue("wareCard", out var wc))
+                        for (var wi = 0; wi < ws.Wares.Count; wi++)
+                        {
+                            var wx = pp.Rect.X + wi * (wc.Size[0] + WareGap);
+                            if (wx + wc.Size[0] > pp.Rect.X + pp.Rect.W + 1) break;
+                            foreach (var wp in CardTemplate.Place(wc, wx, pp.Rect.Y))
+                                DrawWarePart(wp, ws.Wares[wi]);
+                        }
+                    continue;
+                }
                 // FSM state parts resolve from the LIVE run — an idle card shows no chip/label at all
                 // (never the sample), so resolve BEFORE chrome and bail when there's nothing to say.
                 string? stateText = null;
@@ -468,6 +489,10 @@ public partial class Game1
                 new MerchantOffer("Full repair", "every wound, at a premium", Exp.FullHealPrice),
             }
             : new List<object>(),
+        "merchant.stock.sections" => InRun && Exp.AtMerchant
+            ? MerchantSections().Skip(_merchantPage * SectionsPerPage).Take(SectionsPerPage)
+                .Cast<object>().ToList()
+            : new List<object>(),
         "merchant.provisions.stock" => InRun && Exp.AtMerchant
             ? new List<object>
             {
@@ -493,6 +518,88 @@ public partial class Game1
     private sealed record MerchantOffer(string Name, string Note, int Price);
     private sealed record MerchantLot(string Id, string Name, int Qty, int Price);
     private sealed record ResourceReadout(string Id, string Value, string Label);
+    private sealed record MerchantSection(string Label, IReadOnlyList<Ware> Wares);
+    private sealed record Ware(string Category, string Name, string Note, string Desc,
+        string PriceText, string BuyState, object Item);
+
+    // Wares-shelf geometry shared by render + click hit-test: cards flow horizontally inside the
+    // section's wares region; 3 sections fill a page of the shelf area.
+    private const int WareGap = 11, SectionsPerPage = 3;
+    private int _merchantPage;
+
+    // §12: the rolled stock as display sections. Weapons/armor BUY into the stash; techniques/
+    // minions/runes are OFFERED (their receiving models are design-open) so they show un-buyable.
+    private List<MerchantSection> MerchantSections()
+    {
+        var s = new List<MerchantSection>();
+        void Add(string label, IEnumerable<Ware> wares)
+        {
+            var list = wares.ToList();
+            if (list.Count > 0) s.Add(new MerchantSection(label, list));
+        }
+        Add("WEAPONS", Exp.OfferedWeapons.Select(w => new Ware("WPN", DisplayName(w.Id),
+            w.Stat.ToString().ToUpperInvariant() + " " + w.Reserve, "",
+            Roguebane.Core.Expedition.Price(w) + "g", "BUY", w)));
+        Add("ARMOR", Exp.OfferedArmor.Select(a => new Ware("ARM", DisplayName(a.Id),
+            a.Kind.ToString().ToUpperInvariant() + " " + a.Group.ToString().ToUpperInvariant(), "",
+            Roguebane.Core.Expedition.Price(a) + "g", "BUY", a)));
+        Add("TECHNIQUES", Exp.OfferedTechniques.Select(t => new Ware("TEC", DisplayName(t.Id),
+            t.Stat.ToString().ToUpperInvariant() + " " + t.Reserve, t.DescText, "-", "", t)));
+        Add("MINIONS", Exp.OfferedMinions.Select(m => new Ware("MIN", DisplayName(m.Id),
+            m.Stat.ToString().ToUpperInvariant() + " " + m.Reserve, m.DescText, "-", "", m)));
+        Add("RUNES", Exp.OfferedMarks.Select(k => new Ware("RUNE", k.DisplayName,
+            "RANK " + k.Rank, "", "-", "", k)));
+        return s;
+    }
+
+    private int MerchantPageCount()
+        => Math.Max(1, (MerchantSections().Count + SectionsPerPage - 1) / SectionsPerPage);
+
+    // Ware-card hit-test sharing the nested-stamping geometry: page sections in their manifest list
+    // cells, cards flowing horizontally through each section's wares region. Template ids are needed
+    // for GEOMETRY here (guarded — a CD rename degrades to no shelves, never a crash).
+    private IEnumerable<(object Item, Rectangle Rect)> WareRects()
+    {
+        if (_ui.Manifest is not { } m || !m.Templates.TryGetValue("wareCard", out var wc)
+            || !m.Templates.TryGetValue("shopSection", out var sect)) yield break;
+        var waresPart = sect.Parts.FirstOrDefault(p => p.Binds == "section.wares");
+        if (waresPart is null) yield break;
+        var sections = MerchantSections().Skip(_merchantPage * SectionsPerPage)
+            .Take(SectionsPerPage).ToList();
+        var cells = ManifestListCells("merchant", "merchant.stock.sections", sections.Count);
+        for (var si = 0; si < sections.Count && si < cells.Count; si++)
+        {
+            var rx = cells[si].X + waresPart.Rect[0];
+            var ry = cells[si].Y + waresPart.Rect[1];
+            var wares = sections[si].Wares;
+            for (var wi = 0; wi < wares.Count; wi++)
+            {
+                var wx = rx + wi * (wc.Size[0] + WareGap);
+                if (wx + wc.Size[0] > rx + waresPart.Rect[2] + 1) break;
+                yield return (wares[wi].Item, new Rectangle(wx, ry, wc.Size[0], wc.Size[1]));
+            }
+        }
+    }
+
+    // One stamped ware-card part: chrome + bound text. A bound part resolving to "" is a SUPPRESSED
+    // slot (rarity tags / buy chips whose model isn't built) — no chrome, no sample. Unbound parts are
+    // design-mock filler and never draw against live data.
+    private void DrawWarePart(PlacedPart wp, Ware w)
+    {
+        if (wp.Binds is null) return;
+        var bound = ResolveBind(w, wp.Binds);
+        if (bound == "") return;
+        if (ResolveColorToken(wp.ColorBind, w) is { } tok) DrawFill(RectOf(wp.Rect), new Fill { Token = tok });
+        else if (wp.Fill is { } f) DrawFill(RectOf(wp.Rect), f);
+        if (wp.Border is { } b)
+            Border(wp.Rect.X, wp.Rect.Y, wp.Rect.W, wp.Rect.H, _ui.Color(b.Color, Border0),
+                Math.Max(2, b.W * SS), b.Sides);
+        var text = bound ?? wp.Sample;
+        if (string.IsNullOrEmpty(text)) return;
+        var font = wp.Font == "display" ? _assets.Display : _assets.Mono;
+        TextPxWrapped(font, text, new Rectangle(wp.Rect.X, wp.Rect.Y, wp.Rect.W, wp.Rect.H),
+            _ui.Color(wp.Color, Ink), wp.FontPx);
+    }
 
     // The attribute bars/pool rows: one datum per stat — (key, part label §6, free pool, capacity,
     // pip colour token). In a run the LIVE body supplies them (actives reserve, damage shrinks caps);
@@ -633,6 +740,23 @@ public partial class Game1
             "attrs.part" or "pool.attr.part" => ab.Item2,
             "attrs.alloc" or "pool.attr.alloc" => ab.Item3.ToString(),
             "attrs.available" or "pool.attr.available" => ab.Item4.ToString(),
+            _ => null,
+        },
+        MerchantSection sec => bind switch // §12 wares shelves (design/07)
+        {
+            "section.label" => sec.Label,
+            "section.count" => sec.Wares.Count.ToString(),
+            _ => null,
+        },
+        Ware w2 => bind switch // ware cards; "" SUPPRESSES a slot whose model isn't built (tag/buy)
+        {
+            "ware.category" => w2.Category,
+            "ware.tag" => "",
+            "ware.name" => w2.Name,
+            "ware.note" => w2.Note,
+            "ware.desc" => w2.Desc,
+            "ware.price" => w2.PriceText,
+            "ware.buyState" => w2.BuyState,
             _ => null,
         },
         MerchantOffer off => bind switch // §12 heal rows (design/07)
