@@ -1196,7 +1196,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         if (e.Fill is { } fill)
             DrawFill(r, fill);
         if (e.Frame is { } fr && fr.Slice.Length == 4 && _assets.Texture(fr.Asset) is { } ftex)
-            DrawFrameTex(ftex, fr.Slice, r);
+            DrawFrameTex(ftex, fr, r);
         if (e.Border is { } b)
             Border(r.X, r.Y, r.Width, r.Height, _ui.Color(b.Color ?? "border", Border0));
 
@@ -1727,10 +1727,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     private static int ListCountFor(string? bind) => 3; // sample-count fallback for unmapped binds
 
-    private void DrawFrameTex(Texture2D tex, int[] slice, Rectangle r)
+    private void DrawFrameTex(Texture2D tex, Frame fr, Rectangle r)
     {
         var dst = new LayoutRect(r.X, r.Y, r.Width, r.Height);
-        foreach (var p in NineSlice.Patches(tex.Width, tex.Height, slice, dst))
+        foreach (var p in NineSlice.Patches(tex.Width, tex.Height, fr.Slice, dst,
+                     tile: fr.Repeat == "tile", centerFill: fr.CenterFill))
             _spriteBatch.Draw(tex, new Rectangle(p.Dst.X, p.Dst.Y, p.Dst.W, p.Dst.H),
                 new Rectangle(p.Src.X, p.Src.Y, p.Src.W, p.Src.H), Color.White);
     }

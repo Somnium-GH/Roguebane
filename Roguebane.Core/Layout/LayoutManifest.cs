@@ -118,6 +118,8 @@ public sealed class Frame
     public string? Token { get; init; }
     public string Asset { get; init; } = "";
     public int[] Slice { get; init; } = [];
+    public string? Repeat { get; init; }            // v3: "tile" repeats edges/centre at native scale
+    public bool CenterFill { get; init; } = true;   // v3: false leaves the frame's middle open
 }
 
 // How a container repeats a template: per bound datum (list) or per map/campaign node (graph). The

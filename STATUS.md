@@ -144,8 +144,9 @@ ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered 
 - **Confirm-to-close (lets Doug clear CD's entries):** on the relevant cutovers, confirm `cityNode` reads
   `[8,8]` (CampaignMap, CD #12) and the 5 full-bleed HUD bars ship WITHOUT a `frame` (CD #14 regression fix).
 - NOTE: CD #1+7 (shadow/frame/gradient DRAW) is STALE — the foundation renderer already draws them (§10
-  order); only tile/repeat (CD #16, approved above) + a gradient-interpolation check remain. CD can close
-  #1+7's basic-draw.
+  order). Frame-v3 tile/repeat + centerFill (CD #16) — DONE 2026-07-02 (NineSlice tiles edge/centre
+  patches at native scale, trailing chunk crops 1:1; centerFill:false leaves the middle open;
+  Core-tested). Only a gradient-interpolation check remains; CD can close #1+7's basic-draw.
 
 ## Verify mechanics
 - `RB_MF=<screenId>` renders a screen STRAIGHT from the manifest (safe — live screens untouched): the

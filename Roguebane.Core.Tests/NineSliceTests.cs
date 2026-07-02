@@ -46,4 +46,26 @@ public class NineSliceTests
             Assert.True(patch.Dst.W > 0 && patch.Dst.H > 0);
         });
     }
+
+    [Fact]
+    public void TiledEdgesRepeatAtNativeSizeAndCropTheTail()
+    {
+        // Frame v3 `repeat:"tile"`: a 90x90 frame with 30px margins over a 300-wide dest tiles the top
+        // edge in native 30px chunks; the last chunk crops BOTH src and dest to the remainder (no squash).
+        var patches = NineSlice.Patches(90, 90, new[] { 30, 30, 30, 30 },
+            new LayoutRect(0, 0, 300, 90), tile: true, centerFill: true);
+        var top = patches.Where(p => p.Src.Y == 0 && p.Src.X == 30 && p.Dst.Y == 0).ToList();
+        Assert.Equal(8, top.Count);                       // 240px band / 30px tiles
+        Assert.All(top, p => Assert.Equal(p.Src.W, p.Dst.W)); // every chunk blits 1:1 wide
+        Assert.Equal(240, top.Sum(p => p.Dst.W));         // full coverage, no overlap
+    }
+
+    [Fact]
+    public void CenterFillFalseLeavesTheMiddleOpen()
+    {
+        var patches = NineSlice.Patches(90, 90, new[] { 30, 30, 30, 30 },
+            new LayoutRect(0, 0, 300, 300), tile: false, centerFill: false);
+        Assert.Equal(8, patches.Count); // 9 minus the omitted centre
+        Assert.DoesNotContain(patches, p => p.Src.X == 30 && p.Src.Y == 30);
+    }
 }
