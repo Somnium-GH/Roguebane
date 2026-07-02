@@ -63,11 +63,15 @@ FIDELITY DRAW (shadow/frame/gradient, §10) feeds all of the above — same crit
   `ResolveBind(datum, bind)` (falls back to the manifest `sample` for unmapped binds). Mapped: `race.name`
   /`race.hp`; `core.name`/`core.role`/`core.budget`/`core.bays`/`core.actionSlots`. Verified RB_MF=newgame:
   the 2 race cards show Human(HP20)/Elf(HP14) and the 6 core cards show distinct live name+role+budget+
-  bays+slots (Grunt THE GENERALIST 24/3/1 ... Ranger THE MARKSMAN 12/4/0). STILL sample: per-attr tiles
-  (`race.attrs.*` need positional resolution -- same bind repeats 4x), and `race.tag`/`race.blurb`/
-  `core.apexName`/`core.apexDescription`/`core.icon` (missing data fields -- add display-only text to the
-  Race/CoreRune content, no apex EFFECTS per the guardrail). NEXT: those (positional attrs + display data)
-  + text clipping so values fit the tiles; the composed figure via `preview.fig`; graphs. Then CUT
+  bays+slots (Grunt THE GENERALIST 24/3/1 ... Ranger THE MARKSMAN 12/4/0).
+  SLICE 5 DONE — POSITIONAL per-attr tiles: `race.attrs.value`/`race.attrs.key` repeat 4x per card, so
+  DrawManifestList counts each occurrence and `AttrTile(datum,i)` picks STR/INT/DEX/CON in order. The Elf
+  card now shows its LIVE 2/3/4/2 HP14 (vs Human 3/3/3/3 HP20). Race cards are now fully data-bound
+  (name + all attrs + HP). STILL sample: `race.tag`/`race.blurb`/`core.apexName`/`core.apexDescription`/
+  `core.icon` (missing DISPLAY data — add flavour text to Race/CoreRune, no apex EFFECTS per guardrail).
+  KNOWN ISSUE: text overflows the small tiles — the renderer maps `font` to only mono/display and ignores
+  `fontPx`, so a big-`fontPx` label in a small tile spills (a FONT-SYSTEM slice: more sizes or a scaled
+  DrawString). NEXT: display data + fontPx/clipping; composed figure via `preview.fig`; graphs; then CUT
   NewGame's live screen over + diff vs design/05.]
 
 FLOW: Equipment reachable BETWEEN fights — from the post-combat Cleared/Redeploy state + CityMap +

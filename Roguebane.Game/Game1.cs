@@ -1613,21 +1613,41 @@ public class Game1 : Microsoft.Xna.Framework.Game
         {
             var datum = data is not null && i < data.Count ? data[i] : null;
             var cell = cells[i];
+            // The per-attr tiles reuse the SAME bind 4x (STR/INT/DEX/CON in template order); count each
+            // occurrence per card to pick the right attribute.
+            int valIx = 0, keyIx = 0;
             foreach (var pp in CardTemplate.Place(tmpl, cell.X, cell.Y))
             {
                 var img = pp.Image;
                 if (!string.IsNullOrEmpty(img))
-                    Sprite(_assets.Texture(img!), pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H, Color.White);
-                else
                 {
-                    var text = (datum is not null ? ResolveBind(datum, pp.Binds) : null) ?? pp.Sample;
-                    if (!string.IsNullOrEmpty(text))
-                        Text(pp.Font == "display" ? _assets.Display : _assets.Mono,
-                            text!, pp.Rect.X, pp.Rect.Y, _ui.Color(pp.Color ?? "ink", Ink));
+                    Sprite(_assets.Texture(img!), pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H, Color.White);
+                    continue;
                 }
+                var text = pp.Binds switch
+                {
+                    "race.attrs.value" => AttrTile(datum, valIx++)?.value,
+                    "race.attrs.key" => AttrTile(datum, keyIx++)?.key,
+                    _ => datum is not null ? ResolveBind(datum, pp.Binds) : null,
+                } ?? pp.Sample;
+                if (!string.IsNullOrEmpty(text))
+                    Text(pp.Font == "display" ? _assets.Display : _assets.Mono,
+                        text!, pp.Rect.X, pp.Rect.Y, _ui.Color(pp.Color ?? "ink", Ink));
             }
         }
     }
+
+    // The i-th attribute tile (STR/INT/DEX/CON order) of a Race datum, for the per-attr card tiles.
+    private static (string key, string value)? AttrTile(object? datum, int i) => datum is Roguebane.Core.Race r
+        ? i switch
+        {
+            0 => ("STR", r.Str.ToString()),
+            1 => ("INT", r.Int.ToString()),
+            2 => ("DEX", r.Dex.ToString()),
+            3 => ("CON", r.Con.ToString()),
+            _ => null,
+        }
+        : null;
 
     // The live data a bound list stamps one card per, or null for an unmapped bind (falls back to samples).
     private static System.Collections.Generic.IReadOnlyList<object>? ListData(string? bind) => bind switch
