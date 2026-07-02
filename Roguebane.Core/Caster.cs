@@ -36,7 +36,7 @@ public sealed class Caster
     // (untargeted holds, never falling back to a default front). Engine casters (foe offense, sims)
     // leave it false and keep the default-front auto-fire. Minions and Sustained reserves track the
     // front in BOTH modes — only the per-technique offensive FSM is gated.
-    public Caster(Body self, ICombatTarget? target = null, int maxCharge = 0, bool requireAim = false, int bayCap = 0)
+    public Caster(Body self, ICombatTarget? target = null, int maxCharge = 0, bool requireAim = false, int bayCap = 0, int maxSummons = -1)
     {
         _self = self;
         _default = target;
@@ -45,9 +45,27 @@ public sealed class Caster
         _requireAim = requireAim;
         _keepTargets = !requireAim; // engine casters never clear (front auto-fire); player default = OFF (one-shot)
         BayCap = bayCap;
+        // §9/§14 deploy budget: unlimited unless the assembler passes one (Forge does for runs) —
+        // bare unit-test casters stay resource-free.
+        MaxSummons = maxSummons < 0 ? int.MaxValue : maxSummons;
+        SummonsLeft = MaxSummons;
     }
 
     public int BayCap { get; } // how many minion bays this caster's chassis has (for the render lane)
+
+    // §9 SUMMONS [LOCKED]: the finite deploy resource. Paid ONCE per FRESH summon; an idle minion is
+    // still summoned (free reactivation); merchant/loot refills top it up.
+    public int MaxSummons { get; }
+    public int SummonsLeft { get; private set; }
+
+    public void AddSummons(int amount)
+    {
+        if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));
+        SummonsLeft = Math.Min(MaxSummons, SummonsLeft + amount);
+    }
+
+    // The Summoner's Core Effect hook (§11): refund one Summons per surviving minion on Redeploy.
+    public void RefundSummons(int amount) => AddSummons(amount);
 
     // Battle hands every caster the fight's shared PRNG so chance rolls are deterministic.
     public void UseRng(Rng rng) => _rng = rng;
@@ -197,19 +215,23 @@ public sealed class Caster
 
     // Summon a minion into a free bay: capped by the chassis's bay count, paid per its GATE — a stat
     // reservation (default), nothing (chassis-granted), or a one-off charge cost (alt-cost caster).
+    // §9: a FRESH summon costs BOTH — 1 SUMMONS (the finite deploy resource, uniform across gates) and
+    // its GATE — a stat reservation (default), nothing (chassis-granted), or the alt-cost placeholder.
     public bool Summon(Minion minion, int bayCap)
     {
         if (_bays.ContainsKey(minion.Id)) return true;
         if (_bays.Count >= bayCap) return false;
+        if (SummonsLeft <= 0) return false;
         switch (minion.Gate)
         {
-            case MinionGate.None: break; // ungated loyal ally — no cost
+            case MinionGate.None: break; // ungated loyal ally — no reservation (Summons still spends)
             // Alt-cost is a DESIGNED cost (HP or a stat, §9) — NOT Charge; Charge is the shield-pierce
             // resource now. No alt-cost minion is authored yet + HP isn't reachable here, so it is an
             // un-costed placeholder until one ships (then wire the real HP/stat spend).
             case MinionGate.AltCost: break;
             default: if (!_self.Activate(Reservation(minion))) return false; break;
         }
+        SummonsLeft--;
         _bays[minion.Id] = minion;
         return true;
     }
@@ -245,10 +267,12 @@ public sealed class Caster
             }
         }
 
-        // Minions auto-fire on whatever the caster is pressing (the default front).
+        // Minions auto-fire on whatever the caster is pressing (the default front); an IDLE minion
+        // (gate stat drained, §9) holds its bay but stays silent until the stat recovers.
         if (_default is { Down: false })
             foreach (var minion in _bays.Values)
-                Hit(_default, null, minion.Power);
+                if (minion.Gate != MinionGate.Stat || _self.IsActive(Reservation(minion)))
+                    Hit(_default, null, minion.Power);
     }
 
     // Resolve a technique's aim and land one discharge: hits its own foe (and PART) while that foe
@@ -313,10 +337,11 @@ public sealed class Caster
                 if (run.Tech.ShieldLayers > 0) _self.DropShield(run.Tech.Id); // a smashed source sheds its shield
             }
 
-        // A drained stat dismisses a STAT-gated minion the same way it silences a technique. Ungated
-        // and alt-cost minions hold no reservation, so the cascade leaves them standing.
-        foreach (var minion in _bays.Values.ToList())
+        // §9 [LOCKED 2026-07-02]: a drained stat only IDLES a stat-gated minion — it stays SUMMONED
+        // (paid once) and re-raises FREE the moment its stat recovers. Idle minions hold their bay but
+        // do not fire (the auto-fire loop skips them).
+        foreach (var minion in _bays.Values)
             if (minion.Gate == MinionGate.Stat && !_self.IsActive(Reservation(minion)))
-                _bays.Remove(minion.Id);
+                _self.Activate(Reservation(minion)); // free re-raise; fails harmlessly while short
     }
 }

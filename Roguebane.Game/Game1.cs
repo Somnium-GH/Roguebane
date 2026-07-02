@@ -345,6 +345,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
             if (Pressed(keys, Keys.F)) Exp.BuyFullHeal();                      // full repair at a premium
             if (Pressed(keys, Keys.S)) Exp.BuySupplies();                      // §12 resource stock
             if (Pressed(keys, Keys.C)) Exp.BuyCharge();
+            if (Pressed(keys, Keys.M)) Exp.BuySummons();                   // §9 deploy resource
 
             // Buy a gear chip into the Stash pack (weapons first, then armor — same order as drawn).
             var ws = Exp.OfferedWeapons;
@@ -606,6 +607,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
             ("supplies", Exp.Map.Supplies + "/" + Exp.Map.MaxSupplies),
             ("spoils", Exp.Gold.ToString()),
             ("charge", Exp.Charge + "/" + Exp.MaxCharge),
+            // §9 Summons (icon not authored yet — the null-sprite gap marks it; Needs-CD)
+            ("summons", Exp.Summons + "/" + Exp.MaxSummons),
         };
         var x = W - 8;
         for (var i = items.Length - 1; i >= 0; i--)
@@ -840,6 +843,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
             Exp.SuppliesStock > 0 && Exp.Map.Supplies < Exp.Map.MaxSupplies && Exp.Gold >= Exp.SuppliesPrice, Keys.S);
         DrawButton($"C  charge x{Exp.ChargeStock}  ({Exp.ChargePrice}g)", x + 184, y + 80, 160, 26,
             Exp.ChargeStock > 0 && Exp.Charge < Exp.MaxCharge && Exp.Gold >= Exp.ChargePrice, Keys.C);
+        DrawButton($"M  summons x{Exp.SummonsStock}  ({Exp.SummonsPrice}g)", x + 14, y + 112, 160, 26,
+            Exp.SummonsStock > 0 && Exp.Summons < Exp.MaxSummons && Exp.Gold >= Exp.SummonsPrice, Keys.M);
 
         // The gear stock as a compact row of buy chips (name + price); dim when unaffordable / sold.
         Text(_assets.Mono, "GEAR", x + 14, y + 150, Muted);

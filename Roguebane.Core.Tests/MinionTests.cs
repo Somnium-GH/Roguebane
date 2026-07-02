@@ -42,21 +42,25 @@ public class MinionTests
     }
 
     [Fact]
-    public void DrainingTheStatDismissesTheMinion()
+    public void DrainingTheStatIdlesTheMinionAndRecoveryReRaisesFree()
     {
+        // §9 [LOCKED 2026-07-02]: Summons pays ONCE — a drained gate stat only IDLES the minion (it
+        // stays summoned, silent), and it re-raises FREE when the stat recovers. No re-pay.
         var body = IntBody(2);
-        var head = body.Parts[0];
         var foe = new Foe("front", 100);
-        var caster = new Caster(body, foe);
-        caster.Summon(Minions.Skeleton, bayCap: 3);
+        var caster = new Caster(body, foe, maxSummons: 1);
+        Assert.True(caster.Summon(Minions.Skeleton, bayCap: 3)); // spends the only summon
+        Assert.Equal(0, caster.SummonsLeft);
 
+        var head = body.Parts.Single();
+        body.Damage(head, 2);                    // drain INT -> the reservation cascades off
         caster.Step();
-        Assert.Equal(99, foe.Hp);
+        Assert.Equal(1, caster.MinionCount);     // still SUMMONED (idle), not dismissed
+        Assert.Equal(100, foe.Hp);               // but silent while idle
 
-        body.Damage(head, 2); // INT -> 0, skeleton can no longer stand
-        caster.Step();        // pruned before firing
-        Assert.Equal(0, caster.MinionCount);
-        Assert.Equal(99, foe.Hp); // no further chip
+        body.Repair(head, 2);                    // stat recovers
+        caster.Step();                           // free re-raise (no Summons left, none needed) + fires
+        Assert.Equal(99, foe.Hp);                // firing again
     }
 
     [Fact]

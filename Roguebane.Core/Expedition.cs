@@ -190,12 +190,27 @@ public sealed class Expedition
         return true;
     }
 
+    private int _summonsBought;
+    public int SummonsStock => AtMerchant && MaxSummons > 0 ? Math.Max(0, 1 + StockRoll(5, 1) - _summonsBought) : 0;
+    public int SummonsPrice => 4 + StockRoll(6, 2); // 4..6 gold per summon (placeholder)
+
+    public bool BuySummons()
+    {
+        if (!AtMerchant || SummonsStock <= 0 || Summons >= MaxSummons) return false;
+        if (!_stash.TrySpend(SummonsPrice)) return false;
+        _caster.AddSummons(1);
+        _summonsBought++;
+        return true;
+    }
+
     public bool IsActive(Technique technique) => _caster.IsActive(technique);
 
     // Bay occupants (the summoned minions) + total bays for the combat minion-bay lane.
     public int MinionCount => _caster.MinionCount;
     public int Charge => _caster.Charge;       // the shield-pierce resource (§6b) — readout + spend
     public int MaxCharge => _caster.MaxCharge;
+    public int Summons => _caster.SummonsLeft; // §9 deploy resource — readout + merchant refill
+    public int MaxSummons => _caster.MaxSummons;
     public IReadOnlyList<Minion> Minions => _caster.Minions;
     public int Bays => _caster.BayCap;
 

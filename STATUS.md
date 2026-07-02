@@ -55,9 +55,13 @@ comments/tests swept (keystone "apex-tier" untouched). REMAINING: the manifest's
 CD-owned — the Game resolver keeps matching them until CD renames the manifest side (flip the resolver
 keys in the same pass); docs (STATUS slice notes / spec prose) sweep with CD's rename. [DESIGN_SPEC §17 #14]
 
-MINION RESOURCE = **Summons** [LOCKED §9/§14]: a minion costs a RESERVED gate stat AND spends Summons to
-SUMMON; idle/reactivate is FREE; re-summoning a KILLED minion re-costs. (Builds with the minion system —
-not the current arc; noted for when minions are wired.)
+MINION RESOURCE = **Summons** [LOCKED §9/§14] — BUILT (2026-07-02): Caster carries MaxSummons/
+SummonsLeft (Forge sizes runs at bays+2, placeholder; bare test casters stay unlimited); a FRESH summon
+spends 1 (uniform across gates) + its gate; a drained gate stat now IDLES the minion (stays summoned,
+silent, holds its bay) and it re-raises FREE on recovery — the old drain-dismiss cascade + its test are
+superseded. Merchant stocks summons (seeded x1-2, M key) + the in-run readout shows summons N/M (no
+icon authored — Needs-CD). Core-tested (300 green). REMAINING: minion DEATH (no HP model yet — killed
+re-pay untestable) + the Summoner Core Effect refund (next).
 
 MERCHANT: mechanics SPEC'd (§12). PARTIAL (2026-07-02): resource stock (seeded per node — supplies 1-3,
 charge 1-2, capped top-ups, placeholder prices flagged to the economy tune) + the 1-HP buy + the premium

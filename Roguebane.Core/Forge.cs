@@ -28,7 +28,8 @@ public static class Forge
         CityMap map)
     {
         var body = chassis.NewBody(race, runes);
-        var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, bayCap: chassis.Bays);
+        var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, bayCap: chassis.Bays,
+            maxSummons: chassis.Bays + 2); // §9 deploy budget — placeholder size, economy tune owns it
         SummonKit(caster, chassis, runes);
         return new Expedition(PlayerFighter(body, race), caster, WithRuneGrants(equipment, runes), map,
             figureId: chassis.FigureKey(race));
@@ -43,7 +44,8 @@ public static class Forge
         IReadOnlyList<Func<CityMap>> legs)
     {
         var body = chassis.NewBody(race, runes);
-        var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, bayCap: chassis.Bays);
+        var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, bayCap: chassis.Bays,
+            maxSummons: chassis.Bays + 2); // §9 deploy budget — placeholder size, economy tune owns it
         SummonKit(caster, chassis, runes);
         return new Campaign(PlayerFighter(body, race), caster, WithRuneGrants(equipment, runes), legs,
             figureId: chassis.FigureKey(race));
