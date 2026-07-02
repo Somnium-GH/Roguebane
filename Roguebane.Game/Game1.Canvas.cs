@@ -171,11 +171,17 @@ public partial class Game1
     }
 
     private void Border(int x, int y, int w, int h, Color color)
+        => Border(x, y, w, h, color, 2, null);
+
+    // §10 border.sides: a manifest border may name a subset of edges (e.g. ["top"] for an accent rule)
+    // — null/empty draws all four. Thickness is in physical px (design px * SS).
+    private void Border(int x, int y, int w, int h, Color color, int t, string[]? sides)
     {
-        Rect(x, y, w, 2, color);
-        Rect(x, y + h - 2, w, 2, color);
-        Rect(x, y, 2, h, color);
-        Rect(x + w - 2, y, 2, h, color);
+        bool On(string s) => sides is null || sides.Length == 0 || Array.IndexOf(sides, s) >= 0;
+        if (On("top")) Rect(x, y, w, t, color);
+        if (On("bottom")) Rect(x, y + h - t, w, t, color);
+        if (On("left")) Rect(x, y, t, h, color);
+        if (On("right")) Rect(x + w - t, y, t, h, color);
     }
 
     // A straight line between two points (a stretched, rotated 1px texture) for the chart's links.

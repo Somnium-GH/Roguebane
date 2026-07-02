@@ -43,7 +43,8 @@ public partial class Game1
         if (e.Frame is { } fr && fr.Slice.Length == 4 && _assets.Texture(fr.Asset) is { } ftex)
             DrawFrameTex(ftex, fr, r);
         if (e.Border is { } b)
-            Border(r.X, r.Y, r.Width, r.Height, _ui.Color(b.Color ?? "border", Border0));
+            Border(r.X, r.Y, r.Width, r.Height, _ui.Color(b.Color ?? "border", Border0),
+                Math.Max(2, b.W * SS), b.Sides);
 
         switch (e.Type)
         {
@@ -347,7 +348,8 @@ public partial class Game1
                     if (fillTok is not null) DrawFill(RectOf(pp.Rect), new Fill { Token = fillTok });
                     else if (!skipFill && pp.Fill is { } pf) DrawFill(RectOf(pp.Rect), pf);
                     if (pp.Border is { } pb)
-                        Border(pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H, _ui.Color(pb.Color, Border0));
+                        Border(pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H, _ui.Color(pb.Color, Border0),
+                            Math.Max(2, pb.W * SS), pb.Sides);
                 }
                 // imageBind (CD #15): a Content path template whose {bind} placeholders resolve
                 // from the bound item — the part blits that PNG instead of text/fill glyphs.

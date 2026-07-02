@@ -134,6 +134,19 @@ public class LayoutManifestTests
     }
 
     [Fact]
+    public void BorderSidesNameRealEdges()
+    {
+        // border.sides: a border may restrict itself to named edges (an accent rule, not a full box).
+        // Whatever CD authors, every named side must be a real edge; the drop exercises the form.
+        var borders = Real().Screens.Values.SelectMany(s => s.Elements).Select(e => e.Border)
+            .Concat(Real().Templates.Values.SelectMany(t => t.Parts).Select(p => p.Border))
+            .Where(b => b?.Sides is { Length: > 0 }).ToList();
+        Assert.NotEmpty(borders);
+        Assert.All(borders, b => Assert.All(b!.Sides!,
+            s => Assert.Contains(s, new[] { "top", "bottom", "left", "right" })));
+    }
+
+    [Fact]
     public void PaletteValuesAreHexColors()
     {
         Assert.NotEmpty(Real().Style.Palette);

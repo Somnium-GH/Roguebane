@@ -20,8 +20,9 @@ rename completed CD-side). Assets: `icons/resource/summons.png` (the missing Sum
 `bg/merchant_stall.png` — both mirrored into the GAME-side mgcb. Designs: refreshed 01–05, NEW
 `design/07-merchant.png` + `design/08-reticle-mounts.png` (the how-it-mounts reference). Core schema
 model + contract tests updated (self-styled leaf templates + static imageBind paths are legal).
-ENGINE TODO (unblocked, in order): `states` draw, `border.sides` draw, `colorBind` resolve, shield-pip
-instancing + regen fill, the merchant-screen consumer, summons icon in the resource strip.
+ENGINE TODO (unblocked, in order): `states` draw, ~~`border.sides` draw~~ DONE (element + template-part
+borders honour named edges + manifest width; contract test pins side names), `colorBind` resolve,
+shield-pip instancing + regen fill, the merchant-screen consumer, summons icon in the resource strip.
 
 ## ⇒ HUMAN DIRECTIVES — 2026-07-02 (revisions WIN; fold into the render arc / after the current slice)
 
