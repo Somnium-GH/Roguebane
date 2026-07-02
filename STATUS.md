@@ -3,9 +3,9 @@
 ## ✅ layout.json RESTORED (2026-07-01 pm) — the PNG-clobber is fixed by a clean re-drop
 Valid JSON (5690 lines) carrying the newest CD work: `imageBind` (beaconNode → node icons as PNGs, incl.
 skirmish, via `icons/node/{node.type}` — so "skirmish" isn't a literal), frame-v3 `repeat`+`centerFill`,
-`cityNode`, the instrumentation. ONE BUILD GAP: the new icons `icons/node/skirmish`,
-`icons/resource/charge`, `icons/technique/shot` PNGs exist but are NOT in `Content.mgcb` → they won't load
-(tolerant loader → blank, not a crash) until added. **ADD their mgcb entries** (small build task).
+`cityNode`, the instrumentation. The BUILD GAP is CLOSED (2026-07-02): the three new icons are mirrored
+into the GAME-side `Roguebane.Game/Content/Content.mgcb` (the one the build actually reads — CD's
+`Roguebane.Content/Content.mgcb` copy is not wired; unify later) and skirmish renders on the map.
 
 *Lean by design. SHIPPED-work history + rationale live in `git log` (detailed commits) and old STATUS
 revisions (`git show <rev>:STATUS.md`) — recoverable, so not duplicated here. Locked design lives in
@@ -123,8 +123,8 @@ STRAIGHT to CityMap, no build gate / no Enter-through. (2) Equipment must open a
 CampaignMap). (4) MERCHANT is an IMPROVISED un-designed POPOVER stopgap — the heal+gear-shop MECHANIC is
 designed (§12/§14), the SCREEN is not; spec with Doug + a CD design PNG before building it (design-open,
 DESIGN_SPEC §17). Do NOT expand the popover as if it were the design. See DESIGN_SPEC §12.
-IMMEDIATE small tasks (not CD): bind `core.icon` → `icons/rune/core_<id>` (icons exist); add the new
-icons (skirmish/charge/shot) to `Content.mgcb`; and the **FONT task** below.
+IMMEDIATE small tasks (not CD): bind `core.icon` → `icons/rune/core_<id>` (icons exist); and the
+**FONT task** below. (mgcb icon entries: DONE 2026-07-02.)
 **FONT task (ours, no CD — fixes the "wrong font" AND the "?" glyphs in ONE move):** `display.spritefont`
 + `mono.spritefont` still name SYSTEM **Consolas/Georgia** with an **ASCII-only** char region
 (`&#32;`–`&#126;`) — that's why every screen shows the wrong font AND why ①②③ ✚ ◉ ✓ render "?". Bundle
@@ -134,10 +134,9 @@ Content), point each `.spritefont` `FontName` at them, and widen `CharacterRegio
 font truly lacks. (Supersedes the old "swap fonts before distribution" needs-human note.)
 
 ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered above:
-- **`imageBind`** (NEW manifest field, CD #15): resolve its path template (e.g. `icons/node/{node.type}`)
-  against the bound item + BLIT that Content PNG instead of the element's border/fill/glyph. First user:
-  `templates.beaconNode` map markers (incl. the new `skirmish` ⚔) — this is HOW node icons render as PNGs,
-  never the "?" glyph. The renderer must learn it.
+- **`imageBind`** — DONE (2026-07-02, CD #15): `TemplatePart.ImageBind` parses (contract-tested), the
+  list renderer resolves `{bind}` placeholders per datum generically, and the map graph blits the
+  fog-aware node token through it — skirmish ⚔ renders live; the "unknown ?" stopgap mapping retired.
 - **Button 9-slice corners = 12px** (CD #11): buttons were repainted to 320×88 (1080-class); the engine's
   button nine-slice must blit with 12px corners, not 6px.
 - **Container overflow/scroll** (CD #4): DEFERRED (2 races / 6 cores fit today) — add a scroll/page
