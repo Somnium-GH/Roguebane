@@ -59,9 +59,13 @@ not the current arc; noted for when minions are wired.)
 MERCHANT: mechanics SPEC'd (§12). PARTIAL (2026-07-02): resource stock (seeded per node — supplies 1-3,
 charge 1-2, capped top-ups, placeholder prices flagged to the economy tune) + the 1-HP buy + the premium
 FULL-heal are BUILT + Core-tested (298 green) + wired into the stopgap popover (H/F/S/C). REMAINING:
-Summons stock (needs the §9 resource model) + the weighted 5-CATEGORY gear shop (always-3 picks,
-techniques 5-when-present + 2nd-rarest, runes exceedingly rare, keystones never; the weighted-shuffle
-algorithm itself stays OPEN §17). The SCREEN LAYOUT waits on a CD design PNG (popover = flagged stopgap).
+Summons stock (needs the §9 resource model). The 5-CATEGORY gear stock MODEL is BUILT (2026-07-02):
+`MerchantStock.Roll` — seeded/reproducible, ≤4 of 5 sections, 3 picks per section (pool-capped),
+techniques always-5-when-present + 2nd-rarest, rank-2 runes rarer, keystones NEVER; section weights
+placeholder (shuffle algorithm OPEN §17). Shape Core-tested over a 400-seed sweep (300 green).
+NOT WIRED yet: Expedition still stocks the old weapon/armor lists — wire Roll per merchant node +
+buy verbs for techniques/minions/runes (their RECEIVING models — mid-run palette/bay/rune mutation —
+are the design-open gate; weapons/armor can wire now). The SCREEN LAYOUT waits on a CD design PNG (popover = flagged stopgap).
 
 **AFTER HiFi completes/blocks + all outstanding identified bugs resolved:**
 - **Summoner CoreRune — real Core Effect:** on Redeploy, refund Summons for SURVIVING minions (§11). The
