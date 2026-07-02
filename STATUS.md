@@ -96,6 +96,11 @@ SLICES (one screen/pass, pixel-verify vs its design PNG):
    label (design/01's Firebolt card), verified live via the encounter smoke's targeting card.
    Gaps: techCard's bindless sample parts (the cost NUMBER + the mid-description damage digit) stamp
    their sample on every card (Needs-CD: bind them).
+   Pixel-walk vs the NEW hi-res design/01 (2026-07-02): positions/values match the manifest; deltas are
+   the known chrome family PLUS two fresh Needs-CD items — `poolRow` has NO pip parts (the design's
+   per-stat pip strips can't render; `ui/pip/*` assets exist), and the re-dropped manifest LOST the
+   "Attribute Pool"/"Action Bar" panel titles that design/01 shows (they were elements before the
+   re-drop). No renderer-side bugs found.
    DISPLAY COPY DONE: `Technique.Desc`/`Minion.Desc` (+`DescText`) ship card copy for all 8 techniques
    + both minions; `{power}` resolves from the data at render so copy can't contradict tuning. Bound
    via technique.description/bay.description; Core-tested (290 green).
