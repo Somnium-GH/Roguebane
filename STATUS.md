@@ -27,10 +27,16 @@ FLAGGED FIXES (from live screenshots):
   fill direction with §12 castle-right→camp-left advance).
 - **Targeting reticles don't sit on the foe's body parts** — fix reticle placement on the limb bands;
   needs matching reticle assets + (Needs-CD) demonstrative "how-it-mounts" design screens.
+- **SHIELD BAR + active-shield BUG:** shields are ALWAYS PASSIVE (reserve-the-stat) — an active-cast
+  shield ability is a BUG; make shield sources passive-only (§6b). Add a **SHIELD BAR**: PIPS
+  (filled/empty) + a per-pip **REGEN progress bar** (time-to-next-pip) while the source is active, wired
+  to `ShieldPool` (layers + CON-scaled regen). Pool scales beyond 4 → render a VARIABLE N of pips
+  gracefully. CD designs the bar (best-stab, Doug refines tomorrow); loop wires it.
 
-RENAME **apex → Core Effect** everywhere it means a core rune's signature effect: code (`ApexName/ApexDesc`
-→ `CoreEffectName/CoreEffectDesc`), manifest `apex*` binds/labels, docs. (Leave the keystone "apex-tier"
-usage.) [DESIGN_SPEC §17 #14]
+RENAME **apex → Core Effect** — CODE DONE (2026-07-02): `CoreEffectName/CoreEffectDesc` + all code
+comments/tests swept (keystone "apex-tier" untouched). REMAINING: the manifest's `apex*` bind names are
+CD-owned — the Game resolver keeps matching them until CD renames the manifest side (flip the resolver
+keys in the same pass); docs (STATUS slice notes / spec prose) sweep with CD's rename. [DESIGN_SPEC §17 #14]
 
 MINION RESOURCE = **Summons** [LOCKED §9/§14]: a minion costs a RESERVED gate stat AND spends Summons to
 SUMMON; idle/reactivate is FREE; re-summoning a KILLED minion re-costs. (Builds with the minion system —

@@ -1386,8 +1386,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
         "preview.budget" => _build.CoreRune.RuneBudget.ToString(),
         "preview.techniques" => _build.CoreRune.Kit.Count.ToString(),
         "preview.bays" => _build.CoreRune.Bays.ToString(),
-        "preview.apexName" => _build.CoreRune.ApexName,
-        "preview.apexDesc" => _build.CoreRune.ApexDesc,
+        "preview.apexName" => _build.CoreRune.CoreEffectName, // manifest still binds apex* (CD rename pending)
+        "preview.apexDesc" => _build.CoreRune.CoreEffectDesc,
         "core" => _build.Race.Name + " " + _build.CoreRune.Title,
         "runes.budget" => _build.Runes.Available + " free / " + _build.Runes.Budget,
         "Body.hp" => InRun ? Exp.Player.Hp + " / " + Exp.Player.MaxHp : null,
@@ -1599,7 +1599,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     }
 
     // Resolve a template part's `binds` against a live datum -> display text, or null to use the sample.
-    // Missing-data binds (race tag/blurb, per-attr tiles, apex text) return null pending their data.
+    // Missing-data binds (race tag/blurb, per-attr tiles, Core Effect text) return null pending their data.
     private static string? ResolveBind(object datum, string? bind) => datum switch
     {
         Roguebane.Core.Race r => bind switch
@@ -1617,8 +1617,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
             "core.budget" => c.RuneBudget.ToString(),
             "core.bays" => c.Bays.ToString(),
             "core.actionSlots" => c.Kit.Count.ToString(),
-            "core.apexName" => c.ApexName,
-            "core.apexDescription" => c.ApexDesc,
+            "core.apexName" => c.CoreEffectName,
+            "core.apexDescription" => c.CoreEffectDesc,
             _ => null,
         },
         ValueTuple<string, string, string> a => bind switch // (key, value, swatch-token) attr tile

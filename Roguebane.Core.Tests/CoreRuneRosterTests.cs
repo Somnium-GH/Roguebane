@@ -18,18 +18,18 @@ public class CoreRuneRosterTests
     [Fact]
     public void EveryCoreRuneCarriesADisplayIdentity()
     {
-        // design/05 cards need a title, an archetype tagline, a flavor pitch, and DISPLAY-only apex text
-        // (name + blurb) per core — the card binds render these (the apex EFFECT is NOT implemented, §11).
+        // design/05 cards need a title, an archetype tagline, a flavor pitch, and DISPLAY-only Core Effect text
+        // (name + blurb) per core — the card binds render these (the Core EFFECT is NOT implemented, §11).
         foreach (var c in CoreRunes.Roster)
         {
             Assert.False(string.IsNullOrEmpty(c.Archetype), $"{c.Id} archetype");
             Assert.False(string.IsNullOrEmpty(c.Flavor), $"{c.Id} flavor");
-            Assert.False(string.IsNullOrEmpty(c.ApexName), $"{c.Id} apex name");
-            Assert.False(string.IsNullOrEmpty(c.ApexDesc), $"{c.Id} apex desc");
+            Assert.False(string.IsNullOrEmpty(c.CoreEffectName), $"{c.Id} Core Effect name");
+            Assert.False(string.IsNullOrEmpty(c.CoreEffectDesc), $"{c.Id} Core Effect desc");
             Assert.Equal(char.ToUpperInvariant(c.Id[0]), c.Title[0]); // "grunt" -> "Grunt"
         }
         Assert.Equal("THE WALL", CoreRunes.Warden.Archetype);
-        Assert.Equal("Hollow Vessel", CoreRunes.Grunt.ApexName); // the POC keystone (§11)
+        Assert.Equal("Hollow Vessel", CoreRunes.Grunt.CoreEffectName); // the POC keystone (§11)
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class CoreRuneRosterTests
     [Fact]
     public void EveryTechniqueAndMinionCarriesDisplayCopy()
     {
-        // Card DESCRIPTIONS are display data (design/01) like the apex copy: every palette technique
+        // Card DESCRIPTIONS are display data (design/01) like the Core Effect copy: every palette technique
         // (+ the opt-in shield/heal content) and every minion must ship copy, and {power} must resolve
         // so the rendered text never contradicts the data.
         var techs = Techniques.All.Concat(new[] { Techniques.Bandage, Techniques.Stoneskin });

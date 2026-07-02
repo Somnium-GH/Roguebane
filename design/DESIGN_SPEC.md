@@ -119,6 +119,14 @@ Every class should have a viable block source; a build with none must compensate
 damage + evasion). **Counterplay — shield-piercing:** some techniques, and ALL **bows** (§10), IGNORE the
 shield pool entirely; that bypass is gated by the **Charge** resource (§10) — powerful but logistically
 limited. *(Supersedes the earlier "sustained CON-block, flat-while-held, capped" model, §18.)*
+- **ALWAYS PASSIVE [LOCKED — reinforce]:** a shield source is NEVER an active-cast ability. It reserves
+  its stat to hold the pool passively; toggling it OFF just frees the stat. (Any "active shield" in the
+  build/code is a BUG — make it passive.)
+- **SHIELD BAR [UI]:** show the pool as **PIPS** (filled = a live shield point, empty = spent), plus a
+  **regen progress bar** that fills to show time-to-next-pip while the source is passively active (the
+  regen cadence is CON-scaled, §6b). FTL-reminiscent read, our own skin — no trade-dress. The pip count is
+  **NOT capped at ~4** (that was FTL's damage scale); ours scales HIGHER (likely 8+) to mitigate this
+  game's larger damage numbers — so the bar must render a **variable, larger N** of pips gracefully.
 
 ## 7. Race + Core rune, and the three-layer architecture [LOCKED]
 Identity is **two axes** (FTL ship + layout):
