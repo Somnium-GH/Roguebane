@@ -12,6 +12,17 @@ revisions (`git show <rev>:STATUS.md`) — recoverable, so not duplicated here. 
 `design/DESIGN_SPEC.md`. This file = CURRENT state only. (Whittled 2026-07-01 from ~900 lines; nothing
 current dropped.)*
 
+## ✅ CD DROP LANDED (2026-07-02 pm) — verified + committed
+layout.json (+4786 lines, parses, all 5 smokes green): NEW `merchant` screen; `states` (button skin
+families + template state styles), `border.sides` (per-side borders), `colorBind` (element + part),
+`shieldPip` self-styled leaf template (pips + state styles); `apex*` binds GONE from the manifest (the
+rename completed CD-side). Assets: `icons/resource/summons.png` (the missing Summons icon),
+`bg/merchant_stall.png` — both mirrored into the GAME-side mgcb. Designs: refreshed 01–05, NEW
+`design/07-merchant.png` + `design/08-reticle-mounts.png` (the how-it-mounts reference). Core schema
+model + contract tests updated (self-styled leaf templates + static imageBind paths are legal).
+ENGINE TODO (unblocked, in order): `states` draw, `border.sides` draw, `colorBind` resolve, shield-pip
+instancing + regen fill, the merchant-screen consumer, summons icon in the resource strip.
+
 ## ⇒ HUMAN DIRECTIVES — 2026-07-02 (revisions WIN; fold into the render arc / after the current slice)
 
 **⚡ NOT STARVED — DROP-INDEPENDENT WORK (do NOW; the pixel-perfect render POLISH is drop-gated on CD's
@@ -67,10 +78,9 @@ FLAGGED FIXES (from live screenshots):
   SELF tech never enters targeting; a powered PASSIVE source toggles OFF (§6b) — never the FSM.
   Core-tested (296 green). The SHIELD BAR UI waits on CD's bar design.
 
-RENAME **apex → Core Effect** — CODE DONE (2026-07-02): `CoreEffectName/CoreEffectDesc` + all code
-comments/tests swept (keystone "apex-tier" untouched). REMAINING: the manifest's `apex*` bind names are
-CD-owned — the Game resolver keeps matching them until CD renames the manifest side (flip the resolver
-keys in the same pass); docs (STATUS slice notes / spec prose) sweep with CD's rename. [DESIGN_SPEC §17 #14]
+RENAME **apex → Core Effect** — COMPLETE (2026-07-02): code side done earlier; today's CD drop renamed
+the manifest binds (`preview.coreEffect*` / `core.coreEffect*`, zero `apex` left in layout.json) and the
+Game resolver keys flipped in the same pass (keystone "apex-tier" untouched). [DESIGN_SPEC §17 #14]
 
 MINION RESOURCE = **Summons** [LOCKED §9/§14] — BUILT (2026-07-02): Caster carries MaxSummons/
 SummonsLeft (Forge sizes runs at bays+2, placeholder; bare test casters stay unlimited); a FRESH summon

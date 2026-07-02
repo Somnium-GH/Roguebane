@@ -239,8 +239,8 @@ public partial class Game1
         "preview.budget" => _build.CoreRune.RuneBudget.ToString(),
         "preview.techniques" => _build.CoreRune.Kit.Count.ToString(),
         "preview.bays" => _build.CoreRune.Bays.ToString(),
-        "preview.apexName" => _build.CoreRune.CoreEffectName, // manifest still binds apex* (CD rename pending)
-        "preview.apexDesc" => _build.CoreRune.CoreEffectDesc,
+        "preview.coreEffectName" => _build.CoreRune.CoreEffectName,
+        "preview.coreEffectDesc" or "preview.coreEffect" => _build.CoreRune.CoreEffectDesc,
         "core" => _build.Race.Name + " " + _build.CoreRune.Title,
         "runes.budget" => _build.Runes.Available + " free / " + _build.Runes.Budget,
         "Body.hp" => InRun ? Exp.Player.Hp + " / " + Exp.Player.MaxHp : null,
@@ -471,8 +471,8 @@ public partial class Game1
             "core.budget" => c.RuneBudget.ToString(),
             "core.bays" => c.Bays.ToString(),
             "core.actionSlots" => c.Kit.Count.ToString(),
-            "core.apexName" => c.CoreEffectName,
-            "core.apexDescription" => c.CoreEffectDesc,
+            "core.coreEffectName" => c.CoreEffectName,
+            "core.coreEffectDesc" or "core.coreEffect" => c.CoreEffectDesc,
             _ => null,
         },
         ValueTuple<string, string, string> a => bind switch // (key, value, swatch-token) attr tile

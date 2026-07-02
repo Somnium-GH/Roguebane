@@ -18,13 +18,16 @@ public class CardTemplateTests
     public void EveryTemplateParsesWithSizeAndStyledParts()
     {
         // Schema, not literal keys: whatever templates CD ships, each is sized and every part fills its
-        // slot with a text datum (sample), an image, or a live binds.
+        // slot with a text datum (sample), an image, or a live binds. A template with NO parts must be a
+        // self-styled leaf (its own binds/fill carry the visual — e.g. a shield pip), never a blank box.
         var templates = Manifest().Templates;
         Assert.NotEmpty(templates);
         foreach (var (name, t) in templates)
         {
             Assert.True(t.Size.Length == 2, $"{name} size");
-            Assert.NotEmpty(t.Parts);
+            if (t.Parts.Length == 0)
+                Assert.False(string.IsNullOrEmpty(t.Binds) && t.Fill is null,
+                    $"{name} has no parts and no self-style — a blank template");
             foreach (var p in t.Parts)
             {
                 Assert.Equal(4, p.Rect.Length);
@@ -60,7 +63,7 @@ public class CardTemplateTests
     [Fact]
     public void PlaceTranslatesPartsByTheOrigin()
     {
-        var tech = Manifest().Templates.Values.First(); // any real template
+        var tech = Manifest().Templates.Values.First(t => t.Parts.Length > 0); // any real parts-carrying template
         var first = tech.Parts[0];
 
         var placed = CardTemplate.Place(tech, 100, 200);

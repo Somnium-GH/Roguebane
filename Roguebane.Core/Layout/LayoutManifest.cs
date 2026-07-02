@@ -96,6 +96,8 @@ public sealed class Element
     public Shadow? Shadow { get; init; }   // an engine-drawn drop shadow under this element (§10)
     public string? Content { get; init; } // a literal text element (no data binding)
     public Item? Item { get; init; }       // a repeated child: list (horizontal/vertical) or graph
+    public string? ColorBind { get; init; } // a colour bound from live data (e.g. "preview.accent")
+    public JsonElement States { get; init; } // interaction-state skins (button family asset map)
 }
 
 // An engine-drawn drop shadow (§10): the element silhouette offset by (Dx,Dy), softened by Blur, in the
@@ -137,14 +139,24 @@ public sealed class Border
     public string Color { get; init; } = "";
     public int W { get; init; }
     public string Style { get; init; } = "";
+    public string[]? Sides { get; init; } // per-side borders, e.g. ["top"]; null/empty = all four
 }
 
 // A repeated UI card (techCard/poolRow/invCard/…): a fixed-size box of styled sub-parts whose
-// rects are card-local. The shell stamps it at a screen position via CardTemplate.
+// rects are card-local. The shell stamps it at a screen position via CardTemplate. A template may
+// instead be a SELF-STYLED LEAF (empty parts, its own binds/fill/border/states — e.g. a shield pip):
+// the whole cell IS the visual.
 public sealed class Template
 {
     public int[] Size { get; init; } = [];
     public TemplatePart[] Parts { get; init; } = [];
+    public string? Binds { get; init; }
+    public string Color { get; init; } = "";
+    public Fill? Fill { get; init; }
+    public Border? Border { get; init; }
+    public string Font { get; init; } = "";
+    public double FontPx { get; init; }
+    public JsonElement States { get; init; } // state key -> style overrides (fill/border/borderStyle)
 }
 
 public sealed class TemplatePart
@@ -160,6 +172,7 @@ public sealed class TemplatePart
                                                // whose {bind} placeholders fill from the bound item (CD #15)
     public Fill? Fill { get; init; }           // part-level chrome (attr swatches, slot backgrounds)
     public Border? Border { get; init; }
+    public string? ColorBind { get; init; }    // a colour bound from the stamped datum (e.g. "technique.attrColor")
 }
 
 public sealed class Style

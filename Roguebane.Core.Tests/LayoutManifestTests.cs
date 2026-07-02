@@ -117,20 +117,20 @@ public class LayoutManifestTests
     }
 
     [Fact]
-    public void ImageBindPathsCarryAPlaceholder()
+    public void ImageBindPathsResolveToContentPaths()
     {
-        // imageBind (CD #15): a Content path template resolved per bound item. Any part carrying one
-        // must give the renderer a non-empty pattern with at least one {bind} placeholder (quantified —
-        // no CD ids pinned). The manifest drives at least one (the map node icons).
+        // imageBind (CD #15): a Content path resolved per bound item — either a {bind} template or a
+        // STATIC path (a fixed icon in a bound slot; resolves to itself). Every one must be non-empty
+        // with balanced braces, and the manifest must exercise the placeholder form at least once.
         var bound = Real().Templates.Values.SelectMany(t => t.Parts)
             .Where(pp => pp.ImageBind is not null).ToList();
         Assert.NotEmpty(bound);
         Assert.All(bound, pp =>
         {
             Assert.False(string.IsNullOrEmpty(pp.ImageBind));
-            Assert.Contains("{", pp.ImageBind!);
-            Assert.Contains("}", pp.ImageBind!);
+            Assert.Equal(pp.ImageBind!.Contains('{'), pp.ImageBind.Contains('}'));
         });
+        Assert.Contains(bound, pp => pp.ImageBind!.Contains('{'));
     }
 
     [Fact]

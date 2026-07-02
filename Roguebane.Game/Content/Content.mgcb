@@ -5998,3 +5998,25 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/icons/map/enemy_host_near.png;icons/map/enemy_host_near
+
+#begin icons/resource/summons
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/icons/resource/summons.png;icons/resource/summons
+
+#begin bg/merchant_stall
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/bg/merchant_stall.png;bg/merchant_stall
