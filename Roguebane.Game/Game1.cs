@@ -239,6 +239,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
         for (var i = 0; i < slotted.Count && i < _build.Equipment.Count; i++)
             if (Click(RectOf(slotted[i]))) _build.Toggle(_build.Equipment[i]);
 
+        // Rune Bag: click a group card to climb its ladder's next rung (spends budget; Core gates it).
+        var groups = ManifestListCells("equipment", "runeGroups", _build.Paths.Count);
+        for (var i = 0; i < groups.Count && i < _build.Paths.Count; i++)
+            if (Click(RectOf(groups[i]))) _build.Climb(_build.Paths[i]);
+
         // March the campaign. The chassis ships a fixed kit so the bar is never empty — no gate.
         // Alt+Enter is the fullscreen toggle, not a march. (The design's READY TO MARCH chip was
         // flattened into the status strip by extraction — Needs-CD; Enter carries the march until then.)
@@ -1407,6 +1412,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
             // Positional binds repeat the SAME bind N times per card (attr tiles 4x, attr-bar pips 12x,
             // in template order); count each occurrence per card to pick the right datum slice.
             int valIx = 0, keyIx = 0, pipIx = 0;
+            var occ = new System.Collections.Generic.Dictionary<string, int>(); // per-bind occurrence (rune rows)
             foreach (var pp in CardTemplate.Place(tmpl, cell.X, cell.Y))
             {
                 if (pp.Binds is { } sel && sel.EndsWith(".selection") && i != selIx)
@@ -1419,6 +1425,18 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 {
                     stateText = ResolveStateBind(datum, pp.Binds!);
                     if (string.IsNullOrEmpty(stateText)) continue;
+                }
+                // Rune-bag rows (g.runes.* repeats twice per group): a LIVE ladder shows its held
+                // rung (or the first) then the next — resolved copy only, never the template samples.
+                if (pp.Binds is { } gb && gb.StartsWith("g.runes") && datum is not null)
+                {
+                    var row = occ.GetValueOrDefault(gb);
+                    occ[gb] = row + 1;
+                    var rtxt = RuneRow(datum, row) is { } mk ? RuneBind(mk, gb) : null;
+                    if (!string.IsNullOrEmpty(rtxt))
+                        TextPxWrapped(pp.Font == "display" ? _assets.Display : _assets.Mono,
+                            rtxt!, RectOf(pp.Rect), _ui.Color(pp.Color ?? "ink", Ink), pp.FontPx);
+                    continue;
                 }
                 // Charge/cooldown progress: the fill bar's WIDTH is the resolved fraction.
                 if (pp.Binds == "technique.chargePct")
@@ -1512,6 +1530,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
             2 => _build.CoreRune.MinionKit.Concat(_build.Runes.GrantedMinions).Cast<object>().ToList(),
             _ => null,
         },
+        // The Rune Bag (design/02): one group per PATH ladder — the MARKS/PATHS/KEYSTONES taxonomy
+        // is OPEN (§17), so the model's actual grouping (ladders) is what renders.
+        "runeGroups" => _build.Paths.Cast<object>().ToList(),
         // Encounter (design/01): the combat pool + action bar read the RUN body once marching.
         "pool" => AttrBars(),
         "loadout.techniques" => InRun ? Exp.Equipment.Cast<object>().ToList()
@@ -1634,6 +1655,39 @@ public class Game1 : Microsoft.Xna.Framework.Game
         }
         // A fielded minion is ACTIVE by definition (the bays list holds the live retinue in a run).
         return datum is Roguebane.Core.Minion && bind == "bay.state" ? "ACTIVE" : null;
+    }
+
+    // Which rung a rune-group row shows: the held rung (or the first) then the next — the pair the
+    // player acts on. Rows past the ladder clamp to the keystone.
+    private Roguebane.Core.Mark? RuneRow(object? datum, int row)
+    {
+        if (datum is not System.Collections.Generic.IReadOnlyList<Roguebane.Core.Mark> ladder
+            || ladder.Count == 0) return null;
+        var held = _build.Runes.CurrentRank(ladder[0].Path);
+        var first = held > 0 ? Math.Min(held - 1, ladder.Count - 1) : 0;
+        return ladder[Math.Min(first + row, ladder.Count - 1)];
+    }
+
+    private string? RuneBind(Roguebane.Core.Mark m, string bind) => bind switch
+    {
+        "g.runes.name" => m.DisplayName,
+        "g.runes.effect" => RuneEffect(m),
+        "g.runes.state" => _build.Runes.Has(m) ? "EQUIPPED"
+            : _build.Runes.CurrentRank(m.Path) == m.Rank - 1
+                && _build.Runes.Available >= _build.Runes.EffectiveCost(m) ? "EQUIPPABLE" : "LOCKED",
+        "g.runes.cost" => _build.Runes.EffectiveCost(m) + "p",
+        _ => null, // icon glyph + stack countLabel have no model — draw nothing, never the sample
+    };
+
+    // A rune's effect line, derived from what the rung actually grants so copy can't drift from data.
+    private static string RuneEffect(Roguebane.Core.Mark m)
+    {
+        var bits = new System.Collections.Generic.List<string>();
+        foreach (var p in m.Granted) bits.Add("Sockets +" + p.Capacity + " " + p.Stat.ToString().ToUpperInvariant());
+        foreach (var t in m.GrantedTechniques) bits.Add("Grants the " + DisplayName(t.Id) + " technique");
+        foreach (var mn in m.GrantedMinions) bits.Add("Grants the " + DisplayName(mn.Id) + " minion");
+        if (bits.Count == 0) bits.Add("Rung " + m.Rank + " of the " + m.Path + " ladder");
+        return string.Join("; ", bits) + ".";
     }
 
     private static int ListCountFor(string? bind) => 3; // sample-count fallback for unmapped binds

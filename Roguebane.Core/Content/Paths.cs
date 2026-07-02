@@ -6,11 +6,11 @@ public static class Paths
 {
     public const string Vessel = "vessel";
 
-    public static readonly Mark VesselI = new(Vessel, Rank: 1, Cost: 4, Refund: 2);
-    public static readonly Mark VesselII = new(Vessel, Rank: 2, Cost: 6, Refund: 3);
+    public static readonly Mark VesselI = new(Vessel, Rank: 1, Cost: 4, Refund: 2, Name: "Vessel Seal I");
+    public static readonly Mark VesselII = new(Vessel, Rank: 2, Cost: 6, Refund: 3, Name: "Vessel Seal II");
     // CoreRune-extending keystone: a Hollow Vessel sockets extra CON onto the body (the vessel core).
     public static readonly Mark HollowVessel = new(Vessel, Rank: 3, Cost: 8, Refund: 0, Keystone: true,
-        Grants: new[] { new BodyPart("vessel-core", Stat.Con, 6) });
+        Grants: new[] { new BodyPart("vessel-core", Stat.Con, 6) }, Name: "Hollow Vessel");
 
     public static readonly IReadOnlyList<Mark> VesselLadder = new[] { VesselI, VesselII, HollowVessel };
 
@@ -18,11 +18,11 @@ public static class Paths
     // to Resonant Core; a fat-budget outsider can reach it too, at a real cost.
     public const string Resonance = "resonance";
 
-    public static readonly Mark ResonanceI = new(Resonance, Rank: 1, Cost: 5, Refund: 2);
-    public static readonly Mark ResonanceII = new(Resonance, Rank: 2, Cost: 6, Refund: 3);
+    public static readonly Mark ResonanceI = new(Resonance, Rank: 1, Cost: 5, Refund: 2, Name: "Resonance I");
+    public static readonly Mark ResonanceII = new(Resonance, Rank: 2, Cost: 6, Refund: 3, Name: "Resonance II");
     // The specialist keystone amplifies the head: a Resonant Core sockets extra INT (spell power).
     public static readonly Mark ResonantCore = new(Resonance, Rank: 3, Cost: 4, Refund: 0, Keystone: true,
-        Grants: new[] { new BodyPart("resonant-core", Stat.Int, 4) });
+        Grants: new[] { new BodyPart("resonant-core", Stat.Int, 4) }, Name: "Resonant Core");
 
     public static readonly IReadOnlyList<Mark> ResonanceLadder = new[] { ResonanceI, ResonanceII, ResonantCore };
 
@@ -35,10 +35,10 @@ public static class Paths
     public static readonly Technique Maelstrom =
         new("maelstrom", Stat.Int, Reserve: 3, TechniqueKind.Sustained, Cooldown: 0, Power: 3);
 
-    public static readonly Mark TempestI = new(Tempest, Rank: 1, Cost: 4, Refund: 2);
-    public static readonly Mark TempestII = new(Tempest, Rank: 2, Cost: 5, Refund: 2);
+    public static readonly Mark TempestI = new(Tempest, Rank: 1, Cost: 4, Refund: 2, Name: "Tempest I");
+    public static readonly Mark TempestII = new(Tempest, Rank: 2, Cost: 5, Refund: 2, Name: "Tempest II");
     public static readonly Mark EyeOfTheStorm = new(Tempest, Rank: 3, Cost: 6, Refund: 0, Keystone: true,
-        Techniques: new[] { Maelstrom });
+        Techniques: new[] { Maelstrom }, Name: "Eye of the Storm");
 
     public static readonly IReadOnlyList<Mark> TempestLadder = new[] { TempestI, TempestII, EyeOfTheStorm };
 

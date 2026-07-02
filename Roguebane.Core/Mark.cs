@@ -12,8 +12,12 @@ public sealed record Mark(
     bool Keystone = false,
     IReadOnlyList<BodyPart>? Grants = null,
     IReadOnlyList<Technique>? Techniques = null,
-    IReadOnlyList<Minion>? Minions = null)
+    IReadOnlyList<Minion>? Minions = null,
+    string Name = "") // DISPLAY-ONLY rune-card title (design/02); "" falls back to "<Path> <Rank>"
 {
+    public string DisplayName => Name.Length > 0
+        ? Name : char.ToUpperInvariant(Path[0]) + Path[1..] + " " + Rank;
+
     public IReadOnlyList<BodyPart> Granted => Grants ?? Array.Empty<BodyPart>();
 
     // Non-extension effects: a rune can also unlock a technique or a minion the chassis lacks —

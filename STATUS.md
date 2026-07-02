@@ -60,8 +60,13 @@ SLICES (one screen/pass, pixel-verify vs its design PNG):
    slotted action-bar card unslots; keys 1-9 still toggle; Enter marches (the design's READY TO MARCH
    chip was flattened into the status strip by extraction — Needs-CD; Enter carries the march).
    Live binds: paperDoll figure, attr bars (§6 part labels, free/cap, positional pips), loadout/minion
-   cards, core identity, rune budget. Sample-only: GEAR cards + rune-bag groups (models design-open,
-   Debt). Not design-done: chrome/label gaps in Needs-CD.
+   cards, core identity, rune budget. RUNE BAG LIVE: one group per PATH ladder (MARKS/PATHS/KEYSTONES
+   taxonomy stays OPEN §17 — the model's ladders render); each group shows held-rung + next with
+   `Mark.Name` display titles (Vessel Seal I/II, Hollow Vessel, ...), a data-derived effect line
+   (sockets/grants — can't drift), live EQUIPPED/EQUIPPABLE/LOCKED state + discounted cost; clicking a
+   group card Climbs the ladder (budget-gated in Core). Group header label + row icon/stack are
+   bindless in the template (Needs-CD). Sample-only: GEAR cards (model design-open, Debt).
+   Not design-done: chrome/label gaps in Needs-CD.
 3. **Encounter** — CUT OVER: the fighting screen renders `DrawManifestScreen("encounter")` over the
    battlefield backdrop; only the cleared/lost overlay stays legacy (not part of design/01). Combat
    input reads manifest geometry by binds: card cells press/right-press, the foe hit-box + limb bands
@@ -144,10 +149,16 @@ CampaignMap — editing the CURRENT loadout (core fixed).
   character regions + use a bundled font that covers them (fold into the planned system→bundled-font
   swap). This is the ONE real dependency for NewGame pixel-perfect; bake a glyph as an icon only if the
   chosen font lacks it.
-- Skirmish node icon (map uses the `unknown` "?" stopgap).
-- wraith (partial art, 12/21 files) + gargoyle (nonstandard layout) — need completion/normalization before wiring.
-- HI-FI CHROME pass on all 5 screens + backgrounds at 1080; + the layout-drift corrective (extra inner
-  boxes in cards/headers/footers). Full brief in the pending payload (see Pointers) — relay to CD.
+- Skirmish node icon — CD adding it (the ⚔ marker on b1 + a legend row, ~8px taller: an APPROVED intended
+  CityMap delta, not drift). Deliver as a node ICON PNG (`icons/node/skirmish`), NOT a font glyph.
+- wraith + gargoyle: ART-QUALITY completion ONLY — NOT a uniform 21-part scheme. Robe figures legitimately
+  have ~12 parts (§1 omits torso/legs/boots; adept/summoner are also 12); gargoyle's `back` is contract-
+  legal. The renderer composes each figure from its OWN z-list — never assume 21 (fix any consumer/test
+  that hardcodes it).
+- HI-FI CHROME pass on all 5 screens + backgrounds at 1080 (SENT + in progress at CD). NEXT levers
+  (tiled 9-slice EDGES + painted CENTERS) SMEAR under the engine's current STRETCH blit — needs a
+  **TILE/repeat mode added to the nine-slice blit (engine/Fable task)** before CD paints them. [DECISION
+  pending Doug — see chat; if yes, it's the next chrome step and a bounded renderer change.]
 - Manifest-extraction gaps (design shows it, layout.json can't express it — renderer must NOT invent):
   card/tile BACKGROUND+border parts (race/core cards, attr+budget tiles render chrome-less); tile
   VALUE+LABEL flattened to one text element (BASE HP / RUNE BUDGET / ACTIONS / MINION BAYS labels lost);
