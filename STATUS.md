@@ -30,7 +30,8 @@ take a core accent; `CoreRune.Accent` is the data hook, per-core VALUES await de
 ware.* resolves with the merchant consumer), ~~shield-pip instancing + regen fill~~ DONE (variable-N
 pips via the self-styled shieldPip leaf template, live/spent states, SHIELD n/m header, regen track
 fills toward the next pip from Body.ShieldRegenProgress — Core-tested; dashed spent-borders draw solid
-pending the pixel pass), the merchant-screen consumer, summons icon in the resource strip.
+pending the pixel pass), ~~summons icon in the resource strip~~ DONE (the drop's icon + the mgcb
+mirror light the already-wired strip slot), the merchant-screen consumer (LAST in the queue).
 
 ## ⇒ HUMAN DIRECTIVES — 2026-07-02 (revisions WIN; fold into the render arc / after the current slice)
 
@@ -94,8 +95,8 @@ MINION RESOURCE = **Summons** [LOCKED §9/§14] — BUILT (2026-07-02): Caster c
 SummonsLeft (Forge sizes runs at bays+2, placeholder; bare test casters stay unlimited); a FRESH summon
 spends 1 (uniform across gates) + its gate; a drained gate stat now IDLES the minion (stays summoned,
 silent, holds its bay) and it re-raises FREE on recovery — the old drain-dismiss cascade + its test are
-superseded. Merchant stocks summons (seeded x1-2, M key) + the in-run readout shows summons N/M (no
-icon authored — Needs-CD). Core-tested (300 green). REMAINING: minion DEATH (no HP model yet — killed
+superseded. Merchant stocks summons (seeded x1-2, M key) + the in-run readout shows summons N/M (icon
+landed 07-02). Core-tested (300 green). REMAINING: minion DEATH (no HP model yet — killed
 re-pay untestable) + the Summoner Core Effect refund (next).
 
 MERCHANT: mechanics SPEC'd (§12). PARTIAL (2026-07-02): resource stock (seeded per node — supplies 1-3,

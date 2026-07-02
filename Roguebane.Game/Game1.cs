@@ -597,8 +597,8 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         DrawStateOverlay();
     }
 
-    // 2026-07-02 directive: the run's resource counts — supplies / gold / charge (Summons joins when
-    // its §9 model lands) — read top-right on every IN-RUN screen, under the status strip.
+    // 2026-07-02 directive: the run's resource counts — supplies / gold / charge / Summons (§9) —
+    // read top-right on every IN-RUN screen, under the status strip.
     private void DrawResourceStrip()
     {
         if (!InRun) return;
@@ -607,8 +607,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             ("supplies", Exp.Map.Supplies + "/" + Exp.Map.MaxSupplies),
             ("spoils", Exp.Gold.ToString()),
             ("charge", Exp.Charge + "/" + Exp.MaxCharge),
-            // §9 Summons (icon not authored yet — the null-sprite gap marks it; Needs-CD)
-            ("summons", Exp.Summons + "/" + Exp.MaxSummons),
+            ("summons", Exp.Summons + "/" + Exp.MaxSummons), // §9 (icon landed in the 07-02 drop)
         };
         var x = W - 8;
         for (var i = items.Length - 1; i >= 0; i--)
