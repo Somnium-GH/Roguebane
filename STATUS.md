@@ -20,7 +20,10 @@ rename completed CD-side). Assets: `icons/resource/summons.png` (the missing Sum
 `bg/merchant_stall.png` — both mirrored into the GAME-side mgcb. Designs: refreshed 01–05, NEW
 `design/07-merchant.png` + `design/08-reticle-mounts.png` (the how-it-mounts reference). Core schema
 model + contract tests updated (self-styled leaf templates + static imageBind paths are legal).
-ENGINE TODO (unblocked, in order): `states` draw, ~~`border.sides` draw~~ DONE (element + template-part
+ENGINE TODO (unblocked, in order): ~~`states` draw~~ DONE (button-family skins nine-slice under the
+label; disabled/on/down/hover/normal picked by bind + pointer; route-style states on chart/cityGraph are
+style HINTS the graph drawers already cover semantically — revisit only on pixel-compare; merchant
+buttons light up with the consumer), ~~`border.sides` draw~~ DONE (element + template-part
 borders honour named edges + manifest width; contract test pins side names), ~~`colorBind` resolve~~
 DONE (part fills tint from the bound datum's stat — technique/loadout/inv/bay — and element borders
 take a core accent; `CoreRune.Accent` is the data hook, per-core VALUES await design [Needs-human];
@@ -53,6 +56,7 @@ FLAGGED FIXES (from live screenshots):
   power/unpower on the campaign; pre-run they slot/unslot the build; rune Climb stays pre-run (mid-run
   rune mutation is design-open). RESIDUAL: an Encounter button (disabled in combat) + a CampaignMap
   button need manifest elements (Needs-CD); a drawn BACK affordance likewise (Esc carries it).
+- (drop renamed `combat.flee`→`combat.retreat` — resolver + input geometry flipped same pass)
 - **AUTO-ATTACK button isn't wired** — believed ALREADY WIRED at the Encounter cut-over (slice 14:
   the combat.autoAttack element click toggles the one global AUTO, and its label reads
   "AUTO-ATTACK ON" when lit). If the screenshot predates that build, re-test; else report repro.

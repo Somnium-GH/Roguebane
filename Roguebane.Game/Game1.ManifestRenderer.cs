@@ -54,6 +54,7 @@ public partial class Game1
         {
             case "text":
                 var txt = e.Content ?? ResolveScreenBind(e.Binds);
+                DrawStateSkin(e, r, enabled: !string.IsNullOrEmpty(txt));
                 if (!string.IsNullOrEmpty(txt))
                 {
                     var font = e.Font == "display" ? _assets.Display : _assets.Mono;
@@ -252,7 +253,7 @@ public partial class Game1
         "encounter.foe.hp" => InRun && Exp.Enemy is { } foe ? foe.Hp + " / " + foe.MaxHp : null,
         // Combat verbs (design/01 chips; labels were flattened by extraction -> authored here).
         "combat.autoAttack" => InRun ? (Exp.IsAuto() ? "AUTO-ATTACK ON" : "AUTO-ATTACK") : null,
-        "combat.flee" => InRun ? "FLEE" : null,
+        "combat.retreat" => InRun ? "RETREAT" : null,
         "combat.paused" => _paused ? "HELD" : null, // badge shows only while the fight is held
         "campaign.taken" => InRun ? _campaign.LegIndex + " / " + _campaign.LegCount : null,
         _ => null,
@@ -459,6 +460,29 @@ public partial class Game1
             ("DEX", b.Capacity(Stat.Dex).ToString(), "dex"),
             ("CON", b.Capacity(Stat.Con).ToString(), "con"),
         };
+    }
+
+    // states (CD drop 2026-07-02): a button-family element draws its interaction skin under its label.
+    // The shell picks the state — disabled (its bind resolved null), on (a lit toggle), down/hover from
+    // the pointer, else normal — and nine-slices the named texture like DrawButton (CD #11 corners).
+    private bool DrawStateSkin(Element e, Rectangle r, bool enabled)
+    {
+        if (e.States.ValueKind != System.Text.Json.JsonValueKind.Object
+            || !e.States.TryGetProperty("family", out var fam) || fam.GetString() != "button")
+            return false;
+        var key = !enabled ? "disabled"
+            : e.Binds == "combat.autoAttack" && InRun && Exp.IsAuto() ? "on"
+            : Hover(r) ? (Mouse.GetState().LeftButton == ButtonState.Pressed ? "down" : "hover")
+            : "normal";
+        if (!e.States.TryGetProperty(key, out var pathEl) || pathEl.GetString() is not { Length: > 0 } path
+            || _assets.Texture(path) is not { } skin)
+            return false;
+        foreach (var p in NineSlice.Patches(skin.Width, skin.Height, ButtonSlice,
+                     new LayoutRect(r.X, r.Y, r.Width, r.Height), tile: false, centerFill: true,
+                     dstCornerScale: 1.0 / SS))
+            _spriteBatch.Draw(skin, new Rectangle(p.Dst.X, p.Dst.Y, p.Dst.W, p.Dst.H),
+                new Rectangle(p.Src.X, p.Src.Y, p.Src.W, p.Src.H), Color.White);
+        return true;
     }
 
     // colorBind (CD drop 2026-07-02, APPROVED): resolve a bound COLOUR — a palette token derived from

@@ -290,7 +290,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         if (Pressed(keys, Keys.Space)
             || (ManifestElementRect("encounter", "combat.paused") is { } pr && Click(pr))) _paused = !_paused;
         if (Pressed(keys, Keys.F)
-            || (ManifestElementRect("encounter", "combat.flee") is { } fr && Click(fr))) Exp.Retreat();
+            || (ManifestElementRect("encounter", "combat.retreat") is { } fr && Click(fr))) Exp.Retreat();
         if (Pressed(keys, Keys.Tab)
             || (ManifestElementRect("encounter", "combat.autoAttack") is { } ar && Click(ar))) _ctrl.ToggleAuto(Exp);
 
