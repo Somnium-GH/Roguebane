@@ -45,6 +45,17 @@
 /processorParam:TextureFormat=Color
 /build:bg/map_chart.png
 
+#begin bg/merchant_stall.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:bg/merchant_stall.png
+
 #begin bg/spine_road.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -231,6 +242,17 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:icons/resource/spoils.png
+
+#begin icons/resource/summons.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/resource/summons.png
 
 #begin icons/resource/supplies.png
 /importer:TextureImporter

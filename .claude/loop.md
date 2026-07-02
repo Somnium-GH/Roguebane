@@ -32,4 +32,7 @@ Per run:
    force-push. If the step-1 pull or the push hits a CONFLICT you can't resolve cleanly, park it in
    "Needs human" rather than forcing. Then STOP — one task done.
 
-When everything left is in "Needs human", say so in one line instead of picking work.
+When everything left is in "Needs human", OR the loop is TRULY STARVED (no unblocked, drop-independent,
+valuable work remains) or BLOCKED (waiting on an external drop / a human decision): **STOP LOOPING** — say
+so in one line. Do NOT spin, invent busywork, lower the bar, or grind low-value churn to appear busy. A
+clean stop with a clear "blocked on X" beats a wasted pass.

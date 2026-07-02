@@ -1878,11 +1878,48 @@
           "image": "Content/bg/combat_field.png"
         },
         {
+          "id": "logo",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            13,
+            6
+          ],
+          "size": [
+            57,
+            15
+          ],
+          "z": 1,
+          "color": "inkWarm",
+          "font": "display",
+          "fontPx": 11.5,
+          "content": "Roguebane"
+        },
+        {
+          "id": "sceneLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            79,
+            10
+          ],
+          "size": [
+            98,
+            8
+          ],
+          "z": 1,
+          "binds": "encounter.label",
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 6,
+          "sample": "SKIRMISH · the high pass"
+        },
+        {
           "id": "heldBadge",
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            462,
+            352,
             6
           ],
           "size": [
@@ -1899,18 +1936,19 @@
             "style": "solid"
           },
           "font": "mono",
-          "fontPx": 6.5
+          "fontPx": 6.5,
+          "sample": "❚❚ HELD"
         },
         {
           "id": "topControls",
           "type": "panel",
           "anchor": "TopLeft",
           "offset": [
-            794,
+            575,
             4
           ],
           "size": [
-            153,
+            372,
             20
           ],
           "z": 1,
@@ -1923,7 +1961,7 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            794,
+            784,
             4
           ],
           "size": [
@@ -1935,26 +1973,44 @@
           "color": "ink",
           "font": "display",
           "fontPx": 8,
-          "image": "Content/ui/button/button_on.png"
+          "image": "Content/ui/button/button_on.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "sample": "⟳ AUTO-ATTACK"
         },
         {
-          "id": "fleeBtn",
+          "id": "retreatBtn",
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            897,
+            887,
             4
           ],
           "size": [
-            50,
+            60,
             20
           ],
           "z": 1,
-          "binds": "combat.flee",
+          "binds": "combat.retreat",
           "color": "ink",
           "font": "display",
           "fontPx": 8,
-          "image": "Content/ui/button/button_normal.png"
+          "image": "Content/ui/button/button_normal.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "sample": "⮐ RETREAT"
         },
         {
           "id": "youLabel",
@@ -2024,6 +2080,77 @@
           "binds": "Body.hp",
           "color": "ink",
           "font": "display",
+          "fontPx": 8,
+          "align": "center",
+          "sample": "GRUNT · HP 9 / 12"
+        },
+        {
+          "id": "heroShield",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            13,
+            54
+          ],
+          "size": [
+            112,
+            19
+          ],
+          "z": 1,
+          "binds": "ShieldPool",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "heroShieldPips",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            13,
+            63
+          ],
+          "size": [
+            112,
+            5
+          ],
+          "z": 1,
+          "binds": "ShieldPool.points",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "shieldPip",
+            "flow": "horizontal",
+            "gap": 2,
+            "size": [
+              8,
+              5
+            ]
+          }
+        },
+        {
+          "id": "heroShieldRegen",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            13,
+            71
+          ],
+          "size": [
+            112,
+            3
+          ],
+          "z": 1,
+          "binds": "ShieldPool.regen",
+          "color": "ink",
+          "fill": "slot",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
           "fontPx": 8
         },
         {
@@ -2061,7 +2188,9 @@
           "binds": "encounter.foe.hp",
           "color": "ink",
           "font": "display",
-          "fontPx": 8
+          "fontPx": 8,
+          "align": "center",
+          "sample": "DIRE OGRE · HP 14 / 20"
         },
         {
           "id": "hudFooter",
@@ -2086,7 +2215,10 @@
           "border": {
             "color": "borderMid",
             "w": 1,
-            "style": "solid"
+            "style": "solid",
+            "sides": [
+              "top"
+            ]
           },
           "font": "display",
           "fontPx": 8,
@@ -2098,6 +2230,24 @@
             "color": "outline",
             "opacity": 0.5
           }
+        },
+        {
+          "id": "attrPoolTitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            10,
+            366
+          ],
+          "size": [
+            79,
+            15
+          ],
+          "z": 1,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 12,
+          "content": "Attribute Pool"
         },
         {
           "id": "poolRows",
@@ -2142,7 +2292,44 @@
           "binds": "pool.legend",
           "color": "mutedWarm",
           "font": "mono",
-          "fontPx": 4.5
+          "fontPx": 4.5,
+          "sample": "equipment reserved active skill free debuff damage"
+        },
+        {
+          "id": "actionBarTitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            340,
+            366
+          ],
+          "size": [
+            59,
+            15
+          ],
+          "z": 1,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 12,
+          "content": "Action Bar"
+        },
+        {
+          "id": "techGroupLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            340,
+            387
+          ],
+          "size": [
+            495,
+            7
+          ],
+          "z": 1,
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 5,
+          "content": "TECHNIQUES"
         },
         {
           "id": "techList",
@@ -2170,6 +2357,24 @@
               136
             ]
           }
+        },
+        {
+          "id": "bayGroupLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            850,
+            387
+          ],
+          "size": [
+            100,
+            7
+          ],
+          "z": 1,
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 5,
+          "content": "MINIONS"
         },
         {
           "id": "bayList",
@@ -2272,8 +2477,43 @@
             "to": "panelCard",
             "dir": "vertical"
           },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "bottom"
+            ]
+          },
           "font": "display",
           "fontPx": 8
+        },
+        {
+          "id": "resourceStrip",
+          "type": "list",
+          "anchor": "TopRight",
+          "offset": [
+            -188,
+            8
+          ],
+          "size": [
+            197,
+            11
+          ],
+          "z": 6,
+          "binds": "run.resources",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "resourceItem",
+            "flow": "horizontal",
+            "gap": 8,
+            "size": [
+              47,
+              11
+            ]
+          }
         },
         {
           "id": "attrPool",
@@ -2290,6 +2530,14 @@
           "z": 6,
           "binds": "Body.pool",
           "color": "ink",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "right"
+            ]
+          },
           "font": "display",
           "fontPx": 8
         },
@@ -2320,6 +2568,62 @@
       ],
       "elements": [
         {
+          "id": "logo",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            13,
+            6
+          ],
+          "size": [
+            57,
+            15
+          ],
+          "z": 1,
+          "color": "inkWarm",
+          "font": "display",
+          "fontPx": 11.5,
+          "content": "Roguebane"
+        },
+        {
+          "id": "coreLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            841,
+            10
+          ],
+          "size": [
+            36,
+            8
+          ],
+          "z": 1,
+          "binds": "core.name",
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 6,
+          "sample": "CORE GRUNT"
+        },
+        {
+          "id": "marchState",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            888,
+            10
+          ],
+          "size": [
+            59,
+            8
+          ],
+          "z": 1,
+          "binds": "run.state",
+          "color": "good",
+          "font": "mono",
+          "fontPx": 6,
+          "sample": "▶ READY TO MARCH"
+        },
+        {
           "id": "equipTitle",
           "type": "text",
           "anchor": "TopLeft",
@@ -2344,6 +2648,150 @@
             "opacity": 0.65
           },
           "content": "Equipment"
+        },
+        {
+          "id": "partLabelHead",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            196,
+            200
+          ],
+          "size": [
+            35,
+            7
+          ],
+          "z": 1,
+          "color": "int",
+          "font": "mono",
+          "fontPx": 5,
+          "content": "HEAD · INT"
+        },
+        {
+          "id": "partLineHead",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            153,
+            204
+          ],
+          "size": [
+            41,
+            1
+          ],
+          "z": 1,
+          "color": "ink",
+          "fill": "int",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "partLabelArms",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            196,
+            229
+          ],
+          "size": [
+            35,
+            7
+          ],
+          "z": 1,
+          "color": "str",
+          "font": "mono",
+          "fontPx": 5,
+          "content": "ARMS · STR"
+        },
+        {
+          "id": "partLineArms",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            176,
+            233
+          ],
+          "size": [
+            18,
+            1
+          ],
+          "z": 1,
+          "color": "ink",
+          "fill": "str",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "partLabelChest",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            196,
+            257
+          ],
+          "size": [
+            39,
+            7
+          ],
+          "z": 1,
+          "color": "gold",
+          "font": "mono",
+          "fontPx": 5,
+          "content": "CHEST · CON"
+        },
+        {
+          "id": "partLineChest",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            159,
+            261
+          ],
+          "size": [
+            35,
+            1
+          ],
+          "z": 1,
+          "color": "ink",
+          "fill": "gold",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "partLabelLegs",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            196,
+            287
+          ],
+          "size": [
+            35,
+            7
+          ],
+          "z": 1,
+          "color": "dex",
+          "font": "mono",
+          "fontPx": 5,
+          "content": "LEGS · DEX"
+        },
+        {
+          "id": "partLineLegs",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            148,
+            291
+          ],
+          "size": [
+            46,
+            1
+          ],
+          "z": 1,
+          "color": "ink",
+          "fill": "dex",
+          "font": "display",
+          "fontPx": 8
         },
         {
           "id": "attrTitle",
@@ -2411,7 +2859,7 @@
             29
           ],
           "z": 1,
-          "binds": "tabs",
+          "binds": "inventory.tabs",
           "color": "ink",
           "font": "display",
           "fontPx": 8,
@@ -2438,7 +2886,7 @@
             105
           ],
           "z": 1,
-          "binds": "invItems",
+          "binds": "inventory.activeTab.items",
           "color": "ink",
           "font": "display",
           "fontPx": 8,
@@ -2495,6 +2943,50 @@
           "binds": "runes.budget",
           "color": "ink",
           "font": "display",
+          "fontPx": 8,
+          "sample": "BUDGET 10 free / 20"
+        },
+        {
+          "id": "runeBudgetBar",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            714,
+            76
+          ],
+          "size": [
+            236,
+            8
+          ],
+          "z": 1,
+          "binds": "runes.budgetPct",
+          "color": "ink",
+          "fill": "slot",
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "runeBudgetFill",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            715,
+            77
+          ],
+          "size": [
+            117,
+            6
+          ],
+          "z": 1,
+          "binds": "runes.budgetPct",
+          "color": "ink",
+          "fill": "int",
+          "font": "display",
           "fontPx": 8
         },
         {
@@ -2526,7 +3018,7 @@
         },
         {
           "id": "currentCore",
-          "type": "text",
+          "type": "panel",
           "anchor": "TopLeft",
           "offset": [
             0,
@@ -2539,8 +3031,164 @@
           "z": 1,
           "binds": "core",
           "color": "ink",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "right"
+            ]
+          },
           "font": "display",
           "fontPx": 8
+        },
+        {
+          "id": "currentCoreName",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            9,
+            417
+          ],
+          "size": [
+            131,
+            14
+          ],
+          "z": 1,
+          "binds": "core.name",
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 14,
+          "sample": "Human Grunt"
+        },
+        {
+          "id": "currentCoreRole",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            9,
+            434
+          ],
+          "size": [
+            131,
+            7
+          ],
+          "z": 1,
+          "binds": "core.role",
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 5,
+          "sample": "THE GENERALIST"
+        },
+        {
+          "id": "coreStats",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            9,
+            447
+          ],
+          "size": [
+            131,
+            25
+          ],
+          "z": 1,
+          "binds": "core.stats",
+          "color": "ink",
+          "font": "mono",
+          "fontPx": 5.5,
+          "item": {
+            "template": "coreStatRow",
+            "flow": "grid",
+            "gap": 2,
+            "cols": 2,
+            "size": [
+              62,
+              7
+            ]
+          }
+        },
+        {
+          "id": "coreEffectBlock",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            9,
+            485
+          ],
+          "size": [
+            131,
+            40
+          ],
+          "z": 1,
+          "binds": "core.coreEffect",
+          "color": "ink",
+          "border": {
+            "color": "good",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "left"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "coreEffectLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            16,
+            486
+          ],
+          "size": [
+            124,
+            6
+          ],
+          "z": 1,
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 4.5,
+          "content": "CORE EFFECT"
+        },
+        {
+          "id": "coreEffectName",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            16,
+            494
+          ],
+          "size": [
+            124,
+            11
+          ],
+          "z": 1,
+          "binds": "core.coreEffectName",
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 10,
+          "sample": "Hollow Vessel"
+        },
+        {
+          "id": "coreEffectDesc",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            16,
+            507
+          ],
+          "size": [
+            124,
+            16
+          ],
+          "z": 1,
+          "binds": "core.coreEffectDesc",
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 5,
+          "sample": "You are healed for your unspent budget points after each encounter."
         },
         {
           "id": "actionBar",
@@ -2587,6 +3235,25 @@
           "content": "Action Bar"
         },
         {
+          "id": "techSlotCount",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            160,
+            434
+          ],
+          "size": [
+            681,
+            7
+          ],
+          "z": 1,
+          "binds": "loadout.slotLabel",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 5,
+          "sample": "TECHNIQUES · 4 / 5 slotted"
+        },
+        {
           "id": "loadoutList",
           "type": "list",
           "anchor": "TopLeft",
@@ -2612,6 +3279,25 @@
               89
             ]
           }
+        },
+        {
+          "id": "minionSlotCount",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            856,
+            434
+          ],
+          "size": [
+            94,
+            7
+          ],
+          "z": 1,
+          "binds": "minions.slotLabel",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 5,
+          "sample": "MINIONS · 0 / 1 slotted"
         },
         {
           "id": "buildMinions",
@@ -2651,6 +3337,14 @@
           "z": 2,
           "binds": "Body",
           "color": "ink",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "right"
+            ]
+          },
           "font": "display",
           "fontPx": 8
         },
@@ -2742,7 +3436,7 @@
         },
         {
           "id": "statusStrip",
-          "type": "text",
+          "type": "panel",
           "anchor": "Top",
           "offset": [
             0,
@@ -2760,9 +3454,43 @@
             "to": "panelCard",
             "dir": "vertical"
           },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "bottom"
+            ]
+          },
           "font": "display",
-          "fontPx": 8,
-          "content": "Roguebane CORE GRUNT ▶ READY TO MARCH"
+          "fontPx": 8
+        },
+        {
+          "id": "resourceStrip",
+          "type": "list",
+          "anchor": "TopRight",
+          "offset": [
+            -130,
+            8
+          ],
+          "size": [
+            197,
+            11
+          ],
+          "z": 6,
+          "binds": "run.resources",
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 6,
+          "item": {
+            "template": "resourceItem",
+            "flow": "horizontal",
+            "gap": 8,
+            "size": [
+              47,
+              11
+            ]
+          }
         },
         {
           "id": "bottomBand",
@@ -2787,7 +3515,10 @@
           "border": {
             "color": "borderMid",
             "w": 1,
-            "style": "solid"
+            "style": "solid",
+            "sides": [
+              "top"
+            ]
           },
           "font": "display",
           "fontPx": 8,
@@ -2808,6 +3539,24 @@
         540
       ],
       "elements": [
+        {
+          "id": "logo",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            13,
+            6
+          ],
+          "size": [
+            57,
+            15
+          ],
+          "z": 1,
+          "color": "inkWarm",
+          "font": "display",
+          "fontPx": 11.5,
+          "content": "Roguebane"
+        },
         {
           "id": "legSubtitle",
           "type": "text",
@@ -2924,12 +3673,21 @@
             19
           ],
           "z": 1,
+          "binds": "enemy.advancePct",
           "color": "ink",
           "fill": {
             "type": "gradient",
             "from": "blood",
             "to": "blood",
             "dir": "diagonal"
+          },
+          "border": {
+            "color": "panel",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "left"
+            ]
           },
           "font": "display",
           "fontPx": 8
@@ -2939,7 +3697,7 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            353,
+            338,
             39
           ],
           "size": [
@@ -3010,17 +3768,36 @@
           "anchor": "Center",
           "offset": [
             0,
-            49
+            31
           ],
           "size": [
             960,
-            442
+            406
           ],
           "z": 2,
           "binds": "map",
           "color": "ink",
           "font": "display",
           "fontPx": 8,
+          "states": {
+            "routeFrontier": {
+              "color": "amber",
+              "w": 2
+            },
+            "routeCharted": {
+              "color": "mutedDim",
+              "w": 1.5
+            },
+            "routeDim": {
+              "color": "borderMid",
+              "w": 1
+            },
+            "routeUncharted": {
+              "color": "borderDim",
+              "w": 1,
+              "dash": true
+            }
+          },
           "item": {
             "template": "beaconNode",
             "flow": "graph",
@@ -3047,6 +3824,7 @@
           "color": "ink",
           "font": "display",
           "fontPx": 8,
+          "align": "center",
           "content": "CASTLE FORTIFICATIONSgate · wall · catapult · ballista"
         },
         {
@@ -3201,8 +3979,43 @@
             "to": "panelCard",
             "dir": "vertical"
           },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "bottom"
+            ]
+          },
           "font": "display",
           "fontPx": 8
+        },
+        {
+          "id": "resourceStrip",
+          "type": "list",
+          "anchor": "TopRight",
+          "offset": [
+            -49,
+            8
+          ],
+          "size": [
+            197,
+            11
+          ],
+          "z": 6,
+          "binds": "run.resources",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "resourceItem",
+            "flow": "horizontal",
+            "gap": 8,
+            "size": [
+              47,
+              11
+            ]
+          }
         },
         {
           "id": "doomBar",
@@ -3232,6 +4045,45 @@
           },
           "font": "display",
           "fontPx": 8
+        },
+        {
+          "id": "footer",
+          "type": "text",
+          "anchor": "Bottom",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            36
+          ],
+          "z": 6,
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "panel",
+            "to": "panelTab",
+            "dir": "vertical"
+          },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "top"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          }
         }
       ]
     },
@@ -3241,6 +4093,25 @@
         540
       ],
       "elements": [
+        {
+          "id": "backdrop",
+          "type": "text",
+          "anchor": "Center",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            540
+          ],
+          "z": 0,
+          "binds": "campaign.scene",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/bg/spine_road.png"
+        },
         {
           "id": "eyebrow",
           "type": "text",
@@ -3309,7 +4180,9 @@
           "binds": "campaign.taken",
           "color": "mutedWarm",
           "font": "mono",
-          "fontPx": 6
+          "fontPx": 6,
+          "align": "right",
+          "sample": "CITIES TAKEN 2 / 6"
         },
         {
           "id": "cityGraph",
@@ -3328,6 +4201,26 @@
           "color": "ink",
           "font": "display",
           "fontPx": 8,
+          "states": {
+            "routeTraveled": {
+              "color": "good",
+              "w": 2
+            },
+            "routeReachable": {
+              "color": "amber",
+              "w": 2
+            },
+            "routeSkipped": {
+              "color": "borderDim",
+              "w": 1,
+              "dash": true
+            },
+            "routeFuture": {
+              "color": "borderDim",
+              "w": 1,
+              "dash": true
+            }
+          },
           "item": {
             "template": "cityNode",
             "flow": "graph",
@@ -3354,6 +4247,7 @@
           "color": "ink",
           "font": "display",
           "fontPx": 8,
+          "align": "center",
           "shadow": {
             "token": "title",
             "dx": 0,
@@ -3381,6 +4275,33 @@
           "fontPx": 8
         },
         {
+          "id": "resourceStrip",
+          "type": "list",
+          "anchor": "TopRight",
+          "offset": [
+            -20,
+            20
+          ],
+          "size": [
+            197,
+            11
+          ],
+          "z": 5,
+          "binds": "run.resources",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "resourceItem",
+            "flow": "horizontal",
+            "gap": 8,
+            "size": [
+              47,
+              11
+            ]
+          }
+        },
+        {
           "id": "footer",
           "type": "text",
           "anchor": "Bottom",
@@ -3403,7 +4324,10 @@
           "border": {
             "color": "borderMid",
             "w": 1,
-            "style": "solid"
+            "style": "solid",
+            "sides": [
+              "top"
+            ]
           },
           "font": "display",
           "fontPx": 8,
@@ -3424,6 +4348,24 @@
         540
       ],
       "elements": [
+        {
+          "id": "logo",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            14,
+            8
+          ],
+          "size": [
+            60,
+            15
+          ],
+          "z": 1,
+          "color": "inkWarm",
+          "font": "display",
+          "fontPx": 12,
+          "content": "Roguebane"
+        },
         {
           "id": "topBarSubtitle",
           "type": "text",
@@ -3538,7 +4480,8 @@
             "blur": 3,
             "color": "outline",
             "opacity": 0.65
-          }
+          },
+          "sample": "Human Grunt"
         },
         {
           "id": "previewRole",
@@ -3564,7 +4507,8 @@
             "blur": 3,
             "color": "outline",
             "opacity": 0.65
-          }
+          },
+          "sample": "THE GENERALIST"
         },
         {
           "id": "previewAttrRow",
@@ -3615,7 +4559,9 @@
             "style": "solid"
           },
           "font": "display",
-          "fontPx": 8
+          "fontPx": 8,
+          "align": "center",
+          "sample": "20 BASE HP"
         },
         {
           "id": "previewLayoutRow",
@@ -3656,7 +4602,9 @@
             "style": "solid"
           },
           "font": "display",
-          "fontPx": 8
+          "fontPx": 8,
+          "align": "center",
+          "sample": "20 RUNE BUDGET"
         },
         {
           "id": "previewActionsTile",
@@ -3680,7 +4628,9 @@
             "style": "solid"
           },
           "font": "display",
-          "fontPx": 8
+          "fontPx": 8,
+          "align": "center",
+          "sample": "4 ACTIONS"
         },
         {
           "id": "previewBaysTile",
@@ -3704,10 +4654,12 @@
             "style": "solid"
           },
           "font": "display",
-          "fontPx": 8
+          "fontPx": 8,
+          "align": "center",
+          "sample": "1 MINION BAYS"
         },
         {
-          "id": "previewApex",
+          "id": "previewCoreEffect",
           "type": "panel",
           "anchor": "Right",
           "offset": [
@@ -3719,13 +4671,22 @@
             49
           ],
           "z": 1,
-          "binds": "preview.apex",
+          "binds": "preview.coreEffect",
           "color": "ink",
+          "border": {
+            "color": "good",
+            "w": 2,
+            "style": "solid",
+            "sides": [
+              "left"
+            ]
+          },
           "font": "display",
-          "fontPx": 8
+          "fontPx": 8,
+          "colorBind": "preview.accent"
         },
         {
-          "id": "previewApexLabel",
+          "id": "previewCoreEffectLabel",
           "type": "text",
           "anchor": "Right",
           "offset": [
@@ -3740,10 +4701,10 @@
           "color": "mutedDim",
           "font": "mono",
           "fontPx": 5,
-          "content": "APEX"
+          "content": "CORE EFFECT"
         },
         {
-          "id": "previewApexName",
+          "id": "previewCoreEffectName",
           "type": "text",
           "anchor": "Right",
           "offset": [
@@ -3755,13 +4716,14 @@
             14
           ],
           "z": 1,
-          "binds": "preview.apexName",
+          "binds": "preview.coreEffectName",
           "color": "inkBright",
           "font": "display",
-          "fontPx": 13
+          "fontPx": 13,
+          "sample": "Hollow Vessel"
         },
         {
-          "id": "previewApexDesc",
+          "id": "previewCoreEffectDesc",
           "type": "text",
           "anchor": "Right",
           "offset": [
@@ -3773,10 +4735,11 @@
             19
           ],
           "z": 1,
-          "binds": "preview.apexDesc",
+          "binds": "preview.coreEffectDesc",
           "color": "mutedWarm",
           "font": "mono",
-          "fontPx": 6
+          "fontPx": 6,
+          "sample": "You are healed for your unspent budget points after each encounter."
         },
         {
           "id": "beginBtn",
@@ -3784,7 +4747,7 @@
           "anchor": "TopLeft",
           "offset": [
             824,
-            505
+            506
           ],
           "size": [
             116,
@@ -3800,7 +4763,19 @@
             "style": "solid"
           },
           "font": "mono",
-          "fontPx": 7.5
+          "fontPx": 7.5,
+          "states": {
+            "idle": {
+              "fill": "good",
+              "color": "ground",
+              "border": "ground"
+            },
+            "disabled": {
+              "fill": "slot",
+              "color": "muted",
+              "opacity": 0.7
+            }
+          }
         },
         {
           "id": "racePanel",
@@ -3817,6 +4792,14 @@
           "z": 4,
           "binds": "races",
           "color": "ink",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "right"
+            ]
+          },
           "font": "display",
           "fontPx": 8
         },
@@ -3913,6 +4896,14 @@
             "to": "panelDeep",
             "dir": "vertical"
           },
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "left"
+            ]
+          },
           "font": "display",
           "fontPx": 8
         },
@@ -3936,6 +4927,14 @@
             "from": "slot",
             "to": "panelCard",
             "dir": "vertical"
+          },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "bottom"
+            ]
           },
           "font": "display",
           "fontPx": 8,
@@ -3969,6 +4968,670 @@
             "to": "panelDeep",
             "dir": "vertical"
           },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "top"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          }
+        }
+      ]
+    },
+    "merchant": {
+      "designSize": [
+        960,
+        540
+      ],
+      "elements": [
+        {
+          "id": "backdrop",
+          "type": "text",
+          "anchor": "Center",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            540
+          ],
+          "z": 0,
+          "binds": "merchant.scene",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/bg/merchant_stall.png"
+        },
+        {
+          "id": "logo",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            13,
+            6
+          ],
+          "size": [
+            57,
+            15
+          ],
+          "z": 1,
+          "color": "inkWarm",
+          "font": "display",
+          "fontPx": 11.5,
+          "content": "Roguebane"
+        },
+        {
+          "id": "nodeLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            79,
+            10
+          ],
+          "size": [
+            33,
+            8
+          ],
+          "z": 1,
+          "binds": "merchant.label",
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 6,
+          "sample": "MERCHANT"
+        },
+        {
+          "id": "leaveBtn",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            887,
+            4
+          ],
+          "size": [
+            60,
+            20
+          ],
+          "z": 1,
+          "binds": "merchant.leave",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/ui/button/button_normal.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "sample": "⮐ LEAVE"
+        },
+        {
+          "id": "factorToken",
+          "type": "icon",
+          "anchor": "TopLeft",
+          "offset": [
+            12,
+            37
+          ],
+          "size": [
+            22,
+            22
+          ],
+          "z": 1,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/icons/node/merchant.png",
+          "shadow": {
+            "token": "soft",
+            "dx": 0,
+            "dy": 3,
+            "blur": 4,
+            "color": "outline",
+            "opacity": 0.45
+          }
+        },
+        {
+          "id": "factorTitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            40,
+            40
+          ],
+          "size": [
+            52,
+            15
+          ],
+          "z": 1,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 12,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          },
+          "content": "Merchant"
+        },
+        {
+          "id": "healTitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            22,
+            77
+          ],
+          "size": [
+            37,
+            13
+          ],
+          "z": 1,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 10,
+          "content": "Healing"
+        },
+        {
+          "id": "healHp",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            185,
+            80
+          ],
+          "size": [
+            32,
+            8
+          ],
+          "z": 1,
+          "binds": "Body.hp",
+          "color": "lockRed",
+          "font": "mono",
+          "fontPx": 6,
+          "sample": "HP 9 / 12"
+        },
+        {
+          "id": "healRows",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            22,
+            106
+          ],
+          "size": [
+            195,
+            64
+          ],
+          "z": 1,
+          "binds": "merchant.healing.offers",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "healRow",
+            "flow": "vertical",
+            "gap": 4,
+            "size": [
+              195,
+              30
+            ]
+          }
+        },
+        {
+          "id": "provisionTitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            22,
+            196
+          ],
+          "size": [
+            47,
+            13
+          ],
+          "z": 1,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 10,
+          "content": "Provisions"
+        },
+        {
+          "id": "provisionRows",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            22,
+            214
+          ],
+          "size": [
+            195,
+            98
+          ],
+          "z": 1,
+          "binds": "merchant.provisions.stock",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "provisionRow",
+            "flow": "vertical",
+            "gap": 4,
+            "size": [
+              195,
+              30
+            ]
+          }
+        },
+        {
+          "id": "waresTitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            254,
+            37
+          ],
+          "size": [
+            33,
+            15
+          ],
+          "z": 1,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 12,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          },
+          "content": "Wares"
+        },
+        {
+          "id": "waresShelves",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            254,
+            61
+          ],
+          "size": [
+            692,
+            377
+          ],
+          "z": 1,
+          "binds": "merchant.stock.sections",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "shopSection",
+            "flow": "vertical",
+            "gap": 12,
+            "size": [
+              692,
+              118
+            ]
+          }
+        },
+        {
+          "id": "footerFlavor",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            14,
+            517
+          ],
+          "size": [
+            88,
+            11
+          ],
+          "z": 1,
+          "color": "muted",
+          "font": "display",
+          "fontPx": 8.5,
+          "content": "Fair dealing by lantern light."
+        },
+        {
+          "id": "pager",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            785,
+            514
+          ],
+          "size": [
+            109,
+            17
+          ],
+          "z": 1,
+          "binds": "merchant.stock.page",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "pagePrev",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            785,
+            514
+          ],
+          "size": [
+            22,
+            17
+          ],
+          "z": 1,
+          "binds": "merchant.stock.pagePrev",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/ui/button/button_normal.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "sample": "◀"
+        },
+        {
+          "id": "pageLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            812,
+            519
+          ],
+          "size": [
+            55,
+            8
+          ],
+          "z": 1,
+          "binds": "merchant.stock.pageLabel",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 6,
+          "align": "center",
+          "sample": "PAGE 1 / 2"
+        },
+        {
+          "id": "pageNext",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            872,
+            514
+          ],
+          "size": [
+            22,
+            17
+          ],
+          "z": 1,
+          "binds": "merchant.stock.pageNext",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/ui/button/button_normal.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "sample": "▶"
+        },
+        {
+          "id": "purseNote",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            907,
+            518
+          ],
+          "size": [
+            39,
+            9
+          ],
+          "z": 1,
+          "binds": "run.gold",
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 6.5,
+          "sample": "PURSE 128g"
+        },
+        {
+          "id": "factorPanel",
+          "type": "panel",
+          "anchor": "Left",
+          "offset": [
+            0,
+            -4
+          ],
+          "size": [
+            240,
+            476
+          ],
+          "z": 4,
+          "binds": "merchant",
+          "color": "ink",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "right"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "waresPanel",
+          "type": "panel",
+          "anchor": "Right",
+          "offset": [
+            0,
+            -4
+          ],
+          "size": [
+            720,
+            476
+          ],
+          "z": 4,
+          "binds": "merchant.stock",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "healPanel",
+          "type": "panel",
+          "anchor": "Left",
+          "offset": [
+            12,
+            -146
+          ],
+          "size": [
+            215,
+            111
+          ],
+          "z": 5,
+          "binds": "merchant.healing",
+          "color": "ink",
+          "fill": "panel",
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          },
+          "frame": {
+            "token": "card",
+            "asset": "ui/frame/card",
+            "slice": [
+              36,
+              36,
+              36,
+              36
+            ],
+            "repeat": "tile",
+            "centerFill": true
+          }
+        },
+        {
+          "id": "provisionPanel",
+          "type": "panel",
+          "anchor": "Left",
+          "offset": [
+            12,
+            -15
+          ],
+          "size": [
+            215,
+            135
+          ],
+          "z": 5,
+          "binds": "merchant.provisions",
+          "color": "ink",
+          "fill": "panel",
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          },
+          "frame": {
+            "token": "card",
+            "asset": "ui/frame/card",
+            "slice": [
+              36,
+              36,
+              36,
+              36
+            ],
+            "repeat": "tile",
+            "centerFill": true
+          }
+        },
+        {
+          "id": "statusStrip",
+          "type": "panel",
+          "anchor": "Top",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            28
+          ],
+          "z": 6,
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "slot",
+            "to": "panelCard",
+            "dir": "vertical"
+          },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "bottom"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "resourceStrip",
+          "type": "list",
+          "anchor": "TopRight",
+          "offset": [
+            -85,
+            8
+          ],
+          "size": [
+            197,
+            11
+          ],
+          "z": 6,
+          "binds": "run.resources",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "resourceItem",
+            "flow": "horizontal",
+            "gap": 8,
+            "size": [
+              47,
+              11
+            ]
+          }
+        },
+        {
+          "id": "footer",
+          "type": "panel",
+          "anchor": "Bottom",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            36
+          ],
+          "z": 6,
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "panel",
+            "to": "panelTab",
+            "dir": "vertical"
+          },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "top"
+            ]
+          },
           "font": "display",
           "fontPx": 8,
           "shadow": {
@@ -3984,437 +5647,84 @@
     }
   },
   "templates": {
-    "raceCard": {
+    "resourceItem": {
       "size": [
-        209,
-        79
+        47,
+        11
       ],
       "parts": [
         {
           "rect": [
-            1,
-            1,
-            53,
-            77
-          ],
-          "color": "ink",
-          "fill": {
-            "type": "gradient",
-            "from": "slot",
-            "to": "ground",
-            "dir": "vertical"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "binds": "race.headImage"
-        },
-        {
-          "rect": [
-            10,
-            22,
-            35,
-            35
-          ],
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "image": "Content/sprites/body/human_grunt/head_healthy.png",
-          "shadow": {
-            "token": "soft",
-            "dx": 0,
-            "dy": 3,
-            "blur": 4,
-            "color": "outline",
-            "opacity": 0.45
-          }
-        },
-        {
-          "rect": [
-            61,
-            7,
-            44,
-            14
-          ],
-          "color": "inkBright",
-          "font": "display",
-          "fontPx": 13.5,
-          "binds": "race.name",
-          "sample": "Human"
-        },
-        {
-          "rect": [
-            162,
-            10,
-            39,
+            0,
+            0,
+            11,
             11
           ],
-          "color": "panelDeep",
-          "fill": "amber",
-          "border": {
-            "color": "amber",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "mono",
-          "fontPx": 4.5,
-          "binds": "race.selection",
-          "sample": "✓ CHOSEN"
-        },
-        {
-          "rect": [
-            61,
-            22,
-            140,
-            6
-          ],
-          "color": "muted",
-          "font": "mono",
-          "fontPx": 4.5,
-          "binds": "race.tag",
-          "sample": "THE FOUNDER LINE"
-        },
-        {
-          "rect": [
-            62,
-            41,
-            23,
-            8
-          ],
-          "color": "ink",
-          "font": "mono",
-          "fontPx": 7.5,
-          "binds": "race.attrs.value",
-          "sample": "3"
-        },
-        {
-          "rect": [
-            62,
-            49,
-            23,
-            5
-          ],
-          "color": "mutedDim",
-          "font": "mono",
-          "fontPx": 3.75,
-          "binds": "race.attrs.key",
-          "sample": "STR"
-        },
-        {
-          "rect": [
-            91,
-            41,
-            23,
-            8
-          ],
-          "color": "ink",
-          "font": "mono",
-          "fontPx": 7.5,
-          "binds": "race.attrs.value",
-          "sample": "3"
-        },
-        {
-          "rect": [
-            91,
-            49,
-            23,
-            5
-          ],
-          "color": "mutedDim",
-          "font": "mono",
-          "fontPx": 3.75,
-          "binds": "race.attrs.key",
-          "sample": "INT"
-        },
-        {
-          "rect": [
-            120,
-            41,
-            23,
-            8
-          ],
-          "color": "ink",
-          "font": "mono",
-          "fontPx": 7.5,
-          "binds": "race.attrs.value",
-          "sample": "3"
-        },
-        {
-          "rect": [
-            120,
-            49,
-            23,
-            5
-          ],
-          "color": "mutedDim",
-          "font": "mono",
-          "fontPx": 3.75,
-          "binds": "race.attrs.key",
-          "sample": "DEX"
-        },
-        {
-          "rect": [
-            148,
-            41,
-            23,
-            8
-          ],
-          "color": "ink",
-          "font": "mono",
-          "fontPx": 7.5,
-          "binds": "race.attrs.value",
-          "sample": "3"
-        },
-        {
-          "rect": [
-            148,
-            49,
-            23,
-            5
-          ],
-          "color": "mutedDim",
-          "font": "mono",
-          "fontPx": 3.75,
-          "binds": "race.attrs.key",
-          "sample": "CON"
-        },
-        {
-          "rect": [
-            177,
-            40,
-            23,
-            8
-          ],
-          "color": "gold",
-          "font": "mono",
-          "fontPx": 7.5,
-          "binds": "race.hp",
-          "sample": "20"
-        },
-        {
-          "rect": [
-            177,
-            48,
-            23,
-            5
-          ],
-          "color": "mutedDim",
-          "font": "mono",
-          "fontPx": 3.75,
-          "sample": "HP"
-        },
-        {
-          "rect": [
-            61,
-            60,
-            140,
-            13
-          ],
-          "color": "mutedWarm",
-          "font": "mono",
-          "fontPx": 4.75,
-          "binds": "race.blurb",
-          "sample": "No innate edge or lack — fits any core i"
-        }
-      ]
-    },
-    "coreCard": {
-      "size": [
-        152,
-        203
-      ],
-      "parts": [
-        {
-          "rect": [
-            50,
-            12,
-            52,
-            52
-          ],
           "color": "ink",
           "font": "display",
           "fontPx": 8,
-          "shadow": {
-            "token": "soft",
-            "dx": 0,
-            "dy": 3,
-            "blur": 4,
-            "color": "outline",
-            "opacity": 0.45
-          },
-          "binds": "core.icon",
-          "sample": "✚"
-        },
-        {
-          "rect": [
-            121,
-            7,
-            22,
-            6
-          ],
-          "color": "good",
-          "font": "mono",
-          "fontPx": 4.5,
-          "sample": "STARTER"
-        },
-        {
-          "rect": [
-            8,
-            82,
-            136,
-            13
-          ],
-          "color": "inkBright",
-          "font": "display",
-          "fontPx": 12.5,
-          "binds": "core.name",
-          "sample": "Grunt"
-        },
-        {
-          "rect": [
-            8,
-            97,
-            136,
-            6
-          ],
-          "color": "muted",
-          "font": "mono",
-          "fontPx": 4.75,
-          "binds": "core.role",
-          "sample": "THE GENERALIST"
-        },
-        {
-          "rect": [
-            10,
-            112,
-            38,
-            9
-          ],
-          "color": "amber",
-          "font": "mono",
-          "fontPx": 9,
-          "binds": "core.budget",
-          "sample": "20"
-        },
-        {
-          "rect": [
-            10,
-            122,
-            38,
-            5
-          ],
-          "color": "mutedDim",
-          "font": "mono",
-          "fontPx": 4,
-          "sample": "BUDGET"
-        },
-        {
-          "rect": [
-            57,
-            112,
-            38,
-            9
-          ],
-          "color": "inkWarm",
-          "font": "mono",
-          "fontPx": 9,
-          "binds": "core.actionSlots",
-          "sample": "4"
-        },
-        {
-          "rect": [
-            57,
-            122,
-            38,
-            5
-          ],
-          "color": "mutedDim",
-          "font": "mono",
-          "fontPx": 4,
-          "sample": "ACTIONS"
-        },
-        {
-          "rect": [
-            103,
-            112,
-            38,
-            9
-          ],
-          "color": "inkWarm",
-          "font": "mono",
-          "fontPx": 9,
-          "binds": "core.bays",
-          "sample": "1"
-        },
-        {
-          "rect": [
-            103,
-            122,
-            38,
-            5
-          ],
-          "color": "mutedDim",
-          "font": "mono",
-          "fontPx": 4,
-          "sample": "BAYS"
+          "image": "Content/icons/resource/supplies.png",
+          "imageBind": "icons/resource/{resource.id}",
+          "binds": "resource.icon"
         },
         {
           "rect": [
             14,
-            137,
-            131,
+            1,
+            4,
+            9
+          ],
+          "color": "inkWarm",
+          "font": "mono",
+          "fontPx": 7,
+          "binds": "resource.value",
+          "sample": "6"
+        },
+        {
+          "rect": [
+            21,
+            3,
+            26,
             6
           ],
           "color": "mutedDim",
           "font": "mono",
           "fontPx": 4.5,
-          "sample": "APEX"
-        },
-        {
-          "rect": [
-            14,
-            144,
-            131,
-            8
-          ],
-          "color": "inkBright",
-          "font": "display",
-          "fontPx": 7.5,
-          "binds": "core.apexName",
-          "sample": "Hollow Vessel"
-        },
-        {
-          "rect": [
-            14,
-            154,
-            131,
-            14
-          ],
-          "color": "muted",
-          "font": "mono",
-          "fontPx": 4.75,
-          "binds": "core.apexDescription",
-          "sample": "You are healed for your unspent budget p"
-        },
-        {
-          "rect": [
-            8,
-            179,
-            136,
-            17
-          ],
-          "color": "panelDeep",
-          "fill": "good",
-          "border": {
-            "color": "good",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "mono",
-          "fontPx": 5.5,
-          "binds": "core.selection",
-          "sample": "✓ CORE SET"
+          "binds": "resource.label",
+          "sample": "SUPPLIES"
         }
-      ]
+      ],
+      "color": "ink",
+      "font": "display",
+      "fontPx": 8
+    },
+    "shieldPip": {
+      "size": [
+        8,
+        5
+      ],
+      "parts": [],
+      "binds": "point.live",
+      "color": "ink",
+      "fill": "mintActive",
+      "border": {
+        "color": "outline",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "states": {
+        "live": {
+          "fill": "mintActive",
+          "border": "outline"
+        },
+        "spent": {
+          "fill": "slot",
+          "border": "teal",
+          "borderStyle": "dashed"
+        }
+      }
     },
     "poolRow": {
       "size": [
@@ -4486,7 +5796,10 @@
           "binds": "pool.attr.available",
           "sample": "10"
         }
-      ]
+      ],
+      "color": "ink",
+      "font": "display",
+      "fontPx": 8
     },
     "techCard": {
       "size": [
@@ -4510,8 +5823,27 @@
           },
           "font": "mono",
           "fontPx": 7.5,
+          "colorBind": "technique.attrColor",
           "binds": "technique.icon",
           "sample": "⚔"
+        },
+        {
+          "rect": [
+            58,
+            9,
+            9,
+            8
+          ],
+          "color": "border",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 4,
+          "binds": "technique.aimTag",
+          "sample": "—"
         },
         {
           "rect": [
@@ -4548,13 +5880,14 @@
           "rect": [
             69,
             25,
-            20,
+            12,
             9
           ],
           "color": "str",
           "font": "mono",
           "fontPx": 6.5,
-          "binds": "technique.cost",
+          "colorBind": "technique.attrColor",
+          "binds": "technique.attr",
           "sample": "STR"
         },
         {
@@ -4567,6 +5900,8 @@
           "color": "str",
           "font": "mono",
           "fontPx": 6.5,
+          "colorBind": "technique.attrColor",
+          "binds": "technique.cost",
           "sample": "1"
         },
         {
@@ -4580,11 +5915,11 @@
           "font": "display",
           "fontPx": 8.25,
           "binds": "technique.description",
-          "sample": "A committed swing of your blade for  dam"
+          "sample": "A committed swing of your blade for  damage."
         },
         {
           "rect": [
-            60,
+            33,
             56,
             5,
             10
@@ -4592,7 +5927,8 @@
           "color": "hit",
           "font": "mono",
           "fontPx": 7.84,
-          "sample": "1"
+          "sample": "1",
+          "binds": "technique.amount"
         },
         {
           "rect": [
@@ -4620,7 +5956,47 @@
           "binds": "technique.cooldownLabel",
           "sample": "ready"
         }
-      ]
+      ],
+      "color": "ink",
+      "fill": "panelCard",
+      "border": {
+        "color": "good",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "states": {
+        "family": "actionCard",
+        "ready": {
+          "border": "good",
+          "fill": "panelCard",
+          "opacity": 1
+        },
+        "locked": {
+          "border": "borderDim",
+          "borderStyle": "dashed",
+          "fill": "panelCard",
+          "opacity": 0.82,
+          "pattern": "diagonalHatch"
+        },
+        "targeting": {
+          "border": "str",
+          "pulse": true,
+          "fill": "panelDeep",
+          "opacity": 1
+        },
+        "cooldown": {
+          "border": "borderDim",
+          "fill": "panelCard",
+          "opacity": 1
+        },
+        "held": {
+          "border": "gold",
+          "fill": "panelDeep",
+          "opacity": 1
+        }
+      }
     },
     "minionBay": {
       "size": [
@@ -4669,6 +6045,7 @@
           "color": "int",
           "font": "mono",
           "fontPx": 6.5,
+          "colorBind": "bay.gateColor",
           "sample": "INT",
           "binds": "bay.cost"
         },
@@ -4695,11 +6072,11 @@
           "font": "display",
           "fontPx": 8.25,
           "binds": "bay.description",
-          "sample": "A raised thrall that strikes for  damage"
+          "sample": "A raised thrall that strikes for  damage each turn."
         },
         {
           "rect": [
-            45,
+            6,
             56,
             5,
             10
@@ -4707,89 +6084,35 @@
           "color": "hit",
           "font": "mono",
           "fontPx": 7.84,
-          "sample": "1"
+          "sample": "1",
+          "binds": "bay.amount"
         }
-      ]
-    },
-    "legendRow": {
-      "size": [
-        107,
-        8
       ],
-      "parts": [
-        {
-          "rect": [
-            0,
-            0,
-            8,
-            8
-          ],
-          "color": "parch",
-          "fill": "slot",
-          "border": {
-            "color": "mutedDim",
-            "w": 1,
-            "style": "dashed"
-          },
-          "font": "mono",
-          "fontPx": 4.5,
-          "sample": "?"
-        }
-      ]
-    },
-    "beaconNode": {
-      "size": [
-        28,
-        28
-      ],
-      "parts": [
-        {
-          "rect": [
-            0,
-            0,
-            28,
-            28
-          ],
-          "color": "ink",
-          "fill": "slot",
-          "border": {
-            "color": "good",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "binds": "node.type",
-          "imageBind": "icons/node/{node.type}"
+      "color": "ink",
+      "fill": "slot",
+      "border": {
+        "color": "teal",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "states": {
+        "active": {
+          "border": "teal",
+          "fill": "panelDeep"
         },
-        {
-          "rect": [
-            9,
-            9,
-            9,
-            11
-          ],
-          "color": "good",
-          "font": "mono",
-          "fontPx": 11,
-          "binds": "node.glyph",
-          "sample": "◉"
+        "idle": {
+          "border": "borderDim",
+          "fill": "panelCard",
+          "opacity": 0.7
         },
-        {
-          "rect": [
-            7,
-            31,
-            14,
-            7
-          ],
-          "color": "good",
-          "font": "mono",
-          "fontPx": 5,
-          "binds": "node.label",
-          "sample": "CAMP"
+        "starved": {
+          "border": "lockRed",
+          "fill": "panelDeep",
+          "opacity": 0.82
         }
-      ],
-      "binds": "node"
+      }
     },
     "attrBar": {
       "size": [
@@ -5075,7 +6398,10 @@
           "binds": "attrs.available",
           "sample": "10"
         }
-      ]
+      ],
+      "color": "ink",
+      "font": "display",
+      "fontPx": 8
     },
     "invTab": {
       "size": [
@@ -5095,7 +6421,29 @@
           "fontPx": 6,
           "sample": "GEAR"
         }
-      ]
+      ],
+      "binds": "tab.label",
+      "color": "inkBright",
+      "fill": "slot",
+      "border": {
+        "color": "amber",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "mono",
+      "fontPx": 6,
+      "states": {
+        "active": {
+          "border": "amber",
+          "fill": "panel",
+          "color": "inkBright"
+        },
+        "idle": {
+          "border": "borderDim",
+          "fill": "panelDeep",
+          "color": "mutedDim"
+        }
+      }
     },
     "invCard": {
       "size": [
@@ -5103,6 +6451,25 @@
         31
       ],
       "parts": [
+        {
+          "rect": [
+            8,
+            7,
+            26,
+            18
+          ],
+          "color": "ink",
+          "fill": "str",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "colorBind": "invItems.attrColor",
+          "binds": "invItems.badge"
+        },
         {
           "rect": [
             16,
@@ -5161,7 +6528,34 @@
           "binds": "invItems.rarity",
           "sample": "EPIC"
         }
-      ]
+      ],
+      "color": "ink",
+      "fill": "slot",
+      "border": {
+        "color": "good",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "states": {
+        "equipped": {
+          "border": "good",
+          "fill": "panelDeep"
+        },
+        "ready": {
+          "border": "border",
+          "fill": "panelCard"
+        },
+        "dropped": {
+          "border": "lockRed",
+          "fill": "panelDeep"
+        },
+        "neutral": {
+          "border": "borderDim",
+          "fill": "panelCard"
+        }
+      }
     },
     "runeGroup": {
       "size": [
@@ -5173,12 +6567,21 @@
           "rect": [
             0,
             0,
-            22,
-            7
+            236,
+            10
           ],
           "color": "parch",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "bottom"
+            ]
+          },
           "font": "mono",
           "fontPx": 5.5,
+          "binds": "runeGroups.type",
           "sample": "MARKS"
         },
         {
@@ -5188,168 +6591,58 @@
             236,
             64
           ],
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "binds": "g.runes",
-          "sample": "6"
-        },
-        {
-          "rect": [
-            7,
-            23,
-            11,
-            11
-          ],
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "binds": "g.runes.icon"
-        },
-        {
-          "rect": [
-            20,
-            37,
-            3,
-            0
-          ],
-          "color": "panelDeep",
-          "fill": "parch",
-          "font": "mono",
-          "fontPx": 4.5,
-          "binds": "g.runes.countLabel"
-        },
-        {
-          "rect": [
-            26,
-            20,
-            158,
-            9
-          ],
-          "color": "ink",
-          "font": "display",
-          "fontPx": 7.5,
-          "binds": "g.runes.name",
-          "sample": "Master INT Mark"
-        },
-        {
-          "rect": [
-            26,
-            30,
-            158,
-            8
-          ],
-          "color": "muted",
-          "font": "mono",
-          "fontPx": 5.25,
-          "binds": "g.runes.effect",
-          "sample": "Increases INT by ."
-        },
-        {
-          "rect": [
-            196,
-            21,
-            33,
-            6
-          ],
-          "color": "good",
-          "font": "mono",
-          "fontPx": 4.5,
-          "binds": "g.runes.state",
-          "sample": "✓ EQUIPPED"
-        },
-        {
-          "rect": [
-            222,
-            29,
-            7,
-            8
-          ],
-          "color": "amber",
-          "font": "mono",
-          "fontPx": 6,
-          "sample": "p",
-          "binds": "g.runes.cost"
-        },
-        {
-          "rect": [
-            7,
-            57,
-            11,
-            11
-          ],
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "binds": "g.runes.icon"
-        },
-        {
-          "rect": [
-            14,
-            65,
-            8,
-            6
-          ],
-          "color": "panelDeep",
-          "fill": "parch",
-          "font": "mono",
-          "fontPx": 4.5,
-          "binds": "g.runes.countLabel",
-          "sample": "×3"
-        },
-        {
-          "rect": [
-            26,
-            53,
-            159,
-            9
-          ],
-          "color": "ink",
-          "font": "display",
-          "fontPx": 7.5,
-          "binds": "g.runes.name",
-          "sample": "Ember Mote"
-        },
-        {
-          "rect": [
-            26,
-            64,
-            159,
-            8
-          ],
-          "color": "muted",
-          "font": "mono",
-          "fontPx": 5.25,
-          "binds": "g.runes.effect",
-          "sample": "Increases STR by ."
-        },
-        {
-          "rect": [
-            197,
-            55,
-            32,
-            6
-          ],
-          "color": "amber",
-          "font": "mono",
-          "fontPx": 4.5,
-          "binds": "g.runes.state",
-          "sample": "EQUIPPABLE"
-        },
-        {
-          "rect": [
-            222,
-            63,
-            7,
-            8
-          ],
-          "color": "amber",
-          "font": "mono",
-          "fontPx": 6,
-          "sample": "p",
-          "binds": "g.runes.cost"
+          "list": {
+            "template": "runeCard",
+            "flow": "vertical",
+            "gap": 4,
+            "size": [
+              236,
+              30
+            ]
+          },
+          "binds": "g.runes"
         }
-      ]
+      ],
+      "color": "ink",
+      "font": "display",
+      "fontPx": 8
+    },
+    "coreStatRow": {
+      "size": [
+        62,
+        7
+      ],
+      "parts": [
+        {
+          "rect": [
+            0,
+            0,
+            13,
+            7
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "gear",
+          "binds": "stat.label"
+        },
+        {
+          "rect": [
+            58,
+            0,
+            3,
+            7
+          ],
+          "color": "inkWarm",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "4",
+          "binds": "stat.value"
+        }
+      ],
+      "color": "ink",
+      "font": "mono",
+      "fontPx": 5.5
     },
     "loadoutCard": {
       "size": [
@@ -5373,6 +6666,8 @@
           },
           "font": "mono",
           "fontPx": 13,
+          "align": "center",
+          "colorBind": "loadout.attrColor",
           "binds": "loadout.glyph",
           "sample": "⚔"
         },
@@ -5386,6 +6681,7 @@
           "color": "ink",
           "font": "display",
           "fontPx": 7,
+          "align": "center",
           "binds": "loadout.name",
           "sample": "Swing"
         },
@@ -5399,10 +6695,155 @@
           "color": "str",
           "font": "mono",
           "fontPx": 4.5,
+          "align": "center",
+          "colorBind": "loadout.attrColor",
           "binds": "loadout.attr",
           "sample": "STR 1"
         }
-      ]
+      ],
+      "color": "ink",
+      "fill": "panelCard",
+      "border": {
+        "color": "border",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "align": "center",
+      "states": {
+        "slotted": {
+          "border": "border",
+          "fill": "panelCard"
+        },
+        "empty": {
+          "border": "border",
+          "borderStyle": "dashed",
+          "fill": "panelDeep",
+          "opacity": 0.8
+        }
+      }
+    },
+    "legendRow": {
+      "size": [
+        107,
+        8
+      ],
+      "parts": [
+        {
+          "rect": [
+            0,
+            0,
+            8,
+            8
+          ],
+          "color": "parch",
+          "fill": "slot",
+          "border": {
+            "color": "mutedDim",
+            "w": 1,
+            "style": "dashed"
+          },
+          "font": "mono",
+          "fontPx": 4.5,
+          "imageBind": "icons/node/{legend.type}",
+          "sample": "?",
+          "binds": "legend.icon"
+        },
+        {
+          "rect": [
+            12,
+            0,
+            53,
+            7
+          ],
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "Unknown waypoint",
+          "binds": "legend.label"
+        }
+      ],
+      "color": "mutedWarm",
+      "font": "mono",
+      "fontPx": 5.5
+    },
+    "beaconNode": {
+      "size": [
+        28,
+        28
+      ],
+      "parts": [
+        {
+          "rect": [
+            0,
+            0,
+            28,
+            28
+          ],
+          "color": "ink",
+          "fill": "slot",
+          "border": {
+            "color": "good",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "imageBind": "icons/node/{node.type}",
+          "binds": "node.type"
+        },
+        {
+          "rect": [
+            9,
+            9,
+            9,
+            11
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 11,
+          "binds": "node.glyph",
+          "sample": "◉"
+        },
+        {
+          "rect": [
+            22,
+            -3,
+            10,
+            10
+          ],
+          "color": "muted",
+          "fill": "panelDeep",
+          "border": {
+            "color": "mutedDim",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 5.5,
+          "binds": "node.deployDistance",
+          "sample": "0"
+        },
+        {
+          "rect": [
+            7,
+            31,
+            14,
+            7
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 5,
+          "align": "center",
+          "binds": "node.label",
+          "sample": "CAMP"
+        }
+      ],
+      "binds": "node",
+      "color": "ink",
+      "font": "display",
+      "fontPx": 8
     },
     "cityNode": {
       "size": [
@@ -5410,6 +6851,19 @@
         8
       ],
       "parts": [
+        {
+          "rect": [
+            -24,
+            -38,
+            48,
+            38
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "imageBind": "icons/node/castle",
+          "binds": "city.castle"
+        },
         {
           "rect": [
             -47,
@@ -5420,8 +6874,9 @@
           "color": "good",
           "font": "mono",
           "fontPx": 4.5,
+          "align": "center",
           "binds": "city.tier",
-          "sample": "Tier 1 · TAKEN ✓"
+          "sample": "Tier 1"
         },
         {
           "rect": [
@@ -5433,11 +6888,630 @@
           "color": "parch",
           "font": "display",
           "fontPx": 9,
+          "align": "center",
           "binds": "city.name",
           "sample": "Ashford"
+        },
+        {
+          "rect": [
+            -16,
+            25,
+            31,
+            8
+          ],
+          "color": "good",
+          "fill": "panelDeep",
+          "border": {
+            "color": "border",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 4,
+          "align": "center",
+          "states": {
+            "taken": {
+              "color": "good",
+              "border": "good"
+            },
+            "current": {
+              "color": "amber",
+              "border": "amber"
+            }
+          },
+          "binds": "city.status",
+          "sample": "TAKEN ✓"
         }
       ],
-      "binds": "city"
+      "binds": "city",
+      "color": "ink",
+      "font": "display",
+      "fontPx": 8,
+      "states": {
+        "current": {
+          "border": "amber",
+          "glow": true
+        },
+        "cleared": {
+          "opacity": 0.7
+        },
+        "skipped": {
+          "opacity": 0.4
+        },
+        "future": {
+          "opacity": 0.5
+        },
+        "capital": {
+          "color": "gold",
+          "opacity": 0.62
+        }
+      }
+    },
+    "raceCard": {
+      "size": [
+        209,
+        79
+      ],
+      "parts": [
+        {
+          "rect": [
+            1,
+            1,
+            53,
+            77
+          ],
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "slot",
+            "to": "ground",
+            "dir": "vertical"
+          },
+          "border": {
+            "color": "borderFaint",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "right"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8,
+          "imageBind": "sprites/body/{race.id}_grunt/head_healthy",
+          "binds": "race.headImage"
+        },
+        {
+          "rect": [
+            10,
+            22,
+            35,
+            35
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/sprites/body/human_grunt/head_healthy.png",
+          "shadow": {
+            "token": "soft",
+            "dx": 0,
+            "dy": 3,
+            "blur": 4,
+            "color": "outline",
+            "opacity": 0.45
+          }
+        },
+        {
+          "rect": [
+            61,
+            7,
+            44,
+            14
+          ],
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 13.5,
+          "binds": "race.name",
+          "sample": "Human"
+        },
+        {
+          "rect": [
+            162,
+            10,
+            39,
+            11
+          ],
+          "color": "panelDeep",
+          "fill": "amber",
+          "border": {
+            "color": "amber",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 4.5,
+          "states": {
+            "chosen": {
+              "fill": "amber",
+              "color": "ground",
+              "border": "amber"
+            },
+            "idle": {
+              "color": "mutedDim",
+              "border": "borderDim"
+            }
+          },
+          "binds": "race.selection",
+          "sample": "✓ CHOSEN"
+        },
+        {
+          "rect": [
+            61,
+            22,
+            140,
+            6
+          ],
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 4.5,
+          "binds": "race.tag",
+          "sample": "THE FOUNDER LINE"
+        },
+        {
+          "rect": [
+            62,
+            41,
+            23,
+            8
+          ],
+          "color": "ink",
+          "font": "mono",
+          "fontPx": 7.5,
+          "align": "center",
+          "binds": "race.attrs.value",
+          "sample": "3"
+        },
+        {
+          "rect": [
+            62,
+            49,
+            23,
+            5
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 3.75,
+          "align": "center",
+          "binds": "race.attrs.key",
+          "sample": "STR"
+        },
+        {
+          "rect": [
+            91,
+            41,
+            23,
+            8
+          ],
+          "color": "ink",
+          "font": "mono",
+          "fontPx": 7.5,
+          "align": "center",
+          "binds": "race.attrs.value",
+          "sample": "3"
+        },
+        {
+          "rect": [
+            91,
+            49,
+            23,
+            5
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 3.75,
+          "align": "center",
+          "binds": "race.attrs.key",
+          "sample": "INT"
+        },
+        {
+          "rect": [
+            120,
+            41,
+            23,
+            8
+          ],
+          "color": "ink",
+          "font": "mono",
+          "fontPx": 7.5,
+          "align": "center",
+          "binds": "race.attrs.value",
+          "sample": "3"
+        },
+        {
+          "rect": [
+            120,
+            49,
+            23,
+            5
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 3.75,
+          "align": "center",
+          "binds": "race.attrs.key",
+          "sample": "DEX"
+        },
+        {
+          "rect": [
+            148,
+            41,
+            23,
+            8
+          ],
+          "color": "ink",
+          "font": "mono",
+          "fontPx": 7.5,
+          "align": "center",
+          "binds": "race.attrs.value",
+          "sample": "3"
+        },
+        {
+          "rect": [
+            148,
+            49,
+            23,
+            5
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 3.75,
+          "align": "center",
+          "binds": "race.attrs.key",
+          "sample": "CON"
+        },
+        {
+          "rect": [
+            177,
+            40,
+            23,
+            8
+          ],
+          "color": "gold",
+          "font": "mono",
+          "fontPx": 7.5,
+          "align": "center",
+          "binds": "race.hp",
+          "sample": "20"
+        },
+        {
+          "rect": [
+            177,
+            48,
+            23,
+            5
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 3.75,
+          "align": "center",
+          "sample": "HP"
+        },
+        {
+          "rect": [
+            61,
+            60,
+            140,
+            13
+          ],
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 4.75,
+          "binds": "race.blurb",
+          "sample": "No innate edge or lack — fits any core it can afford."
+        }
+      ],
+      "color": "ink",
+      "fill": "slot",
+      "border": {
+        "color": "amber",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "states": {
+        "family": "pickerCard",
+        "idle": {
+          "border": "borderDim",
+          "fill": "panelDeep"
+        },
+        "hover": {
+          "border": "border",
+          "fill": "panelCard"
+        },
+        "selected": {
+          "border": "amber",
+          "fill": "panelCard",
+          "badge": "✓ CHOSEN"
+        },
+        "locked": {
+          "border": "borderFaint",
+          "fill": "panelDeep",
+          "opacity": 0.55,
+          "badge": "LOCKED"
+        }
+      }
+    },
+    "coreCard": {
+      "size": [
+        152,
+        203
+      ],
+      "parts": [
+        {
+          "rect": [
+            50,
+            12,
+            52,
+            52
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "soft",
+            "dx": 0,
+            "dy": 3,
+            "blur": 4,
+            "color": "outline",
+            "opacity": 0.45
+          },
+          "binds": "core.icon",
+          "sample": "✚"
+        },
+        {
+          "rect": [
+            118,
+            5,
+            29,
+            10
+          ],
+          "color": "good",
+          "fill": "panelDeep",
+          "border": {
+            "color": "good",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 4.5,
+          "colorBind": "core.accent",
+          "binds": "core.badge",
+          "sample": "STARTER"
+        },
+        {
+          "rect": [
+            8,
+            82,
+            136,
+            13
+          ],
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 12.5,
+          "binds": "core.name",
+          "sample": "Grunt"
+        },
+        {
+          "rect": [
+            8,
+            97,
+            136,
+            6
+          ],
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 4.75,
+          "binds": "core.role",
+          "sample": "THE GENERALIST"
+        },
+        {
+          "rect": [
+            10,
+            112,
+            38,
+            9
+          ],
+          "color": "amber",
+          "font": "mono",
+          "fontPx": 9,
+          "align": "center",
+          "binds": "core.budget",
+          "sample": "20"
+        },
+        {
+          "rect": [
+            10,
+            122,
+            38,
+            5
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 4,
+          "align": "center",
+          "sample": "BUDGET"
+        },
+        {
+          "rect": [
+            57,
+            112,
+            38,
+            9
+          ],
+          "color": "inkWarm",
+          "font": "mono",
+          "fontPx": 9,
+          "align": "center",
+          "binds": "core.actionSlots",
+          "sample": "4"
+        },
+        {
+          "rect": [
+            57,
+            122,
+            38,
+            5
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 4,
+          "align": "center",
+          "sample": "ACTIONS"
+        },
+        {
+          "rect": [
+            103,
+            112,
+            38,
+            9
+          ],
+          "color": "inkWarm",
+          "font": "mono",
+          "fontPx": 9,
+          "align": "center",
+          "binds": "core.bays",
+          "sample": "1"
+        },
+        {
+          "rect": [
+            103,
+            122,
+            38,
+            5
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 4,
+          "align": "center",
+          "sample": "BAYS"
+        },
+        {
+          "rect": [
+            8,
+            136,
+            136,
+            33
+          ],
+          "color": "ink",
+          "border": {
+            "color": "good",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "left"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8,
+          "colorBind": "core.accent",
+          "binds": "core.coreEffect",
+          "sample": "CORE EFFECT"
+        },
+        {
+          "rect": [
+            14,
+            144,
+            131,
+            8
+          ],
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 7.5,
+          "binds": "core.coreEffectName",
+          "sample": "Hollow Vessel"
+        },
+        {
+          "rect": [
+            14,
+            154,
+            131,
+            14
+          ],
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 4.75,
+          "binds": "core.coreEffectDesc",
+          "sample": "You are healed for your unspent budget points after each encounter."
+        },
+        {
+          "rect": [
+            8,
+            179,
+            136,
+            17
+          ],
+          "color": "panelDeep",
+          "fill": "good",
+          "border": {
+            "color": "good",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 5.5,
+          "align": "center",
+          "states": {
+            "selected": {
+              "fill": "good",
+              "color": "ground",
+              "border": "good"
+            },
+            "idle": {
+              "color": "mutedDim",
+              "border": "borderDim"
+            },
+            "locked": {
+              "color": "lockText",
+              "border": "lockRed",
+              "borderStyle": "dashed",
+              "opacity": 0.6
+            }
+          },
+          "binds": "core.selection",
+          "sample": "✓ CORE SET"
+        }
+      ],
+      "color": "ink",
+      "fill": "slot",
+      "border": {
+        "color": "good",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "states": {
+        "family": "pickerCard",
+        "idle": {
+          "border": "borderDim",
+          "fill": "panelDeep"
+        },
+        "hover": {
+          "border": "border",
+          "fill": "panelCard"
+        },
+        "selected": {
+          "border": "amber",
+          "fill": "panelCard",
+          "badge": "✓ CHOSEN"
+        },
+        "locked": {
+          "border": "borderFaint",
+          "fill": "panelDeep",
+          "opacity": 0.55,
+          "badge": "LOCKED"
+        }
+      }
     },
     "previewAttrTile": {
       "size": [
@@ -5461,6 +7535,8 @@
           },
           "font": "display",
           "fontPx": 8,
+          "align": "center",
+          "colorBind": "attr.color",
           "binds": "attr.color"
         },
         {
@@ -5473,6 +7549,7 @@
           "color": "ink",
           "font": "mono",
           "fontPx": 10,
+          "align": "center",
           "binds": "attr.value",
           "sample": "3"
         },
@@ -5486,10 +7563,569 @@
           "color": "mutedDim",
           "font": "mono",
           "fontPx": 4.5,
+          "align": "center",
           "binds": "attr.key",
           "sample": "STR"
         }
-      ]
+      ],
+      "color": "ink",
+      "fill": "panelDeep",
+      "border": {
+        "color": "borderDim",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "align": "center"
+    },
+    "healRow": {
+      "size": [
+        195,
+        30
+      ],
+      "parts": [
+        {
+          "rect": [
+            7,
+            9,
+            13,
+            13
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/icons/resource/hp.png",
+          "imageBind": "icons/resource/hp",
+          "binds": "offer.icon"
+        },
+        {
+          "rect": [
+            26,
+            6,
+            143,
+            11
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8.5,
+          "binds": "offer.name",
+          "sample": "Mend 1 HP"
+        },
+        {
+          "rect": [
+            26,
+            18,
+            143,
+            6
+          ],
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 4.75,
+          "binds": "offer.note",
+          "sample": "a careful binding"
+        },
+        {
+          "rect": [
+            175,
+            10,
+            14,
+            10
+          ],
+          "color": "amber",
+          "font": "mono",
+          "fontPx": 7.5,
+          "sample": "g",
+          "binds": "offer.price"
+        },
+        {
+          "rect": [
+            175,
+            10,
+            9,
+            10
+          ],
+          "color": "amber",
+          "font": "mono",
+          "fontPx": 7.5,
+          "sample": "14"
+        }
+      ],
+      "color": "ink",
+      "fill": "panelCard",
+      "border": {
+        "color": "border",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "states": {
+        "affordable": {
+          "border": "border",
+          "fill": "panelCard"
+        },
+        "tooPoor": {
+          "border": "borderDim",
+          "fill": "panelDeep",
+          "opacity": 0.55
+        }
+      }
+    },
+    "provisionRow": {
+      "size": [
+        195,
+        30
+      ],
+      "parts": [
+        {
+          "rect": [
+            7,
+            9,
+            13,
+            13
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/icons/resource/supplies.png",
+          "imageBind": "icons/resource/{lot.id}",
+          "binds": "lot.icon"
+        },
+        {
+          "rect": [
+            26,
+            6,
+            143,
+            11
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8.5,
+          "binds": "lot.name",
+          "sample": "Supplies"
+        },
+        {
+          "rect": [
+            26,
+            18,
+            143,
+            6
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 4.75,
+          "binds": "lot.qty",
+          "sample": "+3"
+        },
+        {
+          "rect": [
+            175,
+            10,
+            14,
+            10
+          ],
+          "color": "amber",
+          "font": "mono",
+          "fontPx": 7.5,
+          "sample": "g",
+          "binds": "lot.price"
+        },
+        {
+          "rect": [
+            175,
+            10,
+            9,
+            10
+          ],
+          "color": "amber",
+          "font": "mono",
+          "fontPx": 7.5,
+          "sample": "12"
+        }
+      ],
+      "color": "ink",
+      "fill": "panelCard",
+      "border": {
+        "color": "border",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "states": {
+        "affordable": {
+          "border": "border",
+          "fill": "panelCard"
+        },
+        "tooPoor": {
+          "border": "borderDim",
+          "fill": "panelDeep",
+          "opacity": 0.55
+        },
+        "sold": {
+          "border": "borderDim",
+          "borderStyle": "dashed",
+          "opacity": 0.4
+        }
+      }
+    },
+    "runeCard": {
+      "size": [
+        236,
+        30
+      ],
+      "parts": [
+        {
+          "rect": [
+            7,
+            10,
+            11,
+            11
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "binds": "g.runes.icon"
+        },
+        {
+          "rect": [
+            20,
+            24,
+            3,
+            0
+          ],
+          "color": "panelDeep",
+          "fill": "parch",
+          "font": "mono",
+          "fontPx": 4.5,
+          "binds": "g.runes.countLabel"
+        },
+        {
+          "rect": [
+            26,
+            6,
+            158,
+            9
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 7.5,
+          "binds": "g.runes.name",
+          "sample": "Master INT Mark"
+        },
+        {
+          "rect": [
+            26,
+            16,
+            158,
+            8
+          ],
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 5.25,
+          "binds": "g.runes.effect",
+          "sample": "Increases INT by ."
+        },
+        {
+          "rect": [
+            80,
+            17,
+            3,
+            7
+          ],
+          "color": "int",
+          "font": "mono",
+          "fontPx": 5.25,
+          "sample": "6"
+        },
+        {
+          "rect": [
+            196,
+            7,
+            33,
+            6
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 4.5,
+          "align": "right",
+          "states": {
+            "equipped": {
+              "color": "good"
+            },
+            "equippable": {
+              "color": "amber"
+            },
+            "locked": {
+              "color": "lockText"
+            }
+          },
+          "binds": "g.runes.state",
+          "sample": "✓ EQUIPPED"
+        },
+        {
+          "rect": [
+            222,
+            15,
+            7,
+            8
+          ],
+          "color": "amber",
+          "font": "mono",
+          "fontPx": 6,
+          "align": "right",
+          "sample": "p",
+          "binds": "g.runes.cost"
+        },
+        {
+          "rect": [
+            222,
+            15,
+            4,
+            8
+          ],
+          "color": "amber",
+          "font": "mono",
+          "fontPx": 6,
+          "align": "right",
+          "sample": "6"
+        }
+      ],
+      "color": "ink",
+      "fill": "slot",
+      "border": {
+        "color": "good",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "states": {
+        "equipped": {
+          "border": "good",
+          "fill": "panelDeep"
+        },
+        "equippable": {
+          "border": "border",
+          "fill": "panelCard"
+        },
+        "locked": {
+          "border": "borderDim",
+          "fill": "panelCard",
+          "opacity": 0.82
+        }
+      }
+    },
+    "wareCard": {
+      "size": [
+        129,
+        99
+      ],
+      "parts": [
+        {
+          "rect": [
+            7,
+            6,
+            23,
+            16
+          ],
+          "color": "panelDeep",
+          "fill": "gold",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 5,
+          "colorBind": "ware.categoryColor",
+          "binds": "ware.category",
+          "sample": "ARM"
+        },
+        {
+          "rect": [
+            96,
+            9,
+            26,
+            10
+          ],
+          "color": "rareMagic",
+          "fill": "rareMagic",
+          "border": {
+            "color": "rareMagic",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 4.5,
+          "colorBind": "ware.tagColor",
+          "binds": "ware.tag",
+          "sample": "MAGIC"
+        },
+        {
+          "rect": [
+            7,
+            31,
+            115,
+            12
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 9.5,
+          "binds": "ware.name",
+          "sample": "Steel Helm"
+        },
+        {
+          "rect": [
+            7,
+            45,
+            115,
+            8
+          ],
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 4.75,
+          "binds": "ware.note",
+          "sample": "HEAD ARMOR"
+        },
+        {
+          "rect": [
+            7,
+            56,
+            115,
+            22
+          ],
+          "color": "parch",
+          "font": "display",
+          "fontPx": 7.25,
+          "binds": "ware.desc",
+          "sample": "A close-fitting helm scribed against meddling voices."
+        },
+        {
+          "rect": [
+            7,
+            85,
+            15,
+            8
+          ],
+          "color": "good",
+          "border": {
+            "color": "good",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 4,
+          "binds": "ware.buyState",
+          "sample": "BUY"
+        },
+        {
+          "rect": [
+            108,
+            83,
+            14,
+            10
+          ],
+          "color": "amber",
+          "font": "mono",
+          "fontPx": 8,
+          "sample": "g",
+          "binds": "ware.price"
+        },
+        {
+          "rect": [
+            108,
+            83,
+            10,
+            10
+          ],
+          "color": "amber",
+          "font": "mono",
+          "fontPx": 8,
+          "sample": "26"
+        }
+      ],
+      "color": "ink",
+      "fill": "panelCard",
+      "border": {
+        "color": "border",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "states": {
+        "affordable": {
+          "border": "border",
+          "fill": "panelCard"
+        },
+        "tooPoor": {
+          "border": "borderDim",
+          "fill": "panelDeep",
+          "opacity": 0.55
+        },
+        "sold": {
+          "border": "borderDim",
+          "borderStyle": "dashed",
+          "opacity": 0.4
+        }
+      }
+    },
+    "shopSection": {
+      "size": [
+        692,
+        118
+      ],
+      "parts": [
+        {
+          "rect": [
+            0,
+            0,
+            27,
+            9
+          ],
+          "color": "inkWarm",
+          "font": "mono",
+          "fontPx": 6.5,
+          "binds": "section.label",
+          "sample": "ARMOR"
+        },
+        {
+          "rect": [
+            32,
+            2,
+            3,
+            7
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 5,
+          "binds": "section.count",
+          "sample": "1"
+        },
+        {
+          "rect": [
+            0,
+            19,
+            692,
+            99
+          ],
+          "list": {
+            "template": "wareCard",
+            "flow": "horizontal",
+            "gap": 8,
+            "size": [
+              129,
+              99
+            ]
+          },
+          "binds": "section.wares"
+        }
+      ],
+      "color": "ink",
+      "font": "display",
+      "fontPx": 8
     }
   },
   "style": {

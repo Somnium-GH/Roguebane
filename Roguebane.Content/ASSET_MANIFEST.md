@@ -135,7 +135,7 @@ technique glyph chips `icons/technique/{swing,frenzy,firebolt,disarm,brace}` (+ 
 the pool pips `ui/pip/*` — token-stamped per colour from `proto/atom_slice.js` (`pip_full_<colour>` solid; `pip_reserved_<attr>` black −45° hatch; `pip_empty`/`pip_empty_<resource>` dark socket, dashed frame on resources; `pip_debuff`/`pip_damage` amber/red +45° hatch), AND the map node tokens `icons/node/*` — CAPTURED flat from the RunMap node DOM via `proto/atom_capture.js` (ASSET_GEN_METHOD.md).
 (b) **Generated as deterministic vector shapes** by **`proto/ui_atoms_gen.js`** (for atoms that are NOT on
 the screens as polished art), coloured from `style_tokens.js`: `icons/attr/{strength,intellect,dexterity,
-constitution}`, `icons/rune/{mark,path_minor,path_major,keystone}`, `icons/resource/{supplies,support,spoils,hp,charge}`,
+constitution}`, `icons/rune/{mark,path_minor,path_major,keystone}`, `icons/resource/{supplies,support,spoils,hp,charge,summons}`,
 `icons/minion/skeleton`, `ui/reticle/{focus,secondary,aiming,target_tag}`. Re-run to reproduce identically.
 
 Generators + capture (the whole package is reproducible from these): `roster_gen.js` (figures+gear+layout.json),
@@ -170,7 +170,7 @@ control uses the shared `ui/button/button_{on,normal}` chrome.
 | `icons/rune/{mark,path_minor,path_major,keystone}` | rune tier glyph — shape encodes tier: diamond(4)/pentagon(5)/hexagon(6)/octagon(8) | Build | `rune.tier` | 120×120 | 4 | hi-fi · deterministic polygon per tier (`ui_atoms_gen.js`) |
 | `icons/rune/core_{grunt,warden,adept,summoner,reaver,ranger}` | Core-rune identity token — decagon (10-gon) shape encodes the "Core" tier, per-core accent fill + carved glyph (✚◈✦❖⚔↗) | New Game | `core.id` | ~412×412 | 6 | hi-fi · CAPTURED from the live NewGame core cards (`proto/rune_capture.js`, dual-bg transparency recovery) — not hand-drawn; supersedes the inline-SVG-only token (DEV_LOOP_MEMORY #2) |
 | `icons/node/{camp,resource,merchant,unknown,castle,skirmish}` | map token | Run Map | `node.type` + `node.revealed` (→`unknown`) | 220 (castle 413) | 6 | hi-fi · captured WITH a smooth high-res emboss (gloss + soft bevel) from the RunMap nodes; transparent corners via dual-bg recovery (ASSET_GEN_METHOD.md). `skirmish` = the dedicated combat node (red ⚔ on dark, blood border; reveals 1 jump out like merchants) — captured from CityMap's live `b1` exemplar |
-| `icons/resource/{supplies,support,spoils,hp,charge}` | resource glyph | Run Map, Spine, Combat | resource readouts | 120×120 | 5 | placeholder · `charge` = the shield-PIERCE resource (steel heater shield run through by a `hit`-red bolt, `ui_atoms_gen.js`) |
+| `icons/resource/{supplies,support,spoils,hp,charge,summons}` | resource glyph | resource readout top-right of EVERY in-run screen (Encounter/CityMap/CampaignMap/Equipment/Merchant) + merchant provisions/healing | resource readouts (`run.resources`, `data-image-bind="icons/resource/{resource.id}"`) | 120×120 | 6 | placeholder · `charge` = the shield-PIERCE resource (steel heater shield run through by a `hit`-red bolt); `summons` = the minion-deploy resource (§9/§14: mint spirit rising from a teal summoning circle) — both `ui_atoms_gen.js` |
 | `icons/map/{enemy_host,enemy_host_near}` | enemy war-party marker — a LEFT-facing mounted knight + red war banner + barding; rides the leading edge of the Run Map DOOM BAR as the horde marches from the castle (right) toward your camp (left). Reaching camp = you lose; `enemy_host_near` brightens the red as it closes | Run Map (doom bar) | `enemy.advance` distance + near-camp danger flag | 60×52 | 2 | world-art · deterministic flat-bevel (ART_RULES) via `proto/party_gen.js` |
 
 ## ui/frame/ — 9-slice ORNATE panel/card chrome (LAYOUT_CONTRACT §10, PNG32, transparent centre)
@@ -219,6 +219,7 @@ CityMap's supplies/support cards rendered frameless until 2026-07-01). And scree
 | `bg/build_alcove` | scene backdrop | Build | static (loadout) | 1920×1080 | — | placeholder |
 | `bg/map_chart` | scene backdrop | Run Map | static | 1920×1080 | — | placeholder |
 | `bg/spine_road` | scene backdrop | Campaign Spine | static | 1920×1080 | — | placeholder |
+| `bg/merchant_stall` | scene backdrop | Merchant (DESIGN_SPEC §12 shop screen) | static | 1920×1080 | — | placeholder · procedural lantern-lit trade tent (striped awning + counter band), `bg_gen.js` scene 5 |
 
 ## fonts/ — type (external)
 

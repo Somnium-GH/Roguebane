@@ -13,6 +13,23 @@ revisions (`git show <rev>:STATUS.md`) — recoverable, so not duplicated here. 
 current dropped.)*
 
 ## ⇒ HUMAN DIRECTIVES — 2026-07-02 (revisions WIN; fold into the render arc / after the current slice)
+
+**⚡ NOT STARVED — DROP-INDEPENDENT WORK (do NOW; the pixel-perfect render POLISH is drop-gated on CD's
+states/sides/colorBind/merchant manifest, but plenty needs NO drop):**
+- Finish the flagged CODE fixes below (war-party fill R→L; Bandage target-side {enemy|self} + shield
+  sources flagged PASSIVE + the SHIELD-BAR wiring; the Encounter/CampaignMap Equipment buttons shell-side
+  if doable; the `apex`→`Core Effect` CODE rename `ApexName/Desc`→`CoreEffectName/Desc`).
+- Build the ENGINE DRAW routines against the SCHEMA (data arrives with the drop; code is testable now):
+  `states` resolution (draw by the bound datum's state key), `border.sides` (per-side borders — else a
+  single accent edge draws as a FULL box), **`colorBind` [APPROVED]** (bind a color field e.g.
+  `core.accent` → a visual prop), shield-pip instancing + regen fill, the merchant-screen consumer,
+  **nested-list stamping** (#23 — a template/list whose items contain their OWN list: merchant shelves,
+  runeGroup rows) + **merchant paging** (#23; same family as #4 overflow).
+- **CONTINGENCY GREEN-LIT** (render polish is drop-gated = the exhaustion trigger is met): the **`Game1.cs`
+  SRP refactor** — split the uber-class by responsibility. High-value, fully drop-independent.
+- **If after all this everything left is TRULY blocked (needs a drop / a human decision): STOP looping**
+  — say so in one line; do NOT spin, invent busywork, or grind low-value churn (see loop.md).
+
 FLAGGED FIXES (from live screenshots):
 - ~~Enter still passes the OLD build screen~~ DONE (2026-07-02): BEGIN now marches straight to the
   CityMap (`Redeploy` + Run screen) — no build gate; the fixed kit keeps the bar non-empty.
@@ -28,9 +45,9 @@ FLAGGED FIXES (from live screenshots):
 - ~~Resource-count readout top-right~~ DONE (2026-07-02) for supplies / gold / charge (the drop's new
   charge icon renders) on Encounter + CityMap + Equipment, InRun-gated. SUMMONS joins when its §9
   resource model lands (not yet built).
-- ~~War-party indicator~~ DONE (2026-07-02): camp token LEFT, castle RIGHT, the covered-ground fill
-  loads LEFT→RIGHT, and the host token slides right→left toward camp (it previously moved AWAY from
-  camp — inverted fraction). The manifest doom bar (icons already camp-left/castle-right) matches.
+- ~~War-party indicator (fill direction re-open)~~ DONE (2026-07-02): the covered-ground fill now loads
+  RIGHT→LEFT IN TANDEM with the host — its leading (left) edge tracks the host token; camp LEFT / castle
+  RIGHT unchanged (citymap smoke green).
 - ~~Targeting reticles don't sit on the foe's body parts~~ ENGINE DONE (2026-07-02): reticles anchor
   on the figure's ACTUAL limb rects via the manifest transform (`FigureBinding.StatOf` + a screen-rect
   union, both arms as one group) — AIMING centres on the hovered part while picking, FOCUS marks each
@@ -267,6 +284,10 @@ ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered 
 - G1: skirmish foe-part-aim numbers placeholder — tune in play (campaign verified winnable).
 - Targeting-FSM bug (no clean repro yet): firing after a weapon charges while UNTARGETED misbehaves —
   watch/fix as the targeting+firing FSM is refined.
+- Code ORGANIZATION (LOW-PRI — do NOT prioritize over HiFi): the `Game1.cs` uber-class was split (good),
+  but the resulting classes lack a sensible FOLDER structure — organize into responsibility-based dirs
+  (e.g. `Roguebane.Game/{Rendering,Screens,Input,Assets,...}`, `Roguebane.Core` by domain). Pure housekeeping;
+  reconcile whenever render/HiFi work isn't the priority.
 - FTL-ism **"jump"** (the beacon-chart verb) — canonical terms are **deployment** (the move/unit) +
   **Redeploy** (the action), **Retreat** (bail a fight). STOP THE BLEEDING: introduce NO new "jump" in any
   text/identifier. UI strings + the two canon docs are fixed; residual "jump" lives only in CODE COMMENTS

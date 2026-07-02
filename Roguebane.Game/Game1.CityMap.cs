@@ -198,17 +198,18 @@ public partial class Game1
         return -1;
     }
 
-    // The forward-pressure track: the war party marches on the camp one step per jump. The marker
+    // The forward-pressure track: the war party marches on the camp one step per deployment. The marker
     // slides toward the camp (left) as the distance closes; reaching it overruns the run.
-    // 2026-07-02 directive: CAMP anchors the LEFT end, the CASTLE the RIGHT; the bar LOADS left->right
-    // as the horde advances, and the host token slides right->left toward camp (§12's castle->camp march).
+    // 2026-07-02 directive (rev 2): CAMP anchors the LEFT end, the CASTLE the RIGHT; the covered-ground
+    // fill loads RIGHT->LEFT IN TANDEM with the host token sliding right->left toward camp — the fill's
+    // leading (left) edge tracks the host (§12's castle->camp march).
     private void DrawWarParty(int x, int y, int w)
     {
         var map = Exp.Map;
         Text(_assets.Mono, "WAR PARTY", x + 22, y - 16, Muted);
         Rect(x, y, w, 6, new Color(70, 55, 50));
         var frac = map.MarchLength > 0 ? (float)map.WarPartyDistance / map.MarchLength : 0f;
-        Rect(x, y, (int)((1f - frac) * w), 6, new Color(Blood, 190)); // covered ground loads left->right
+        Rect(x + (int)(frac * w), y, (int)((1f - frac) * w), 6, new Color(Blood, 190)); // fill loads right->left with the host
         Sprite(_assets.Node(NodeType.Camp), x - 8, y - 8, 20, 20, Color.White);           // camp LEFT
         Sprite(_assets.Node(NodeType.Castle), x + w - 12, y - 8, 20, 20, Color.White);    // castle RIGHT
         var mx = x + (int)(frac * (w - 22)); // distance-to-camp places the host: 1 = castle, 0 = camp
