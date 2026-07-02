@@ -1249,6 +1249,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
             case "graph" when e.Binds == "map" && InRun && e.Item is not null:
                 DrawManifestGraph(e, r);
                 break;
+            case "graph" when e.Binds == "campaign" && InRun && e.Item is not null:
+                DrawCampaignGraph(e, r);
+                break;
             case "figure" when e.Binds == "encounter.minions" && InRun:
                 // The fielded retinue on the battlefield: each minion's sprite, feet on the box floor.
                 for (var mi = 0; mi < Exp.Minions.Count; mi++)
@@ -1265,7 +1268,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     // The city chart (design/03): map nodes spread over the graph element's region via GraphLayout —
     // links first (dashed when uncharted), then a beacon per node (fog-aware icon), the current node
-    // ringed and reachable jumps numbered. Same live rules as the legacy chart, manifest geometry.
+    // ringed and reachable deployments numbered. Same live rules as the legacy chart, manifest geometry.
     private void DrawManifestGraph(Element e, Rectangle region)
     {
         var map = Exp.Map;
@@ -1303,10 +1306,53 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 Border(r.X - 3, r.Y - 3, cw + 6, ch + 6, Amber);
                 Text(_assets.Mono, "you are here", r.X - 8, r.Y + ch + 2, Amber);
             }
-            else if (oi >= 0) // a reachable onward jump
+            else if (oi >= 0) // a reachable onward deployment
             {
                 Border(r.X - 2, r.Y - 2, cw + 4, ch + 4, Hover(r) ? Ink : new Color(150, 130, 95));
                 Text(_assets.Mono, $"[{oi + 1}] {seen.ToString().ToLower()}", r.X - 6, r.Y + ch + 2, Ink);
+            }
+        }
+    }
+
+    // The campaign chart (design/04): one city marker per campaign leg, spread across the graph
+    // region — taken legs link solid (good), the current leg is framed, onward legs run dotted.
+    // City NAMES are OPEN content (§12/§17: count + procgen-vs-authored undecided) so only the tier/
+    // status label draws; the design's castle icons aren't in the manifest template (Needs-CD).
+    private void DrawCampaignGraph(Element e, Rectangle region)
+    {
+        var cw = e.Item!.Size.Length == 2 ? e.Item.Size[0] : 8;
+        var ch = e.Item.Size.Length == 2 ? e.Item.Size[1] : 8;
+        var count = _campaign.LegCount;
+        var m = _ui.Manifest;
+        Template? tmpl = null;
+        if (m is not null) m.Templates.TryGetValue(e.Item.Template, out tmpl);
+        Rectangle Cell(int i) => RectOf(GraphLayout.Cell(
+            new LayoutRect(region.X, region.Y, region.Width, region.Height), count, 1, i, 0, cw, ch));
+
+        for (var i = 0; i < count - 1; i++)
+        {
+            var a = Cell(i); var b = Cell(i + 1);
+            var taken = i < _campaign.LegIndex;
+            Line(a.X + cw / 2, a.Y + ch / 2, b.X + cw / 2, b.Y + ch / 2, 2,
+                taken ? _ui.Color("good", Amber) : i == _campaign.LegIndex
+                    ? Amber : new Color(90, 78, 66), dashed: !taken && i != _campaign.LegIndex);
+        }
+        for (var i = 0; i < count; i++)
+        {
+            var c = Cell(i);
+            var taken = i < _campaign.LegIndex;
+            var current = i == _campaign.LegIndex;
+            Rect(c.X, c.Y, c.Width, c.Height,
+                taken ? _ui.Color("good", Amber) : current ? Amber : new Color(90, 78, 66));
+            if (current) Border(c.X - 4, c.Y - 4, c.Width + 8, c.Height + 8, Amber);
+            if (tmpl is null) continue;
+            foreach (var pp in CardTemplate.Place(tmpl, c.X, c.Y))
+            {
+                // Only the tier/status line has data; city names are OPEN content — draw nothing there.
+                if (pp.Binds != "city.tier") continue;
+                var label = "Tier " + (i + 1) + (taken ? " - TAKEN" : current ? " - CURRENT" : "");
+                TextPxWrapped(pp.Font == "display" ? _assets.Display : _assets.Mono,
+                    label, RectOf(pp.Rect), _ui.Color(pp.Color ?? "ink", Ink), pp.FontPx);
             }
         }
     }
@@ -1330,6 +1376,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         "combat.autoAttack" => InRun ? (Exp.IsAuto() ? "AUTO-ATTACK ON" : "AUTO-ATTACK") : null,
         "combat.flee" => InRun ? "FLEE" : null,
         "combat.paused" => _paused ? "HELD" : null, // badge shows only while the fight is held
+        "campaign.taken" => InRun ? _campaign.LegIndex + " / " + _campaign.LegCount : null,
         _ => null,
     };
 

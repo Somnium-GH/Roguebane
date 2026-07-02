@@ -77,13 +77,20 @@ SLICES (one screen/pass, pixel-verify vs its design PNG):
    NUMBER is a bindless sample part (Needs-CD).
 4. **CityMap** (in progress) — `design/03`. THIS PASS: the manifest `chart` graph element renders LIVE
    via `DrawManifestGraph` (GraphLayout spread over the element region): fog-aware beacon icons,
-   charted solid / uncharted dashed links, the current node ringed "you are here", reachable jumps
-   numbered. Verified RB_MF=citymap at a live merchant node. Supplies/support/doom/legend panels render
+   charted solid / uncharted dashed links, the current node ringed "you are here", reachable
+   deployments numbered. Verified RB_MF=citymap at a live merchant node. Supplies/support/doom/legend panels render
    their manifest chrome (inner pips/rows were flattened by extraction — Needs-CD).
    REMAINING for cut-over: map input on manifest geometry (node clicks); a home for the merchant panel,
    gear bar + EQUIPMENT button (design/03 shows none of them — surface where they live, Needs-CD/human,
    before deleting the legacy citymap screen).
-5. **CampaignMap** — BUILD it (not implemented) from `design/04`.
+5. **CampaignMap** (render started) — `design/04`. The manifest screen renders: header/eyebrow,
+   `campaign.taken` ("N / M" from the live campaign), and `cityGraph` draws one marker per campaign
+   LEG spread across the region (taken = solid good links, current framed, onward dotted) with
+   "Tier N - TAKEN/CURRENT" labels. City NAMES stay undrawn — §12/§17 leave the city roster OPEN
+   (count, procgen-vs-authored), so no names are invented; the design's castle icons are absent from
+   the cityNode template (Needs-CD). MODEL gap: §12 Layer 1 locks a forward-biased city GRAPH but
+   Campaign is still a linear leg list — graph model + campaign-level supplies/WAIT is its own Core
+   pass (surface before building). No screen-flow entry yet (not reachable in game; RB_MF only).
 FLOW: Equipment reachable BETWEEN fights — from the post-combat Cleared/Redeploy state + CityMap +
 CampaignMap — editing the CURRENT loadout (core fixed).
 
@@ -111,6 +118,12 @@ CampaignMap — editing the CURRENT loadout (core fixed).
 - G1: skirmish foe-part-aim numbers placeholder — tune in play (campaign verified winnable).
 - Targeting-FSM bug (no clean repro yet): firing after a weapon charges while UNTARGETED misbehaves —
   watch/fix as the targeting+firing FSM is refined.
+- FTL-ism **"jump"** (the beacon-chart verb) — canonical terms are **deployment** (the move/unit) +
+  **Redeploy** (the action), **Retreat** (bail a fight). STOP THE BLEEDING: introduce NO new "jump" in any
+  text/identifier. UI strings + the two canon docs are fixed; residual "jump" lives only in CODE COMMENTS
+  + test prose — LOW-PRIORITY sweep, DEFERRED until the hi-fi render arc is confirmed complete. ("beacon"
+  is the other FTL-ism — embedded in the `beaconNode` manifest template + comments; flagged for a
+  decision, not auto-changed. "FTL" in comments is an allowed private design ref, leave it.)
 
 ## Needs human (loop skips)
 - Balance/feel tuning (all placeholder-sane, tune in PLAY): tick 10/s; cooldowns + damage; DEX haste

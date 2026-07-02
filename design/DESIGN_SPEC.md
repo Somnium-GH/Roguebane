@@ -264,7 +264,7 @@ Nested layers, macro → micro:
   **Movement is ANY-DIRECTION [LOCKED]:** move to any linked node, forward OR back (e.g. return to a
   merchant to heal). **Every move costs 1 supply AND advances the war party one step** — that reciprocal
   cost is the whole tradeoff; backtracking is allowed but never free. Half-blind fog (resource-holds +
-  castle visible afar, merchant resolves 1 jump out, else hidden until adjacent). **Retreat** bails an
+  castle visible afar, merchant resolves 1 deployment out, else hidden until adjacent). **Retreat** bails an
   active fight (§8; flow below).
 - **Layer 3 — node types:** skirmish (combat); resource-hold (win to **bank support**); merchant
   (out-of-combat **HP healing** — gold → HP at 1 HP per randomized cost, §10; **no potion sales** —

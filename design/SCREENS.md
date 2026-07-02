@@ -50,7 +50,7 @@ Action Bar loadout (bottom). **This is the worst current gap — most of the bel
 ## 03 Run Map — `design/03-runmap.png`
 - [x] Supplies meter (X/max); Mastered Support (banked/holds).
 - [x] Half-blind beacon CHART: node graph, charted (solid) vs uncharted (dotted) links; YOU ARE HERE.
-- [x] Fog: `?` unknown beacons; resource-holds + castle visible afar; merchant resolves 1 jump out.
+- [x] Fog: `?` unknown beacons; resource-holds + castle visible afar; merchant resolves 1 deployment out.
 - [x] Node-type icons (+ a CHART legend): camp / merchant / resource-hold / unknown / castle.
 - [~] War-party advance track (top, closing-distance read); dedicated war-party token/camp icon = art gap.
 - [x] Flee verb; gold/potions readout; campaign spine strip.
