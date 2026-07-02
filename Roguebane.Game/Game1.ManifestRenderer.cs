@@ -43,8 +43,12 @@ public partial class Game1
         if (e.Frame is { } fr && fr.Slice.Length == 4 && _assets.Texture(fr.Asset) is { } ftex)
             DrawFrameTex(ftex, fr, r);
         if (e.Border is { } b)
-            Border(r.X, r.Y, r.Width, r.Height, _ui.Color(b.Color ?? "border", Border0),
+        {
+            // An element-level colorBind tints the border (the accent rule) when it resolves.
+            var accent = ResolveColorToken(e.ColorBind, null);
+            Border(r.X, r.Y, r.Width, r.Height, _ui.Color(accent ?? b.Color ?? "border", Border0),
                 Math.Max(2, b.W * SS), b.Sides);
+        }
 
         switch (e.Type)
         {
@@ -330,9 +334,12 @@ public partial class Game1
                     // attr.color binds the swatch's fill TOKEN to the datum (str/int/dex/con);
                     // attrs.pip picks per PIP INDEX: filled -> the attr's token, allocatable -> slot,
                     // beyond the cap -> nothing.
-                    string? fillTok = null;
+                    // colorBind (manifest-declared) wins; the older bind-specific tinting stays as the
+                    // fallback for manifests that predate it.
+                    string? fillTok = ResolveColorToken(pp.ColorBind, datum);
                     var skipFill = false;
-                    if (pp.Binds == "attr.color" && datum is not null)
+                    if (fillTok is not null) { }
+                    else if (pp.Binds == "attr.color" && datum is not null)
                         fillTok = ResolveBind(datum, pp.Binds);
                     else if (pp.Binds == "attrs.pip" && datum is ValueTuple<string, string, int, int, string> ab)
                     {
@@ -453,6 +460,28 @@ public partial class Game1
             ("CON", b.Capacity(Stat.Con).ToString(), "con"),
         };
     }
+
+    // colorBind (CD drop 2026-07-02, APPROVED): resolve a bound COLOUR — a palette token derived from
+    // the datum (attr colours from a stat, a core's accent) — or null to keep the part's static chrome.
+    // ware.* waits on the merchant consumer; core accent VALUES are unset content (resolve when authored).
+    private string? ResolveColorToken(string? colorBind, object? datum) => colorBind switch
+    {
+        null or "" => null,
+        "preview.accent" => _build.CoreRune.Accent is { Length: > 0 } a ? a : null,
+        "core.accent" when datum is Roguebane.Core.CoreRune c =>
+            c.Accent is { Length: > 0 } ca ? ca : null,
+        "attr.color" when datum is not null => ResolveBind(datum, "attr.color"),
+        "technique.attrColor" or "loadout.attrColor" or "invItems.attrColor" or "bay.gateColor" =>
+            datum switch
+            {
+                Roguebane.Core.Technique t => t.Stat.ToString().ToLowerInvariant(),
+                Roguebane.Core.Minion m => m.Stat.ToString().ToLowerInvariant(),
+                Roguebane.Core.Weapon w => w.Stat.ToString().ToLowerInvariant(),
+                Roguebane.Core.Armor ar => ar.Group.ToString().ToLowerInvariant(),
+                _ => null,
+            },
+        _ => null,
+    };
 
     // Resolve a template part's `binds` against a live datum -> display text, or null to use the sample.
     // Missing-data binds (race tag/blurb, per-attr tiles, Core Effect text) return null pending their data.

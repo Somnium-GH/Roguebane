@@ -21,8 +21,10 @@ rename completed CD-side). Assets: `icons/resource/summons.png` (the missing Sum
 `design/07-merchant.png` + `design/08-reticle-mounts.png` (the how-it-mounts reference). Core schema
 model + contract tests updated (self-styled leaf templates + static imageBind paths are legal).
 ENGINE TODO (unblocked, in order): `states` draw, ~~`border.sides` draw~~ DONE (element + template-part
-borders honour named edges + manifest width; contract test pins side names), `colorBind` resolve,
-shield-pip instancing + regen fill, the merchant-screen consumer, summons icon in the resource strip.
+borders honour named edges + manifest width; contract test pins side names), ~~`colorBind` resolve~~
+DONE (part fills tint from the bound datum's stat — technique/loadout/inv/bay — and element borders
+take a core accent; `CoreRune.Accent` is the data hook, per-core VALUES await design [Needs-human];
+ware.* resolves with the merchant consumer), shield-pip instancing + regen fill, the merchant-screen consumer, summons icon in the resource strip.
 
 ## ⇒ HUMAN DIRECTIVES — 2026-07-02 (revisions WIN; fold into the render arc / after the current slice)
 
