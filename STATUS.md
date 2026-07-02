@@ -77,8 +77,12 @@ receiving models (mid-run palette/bay/rune mutation) stay the design-open gate. 
 "b" merchant deterministically stocks dagger+plate so the existing buy/equip tests hold unchanged. The SCREEN LAYOUT waits on a CD design PNG (popover = flagged stopgap).
 
 **AFTER HiFi completes/blocks + all outstanding identified bugs resolved:**
-- **Summoner CoreRune — real Core Effect:** on Redeploy, refund Summons for SURVIVING minions (§11). The
-  first real Core Effect; build it.
+- ~~Summoner CoreRune — real Core Effect~~ BUILT (2026-07-02): `CoreRune.CoreEffectRefundsSummons`
+  (effect-as-DATA, one interpreter) threads Forge→Campaign→Expedition; Redeploy refunds 1 Summons per
+  SURVIVING minion (idle counts — still summoned), capped at max; Summoner's card copy updated to the
+  real effect (CD reconciles the design/05 Legion label). Core-tested over a live cleared fight
+  (301 green). NOTE surfaced: the Shade (INT 3) fails its gate at assembly on a base Human (INT 3,
+  Skeleton already reserving 2) — only the Skeleton fields from the off; balance touchpoint.
 - **CONTINGENCY (only if HiFi work is exhausted):** refactor the uber `Game1.cs` — split by responsibility
   (SRP), codify SOLID where it sensibly applies. The giant class/file is the target.
 

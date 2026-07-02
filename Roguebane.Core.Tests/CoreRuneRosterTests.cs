@@ -56,4 +56,34 @@ public class CoreRuneRosterTests
             Assert.DoesNotContain("{", m.DescText);
         }
     }
+
+    [Fact]
+    public void SummonerCoreEffectRefundsSummonsForSurvivorsOnRedeploy()
+    {
+        // The first REAL Core Effect [LOCKED §11]: on Redeploy each SURVIVING minion refunds its
+        // Summons; other cores refund nothing. The kit's two summons spend at assembly.
+        var summoner = Forge.Embark(Races.Human, CoreRunes.Summoner, CoreRunes.Summoner.NewLoadout(),
+            CoreRunes.Summoner.Kit, Maps.StandardLeg());
+        var spentAtStart = summoner.MaxSummons - summoner.Summons;
+        Assert.Equal(summoner.MinionCount, spentAtStart); // each fielded kit minion spent one Summons
+        Assert.True(spentAtStart >= 1);                   // the Binder fields at least the Skeleton
+
+        foreach (var t in summoner.Equipment) summoner.Toggle(t);
+        summoner.SetAuto(true);
+        summoner.Enter("a2");
+        var guard = 0;
+        while (summoner.State == ExpeditionState.Fighting && guard++ < 10000)
+        {
+            if (summoner.Enemy is { } foe) foreach (var t in summoner.Equipment) if (summoner.IsActive(t)) summoner.Aim(t, foe);
+            summoner.Tick();
+        }
+        Assert.Equal(ExpeditionState.Cleared, summoner.State);
+        var before = summoner.Summons;
+        var survivors = summoner.MinionCount;
+        summoner.Redeploy();
+        Assert.Equal(Math.Min(summoner.MaxSummons, before + survivors), summoner.Summons); // refunded, capped
+
+        // A non-summoner core refunds nothing on the same path.
+        Assert.False(CoreRunes.Grunt.CoreEffectRefundsSummons);
+    }
 }

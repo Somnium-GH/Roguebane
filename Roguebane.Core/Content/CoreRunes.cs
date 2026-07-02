@@ -50,7 +50,8 @@ public static class CoreRunes
         Archetype: "THE BINDER",
         Flavor: "Three bays - fights through a war-party of summons while staying back. INT funds them all.",
         CoreEffectName: "Legion",
-        CoreEffectDesc: "Every filled bay strengthens the whole war-party at once.");
+        CoreEffectDesc: "On redeploy, surviving minions refund their Summons.",
+        CoreEffectRefundsSummons: true); // the first REAL Core Effect [LOCKED §11]; CD reconciles the card copy
 
     // The Duelist: glass-cannon, no bays — ends parts before they answer.
     public static readonly CoreRune Reaver = new(
