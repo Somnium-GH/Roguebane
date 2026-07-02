@@ -216,25 +216,33 @@ public class Game1 : Microsoft.Xna.Framework.Game
         return s is null || e is null ? null : ManifestUi.Rect(s, e);
     }
 
+    // Equipment is a BETWEEN-FIGHTS loadout for the CURRENT core (design/02) — no core switching here;
+    // that choice lives on NewGame. Geometry comes from the manifest by binds, like NewGame.
     private void UpdateEquipment(KeyboardState keys)
     {
-        if (Pressed(keys, Keys.Left)) _build.CycleCoreRune(-1);
-        if (Pressed(keys, Keys.Right)) _build.CycleCoreRune(1);
-
         for (var i = 0; i < TechniqueKeys.Length && i < _build.Palette.Count; i++)
             if (Pressed(keys, TechniqueKeys[i]))
                 _build.Toggle(_build.Palette[i]);
 
-        // Mouse: click a chassis, a palette card to toggle, the march CTA. (The throwaway rune-ladder
-        // test is retired; the real rune-bag UI, design/02, is the deferred replacement.)
-        for (var i = 0; i < _build.CoreRuneCount; i++)
-            if (Click(CoreRuneRect(i))) _build.CycleCoreRune(i - _build.CoreRuneIndex);
-        for (var i = 0; i < _build.Palette.Count; i++)
-            if (Click(PaletteRect(i))) _build.Toggle(_build.Palette[i]);
+        var tabs = ManifestListCells("equipment", "tabs", InvTabCount);
+        for (var i = 0; i < tabs.Count; i++)
+            if (Click(RectOf(tabs[i]))) _invTab = i;
+
+        // TECHNIQUES tab: click an inventory card to slot/unslot it; a slotted action-bar card unslots.
+        if (_invTab == 1)
+        {
+            var cards = ManifestListCells("equipment", "invItems", _build.Palette.Count);
+            for (var i = 0; i < cards.Count; i++)
+                if (Click(RectOf(cards[i]))) _build.Toggle(_build.Palette[i]);
+        }
+        var slotted = ManifestListCells("equipment", "loadout", _build.Equipment.Count);
+        for (var i = 0; i < slotted.Count && i < _build.Equipment.Count; i++)
+            if (Click(RectOf(slotted[i]))) _build.Toggle(_build.Equipment[i]);
 
         // March the campaign. The chassis ships a fixed kit so the bar is never empty — no gate.
-        // Alt+Enter is the fullscreen toggle, not a march.
-        var march = (Pressed(keys, Keys.Enter) && !keys.IsKeyDown(Keys.LeftAlt)) || Click(RedeployRect);
+        // Alt+Enter is the fullscreen toggle, not a march. (The design's READY TO MARCH chip was
+        // flattened into the status strip by extraction — Needs-CD; Enter carries the march until then.)
+        var march = Pressed(keys, Keys.Enter) && !keys.IsKeyDown(Keys.LeftAlt);
         if (march)
         {
             _campaign = _build.Redeploy(Maps.StandardLegs(3));
@@ -243,6 +251,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
             _screen = Screen.Run;
         }
     }
+
+    // Inventory tab strip state (design/02): GEAR | TECHNIQUES | MINIONS. Render-side UI state only.
+    private const int InvTabCount = 3;
+    private int _invTab;
 
     private void UpdateRun(KeyboardState keys, GameTime gameTime)
     {
@@ -366,9 +378,6 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     // Interactive layout rects — single source of truth shared by Update (hit-test) and Draw (paint
     // + hover). Mirrors the coordinates used in the Draw* methods.
-    private static Rectangle CoreRuneRect(int i) => new(180 + i * 110 - 2, 4, 100, 32);
-    private static Rectangle PaletteRect(int i) => new(320 + i * 52, 300, 48, 48); // fits 7 before the bay preview
-    private static readonly Rectangle RedeployRect = new(40, H - 52, 300, 44);
     // The action bar sits bottom-RIGHT (design/01), right of the attribute pool and left of the combat
     // verb buttons. Card pitch adapts to the equipment size so N cards fit the region.
     private const int ActBarX = 366, ActBarY = H - 84, ActBarW = 314;
@@ -471,7 +480,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Matrix.CreateScale(SS));
         if (_mfScreen is not null) DrawManifestScreen(_mfScreen); // dev: render a screen straight from the manifest
         else if (_screen == Screen.NewGame) DrawManifestScreen("newgame"); // LIVE cut-over (design/05)
-        else if (_screen == Screen.Equipment) DrawEquipmentScreen();
+        else if (_screen == Screen.Equipment) DrawManifestScreen("equipment"); // LIVE cut-over (design/02)
         else DrawRunScreen();
         _spriteBatch.End();
 
@@ -882,138 +891,6 @@ public class Game1 : Microsoft.Xna.Framework.Game
         if (line.Length > 0) Text(_assets.Mono, line, x, ly, col);
     }
 
-    // Build screen (design/02): chassis anatomy + attribute readout on the left, the chassis line-up
-    // up top, rune ladders and the technique palette on the right. All read from the BuildSession.
-    private void DrawEquipmentScreen()
-    {
-        Stretch(_assets.Background("build_alcove"), 0, 0, W, H);
-        Panel(0, 0, W, 40);
-        Text(_assets.Display, "EQUIPMENT", 16, 8, Ink);
-        var runes = _build.Runes;
-        Text(_assets.Mono, $"runes {runes.Spent}/{runes.Budget}", 760, 12, Amber);
-
-        DrawCoreRuneSelector(180, 6);
-
-        var preview = _build.Preview();
-        Panel(40, 90, 240, 410);
-        Text(_assets.Mono, _build.CoreRune.Title.ToUpper(), 56, 100, Muted);
-        var figBox = _ui.ElementRect("equipment", "paperDoll") ?? new Rectangle(100, 104, 120, 215);
-        DrawFigureIn(preview, _build.CoreRune.FigureKey(_build.Race), "equipment", "paperDoll", 160, 470, 360);
-        DrawAnatomyTags(figBox);
-        DrawAttributeReadout(preview, _build.Race.NewBody(), 56, 318, KitDemand());
-
-        DrawCoreBlock(700, 90);
-        DrawMinionPreview(700, 320);
-        DrawPalette(320, 300);
-        DrawLoadoutStrip(320, 400);
-
-        DrawButton("ENTER  redeploy", 40, H - 52, 300, 44, true, Keys.Enter);
-        // Control hint (rune-bag UI deferred; techniques toggle for now).
-        Text(_assets.Mono, "1-9 toggle techniques", 360, H - 30, Muted);
-    }
-
-    // CURRENT CORE stat block (design/02): the chassis's identity at a glance — base attributes,
-    // bays, rune budget, and how many techniques are slotted on the action bar.
-    private void DrawCoreBlock(int x, int y)
-    {
-        var c = _build.CoreRune;
-        var baseBody = _build.Race.NewBody();
-        Panel(x, y, 220, 190);
-        Text(_assets.Display, "CURRENT CORE", x + 12, y + 10, Ink);
-        Text(_assets.Mono, c.Archetype, x + 12, y + 28, Amber); // design/05 archetype tagline
-        Sprite(_assets.Rune("core_" + c.Id), x + 184, y + 40, 26, 26, Color.White); // core identity glyph
-        var row = y + 44;
-        void Line(string k, string v) { Text(_assets.Mono, k, x + 12, row, Muted);
-            Text(_assets.Mono, v, x + 150, row, Ink); row += 22; }
-        Line("str", baseBody.Capacity(Stat.Str).ToString());
-        Line("int", baseBody.Capacity(Stat.Int).ToString());
-        Line("dex", baseBody.Capacity(Stat.Dex).ToString());
-        Line("con", baseBody.Capacity(Stat.Con).ToString());
-        Line("bays", c.Bays.ToString());
-        Line("budget", c.RuneBudget.ToString());
-        Line("actions", _build.Equipment.Count.ToString());
-    }
-
-    // The action-bar equipment strip: the chassis's FIXED starting kit, pre-slotted (no pick gate).
-    // Mirrors the combat action bar so the player reads the bar they will fight with.
-    // Build-screen MINION BAYS preview (design/02): a slot per chassis bay, filled with the kit's
-    // minion sprite (or empty outline), so the player previews the retinue they'll field. Mirrors the
-    // combat bay lane; display-only.
-    private void DrawMinionPreview(int x, int y)
-    {
-        var c = _build.CoreRune;
-        if (c.Bays <= 0) return;
-        Text(_assets.Mono, "MINION BAYS", x, y - 18, Muted);
-        var kit = c.MinionKit;
-        const int slot = 44, gap = 8;
-        for (var i = 0; i < c.Bays; i++)
-        {
-            var sx = x + i * (slot + gap);
-            Panel(sx, y, slot, slot);
-            if (i < kit.Count)
-            {
-                var m = kit[i];
-                var tex = _assets.Minion(m.Id);
-                if (tex is not null) Sprite(tex, sx + 4, y + 4, slot - 8, slot - 8, Color.White);
-                else
-                {
-                    Rect(sx + 6, y + 6, slot - 12, slot - 12, new Color(Amber, 70));
-                    Text(_assets.Mono, (m.Id.Length >= 2 ? m.Id[..2] : m.Id).ToUpperInvariant(), sx + 8, y + 12, Ink);
-                }
-                Text(_assets.Mono, m.Power.ToString(), sx + slot - 14, y + slot - 18, Amber);
-            }
-            else Border(sx, y, slot, slot, Border0); // empty bay
-        }
-    }
-
-    private void DrawLoadoutStrip(int x, int y)
-    {
-        Text(_assets.Mono, "ACTION BAR", x, y - 18, Muted);
-        var kit = _build.Equipment;
-        if (kit.Count == 0) { Text(_assets.Mono, "-", x, y, Muted); return; }
-        for (var i = 0; i < kit.Count; i++)
-        {
-            var t = kit[i];
-            var left = x + i * 64;
-            Panel(left, y, 56, 56);
-            Sprite(_assets.Technique(t.Id), left + 4, y + 4, 48, 48, Color.White);
-            Text(_assets.Mono, t.Reserve.ToString(), left + 42, y + 40, StatColor(t.Stat));
-            Border(left, y, 56, 56, Amber);
-        }
-    }
-
-    private void DrawCoreRuneSelector(int x, int y)
-    {
-        for (var i = 0; i < _build.CoreRuneCount; i++)
-        {
-            var left = x + i * 110;
-            var selected = i == _build.CoreRuneIndex;
-            var id = CoreRunes.Roster[i].Id;
-            Sprite(_assets.CoreRuneFigure(id), left, y, 28, 28, selected ? Color.White : new Color(150, 140, 130));
-            Text(_assets.Mono, id, left + 32, y + 8, selected ? Ink : Muted);
-            if (selected) Border(left - 2, y - 2, 100, 32, Amber);
-            else if (Hover(CoreRuneRect(i))) Border(left - 2, y - 2, 100, 32, Ink);
-        }
-    }
-
-    // Rune ladders: a row per path, a rune glyph per rung (keystone glyph at the top), filled rungs
-    // tinted, the rest dim. Climbing in order spends the budget toward a keystone.
-
-    private void DrawPalette(int x, int y)
-    {
-        Text(_assets.Mono, "TECHNIQUES", x, y - 20, Muted);
-        for (var i = 0; i < _build.Palette.Count; i++)
-        {
-            var t = _build.Palette[i];
-            var left = x + i * 52;
-            var selected = _build.IsSelected(t);
-            Panel(left, y, 48, 48);
-            Sprite(_assets.Technique(t.Id), left + 3, y + 3, 42, 42, Color.White);
-            Text(_assets.Mono, (i + 1).ToString(), left + 3, y + 36, Muted);
-            Border(left, y, 48, 48, selected ? Amber : Hover(PaletteRect(i)) ? Ink : Border0);
-        }
-    }
-
     // Player side: a part composite (each limb's sprite chosen by its condition), the HP life total,
     // and the attribute-pool pip widget below.
     // The YOU side of the battlefield (design/01): the player figure + HP. The attribute POOL moved to
@@ -1076,29 +953,6 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 Text(_assets.Mono, "/" + need, px + max * 16 + 26, top + 4, fits ? Muted : Blood);
             }
         }
-    }
-
-    // What the slotted kit (techniques + the chassis's fielded minions) reserves per stat — the demand
-    // the minted body must cover. Drives the build screen's gate markers.
-    private Dictionary<Stat, int> KitDemand()
-    {
-        var d = new Dictionary<Stat, int>();
-        foreach (var t in _build.Equipment) d[t.Stat] = d.GetValueOrDefault(t.Stat) + t.Reserve;
-        foreach (var m in _build.CoreRune.MinionKit) d[m.Stat] = d.GetValueOrDefault(m.Stat) + m.Reserve;
-        return d;
-    }
-
-    // CoreRune-anatomy callouts (design/02): a stat tag at each body region so the chassis structure
-    // — which part sources which stat — reads at a glance on the figure (the core thesis). Tags sit
-    // just outside the figure box: head top, arms mid-sides, chest centre, legs lower.
-    private void DrawAnatomyTags(Rectangle b)
-    {
-        void Tag(Stat s, int px, int py) => Text(_assets.Mono, s.ToString().ToUpperInvariant(), px, py, StatColor(s));
-        var rx = b.Right + 2;          // right gutter
-        Tag(Stat.Int, rx, b.Y + (int)(b.Height * 0.06f));   // head
-        Tag(Stat.Con, rx, b.Y + (int)(b.Height * 0.34f));   // chest
-        Tag(Stat.Str, rx, b.Y + (int)(b.Height * 0.50f));   // arms
-        Tag(Stat.Dex, rx, b.Y + (int)(b.Height * 0.74f));   // legs
     }
 
     // Build-screen ATTRIBUTE READOUT (design/02): a horizontal bar per stat — base (solid) + rune
@@ -1720,6 +1574,14 @@ public class Game1 : Microsoft.Xna.Framework.Game
         "attrs" => AttrBars(),
         "loadout" => _build.Equipment.Cast<object>().ToList(),
         "minions" => _build.CoreRune.MinionKit.Concat(_build.Runes.GrantedMinions).Cast<object>().ToList(),
+        // Inventory follows the tab strip: TECHNIQUES = the palette, MINIONS = the retinue; GEAR has
+        // no pre-run model yet (design-open, see Debt) so it falls back to the manifest samples.
+        "invItems" => _invTab switch
+        {
+            1 => _build.Palette.Cast<object>().ToList(),
+            2 => _build.CoreRune.MinionKit.Concat(_build.Runes.GrantedMinions).Cast<object>().ToList(),
+            _ => null,
+        },
         _ => null,
     };
 
@@ -1790,14 +1652,18 @@ public class Game1 : Microsoft.Xna.Framework.Game
         },
         Roguebane.Core.Technique t => bind switch
         {
-            "loadout.name" => DisplayName(t.Id),
+            "loadout.name" or "invItems.name" => DisplayName(t.Id),
             "loadout.attr" => t.Stat.ToString().ToUpperInvariant() + " " + t.Reserve,
+            "invItems.badgeLabel" => t.Stat.ToString().ToUpperInvariant(),
+            "invItems.badgeNum" => t.Reserve.ToString(),
             _ => null,
         },
         Roguebane.Core.Minion mn => bind switch
         {
-            "loadout.name" => DisplayName(mn.Id),
+            "loadout.name" or "invItems.name" => DisplayName(mn.Id),
             "loadout.attr" => mn.Stat.ToString().ToUpperInvariant() + " " + mn.Reserve,
+            "invItems.badgeLabel" => mn.Stat.ToString().ToUpperInvariant(),
+            "invItems.badgeNum" => mn.Reserve.ToString(),
             _ => null,
         },
         _ => null,

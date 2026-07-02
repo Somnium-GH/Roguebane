@@ -52,15 +52,16 @@ SLICES (one screen/pass, pixel-verify vs its design PNG):
    NOT design-done — remaining deltas are ALL manifest-expressiveness gaps (Needs-CD below): card/tile
    bg+chrome parts, tile value+label split, `align`, button/chip labels+fills, core-rune icons +
    ①②③/✚ glyph font, head-image assets, hi-fi bg. Re-walk the full delta list when CD's drop lands.
-2. **Equipment** (in progress) — a BETWEEN-FIGHTS loadout for the CURRENT core (NO core-switch tabs —
-   that's NewGame). THIS PASS the manifest renderer covers its live binds: `Body` paperDoll figure;
-   `attrs` attribute bars (key/part-label §6, free/cap readout, 12 positional pips: filled→attr token,
-   allocatable→slot, beyond cap→empty); `loadout`/`minions` action-bar cards (name + STAT-reserve from
-   the seeded kit); `core` identity; `runes.budget` ("N free / M"). Verified RB_MF=equipment.
-   NOT cut over yet: the old hand-drawn Equipment screen keeps its WORKING interactions (palette
-   toggles, rune-ladder climbs, redeploy CTA) — cutting now would regress function. Cut when manifest
-   input wiring lands (like NewGame's by-binds click cells). Sample-only still: inventory GEAR cards +
-   rune-bag group cards (models design-open, see Debt) + tabs (labels lost in extraction, Needs-CD).
+2. **Equipment** — CUT OVER: live screen renders via `DrawManifestScreen("equipment")`; the hand-drawn
+   build screen (core selector/core block/palette/loadout strip/anatomy tags) is DELETED. Core switching
+   is REMOVED from this screen per design/02 (core is fixed between fights — that choice is NewGame's).
+   Input by binds: tab strip picks GEAR/TECHNIQUES/MINIONS (`_invTab`, render-side state); TECHNIQUES
+   tab lists the palette as inv cards (badge stat+reserve, name) — click slots/unslots; clicking a
+   slotted action-bar card unslots; keys 1-9 still toggle; Enter marches (the design's READY TO MARCH
+   chip was flattened into the status strip by extraction — Needs-CD; Enter carries the march).
+   Live binds: paperDoll figure, attr bars (§6 part labels, free/cap, positional pips), loadout/minion
+   cards, core identity, rune budget. Sample-only: GEAR cards + rune-bag groups (models design-open,
+   Debt). Not design-done: chrome/label gaps in Needs-CD.
 3. **Encounter** — `design/01` (single foe, attribute pool, action bar); single-frame panels.
 4. **CityMap** — `design/03` (node graph, supplies, war-party RIGHT→LEFT, Equipment button).
 5. **CampaignMap** — BUILD it (not implemented) from `design/04`.
