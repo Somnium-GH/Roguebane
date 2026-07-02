@@ -79,6 +79,8 @@ SLICES (one screen/pass, pixel-verify vs its design PNG):
    Live binds (all verified over a live castle fight): hero/foe figures + HP, pool rows w/ live
    reservations, technique/bay cards (stat glyph tiles, costs), FSM state chips (DRY/HELD/READY/
    COOLDOWN, idle = no chip), cooldown labels, charge-progress fill widths, bay ACTIVE.
+   AIMING state done: the card the targeting FSM is picking for reads an AIMING chip + "locking on"
+   label (design/01's Firebolt card), verified live via the encounter smoke's targeting card.
    Gaps: techCard's bindless sample parts (the cost NUMBER + the mid-description damage digit) stamp
    their sample on every card (Needs-CD: bind them).
    DISPLAY COPY DONE: `Technique.Desc`/`Minion.Desc` (+`DescText`) ship card copy for all 8 techniques

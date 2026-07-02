@@ -1423,7 +1423,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 var isStatePart = pp.Binds is "technique.state" or "bay.state" or "technique.cooldownLabel";
                 if (isStatePart)
                 {
-                    stateText = ResolveStateBind(datum, pp.Binds!);
+                    // The card the targeting FSM is picking a foe for reads AIMING / "locking on".
+                    var aiming = e.Binds == "loadout.techniques" && InRun && _ctrl.Targeting == i;
+                    stateText = ResolveStateBind(datum, pp.Binds!, aiming);
                     if (string.IsNullOrEmpty(stateText)) continue;
                 }
                 // Rune-bag rows (g.runes.* repeats twice per group): a LIVE ladder shows its held
@@ -1653,7 +1655,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     // A card's live FSM read (design/01 chips + cooldown label): null = idle, show nothing.
     // Countdown is in fixed ticks (10/s) -> seconds for the label.
-    private string? ResolveStateBind(object? datum, string bind)
+    private string? ResolveStateBind(object? datum, string bind, bool aiming = false)
     {
         if (!InRun) return null;
         if (datum is Roguebane.Core.Technique t)
@@ -1661,11 +1663,13 @@ public class Game1 : Microsoft.Xna.Framework.Game
             var st = Exp.Status(t);
             return bind switch
             {
-                "technique.state" => st.ChargeDry ? "DRY"
+                "technique.state" => aiming ? "AIMING"
+                    : st.ChargeDry ? "DRY"
                     : st.Sustained && st.Active ? "HELD"
                     : st.Ready ? "READY"
                     : st.Active && st.Countdown > 0 ? "COOLDOWN" : null,
-                "technique.cooldownLabel" => st.Ready ? "ready"
+                "technique.cooldownLabel" => aiming ? "locking on"
+                    : st.Ready ? "ready"
                     : st.Sustained && st.Active ? "held"
                     : st.Active && st.Countdown > 0 ? (st.Countdown / 10f).ToString("0.0") + "s" : null,
                 _ => null,
