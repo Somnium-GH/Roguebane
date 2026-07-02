@@ -269,24 +269,31 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     private void UpdateCombat(KeyboardState keys, GameTime gameTime)
     {
-        if (Pressed(keys, Keys.Space) || Click(PauseRect)) _paused = !_paused;
-        if (Pressed(keys, Keys.F) || Click(RetreatRect)) Exp.Retreat();
-        if (Pressed(keys, Keys.Tab) || Click(AutoRect)) _ctrl.ToggleAuto(Exp); // ONE global toggle
+        // Combat controls read manifest geometry by binds (design/01): the HELD badge pauses, the
+        // FLEE chip retreats, AUTO-ATTACK is the one global toggle. Keyboard verbs unchanged.
+        if (Pressed(keys, Keys.Space)
+            || (ManifestElementRect("encounter", "combat.paused") is { } pr && Click(pr))) _paused = !_paused;
+        if (Pressed(keys, Keys.F)
+            || (ManifestElementRect("encounter", "combat.flee") is { } fr && Click(fr))) Exp.Retreat();
+        if (Pressed(keys, Keys.Tab)
+            || (ManifestElementRect("encounter", "combat.autoAttack") is { } ar && Click(ar))) _ctrl.ToggleAuto(Exp);
 
         // The targeting FSM lives in Core (CombatTargeting); the shell only feeds it press intents.
         // Card LEFT-press powers/enters-targeting; card RIGHT-press unpowers.
         var rclickOnCard = false;
+        var cards = ManifestListCells("encounter", "loadout.techniques", Exp.Equipment.Count);
         for (var i = 0; i < TechniqueKeys.Length && i < Exp.Equipment.Count; i++)
         {
-            if (Pressed(keys, TechniqueKeys[i]) || Click(ActionCardRect(i))) _ctrl.CardPress(Exp, i);
-            if (RightClick(ActionCardRect(i))) { rclickOnCard = true; _ctrl.CardRightPress(Exp, i); }
+            var cardRect = i < cards.Count ? RectOf(cards[i]) : Rectangle.Empty;
+            if (Pressed(keys, TechniqueKeys[i]) || Click(cardRect)) _ctrl.CardPress(Exp, i);
+            if (RightClick(cardRect)) { rclickOnCard = true; _ctrl.CardRightPress(Exp, i); }
         }
 
         // While a module is targeting: LEFT-press a live foe (clicked limb -> part aim) to set + exit;
         // RIGHT-press the battlefield cancels. A charged + targeted module fires on its own (no button).
         if (_ctrl.IsTargeting(Exp))
         {
-            if (Exp.Enemy is { Down: false } foe && Click(FoeRect(0)))
+            if (Exp.Enemy is { Down: false } foe && Click(FoeRect()))
                 _ctrl.FoePress(Exp, foe, FoePartAt(foe, _cursor));
             if (_rclicked && !rclickOnCard) _ctrl.CancelTargeting();
         }
@@ -388,18 +395,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
         var card = Math.Max(42, pitch - 6);
         return new(ActBarX + i * pitch, ActBarY, card, 60);
     }
-    // Single-foe (canon): ONE enemy, drawn large on the right. The index is vestigial (always 0).
-    private static Rectangle FoeRect(int i = 0) => new(632, 96, 224, 252);
-    private static readonly Rectangle PauseRect = new(W - 156, H - 84, 110, 26);
-    private static readonly Rectangle RetreatRect = new(W - 156, H - 50, 110, 26);
-    private static readonly Rectangle AutoRect = new(W - 272, H - 50, 110, 26);
-
-    // Which foe a target points at (for the per-card target tag), or -1 for the default front / none.
-    private int FoeIndexOf(ICombatTarget? target)
-    {
-        if (target is null) return -1;
-        return ReferenceEquals(Exp.Enemy, target) ? 0 : -1; // single-foe: the lone enemy is index 0
-    }
+    // Single-foe (canon): the foe hit-box IS the manifest foeFigure element; hand rect only as a
+    // fallback for a missing manifest.
+    private Rectangle FoeRect() => ManifestElementRect("encounter", "encounter.foe")
+        ?? new Rectangle(632, 96, 224, 252);
 
     // Anatomical part bands stacked on the foe sprite, top->bottom: head, arms, chest, legs. A
     // structured foe is aimed limb-by-limb by clicking the band; an unstructured foe has no bands.
@@ -412,9 +411,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
         _ => 1,
     };
 
-    private static Rectangle FoePartRect(int foeIndex, Stat stat)
+    private Rectangle FoePartRect(Stat stat)
     {
-        var r = FoeRect(foeIndex);
+        var r = FoeRect();
         var band = r.Height / 4;
         return new Rectangle(r.X, r.Y + PartBand(stat) * band, r.Width, band);
     }
@@ -423,17 +422,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private BodyPart? FoePartAt(Foe foe, Point p)
     {
         if (foe.Frame is null) return null;
-        var fi = FoeIndexOf(foe);
         foreach (var part in foe.Frame.Parts)
-            if (FoePartRect(fi, part.Stat).Contains(p)) return part;
+            if (FoePartRect(part.Stat).Contains(p)) return part;
         return null;
     }
 
-    // One-letter limb glyph for the per-card target tag (head/arm/chest/legs).
-    private static char PartGlyph(Stat stat) => stat switch
-    {
-        Stat.Int => 'H', Stat.Str => 'A', Stat.Con => 'C', Stat.Dex => 'L', _ => '?',
-    };
     // Merchant verb button + gear chips — mirror DrawMerchant's panel origin (560,300) + offsets.
     private static readonly Rectangle MerchHealRect = new(574, 344, 330, 30);
     private static Rectangle MerchGearRect(int i) => new(574 + i * 112, 472, 104, 30);
@@ -559,32 +552,12 @@ public class Game1 : Microsoft.Xna.Framework.Game
         else DrawCityMapScreen();
     }
 
-    // Combat screen (design/01): backdrop, run resources up top, you on the left (part composite +
-    // HP + attribute pips), the foe on the right, the action bar along the bottom.
+    // Combat screen (design/01): rendered from the manifest; only the cleared/lost state overlay is
+    // legacy (it isn't part of the encounter design). The battlefield backdrop stays under the chrome.
     private void DrawEncounterScreen()
     {
         Stretch(_assets.Background("combat_field"), 0, 0, W, H);
-        Panel(0, 0, W, 40);
-        // Title by the node under fight (design/01 names the encounter), not a fixed "SIEGE".
-        var title = Exp.Map.Current.Type switch
-        {
-            NodeType.Castle => "SIEGE",
-            NodeType.ResourceHold => "RESOURCE HOLD",
-            NodeType.Skirmish => "SKIRMISH",
-            _ => "BATTLE",
-        };
-        Text(_assets.Display, title, 16, 8, Ink);
-        DrawRunResources(200, 10);
-        DrawSpine(720, 12);
-
-        DrawFighter(40, 90);
-        DrawBays(300, 120);
-        DrawSupport(300, 220);
-        DrawFoe();
-        // Control hint (POC): the targeting scheme is non-obvious (no fire button). In the header gap.
-        Text(_assets.Mono, "click a foe limb to aim   right-click cancels", 330, 70, Muted);
-        DrawAttributePool(16, H - 160);
-        DrawActionBar();
+        DrawManifestScreen("encounter");
         DrawStateOverlay();
     }
 
@@ -891,73 +864,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
         if (line.Length > 0) Text(_assets.Mono, line, x, ly, col);
     }
 
-    // Player side: a part composite (each limb's sprite chosen by its condition), the HP life total,
-    // and the attribute-pool pip widget below.
-    // The YOU side of the battlefield (design/01): the player figure + HP. The attribute POOL moved to
-    // its own prominent bottom-left panel (DrawAttributePool), per design/01.
-    private void DrawFighter(int x, int y)
-    {
-        var body = Exp.Player.Body;
-        Panel(x, y, 220, 250);
-        Text(_assets.Mono, "YOU - " + Exp.FigureId.ToUpperInvariant(), x + 12, y + 8, Muted);
-        DrawFigureIn(body, Exp.FigureId, "encounter", "heroFigure", x + 110, y + 226, 210);
 
-        var hp = Exp.Player;
-        DrawBar(x + 16, y + 224, 188, _assets.Resource("hp"), hp.Hp, hp.MaxHp, Blood);
-    }
-
-    // design/01 signature: the prominent bottom-left ATTRIBUTE POOL — per-stat pips (free / reserved /
-    // damaged), the read the whole build revolves around.
-    private void DrawAttributePool(int x, int y)
-    {
-        Panel(x, y, 344, 156);
-        Text(_assets.Mono, "ATTRIBUTE POOL", x + 12, y + 8, Muted);
-        DrawPips(Exp.Player.Body, x + 12, y + 30);
-    }
-
-    // The attribute-pool pip widget: one row per stat — attribute icon, then pips for damaged (dim),
-    // free (stat colour) and reserved (dark) capacity, anchored by the live number in mono. When a
-    // `demand` map is supplied (the build screen), each row also gets a GATE MARKER: a notch at the
-    // stat the slotted kit reserves, plus "/N", red when the kit out-demands the pool (can't all power).
-    private void DrawPips(Body body, int x, int y, IReadOnlyDictionary<Stat, int>? demand = null)
-    {
-        for (var i = 0; i < StatColors.Length; i++)
-        {
-            var (s, _) = StatColors[i];
-            var top = y + i * 30;
-            Sprite(_assets.Attr(s), x, top, 24, 24, Color.White);
-
-            var max = 0;
-            foreach (var p in body.Parts) if (p.Stat == s) max += p.Capacity;
-            var cur = body.Capacity(s);
-            var reserved = body.Reserved(s);
-            var free = cur - reserved;
-
-            var px = x + 30;
-            var suffix = s.ToString().ToLowerInvariant(); // str/int/dex/con -> per-stat coloured pips
-            for (var k = 0; k < max; k++)
-            {
-                // Drop ships pre-coloured per-stat pips: free=full_<stat>, reserved=reserved_<stat>,
-                // damaged=damage (the old "damaged" name was removed). White tint — the art is coloured.
-                var pip = k < free ? _assets.Pip("full_" + suffix)
-                    : k < cur ? _assets.Pip("reserved_" + suffix)
-                    : _assets.Pip("damage");
-                Sprite(pip, px + k * 16, top, 14, 14, Color.White);
-            }
-            Text(_assets.Mono, cur.ToString(), px + max * 16 + 6, top + 4, Ink);
-
-            if (demand is not null && demand.TryGetValue(s, out var need) && need > 0)
-            {
-                var fits = need <= cur;
-                Rect(px + Math.Min(need, max) * 16 - 1, top - 2, 2, 18, fits ? Amber : Blood); // gate notch
-                Text(_assets.Mono, "/" + need, px + max * 16 + 26, top + 4, fits ? Muted : Blood);
-            }
-        }
-    }
-
-    // Build-screen ATTRIBUTE READOUT (design/02): a horizontal bar per stat — base (solid) + rune
-    // marks (lighter extension), a gate notch at the kit's per-stat demand (amber if met, blood if
-    // over-pool), and the current total. Distinct from combat's pip widget (design/01).
     private void DrawAttributeReadout(Body cur, Body baseBody, int x, int y, IReadOnlyDictionary<Stat, int> demand)
     {
         static string Part(Stat s) => s switch
@@ -1084,153 +991,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
         }
     }
 
-    // Foe side: each foe a sprite + HP bar. Foe/part HIGHLIGHTS come ONLY from active TARGETING (a
-    // module is picking): every live foe shows a faint pick-prompt reticle, a structured foe shows its
-    // limb bands, and the band under the cursor highlights. There is NO persistent locked-aim ring —
-    // which module targets which foe/limb reads off the action-bar card tags (F1:H). AUTO never touches
-    // this; it is purely a button state.
-    // The ONE enemy (single-foe canon, design/01): drawn large on the right with its creature figure,
-    // targetable PART bands, a name tag, and an HP bar beneath. Part-aim clicks a limb band.
-    private void DrawFoe()
-    {
-        var foe = Exp.Battle!.Encounter.Enemy;
-        var r = FoeRect();
-        var tint = foe.Down ? new Color(70, 60, 55) : Color.White;
 
-        if (foe.Frame is not null)
-            DrawHumanoid(foe.Frame, foe.Figure, r.X + r.Width / 2, r.Y + r.Height, r.Height, tint, allowBare: false);
-        else
-            Sprite(_assets.Reticle("focus"), r.X + r.Width / 2 - 64, r.Y + 40, 128, 128, tint); // inert marker
 
-        if (!foe.Down && _ctrl.IsTargeting(Exp))
-        {
-            if (foe.Frame is not null) // limb bands + the band under the cursor (hover highlight)
-            {
-                var band = r.Height / 4;
-                for (var b = 1; b < 4; b++) Rect(r.X, r.Y + b * band, r.Width, 1, new Color(Ink, 90));
-                if (FoePartAt(foe, _cursor) is { } hov)
-                    Border(r.X, r.Y + PartBand(hov.Stat) * band, r.Width, band, Ink);
-            }
-            else Border(r.X, r.Y, r.Width, r.Height, new Color(Ink, 110));
-        }
-        else if (!foe.Down && Hover(r)) Border(r.X, r.Y, r.Width, r.Height, Ink);
 
-        Text(_assets.Mono, foe.Figure.ToUpperInvariant(), r.X + 4, r.Y - 16, foe.Down ? Muted : Ink);
-        DrawBar(r.X, r.Y + r.Height + 4, r.Width, _assets.Resource("hp"), foe.Hp, foe.MaxHp, Blood);
-    }
-
-    // The minion-bay lane: one slot per chassis bay, filled with its summoned occupant (its sprite,
-    // or a tinted disc + 2-letter tag when no sprite is authored) or left an empty outline. Hidden
-    // for a no-bay chassis.
-    private void DrawBays(int x, int y)
-    {
-        var bays = Exp.Bays;
-        if (bays <= 0) return;
-        Text(_assets.Mono, "BAYS", x, y - 18, Muted);
-        var minions = Exp.Minions;
-        const int slot = 44, gap = 8;
-        for (var i = 0; i < bays; i++)
-        {
-            var sx = x + i * (slot + gap);
-            Panel(sx, y, slot, slot);
-            if (i < minions.Count)
-            {
-                var m = minions[i];
-                var tex = _assets.Minion(m.Id);
-                if (tex is not null) Sprite(tex, sx + 4, y + 4, slot - 8, slot - 8, Color.White);
-                else // fallback: tinted disc + 2-letter tag
-                {
-                    Rect(sx + 6, y + 6, slot - 12, slot - 12, new Color(Amber, 70));
-                    Text(_assets.Mono, (m.Id.Length >= 2 ? m.Id[..2] : m.Id).ToUpperInvariant(), sx + 8, y + 12, Ink);
-                }
-                Text(_assets.Mono, m.Power.ToString(), sx + slot - 14, y + slot - 18, Amber); // power
-            }
-            else Border(sx, y, slot, slot, Border0); // empty bay
-        }
-    }
-
-    // The rallied-support lane: the holds banked en route become an allied force that auto-fires on the
-    // castle boss. Shows banked pips out of combat / at lesser nodes, and reads RALLIED +N (brighter)
-    // during the castle fight where that banked force is firing on the boss. Hidden when there is none.
-    private void DrawSupport(int x, int y)
-    {
-        var banked = Exp.Map.SupportBank;
-        var rallied = Exp.Battle?.Encounter.SupportAmount ?? 0; // >0 only at the castle (fed by the bank)
-        if (banked <= 0 && rallied <= 0) return;
-
-        Text(_assets.Mono, "SUPPORT", x, y - 18, Muted);
-        var pips = Math.Max(banked, rallied);
-        for (var i = 0; i < pips; i++)
-            Rect(x + i * 16, y, 12, 12, new Color(Amber, rallied > 0 ? 200 : 110)); // brighter while firing
-        Text(_assets.Mono, rallied > 0 ? "RALLIED +" + rallied : "banked", x, y + 16, rallied > 0 ? Amber : Muted);
-    }
-
-    // The action bar (design/01, bottom-right): one card per equipment technique — icon, stat cost, active
-    // ring, cooldown wipe, target tag. Card geometry comes from ActionCardRect so hit-tests line up.
-    private void DrawActionBar()
-    {
-        Text(_assets.Mono, "ACTION BAR", ActBarX, ActBarY - 16, Muted);
-        for (var i = 0; i < Exp.Equipment.Count; i++)
-        {
-            var t = Exp.Equipment[i];
-            var r = ActionCardRect(i);
-            var st = Exp.Status(t);
-            var sz = r.Height - 22;            // icon square
-            int ix = r.X + (r.Width - sz) / 2, iy = r.Y + 4;
-            Panel(r.X, r.Y, r.Width, r.Height);
-            Sprite(_assets.Technique(t.Id), ix, iy, sz, sz, st.Active ? Color.White : new Color(150, 140, 130));
-
-            // Cooldown wipe (Timered) or a held tint (Sustained block).
-            if (st.Active && !st.Sustained && st.Cooldown > 0 && st.Countdown > 0)
-                Rect(ix, iy, sz, sz * st.Countdown / st.Cooldown, new Color(0, 0, 0, 150));
-            else if (st.Sustained && st.Active)
-                Rect(ix, iy, sz, sz, new Color(Amber, 60));
-
-            var tag = st.ChargeDry ? "dry" : st.Sustained && st.Active ? "held" : st.Ready ? "RDY" : null;
-            if (tag is not null) Text(_assets.Mono, tag, ix, iy - 2, st.ChargeDry ? Blood : Amber);
-            if (st.Ready && !st.Auto && !st.Sustained) Border(ix, iy, sz, sz, Amber); // holding for a target
-
-            // Current aim (which limb if part-aimed) — single foe, so just the part glyph.
-            if (st.Active && Exp.AimOf(t) is not null)
-                Text(_assets.Mono, Exp.PartOf(t) is { } pt ? PartGlyph(pt.Stat).ToString() : "*",
-                    r.Right - 12, iy - 2, Amber);
-
-            Text(_assets.Mono, "[" + (i + 1) + "]", r.X + 3, r.Bottom - 12, Muted);
-            Text(_assets.Mono, t.Reserve.ToString(), r.Right - 12, r.Bottom - 12, StatColor(t.Stat));
-            var border = i == _ctrl.Targeting ? Ink : st.Active ? Amber : Hover(r) ? Ink : Border0;
-            Border(r.X, r.Y, r.Width, r.Height, border);
-            if (i == _ctrl.Targeting) Border(r.X - 2, r.Y - 2, r.Width + 4, r.Height + 4, Ink);
-        }
-
-        // Combat verbs (keyboard Tab/Space/F still work). No FIRE button. AUTO is ONE global toggle.
-        DrawToggleButton("AUTO", AutoRect, Exp.IsAuto(), Hover(AutoRect));
-        DrawHotButton(_paused ? "RESUME" : "PAUSE", PauseRect, Hover(PauseRect));
-        DrawHotButton("RETREAT", RetreatRect, Hover(RetreatRect));
-    }
-
-    // A compact skinned button at a fixed rect with a hover highlight (combat pause/flee).
-    private void DrawHotButton(string label, Rectangle r, bool hovered)
-    {
-        var skin = _assets.Button(hovered ? "down" : "normal");
-        if (skin is not null) Sprite(skin, r.X, r.Y, r.Width, r.Height, Color.White);
-        else Panel(r.X, r.Y, r.Width, r.Height);
-        var size = MeasureText(_assets.Mono, label);
-        Text(_assets.Mono, label, (int)(r.X + r.Width / 2 - size.X / 2), (int)(r.Y + r.Height / 2 - size.Y / 2), Ink);
-        if (hovered) Border(r.X, r.Y, r.Width, r.Height, Amber);
-    }
-
-    // A two-state toggle button: ON reads LIT (amber fill + dark label + amber border), OFF reads as a
-    // normal button. No glyph — the lit/unlit state IS the indicator.
-    private void DrawToggleButton(string label, Rectangle r, bool on, bool hovered)
-    {
-        var skin = _assets.Button(on || hovered ? "down" : "normal");
-        if (skin is not null) Sprite(skin, r.X, r.Y, r.Width, r.Height, on ? Amber : Color.White);
-        else { Panel(r.X, r.Y, r.Width, r.Height); if (on) Rect(r.X, r.Y, r.Width, r.Height, new Color(Amber, 110)); }
-        var size = MeasureText(_assets.Mono, label);
-        Text(_assets.Mono, label, (int)(r.X + r.Width / 2 - size.X / 2), (int)(r.Y + r.Height / 2 - size.Y / 2),
-            on ? new Color(30, 24, 18) : Ink);
-        if (on || hovered) Border(r.X, r.Y, r.Width, r.Height, Amber);
-    }
 
     private static readonly Rectangle ClearedRedeployRect = new(W / 2 - 90, H / 2 + 24, 180, 34);
 
@@ -1468,6 +1231,31 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 if (ef.Frame is { } frame)
                     DrawHumanoid(frame, ef.Figure, r.X + r.Width / 2, r.Y + r.Height, r.Height,
                         ef.Down ? new Color(70, 60, 55) : Color.White, allowBare: false);
+                // Part-aim affordance while a module is picking (design/01): limb bands over the
+                // structured foe, the band under the cursor highlighted. No persistent aim ring.
+                if (!ef.Down && _ctrl.IsTargeting(Exp))
+                {
+                    if (ef.Frame is not null)
+                    {
+                        var band = r.Height / 4;
+                        for (var bd = 1; bd < 4; bd++) Rect(r.X, r.Y + bd * band, r.Width, 1, new Color(Ink, 90));
+                        if (FoePartAt(ef, _cursor) is { } hov)
+                            Border(r.X, r.Y + PartBand(hov.Stat) * band, r.Width, band, Ink);
+                    }
+                    else Border(r.X, r.Y, r.Width, r.Height, new Color(Ink, 110));
+                }
+                else if (!ef.Down && Hover(r)) Border(r.X, r.Y, r.Width, r.Height, Ink);
+                break;
+            case "figure" when e.Binds == "encounter.minions" && InRun:
+                // The fielded retinue on the battlefield: each minion's sprite, feet on the box floor.
+                for (var mi = 0; mi < Exp.Minions.Count; mi++)
+                {
+                    var tex = _assets.Minion(Exp.Minions[mi].Id);
+                    var mw = r.Height * 2 / 3;
+                    var mx = r.X + mi * (mw + 8);
+                    if (tex is not null) Sprite(tex, mx, r.Y, mw, r.Height, Color.White);
+                    else Rect(mx + 4, r.Y + 8, mw - 8, r.Height - 16, new Color(Amber, 70));
+                }
                 break;
         }
     }
@@ -1487,6 +1275,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
         "runes.budget" => _build.Runes.Available + " free / " + _build.Runes.Budget,
         "Body.hp" => InRun ? Exp.Player.Hp + " / " + Exp.Player.MaxHp : null,
         "encounter.foe.hp" => InRun && Exp.Enemy is { } foe ? foe.Hp + " / " + foe.MaxHp : null,
+        // Combat verbs (design/01 chips; labels were flattened by extraction -> authored here).
+        "combat.autoAttack" => InRun ? (Exp.IsAuto() ? "AUTO-ATTACK ON" : "AUTO-ATTACK") : null,
+        "combat.flee" => InRun ? "FLEE" : null,
+        "combat.paused" => _paused ? "HELD" : null, // badge shows only while the fight is held
         _ => null,
     };
 

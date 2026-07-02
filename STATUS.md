@@ -62,7 +62,15 @@ SLICES (one screen/pass, pixel-verify vs its design PNG):
    Live binds: paperDoll figure, attr bars (§6 part labels, free/cap, positional pips), loadout/minion
    cards, core identity, rune budget. Sample-only: GEAR cards + rune-bag groups (models design-open,
    Debt). Not design-done: chrome/label gaps in Needs-CD.
-3. **Encounter** (in progress) — `design/01`. THIS PASS the renderer resolves its RUN-state binds
+3. **Encounter** — CUT OVER: the fighting screen renders `DrawManifestScreen("encounter")` over the
+   battlefield backdrop; only the cleared/lost overlay stays legacy (not part of design/01). Combat
+   input reads manifest geometry by binds: card cells press/right-press, the foe hit-box + limb bands
+   ARE the foeFigure element, AUTO-ATTACK/FLEE/HELD chips click (labels authored in the shell — the
+   design chips were flattened by extraction, Needs-CD). Fielded minions draw as sprites in the
+   minionField element. Deleted: DrawFighter/AttributePool/Pips/Foe/Bays/Support/ActionBar + hot/
+   toggle buttons + hand rects (~10 helpers). LOST at cut-over (manifest lacks the element — Needs-CD/
+   design): per-card AIM TAG (F1:H read), banked/rallied SUPPORT pips (rally lane already in Debt).
+   Prior state (still true) — `design/01` run-state binds:
    (guarded by `InRun`; samples pre-march): hero figure = LIVE body (conditions/gear) + `Body.hp`;
    foe figure/HP from `encounter.foe` (down-tint); `pool` rows read the live body — reservations show
    (verified: STR 2/3 with a reserve held); `loadout.techniques`/`loadout.bays` cards with stat-token
