@@ -16,9 +16,12 @@ current dropped.)*
 FLAGGED FIXES (from live screenshots):
 - ~~Enter still passes the OLD build screen~~ DONE (2026-07-02): BEGIN now marches straight to the
   CityMap (`Redeploy` + Run screen) — no build gate; the fixed kit keeps the bar non-empty.
-- **Equipment must be the FULL screen, not the LOADOUT popover** — kill the popover; `e`/buttons open the
-  real Equipment screen; BACK/close returns to caller. Buttons on Encounter (DISABLED in combat) +
-  CampaignMap (CityMap has EQUIPMENT [E] already). [DESIGN_SPEC §12]
+- ~~Equipment must be the FULL screen, not the LOADOUT popover~~ MOSTLY DONE (2026-07-02): popover
+  DELETED; E / the EQUIPMENT button opens the real Equipment screen; Esc returns to the caller. In a
+  run the screen reads the LIVE state (run body/reservations, run bar, run minions) and card clicks
+  power/unpower on the campaign; pre-run they slot/unslot the build; rune Climb stays pre-run (mid-run
+  rune mutation is design-open). RESIDUAL: an Encounter button (disabled in combat) + a CampaignMap
+  button need manifest elements (Needs-CD); a drawn BACK affordance likewise (Esc carries it).
 - **AUTO-ATTACK button isn't wired** — believed ALREADY WIRED at the Encounter cut-over (slice 14:
   the combat.autoAttack element click toggles the one global AUTO, and its label reads
   "AUTO-ATTACK ON" when lit). If the screenshot predates that build, re-test; else report repro.

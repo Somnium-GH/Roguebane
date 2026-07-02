@@ -32,7 +32,7 @@ public class Game1 : Microsoft.Xna.Framework.Game
     private BuildSession _build = null!;
     private Campaign _campaign = null!;
     private bool _paused;
-    private bool _loadoutOpen; // between-fights Equipment view over the CityMap (read + re-slot techniques)
+    private Screen _equipReturnTo = Screen.Run; // where BACK leads from the (in-run) Equipment screen
     private string? _mfScreen;  // dev: RB_MF=<screenId> renders that screen straight from the manifest (RESCUE arc)
     private readonly CombatTargeting _ctrl = new(); // the targeting FSM (headless, in Core); shell just feeds it intents
     private KeyboardState _prevKeys;
@@ -132,7 +132,8 @@ public class Game1 : Microsoft.Xna.Framework.Game
             else if (_smokeScreen == "loadout") // between-fights Equipment overlay, open over the chart
             {
                 _campaign.Enter("a1"); Resolve(); _campaign.Redeploy(); // clear a node -> back at the chart (Choosing)
-                _loadoutOpen = true;
+                _screen = Screen.Equipment; // 2026-07-02: the FULL Equipment screen replaced the popover
+                _equipReturnTo = Screen.Run;
             }
         }
         else if (_smokeScreen == "equipment") _screen = Screen.Equipment; // else fall through to NewGame
@@ -223,44 +224,47 @@ public class Game1 : Microsoft.Xna.Framework.Game
         return s is null || e is null ? null : ManifestUi.Rect(s, e);
     }
 
-    // Equipment is a BETWEEN-FIGHTS loadout for the CURRENT core (design/02) — no core switching here;
-    // that choice lives on NewGame. Geometry comes from the manifest by binds, like NewGame.
+    // Equipment is the BETWEEN-FIGHTS loadout for the CURRENT core (design/02) — no core switching
+    // here; that choice lives on NewGame. Reached in-run (E / EQUIPMENT buttons); BACK/Esc returns to
+    // the caller (2026-07-02: this full screen replaced the loadout popover). Geometry by binds.
     private void UpdateEquipment(KeyboardState keys)
     {
+        if (Pressed(keys, Keys.Escape)) { _screen = _equipReturnTo; return; }
+
+        // Toggling routes to the RUN when marching (power/unpower on the live bar) and to the build
+        // session otherwise. Mid-run rune mutation stays design-open, so Climb is pre-run only.
+        void ToggleTech(Roguebane.Core.Technique t)
+        {
+            if (InRun) _campaign.Toggle(t);
+            else _build.Toggle(t);
+        }
+
         for (var i = 0; i < TechniqueKeys.Length && i < _build.Palette.Count; i++)
             if (Pressed(keys, TechniqueKeys[i]))
-                _build.Toggle(_build.Palette[i]);
+                ToggleTech(_build.Palette[i]);
 
         var tabs = ManifestListCells("equipment", "tabs", InvTabCount);
         for (var i = 0; i < tabs.Count; i++)
             if (Click(RectOf(tabs[i]))) _invTab = i;
 
-        // TECHNIQUES tab: click an inventory card to slot/unslot it; a slotted action-bar card unslots.
+        // TECHNIQUES tab: click an inventory card to slot/unslot (pre-run) or power/unpower (in-run).
         if (_invTab == 1)
         {
             var cards = ManifestListCells("equipment", "invItems", _build.Palette.Count);
             for (var i = 0; i < cards.Count; i++)
-                if (Click(RectOf(cards[i]))) _build.Toggle(_build.Palette[i]);
+                if (Click(RectOf(cards[i]))) ToggleTech(_build.Palette[i]);
         }
-        var slotted = ManifestListCells("equipment", "loadout", _build.Equipment.Count);
-        for (var i = 0; i < slotted.Count && i < _build.Equipment.Count; i++)
-            if (Click(RectOf(slotted[i]))) _build.Toggle(_build.Equipment[i]);
+        var slottedData = InRun ? Exp.Equipment : _build.Equipment;
+        var slotted = ManifestListCells("equipment", "loadout", slottedData.Count);
+        for (var i = 0; i < slotted.Count && i < slottedData.Count; i++)
+            if (Click(RectOf(slotted[i]))) ToggleTech(slottedData[i]);
 
-        // Rune Bag: click a group card to climb its ladder's next rung (spends budget; Core gates it).
-        var groups = ManifestListCells("equipment", "runeGroups", _build.Paths.Count);
-        for (var i = 0; i < groups.Count && i < _build.Paths.Count; i++)
-            if (Click(RectOf(groups[i]))) _build.Climb(_build.Paths[i]);
-
-        // March the campaign. The chassis ships a fixed kit so the bar is never empty — no gate.
-        // Alt+Enter is the fullscreen toggle, not a march. (The design's READY TO MARCH chip was
-        // flattened into the status strip by extraction — Needs-CD; Enter carries the march until then.)
-        var march = Pressed(keys, Keys.Enter) && !keys.IsKeyDown(Keys.LeftAlt);
-        if (march)
+        if (!InRun)
         {
-            _campaign = _build.Redeploy(Maps.StandardLegs(3));
-            // Techniques start INACTIVE: the bar is slotted but nothing is reserved/aimed/firing until
-            // the player clicks a card. (No auto-arm — that bug had the whole bar auto-targeting.)
-            _screen = Screen.Run;
+            // Rune Bag: climb a ladder's next rung (spends budget; Core gates it). Pre-run only.
+            var groups = ManifestListCells("equipment", "runeGroups", _build.Paths.Count);
+            for (var i = 0; i < groups.Count && i < _build.Paths.Count; i++)
+                if (Click(RectOf(groups[i]))) _build.Climb(_build.Paths[i]);
         }
     }
 
@@ -326,16 +330,14 @@ public class Game1 : Microsoft.Xna.Framework.Game
     // On the chart: number keys pick a charted jump; at a merchant, the shop verbs are live.
     private void UpdateChoosing(KeyboardState keys)
     {
-        // Between-fights Equipment view: opens over the map (E), re-slots techniques (click a card ->
-        // power/unpower via the existing Toggle), closes with Esc/BACK. While open it eats map input.
-        if (_loadoutOpen)
+        // 2026-07-02 directive: E / the EQUIPMENT button opens the REAL Equipment screen (the loadout
+        // popover is gone); BACK/Esc returns here.
+        if (Pressed(keys, Keys.E) || Click(EquipOpenRect))
         {
-            for (var i = 0; i < Exp.Equipment.Count; i++)
-                if (Click(LoadoutCardRect(i))) _campaign.Toggle(Exp.Equipment[i]);
-            if (Pressed(keys, Keys.Escape) || Click(LoadoutBackRect)) _loadoutOpen = false;
+            _equipReturnTo = Screen.Run;
+            _screen = Screen.Equipment;
             return;
         }
-        if (Pressed(keys, Keys.E) || Click(EquipOpenRect)) { _loadoutOpen = true; return; }
 
         if (Exp.AtMerchant)
         {
@@ -445,9 +447,6 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
     // Between-fights Equipment: open button (CityMap) + the overlay's technique cards & close button.
     private static readonly Rectangle EquipOpenRect = new(16, 190, 150, 30); // left column, clear of the merchant panel
-    private static readonly Rectangle LoadoutPanel = new(180, 70, 600, 400);
-    private static readonly Rectangle LoadoutBackRect = new(600, 430, 150, 30);
-    private static Rectangle LoadoutCardRect(int i) => new(430 + (i % 5) * 62, 240 + (i / 5) * 62, 56, 56);
 
     private void ToggleFullscreen()
     {
@@ -590,51 +589,10 @@ public class Game1 : Microsoft.Xna.Framework.Game
         DrawCastlePanel(740, 158);
         if (Exp.AtMerchant) DrawMerchant(560, 300);
         DrawGearBar(20, H - 44);
-        if (!_loadoutOpen)
-            DrawButton("EQUIPMENT [E]", EquipOpenRect.X, EquipOpenRect.Y,
-                EquipOpenRect.Width, EquipOpenRect.Height, true, Keys.E);
+        DrawButton("EQUIPMENT [E]", EquipOpenRect.X, EquipOpenRect.Y,
+            EquipOpenRect.Width, EquipOpenRect.Height, true, Keys.E);
 
         DrawStateOverlay();
-        if (_loadoutOpen) DrawLoadoutOverlay();
-    }
-
-    // Between-fights Equipment (design #4, flow-only slice): a read view of the RUN's loadout over the
-    // CityMap, with technique RE-SLOTTING via the existing Toggle (power/unpower on the bar). Mid-run
-    // gear/rune changes stay deferred (that's the design-open part); gear-equip already lives on the map.
-    private static readonly IReadOnlyDictionary<Stat, int> EmptyDemand =
-        new System.Collections.Generic.Dictionary<Stat, int>();
-
-    private void DrawLoadoutOverlay()
-    {
-        Rect(0, 0, W, H, new Color(0, 0, 0, 160)); // dim the chart behind
-        var p = LoadoutPanel;
-        Panel(p.X, p.Y, p.Width, p.Height);
-        Text(_assets.Display, "LOADOUT", p.X + 16, p.Y + 12, Ink);
-        Text(_assets.Mono, "between fights - click a technique to power / unpower it",
-            p.X + 16, p.Y + 44, Muted);
-
-        var body = Exp.Player.Body;
-        DrawHumanoid(body, Exp.FigureId, p.X + 116, p.Y + 250, 190);
-        Text(_assets.Mono, $"HP {Exp.Player.Hp}/{Exp.Player.MaxHp}", p.X + 16, p.Y + 72, Ink);
-        Text(_assets.Mono, $"GOLD {Exp.Gold}", p.X + 150, p.Y + 72, Amber);
-        DrawAttributeReadout(body, body, p.X + 16, p.Y + 100, EmptyDemand);
-
-        Text(_assets.Mono, "TECHNIQUES", 430, 218, Muted);
-        for (var i = 0; i < Exp.Equipment.Count; i++)
-        {
-            var t = Exp.Equipment[i];
-            var r = LoadoutCardRect(i);
-            var on = Exp.IsActive(t);
-            Panel(r.X, r.Y, r.Width, r.Height);
-            Sprite(_assets.Technique(t.Id), r.X + 6, r.Y + 6, r.Width - 12, r.Height - 12,
-                on ? Color.White : new Color(120, 110, 100));
-            Border(r.X, r.Y, r.Width, r.Height, on ? Amber : Hover(r) ? Ink : Border0);
-            Text(_assets.Mono, t.Reserve.ToString(), r.Right - 12, r.Bottom - 12, StatColor(t.Stat));
-        }
-        Text(_assets.Mono, "MINIONS  " + Exp.MinionCount, 430, p.Bottom - 58, Muted);
-
-        DrawButton("BACK [Esc]", LoadoutBackRect.X, LoadoutBackRect.Y,
-            LoadoutBackRect.Width, LoadoutBackRect.Height, true, Keys.Escape);
     }
 
     // design/03 right-side card: the run's destination. The castle is the structural boss the whole
@@ -876,38 +834,6 @@ public class Game1 : Microsoft.Xna.Framework.Game
         if (line.Length > 0) Text(_assets.Mono, line, x, ly, col);
     }
 
-
-    private void DrawAttributeReadout(Body cur, Body baseBody, int x, int y, IReadOnlyDictionary<Stat, int> demand)
-    {
-        static string Part(Stat s) => s switch
-        { Stat.Str => "arms", Stat.Int => "head", Stat.Dex => "legs", Stat.Con => "chest", _ => "" };
-
-        for (var i = 0; i < StatColors.Length; i++)
-        {
-            var (s, color) = StatColors[i];
-            var top = y + i * 34;
-            Sprite(_assets.Attr(s), x, top, 20, 20, Color.White);
-            Text(_assets.Mono, s.ToString().ToUpperInvariant(), x + 26, top, color);
-            Text(_assets.Mono, Part(s), x + 26, top + 11, Muted);
-
-            var b = baseBody.Capacity(s);
-            var c = cur.Capacity(s);
-            var marks = c - b;
-            var gate = demand.TryGetValue(s, out var g) ? g : 0;
-
-            const int bx0 = 64, bw = 116, bh = 14;
-            var bx = x + bx0;
-            var top2 = top + 2;
-            var maxPts = Math.Max(Math.Max(c, gate), 6);
-            float unit = (float)bw / maxPts;
-            Rect(bx, top2, bw, bh, new Color(0x24, 0x1b, 0x14));            // slot
-            Rect(bx, top2, (int)(b * unit), bh, color);                     // base
-            if (marks > 0) Rect(bx + (int)(b * unit), top2, (int)(marks * unit), bh, new Color(color, 150)); // +marks
-            if (gate > 0) Rect(bx + (int)(gate * unit) - 1, top2 - 2, 2, bh + 4, gate <= c ? Amber : Blood);  // gate
-            Text(_assets.Mono, c.ToString(), bx + bw + 8, top2, Ink);
-            if (marks > 0) Text(_assets.Mono, "+" + marks, bx + bw + 26, top2 + 2, Muted);
-        }
-    }
 
     // Lay a humanoid from its parts: head (INT), chest (CON), arms (STR ×2), legs (DEX ×2). Each
     // part's sprite is picked by condition; paired parts fan out to either side of the torso.
@@ -1544,8 +1470,9 @@ public class Game1 : Microsoft.Xna.Framework.Game
         "cores" => Roguebane.Core.Content.CoreRunes.Roster.Cast<object>().ToList(),
         "preview.attrs" => PreviewAttrs(),
         "attrs" => AttrBars(),
-        "loadout" => _build.Equipment.Cast<object>().ToList(),
-        "minions" => _build.CoreRune.MinionKit.Concat(_build.Runes.GrantedMinions).Cast<object>().ToList(),
+        "loadout" => (InRun ? Exp.Equipment : _build.Equipment).Cast<object>().ToList(),
+        "minions" => InRun ? Exp.Minions.Cast<object>().ToList()
+                           : _build.CoreRune.MinionKit.Concat(_build.Runes.GrantedMinions).Cast<object>().ToList(),
         // Inventory follows the tab strip: GEAR = the run's wielded/worn/packed pieces (empty pre-run
         // — gear only exists once marching), TECHNIQUES = the palette, MINIONS = the retinue.
         "invItems" => _invTab switch
