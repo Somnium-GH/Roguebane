@@ -1456,9 +1456,18 @@ public class Game1 : Microsoft.Xna.Framework.Game
                 DrawManifestList(e, r);
                 break;
             case "figure" when e.Binds is "preview.fig" or "Body":
-                // Composed loadout figure: feet at the box bottom-centre, scaled to the box height.
-                DrawHumanoid(_build.Preview(), _build.CoreRune.FigureKey(_build.Race),
-                    r.X + r.Width / 2, r.Y + r.Height, r.Height);
+                // Composed figure: feet at the box bottom-centre, scaled to the box height. In a run
+                // the LIVE body draws (part conditions, worn gear); pre-run the build preview does.
+                if (InRun)
+                    DrawHumanoid(Exp.Player.Body, Exp.FigureId, r.X + r.Width / 2, r.Y + r.Height, r.Height);
+                else
+                    DrawHumanoid(_build.Preview(), _build.CoreRune.FigureKey(_build.Race),
+                        r.X + r.Width / 2, r.Y + r.Height, r.Height);
+                break;
+            case "figure" when e.Binds == "encounter.foe" && InRun && Exp.Enemy is { } ef:
+                if (ef.Frame is { } frame)
+                    DrawHumanoid(frame, ef.Figure, r.X + r.Width / 2, r.Y + r.Height, r.Height,
+                        ef.Down ? new Color(70, 60, 55) : Color.White, allowBare: false);
                 break;
         }
     }
@@ -1476,8 +1485,13 @@ public class Game1 : Microsoft.Xna.Framework.Game
         "preview.apexDesc" => _build.CoreRune.ApexDesc,
         "core" => _build.Race.Name + " " + _build.CoreRune.Title,
         "runes.budget" => _build.Runes.Available + " free / " + _build.Runes.Budget,
+        "Body.hp" => InRun ? Exp.Player.Hp + " / " + Exp.Player.MaxHp : null,
+        "encounter.foe.hp" => InRun && Exp.Enemy is { } foe ? foe.Hp + " / " + foe.MaxHp : null,
         _ => null,
     };
+
+    // Run state exists only after a march; encounter binds fall back to samples until then.
+    private bool InRun => _campaign is not null;
 
     // A list container: stamp its item template into each cell (ListLayout), filling each part from the
     // i-th LIVE datum's `binds` (falling back to the manifest `sample` where a bind isn't mapped yet).
@@ -1526,6 +1540,11 @@ public class Game1 : Microsoft.Xna.Framework.Game
                         fillTok = p < ab.Item3 ? ab.Item5 : p < ab.Item4 ? "slot" : null;
                         skipFill = fillTok is null;
                     }
+                    // Glyph tiles colour by the datum's stat (technique/minion cards).
+                    else if (pp.Binds is "technique.icon" or "loadout.glyph" && datum is Roguebane.Core.Technique tq)
+                        fillTok = tq.Stat.ToString().ToLowerInvariant();
+                    else if (pp.Binds is "technique.icon" or "loadout.glyph" && datum is Roguebane.Core.Minion mnq)
+                        fillTok = mnq.Stat.ToString().ToLowerInvariant();
                     if (fillTok is not null) DrawFill(RectOf(pp.Rect), new Fill { Token = fillTok });
                     else if (!skipFill && pp.Fill is { } pf) DrawFill(RectOf(pp.Rect), pf);
                     if (pp.Border is { } pb)
@@ -1582,14 +1601,21 @@ public class Game1 : Microsoft.Xna.Framework.Game
             2 => _build.CoreRune.MinionKit.Concat(_build.Runes.GrantedMinions).Cast<object>().ToList(),
             _ => null,
         },
+        // Encounter (design/01): the combat pool + action bar read the RUN body once marching.
+        "pool" => AttrBars(),
+        "loadout.techniques" => InRun ? Exp.Equipment.Cast<object>().ToList()
+                                      : _build.Equipment.Cast<object>().ToList(),
+        "loadout.bays" => InRun ? Exp.Minions.Cast<object>().ToList()
+                                : _build.CoreRune.MinionKit.Cast<object>().ToList(),
         _ => null,
     };
 
-    // The Equipment attribute bars: one datum per stat — (key, part label §6, free pool, capacity,
-    // pip colour token). Pre-run nothing is reserved, so free == capacity until actives wire in.
+    // The attribute bars/pool rows: one datum per stat — (key, part label §6, free pool, capacity,
+    // pip colour token). In a run the LIVE body supplies them (actives reserve, damage shrinks caps);
+    // pre-run it's the build preview, where nothing is reserved so free == capacity.
     private System.Collections.Generic.IReadOnlyList<object> AttrBars()
     {
-        var b = _build.Preview();
+        var b = InRun ? Exp.Player.Body : _build.Preview();
         return new object[]
         {
             ("STR", "Arms", b.Available(Stat.Str), b.Capacity(Stat.Str), "str"),
@@ -1644,25 +1670,25 @@ public class Game1 : Microsoft.Xna.Framework.Game
         },
         ValueTuple<string, string, int, int, string> ab => bind switch // (key, part, free, cap, token) attr bar
         {
-            "attrs.key" => ab.Item1,
-            "attrs.part" => ab.Item2,
-            "attrs.alloc" => ab.Item3.ToString(),
-            "attrs.available" => ab.Item4.ToString(),
+            "attrs.key" or "pool.attr.key" => ab.Item1,
+            "attrs.part" or "pool.attr.part" => ab.Item2,
+            "attrs.alloc" or "pool.attr.alloc" => ab.Item3.ToString(),
+            "attrs.available" or "pool.attr.available" => ab.Item4.ToString(),
             _ => null,
         },
         Roguebane.Core.Technique t => bind switch
         {
-            "loadout.name" or "invItems.name" => DisplayName(t.Id),
+            "loadout.name" or "invItems.name" or "technique.name" => DisplayName(t.Id),
             "loadout.attr" => t.Stat.ToString().ToUpperInvariant() + " " + t.Reserve,
-            "invItems.badgeLabel" => t.Stat.ToString().ToUpperInvariant(),
+            "invItems.badgeLabel" or "technique.cost" => t.Stat.ToString().ToUpperInvariant(),
             "invItems.badgeNum" => t.Reserve.ToString(),
             _ => null,
         },
         Roguebane.Core.Minion mn => bind switch
         {
-            "loadout.name" or "invItems.name" => DisplayName(mn.Id),
+            "loadout.name" or "invItems.name" or "bay.name" => DisplayName(mn.Id),
             "loadout.attr" => mn.Stat.ToString().ToUpperInvariant() + " " + mn.Reserve,
-            "invItems.badgeLabel" => mn.Stat.ToString().ToUpperInvariant(),
+            "invItems.badgeLabel" or "bay.cost" => mn.Stat.ToString().ToUpperInvariant(),
             "invItems.badgeNum" => mn.Reserve.ToString(),
             _ => null,
         },

@@ -62,7 +62,16 @@ SLICES (one screen/pass, pixel-verify vs its design PNG):
    Live binds: paperDoll figure, attr bars (§6 part labels, free/cap, positional pips), loadout/minion
    cards, core identity, rune budget. Sample-only: GEAR cards + rune-bag groups (models design-open,
    Debt). Not design-done: chrome/label gaps in Needs-CD.
-3. **Encounter** — `design/01` (single foe, attribute pool, action bar); single-frame panels.
+3. **Encounter** (in progress) — `design/01`. THIS PASS the renderer resolves its RUN-state binds
+   (guarded by `InRun`; samples pre-march): hero figure = LIVE body (conditions/gear) + `Body.hp`;
+   foe figure/HP from `encounter.foe` (down-tint); `pool` rows read the live body — reservations show
+   (verified: STR 2/3 with a reserve held); `loadout.techniques`/`loadout.bays` cards with stat-token
+   glyph tiles + costs. Verified RB_MF=encounter over a live castle fight.
+   REMAINING for cut-over: combat input on manifest geometry (card press/aim, foe part bands, auto/
+   flee), state labels (technique.state/chargePct/cooldownLabel — FSM read), minionField multi-figure.
+   Gaps: technique/minion DESCRIPTIONS have no data (display-data pass, like ApexDesc); AUTO-ATTACK/
+   FLEE/HELD chip labels + foe/hero HP-label text flattened by extraction (Needs-CD); techCard cost
+   NUMBER is a bindless sample part (Needs-CD).
 4. **CityMap** — `design/03` (node graph, supplies, war-party RIGHT→LEFT, Equipment button).
 5. **CampaignMap** — BUILD it (not implemented) from `design/04`.
 FLOW: Equipment reachable BETWEEN fights — from the post-combat Cleared/Redeploy state + CityMap +
