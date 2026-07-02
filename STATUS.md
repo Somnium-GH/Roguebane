@@ -12,6 +12,39 @@ revisions (`git show <rev>:STATUS.md`) — recoverable, so not duplicated here. 
 `design/DESIGN_SPEC.md`. This file = CURRENT state only. (Whittled 2026-07-01 from ~900 lines; nothing
 current dropped.)*
 
+## ⇒ HUMAN DIRECTIVES — 2026-07-02 (revisions WIN; fold into the render arc / after the current slice)
+FLAGGED FIXES (from live screenshots):
+- ~~Enter still passes the OLD build screen~~ DONE (2026-07-02): BEGIN now marches straight to the
+  CityMap (`Redeploy` + Run screen) — no build gate; the fixed kit keeps the bar non-empty.
+- **Equipment must be the FULL screen, not the LOADOUT popover** — kill the popover; `e`/buttons open the
+  real Equipment screen; BACK/close returns to caller. Buttons on Encounter (DISABLED in combat) +
+  CampaignMap (CityMap has EQUIPMENT [E] already). [DESIGN_SPEC §12]
+- **AUTO-ATTACK button isn't wired** — believed ALREADY WIRED at the Encounter cut-over (slice 14:
+  the combat.autoAttack element click toggles the one global AUTO, and its label reads
+  "AUTO-ATTACK ON" when lit). If the screenshot predates that build, re-test; else report repro.
+- **Resource-count readout top-right** on every IN-RUN screen (not pre-run): supplies / gold / charge / summons.
+- **War-party indicator:** castle icon RIGHT, camp icon LEFT; the bar "loads" LEFT→RIGHT (reconcile the
+  fill direction with §12 castle-right→camp-left advance).
+- **Targeting reticles don't sit on the foe's body parts** — fix reticle placement on the limb bands;
+  needs matching reticle assets + (Needs-CD) demonstrative "how-it-mounts" design screens.
+
+RENAME **apex → Core Effect** everywhere it means a core rune's signature effect: code (`ApexName/ApexDesc`
+→ `CoreEffectName/CoreEffectDesc`), manifest `apex*` binds/labels, docs. (Leave the keystone "apex-tier"
+usage.) [DESIGN_SPEC §17 #14]
+
+MINION RESOURCE = **Summons** [LOCKED §9/§14]: a minion costs a RESERVED gate stat AND spends Summons to
+SUMMON; idle/reactivate is FREE; re-summoning a KILLED minion re-costs. (Builds with the minion system —
+not the current arc; noted for when minions are wired.)
+
+MERCHANT: mechanics SPEC'd (§12) — Supplies/Charge/Summons + 1HP/full-heal + weighted 5-category gear
+shop. Build the MECHANICS per spec; the SCREEN LAYOUT waits on a CD design PNG (popover = flagged stopgap).
+
+**AFTER HiFi completes/blocks + all outstanding identified bugs resolved:**
+- **Summoner CoreRune — real Core Effect:** on Redeploy, refund Summons for SURVIVING minions (§11). The
+  first real Core Effect; build it.
+- **CONTINGENCY (only if HiFi work is exhausted):** refactor the uber `Game1.cs` — split by responsibility
+  (SRP), codify SOLID where it sensibly applies. The giant class/file is the target.
+
 ## ⇒ HOW TO WORK THIS ARC — read EVERY pass (pixel-perfect · no drift · no premature "done")
 ONE screen per pass. The goal is: every screen renders 100% from `layout.json` and matches its
 `design/NN-*.png` **pixel-close**.

@@ -192,7 +192,14 @@ public class Game1 : Microsoft.Xna.Framework.Game
 
         var go = (Pressed(keys, Keys.Enter) && !keys.IsKeyDown(Keys.LeftAlt))
             || (ManifestElementRect("newgame", "begin") is { } b && Click(b));
-        if (go) _screen = Screen.Equipment; // on to the equipment screen for the chosen core
+        if (go)
+        {
+            // 2026-07-02 directive: BEGIN marches straight to the CityMap — no build-screen gate.
+            // The chassis ships a fixed kit, so the bar is never empty; Equipment is reachable
+            // BETWEEN fights to edit the loadout.
+            _campaign = _build.Redeploy(Maps.StandardLegs(3));
+            _screen = Screen.Run;
+        }
     }
 
     // Input geometry from the manifest, located by BINDS (the data contract) — never by CD's element

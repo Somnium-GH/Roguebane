@@ -284,9 +284,23 @@ Nested layers, macro → micro:
   cost is the whole tradeoff; backtracking is allowed but never free. Half-blind fog (resource-holds +
   castle visible afar, merchant resolves 1 deployment out, else hidden until adjacent). **Retreat** bails an
   active fight (§8; flow below).
-- **Layer 3 — node types:** skirmish (combat); resource-hold (win to **bank support**); merchant
-  (out-of-combat **HP healing** — gold → HP at 1 HP per randomized cost, §10; **no potion sales** —
-  potions are techniques); unknown (fogged); the castle (exit).
+- **Layer 3 — node types:** skirmish (combat); resource-hold (win to **bank support**); merchant (shop,
+  spec below); unknown (fogged); the castle (exit).
+- **MERCHANT (out-of-combat shop) [LOCKED spec 2026-07-02]:** each visit stocks RANDOM but SCARCE:
+  - **Resources** (small quantities): **Supplies, Charge, Summons**.
+  - **Healing** (tier-reasonable random price, expensive for a full repair, §10): a **1-HP** buy + a
+    **FULL-heal** buy.
+  - **Gear across 5 categories** — Armor / Weapons / Techniques / Minions / Runes — tier-appropriate (with
+    occasional outliers), rarity-weighted:
+    * **Always 3** random tier-appropriate picks from {Armor, Weapons, Minions, Runes}; up to 4 of the 5
+      sections appear per visit — most visits are just Armor/Weapons/Minions (a 2–3-stock rotation).
+    * **Techniques: always 5 when present**, but techniques are the 2nd-rarest to appear.
+    * **Runes: EXTREMELY rare; good runes EXCEEDINGLY rare; Keystones NEVER (drop-only).**
+  - **[OPEN §17]** the weighted-shuffle / distribution algorithm (balanced attr-lean variety; e.g. "prefer
+    1–2 passives, rarely 0, when techniques show") — a separate tuning pass.
+  - **[NOTE]** placeholder rune behavior: POC currently just seeds runes into inventory at run start.
+  - The merchant SCREEN LAYOUT is a Claude Design item (design PNG → manifest); today's popover is a
+    flagged stopgap (§17).
 - **Layer 4 — encounter resolution:** every node is the one combat grammar (§8); the **castle is that
   grammar at max scale** (gate/wall/catapult/ballista + boss-tier, map-scaled damage; its "systems"
   are its parts).
