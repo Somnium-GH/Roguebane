@@ -60,4 +60,30 @@ public class ShieldPoolTests
         pool.Refill();
         Assert.Equal(3, pool.Points);
     }
+
+    [Fact]
+    public void RegenProgressClimbsToTheNextPipAndRestsAtFull()
+    {
+        // The shield bar's per-pip regen readout: 0 at full, fractional between pips, and it lands
+        // back at 0 the tick the pip fills (progress measures the NEXT layer, not history).
+        var pool = new ShieldPool(2, regenEvery: 4);
+        Assert.Equal(0f, pool.RegenProgress); // full -> nothing regenerating
+        pool.Absorb(1);
+        pool.Tick();
+        pool.Tick();
+        Assert.Equal(0.5f, pool.RegenProgress, 3);
+        pool.Tick();
+        pool.Tick(); // 4th tick lands the pip
+        Assert.Equal(2, pool.Points);
+        Assert.Equal(0f, pool.RegenProgress);
+    }
+
+    [Fact]
+    public void NeverRegeneratingPoolsReportZeroProgress()
+    {
+        var pool = new ShieldPool(2, regenEvery: 0);
+        pool.Absorb(2);
+        pool.Tick();
+        Assert.Equal(0f, pool.RegenProgress);
+    }
 }

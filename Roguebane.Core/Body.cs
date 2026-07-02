@@ -137,6 +137,13 @@ public sealed class Body
 
     public int ShieldPoints => _shields.Values.Sum(p => p.Points);
 
+    public int ShieldLayers => _shields.Values.Sum(p => p.Layers);
+
+    // The furthest-along regen among still-filling pools — what the single regen bar under the pips
+    // shows (multiple sources regen independently; the bar reads the next pip to land).
+    public float ShieldRegenProgress
+        => _shields.Values.Select(p => p.RegenProgress).DefaultIfEmpty(0f).Max();
+
     // Absorb incoming damage across the standing shield layers; returns the unabsorbed remainder.
     public int AbsorbShields(int damage)
     {

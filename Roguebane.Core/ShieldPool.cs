@@ -23,6 +23,11 @@ public sealed class ShieldPool
     public int Points => _points;
     public int Layers => _max;
 
+    // Progress toward the NEXT regenerated layer, 0..1 (0 when full or the source never regens) —
+    // the shield bar's per-pip regen readout.
+    public float RegenProgress => _regenEvery <= 0 || _points >= _max
+        ? 0f : (float)(_tick % _regenEvery) / _regenEvery;
+
     // Absorb incoming damage: each standing point eats 1, and is consumed. Returns the UNABSORBED
     // remainder to spill onto armor / the part / HP (the shield is the outermost mitigation layer).
     public int Absorb(int damage)

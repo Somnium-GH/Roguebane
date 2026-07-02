@@ -53,6 +53,15 @@ public partial class Game1
         switch (e.Type)
         {
             case "text":
+                // §6b regen readout: the element's fill/border drew the track above; the live progress
+                // toward the NEXT pip fills it in the pips' live token. No text — the bar IS the datum.
+                if (e.Binds == "ShieldPool.regen")
+                {
+                    if (InRun && Exp.Player.Body.ShieldRegenProgress is > 0f and var prog)
+                        DrawFill(new Rectangle(r.X, r.Y, (int)(r.Width * prog), r.Height),
+                            new Fill { Token = "mintActive" });
+                    break;
+                }
                 var txt = e.Content ?? ResolveScreenBind(e.Binds);
                 DrawStateSkin(e, r, enabled: !string.IsNullOrEmpty(txt));
                 if (!string.IsNullOrEmpty(txt))
@@ -254,6 +263,9 @@ public partial class Game1
         // Combat verbs (design/01 chips; labels were flattened by extraction -> authored here).
         "combat.autoAttack" => InRun ? (Exp.IsAuto() ? "AUTO-ATTACK ON" : "AUTO-ATTACK") : null,
         "combat.retreat" => InRun ? "RETREAT" : null,
+        // §6b shield bar header: standing points / total layers across the body's shield sources.
+        "ShieldPool" => InRun && Exp.Player.Body.ShieldLayers > 0
+            ? "SHIELD " + Exp.Player.Body.ShieldPoints + "/" + Exp.Player.Body.ShieldLayers : null,
         "combat.paused" => _paused ? "HELD" : null, // badge shows only while the fight is held
         "campaign.taken" => InRun ? _campaign.LegIndex + " / " + _campaign.LegCount : null,
         _ => null,
@@ -283,6 +295,7 @@ public partial class Game1
         {
             var datum = data is not null && i < data.Count ? data[i] : null;
             var cell = cells[i];
+            if (tmpl.Parts.Length == 0) { DrawLeafTemplate(tmpl, cell, datum); continue; }
             // Positional binds repeat the SAME bind N times per card (attr tiles 4x, attr-bar pips 12x,
             // in template order); count each occurrence per card to pick the right datum slice.
             int valIx = 0, keyIx = 0, pipIx = 0;
@@ -431,6 +444,11 @@ public partial class Game1
                                       : _build.Equipment.Cast<object>().ToList(),
         "loadout.bays" => InRun ? Exp.Minions.Cast<object>().ToList()
                                 : _build.CoreRune.MinionKit.Cast<object>().ToList(),
+        // Shield bar (§6b): one bool per pip, filled first. No standing sources -> no pips at all.
+        "ShieldPool.points" => InRun
+            ? Enumerable.Range(0, Exp.Player.Body.ShieldLayers)
+                .Select(i => (object)(i < Exp.Player.Body.ShieldPoints)).ToList()
+            : new List<object>(),
         _ => null,
     };
 
@@ -460,6 +478,28 @@ public partial class Game1
             ("DEX", b.Capacity(Stat.Dex).ToString(), "dex"),
             ("CON", b.Capacity(Stat.Con).ToString(), "con"),
         };
+    }
+
+    // A self-styled LEAF template (no parts): the cell itself is the visual — its fill/border restyled
+    // by the template's `states` block keyed from the bound datum (shield pips: live/spent). Dashed
+    // border styles draw solid for now (a 8x5 design-px pip; dash polish rides the pixel-compare pass).
+    private void DrawLeafTemplate(Template t, LayoutRect cell, object? datum)
+    {
+        var fillTok = t.Fill?.Token;
+        var borderTok = t.Border?.Color;
+        var key = t.Binds == "point.live" && datum is bool live ? (live ? "live" : "spent") : null;
+        if (key is not null && t.States.ValueKind == System.Text.Json.JsonValueKind.Object
+            && t.States.TryGetProperty(key, out var st)
+            && st.ValueKind == System.Text.Json.JsonValueKind.Object)
+        {
+            if (st.TryGetProperty("fill", out var f)) fillTok = f.GetString();
+            if (st.TryGetProperty("border", out var b)) borderTok = b.GetString();
+        }
+        var r = new Rectangle(cell.X, cell.Y, cell.W, cell.H);
+        if (fillTok is { Length: > 0 }) DrawFill(r, new Fill { Token = fillTok });
+        if (borderTok is { Length: > 0 })
+            Border(r.X, r.Y, r.Width, r.Height, _ui.Color(borderTok, Border0),
+                Math.Max(2, (t.Border?.W ?? 1) * SS), t.Border?.Sides);
     }
 
     // states (CD drop 2026-07-02): a button-family element draws its interaction skin under its label.
