@@ -44,6 +44,13 @@ equipment painted on. Mount at runtime = align `gear.pivot` to `figure.sockets.h
   horns, robe sleeves — STAY part of their body part (bake them into head/torso/arm as today).
 - The FLATTENED thumbnail figure may keep its signature gear baked in (it's a static portrait for the
   build / New Run cards). Only the modular combat parts must be gear-free.
+- **MULTI-SLOT + MORPH [direction; mechanics OPEN — DESIGN_SPEC §7/§17]:** a gear piece may cover MULTIPLE
+  part slots (a robe = all/most slots), and equipping gear CHANGES which parts render (robe parts ↔ plate
+  parts). Figures compose **human base → race morph → core-rune morph → equipped-gear parts** — author
+  MORPH layers, NOT a pre-rendered set per race×core×gear (that explodes).
+- **PRINCIPLE — design to the IDEAL, the engine catches up:** author assets/manifest toward the TARGET
+  (e.g. tiled 9-slice edges + painted centers) and EXTEND the engine to render them; never down-scope the
+  art to a current engine limitation. The design/manifest is the source of truth (§4).
 
 ## 3. Screens — responsive UI manifest (fills any aspect)
 For each screen, emit `screens.<id>`:

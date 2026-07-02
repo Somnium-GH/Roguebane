@@ -140,8 +140,13 @@ Three layers over the shared attribute pool:
    retires.)*
 2. **Equipment (installed things).** Weapons (in hands), armor (per-group slots), minion-bay contents,
    shield sources, runes — configured **between fights** on the **Equipment screen**, sealed in combat.
-   Each Core rune ships a **FIXED default Equipment set** (grown by finds; no build-time "pick a
-   technique" gate). *(Was called "Loadout"; renamed to Equipment to match its screen.)*
+   A Core rune only ships a **STARTING** Equipment set — it does NOT lock equipment; gear is swappable
+   (grown by finds; no build-time "pick a technique" gate). A piece may be **single-slot OR MULTI-SLOT**:
+   a robe covers ALL/most body-part slots at once; plate is per-part; etc. The figure RENDERS its
+   equipment — swapping gear changes which PARTS draw (robe parts ↔ plate parts), so figures compose as
+   **human base → race morph → core-rune morph → equipped-gear parts** (a MORPH model, NOT a pre-rendered
+   set per race×core×gear — that would explode the art). Exact morph + multi-slot mechanics = OPEN (§17).
+   *(Was called "Loadout"; renamed to Equipment to match its screen.)*
 3. **Action bar (verbs).** **Techniques** — live actions; each **consults equipped gear and reserves
    attributes**; **timered** (charge→fire) or **passive/sustained** (holds its reservation).
 
@@ -377,6 +382,10 @@ points there so the canon stays design-focused.
     Redeploy/Retreat (§12) — both deferred; flow ships first.
 14. The term **"apex effect"** (a core rune's signature effect) is PLACEHOLDER, not Doug's word — he'll
     rename it later; don't treat it as final.
+15. Figure MORPH model + MULTI-SLOT equipment (§7): figures = human base + race morph + core-rune morph +
+    equipped-gear parts (a morph model, not per-race×core×gear art); a piece may cover multiple part slots
+    (robe = all/most). Exact morph mechanics + the multi-slot slot model — design BEFORE building the
+    gear-swap system (today gear is starting-set only; GEAR cards are sample/design-open).
 
 ## 18. DROPPED — must not resurface
 - **"Chassis" as the identity model** → split into **Race + Core rune** (§7).

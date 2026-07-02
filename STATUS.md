@@ -65,7 +65,8 @@ SLICES (one screen/pass, pixel-verify vs its design PNG):
    `Mark.Name` display titles (Vessel Seal I/II, Hollow Vessel, ...), a data-derived effect line
    (sockets/grants — can't drift), live EQUIPPED/EQUIPPABLE/LOCKED state + discounted cost; clicking a
    group card Climbs the ladder (budget-gated in Core). Group header label + row icon/stack are
-   bindless in the template (Needs-CD). Sample-only: GEAR cards (model design-open, Debt).
+   bindless in the template (Needs-CD). GEAR tab now lists the RUN's gear (wielded + packed weapons,
+   armor; EMPTY pre-run — gear only exists once marching); rarity chip stays gated (no rarity model).
    Not design-done: chrome/label gaps in Needs-CD.
 3. **Encounter** — CUT OVER: the fighting screen renders `DrawManifestScreen("encounter")` over the
    battlefield backdrop; only the cleared/lost overlay stays legacy (not part of design/01). Combat
@@ -113,7 +114,10 @@ CampaignMap — editing the CURRENT loadout (core fixed).
 
 ## Debt (active — with reconcile trigger)
 - Equipment: no inventory tabs (GEAR/TECH/MINIONS) + drag-to-equip + equipped-gear-on-anatomy + real
-  rune-bag cards yet — blocked on gear/minion equip + mid-run gear/rune mutation (design-open).
+  rune-bag cards yet — blocked on gear/minion equip + mid-run gear/rune mutation (design-open). MODEL now
+  refined (DESIGN_SPEC §7): a Core rune gives STARTING gear (does NOT lock it), gear is swappable;
+  MULTI-SLOT pieces (robe = all slots); figures MORPH (human base + race + core + equipped-gear parts) —
+  author morph layers, not per-combo art. Exact morph/slot mechanics OPEN (§17); feeds this when built.
 - Bow.png not mounted on the figure; `shot` technique needs an icon (Game TODO).
 - The FLAT thumbnail dir `sprites/char/chassis/*` + its `Content.mgcb` entries still use the old name.
   (The `layout.json` FIGURE keys are ALREADY `human_`/`elf_`, and CD has ALREADY renamed the screen ids
@@ -157,8 +161,9 @@ CampaignMap — editing the CURRENT loadout (core fixed).
   that hardcodes it).
 - HI-FI CHROME pass on all 5 screens + backgrounds at 1080 (SENT + in progress at CD). NEXT levers
   (tiled 9-slice EDGES + painted CENTERS) SMEAR under the engine's current STRETCH blit — needs a
-  **TILE/repeat mode added to the nine-slice blit (engine/Fable task)** before CD paints them. [DECISION
-  pending Doug — see chat; if yes, it's the next chrome step and a bounded renderer change.]
+  **TILE/repeat mode added to the nine-slice blit (engine/Fable task)**. APPROVED: CD paints the full-
+  fidelity tiled edges + painted centers NOW; the engine adds tile mode to CATCH UP (principle: design to
+  the IDEAL, engine catches up — LAYOUT_CONTRACT §2). A bounded renderer change, part of the chrome arc.
 - Manifest-extraction gaps (design shows it, layout.json can't express it — renderer must NOT invent):
   card/tile BACKGROUND+border parts (race/core cards, attr+budget tiles render chrome-less); tile
   VALUE+LABEL flattened to one text element (BASE HP / RUNE BUDGET / ACTIONS / MINION BAYS labels lost);

@@ -1522,10 +1522,14 @@ public class Game1 : Microsoft.Xna.Framework.Game
         "attrs" => AttrBars(),
         "loadout" => _build.Equipment.Cast<object>().ToList(),
         "minions" => _build.CoreRune.MinionKit.Concat(_build.Runes.GrantedMinions).Cast<object>().ToList(),
-        // Inventory follows the tab strip: TECHNIQUES = the palette, MINIONS = the retinue; GEAR has
-        // no pre-run model yet (design-open, see Debt) so it falls back to the manifest samples.
+        // Inventory follows the tab strip: GEAR = the run's wielded/worn/packed pieces (empty pre-run
+        // — gear only exists once marching), TECHNIQUES = the palette, MINIONS = the retinue.
         "invItems" => _invTab switch
         {
+            0 => InRun
+                ? Exp.Player.Body.Hands.Cast<object>()
+                    .Concat(Exp.Stash.Weapons).Concat(Exp.Stash.Armor).ToList()
+                : new List<object>(),
             1 => _build.Palette.Cast<object>().ToList(),
             2 => _build.CoreRune.MinionKit.Concat(_build.Runes.GrantedMinions).Cast<object>().ToList(),
             _ => null,
@@ -1615,6 +1619,20 @@ public class Game1 : Microsoft.Xna.Framework.Game
             "invItems.badgeLabel" or "technique.cost" => t.Stat.ToString().ToUpperInvariant(),
             "invItems.badgeNum" => t.Reserve.ToString(),
             "technique.description" => t.DescText,
+            _ => null,
+        },
+        Roguebane.Core.Weapon w => bind switch
+        {
+            "invItems.name" => DisplayName(w.Id),
+            "invItems.badgeLabel" => w.Stat.ToString().ToUpperInvariant(),
+            "invItems.badgeNum" => w.Reserve.ToString(),
+            _ => null,
+        },
+        Roguebane.Core.Armor ar => bind switch
+        {
+            "invItems.name" => DisplayName(ar.Id),
+            "invItems.badgeLabel" => ar.Group.ToString().ToUpperInvariant(),
+            "invItems.badgeNum" => ar.Value.ToString(),
             _ => null,
         },
         Roguebane.Core.Minion mn => bind switch
