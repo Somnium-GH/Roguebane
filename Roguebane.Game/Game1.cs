@@ -1599,30 +1599,68 @@ public class Game1 : Microsoft.Xna.Framework.Game
         }
     }
 
-    // A list container: stamp its item template into each cell (ListLayout). Parts are drawn from their
-    // SAMPLE for now (proves the template path); live per-datum `binds` are wired in the next slice.
+    // A list container: stamp its item template into each cell (ListLayout), filling each part from the
+    // i-th LIVE datum's `binds` (falling back to the manifest `sample` where a bind isn't mapped yet).
     private void DrawManifestList(Element e, Rectangle r)
     {
         var m = _ui.Manifest;
         if (m is null || e.Item is null || !m.Templates.TryGetValue(e.Item.Template, out var tmpl)) return;
+        var data = ListData(e.Binds);
+        var count = data?.Count ?? ListCountFor(e.Binds);
         var region = new LayoutRect(r.X, r.Y, r.Width, r.Height);
-        foreach (var cell in ListLayout.Cells(region, e.Item, ListCountFor(e.Binds), tmpl.Size))
+        var cells = ListLayout.Cells(region, e.Item, count, tmpl.Size);
+        for (var i = 0; i < cells.Count; i++)
+        {
+            var datum = data is not null && i < data.Count ? data[i] : null;
+            var cell = cells[i];
             foreach (var pp in CardTemplate.Place(tmpl, cell.X, cell.Y))
             {
-                if (!string.IsNullOrEmpty(pp.Image))
-                    Sprite(_assets.Texture(pp.Image!), pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H, Color.White);
-                else if (!string.IsNullOrEmpty(pp.Sample))
-                    Text(pp.Font == "display" ? _assets.Display : _assets.Mono,
-                        pp.Sample!, pp.Rect.X, pp.Rect.Y, _ui.Color(pp.Color ?? "ink", Ink));
+                var img = pp.Image;
+                if (!string.IsNullOrEmpty(img))
+                    Sprite(_assets.Texture(img!), pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H, Color.White);
+                else
+                {
+                    var text = (datum is not null ? ResolveBind(datum, pp.Binds) : null) ?? pp.Sample;
+                    if (!string.IsNullOrEmpty(text))
+                        Text(pp.Font == "display" ? _assets.Display : _assets.Mono,
+                            text!, pp.Rect.X, pp.Rect.Y, _ui.Color(pp.Color ?? "ink", Ink));
+                }
             }
+        }
     }
 
-    // How many items a bound list stamps: known live rosters resolve to their real count; others fall back
-    // to a small sample count so the layout still renders.
+    // The live data a bound list stamps one card per, or null for an unmapped bind (falls back to samples).
+    private static System.Collections.Generic.IReadOnlyList<object>? ListData(string? bind) => bind switch
+    {
+        "races" => Roguebane.Core.Content.Races.Roster.Cast<object>().ToList(),
+        "cores" => Roguebane.Core.Content.CoreRunes.Roster.Cast<object>().ToList(),
+        _ => null,
+    };
+
+    // Resolve a template part's `binds` against a live datum -> display text, or null to use the sample.
+    // Missing-data binds (race tag/blurb, per-attr tiles, apex text) return null pending their data.
+    private static string? ResolveBind(object datum, string? bind) => datum switch
+    {
+        Roguebane.Core.Race r => bind switch
+        {
+            "race.name" => r.Name,
+            "race.hp" => r.Hp.ToString(),
+            _ => null,
+        },
+        Roguebane.Core.CoreRune c => bind switch
+        {
+            "core.name" => c.Title,
+            "core.role" => c.Archetype,
+            "core.budget" => c.RuneBudget.ToString(),
+            "core.bays" => c.Bays.ToString(),
+            "core.actionSlots" => c.Kit.Count.ToString(),
+            _ => null,
+        },
+        _ => null,
+    };
+
     private static int ListCountFor(string? bind) => bind switch
     {
-        "races" => Roguebane.Core.Content.Races.Roster.Count,
-        "cores" => Roguebane.Core.Content.CoreRunes.Roster.Count,
         "preview.attrs" => 4,
         _ => 3,
     };

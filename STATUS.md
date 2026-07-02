@@ -58,10 +58,17 @@ FIDELITY DRAW (shadow/frame/gradient, §10) feeds all of the above — same crit
   (`ListLayout.Cells` + `CardTemplate.Place`), drawing each part's text/image. Added GRID flow to ListLayout
   (wraps left→right then top→bottom, fits the region width; Core-tested GridWrapsLeftToRightThenTopToBottom).
   Verified RB_MF=newgame: race cards (2, vertical) + core cards (6, grid) lay out per template. STILL sample
-  content — parts draw their `sample` text (the raceCard/coreCard binds reference richer data than the
-  Race/CoreRune models carry: tag/blurb/apex/per-attr tiles). NEXT: the LIVE bind RESOLVER (map `race.name`
-  →Race.Name, `core.title`→core.Title, per-attr tiles, selection, etc.) + text clipping so values fit; the
-  composed figure via `preview.fig`; graphs. Then CUT NewGame's live screen over + diff vs design/05.]
+  content — parts draw their `sample` text.
+  SLICE 4 DONE — LIVE BIND RESOLVER: DrawManifestList now fills each card from the i-th live datum via
+  `ResolveBind(datum, bind)` (falls back to the manifest `sample` for unmapped binds). Mapped: `race.name`
+  /`race.hp`; `core.name`/`core.role`/`core.budget`/`core.bays`/`core.actionSlots`. Verified RB_MF=newgame:
+  the 2 race cards show Human(HP20)/Elf(HP14) and the 6 core cards show distinct live name+role+budget+
+  bays+slots (Grunt THE GENERALIST 24/3/1 ... Ranger THE MARKSMAN 12/4/0). STILL sample: per-attr tiles
+  (`race.attrs.*` need positional resolution -- same bind repeats 4x), and `race.tag`/`race.blurb`/
+  `core.apexName`/`core.apexDescription`/`core.icon` (missing data fields -- add display-only text to the
+  Race/CoreRune content, no apex EFFECTS per the guardrail). NEXT: those (positional attrs + display data)
+  + text clipping so values fit the tiles; the composed figure via `preview.fig`; graphs. Then CUT
+  NewGame's live screen over + diff vs design/05.]
 
 FLOW: Equipment reachable BETWEEN fights — from the post-combat Cleared/Redeploy state + CityMap +
 CampaignMap — editing the CURRENT loadout (core fixed), NOT a core-picker.
