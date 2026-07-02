@@ -86,9 +86,10 @@ receiving models (mid-run palette/bay/rune mutation) stay the design-open gate. 
 - **CONTINGENCY (HiFi is CD-blocked → active):** refactor the uber `Game1.cs` — split by responsibility
   (SRP), codify SOLID where it sensibly applies. STARTED (2026-07-02): the manifest RENDERER half
   (generic element renderer, list/graph stamping, bind resolvers, fidelity primitives — 640 lines)
-  lives in `Game1.ManifestRenderer.cs` (partial split, behavior identical; Game1.cs 1867→1245).
-  NEXT candidates: the legacy CityMap draw block; then true class extraction where coupling allows
-  (draw primitives → a canvas type).
+  lives in `Game1.ManifestRenderer.cs`; the legacy CityMap screen (chart/panels/gear bar/merchant
+  stopgap/spine — 289 lines, retires wholesale at the citymap cut-over) lives in `Game1.CityMap.cs`.
+  Partial splits, behavior identical; Game1.cs 1867→973. NEXT: true class extraction where coupling
+  allows (draw primitives → a canvas type).
 
 ## ⇒ HOW TO WORK THIS ARC — read EVERY pass (pixel-perfect · no drift · no premature "done")
 ONE screen per pass. The goal is: every screen renders 100% from `layout.json` and matches its
