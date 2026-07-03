@@ -726,7 +726,7 @@ public partial class Game1
                 {
                     // A missing icon PNG keeps the glyph-tile fill drawn above — never Sprite's
                     // null-texture border box (an un-shipped icon is a Needs-CD gap, not a frame).
-                    if (_assets.Texture(img!) is { } itex)
+                    if (_assets.Texture(NormalizeContentPath(img!)) is { } itex)
                     {
                         Sprite(itex, pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H, Color.White);
                         continue;
@@ -1180,6 +1180,7 @@ public partial class Game1
         Roguebane.Core.Race r => bind switch
         {
             "race.name" => r.Name,
+            "race.id" => r.Id, // head-sprite imageBind (sprites/body/{race.id}_grunt/head_healthy)
             "race.hp" => r.Hp.ToString(),
             "race.tag" => r.Tag,
             "race.blurb" => r.Blurb,

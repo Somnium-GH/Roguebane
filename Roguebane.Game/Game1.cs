@@ -779,6 +779,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                 + (unresolved.Count > 0 ? $" unresolved=[{string.Join(",", unresolved)}]" : ""));
             if (cycled != 0) _build.CycleCoreRune(cycled); // restore the drive's build
         }
+        ReportAssetResolution();
         if (blankEls.Count > 0)
             Console.WriteLine($"SMOKE ELEM-BLANK: {string.Join(",", blankEls)}");
         if (blank.Count > 0)
@@ -818,6 +819,63 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         Console.WriteLine($"SMOKE TEXTGEOM: {screenId} overflow={overflow.Count} collide={collide.Count}"
             + (overflow.Count > 0 ? $" over=[{string.Join(",", overflow)}]" : "")
             + (collide.Count > 0 ? $" hits=[{string.Join(",", collide)}]" : ""));
+    }
+
+    // M0.5 (Doug 2026-07-03 late): every authored image/imageBind path must resolve to a texture
+    // the game's content build actually carries — silent misses (the race heads) hid as "art gaps".
+    // imageBind placeholders enumerate their REACHABLE domains; unknown placeholders are reported
+    // as unverifiable rather than skipped silently.
+    private void ReportAssetResolution()
+    {
+        var m = _ui.Manifest;
+        if (m is null) return;
+        var missing = new SortedSet<string>();
+        var unverifiable = new SortedSet<string>();
+        var domains = new Dictionary<string, string[]>
+        {
+            ["race.id"] = Roguebane.Core.Content.Races.Roster.Select(r => r.Id).ToArray(),
+            ["technique.id"] = Roguebane.Core.Content.Techniques.All.Select(t => t.Id).ToArray(),
+            ["loadout.id"] = Roguebane.Core.Content.Techniques.All.Select(t => t.Id).ToArray(),
+            ["node.type"] = new[] { "camp", "castle", "merchant", "resource", "unknown", "skirmish" },
+            ["resource.id"] = new[] { "supplies", "spoils", "charge", "summons" },
+            ["cell.asset"] = new[] { "pip_full_str", "pip_full_int", "pip_full_dex", "pip_full_con",
+                "pip_reserved_str", "pip_reserved_int", "pip_reserved_dex", "pip_reserved_con" },
+            ["point.asset"] = new[] { "pip_full_supplies", "pip_empty_supplies",
+                "pip_full_support", "pip_empty_support" },
+        };
+        void Check(string? path)
+        {
+            if (string.IsNullOrEmpty(path)) return;
+            var norm = NormalizeContentPath(path!);
+            var ph = System.Text.RegularExpressions.Regex.Match(norm, @"\{(.+?)\}");
+            if (!ph.Success)
+            {
+                if (_assets.Texture(norm) is null) missing.Add(norm);
+                return;
+            }
+            if (!domains.TryGetValue(ph.Groups[1].Value, out var vals))
+            {
+                unverifiable.Add(norm);
+                return;
+            }
+            foreach (var v in vals)
+                if (_assets.Texture(norm.Replace(ph.Value, v)) is null)
+                    missing.Add(norm.Replace(ph.Value, v));
+        }
+        foreach (var s in m.Screens.Values)
+            foreach (var el in s.Elements)
+            {
+                Check(el.Image);
+                if (el.Frames is { } fr) foreach (var f in fr) Check(f);
+            }
+        foreach (var t in m.Templates.Values)
+        {
+            Check(t.ImageBind);
+            foreach (var p in t.Parts) { Check(p.Image); Check(p.ImageBind); }
+        }
+        Console.WriteLine($"SMOKE ASSETS: missing={missing.Count} unverifiable={unverifiable.Count}"
+            + (missing.Count > 0 ? $" miss=[{string.Join(",", missing)}]" : "")
+            + (unverifiable.Count > 0 ? $" unk=[{string.Join(",", unverifiable)}]" : ""));
     }
 
     private void RenderSceneOnce(Action draw)

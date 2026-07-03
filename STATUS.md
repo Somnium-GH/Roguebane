@@ -53,8 +53,14 @@ inventory, rune→rune bag; slotting stays Equipment's; techniques/minions/runes
 _M0.1–3 DONE (2026-07-03 late, same pass the directive landed): blur scoring REVERTED → unblurred
 alignment search (±3px, shift REPORTED as a number in the ranked list); the illegal identity mask
 DELETED; the newgame smoke now cycles the build to the ref's GRUNT state for its shot and restores
-after (drive aligned, not masked). M0.4 geometry_diff + M0.5 asset probe next; newgame floor claim
-stays REVOKED until the M1 re-walk._
+after (drive aligned, not masked). M0.5 DONE same day: SMOKE ASSETS probes every
+authored image/imageBind path against the real content build (placeholders enumerate their domains;
+unknown placeholders report unverifiable, never skip silent) — first run found the race.headImage
+class exactly as Doug called it: `race.id` had NO ResolveBind case, so the head imageBind resolved
+to an empty path and died silently. Fixed (+ part-image path normalize); HEADS NOW BLIT on both
+race cards (eyeballed). Current probe truth: 6 technique icons missing (bandage/cleave/drain/ember/
+jab/lunge — real Needs-CD), 2 placeholders unverifiable (legend.type/lot.id — domains to add).
+M0.4 geometry_diff next; newgame floor claim stays REVOKED until the M1 re-walk._
 1. **REVERT the blur-tolerant element scoring (4b6a705).** The 1.5px Gaussian before element scoring
    makes the tool blind to ±2–3 design-px errors — EXACTLY the current bug class (padding/margins/
    label offsets Doug can see by eye). Replace with an **ALIGNMENT SEARCH**: score each element crop
@@ -89,13 +95,18 @@ stays REVOKED until the M1 re-walk._
   descs — update CoreEffectName/Desc to the §5 CANON roster (pure data, quick; also shrinks the
   drive-vs-ref content divergence class).
 - `race.headImage` imageBind unresolved (M0.5) — heads render as empty boxes.
-- TILE value+label layout broken on all three columns: dc.html authors VALUE (mono, larger) over
-  LABEL (mono 8.5px, +4px margin) as separate spans; the manifest flattened loadout tiles to ONE
-  text ("20 RUNE BUDGET" samples) and the engine draws one run in the DISPLAY face (serif "1" reads
-  as "I") clipped at the tile corner. Engine meanwhile: split value/label from the flattened run
-  ('\n'-aware path), render MONO per source, centred per source. Manifest fix queued in the payload
-  addendum (proper two-part tiles). Same treatment for core-card BUDGET/ACTIONS/BAYS + race-card
-  stat boxes (labels currently clip under the value).
+- TILE value+label layout broken on all three columns — and in the LOADOUT column the labels are
+  MISSING OUTRIGHT: every box (STR/INT/DEX/CON, BASE HP, RUNE BUDGET, ACTIONS, MINION BAYS) renders
+  a bare corner number and nothing else (Doug, 2026-07-03 late). Mechanism: dc.html authors VALUE
+  (mono, larger) over LABEL (mono 8.5px, +4px margin) as separate spans; the manifest flattened the
+  tile to ONE text ("20 RUNE BUDGET") and the engine draws that run at one size in the DISPLAY face
+  (serif "1" reads as "I") — it overflows the tile and everything past the value CLIPS AWAY. Engine
+  meanwhile: split value/label from the flattened run ('\n'-aware path), render MONO per source,
+  centred, label under value. Manifest fix queued (payload A3, proper two-part tiles). Same class on
+  core-card BUDGET/ACTIONS/BAYS + race-card stat boxes (labels clip under values).
+  **DETECTOR GAP this exposes: a drawn string whose visible portion ≠ the full string (truncated /
+  clipped outside its rect) must FAIL the collision/overflow detector — "label missing from every
+  box on the screen" cannot score 77+ again.**
 - STATE CHIPS missing: unchosen race shows no CHOOSE chip; unchosen cores show no SELECT/LOCKED
   button (dc.html computes selLabel per state; extraction only captured the chosen sample —
   payload addendum). Shell-side flagged stopgap OK meanwhile (input already exists).
@@ -103,6 +114,14 @@ stays REVOKED until the M1 re-walk._
   SPECIALIST appear ZERO times in layout.json; the PNG shows them but extraction dropped the datum).
   Payload addendum: bind `core.badge`. Engine: add the display datum when it lands.
 - previewFigure's purple backdrop panel doesn't draw (design/05 shows it; check the element's fill).
+- **previewFigure MISSING PARTS per core (Doug, 2026-07-03 late):** Warden renders EMPTY OUTLINE
+  BOXES for arms+legs; Elf Ranger likewise (partial). NOT an art gap — `sprites/body/human_warden/`
+  has all 21 part PNGs, the game mgcb lists them (84 entries), the figure def is in layout.json.
+  It's an engine part-resolve/compose failure for non-grunt figures (state-key or part-name lookup
+  misses → the slot rect draws as an outline box, which the paint-coverage gate counts as painted —
+  invisible to it). BUILD THE PROBE with M0.5: for EVERY figure def, attempt-resolve every z-list
+  part texture at every state, headless; report failures per figure. Then fix the lookup. Check the
+  same failure on the Equipment paper-doll + encounter figures (same compose path).
 - CORE EFFECT block spacing (eyebrow/name/desc run together, desc to card edge) — geometry-diff
   will quantify; fix paddings per source.
 **Fix M1 as ONE batched newgame pass (same-class items share causes), verified by the M0 tools.**
