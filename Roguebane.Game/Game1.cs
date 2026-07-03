@@ -707,13 +707,21 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                 var path = System.IO.Path.ChangeExtension(_shotPath, null) + "." + id + ".png";
                 using var fs = System.IO.File.Create(path);
                 _scene.SaveAsPng(fs, _scene.Width, _scene.Height);
-                // Sidecar: every element's resolved DESIGN-space rect, so fidelity v2 can score
-                // per-element crops without re-implementing anchor math tool-side.
+                // Sidecar v2: every element's resolved DESIGN-space rect PLUS the authored style
+                // numbers the probe tool checks the pixels against (P0-A.4) — fontPx for the
+                // text-height probe, border width for the stroke probe.
                 var def = _ui.ScreenDef(id)!;
                 var rects = def.Elements.Where(x => !string.IsNullOrEmpty(x.Id)).Select(x =>
                 {
                     var r = ScreenLayout.Resolve(def, x);
-                    return $"\"{x.Id}\":[{r.X},{r.Y},{r.W},{r.H}]";
+                    var fx = x.FontPx is { } f ? f.ToString(System.Globalization.CultureInfo.InvariantCulture) : "0";
+                    var bw = x.Border?.W ?? 0;
+                    // skinned = a button-family or image-backed element: its ink is chrome, not
+                    // glyphs — the text-height probe skips it.
+                    var skinned = !string.IsNullOrEmpty(x.Image)
+                        || x.States.ValueKind == System.Text.Json.JsonValueKind.Object ? "true" : "false";
+                    return $"\"{x.Id}\":{{\"rect\":[{r.X},{r.Y},{r.W},{r.H}],\"fontPx\":{fx},"
+                        + $"\"borderW\":{bw},\"type\":\"{x.Type}\",\"skinned\":{skinned}}}";
                 });
                 System.IO.File.WriteAllText(
                     System.IO.Path.ChangeExtension(_shotPath, null) + "." + id + ".rects.json",

@@ -82,7 +82,9 @@ def main():
 
     rects = {}
     if args.elements:
-        rects = json.loads(open(args.elements, encoding="utf-8").read())
+        raw = json.loads(open(args.elements, encoding="utf-8").read())
+        # sidecar v1 = {id: [x,y,w,h]}; v2 = {id: {rect, fontPx, borderW, type}}
+        rects = {k: (v["rect"] if isinstance(v, dict) else v) for k, v in raw.items()}
     masked = [m for m in args.mask.split(",") if m]
     for mid in masked:
         if mid in rects:

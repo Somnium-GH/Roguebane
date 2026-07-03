@@ -72,10 +72,14 @@ claims were made against warped refs — treat them as UNVERIFIED; re-walk with 
    warranted). Tile grid stays as the whole-frame score + heatmap visual. **BASELINES RE-PINNED**
    on v2 numbers (1:1 + mask): binds enc 16 eq 22 camp 4 ng 12 city 9 mer 10; fidelity enc 80.5
    eq 80.4 city 84.7 camp 94.7 ng 78.1 mer 83.0. The dead-baseline warning is CLEARED.
-4. **Numeric probes (kill "looks overscaled"):** border-width probe (rendered stroke px at manifest
-   border edges vs authored) + text-height probe (drawn glyph bbox vs fontPx expectation), reported per
-   element as NUMBERS. Doug reads live text at ~1.5–2× design proportion in headers/labels — measure,
-   then fix from the numbers.
+4. **Numeric probes — ✅ BUILT (2026-07-03):** `tools/probes.py <shot> <rects.sidecar>` measures the
+   SHOT's pixels vs the manifest numbers: TEXT-HEIGHT (ink bbox in each text element ÷ authored
+   fontPx; skinned/image elements excluded via sidecar-v2 flags) + BORDER-STROKE (edge-midpoint ink
+   run vs authored w). FIRST NUMBERS: borders ALL 1.00× (the BorderPx fix verified by measurement);
+   labels 1.0–1.1×; worst text 1.4× (part labels — serif ascender span vs fontPx), multi-line descs
+   read as line-count multiples (probe caveat). **Doug's "1.5–2× oversized" is NOT present in the
+   current build's numbers** — if it still LOOKS big live, re-shot through the probe (stale-build
+   suspicion, same as the 07-02 font case). Standalone tool; run on gate shots ad hoc.
 5. **Collision/overflow detector — ✅ BUILT (2026-07-03):** the smoke's full render records every
    drawn text footprint (element-owned); `SMOKE TEXTGEOM` reports per screen OVERFLOW (bbox outside
    its element rect ±2px) and COLLIDE (footprints of two non-nesting elements intersect); the gate
