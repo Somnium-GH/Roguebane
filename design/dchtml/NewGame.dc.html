@@ -34,7 +34,7 @@
   <!-- LEFT: RACE -->
   <div data-el="racePanel" data-anchor="Left" data-z="4" data-binds="races" style="position:absolute;left:0;top:64px;width:460px;height:928px;border-right:2px solid #382a1d;padding:18px 20px 0;display:flex;flex-direction:column;">
     <div data-el="raceHeader" data-anchor="Left" style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;">
-      <span style="font-family: &quot;JetBrains Mono&quot;, monospace; font-size: 14px; font-weight: 700; color: rgb(217, 164, 65);">①</span>
+      
       <span style="font-size: 24px; letter-spacing: 1px; color: rgb(240, 220, 180);">Race<br></span>
     </div>
     <div data-el="raceCards" data-anchor="Left" data-z="4" data-container="1" data-template="raceCard" data-flow="vertical" data-binds="races" style="display:flex;flex-direction:column;gap:14px;">
@@ -49,19 +49,19 @@
           <div style="flex:1;padding:11px 14px;display:flex;flex-direction:column;">
             <div style="display:flex;align-items:baseline;justify-content:space-between;">
               <span data-binds="race.name" style="font-size:27px;letter-spacing:1px;color:#f0dcb4;line-height:1;">{{ r.name }}</span>
-              <span data-binds="race.selection" data-states="{&quot;chosen&quot;:{&quot;fill&quot;:&quot;amber&quot;,&quot;color&quot;:&quot;ground&quot;,&quot;border&quot;:&quot;amber&quot;},&quot;idle&quot;:{&quot;color&quot;:&quot;mutedDim&quot;,&quot;border&quot;:&quot;borderDim&quot;}}" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:{{ r.selColor }};background:{{ r.selBg }};border:1.5px solid {{ r.selBorder }};padding:3px 7px;">{{ r.selLabel }}</span>
+              <span data-binds="race.selection" data-states="{&quot;chosen&quot;:{&quot;fill&quot;:&quot;amber&quot;,&quot;color&quot;:&quot;ground&quot;,&quot;border&quot;:&quot;amber&quot;,&quot;label&quot;:&quot;✓ CHOSEN&quot;},&quot;idle&quot;:{&quot;color&quot;:&quot;mutedDim&quot;,&quot;border&quot;:&quot;borderDim&quot;,&quot;label&quot;:&quot;CHOOSE&quot;}}" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:{{ r.selColor }};background:{{ r.selBg }};border:1.5px solid {{ r.selBorder }};padding:3px 7px;">{{ r.selLabel }}</span>
             </div>
             <div data-binds="race.tag" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:#9a8468;margin-top:4px;">{{ r.tag }}</div>
             <!-- attr + hp mini-tiles -->
             <div style="display:flex;gap:6px;margin-top:8px;">
               <sc-for list="{{ r.attrs }}" as="a" hint-placeholder-count="4">
-                <div data-part="" style="flex:1;border:1px solid #3a2c1d;background:#120c07;padding:4px 2px;text-align:center;">
+                <div data-part="attrBox" style="flex:1;border:1px solid #3a2c1d;background:#120c07;padding:4px 2px;text-align:center;">
                   <div style="width:9px;height:9px;margin:0 auto;border:1.5px solid #0a0807;background:{{ a.color }};"></div>
                   <div data-binds="race.attrs.value" style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#ece0cb;line-height:1;margin-top:3px;">{{ a.val }}</div>
                   <div data-binds="race.attrs.key" style="font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:700;color:#8d775c;margin-top:2px;">{{ a.key }}</div>
                 </div>
               </sc-for>
-              <div data-part="" style="flex:1;border:1px solid #4a3729;background:#1d150e;padding:4px 2px;text-align:center;">
+              <div data-part="hpBox" style="flex:1;border:1px solid #4a3729;background:#1d150e;padding:4px 2px;text-align:center;">
                 <div data-binds="race.hp" style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#cf9a44;line-height:1;margin-top:10px;">{{ r.hp }}</div>
                 <div style="font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:700;color:#8d775c;margin-top:2px;">HP</div>
               </div>
@@ -76,7 +76,7 @@
   <!-- CENTER: CORE RUNE GRID -->
   <div data-el="corePanel" data-anchor="Center" data-z="4" style="position:absolute;left:460px;top:64px;width:1000px;height:928px;padding:18px 24px 0;display:flex;flex-direction:column;">
     <div data-el="coreHeader" data-anchor="Center" style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;">
-      <span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#d9a441;">②</span>
+      
       <span style="font-size:24px;letter-spacing:1px;color:#f0dcb4;">Core Rune</span>
       <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:#8d775c;"><br></span>
     </div>
@@ -95,15 +95,15 @@
             <div data-binds="core.role" style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:2px;color:#9a8468;margin-top:4px;">{{ c.role }}</div>
             <!-- layout tiles -->
             <div style="display:flex;gap:7px;margin-top:11px;">
-              <div data-part="" style="flex:1;border:1px solid #3a2c1d;background:#120c07;padding:6px 4px;text-align:center;">
+              <div data-part="budgetBox" style="flex:1;border:1px solid #3a2c1d;background:#120c07;padding:6px 4px;text-align:center;">
                 <div data-binds="core.budget" style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#d9a441;line-height:1;">{{ c.budget }}</div>
                 <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;color:#8d775c;margin-top:3px;">BUDGET</div>
               </div>
-              <div data-part="" style="flex:1;border:1px solid #3a2c1d;background:#120c07;padding:6px 4px;text-align:center;">
+              <div data-part="actionsBox" style="flex:1;border:1px solid #3a2c1d;background:#120c07;padding:6px 4px;text-align:center;">
                 <div data-binds="core.actionSlots" style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#e9d6b0;line-height:1;">{{ c.techniques }}</div>
                 <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;color:#8d775c;margin-top:3px;">ACTIONS</div>
               </div>
-              <div data-part="" style="flex:1;border:1px solid #3a2c1d;background:#120c07;padding:6px 4px;text-align:center;">
+              <div data-part="baysBox" style="flex:1;border:1px solid #3a2c1d;background:#120c07;padding:6px 4px;text-align:center;">
                 <div data-binds="core.bays" style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#e9d6b0;line-height:1;">{{ c.bays }}</div>
                 <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;color:#8d775c;margin-top:3px;">BAYS</div>
               </div>
@@ -116,7 +116,7 @@
             </div>
             <div style="flex:1;"></div>
             <!-- select -->
-            <div data-binds="core.selection" data-states="{&quot;selected&quot;:{&quot;fill&quot;:&quot;good&quot;,&quot;color&quot;:&quot;ground&quot;,&quot;border&quot;:&quot;good&quot;},&quot;idle&quot;:{&quot;color&quot;:&quot;mutedDim&quot;,&quot;border&quot;:&quot;borderDim&quot;},&quot;locked&quot;:{&quot;color&quot;:&quot;lockText&quot;,&quot;border&quot;:&quot;lockRed&quot;,&quot;borderStyle&quot;:&quot;dashed&quot;,&quot;opacity&quot;:0.6}}" style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:7px;color:{{ c.selColor }};background:{{ c.selBg }};border:2px {{ c.selStyle }} {{ c.selBorder }};">{{ c.selLabel }}</div>
+            <div data-binds="core.selection" data-states="{&quot;selected&quot;:{&quot;fill&quot;:&quot;good&quot;,&quot;color&quot;:&quot;ground&quot;,&quot;border&quot;:&quot;good&quot;,&quot;label&quot;:&quot;✓ CORE SET&quot;},&quot;idle&quot;:{&quot;color&quot;:&quot;mutedDim&quot;,&quot;border&quot;:&quot;borderDim&quot;,&quot;label&quot;:&quot;SELECT&quot;},&quot;locked&quot;:{&quot;color&quot;:&quot;lockText&quot;,&quot;border&quot;:&quot;lockRed&quot;,&quot;borderStyle&quot;:&quot;dashed&quot;,&quot;opacity&quot;:0.6,&quot;label&quot;:&quot;LOCKED&quot;}}" style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:7px;color:{{ c.selColor }};background:{{ c.selBg }};border:2px {{ c.selStyle }} {{ c.selBorder }};">{{ c.selLabel }}</div>
           </div>
           <!-- locked overlay -->
           <sc-if value="{{ c.locked }}" hint-placeholder-val="{{ false }}">
@@ -135,8 +135,9 @@
       <span style="font-size:24px;letter-spacing:1px;color:#f0dcb4;">Loadout</span>
       
     </div>
-    <!-- figure stage -->
-    <div style="position:relative;height:320px;border:2px solid #382a1d;background:linear-gradient(#211a2c,#141020);overflow:hidden;">
+    <!-- figure stage — its OWN element (ADDENDUM A4 2026-07-03: the purple night panel behind the
+         loadout figure never extracted, so live drew nothing behind the figure) -->
+    <div data-el="previewStage" data-anchor="Right" style="position:relative;height:320px;border:2px solid #382a1d;background:linear-gradient(#211a2c,#141020);overflow:hidden;">
       <div style="position:absolute;inset:0;background-image:repeating-conic-gradient(#2a2340 0% 25%,#211a33 0% 50%);background-size:8px 8px;opacity:.26;"></div>
       <div style="position:absolute;left:0;right:0;bottom:34px;height:16px;background:radial-gradient(50% 60% at 50% 50%,#0a0710cc,transparent 70%);"></div>
       <div data-el="previewFigure" data-type="figure" data-binds="preview.fig" style="position:absolute;left:0;right:0;bottom:30px;display:flex;justify-content:center;align-items:flex-end;">
@@ -155,23 +156,25 @@
         </div>
       </sc-for>
       <div data-el="previewHpTile" data-anchor="Right" data-binds="preview.hp" style="flex:1.1;border:1px solid #4a3729;background:#1d150e;padding:8px 2px;text-align:center;">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#cf9a44;line-height:1;margin-top:15px;">{{ preview.hp }}</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#8d775c;margin-top:4px;">BASE HP</div>
+        <div data-part="value" data-binds="preview.hp" style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#cf9a44;line-height:1;margin-top:15px;">{{ preview.hp }}</div>
+        <div data-part="label" style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#8d775c;margin-top:4px;">BASE HP</div>
       </div>
     </div>
     <!-- layout row -->
     <div data-el="previewLayoutRow" data-anchor="Right" style="display:flex;gap:8px;margin-top:10px;">
       <div data-el="previewBudgetTile" data-anchor="Right" data-binds="preview.budget" style="flex:1;border:1px solid #3a2c1d;background:#160f09;padding:9px 4px;text-align:center;">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#d9a441;line-height:1;">{{ preview.budget }}</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:1px;color:#8d775c;margin-top:4px;">RUNE BUDGET</div>
+        <!-- ADDENDUM A3 2026-07-03: value + label are NAMED PARTS so they extract as two runs with
+             their real fonts/px/margins (the flattened element sampled "20 RUNE BUDGET" as one text) -->
+        <div data-part="value" data-binds="preview.budget" style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#d9a441;line-height:1;">{{ preview.budget }}</div>
+        <div data-part="label" style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:1px;color:#8d775c;margin-top:4px;">RUNE BUDGET</div>
       </div>
       <div data-el="previewActionsTile" data-anchor="Right" data-binds="preview.techniques" style="flex:1;border:1px solid #3a2c1d;background:#160f09;padding:9px 4px;text-align:center;">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#e9d6b0;line-height:1;">{{ preview.techniques }}</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:1px;color:#8d775c;margin-top:4px;">ACTIONS</div>
+        <div data-part="value" data-binds="preview.techniques" style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#e9d6b0;line-height:1;">{{ preview.techniques }}</div>
+        <div data-part="label" style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:1px;color:#8d775c;margin-top:4px;">ACTIONS</div>
       </div>
       <div data-el="previewBaysTile" data-anchor="Right" data-binds="preview.bays" style="flex:1;border:1px solid #3a2c1d;background:#160f09;padding:9px 4px;text-align:center;">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#e9d6b0;line-height:1;">{{ preview.bays }}</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:1px;color:#8d775c;margin-top:4px;">MINION BAYS</div>
+        <div data-part="value" data-binds="preview.bays" style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#e9d6b0;line-height:1;">{{ preview.bays }}</div>
+        <div data-part="label" style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:1px;color:#8d775c;margin-top:4px;">MINION BAYS</div>
       </div>
     </div>
     <!-- Core Effect (uniform border-left treatment, scaled up; renamed from "apex") -->

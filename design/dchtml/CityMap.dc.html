@@ -48,8 +48,10 @@
   <div style="position:absolute;left:26px;top:74px;width:560px;display:flex;gap:14px;z-index:5;">
     <div data-el="supplies" data-type="panel" data-anchor="TopLeft" data-z="5" data-binds="supplies" data-shadow="soft" data-frame="card" style="flex:1;box-sizing:border-box;background:#1d150e;border:12px solid transparent;padding:2px 6px;box-shadow:0 3px 6px rgba(10,8,7,.4);border-image-source:url('Content/ui/frame/card.png');border-image-slice:12 fill;border-image-width:12px;border-image-repeat:round;">
       <div style="display:flex;align-items:baseline;justify-content:space-between;">
-        <span style="font-size:17px;letter-spacing:1px;color:#f0dcb4;">Supplies</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#7fa05a;">6 / 9</span>
+        <!-- payload 2026-07-03 pm residual #6: the gauge TITLE row + caption are real elements now
+             (they extracted as nothing, so the engine shipped a one-text-run stopgap header) -->
+        <span data-el="suppliesTitle" style="font-size:17px;letter-spacing:1px;color:#f0dcb4;">Supplies</span>
+        <span data-el="suppliesCount" data-binds="supplies.count" style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#7fa05a;">6 / 9</span>
       </div>
       <!-- pip strip as PARTS (payload #3): stamped from live supply count via ui/pip/* imageBind -->
       <div data-el="suppliesPips" data-container="1" data-template="supplyPip" data-flow="horizontal" data-binds="supplies.points" style="display:flex;gap:4px;margin:9px 0 6px;">
@@ -57,12 +59,12 @@
           <span data-tpl="supplyPip" data-binds="point.live" data-image-bind="ui/pip/{point.asset}" style="flex:1;height:15px;background:{{ sp.bg }};border:2px {{ sp.style }} {{ sp.bd }};"></span>
         </sc-for>
       </div>
-      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#9a8468;">Consume 1 per deployment.<br><span style="color: rgb(205, 180, 151);"></span></div>
+      <div data-el="suppliesNote" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#9a8468;">Consume 1 per deployment.<br><span style="color: rgb(205, 180, 151);"></span></div>
     </div>
     <div data-el="musteredSupport" data-type="panel" data-anchor="TopLeft" data-z="5" data-binds="support" data-shadow="soft" data-frame="card" style="flex:1;box-sizing:border-box;background:#1d150e;border:12px solid transparent;padding:2px 6px;box-shadow:0 3px 6px rgba(10,8,7,.4);border-image-source:url('Content/ui/frame/card.png');border-image-slice:12 fill;border-image-width:12px;border-image-repeat:round;">
       <div style="display:flex;align-items:baseline;justify-content:space-between;">
-        <span style="font-size:17px;letter-spacing:1px;color:#f0dcb4;">Mustered Support</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#d9a441;">0 / 2</span>
+        <span data-el="supportTitle" style="font-size:17px;letter-spacing:1px;color:#f0dcb4;">Mustered Support</span>
+        <span data-el="supportCount" data-binds="support.count" style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#d9a441;">0 / 2</span>
       </div>
       <!-- pip strip as PARTS (payload #3) -->
       <div data-el="supportPips" data-container="1" data-template="supportPip" data-flow="horizontal" data-binds="support.points" style="display:flex;gap:6px;margin:9px 0 6px;">
@@ -70,7 +72,7 @@
           <span data-tpl="supportPip" data-binds="point.live" data-image-bind="ui/pip/{point.asset}" style="flex:1;height:15px;background:{{ sp.bg }};border:2px {{ sp.style }} {{ sp.bd }};"></span>
         </sc-for>
       </div>
-      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#9a8468;">Capture the&nbsp;<span style="color: rgb(217, 164, 65);">2 resource holds</span> to muster support for the fight at the castle.</div>
+      <div data-el="supportNote" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#9a8468;">Capture the&nbsp;<span style="color: rgb(217, 164, 65);">2 resource holds</span> to muster support for the fight at the castle.</div>
     </div>
   </div>
 
@@ -89,7 +91,14 @@
       <div data-el="doomTrack" style="position:relative;flex:1;height:42px;background:#1c1610;border:2px solid #4a3729;box-shadow:inset 0 2px 4px rgba(0,0,0,.55);overflow:visible;">
         <!-- covered ground loads RIGHT→LEFT (Doug 2026-07-02): the horde sets out from the castle
              (right) and marches on camp (left); fill + host token advance in tandem toward camp -->
-        <div data-el="doomFill" data-binds="enemy.advancePct" style="position:absolute;right:0;top:0;bottom:0;width:94%;background:repeating-linear-gradient(-45deg,#b8382e,#b8382e 9px,#a2302810 9px,#a23028 18px);border-left:3px solid #2a0f0c;box-shadow:inset 0 3px 0 rgba(255,150,130,.26),inset 0 -4px 0 rgba(0,0,0,.35);"></div>
+        <!-- payload 2026-07-03 pm residual #6: the hazard stripes can't be expressed as a manifest fill
+             (extracted as a flat blood→blood "gradient"). The stripes now live on their OWN element
+             carrying a data-image-bind to a TILEABLE stripe asset (proto/pattern_gen.js →
+             ui/pattern/doom_stripe) the engine tiles across the rect; doomFill keeps the bind, the
+             leading-edge border and the bevel shadows, so nothing else regresses. -->
+        <div data-el="doomFill" data-binds="enemy.advancePct" style="position:absolute;right:0;top:0;bottom:0;width:94%;border-left:3px solid #2a0f0c;box-shadow:inset 0 3px 0 rgba(255,150,130,.26),inset 0 -4px 0 rgba(0,0,0,.35);">
+          <div data-el="doomFillStripes" data-image-bind="ui/pattern/doom_stripe" style="position:absolute;left:0;top:0;right:0;bottom:0;background:repeating-linear-gradient(-45deg,#b8382e,#b8382e 9px,#a2302810 9px,#a23028 18px);"></div>
+        </div>
         <!-- the marching host rides the leading (left) edge of the covered ground -->
         <img data-el="doomHost" data-shadow="soft" src="Content/icons/map/enemy_host_near.png" height="82" style="position:absolute;left:6%;bottom:0px;width:auto;transform:translateX(-50%);image-rendering:pixelated;filter:drop-shadow(1px 3px 0 rgba(0,0,0,.6));pointer-events:none;" alt="enemy war party">
       </div>

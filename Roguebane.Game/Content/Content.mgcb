@@ -6042,3 +6042,102 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/bg/merchant_stall.png;bg/merchant_stall
+#begin icons/technique/bandage
+\importer:TextureImporter
+\processor:TextureProcessor
+\processorParam:ColorKeyEnabled=False
+\processorParam:GenerateMipmaps=False
+\processorParam:PremultiplyAlpha=True
+\processorParam:ResizeToPowerOfTwo=False
+\processorParam:MakeSquare=False
+\processorParam:TextureFormat=Color
+\build:../../Roguebane.Content/icons/technique/bandage.png;icons/technique/bandage
+
+#begin icons/technique/block
+\importer:TextureImporter
+\processor:TextureProcessor
+\processorParam:ColorKeyEnabled=False
+\processorParam:GenerateMipmaps=False
+\processorParam:PremultiplyAlpha=True
+\processorParam:ResizeToPowerOfTwo=False
+\processorParam:MakeSquare=False
+\processorParam:TextureFormat=Color
+\build:../../Roguebane.Content/icons/technique/block.png;icons/technique/block
+
+#begin icons/technique/cleave
+\importer:TextureImporter
+\processor:TextureProcessor
+\processorParam:ColorKeyEnabled=False
+\processorParam:GenerateMipmaps=False
+\processorParam:PremultiplyAlpha=True
+\processorParam:ResizeToPowerOfTwo=False
+\processorParam:MakeSquare=False
+\processorParam:TextureFormat=Color
+\build:../../Roguebane.Content/icons/technique/cleave.png;icons/technique/cleave
+
+#begin icons/technique/drain
+\importer:TextureImporter
+\processor:TextureProcessor
+\processorParam:ColorKeyEnabled=False
+\processorParam:GenerateMipmaps=False
+\processorParam:PremultiplyAlpha=True
+\processorParam:ResizeToPowerOfTwo=False
+\processorParam:MakeSquare=False
+\processorParam:TextureFormat=Color
+\build:../../Roguebane.Content/icons/technique/drain.png;icons/technique/drain
+
+#begin icons/technique/ember
+\importer:TextureImporter
+\processor:TextureProcessor
+\processorParam:ColorKeyEnabled=False
+\processorParam:GenerateMipmaps=False
+\processorParam:PremultiplyAlpha=True
+\processorParam:ResizeToPowerOfTwo=False
+\processorParam:MakeSquare=False
+\processorParam:TextureFormat=Color
+\build:../../Roguebane.Content/icons/technique/ember.png;icons/technique/ember
+
+#begin icons/technique/jab
+\importer:TextureImporter
+\processor:TextureProcessor
+\processorParam:ColorKeyEnabled=False
+\processorParam:GenerateMipmaps=False
+\processorParam:PremultiplyAlpha=True
+\processorParam:ResizeToPowerOfTwo=False
+\processorParam:MakeSquare=False
+\processorParam:TextureFormat=Color
+\build:../../Roguebane.Content/icons/technique/jab.png;icons/technique/jab
+
+#begin icons/technique/lunge
+\importer:TextureImporter
+\processor:TextureProcessor
+\processorParam:ColorKeyEnabled=False
+\processorParam:GenerateMipmaps=False
+\processorParam:PremultiplyAlpha=True
+\processorParam:ResizeToPowerOfTwo=False
+\processorParam:MakeSquare=False
+\processorParam:TextureFormat=Color
+\build:../../Roguebane.Content/icons/technique/lunge.png;icons/technique/lunge
+
+#begin icons/technique/stoneskin
+\importer:TextureImporter
+\processor:TextureProcessor
+\processorParam:ColorKeyEnabled=False
+\processorParam:GenerateMipmaps=False
+\processorParam:PremultiplyAlpha=True
+\processorParam:ResizeToPowerOfTwo=False
+\processorParam:MakeSquare=False
+\processorParam:TextureFormat=Color
+\build:../../Roguebane.Content/icons/technique/stoneskin.png;icons/technique/stoneskin
+
+#begin ui/pattern/doom_stripe
+\importer:TextureImporter
+\processor:TextureProcessor
+\processorParam:ColorKeyEnabled=False
+\processorParam:GenerateMipmaps=False
+\processorParam:PremultiplyAlpha=True
+\processorParam:ResizeToPowerOfTwo=False
+\processorParam:MakeSquare=False
+\processorParam:TextureFormat=Color
+\build:../../Roguebane.Content/ui/pattern/doom_stripe.png;ui/pattern/doom_stripe
+

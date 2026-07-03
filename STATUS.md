@@ -1,12 +1,39 @@
 # Status
 
-## 🛑 LOOP STOP CONDITION (2026-07-03 late — Doug/Cowork; THIS LINE WINS OVER EVERYTHING)
-A new CD drop is staged in `.drop/` and will be applied to the working tree by the Cowork session
-(NOT the loop). **If you are reading this at pass start: do NO work this pass — commit NOTHING new,
-print one line ("stopped for drop application") and STOP LOOPING.** If you are mid-pass and only see
-this at commit time: finish + commit ONLY your current slice, push, then stop. Do NOT touch `.drop/`,
-do NOT pull it into Content, do NOT resume until this block is REPLACED by a "DROP APPLIED — RESUME"
-block. (Cowork applies + verifies the drop, then re-arms the queue.)
+## ✅ DROP APPLIED — RESUME (2026-07-03 late; applied + verified by Cowork, tree is yours again)
+The `.drop/` staging is applied and deleted. FIRST PASS: commit the applied drop as its own commit
+("CD drop 2026-07-03 pm: residuals #1–8 + addendum A1–A4 + campaignmap repair") BEFORE any work.
+**What landed (all VERIFIED):** per-state chip labels (`states.<state>.label` — SELECT/LOCKED/
+✓ CORE SET, CHOOSE/✓ CHOSEN); `core.badge` bound (engine adds the display datum: Grunt STARTER,
+Warden BULWARK, Adept CASTER, Summoner/Reaver/Ranger SPECIALIST); **NEW SCHEMA `element.parts[]`**
+(named value/label sub-parts with real fonts/px/margins on the loadout tiles + named chrome boxes);
+`previewStage` panel (the purple figure backdrop); citymap gauge internals as real elements
+(titles/counts/notes — retire the one-text-run stopgap header); `doomFillStripes` via NEW pattern
+imageBind semantics (STATIC `ui/pattern/*` path = TILE the PNG across the element rect;
+`ui/pattern/doom_stripe.png` shipped); skinned-button labels re-extracted (mono/7px/ground-dark);
+uniform 94px resource chips (SUMMONS seats, nothing clips); `ShieldPool.count`+`ShieldPool.regenPct`
+now in the manifest (wire the existing shell renders to them); 8 technique icons added
+(bandage/block/cleave/drain/ember/jab/lunge/stoneskin — game mgcb MIRRORED, 558 entries, done by
+Cowork); NewGame "1"/"2" step markers removed from headers (Doug's manual edit, intentional).
+GUARDS RUN: layout.json parses (6 screens); `drop_audit.py` = 0 gaps, all screens clean; changed
+refs (01/03/05) exactly 1920×1080; target_tag stays deleted.
+**⚠ DROP REPAIR (flag, already done — do not redo):** the drop's layout.json had LOST
+`screens.campaignmap` + `templates.cityNode` entirely (CD extraction miss; their audit claimed "04
+untouched"). Cowork RESTORED both VERBATIM from the previous manifest (no invention; drop_audit
+confirms the restored screen matches CampaignMap.dc.html: 9 els / 2 tpls). Logged to CD in the
+payload — until CD's extractor includes campaignmap again, EVERY future drop must re-check the
+key-set diff (screens/templates lost vs previous — add that diff to `drop_audit.py` as a standing
+guard: it currently checks html→manifest, not manifest→previous-manifest).
+**NEW ENGINE WORK from this drop (fold into the M1 newgame batch + adjacent screens; M0 STILL
+FIRST):** `element.parts[]` draw support (schema model + contract test + renderer: parts carry the
+text, never double-draw the element sample); per-state chip labels draw; pattern-tile imageBind;
+`CoreRune.Badge` datum; gauge-header stopgap retire; shield count/regen manifest wires; verify
+resource-strip seating; LAYOUT_CONTRACT fold now includes `parts[]`, `part`, `states.<state>.label`,
+pattern imageBind. Canon core-effect copy in `CoreRunes.cs` is STILL pending (M1).
+**PRIORITY ORDER post-drop (standing rule, CLAUDE.md §Working):** failing gates / measurement
+integrity (M0) FIRST → drop-unblocked work (the list above + M1) → only then contingency/refactor.
+A drop RESOLVING a blocker is authoritative here — don't re-verify what the re-arm block says
+landed; spend the pass building on it.
 
 ## ✅ layout.json RESTORED (2026-07-01 pm) — the PNG-clobber is fixed by a clean re-drop
 Valid JSON (5690 lines) carrying the newest CD work: `imageBind` (beaconNode → node icons as PNGs, incl.
@@ -767,7 +794,8 @@ ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered 
   refined (DESIGN_SPEC §7): a Core rune gives STARTING gear (does NOT lock it), gear is swappable;
   MULTI-SLOT pieces (robe = all slots); figures MORPH (human base + race + core + equipped-gear parts) —
   author morph layers, not per-combo art. Exact morph/slot mechanics OPEN (§17); feeds this when built.
-- Bow.png not mounted on the figure; `shot` technique needs an icon (Game TODO).
+- Bow.png not mounted on the figure. (~~`shot` icon~~ RESOLVED by the 07-03 late drop —
+  `icons/technique/shot.png` ships + is mirrored; drop the swing fallback when touching that code.)
 - The FLAT thumbnail dir `sprites/char/chassis/*` + its `Content.mgcb` entries still use the old name.
   (The `layout.json` FIGURE keys are ALREADY `human_`/`elf_`, and CD has ALREADY renamed the screen ids
   to newgame/equipment/citymap/campaignmap/encounter — both done.) Retire the flat `chassis/` dir once

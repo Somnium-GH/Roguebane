@@ -72,11 +72,52 @@ function extractOne(file, styleSrc, extractSrc) {
     console.log('RBXEND|' + Math.ceil(json.length / CH) + '|' + json.length);
     put('DONE — ' + json.length + ' chars in ' + Math.ceil(json.length / CH) + ' chunks (see console)');
     window.__rbExtract = json;
+    put('PNG channel ready: ' + RB_pngChannelInit(json) + ' segments (call RB_pngChannelDraw(k) per screenshot step)');
   } catch (e) {
     put('FAILED: ' + (e && e.message));
     console.log('RBXFAIL|' + (e && e.message));
   }
 })();
+
+// ---- PNG DATA CHANNEL (2026-07-03: get_webview_logs truncates long console lines, so the chunked
+// console.log path above is LOSSY for agent-side reads — kept for human inspection only). The
+// extract JSON is instead rendered as grey 4×4 blocks (one hex NIBBLE per block, value = nibble*17 —
+// 16 levels tolerate ±8 resample/color-shift error) onto a 896×504 canvas, one SEGMENT per
+// screenshot step, captured via save_screenshot in_memory_png_key and decoded+merged into
+// Content/layout.json by proto/extract_merge.js in run_script. Zero data through the console.
+var RB_PNGCH = { B: 4, W: 896, H: 504, bytes: null };
+function RB_pngChannelInit(json) {
+  RB_PNGCH.bytes = new TextEncoder().encode(json);
+  var bpr = RB_PNGCH.W / RB_PNGCH.B, rows = RB_PNGCH.H / RB_PNGCH.B;
+  RB_PNGCH.perSeg = (bpr * rows - 16) / 2;   // 16 header blocks = 8 header bytes
+  return Math.ceil(RB_PNGCH.bytes.length / RB_PNGCH.perSeg);
+}
+function RB_pngChannelDraw(k) {
+  var C = RB_PNGCH, bpr = C.W / C.B;
+  if (!C.bytes) {
+    if (!window.__rbExtract) throw new Error('extraction not finished yet — wait before drawing segments');
+    RB_pngChannelInit(window.__rbExtract);   // self-init (a fresh page load re-runs extraction)
+  }
+  var cv = document.getElementById('__rbpng');
+  if (!cv) {
+    document.body.style.cssText = 'margin:0;padding:0;background:#000;';
+    Array.prototype.forEach.call(document.body.children, function (n) { n.style.display = 'none'; });
+    cv = document.createElement('canvas'); cv.id = '__rbpng';
+    cv.width = C.W; cv.height = C.H;
+    cv.style.cssText = 'display:block;position:absolute;left:0;top:0;image-rendering:pixelated;';
+    document.body.appendChild(cv);
+  }
+  var total = C.bytes.length, segN = Math.ceil(total / C.perSeg);
+  var off = k * C.perSeg, segLen = Math.max(0, Math.min(C.perSeg, total - off));
+  // header 8 bytes: A5, segIdx, total(4 BE), segLen(2 BE)
+  var head = [0xA5, k, (total >>> 24) & 255, (total >>> 16) & 255, (total >>> 8) & 255, total & 255, (segLen >> 8) & 255, segLen & 255];
+  var x = cv.getContext('2d');
+  x.fillStyle = '#000'; x.fillRect(0, 0, C.W, C.H);
+  function blk(i, nib) { var bx = i % bpr, by = (i / bpr) | 0, v = nib * 17; x.fillStyle = 'rgb(' + v + ',' + v + ',' + v + ')'; x.fillRect(bx * C.B, by * C.B, C.B, C.B); }
+  for (var h = 0; h < 8; h++) { blk(h * 2, head[h] >> 4); blk(h * 2 + 1, head[h] & 15); }
+  for (var i = 0; i < segLen; i++) { var b = C.bytes[off + i]; blk(16 + i * 2, b >> 4); blk(16 + i * 2 + 1, b & 15); }
+  return 'seg ' + k + '/' + segN + ' bytes ' + segLen;
+}
 </script>
 </body>
 </html>

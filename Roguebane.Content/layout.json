@@ -2053,6 +2053,25 @@
           "fontPx": 8
         },
         {
+          "id": "heroShieldCount",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            38,
+            54
+          ],
+          "size": [
+            15,
+            7
+          ],
+          "z": 9,
+          "binds": "ShieldPool.count",
+          "color": "mintActive",
+          "font": "mono",
+          "fontPx": 5,
+          "sample": "6 / 9"
+        },
+        {
           "id": "heroShieldPips",
           "type": "list",
           "anchor": "TopLeft",
@@ -2064,7 +2083,7 @@
             112,
             5
           ],
-          "z": 9,
+          "z": 10,
           "binds": "ShieldPool.points",
           "color": "ink",
           "font": "display",
@@ -2081,7 +2100,7 @@
         },
         {
           "id": "heroShieldRegen",
-          "type": "text",
+          "type": "panel",
           "anchor": "TopLeft",
           "offset": [
             13,
@@ -2091,7 +2110,7 @@
             112,
             3
           ],
-          "z": 10,
+          "z": 11,
           "binds": "ShieldPool.regen",
           "color": "ink",
           "fill": "slot",
@@ -2100,6 +2119,25 @@
             "w": 1,
             "style": "solid"
           },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "heroShieldRegenFill",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            13,
+            71
+          ],
+          "size": [
+            69,
+            2
+          ],
+          "z": 12,
+          "binds": "ShieldPool.regenPct",
+          "color": "ink",
+          "fill": "teal",
           "font": "display",
           "fontPx": 8
         },
@@ -2115,7 +2153,7 @@
             75,
             84
           ],
-          "z": 11,
+          "z": 13,
           "binds": "encounter.minions",
           "color": "ink",
           "font": "display",
@@ -2133,7 +2171,7 @@
             180,
             220
           ],
-          "z": 12,
+          "z": 14,
           "binds": "encounter.foe",
           "color": "ink",
           "font": "display",
@@ -2151,12 +2189,12 @@
             64,
             64
           ],
-          "z": 13,
+          "z": 15,
           "binds": "targeting.focus",
           "color": "ink",
           "font": "display",
           "fontPx": 8,
-          "image": "Content/ui/reticle/focus_p0.png",
+          "image": "Content/ui/reticle/focus_p2.png",
           "frames": [
             "ui/reticle/focus_p0",
             "ui/reticle/focus_p1",
@@ -2175,7 +2213,7 @@
             11,
             11
           ],
-          "z": 14,
+          "z": 16,
           "binds": "targeting.tags",
           "color": "ink",
           "font": "display",
@@ -2202,7 +2240,7 @@
             150,
             14
           ],
-          "z": 15,
+          "z": 17,
           "binds": "encounter.foe.hp",
           "color": "ink",
           "font": "display",
@@ -2221,7 +2259,7 @@
             150,
             7
           ],
-          "z": 16,
+          "z": 18,
           "binds": "encounter.foe.hpLabel",
           "color": "muted",
           "font": "mono",
@@ -2241,7 +2279,7 @@
             150,
             6
           ],
-          "z": 17,
+          "z": 19,
           "binds": "encounter.foe.hp.points",
           "color": "ink",
           "font": "display",
@@ -2269,7 +2307,7 @@
             960,
             28
           ],
-          "z": 18,
+          "z": 20,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -2300,7 +2338,7 @@
             57,
             15
           ],
-          "z": 19,
+          "z": 21,
           "color": "inkWarm",
           "font": "display",
           "fontPx": 11.5,
@@ -2315,10 +2353,10 @@
             10
           ],
           "size": [
-            98,
+            33,
             8
           ],
-          "z": 20,
+          "z": 22,
           "binds": "encounter.label",
           "color": "muted",
           "font": "mono",
@@ -2330,14 +2368,14 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            352,
+            316,
             6
           ],
           "size": [
             48,
             16
           ],
-          "z": 21,
+          "z": 23,
           "binds": "combat.paused",
           "color": "amber",
           "fill": "slot",
@@ -2355,14 +2393,14 @@
           "type": "panel",
           "anchor": "TopLeft",
           "offset": [
-            575,
+            569,
             4
           ],
           "size": [
-            372,
+            378,
             20
           ],
-          "z": 22,
+          "z": 24,
           "color": "ink",
           "font": "display",
           "fontPx": 8
@@ -2376,10 +2414,10 @@
             8
           ],
           "size": [
-            197,
+            203,
             11
           ],
-          "z": 23,
+          "z": 25,
           "binds": "run.resources",
           "color": "ink",
           "font": "display",
@@ -2387,7 +2425,7 @@
           "item": {
             "template": "resourceItem",
             "flow": "horizontal",
-            "gap": 8,
+            "gap": 5,
             "size": [
               47,
               11
@@ -2406,11 +2444,11 @@
             98,
             20
           ],
-          "z": 24,
+          "z": 26,
           "binds": "combat.autoAttack",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
+          "color": "panelCard",
+          "font": "mono",
+          "fontPx": 7,
           "image": "Content/ui/button/button_on.png",
           "states": {
             "family": "button",
@@ -2434,11 +2472,11 @@
             60,
             20
           ],
-          "z": 25,
+          "z": 27,
           "binds": "combat.retreat",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 6,
           "image": "Content/ui/button/button_normal.png",
           "states": {
             "family": "button",
@@ -2462,7 +2500,7 @@
             960,
             182
           ],
-          "z": 26,
+          "z": 28,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -2501,7 +2539,7 @@
             330,
             181
           ],
-          "z": 27,
+          "z": 29,
           "binds": "Body.pool",
           "color": "ink",
           "border": {
@@ -2527,7 +2565,7 @@
             79,
             15
           ],
-          "z": 28,
+          "z": 30,
           "color": "inkBright",
           "font": "display",
           "fontPx": 12,
@@ -2545,7 +2583,7 @@
             309,
             77
           ],
-          "z": 29,
+          "z": 31,
           "binds": "pool",
           "color": "ink",
           "font": "display",
@@ -2572,7 +2610,7 @@
             309,
             6
           ],
-          "z": 30,
+          "z": 32,
           "binds": "pool.legend",
           "color": "mutedWarm",
           "font": "mono",
@@ -2591,7 +2629,7 @@
             630,
             181
           ],
-          "z": 31,
+          "z": 33,
           "binds": "loadout",
           "color": "ink",
           "font": "display",
@@ -2609,7 +2647,7 @@
             59,
             15
           ],
-          "z": 32,
+          "z": 34,
           "color": "inkBright",
           "font": "display",
           "fontPx": 12,
@@ -2627,7 +2665,7 @@
             495,
             7
           ],
-          "z": 33,
+          "z": 35,
           "color": "parch",
           "font": "mono",
           "fontPx": 5,
@@ -2645,7 +2683,7 @@
             495,
             136
           ],
-          "z": 34,
+          "z": 36,
           "binds": "loadout.techniques",
           "color": "ink",
           "font": "display",
@@ -2672,7 +2710,7 @@
             100,
             7
           ],
-          "z": 35,
+          "z": 37,
           "color": "parch",
           "font": "mono",
           "fontPx": 5,
@@ -2690,7 +2728,7 @@
             100,
             136
           ],
-          "z": 36,
+          "z": 38,
           "binds": "loadout.bays",
           "color": "ink",
           "font": "display",
@@ -3163,9 +3201,9 @@
           ],
           "z": 19,
           "binds": "runes.budget",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 6,
           "sample": "BUDGET 10 free / 20"
         },
         {
@@ -3355,9 +3393,9 @@
         {
           "id": "closeBtn",
           "type": "text",
-          "anchor": "TopRight",
+          "anchor": "TopLeft",
           "offset": [
-            -13,
+            887,
             4
           ],
           "size": [
@@ -3366,7 +3404,7 @@
           ],
           "z": 28,
           "binds": "nav.close",
-          "color": "mutedWarm",
+          "color": "parch",
           "font": "mono",
           "fontPx": 6,
           "image": "Content/ui/button/button_normal.png",
@@ -3987,6 +4025,43 @@
           }
         },
         {
+          "id": "suppliesTitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            22,
+            44
+          ],
+          "size": [
+            33,
+            11
+          ],
+          "z": 10,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 8.5,
+          "content": "Supplies"
+        },
+        {
+          "id": "suppliesCount",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            124,
+            46
+          ],
+          "size": [
+            17,
+            7
+          ],
+          "z": 11,
+          "binds": "supplies.count",
+          "color": "good",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "6 / 9"
+        },
+        {
           "id": "suppliesPips",
           "type": "list",
           "anchor": "TopLeft",
@@ -3998,7 +4073,7 @@
             119,
             8
           ],
-          "z": 10,
+          "z": 12,
           "binds": "supplies.points",
           "color": "ink",
           "font": "display",
@@ -4014,6 +4089,24 @@
           }
         },
         {
+          "id": "suppliesNote",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            22,
+            70
+          ],
+          "size": [
+            119,
+            7
+          ],
+          "z": 13,
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 5,
+          "content": "Consume 1 per deployment."
+        },
+        {
           "id": "musteredSupport",
           "type": "panel",
           "anchor": "TopLeft",
@@ -4025,7 +4118,7 @@
             137,
             53
           ],
-          "z": 11,
+          "z": 14,
           "binds": "support",
           "color": "ink",
           "fill": "panel",
@@ -4053,6 +4146,43 @@
           }
         },
         {
+          "id": "supportTitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            166,
+            44
+          ],
+          "size": [
+            72,
+            11
+          ],
+          "z": 15,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 8.5,
+          "content": "Mustered Support"
+        },
+        {
+          "id": "supportCount",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            268,
+            46
+          ],
+          "size": [
+            17,
+            7
+          ],
+          "z": 16,
+          "binds": "support.count",
+          "color": "amber",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "0 / 2"
+        },
+        {
           "id": "supportPips",
           "type": "list",
           "anchor": "TopLeft",
@@ -4064,7 +4194,7 @@
             119,
             8
           ],
-          "z": 12,
+          "z": 17,
           "binds": "support.points",
           "color": "ink",
           "font": "display",
@@ -4080,6 +4210,24 @@
           }
         },
         {
+          "id": "supportNote",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            166,
+            70
+          ],
+          "size": [
+            119,
+            13
+          ],
+          "z": 18,
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 5,
+          "content": "Capture the 2 resource holds to muster support for the fight at the castle."
+        },
+        {
           "id": "legend",
           "type": "list",
           "anchor": "TopRight",
@@ -4091,7 +4239,7 @@
             240,
             62
           ],
-          "z": 13,
+          "z": 19,
           "binds": "legend",
           "color": "mutedWarm",
           "fill": "panelCard",
@@ -4146,7 +4294,7 @@
             150,
             92
           ],
-          "z": 14,
+          "z": 20,
           "binds": "city.castle",
           "color": "ink",
           "fill": "panel",
@@ -4185,7 +4333,7 @@
             130,
             11
           ],
-          "z": 15,
+          "z": 21,
           "color": "inkBright",
           "font": "display",
           "fontPx": 9,
@@ -4203,7 +4351,7 @@
             130,
             61
           ],
-          "z": 16,
+          "z": 22,
           "binds": "city.castle.parts",
           "color": "ink",
           "font": "display",
@@ -4230,7 +4378,7 @@
             354,
             53
           ],
-          "z": 17,
+          "z": 23,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -4258,7 +4406,7 @@
             144,
             11
           ],
-          "z": 18,
+          "z": 24,
           "color": "parch",
           "font": "display",
           "fontPx": 9,
@@ -4276,7 +4424,7 @@
             103,
             8
           ],
-          "z": 19,
+          "z": 25,
           "binds": "enemy.advance",
           "color": "hit",
           "font": "mono",
@@ -4295,7 +4443,7 @@
             22,
             22
           ],
-          "z": 20,
+          "z": 26,
           "color": "ink",
           "font": "display",
           "fontPx": 8,
@@ -4321,7 +4469,7 @@
             277,
             21
           ],
-          "z": 21,
+          "z": 27,
           "color": "ink",
           "fill": "panel",
           "border": {
@@ -4334,7 +4482,7 @@
         },
         {
           "id": "doomFill",
-          "type": "text",
+          "type": "panel",
           "anchor": "TopLeft",
           "offset": [
             359,
@@ -4344,15 +4492,9 @@
             259,
             19
           ],
-          "z": 22,
+          "z": 28,
           "binds": "enemy.advancePct",
           "color": "ink",
-          "fill": {
-            "type": "gradient",
-            "from": "blood",
-            "to": "blood",
-            "dir": "diagonal"
-          },
           "border": {
             "color": "panel",
             "w": 1,
@@ -4363,6 +4505,30 @@
           },
           "font": "display",
           "fontPx": 8
+        },
+        {
+          "id": "doomFillStripes",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            360,
+            61
+          ],
+          "size": [
+            257,
+            19
+          ],
+          "z": 29,
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "blood",
+            "to": "blood",
+            "dir": "diagonal"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "imageBind": "ui/pattern/doom_stripe"
         },
         {
           "id": "doomHost",
@@ -4376,7 +4542,7 @@
             41,
             41
           ],
-          "z": 23,
+          "z": 30,
           "color": "ink",
           "font": "display",
           "fontPx": 8,
@@ -4402,7 +4568,7 @@
             23,
             23
           ],
-          "z": 24,
+          "z": 31,
           "color": "ink",
           "font": "display",
           "fontPx": 8,
@@ -4428,7 +4594,7 @@
             960,
             36
           ],
-          "z": 25,
+          "z": 32,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -4467,7 +4633,7 @@
             32,
             7
           ],
-          "z": 26,
+          "z": 33,
           "color": "mutedDim",
           "font": "mono",
           "fontPx": 5,
@@ -4485,7 +4651,7 @@
             110,
             15
           ],
-          "z": 27,
+          "z": 34,
           "binds": "campaign.cities",
           "color": "ink",
           "font": "display",
@@ -4512,7 +4678,7 @@
             36,
             7
           ],
-          "z": 28,
+          "z": 35,
           "binds": "campaign.taken",
           "color": "mutedWarm",
           "font": "mono",
@@ -4531,7 +4697,7 @@
             16,
             7
           ],
-          "z": 29,
+          "z": 36,
           "color": "mutedDim",
           "font": "mono",
           "fontPx": 5,
@@ -4549,7 +4715,7 @@
             164,
             13
           ],
-          "z": 30,
+          "z": 37,
           "binds": "Body.gear",
           "color": "ink",
           "font": "display",
@@ -4576,11 +4742,11 @@
             100,
             20
           ],
-          "z": 31,
+          "z": 38,
           "binds": "nav.equipment",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 6.5,
           "image": "Content/ui/button/button_normal.png",
           "states": {
             "family": "button",
@@ -4591,6 +4757,1485 @@
             "on": "ui/button/button_on"
           },
           "content": "⚒ EQUIPMENT"
+        }
+      ]
+    },
+    "newgame": {
+      "designSize": [
+        960,
+        540
+      ],
+      "elements": [
+        {
+          "id": "topBar",
+          "type": "panel",
+          "anchor": "Top",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            32
+          ],
+          "z": 0,
+          "binds": "selection",
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "slot",
+            "to": "panelCard",
+            "dir": "vertical"
+          },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "bottom"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          }
+        },
+        {
+          "id": "logo",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            14,
+            8
+          ],
+          "size": [
+            60,
+            15
+          ],
+          "z": 1,
+          "color": "inkWarm",
+          "font": "display",
+          "fontPx": 12,
+          "content": "Roguebane"
+        },
+        {
+          "id": "topBarSubtitle",
+          "type": "text",
+          "anchor": "Top",
+          "offset": [
+            -348,
+            13
+          ],
+          "size": [
+            97,
+            8
+          ],
+          "z": 2,
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 6,
+          "content": "Choose your Loadout"
+        },
+        {
+          "id": "racePanel",
+          "type": "panel",
+          "anchor": "Left",
+          "offset": [
+            0,
+            -6
+          ],
+          "size": [
+            230,
+            464
+          ],
+          "z": 3,
+          "binds": "races",
+          "color": "ink",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "right"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "raceHeader",
+          "type": "text",
+          "anchor": "Left",
+          "offset": [
+            10,
+            -221
+          ],
+          "size": [
+            209,
+            15
+          ],
+          "z": 4,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 12,
+          "content": "Race"
+        },
+        {
+          "id": "raceCards",
+          "type": "list",
+          "anchor": "Left",
+          "offset": [
+            10,
+            -124
+          ],
+          "size": [
+            209,
+            165
+          ],
+          "z": 5,
+          "binds": "races",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "raceCard",
+            "flow": "vertical",
+            "gap": 7,
+            "size": [
+              209,
+              79
+            ]
+          }
+        },
+        {
+          "id": "corePanel",
+          "type": "panel",
+          "anchor": "Center",
+          "offset": [
+            0,
+            -6
+          ],
+          "size": [
+            500,
+            464
+          ],
+          "z": 6,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "coreHeader",
+          "type": "text",
+          "anchor": "Center",
+          "offset": [
+            0,
+            -221
+          ],
+          "size": [
+            476,
+            15
+          ],
+          "z": 7,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 12,
+          "content": "Core Rune"
+        },
+        {
+          "id": "coreCards",
+          "type": "list",
+          "anchor": "Center",
+          "offset": [
+            0,
+            1
+          ],
+          "size": [
+            476,
+            416
+          ],
+          "z": 8,
+          "binds": "cores",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "coreCard",
+            "flow": "grid",
+            "gap": 10,
+            "cols": 3,
+            "size": [
+              152,
+              203
+            ]
+          }
+        },
+        {
+          "id": "preview",
+          "type": "panel",
+          "anchor": "Right",
+          "offset": [
+            0,
+            -6
+          ],
+          "size": [
+            230,
+            464
+          ],
+          "z": 9,
+          "binds": "preview",
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "borderDim",
+            "to": "panelDeep",
+            "dir": "vertical"
+          },
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "left"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "loadoutHeader",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -11,
+            -221
+          ],
+          "size": [
+            207,
+            15
+          ],
+          "z": 10,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 12,
+          "content": "Loadout"
+        },
+        {
+          "id": "previewStage",
+          "type": "panel",
+          "anchor": "Right",
+          "offset": [
+            -11,
+            -130
+          ],
+          "size": [
+            207,
+            160
+          ],
+          "z": 11,
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "slot",
+            "to": "ground",
+            "dir": "vertical"
+          },
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "previewFigure",
+          "type": "figure",
+          "anchor": "TopLeft",
+          "offset": [
+            743,
+            82
+          ],
+          "size": [
+            205,
+            122
+          ],
+          "z": 12,
+          "binds": "preview.fig",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "previewName",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            749,
+            67
+          ],
+          "size": [
+            76,
+            16
+          ],
+          "z": 13,
+          "binds": "preview.name",
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 13,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          },
+          "sample": "Human Grunt"
+        },
+        {
+          "id": "previewRole",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            749,
+            83
+          ],
+          "size": [
+            56,
+            7
+          ],
+          "z": 14,
+          "binds": "preview.role",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 5,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          },
+          "sample": "THE GENERALIST"
+        },
+        {
+          "id": "previewAttrRow",
+          "type": "list",
+          "anchor": "Right",
+          "offset": [
+            -11,
+            -25
+          ],
+          "size": [
+            207,
+            35
+          ],
+          "z": 15,
+          "binds": "preview.attrs",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "previewAttrTile",
+            "flow": "horizontal",
+            "gap": 4,
+            "size": [
+              38,
+              35
+            ]
+          }
+        },
+        {
+          "id": "previewHpTile",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -11,
+            -25
+          ],
+          "size": [
+            41,
+            35
+          ],
+          "z": 16,
+          "binds": "preview.hp",
+          "color": "mutedDim",
+          "fill": "panel",
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 4.5,
+          "align": "center",
+          "parts": [
+            {
+              "part": "value",
+              "rect": [
+                1,
+                12,
+                38,
+                10
+              ],
+              "color": "gold",
+              "font": "mono",
+              "fontPx": 10,
+              "align": "center",
+              "sample": "20",
+              "binds": "preview.hp"
+            },
+            {
+              "part": "label",
+              "rect": [
+                1,
+                24,
+                38,
+                6
+              ],
+              "color": "mutedDim",
+              "font": "mono",
+              "fontPx": 4.5,
+              "align": "center",
+              "content": "BASE HP"
+            }
+          ]
+        },
+        {
+          "id": "previewLayoutRow",
+          "type": "panel",
+          "anchor": "Right",
+          "offset": [
+            -11,
+            12
+          ],
+          "size": [
+            207,
+            27
+          ],
+          "z": 17,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "previewBudgetTile",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -152,
+            12
+          ],
+          "size": [
+            66,
+            27
+          ],
+          "z": 18,
+          "binds": "preview.budget",
+          "color": "mutedDim",
+          "fill": "panelDeep",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 4.25,
+          "align": "center",
+          "parts": [
+            {
+              "part": "value",
+              "rect": [
+                2,
+                5,
+                62,
+                10
+              ],
+              "color": "amber",
+              "font": "mono",
+              "fontPx": 10,
+              "align": "center",
+              "sample": "20",
+              "binds": "preview.budget"
+            },
+            {
+              "part": "label",
+              "rect": [
+                2,
+                17,
+                62,
+                6
+              ],
+              "color": "mutedDim",
+              "font": "mono",
+              "fontPx": 4.25,
+              "align": "center",
+              "content": "RUNE BUDGET"
+            }
+          ]
+        },
+        {
+          "id": "previewActionsTile",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -82,
+            12
+          ],
+          "size": [
+            66,
+            27
+          ],
+          "z": 19,
+          "binds": "preview.techniques",
+          "color": "mutedDim",
+          "fill": "panelDeep",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 4.25,
+          "align": "center",
+          "parts": [
+            {
+              "part": "value",
+              "rect": [
+                2,
+                5,
+                62,
+                10
+              ],
+              "color": "inkWarm",
+              "font": "mono",
+              "fontPx": 10,
+              "align": "center",
+              "sample": "4",
+              "binds": "preview.techniques"
+            },
+            {
+              "part": "label",
+              "rect": [
+                2,
+                17,
+                62,
+                6
+              ],
+              "color": "mutedDim",
+              "font": "mono",
+              "fontPx": 4.25,
+              "align": "center",
+              "content": "ACTIONS"
+            }
+          ]
+        },
+        {
+          "id": "previewBaysTile",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -11,
+            12
+          ],
+          "size": [
+            66,
+            27
+          ],
+          "z": 20,
+          "binds": "preview.bays",
+          "color": "mutedDim",
+          "fill": "panelDeep",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 4.25,
+          "align": "center",
+          "parts": [
+            {
+              "part": "value",
+              "rect": [
+                2,
+                5,
+                62,
+                10
+              ],
+              "color": "inkWarm",
+              "font": "mono",
+              "fontPx": 10,
+              "align": "center",
+              "sample": "1",
+              "binds": "preview.bays"
+            },
+            {
+              "part": "label",
+              "rect": [
+                2,
+                17,
+                62,
+                6
+              ],
+              "color": "mutedDim",
+              "font": "mono",
+              "fontPx": 4.25,
+              "align": "center",
+              "content": "MINION BAYS"
+            }
+          ]
+        },
+        {
+          "id": "previewCoreEffect",
+          "type": "panel",
+          "anchor": "Right",
+          "offset": [
+            -11,
+            58
+          ],
+          "size": [
+            207,
+            49
+          ],
+          "z": 21,
+          "binds": "preview.coreEffect",
+          "color": "ink",
+          "border": {
+            "color": "good",
+            "w": 2,
+            "style": "solid",
+            "sides": [
+              "left"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8,
+          "colorBind": "preview.accent"
+        },
+        {
+          "id": "previewCoreEffectLabel",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -10,
+            38
+          ],
+          "size": [
+            198,
+            7
+          ],
+          "z": 22,
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 5,
+          "content": "CORE EFFECT"
+        },
+        {
+          "id": "previewCoreEffectName",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -10,
+            50
+          ],
+          "size": [
+            198,
+            14
+          ],
+          "z": 23,
+          "binds": "preview.coreEffectName",
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 13,
+          "sample": "Hollow Vessel"
+        },
+        {
+          "id": "previewCoreEffectDesc",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -10,
+            71
+          ],
+          "size": [
+            198,
+            19
+          ],
+          "z": 24,
+          "binds": "preview.coreEffectDesc",
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 6,
+          "sample": "You are healed for your unspent budget points after each encounter."
+        },
+        {
+          "id": "confirmBar",
+          "type": "panel",
+          "anchor": "Bottom",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            44
+          ],
+          "z": 25,
+          "binds": "selection",
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "panel",
+            "to": "panelDeep",
+            "dir": "vertical"
+          },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "top"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          }
+        },
+        {
+          "id": "beginBtn",
+          "type": "button",
+          "anchor": "TopLeft",
+          "offset": [
+            824,
+            506
+          ],
+          "size": [
+            116,
+            25
+          ],
+          "z": 26,
+          "binds": "begin",
+          "color": "panelDeep",
+          "fill": "good",
+          "border": {
+            "color": "panelDeep",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 7.5,
+          "states": {
+            "idle": {
+              "fill": "good",
+              "color": "ground",
+              "border": "ground"
+            },
+            "disabled": {
+              "fill": "slot",
+              "color": "muted",
+              "opacity": 0.7
+            }
+          },
+          "content": "BEGIN THE RUN ▶"
+        }
+      ]
+    },
+    "merchant": {
+      "designSize": [
+        960,
+        540
+      ],
+      "elements": [
+        {
+          "id": "backdrop",
+          "type": "text",
+          "anchor": "Center",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            540
+          ],
+          "z": 0,
+          "binds": "merchant.scene",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/bg/merchant_stall.png"
+        },
+        {
+          "id": "factorPanel",
+          "type": "panel",
+          "anchor": "Left",
+          "offset": [
+            0,
+            -4
+          ],
+          "size": [
+            240,
+            476
+          ],
+          "z": 1,
+          "binds": "merchant",
+          "color": "ink",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "right"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "factorToken",
+          "type": "icon",
+          "anchor": "TopLeft",
+          "offset": [
+            12,
+            37
+          ],
+          "size": [
+            22,
+            22
+          ],
+          "z": 2,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/icons/node/merchant.png",
+          "shadow": {
+            "token": "soft",
+            "dx": 0,
+            "dy": 3,
+            "blur": 4,
+            "color": "outline",
+            "opacity": 0.45
+          }
+        },
+        {
+          "id": "factorTitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            40,
+            40
+          ],
+          "size": [
+            52,
+            15
+          ],
+          "z": 3,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 12,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          },
+          "content": "Merchant"
+        },
+        {
+          "id": "healPanel",
+          "type": "panel",
+          "anchor": "Left",
+          "offset": [
+            12,
+            -145
+          ],
+          "size": [
+            215,
+            113
+          ],
+          "z": 4,
+          "binds": "merchant.healing",
+          "color": "ink",
+          "fill": "panel",
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          },
+          "frame": {
+            "token": "card",
+            "asset": "ui/frame/card",
+            "slice": [
+              12,
+              12,
+              12,
+              12
+            ],
+            "repeat": "tile",
+            "centerFill": true
+          }
+        },
+        {
+          "id": "healTitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            23,
+            78
+          ],
+          "size": [
+            37,
+            13
+          ],
+          "z": 5,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 10,
+          "content": "Healing"
+        },
+        {
+          "id": "healHp",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            184,
+            81
+          ],
+          "size": [
+            32,
+            8
+          ],
+          "z": 6,
+          "binds": "Body.hp",
+          "color": "lockRed",
+          "font": "mono",
+          "fontPx": 6,
+          "sample": "HP 9 / 12"
+        },
+        {
+          "id": "healPips",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            23,
+            96
+          ],
+          "size": [
+            193,
+            6
+          ],
+          "z": 7,
+          "binds": "Body.hp.points",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "healPip",
+            "flow": "horizontal",
+            "gap": 2,
+            "size": [
+              15,
+              6
+            ]
+          }
+        },
+        {
+          "id": "healRows",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            23,
+            107
+          ],
+          "size": [
+            193,
+            64
+          ],
+          "z": 8,
+          "binds": "merchant.healing.offers",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "healRow",
+            "flow": "vertical",
+            "gap": 4,
+            "size": [
+              193,
+              30
+            ]
+          }
+        },
+        {
+          "id": "provisionPanel",
+          "type": "panel",
+          "anchor": "Left",
+          "offset": [
+            12,
+            -12
+          ],
+          "size": [
+            215,
+            137
+          ],
+          "z": 9,
+          "binds": "merchant.provisions",
+          "color": "ink",
+          "fill": "panel",
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          },
+          "frame": {
+            "token": "card",
+            "asset": "ui/frame/card",
+            "slice": [
+              12,
+              12,
+              12,
+              12
+            ],
+            "repeat": "tile",
+            "centerFill": true
+          }
+        },
+        {
+          "id": "provisionTitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            23,
+            199
+          ],
+          "size": [
+            47,
+            13
+          ],
+          "z": 10,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 10,
+          "content": "Provisions"
+        },
+        {
+          "id": "provisionRows",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            23,
+            217
+          ],
+          "size": [
+            193,
+            98
+          ],
+          "z": 11,
+          "binds": "merchant.provisions.stock",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "provisionRow",
+            "flow": "vertical",
+            "gap": 4,
+            "size": [
+              193,
+              30
+            ]
+          }
+        },
+        {
+          "id": "waresPanel",
+          "type": "panel",
+          "anchor": "Right",
+          "offset": [
+            0,
+            -4
+          ],
+          "size": [
+            720,
+            476
+          ],
+          "z": 12,
+          "binds": "merchant.stock",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "waresTitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            254,
+            37
+          ],
+          "size": [
+            33,
+            15
+          ],
+          "z": 13,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 12,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          },
+          "content": "Wares"
+        },
+        {
+          "id": "waresShelves",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            254,
+            61
+          ],
+          "size": [
+            692,
+            377
+          ],
+          "z": 14,
+          "binds": "merchant.stock.sections",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "shopSection",
+            "flow": "vertical",
+            "gap": 12,
+            "size": [
+              692,
+              118
+            ]
+          }
+        },
+        {
+          "id": "statusStrip",
+          "type": "panel",
+          "anchor": "Top",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            28
+          ],
+          "z": 15,
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "slot",
+            "to": "panelCard",
+            "dir": "vertical"
+          },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "bottom"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "logo",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            13,
+            6
+          ],
+          "size": [
+            57,
+            15
+          ],
+          "z": 16,
+          "color": "inkWarm",
+          "font": "display",
+          "fontPx": 11.5,
+          "content": "Roguebane"
+        },
+        {
+          "id": "nodeLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            79,
+            10
+          ],
+          "size": [
+            33,
+            8
+          ],
+          "z": 17,
+          "binds": "merchant.label",
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 6,
+          "sample": "MERCHANT"
+        },
+        {
+          "id": "resourceStrip",
+          "type": "list",
+          "anchor": "TopRight",
+          "offset": [
+            -85,
+            8
+          ],
+          "size": [
+            197,
+            11
+          ],
+          "z": 18,
+          "binds": "run.resources",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "resourceItem",
+            "flow": "horizontal",
+            "gap": 8,
+            "size": [
+              47,
+              11
+            ]
+          }
+        },
+        {
+          "id": "leaveBtn",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            887,
+            4
+          ],
+          "size": [
+            60,
+            20
+          ],
+          "z": 19,
+          "binds": "merchant.leave",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 6,
+          "image": "Content/ui/button/button_normal.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "content": "⮐ LEAVE"
+        },
+        {
+          "id": "footer",
+          "type": "panel",
+          "anchor": "Bottom",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            36
+          ],
+          "z": 20,
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "panel",
+            "to": "panelTab",
+            "dir": "vertical"
+          },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "top"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          }
+        },
+        {
+          "id": "footerFlavor",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            14,
+            517
+          ],
+          "size": [
+            88,
+            11
+          ],
+          "z": 21,
+          "color": "muted",
+          "font": "display",
+          "fontPx": 8.5,
+          "content": "Fair dealing by lantern light."
+        },
+        {
+          "id": "pager",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            785,
+            514
+          ],
+          "size": [
+            109,
+            17
+          ],
+          "z": 22,
+          "binds": "merchant.stock.page",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "pagePrev",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            785,
+            514
+          ],
+          "size": [
+            22,
+            17
+          ],
+          "z": 23,
+          "binds": "merchant.stock.pagePrev",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 6.5,
+          "image": "Content/ui/button/button_normal.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "content": "◀"
+        },
+        {
+          "id": "pageLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            812,
+            519
+          ],
+          "size": [
+            55,
+            8
+          ],
+          "z": 24,
+          "binds": "merchant.stock.pageLabel",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 6,
+          "align": "center",
+          "sample": "PAGE 1 / 2"
+        },
+        {
+          "id": "pageNext",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            872,
+            514
+          ],
+          "size": [
+            22,
+            17
+          ],
+          "z": 25,
+          "binds": "merchant.stock.pageNext",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 6.5,
+          "image": "Content/ui/button/button_normal.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "content": "▶"
+        },
+        {
+          "id": "purseNote",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            907,
+            518
+          ],
+          "size": [
+            39,
+            9
+          ],
+          "z": 26,
+          "binds": "run.gold",
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 6.5,
+          "sample": "PURSE 128g"
         }
       ]
     },
@@ -4848,1337 +6493,6 @@
           }
         }
       ]
-    },
-    "newgame": {
-      "designSize": [
-        960,
-        540
-      ],
-      "elements": [
-        {
-          "id": "topBar",
-          "type": "panel",
-          "anchor": "Top",
-          "offset": [
-            0,
-            0
-          ],
-          "size": [
-            960,
-            32
-          ],
-          "z": 0,
-          "binds": "selection",
-          "color": "ink",
-          "fill": {
-            "type": "gradient",
-            "from": "slot",
-            "to": "panelCard",
-            "dir": "vertical"
-          },
-          "border": {
-            "color": "borderMid",
-            "w": 1,
-            "style": "solid",
-            "sides": [
-              "bottom"
-            ]
-          },
-          "font": "display",
-          "fontPx": 8,
-          "shadow": {
-            "token": "panel",
-            "dx": 0,
-            "dy": 4,
-            "blur": 10,
-            "color": "outline",
-            "opacity": 0.5
-          }
-        },
-        {
-          "id": "logo",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            14,
-            8
-          ],
-          "size": [
-            60,
-            15
-          ],
-          "z": 1,
-          "color": "inkWarm",
-          "font": "display",
-          "fontPx": 12,
-          "content": "Roguebane"
-        },
-        {
-          "id": "topBarSubtitle",
-          "type": "text",
-          "anchor": "Top",
-          "offset": [
-            -348,
-            13
-          ],
-          "size": [
-            97,
-            8
-          ],
-          "z": 2,
-          "color": "muted",
-          "font": "mono",
-          "fontPx": 6,
-          "content": "Choose your Loadout"
-        },
-        {
-          "id": "racePanel",
-          "type": "panel",
-          "anchor": "Left",
-          "offset": [
-            0,
-            -6
-          ],
-          "size": [
-            230,
-            464
-          ],
-          "z": 3,
-          "binds": "races",
-          "color": "ink",
-          "border": {
-            "color": "borderDim",
-            "w": 1,
-            "style": "solid",
-            "sides": [
-              "right"
-            ]
-          },
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "raceHeader",
-          "type": "text",
-          "anchor": "Left",
-          "offset": [
-            10,
-            -221
-          ],
-          "size": [
-            209,
-            15
-          ],
-          "z": 4,
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "content": "① Race"
-        },
-        {
-          "id": "raceCards",
-          "type": "list",
-          "anchor": "Left",
-          "offset": [
-            10,
-            -124
-          ],
-          "size": [
-            209,
-            165
-          ],
-          "z": 5,
-          "binds": "races",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "item": {
-            "template": "raceCard",
-            "flow": "vertical",
-            "gap": 7,
-            "size": [
-              209,
-              79
-            ]
-          }
-        },
-        {
-          "id": "corePanel",
-          "type": "panel",
-          "anchor": "Center",
-          "offset": [
-            0,
-            -6
-          ],
-          "size": [
-            500,
-            464
-          ],
-          "z": 6,
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "coreHeader",
-          "type": "text",
-          "anchor": "Center",
-          "offset": [
-            0,
-            -221
-          ],
-          "size": [
-            476,
-            15
-          ],
-          "z": 7,
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "content": "② Core Rune"
-        },
-        {
-          "id": "coreCards",
-          "type": "list",
-          "anchor": "Center",
-          "offset": [
-            0,
-            1
-          ],
-          "size": [
-            476,
-            416
-          ],
-          "z": 8,
-          "binds": "cores",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "item": {
-            "template": "coreCard",
-            "flow": "grid",
-            "gap": 10,
-            "cols": 3,
-            "size": [
-              152,
-              203
-            ]
-          }
-        },
-        {
-          "id": "preview",
-          "type": "panel",
-          "anchor": "Right",
-          "offset": [
-            0,
-            -6
-          ],
-          "size": [
-            230,
-            464
-          ],
-          "z": 9,
-          "binds": "preview",
-          "color": "ink",
-          "fill": {
-            "type": "gradient",
-            "from": "borderDim",
-            "to": "panelDeep",
-            "dir": "vertical"
-          },
-          "border": {
-            "color": "borderDim",
-            "w": 1,
-            "style": "solid",
-            "sides": [
-              "left"
-            ]
-          },
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "loadoutHeader",
-          "type": "text",
-          "anchor": "Right",
-          "offset": [
-            -11,
-            -221
-          ],
-          "size": [
-            207,
-            15
-          ],
-          "z": 10,
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "content": "Loadout"
-        },
-        {
-          "id": "previewFigure",
-          "type": "figure",
-          "anchor": "TopLeft",
-          "offset": [
-            743,
-            82
-          ],
-          "size": [
-            205,
-            122
-          ],
-          "z": 11,
-          "binds": "preview.fig",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "previewName",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            749,
-            67
-          ],
-          "size": [
-            76,
-            16
-          ],
-          "z": 12,
-          "binds": "preview.name",
-          "color": "inkBright",
-          "font": "display",
-          "fontPx": 13,
-          "shadow": {
-            "token": "title",
-            "dx": 0,
-            "dy": 2,
-            "blur": 3,
-            "color": "outline",
-            "opacity": 0.65
-          },
-          "sample": "Human Grunt"
-        },
-        {
-          "id": "previewRole",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            749,
-            83
-          ],
-          "size": [
-            56,
-            7
-          ],
-          "z": 13,
-          "binds": "preview.role",
-          "color": "parch",
-          "font": "mono",
-          "fontPx": 5,
-          "shadow": {
-            "token": "title",
-            "dx": 0,
-            "dy": 2,
-            "blur": 3,
-            "color": "outline",
-            "opacity": 0.65
-          },
-          "sample": "THE GENERALIST"
-        },
-        {
-          "id": "previewAttrRow",
-          "type": "list",
-          "anchor": "Right",
-          "offset": [
-            -11,
-            -25
-          ],
-          "size": [
-            207,
-            35
-          ],
-          "z": 14,
-          "binds": "preview.attrs",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "item": {
-            "template": "previewAttrTile",
-            "flow": "horizontal",
-            "gap": 4,
-            "size": [
-              38,
-              35
-            ]
-          }
-        },
-        {
-          "id": "previewHpTile",
-          "type": "text",
-          "anchor": "Right",
-          "offset": [
-            -11,
-            -25
-          ],
-          "size": [
-            41,
-            35
-          ],
-          "z": 15,
-          "binds": "preview.hp",
-          "color": "ink",
-          "fill": "panel",
-          "border": {
-            "color": "borderMid",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "align": "center",
-          "sample": "20 BASE HP"
-        },
-        {
-          "id": "previewLayoutRow",
-          "type": "panel",
-          "anchor": "Right",
-          "offset": [
-            -11,
-            12
-          ],
-          "size": [
-            207,
-            27
-          ],
-          "z": 16,
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "previewBudgetTile",
-          "type": "text",
-          "anchor": "Right",
-          "offset": [
-            -152,
-            12
-          ],
-          "size": [
-            66,
-            27
-          ],
-          "z": 17,
-          "binds": "preview.budget",
-          "color": "ink",
-          "fill": "panelDeep",
-          "border": {
-            "color": "borderDim",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "align": "center",
-          "sample": "20 RUNE BUDGET"
-        },
-        {
-          "id": "previewActionsTile",
-          "type": "text",
-          "anchor": "Right",
-          "offset": [
-            -82,
-            12
-          ],
-          "size": [
-            66,
-            27
-          ],
-          "z": 18,
-          "binds": "preview.techniques",
-          "color": "ink",
-          "fill": "panelDeep",
-          "border": {
-            "color": "borderDim",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "align": "center",
-          "sample": "4 ACTIONS"
-        },
-        {
-          "id": "previewBaysTile",
-          "type": "text",
-          "anchor": "Right",
-          "offset": [
-            -11,
-            12
-          ],
-          "size": [
-            66,
-            27
-          ],
-          "z": 19,
-          "binds": "preview.bays",
-          "color": "ink",
-          "fill": "panelDeep",
-          "border": {
-            "color": "borderDim",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "align": "center",
-          "sample": "1 MINION BAYS"
-        },
-        {
-          "id": "previewCoreEffect",
-          "type": "panel",
-          "anchor": "Right",
-          "offset": [
-            -11,
-            58
-          ],
-          "size": [
-            207,
-            49
-          ],
-          "z": 20,
-          "binds": "preview.coreEffect",
-          "color": "ink",
-          "border": {
-            "color": "good",
-            "w": 2,
-            "style": "solid",
-            "sides": [
-              "left"
-            ]
-          },
-          "font": "display",
-          "fontPx": 8,
-          "colorBind": "preview.accent"
-        },
-        {
-          "id": "previewCoreEffectLabel",
-          "type": "text",
-          "anchor": "Right",
-          "offset": [
-            -10,
-            38
-          ],
-          "size": [
-            198,
-            7
-          ],
-          "z": 21,
-          "color": "mutedDim",
-          "font": "mono",
-          "fontPx": 5,
-          "content": "CORE EFFECT"
-        },
-        {
-          "id": "previewCoreEffectName",
-          "type": "text",
-          "anchor": "Right",
-          "offset": [
-            -10,
-            50
-          ],
-          "size": [
-            198,
-            14
-          ],
-          "z": 22,
-          "binds": "preview.coreEffectName",
-          "color": "inkBright",
-          "font": "display",
-          "fontPx": 13,
-          "sample": "Hollow Vessel"
-        },
-        {
-          "id": "previewCoreEffectDesc",
-          "type": "text",
-          "anchor": "Right",
-          "offset": [
-            -10,
-            71
-          ],
-          "size": [
-            198,
-            19
-          ],
-          "z": 23,
-          "binds": "preview.coreEffectDesc",
-          "color": "mutedWarm",
-          "font": "mono",
-          "fontPx": 6,
-          "sample": "You are healed for your unspent budget points after each encounter."
-        },
-        {
-          "id": "confirmBar",
-          "type": "panel",
-          "anchor": "Bottom",
-          "offset": [
-            0,
-            0
-          ],
-          "size": [
-            960,
-            44
-          ],
-          "z": 24,
-          "binds": "selection",
-          "color": "ink",
-          "fill": {
-            "type": "gradient",
-            "from": "panel",
-            "to": "panelDeep",
-            "dir": "vertical"
-          },
-          "border": {
-            "color": "borderMid",
-            "w": 1,
-            "style": "solid",
-            "sides": [
-              "top"
-            ]
-          },
-          "font": "display",
-          "fontPx": 8,
-          "shadow": {
-            "token": "panel",
-            "dx": 0,
-            "dy": 4,
-            "blur": 10,
-            "color": "outline",
-            "opacity": 0.5
-          }
-        },
-        {
-          "id": "beginBtn",
-          "type": "button",
-          "anchor": "TopLeft",
-          "offset": [
-            824,
-            506
-          ],
-          "size": [
-            116,
-            25
-          ],
-          "z": 25,
-          "binds": "begin",
-          "color": "panelDeep",
-          "fill": "good",
-          "border": {
-            "color": "panelDeep",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "mono",
-          "fontPx": 7.5,
-          "content": "BEGIN THE RUN ▶",
-          "states": {
-            "idle": {
-              "fill": "good",
-              "color": "ground",
-              "border": "ground"
-            },
-            "disabled": {
-              "fill": "slot",
-              "color": "muted",
-              "opacity": 0.7
-            }
-          }
-        }
-      ]
-    },
-    "merchant": {
-      "designSize": [
-        960,
-        540
-      ],
-      "elements": [
-        {
-          "id": "backdrop",
-          "type": "text",
-          "anchor": "Center",
-          "offset": [
-            0,
-            0
-          ],
-          "size": [
-            960,
-            540
-          ],
-          "z": 0,
-          "binds": "merchant.scene",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "image": "Content/bg/merchant_stall.png"
-        },
-        {
-          "id": "factorPanel",
-          "type": "panel",
-          "anchor": "Left",
-          "offset": [
-            0,
-            -4
-          ],
-          "size": [
-            240,
-            476
-          ],
-          "z": 1,
-          "binds": "merchant",
-          "color": "ink",
-          "border": {
-            "color": "borderDim",
-            "w": 1,
-            "style": "solid",
-            "sides": [
-              "right"
-            ]
-          },
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "factorToken",
-          "type": "icon",
-          "anchor": "TopLeft",
-          "offset": [
-            12,
-            37
-          ],
-          "size": [
-            22,
-            22
-          ],
-          "z": 2,
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "image": "Content/icons/node/merchant.png",
-          "shadow": {
-            "token": "soft",
-            "dx": 0,
-            "dy": 3,
-            "blur": 4,
-            "color": "outline",
-            "opacity": 0.45
-          }
-        },
-        {
-          "id": "factorTitle",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            40,
-            40
-          ],
-          "size": [
-            52,
-            15
-          ],
-          "z": 3,
-          "color": "inkBright",
-          "font": "display",
-          "fontPx": 12,
-          "shadow": {
-            "token": "title",
-            "dx": 0,
-            "dy": 2,
-            "blur": 3,
-            "color": "outline",
-            "opacity": 0.65
-          },
-          "content": "Merchant"
-        },
-        {
-          "id": "healPanel",
-          "type": "panel",
-          "anchor": "Left",
-          "offset": [
-            12,
-            -146
-          ],
-          "size": [
-            215,
-            111
-          ],
-          "z": 4,
-          "binds": "merchant.healing",
-          "color": "ink",
-          "fill": "panel",
-          "font": "display",
-          "fontPx": 8,
-          "shadow": {
-            "token": "panel",
-            "dx": 0,
-            "dy": 4,
-            "blur": 10,
-            "color": "outline",
-            "opacity": 0.5
-          },
-          "frame": {
-            "token": "card",
-            "asset": "ui/frame/card",
-            "slice": [
-              12,
-              12,
-              12,
-              12
-            ],
-            "repeat": "tile",
-            "centerFill": true
-          }
-        },
-        {
-          "id": "healTitle",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            22,
-            77
-          ],
-          "size": [
-            37,
-            13
-          ],
-          "z": 5,
-          "color": "inkBright",
-          "font": "display",
-          "fontPx": 10,
-          "content": "Healing"
-        },
-        {
-          "id": "healHp",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            185,
-            80
-          ],
-          "size": [
-            32,
-            8
-          ],
-          "z": 6,
-          "binds": "Body.hp",
-          "color": "lockRed",
-          "font": "mono",
-          "fontPx": 6,
-          "sample": "HP 9 / 12"
-        },
-        {
-          "id": "healPips",
-          "type": "list",
-          "anchor": "TopLeft",
-          "offset": [
-            22,
-            95
-          ],
-          "size": [
-            195,
-            6
-          ],
-          "z": 7,
-          "binds": "Body.hp.points",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "item": {
-            "template": "healPip",
-            "flow": "horizontal",
-            "gap": 2,
-            "size": [
-              15,
-              6
-            ]
-          }
-        },
-        {
-          "id": "healRows",
-          "type": "list",
-          "anchor": "TopLeft",
-          "offset": [
-            22,
-            106
-          ],
-          "size": [
-            195,
-            64
-          ],
-          "z": 8,
-          "binds": "merchant.healing.offers",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "item": {
-            "template": "healRow",
-            "flow": "vertical",
-            "gap": 4,
-            "size": [
-              195,
-              30
-            ]
-          }
-        },
-        {
-          "id": "provisionPanel",
-          "type": "panel",
-          "anchor": "Left",
-          "offset": [
-            12,
-            -15
-          ],
-          "size": [
-            215,
-            135
-          ],
-          "z": 9,
-          "binds": "merchant.provisions",
-          "color": "ink",
-          "fill": "panel",
-          "font": "display",
-          "fontPx": 8,
-          "shadow": {
-            "token": "panel",
-            "dx": 0,
-            "dy": 4,
-            "blur": 10,
-            "color": "outline",
-            "opacity": 0.5
-          },
-          "frame": {
-            "token": "card",
-            "asset": "ui/frame/card",
-            "slice": [
-              12,
-              12,
-              12,
-              12
-            ],
-            "repeat": "tile",
-            "centerFill": true
-          }
-        },
-        {
-          "id": "provisionTitle",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            22,
-            196
-          ],
-          "size": [
-            47,
-            13
-          ],
-          "z": 10,
-          "color": "inkBright",
-          "font": "display",
-          "fontPx": 10,
-          "content": "Provisions"
-        },
-        {
-          "id": "provisionRows",
-          "type": "list",
-          "anchor": "TopLeft",
-          "offset": [
-            22,
-            214
-          ],
-          "size": [
-            195,
-            98
-          ],
-          "z": 11,
-          "binds": "merchant.provisions.stock",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "item": {
-            "template": "provisionRow",
-            "flow": "vertical",
-            "gap": 4,
-            "size": [
-              195,
-              30
-            ]
-          }
-        },
-        {
-          "id": "waresPanel",
-          "type": "panel",
-          "anchor": "Right",
-          "offset": [
-            0,
-            -4
-          ],
-          "size": [
-            720,
-            476
-          ],
-          "z": 12,
-          "binds": "merchant.stock",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "waresTitle",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            254,
-            37
-          ],
-          "size": [
-            33,
-            15
-          ],
-          "z": 13,
-          "color": "inkBright",
-          "font": "display",
-          "fontPx": 12,
-          "shadow": {
-            "token": "title",
-            "dx": 0,
-            "dy": 2,
-            "blur": 3,
-            "color": "outline",
-            "opacity": 0.65
-          },
-          "content": "Wares"
-        },
-        {
-          "id": "waresShelves",
-          "type": "list",
-          "anchor": "TopLeft",
-          "offset": [
-            254,
-            61
-          ],
-          "size": [
-            692,
-            377
-          ],
-          "z": 14,
-          "binds": "merchant.stock.sections",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "item": {
-            "template": "shopSection",
-            "flow": "vertical",
-            "gap": 12,
-            "size": [
-              692,
-              118
-            ]
-          }
-        },
-        {
-          "id": "statusStrip",
-          "type": "panel",
-          "anchor": "Top",
-          "offset": [
-            0,
-            0
-          ],
-          "size": [
-            960,
-            28
-          ],
-          "z": 15,
-          "color": "ink",
-          "fill": {
-            "type": "gradient",
-            "from": "slot",
-            "to": "panelCard",
-            "dir": "vertical"
-          },
-          "border": {
-            "color": "borderMid",
-            "w": 1,
-            "style": "solid",
-            "sides": [
-              "bottom"
-            ]
-          },
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "logo",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            13,
-            6
-          ],
-          "size": [
-            57,
-            15
-          ],
-          "z": 16,
-          "color": "inkWarm",
-          "font": "display",
-          "fontPx": 11.5,
-          "content": "Roguebane"
-        },
-        {
-          "id": "nodeLabel",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            79,
-            10
-          ],
-          "size": [
-            33,
-            8
-          ],
-          "z": 17,
-          "binds": "merchant.label",
-          "color": "muted",
-          "font": "mono",
-          "fontPx": 6,
-          "sample": "MERCHANT"
-        },
-        {
-          "id": "resourceStrip",
-          "type": "list",
-          "anchor": "TopRight",
-          "offset": [
-            -85,
-            8
-          ],
-          "size": [
-            197,
-            11
-          ],
-          "z": 18,
-          "binds": "run.resources",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "item": {
-            "template": "resourceItem",
-            "flow": "horizontal",
-            "gap": 8,
-            "size": [
-              47,
-              11
-            ]
-          }
-        },
-        {
-          "id": "leaveBtn",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            887,
-            4
-          ],
-          "size": [
-            60,
-            20
-          ],
-          "z": 19,
-          "binds": "merchant.leave",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "image": "Content/ui/button/button_normal.png",
-          "states": {
-            "family": "button",
-            "normal": "ui/button/button_normal",
-            "hover": "ui/button/button_hover",
-            "down": "ui/button/button_down",
-            "disabled": "ui/button/button_disabled",
-            "on": "ui/button/button_on"
-          },
-          "content": "⮐ LEAVE"
-        },
-        {
-          "id": "footer",
-          "type": "panel",
-          "anchor": "Bottom",
-          "offset": [
-            0,
-            0
-          ],
-          "size": [
-            960,
-            36
-          ],
-          "z": 20,
-          "color": "ink",
-          "fill": {
-            "type": "gradient",
-            "from": "panel",
-            "to": "panelTab",
-            "dir": "vertical"
-          },
-          "border": {
-            "color": "borderMid",
-            "w": 1,
-            "style": "solid",
-            "sides": [
-              "top"
-            ]
-          },
-          "font": "display",
-          "fontPx": 8,
-          "shadow": {
-            "token": "panel",
-            "dx": 0,
-            "dy": 4,
-            "blur": 10,
-            "color": "outline",
-            "opacity": 0.5
-          }
-        },
-        {
-          "id": "footerFlavor",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            14,
-            517
-          ],
-          "size": [
-            88,
-            11
-          ],
-          "z": 21,
-          "color": "muted",
-          "font": "display",
-          "fontPx": 8.5,
-          "content": "Fair dealing by lantern light."
-        },
-        {
-          "id": "pager",
-          "type": "panel",
-          "anchor": "TopLeft",
-          "offset": [
-            785,
-            514
-          ],
-          "size": [
-            109,
-            17
-          ],
-          "z": 22,
-          "binds": "merchant.stock.page",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "pagePrev",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            785,
-            514
-          ],
-          "size": [
-            22,
-            17
-          ],
-          "z": 23,
-          "binds": "merchant.stock.pagePrev",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "image": "Content/ui/button/button_normal.png",
-          "states": {
-            "family": "button",
-            "normal": "ui/button/button_normal",
-            "hover": "ui/button/button_hover",
-            "down": "ui/button/button_down",
-            "disabled": "ui/button/button_disabled",
-            "on": "ui/button/button_on"
-          },
-          "content": "◀"
-        },
-        {
-          "id": "pageLabel",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            812,
-            519
-          ],
-          "size": [
-            55,
-            8
-          ],
-          "z": 24,
-          "binds": "merchant.stock.pageLabel",
-          "color": "parch",
-          "font": "mono",
-          "fontPx": 6,
-          "align": "center",
-          "sample": "PAGE 1 / 2"
-        },
-        {
-          "id": "pageNext",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            872,
-            514
-          ],
-          "size": [
-            22,
-            17
-          ],
-          "z": 25,
-          "binds": "merchant.stock.pageNext",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "image": "Content/ui/button/button_normal.png",
-          "states": {
-            "family": "button",
-            "normal": "ui/button/button_normal",
-            "hover": "ui/button/button_hover",
-            "down": "ui/button/button_down",
-            "disabled": "ui/button/button_disabled",
-            "on": "ui/button/button_on"
-          },
-          "content": "▶"
-        },
-        {
-          "id": "purseNote",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            907,
-            518
-          ],
-          "size": [
-            39,
-            9
-          ],
-          "z": 26,
-          "binds": "run.gold",
-          "color": "mutedWarm",
-          "font": "mono",
-          "fontPx": 6.5,
-          "sample": "PURSE 128g"
-        }
-      ]
     }
   },
   "templates": {
@@ -6233,6 +6547,34 @@
       "font": "display",
       "fontPx": 8
     },
+    "heroHpPip": {
+      "size": [
+        7,
+        6
+      ],
+      "parts": [],
+      "binds": "point.live",
+      "color": "ink",
+      "fill": "lockRed",
+      "border": {
+        "color": "outline",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "align": "center",
+      "states": {
+        "live": {
+          "fill": "blood",
+          "border": "outline"
+        },
+        "spent": {
+          "fill": "slot",
+          "border": "outline"
+        }
+      }
+    },
     "shieldPip": {
       "size": [
         8,
@@ -6260,6 +6602,84 @@
           "borderStyle": "dashed"
         }
       }
+    },
+    "aimTag": {
+      "size": [
+        11,
+        11
+      ],
+      "parts": [
+        {
+          "rect": [
+            4,
+            1,
+            4,
+            9
+          ],
+          "color": "outline",
+          "font": "mono",
+          "fontPx": 6.5,
+          "align": "center",
+          "sample": "3"
+        }
+      ],
+      "binds": "tag.hotkey",
+      "color": "outline",
+      "fill": "hit",
+      "border": {
+        "color": "outline",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "mono",
+      "fontPx": 6.5,
+      "align": "center"
+    },
+    "foeHpPip": {
+      "size": [
+        6,
+        6
+      ],
+      "parts": [],
+      "binds": "point.live",
+      "color": "ink",
+      "fill": "str",
+      "border": {
+        "color": "outline",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "align": "center",
+      "states": {
+        "live": {
+          "fill": "hit",
+          "border": "outline"
+        },
+        "spent": {
+          "fill": "slot",
+          "border": "outline"
+        }
+      }
+    },
+    "poolPip": {
+      "size": [
+        16,
+        10
+      ],
+      "parts": [],
+      "binds": "cell.state",
+      "color": "ink",
+      "fill": "str",
+      "border": {
+        "color": "outline",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "imageBind": "ui/pip/{cell.asset}"
     },
     "poolRow": {
       "size": [
@@ -6743,6 +7163,24 @@
         }
       }
     },
+    "attrPip": {
+      "size": [
+        26,
+        9
+      ],
+      "parts": [],
+      "binds": "cell.state",
+      "color": "ink",
+      "fill": "str",
+      "border": {
+        "color": "outline",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "imageBind": "ui/pip/{cell.asset}"
+    },
     "attrBar": {
       "size": [
         431,
@@ -6880,7 +7318,7 @@
     },
     "invCard": {
       "size": [
-        204,
+        199,
         31
       ],
       "parts": [
@@ -6933,7 +7371,7 @@
           "rect": [
             40,
             10,
-            125,
+            120,
             10
           ],
           "color": "ink",
@@ -6944,7 +7382,7 @@
         },
         {
           "rect": [
-            172,
+            167,
             10,
             24,
             12
@@ -6987,6 +7425,153 @@
         "neutral": {
           "border": "borderDim",
           "fill": "panelCard"
+        }
+      }
+    },
+    "runeCard": {
+      "size": [
+        236,
+        30
+      ],
+      "parts": [
+        {
+          "rect": [
+            7,
+            10,
+            11,
+            11
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "binds": "g.runes.icon"
+        },
+        {
+          "rect": [
+            20,
+            24,
+            3,
+            0
+          ],
+          "color": "panelDeep",
+          "fill": "parch",
+          "font": "mono",
+          "fontPx": 4.5,
+          "binds": "g.runes.countLabel"
+        },
+        {
+          "rect": [
+            26,
+            6,
+            158,
+            9
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 7.5,
+          "binds": "g.runes.name",
+          "sample": "Master INT Mark"
+        },
+        {
+          "rect": [
+            26,
+            16,
+            158,
+            8
+          ],
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 5.25,
+          "binds": "g.runes.effect",
+          "sample": "Increases INT by ."
+        },
+        {
+          "rect": [
+            80,
+            17,
+            3,
+            7
+          ],
+          "color": "int",
+          "font": "mono",
+          "fontPx": 5.25,
+          "sample": "6"
+        },
+        {
+          "rect": [
+            196,
+            7,
+            33,
+            6
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 4.5,
+          "align": "right",
+          "states": {
+            "equipped": {
+              "color": "good"
+            },
+            "equippable": {
+              "color": "amber"
+            },
+            "locked": {
+              "color": "lockText"
+            }
+          },
+          "binds": "g.runes.state",
+          "sample": "✓ EQUIPPED"
+        },
+        {
+          "rect": [
+            222,
+            15,
+            7,
+            8
+          ],
+          "color": "amber",
+          "font": "mono",
+          "fontPx": 6,
+          "align": "right",
+          "sample": "p",
+          "binds": "g.runes.cost"
+        },
+        {
+          "rect": [
+            222,
+            15,
+            4,
+            8
+          ],
+          "color": "amber",
+          "font": "mono",
+          "fontPx": 6,
+          "align": "right",
+          "sample": "6"
+        }
+      ],
+      "color": "ink",
+      "fill": "slot",
+      "border": {
+        "color": "good",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "states": {
+        "equipped": {
+          "border": "good",
+          "fill": "panelDeep"
+        },
+        "equippable": {
+          "border": "border",
+          "fill": "panelCard"
+        },
+        "locked": {
+          "border": "borderDim",
+          "fill": "panelCard",
+          "opacity": 0.82
         }
       }
     },
@@ -7158,9 +7743,45 @@
         }
       }
     },
+    "supplyPip": {
+      "size": [
+        11,
+        8
+      ],
+      "parts": [],
+      "binds": "point.live",
+      "color": "ink",
+      "fill": "good",
+      "border": {
+        "color": "panelDeep",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "imageBind": "ui/pip/{point.asset}"
+    },
+    "supportPip": {
+      "size": [
+        58,
+        8
+      ],
+      "parts": [],
+      "binds": "point.live",
+      "color": "ink",
+      "fill": "slot",
+      "border": {
+        "color": "amber",
+        "w": 1,
+        "style": "dashed"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "imageBind": "ui/pip/{point.asset}"
+    },
     "legendRow": {
       "size": [
-        107,
+        104,
         8
       ],
       "parts": [
@@ -7279,107 +7900,154 @@
       "font": "display",
       "fontPx": 8
     },
-    "cityNode": {
+    "fortRow": {
       "size": [
-        8,
-        8
+        130,
+        13
       ],
       "parts": [
         {
           "rect": [
-            -24,
-            -38,
-            48,
-            38
+            15,
+            3,
+            87,
+            8
           ],
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "imageBind": "icons/node/castle",
-          "binds": "city.castle"
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 6,
+          "binds": "fort.name",
+          "sample": "Gate"
         },
         {
           "rect": [
-            -47,
-            7,
-            95,
+            106,
+            4,
+            19,
             6
           ],
           "color": "good",
           "font": "mono",
           "fontPx": 4.5,
-          "align": "center",
-          "binds": "city.tier",
-          "sample": "Tier 1"
-        },
-        {
-          "rect": [
-            -47,
-            13,
-            95,
-            10
-          ],
-          "color": "parch",
-          "font": "display",
-          "fontPx": 9,
-          "align": "center",
-          "binds": "city.name",
-          "sample": "Ashford"
-        },
-        {
-          "rect": [
-            -16,
-            25,
-            31,
-            8
-          ],
-          "color": "good",
-          "fill": "panelDeep",
-          "border": {
-            "color": "border",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "mono",
-          "fontPx": 4,
-          "align": "center",
-          "states": {
-            "taken": {
-              "color": "good",
-              "border": "good"
-            },
-            "current": {
-              "color": "amber",
-              "border": "amber"
-            }
-          },
-          "binds": "city.status",
-          "sample": "TAKEN ✓"
+          "binds": "fort.state",
+          "sample": "INTACT"
         }
       ],
-      "binds": "city",
       "color": "ink",
+      "fill": "panelTab",
+      "border": {
+        "color": "borderDim",
+        "w": 1,
+        "style": "solid"
+      },
       "font": "display",
       "fontPx": 8,
       "states": {
-        "current": {
-          "border": "amber",
-          "glow": true
+        "intact": {
+          "color": "good"
         },
-        "cleared": {
-          "opacity": 0.7
+        "damaged": {
+          "color": "amber"
         },
-        "skipped": {
-          "opacity": 0.4
-        },
-        "future": {
-          "opacity": 0.5
-        },
-        "capital": {
-          "color": "gold",
-          "opacity": 0.62
+        "razed": {
+          "color": "lockText",
+          "opacity": 0.6
         }
       }
+    },
+    "spineCity": {
+      "size": [
+        15,
+        15
+      ],
+      "parts": [
+        {
+          "rect": [
+            3,
+            3,
+            10,
+            10
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/icons/node/castle.png",
+          "imageBind": "icons/node/castle",
+          "binds": "city.castle"
+        }
+      ],
+      "binds": "city.status",
+      "color": "ink",
+      "fill": "panelDeep",
+      "border": {
+        "color": "good",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "states": {
+        "taken": {
+          "border": "good"
+        },
+        "current": {
+          "border": "amber"
+        },
+        "future": {
+          "border": "borderDim",
+          "opacity": 0.45
+        }
+      }
+    },
+    "packChip": {
+      "size": [
+        37,
+        13
+      ],
+      "parts": [
+        {
+          "rect": [
+            5,
+            4,
+            6,
+            6
+          ],
+          "color": "ink",
+          "fill": "str",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "colorBind": "gear.attrColor",
+          "binds": "gear.attr"
+        },
+        {
+          "rect": [
+            15,
+            3,
+            17,
+            7
+          ],
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 5.5,
+          "binds": "gear.name",
+          "sample": "Sword"
+        }
+      ],
+      "binds": "gear.item",
+      "color": "ink",
+      "fill": "panelCard",
+      "border": {
+        "color": "borderDim",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8
     },
     "raceCard": {
       "size": [
@@ -7467,11 +8135,13 @@
             "chosen": {
               "fill": "amber",
               "color": "ground",
-              "border": "amber"
+              "border": "amber",
+              "label": "✓ CHOSEN"
             },
             "idle": {
               "color": "mutedDim",
-              "border": "borderDim"
+              "border": "borderDim",
+              "label": "CHOOSE"
             }
           },
           "binds": "race.selection",
@@ -7506,7 +8176,8 @@
           },
           "font": "display",
           "fontPx": 8,
-          "align": "center"
+          "align": "center",
+          "part": "attrBox"
         },
         {
           "rect": [
@@ -7552,7 +8223,8 @@
           },
           "font": "display",
           "fontPx": 8,
-          "align": "center"
+          "align": "center",
+          "part": "attrBox"
         },
         {
           "rect": [
@@ -7598,7 +8270,8 @@
           },
           "font": "display",
           "fontPx": 8,
-          "align": "center"
+          "align": "center",
+          "part": "attrBox"
         },
         {
           "rect": [
@@ -7644,7 +8317,8 @@
           },
           "font": "display",
           "fontPx": 8,
-          "align": "center"
+          "align": "center",
+          "part": "attrBox"
         },
         {
           "rect": [
@@ -7690,7 +8364,8 @@
           },
           "font": "display",
           "fontPx": 8,
-          "align": "center"
+          "align": "center",
+          "part": "hpBox"
         },
         {
           "rect": [
@@ -7854,7 +8529,8 @@
           },
           "font": "display",
           "fontPx": 8,
-          "align": "center"
+          "align": "center",
+          "part": "budgetBox"
         },
         {
           "rect": [
@@ -7899,7 +8575,8 @@
           },
           "font": "display",
           "fontPx": 8,
-          "align": "center"
+          "align": "center",
+          "part": "actionsBox"
         },
         {
           "rect": [
@@ -7944,7 +8621,8 @@
           },
           "font": "display",
           "fontPx": 8,
-          "align": "center"
+          "align": "center",
+          "part": "baysBox"
         },
         {
           "rect": [
@@ -8042,17 +8720,20 @@
             "selected": {
               "fill": "good",
               "color": "ground",
-              "border": "good"
+              "border": "good",
+              "label": "✓ CORE SET"
             },
             "idle": {
               "color": "mutedDim",
-              "border": "borderDim"
+              "border": "borderDim",
+              "label": "SELECT"
             },
             "locked": {
               "color": "lockText",
               "border": "lockRed",
               "borderStyle": "dashed",
-              "opacity": 0.6
+              "opacity": 0.6,
+              "label": "LOCKED"
             }
           },
           "binds": "core.selection",
@@ -8157,9 +8838,36 @@
       "fontPx": 8,
       "align": "center"
     },
+    "healPip": {
+      "size": [
+        15,
+        6
+      ],
+      "parts": [],
+      "binds": "point.live",
+      "color": "ink",
+      "fill": "lockRed",
+      "border": {
+        "color": "outline",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "states": {
+        "live": {
+          "fill": "blood",
+          "border": "outline"
+        },
+        "spent": {
+          "fill": "slot",
+          "border": "outline"
+        }
+      }
+    },
     "healRow": {
       "size": [
-        195,
+        193,
         30
       ],
       "parts": [
@@ -8181,7 +8889,7 @@
           "rect": [
             26,
             6,
-            143,
+            141,
             11
           ],
           "color": "ink",
@@ -8194,7 +8902,7 @@
           "rect": [
             26,
             18,
-            143,
+            141,
             6
           ],
           "color": "muted",
@@ -8205,7 +8913,7 @@
         },
         {
           "rect": [
-            175,
+            173,
             10,
             14,
             10
@@ -8218,7 +8926,7 @@
         },
         {
           "rect": [
-            175,
+            173,
             10,
             9,
             10
@@ -8252,7 +8960,7 @@
     },
     "provisionRow": {
       "size": [
-        195,
+        193,
         30
       ],
       "parts": [
@@ -8274,7 +8982,7 @@
           "rect": [
             26,
             6,
-            143,
+            141,
             11
           ],
           "color": "ink",
@@ -8287,7 +8995,7 @@
           "rect": [
             26,
             18,
-            143,
+            141,
             6
           ],
           "color": "good",
@@ -8298,7 +9006,7 @@
         },
         {
           "rect": [
-            175,
+            173,
             10,
             14,
             10
@@ -8311,7 +9019,7 @@
         },
         {
           "rect": [
-            175,
+            173,
             10,
             9,
             10
@@ -8345,153 +9053,6 @@
           "border": "borderDim",
           "borderStyle": "dashed",
           "opacity": 0.4
-        }
-      }
-    },
-    "runeCard": {
-      "size": [
-        236,
-        30
-      ],
-      "parts": [
-        {
-          "rect": [
-            7,
-            10,
-            11,
-            11
-          ],
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "binds": "g.runes.icon"
-        },
-        {
-          "rect": [
-            20,
-            24,
-            3,
-            0
-          ],
-          "color": "panelDeep",
-          "fill": "parch",
-          "font": "mono",
-          "fontPx": 4.5,
-          "binds": "g.runes.countLabel"
-        },
-        {
-          "rect": [
-            26,
-            6,
-            158,
-            9
-          ],
-          "color": "ink",
-          "font": "display",
-          "fontPx": 7.5,
-          "binds": "g.runes.name",
-          "sample": "Master INT Mark"
-        },
-        {
-          "rect": [
-            26,
-            16,
-            158,
-            8
-          ],
-          "color": "muted",
-          "font": "mono",
-          "fontPx": 5.25,
-          "binds": "g.runes.effect",
-          "sample": "Increases INT by ."
-        },
-        {
-          "rect": [
-            80,
-            17,
-            3,
-            7
-          ],
-          "color": "int",
-          "font": "mono",
-          "fontPx": 5.25,
-          "sample": "6"
-        },
-        {
-          "rect": [
-            196,
-            7,
-            33,
-            6
-          ],
-          "color": "good",
-          "font": "mono",
-          "fontPx": 4.5,
-          "align": "right",
-          "states": {
-            "equipped": {
-              "color": "good"
-            },
-            "equippable": {
-              "color": "amber"
-            },
-            "locked": {
-              "color": "lockText"
-            }
-          },
-          "binds": "g.runes.state",
-          "sample": "✓ EQUIPPED"
-        },
-        {
-          "rect": [
-            222,
-            15,
-            7,
-            8
-          ],
-          "color": "amber",
-          "font": "mono",
-          "fontPx": 6,
-          "align": "right",
-          "sample": "p",
-          "binds": "g.runes.cost"
-        },
-        {
-          "rect": [
-            222,
-            15,
-            4,
-            8
-          ],
-          "color": "amber",
-          "font": "mono",
-          "fontPx": 6,
-          "align": "right",
-          "sample": "6"
-        }
-      ],
-      "color": "ink",
-      "fill": "slot",
-      "border": {
-        "color": "good",
-        "w": 1,
-        "style": "solid"
-      },
-      "font": "display",
-      "fontPx": 8,
-      "states": {
-        "equipped": {
-          "border": "good",
-          "fill": "panelDeep"
-        },
-        "equippable": {
-          "border": "border",
-          "fill": "panelCard"
-        },
-        "locked": {
-          "border": "borderDim",
-          "fill": "panelCard",
-          "opacity": 0.82
         }
       }
     },
@@ -8724,341 +9285,107 @@
       "font": "display",
       "fontPx": 8
     },
-    "heroHpPip": {
+    "cityNode": {
       "size": [
-        7,
-        6
-      ],
-      "parts": [],
-      "binds": "point.live",
-      "color": "ink",
-      "fill": "lockRed",
-      "border": {
-        "color": "outline",
-        "w": 1,
-        "style": "solid"
-      },
-      "font": "display",
-      "fontPx": 8,
-      "align": "center",
-      "states": {
-        "live": {
-          "fill": "blood",
-          "border": "outline"
-        },
-        "spent": {
-          "fill": "slot",
-          "border": "outline"
-        }
-      }
-    },
-    "aimTag": {
-      "size": [
-        11,
-        11
+        8,
+        8
       ],
       "parts": [
         {
           "rect": [
-            4,
-            1,
-            4,
-            9
+            -24,
+            -38,
+            48,
+            38
           ],
-          "color": "outline",
-          "font": "mono",
-          "fontPx": 6.5,
-          "align": "center",
-          "sample": "3"
-        }
-      ],
-      "binds": "tag.hotkey",
-      "color": "outline",
-      "fill": "hit",
-      "border": {
-        "color": "outline",
-        "w": 1,
-        "style": "solid"
-      },
-      "font": "mono",
-      "fontPx": 6.5,
-      "align": "center"
-    },
-    "foeHpPip": {
-      "size": [
-        6,
-        6
-      ],
-      "parts": [],
-      "binds": "point.live",
-      "color": "ink",
-      "fill": "str",
-      "border": {
-        "color": "outline",
-        "w": 1,
-        "style": "solid"
-      },
-      "font": "display",
-      "fontPx": 8,
-      "align": "center",
-      "states": {
-        "live": {
-          "fill": "hit",
-          "border": "outline"
-        },
-        "spent": {
-          "fill": "slot",
-          "border": "outline"
-        }
-      }
-    },
-    "poolPip": {
-      "size": [
-        16,
-        10
-      ],
-      "parts": [],
-      "binds": "cell.state",
-      "color": "ink",
-      "fill": "str",
-      "border": {
-        "color": "outline",
-        "w": 1,
-        "style": "solid"
-      },
-      "font": "display",
-      "fontPx": 8,
-      "imageBind": "ui/pip/{cell.asset}"
-    },
-    "attrPip": {
-      "size": [
-        26,
-        9
-      ],
-      "parts": [],
-      "binds": "cell.state",
-      "color": "ink",
-      "fill": "str",
-      "border": {
-        "color": "outline",
-        "w": 1,
-        "style": "solid"
-      },
-      "font": "display",
-      "fontPx": 8,
-      "imageBind": "ui/pip/{cell.asset}"
-    },
-    "supplyPip": {
-      "size": [
-        12,
-        8
-      ],
-      "parts": [],
-      "binds": "point.live",
-      "color": "ink",
-      "fill": "good",
-      "border": {
-        "color": "panelDeep",
-        "w": 1,
-        "style": "solid"
-      },
-      "font": "display",
-      "fontPx": 8,
-      "imageBind": "ui/pip/{point.asset}"
-    },
-    "supportPip": {
-      "size": [
-        59,
-        8
-      ],
-      "parts": [],
-      "binds": "point.live",
-      "color": "ink",
-      "fill": "slot",
-      "border": {
-        "color": "amber",
-        "w": 1,
-        "style": "dashed"
-      },
-      "font": "display",
-      "fontPx": 8,
-      "imageBind": "ui/pip/{point.asset}"
-    },
-    "healPip": {
-      "size": [
-        15,
-        6
-      ],
-      "parts": [],
-      "binds": "point.live",
-      "color": "ink",
-      "fill": "lockRed",
-      "border": {
-        "color": "outline",
-        "w": 1,
-        "style": "solid"
-      },
-      "font": "display",
-      "fontPx": 8,
-      "states": {
-        "live": {
-          "fill": "blood",
-          "border": "outline"
-        },
-        "spent": {
-          "fill": "slot",
-          "border": "outline"
-        }
-      }
-    },
-    "fortRow": {
-      "size": [
-        130,
-        13
-      ],
-      "parts": [
-        {
-          "rect": [
-            15,
-            3,
-            87,
-            8
-          ],
-          "color": "parch",
-          "font": "mono",
-          "fontPx": 6,
-          "binds": "fort.name",
-          "sample": "Gate"
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "imageBind": "icons/node/castle",
+          "binds": "city.castle"
         },
         {
           "rect": [
-            106,
-            4,
-            19,
+            -47,
+            7,
+            95,
             6
           ],
           "color": "good",
           "font": "mono",
           "fontPx": 4.5,
-          "binds": "fort.state",
-          "sample": "INTACT"
-        }
-      ],
-      "color": "ink",
-      "fill": "panelTab",
-      "border": {
-        "color": "borderDim",
-        "w": 1,
-        "style": "solid"
-      },
-      "font": "display",
-      "fontPx": 8,
-      "states": {
-        "intact": {
-          "color": "good"
+          "align": "center",
+          "binds": "city.tier",
+          "sample": "Tier 1"
         },
-        "damaged": {
-          "color": "amber"
-        },
-        "razed": {
-          "color": "lockText",
-          "opacity": 0.6
-        }
-      }
-    },
-    "spineCity": {
-      "size": [
-        15,
-        15
-      ],
-      "parts": [
         {
           "rect": [
-            3,
-            3,
-            10,
+            -47,
+            13,
+            95,
             10
           ],
-          "color": "ink",
+          "color": "parch",
           "font": "display",
-          "fontPx": 8,
-          "image": "Content/icons/node/castle.png",
-          "imageBind": "icons/node/castle",
-          "binds": "city.castle"
-        }
-      ],
-      "binds": "city.status",
-      "color": "ink",
-      "fill": "panelDeep",
-      "border": {
-        "color": "good",
-        "w": 1,
-        "style": "solid"
-      },
-      "font": "display",
-      "fontPx": 8,
-      "states": {
-        "taken": {
-          "border": "good"
+          "fontPx": 9,
+          "align": "center",
+          "binds": "city.name",
+          "sample": "Ashford"
         },
-        "current": {
-          "border": "amber"
-        },
-        "future": {
-          "border": "borderDim",
-          "opacity": 0.45
-        }
-      }
-    },
-    "packChip": {
-      "size": [
-        37,
-        13
-      ],
-      "parts": [
         {
           "rect": [
-            5,
-            4,
-            6,
-            6
+            -16,
+            25,
+            31,
+            8
           ],
-          "color": "ink",
-          "fill": "str",
+          "color": "good",
+          "fill": "panelDeep",
           "border": {
-            "color": "outline",
+            "color": "border",
             "w": 1,
             "style": "solid"
           },
-          "font": "display",
-          "fontPx": 8,
-          "colorBind": "gear.attrColor",
-          "binds": "gear.attr"
-        },
-        {
-          "rect": [
-            15,
-            3,
-            17,
-            7
-          ],
-          "color": "parch",
           "font": "mono",
-          "fontPx": 5.5,
-          "binds": "gear.name",
-          "sample": "Sword"
+          "fontPx": 4,
+          "align": "center",
+          "states": {
+            "taken": {
+              "color": "good",
+              "border": "good"
+            },
+            "current": {
+              "color": "amber",
+              "border": "amber"
+            }
+          },
+          "binds": "city.status",
+          "sample": "TAKEN ✓"
         }
       ],
-      "binds": "gear.item",
+      "binds": "city",
       "color": "ink",
-      "fill": "panelCard",
-      "border": {
-        "color": "borderDim",
-        "w": 1,
-        "style": "solid"
-      },
       "font": "display",
-      "fontPx": 8
+      "fontPx": 8,
+      "states": {
+        "current": {
+          "border": "amber",
+          "glow": true
+        },
+        "cleared": {
+          "opacity": 0.7
+        },
+        "skipped": {
+          "opacity": 0.4
+        },
+        "future": {
+          "opacity": 0.5
+        },
+        "capital": {
+          "color": "gold",
+          "opacity": 0.62
+        }
+      }
     }
   },
   "style": {

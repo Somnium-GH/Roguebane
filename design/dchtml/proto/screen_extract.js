@@ -45,7 +45,10 @@
 //     bound text emits as `sample` and the engine's unresolved-content-suppresses rule blanks it.
 //   data-part                force-capture a chrome-only node inside a data-tpl item (card header
 //     divider bands, charge-bar troughs, stat-tile boxes): no text, no icon, no binds — just its
-//     fill/border box, so card chrome survives extraction (payload #4/#13).
+//     fill/border box, so card chrome survives extraction (payload #4/#13). A NON-EMPTY value NAMES
+//     the part (ADDENDUM A3 2026-07-03), and named parts also work on [data-el] ELEMENTS: the
+//     element emits `parts` (element-relative rects, real fonts) so value/label spans stop
+//     flattening into one text run (previewBudgetTile et al).
 
 (function (root) {
 
@@ -279,6 +282,10 @@
         // twins by sample — see DEV_LOOP #8 note below).
         if (directText) { if (subBinds && n.hasAttribute('data-bind-gate')) s.content = directText.slice(0, 200); else s.sample = directText.slice(0, 200); }
         if (subBinds) s.binds = subBinds;
+        // ADDENDUM A3 (2026-07-03): NAMED parts — a non-empty data-part value names the sub-part so
+        // the engine + tools/drop_audit.py can track span-level fidelity, not just presence.
+        var pName = n.getAttribute('data-part');
+        if (pName) s.part = pName;
         tpl.parts.push(s);
       });
       // NESTED dynamic list inside a template item (§7 applied recursively): a template may carry a
@@ -406,6 +413,65 @@
       if (!el.hasAttribute('data-container') && (e.type === 'text' || e.type === 'button')) {
         var t = (el.textContent || '').trim().replace(/\s+/g, ' ');
         if (t) { if (binds && !el.hasAttribute('data-bind-gate')) e.sample = t.slice(0, 200); else e.content = t.slice(0, 200); }
+        // payload 2026-07-03 pm residual #7: skinned buttons (autoAttackBtn/retreatBtn/closeBtn/
+        // leaveBtn) author their LABEL in an inner span — the wrapper's own computed font/colour
+        // (inherited display serif, ink) mis-describes the label the engine must draw. When a leaf's
+        // text lives only in descendants, take font/fontPx/color/align from the descendant carrying
+        // the LONGEST direct text (the label span, not a short glyph span).
+        if (t) {
+          var direct = '';
+          el.childNodes.forEach(function (c) { if (c.nodeType === 3) direct += c.nodeValue; });
+          if (!direct.trim()) {
+            var srcN = null, srcLen = 0;
+            el.querySelectorAll('*').forEach(function (n) {
+              var dt = '';
+              n.childNodes.forEach(function (c) { if (c.nodeType === 3) dt += c.nodeValue; });
+              dt = dt.trim();
+              if (dt.length > srcLen) { srcLen = dt.length; srcN = n; }
+            });
+            if (srcN) {
+              var lcs = getComputedStyle(srcN);
+              var lcol = nearestToken(parseRGB(lcs.color), palette);
+              if (lcol) e.color = lcol;
+              if (parseFloat(lcs.fontSize)) { e.font = fontRole(lcs.fontFamily); e.fontPx = Math.round(parseFloat(lcs.fontSize) / DS * 100) / 100; }
+              if (/center/.test(lcs.textAlign)) e.align = 'center';
+              else if (/right|end/.test(lcs.textAlign)) e.align = 'right';
+            }
+          }
+        }
+      }
+      // ADDENDUM A3 (2026-07-03): element-level NAMED PARTS — an element (not a list container) may
+      // carry [data-part] descendants (previewBudgetTile's value/label spans): emit them as e.parts
+      // (rect element-relative, real font/px/colour, own sample/content/binds) so value+label stop
+      // flattening into one text run. When parts carry the element's text, the element-level
+      // sample/content is DROPPED (the parts are the text — keeping both would double-draw).
+      if (!el.hasAttribute('data-container')) {
+        var pNodes = [];
+        el.querySelectorAll('[data-part]').forEach(function (n) {
+          if (!(n.getAttribute('data-part') || '').trim()) return;
+          if (n.closest('[data-el]') !== el) return;            // belongs to a nested element
+          if (n.closest('[data-tpl]')) return;                  // belongs to a template item
+          pNodes.push(n);
+        });
+        if (pNodes.length) {
+          var eRect = el.getBoundingClientRect();
+          e.parts = pNodes.map(function (n) {
+            var r2 = n.getBoundingClientRect();
+            var s2 = {
+              part: n.getAttribute('data-part').trim(),
+              rect: [Math.round((r2.left - eRect.left) * px2native / DS), Math.round((r2.top - eRect.top) * px2native / DS),
+                     Math.round(r2.width * px2native / DS), Math.round(r2.height * px2native / DS)],
+            };
+            Object.assign(s2, visual(n));
+            var t2 = (n.textContent || '').trim().replace(/\s+/g, ' ');
+            var b2 = n.getAttribute('data-binds');
+            if (t2) { if (b2 && !n.hasAttribute('data-bind-gate')) s2.sample = t2.slice(0, 200); else s2.content = t2.slice(0, 200); }
+            if (b2) s2.binds = b2;
+            return s2;
+          });
+          var partsHaveText = e.parts.some(function (p) { return p.sample || p.content; });
+          if (partsHaveText) { delete e.sample; delete e.content; }
+        }
       }
       elements.push(el = e);
     });

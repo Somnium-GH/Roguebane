@@ -41,9 +41,12 @@
     <span data-el="heldBadge" data-binds="combat.paused" data-bind-gate="" style="display:flex;align-items:center;gap:9px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:2px;color:#d9a441;padding:5px 14px;border:2px solid #6e5026;background:#2a1d10;">❚❚ HELD</span>
     <div data-el="topControls" style="display:flex;align-items:center;gap:10px;">
       <!-- RESOURCE READOUT (payload v5 §G: top-right on every IN-RUN screen) — supplies / gold / charge / summons -->
-      <div data-el="resourceStrip" data-anchor="TopRight" data-z="6" data-binds="run.resources" data-container="1" data-template="resourceItem" data-flow="horizontal" style="display:flex;align-items:center;gap:16px;margin-right:14px;">
+      <div data-el="resourceStrip" data-anchor="TopRight" data-z="6" data-binds="run.resources" data-container="1" data-template="resourceItem" data-flow="horizontal" style="display:flex;align-items:center;flex:none;gap:10px;margin-right:14px;">
         <sc-for list="{{ resources }}" as="res" hint-placeholder-count="4">
-          <div data-tpl="resourceItem" style="display:flex;align-items:center;gap:6px;">
+          <!-- uniform chip width (payload 2026-07-03 pm residual #5): the engine stamps every chip at the
+               TEMPLATE width, so content-width chips under-size the region and the last chip clips —
+               fix the chip at 94px so region extents == stamped extents, 4 chips always seat -->
+          <div data-tpl="resourceItem" style="display:flex;align-items:center;gap:6px;width:94px;flex:none;">
             <span data-binds="resource.icon" data-image-bind="icons/resource/{resource.id}" style="width:22px;height:22px;flex:none;background-image:{{ res.iconCss }};background-size:100% 100%;image-rendering:pixelated;"></span>
             <span data-binds="resource.value" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#e9d6b0;">{{ res.value }}</span>
             <span data-binds="resource.label" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:#8d775c;">{{ res.label }}</span>
@@ -91,14 +94,14 @@
     <div data-el="heroShield" data-binds="ShieldPool" style="position:absolute;left:26px;top:52px;width:224px;">
       <div style="display:flex;align-items:baseline;gap:8px;">
         <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;color:#7fc4b0;">SHIELD</span>
-        <span data-binds="ShieldPool.count" style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#7fc4b0;">6 / 9</span>
+        <span data-el="heroShieldCount" data-binds="ShieldPool.count" style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#7fc4b0;">6 / 9</span>
       </div>
       <div data-el="heroShieldPips" data-container="1" data-template="shieldPip" data-flow="horizontal" data-binds="ShieldPool.points" style="display:flex;flex-wrap:wrap;gap:3px;margin-top:5px;">
         <sc-for list="{{ shieldPips }}" as="sp" hint-placeholder-count="9">
           <span data-tpl="shieldPip" data-binds="point.live" data-states="{&quot;live&quot;:{&quot;fill&quot;:&quot;mintActive&quot;,&quot;border&quot;:&quot;outline&quot;},&quot;spent&quot;:{&quot;fill&quot;:&quot;slot&quot;,&quot;border&quot;:&quot;teal&quot;,&quot;borderStyle&quot;:&quot;dashed&quot;}}" style="width:16px;height:10px;background:{{ sp.bg }};border:1px {{ sp.style }} {{ sp.bd }};"></span>
         </sc-for>
       </div>
-      <div data-el="heroShieldRegen" data-binds="ShieldPool.regen" style="height:5px;margin-top:5px;background:#241b14;border:1px solid #0a0807;overflow:hidden;"><div data-binds="ShieldPool.regenPct" style="height:100%;width:62%;background:#4f9a8a;"></div></div>
+      <div data-el="heroShieldRegen" data-binds="ShieldPool.regen" style="height:5px;margin-top:5px;background:#241b14;border:1px solid #0a0807;overflow:hidden;"><div data-el="heroShieldRegenFill" data-binds="ShieldPool.regenPct" style="height:100%;width:62%;background:#4f9a8a;"></div></div>
     </div>
 
     <!-- ===== MINION on field ===== -->

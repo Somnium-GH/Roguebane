@@ -41,8 +41,9 @@ and does it feel good.
 
 ## Working
 - Start each task by reading `STATUS.md`. Finish by updating it. Run work via `/loop`.
-- CD drops ship the design SOURCES (`design/dchtml/`, READ-ONLY — never edit CD source). On every drop:
-  verify `layout.json` parses + run `tools/drop_audit.py` (dc.html inventory vs manifest).
+- CD drops ship the design SOURCES (`design/dchtml/`, READ-ONLY — never edit CD source). Drops are
+  processed by the Cowork session (stop → apply → guards → re-arm); the re-arm block in STATUS names
+  what each drop RESOLVED and reprioritizes unblocked work — trust it, don't rediscover.
 - Design canon = `design/DESIGN_SPEC.md`; keep it CURRENT — fold a decision in WHEN IT LOCKS. `STATUS.md`
   is build-STATE (target / debt / needs-human / progress) and POINTS to the spec, it doesn't re-specify
   design. A change that alters locked design reconciles DESIGN_SPEC in the same pass.

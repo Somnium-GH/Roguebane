@@ -131,7 +131,7 @@ roster: per-part 1px outline, flat fill + bottom/right bevel.
 **UI atoms come from TWO sources (no hand-painting, no hallucinated twins).**
 (a) **Captured from the live screens** (§12 of `LAYOUT_CONTRACT.md`, via `proto/atom_capture.js` — the
 screen's own rendered `[data-atom]` nodes sliced to PNG, listed in `proto/atom_registry.json`): the
-technique glyph chips `icons/technique/{swing,frenzy,firebolt,disarm,brace}` (+ `shot`, reconstructed — see icon table) and the pool-pip states
+technique glyph chips `icons/technique/{swing,frenzy,firebolt,disarm,brace}` (+ `shot` and the 8 engine-roster chips `bandage,block,cleave,drain,ember,jab,lunge,stoneskin`, reconstructed — 2026-07-03 pm residual #4, `RB_TECHS_SYNTH`) and the pool-pip states
 the pool pips `ui/pip/*` — token-stamped per colour from `proto/atom_slice.js` (`pip_full_<colour>` solid; `pip_reserved_<attr>` black −45° hatch; `pip_empty`/`pip_empty_<resource>` dark socket, dashed frame on resources; `pip_debuff`/`pip_damage` amber/red +45° hatch), AND the map node tokens `icons/node/*` — CAPTURED flat from the RunMap node DOM via `proto/atom_capture.js` (ASSET_GEN_METHOD.md).
 (b) **Generated as deterministic vector shapes** by **`proto/ui_atoms_gen.js`** (for atoms that are NOT on
 the screens as polished art), coloured from `style_tokens.js`: `icons/attr/{strength,intellect,dexterity,
@@ -167,7 +167,7 @@ control uses the shared `ui/button/button_{on,normal}` chrome.
 | id | type | screen | drives-from (Core) | size px | variants | status |
 |---|---|---|---|---|---|---|
 | `icons/attr/{strength,intellect,dexterity,constitution}` | attribute swatch (NO glyph — plain stat-colour box) | all | static attribute id | 120×120 | 4 | hi-fi · deterministic colour box (engine may draw a tinted rect instead — see UI_ASSET_MAP.md) |
-| `icons/technique/{swing,frenzy,firebolt,disarm,brace,shot}` | technique glyph chip | Combat, Build | `technique.id` | 120×120 | 6 | hi-fi · deterministic chip + screen glyph, re-centred (§12); `shot` (bow's shield-piercing shot, DEX-green ➳) is reconstructed via `RB_buildChipOverlay` — the locked Encounter row has no shot card to capture |
+| `icons/technique/{swing,frenzy,firebolt,disarm,brace,shot,bandage,block,cleave,drain,ember,jab,lunge,stoneskin}` | technique glyph chip | Combat, Build | `technique.id` | 120×120 | 14 | hi-fi · deterministic chip + screen glyph, re-centred (§12); `shot` (bow's shield-piercing shot, DEX-green ➳) is reconstructed via `RB_buildChipOverlay` — the locked Encounter row has no shot card to capture |
 | `icons/rune/{mark,path_minor,path_major,keystone}` | rune tier glyph — shape encodes tier: diamond(4)/pentagon(5)/hexagon(6)/octagon(8) | Build | `rune.tier` | 120×120 | 4 | hi-fi · deterministic polygon per tier (`ui_atoms_gen.js`) |
 | `icons/rune/core_{grunt,warden,adept,summoner,reaver,ranger}` | Core-rune identity token — decagon (10-gon) shape encodes the "Core" tier, per-core accent fill + carved glyph (✚◈✦❖⚔↗) | New Game | `core.id` | ~412×412 | 6 | hi-fi · CAPTURED from the live NewGame core cards (`proto/rune_capture.js`, dual-bg transparency recovery) — not hand-drawn; supersedes the inline-SVG-only token (DEV_LOOP_MEMORY #2) |
 | `icons/node/{camp,resource,merchant,unknown,castle,skirmish}` | map token | Run Map | `node.type` + `node.revealed` (→`unknown`) | 220 (castle 413) | 6 | hi-fi · captured WITH a smooth high-res emboss (gloss + soft bevel) from the RunMap nodes; transparent corners via dual-bg recovery (ASSET_GEN_METHOD.md). `skirmish` = the dedicated combat node (red ⚔ on dark, blood border; reveals 1 jump out like merchants) — captured from CityMap's live `b1` exemplar |
@@ -208,7 +208,8 @@ CityMap's supplies/support cards rendered frameless until 2026-07-01). And scree
 | `ui/pip/{pip_empty,pip_empty_supplies,pip_empty_support}` | free socket — generic + special dashed resource empties | Combat, Run Map | empty / supplies / support | 128×80 | 3 | hi-fi · dashed coloured frame on resources |
 | `ui/pip/{pip_debuff,pip_damage}` | debuff / damage pip (never recolour) | Combat | debuff\|damaged | 128×80 | 2 | hi-fi · amber/red +45° hatch (§12) |
 | `ui/reticle/{focus,focus_p0,focus_p1,focus_p2,secondary}` | targeting bracket + pulse frames | Combat | `technique.aim.role` · `frames` cycle | 128×128 | 5 | hi-fi |
-| `ui/button/button_{normal,hover,down,disabled,on}` | button skin (one set 9-slices to EVERY button) | all | input/interaction state + toggle | 320×88 (9-slice, corners 12px) | 5 | hi-fi · v2 @ 1080-class density (§11 — 2× the 160×44 design box; engine 9-slice corners are 12px now, not 6px): black border + double engraved line + state accent + top-sheen gloss + corner rivets + bevel (`proto/ui_gen.js`) |
+| `ui/button/button_{normal,hover,down,disabled,on}` | button skin (one set 9-slices to EVERY button) | all | input/interaction state + toggle | 320×88 (9-slice, corners 12px) | 5 | hi-fi · v2 @ 108
+| `ui/pattern/doom_stripe` | citymap doomFill hazard stripes — seamless -45° tile the engine repeats across the fill rect (`doomFillStripes` imageBind; a manifest fill can't express stripes) | City Map | `enemy.advancePct` fill | 26×26 (tile) | — | hi-fi · deterministic (`proto/pattern_gen.js`) |0-class density (§11 — 2× the 160×44 design box; engine 9-slice corners are 12px now, not 6px): black border + double engraved line + state accent + top-sheen gloss + corner rivets + bevel (`proto/ui_gen.js`) |
 
 *Button **labels are runtime text** (drawn over the skin), never baked into the asset.*
 

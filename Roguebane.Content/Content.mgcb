@@ -386,6 +386,28 @@
 /processorParam:TextureFormat=Color
 /build:icons/rune/path_minor.png
 
+#begin icons/technique/bandage.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/technique/bandage.png
+
+#begin icons/technique/block.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/technique/block.png
+
 #begin icons/technique/brace.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -397,6 +419,17 @@
 /processorParam:TextureFormat=Color
 /build:icons/technique/brace.png
 
+#begin icons/technique/cleave.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/technique/cleave.png
+
 #begin icons/technique/disarm.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -407,6 +440,28 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:icons/technique/disarm.png
+
+#begin icons/technique/drain.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/technique/drain.png
+
+#begin icons/technique/ember.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/technique/ember.png
 
 #begin icons/technique/firebolt.png
 /importer:TextureImporter
@@ -430,6 +485,28 @@
 /processorParam:TextureFormat=Color
 /build:icons/technique/frenzy.png
 
+#begin icons/technique/jab.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/technique/jab.png
+
+#begin icons/technique/lunge.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/technique/lunge.png
+
 #begin icons/technique/shot.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -440,6 +517,17 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:icons/technique/shot.png
+
+#begin icons/technique/stoneskin.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/technique/stoneskin.png
 
 #begin icons/technique/swing.png
 /importer:TextureImporter
@@ -4631,6 +4719,17 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:ui/frame/panel.png
+
+#begin ui/pattern/doom_stripe.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ui/pattern/doom_stripe.png
 
 #begin ui/pip/pip_damage.png
 /importer:TextureImporter

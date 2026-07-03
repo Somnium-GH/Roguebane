@@ -41,6 +41,19 @@ const RB_TECHS_SYNTH = [ // techniques with NO card on the locked Encounter layo
   // layout drift) — chip reconstructed by atom_capture.js RB_buildChipOverlay from the exact techCard
   // chip spec, overlay row starts at x=6,y=6 (overlay padding). Slice: RB_buildTechChips({techs:RB_TECHS_SYNTH, y:6, …}).
   ['shot', '#82a85e', 6, '➳'], // bow's shield-piercing shot — DEX green, feathered-arrow glyph
+  // 2026-07-03 pm reconcile residual #4: the engine's built roster uses these 8 with no card on any
+  // locked screen — same synth pipeline. glyphBg = canonical attribute colour; glyphs stay in the
+  // established pictogram family (⚔ ⇶ ✦ ✂ ◈ ➳). Capture in BATCHES of ≤5 chips per overlay/screenshot
+  // (a longer row wraps at narrow viewports and the x list would drift): x = 6 + i*130 within a batch.
+  // Slice each batch: RB_buildTechChips({ techs: RB_TECHS_SYNTH.slice(a,b), y: 6, … }).
+  ['bandage',   '#cf9a44', 136, '✚'], // CON — field dressing cross          (batch A with shot)
+  ['block',     '#cf9a44', 266, '▣'], // CON — raised square shield
+  ['cleave',    '#c2553f', 396, '⚒'], // STR — heavy two-hand chop
+  ['drain',     '#6f8fc4', 526, '↧'], // INT — life siphoned downward
+  ['ember',     '#6f8fc4', 6,   '✴'], // INT — small fire mote (firebolt's ✦ kin)  (batch B row start)
+  ['jab',       '#82a85e', 136, '↗'], // DEX — quick thrust
+  ['lunge',     '#82a85e', 266, '➤'], // DEX — darting extension
+  ['stoneskin', '#6f8fc4', 396, '⬢'], // INT — living-stone hex plate
 ];
 const RB_TECH_Y = 96, RB_TECH_W = 120; // overlay chip row geometry (k=4 of 30px)
 
