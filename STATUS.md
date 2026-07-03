@@ -41,9 +41,18 @@ each part's text run at its element-local rect w/ align + sample fallback and NE
 flattened sample — the M1 preview-tile stopgap is deleted, the manifest authors those tiles now);
 ~~gauge-header stopgap retire~~ DONE (same pass: `supplies`/`support` panel binds resolve null —
 containers, chrome-only; NEW `supplies.count`/`support.count` resolver cases feed the drop's real
-count elements; citymap binds hold 15). REMAINING: per-state chip labels draw; pattern-tile
-imageBind; `CoreRune.Badge` datum; shield count/regen manifest wires; verify resource-strip
-seating; LAYOUT_CONTRACT fold (`parts[]`, `part`, `states.<state>.label`, pattern imageBind).
+count elements; citymap binds hold 15). ~~per-state chip labels draw~~ DONE (2026-07-03 loop:
+`TemplatePart.States` parses + survives placement [316 tests]; selection chips draw per-state
+fill/border/label/opacity, state style REPLACES part style wholesale — the part's own fill was the
+extracted CHOSEN sample, inheriting it painted every card chosen (caught by fidelity: ng 76.2, fixed
+back to 78.3 = baseline; the M1 CHOOSE/SELECT stopgap is retired; LOCKED state authored but no lock
+model exists, never resolves). REMAINING: pattern-tile imageBind; `CoreRune.Badge` datum; shield
+count/regen manifest wires; verify resource-strip seating; LAYOUT_CONTRACT fold (`parts[]`, `part`,
+`states.<state>.label`, pattern imageBind). **NEW (eyeballed during chip fix): `Races.cs` copy is
+STALE vs the canon'd design/05 v2 (drop #17)** — Elf subtitle "THE KEEN KINDRED" vs ref
+"THE KEEN & FLEET", blurb "Fleet + accurate..." vs ref "Keen and fleet, but frail - punishes a
+dropped block." Same class as the CoreRunes.cs canon pass (M1, done) — sweep Races.cs roster copy
+against the ref, pure data.
 Canon core-effect copy in `CoreRunes.cs` LANDED in M1 (see below).
 **‼ GATE RED (pre-existing, DROP-caused — verified by stash/rerun at HEAD): text OVERFLOWS rose
 ng 6→9, city 4→6.** Membership is the drop's NEW/re-authored elements (city: suppliesTitle/

@@ -75,6 +75,27 @@ public class LayoutManifestTests
     }
 
     [Fact]
+    public void ParsesPerStatePartLabelsAndTheySurvivePlacement()
+    {
+        // §12 (test-owned fixture): a template part may restyle per state INCLUDING its label
+        // text (selection chips: CHOOSE vs the chosen check) — and placement carries the states.
+        var m = LayoutManifest.Parse("""
+        {
+          "templates": { "card": { "size": [200,100], "parts": [
+            { "rect": [10,80,60,12], "font": "mono", "fontPx": 5, "binds": "x.selection",
+              "sample": "CHOSEN",
+              "states": { "chosen": { "fill": "amber", "color": "ground", "label": "CHOSEN" },
+                          "idle": { "color": "mutedDim", "border": "borderDim", "label": "CHOOSE" } } } ] } }
+        }
+        """);
+        var p = m.Templates["card"].Parts[0];
+        Assert.Equal(System.Text.Json.JsonValueKind.Object, p.States.ValueKind);
+        Assert.Equal("CHOOSE", p.States.GetProperty("idle").GetProperty("label").GetString());
+        var placed = CardTemplate.Place(m.Templates["card"], 5, 5);
+        Assert.Equal("CHOOSE", placed[0].States.GetProperty("idle").GetProperty("label").GetString());
+    }
+
+    [Fact]
     public void EveryElementPartIsAWellFormedTextRun()
     {
         // Quantifies over whatever CD authored: every element part names itself, sits INSIDE its

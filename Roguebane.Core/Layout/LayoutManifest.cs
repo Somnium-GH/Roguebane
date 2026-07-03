@@ -195,6 +195,7 @@ public sealed class TemplatePart
     public Border? Border { get; init; }
     public string? ColorBind { get; init; }    // a colour bound from the stamped datum (e.g. "technique.attrColor")
     public Item? List { get; init; }           // a NESTED list inside a card part (pool/attr pip strips, §12)
+    public JsonElement States { get; init; }   // per-state part styling incl. `label` (selection chips, §12)
 }
 
 public sealed class Style

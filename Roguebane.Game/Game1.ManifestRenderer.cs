@@ -631,19 +631,47 @@ public partial class Game1
             var occ = new System.Collections.Generic.Dictionary<string, int>(); // per-bind occurrence (rune rows)
             foreach (var pp in CardTemplate.Place(tmpl, cell.X, cell.Y))
             {
-                if (pp.Binds is { } sel && sel.EndsWith(".selection") && i != selIx)
+                if (pp.Binds is { } sel && sel.EndsWith(".selection")
+                    && pp.States.ValueKind == System.Text.Json.JsonValueKind.Object)
                 {
-                    // FLAGGED STOPGAP (M1; payload addendum A2): the source computes per-state
-                    // labels (CHOOSE / SELECT) but extraction only captured the chosen sample —
-                    // draw the unchosen affordance shell-side until per-state labels ship.
-                    var alt = e.Binds == "races" ? "CHOOSE" : "SELECT";
-                    if (pp.Border is { } ab)
-                        Border(pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H,
-                            _ui.Color("borderDim", Border0), BorderPx(ab.W), ab.Sides);
-                    var asz = MeasureText(_assets.Mono, alt) * (float)(pp.FontPx / MonoDesignPx);
-                    TextPx(_assets.Mono, alt, (int)(pp.Rect.X + pp.Rect.W / 2 - asz.X / 2),
-                        (int)(pp.Rect.Y + pp.Rect.H / 2 - asz.Y / 2), _ui.Color("muted", Muted), pp.FontPx);
-                    continue;
+                    // Per-state chip labels (07-03 drop, A2 landed — the M1 stopgap is retired):
+                    // the selection part restyles itself AND carries its own label per state; the
+                    // chosen/selected key follows the picked index. (The data also authors a
+                    // LOCKED state; no lock model exists yet, so it never resolves — §17-adjacent.)
+                    var key = i == selIx
+                        ? (pp.States.TryGetProperty("chosen", out _) ? "chosen" : "selected")
+                        : "idle";
+                    if (pp.States.TryGetProperty(key, out var chip)
+                        && chip.ValueKind == System.Text.Json.JsonValueKind.Object)
+                    {
+                        string? St(string k) => chip.TryGetProperty(k, out var v)
+                            && v.ValueKind == System.Text.Json.JsonValueKind.String ? v.GetString() : null;
+                        // The state style REPLACES the part style wholesale — the part's own
+                        // fill/border captured the CHOSEN sample; an idle chip that "inherits"
+                        // them paints the chosen look on every card.
+                        if (St("fill") is { } sf) DrawFill(RectOf(pp.Rect), new Fill { Token = sf });
+                        var bcol = St("border");
+                        if (bcol is { Length: > 0 })
+                            Border(pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H,
+                                _ui.Color(bcol, Border0), BorderPx(pp.Border?.W ?? 1), pp.Border?.Sides);
+                        var label = St("label") ?? pp.Sample;
+                        if (!string.IsNullOrEmpty(label))
+                        {
+                            var op = chip.TryGetProperty("opacity", out var ov)
+                                && ov.ValueKind == System.Text.Json.JsonValueKind.Number
+                                ? (float)ov.GetDouble() : 1f;
+                            var cfont = pp.Font == "display" ? _assets.Display : _assets.Mono;
+                            var cbase = cfont == _assets.Display ? DisplayDesignPx : MonoDesignPx;
+                            var lsz = MeasureText(cfont, label!) * (float)(pp.FontPx / cbase);
+                            var lx = (int)(pp.Rect.X + pp.Rect.W / 2 - lsz.X / 2);
+                            var ly = (int)(pp.Rect.Y + pp.Rect.H / 2 - lsz.Y / 2);
+                            RecordTextBox(new Rectangle(lx, ly, (int)lsz.X, (int)lsz.Y),
+                                RectOf(pp.Rect), label!, cfont);
+                            TextPx(cfont, label!, lx, ly,
+                                _ui.Color(St("color") ?? pp.Color ?? "ink", Ink) * op, pp.FontPx);
+                        }
+                        continue;
+                    }
                 }
                 // Merchant rows: an UNBOUND part is design-mock filler (the sample price digits) —
                 // never draw it beside live data. A NESTED wares region stamps its own cards.

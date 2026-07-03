@@ -5,7 +5,8 @@ namespace Roguebane.Core.Layout;
 public readonly record struct PlacedPart(
     LayoutRect Rect, string Color, string Font, double FontPx, string Sample,
     string? Image = null, string? Binds = null, Fill? Fill = null, Border? Border = null,
-    string? ImageBind = null, string? ColorBind = null, Item? List = null);
+    string? ImageBind = null, string? ColorBind = null, Item? List = null,
+    System.Text.Json.JsonElement States = default);
 
 public static class CardTemplate
 {
@@ -17,7 +18,7 @@ public static class CardTemplate
             parts.Add(new PlacedPart(
                 new LayoutRect(x + p.Rect[0], y + p.Rect[1], p.Rect[2], p.Rect[3]),
                 p.Color, p.Font, p.FontPx, p.Sample, p.Image, p.Binds, p.Fill, p.Border, p.ImageBind,
-                p.ColorBind, p.List));
+                p.ColorBind, p.List, p.States));
         return parts;
     }
 }
