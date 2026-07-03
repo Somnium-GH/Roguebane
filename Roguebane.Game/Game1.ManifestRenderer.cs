@@ -1020,8 +1020,10 @@ public partial class Game1
     private void DrawFrameTex(Texture2D tex, Frame fr, Rectangle r)
     {
         var dst = new LayoutRect(r.X, r.Y, r.Width, r.Height);
+        // P0 (2026-07-02, Doug): the frame assets are 2x-painted like the button skins — without the
+        // same dstCornerScale the corners/borders rendered CHUNKY/oversized (the "legacy look").
         foreach (var p in NineSlice.Patches(tex.Width, tex.Height, fr.Slice, dst,
-                     tile: fr.Repeat == "tile", centerFill: fr.CenterFill))
+                     tile: fr.Repeat == "tile", centerFill: fr.CenterFill, dstCornerScale: 1.0 / ChromeBake))
             _spriteBatch.Draw(tex, new Rectangle(p.Dst.X, p.Dst.Y, p.Dst.W, p.Dst.H),
                 new Rectangle(p.Src.X, p.Src.Y, p.Src.W, p.Src.H), Color.White);
     }

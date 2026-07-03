@@ -253,7 +253,8 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     // the caller (2026-07-02: this full screen replaced the loadout popover). Geometry by binds.
     private void UpdateEquipment(KeyboardState keys)
     {
-        if (Pressed(keys, Keys.Escape)) { _screen = _equipReturnTo; return; }
+        // P0 (2026-07-02, Doug): E TOGGLES — the same key that opened Equipment closes it (with Esc).
+        if (Pressed(keys, Keys.Escape) || Pressed(keys, Keys.E)) { _screen = _equipReturnTo; return; }
 
         // Toggling routes to the RUN when marching (power/unpower on the live bar) and to the build
         // session otherwise. Mid-run rune mutation stays design-open, so Climb is pre-run only.

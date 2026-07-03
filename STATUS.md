@@ -91,14 +91,12 @@ remaining merchant work is design-gated (ware pricing/rarity models, pixel-compa
   deleted. Verified live-citymap smoke: THE CASTLE panel wears the tiled hazard frame. REMAINING for the
   floor: per-screen pixel-walks vs design PNGs to find leftover wrong box treatments (fold into the
   SYSTEMIC fidelity-diff work below).
-- **OVERSIZED frames/borders/corner-bolts (the "legacy/oversized look") = ENGINE bug, NOT CD:** in
-  `Game1.Canvas.cs`, `DrawButton` 9-slices with `dstCornerScale: 1.0/ChromeBake` (corners stay native,
-  "never chunky") — but the PANEL/CARD path `Panel`→`DrawFrameTex` is called WITHOUT that scale, so its
-  corners + border render CHUNKY/oversized. FIX: apply the SAME `dstCornerScale` (1/ChromeBake) in
-  `DrawFrameTex`. Likely a MAJOR part of the "everything oversized / wrong-asset-use" look — CD's frame
-  assets are correct hi-res.
-- **`e` doesn't exit Equipment:** the hotkey / BACK must TOGGLE — `e` (and Esc) closes Equipment and
-  returns to the caller. Wire the exit.
+- ~~OVERSIZED frames/borders/corner-bolts~~ **FIXED (2026-07-02):** `DrawFrameTex` now nine-slices with
+  the same `dstCornerScale: 1/ChromeBake` the button path uses — every manifest frame + the legacy
+  Panel route through it, so panel/card corners render at native proportion (citymap gauges/legend
+  visibly slimmed to design weight). Gate green.
+- ~~`e` doesn't exit Equipment~~ **FIXED (2026-07-02):** E toggles — the key that opens Equipment now
+  closes it (alongside Esc), returning to the caller.
 
 **‼ SYSTEMIC — build UI VALIDATION / proof-of-correctness (the ROOT CAUSE of "starved before pixel-perfect"):**
 the loop has NO deterministic way to know how well a screen matches its design PNG — so it can't measure
