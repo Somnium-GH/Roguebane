@@ -106,32 +106,25 @@ public partial class Game1
         return Roguebane.Core.GlyphSafe.Sanitize(s, set);
     }
 
-    private static readonly int[] PanelSlice = { 60, 60, 60, 60 }; // style.frames.panel (240px asset)
-    private static readonly int[] CardSlice = { 36, 36, 36, 36 };  // style.frames.card (144px asset)
-
     private void Panel(int x, int y, int w, int h)
     {
         DrawShadow(x, y, w, h, dx: 2, dy: 3, blur: 3, opacity: 0.40f); // §10 depth under the chrome
-        // Carved nine-slice frames by size: the PANEL frame (60px corners) for large panels, the lighter
-        // CARD frame (36px corners) for card-sized elements, and the clean gradient for small cards/bars
+        // v3 chrome (P0 render-accuracy floor): legacy panels draw through the SAME manifest
+        // style.frames the element renderer uses — tiled edges + painted centres. The old local
+        // stretch-blit smeared the tiled art. Size ladder unchanged: the PANEL frame for large
+        // panels, the lighter CARD frame for card-sized ones, the clean gradient for small boxes
         // (whose corner ornament would be crushed by either frame).
-        if (w >= 220 && h >= 170 && DrawFrame(x, y, w, h, "panel", PanelSlice)) return;
-        if (w >= 100 && h >= 80 && DrawFrame(x, y, w, h, "card", CardSlice)) return;
+        if (_ui.Manifest?.Style.Frames is { } frames)
+        {
+            if (w >= 220 && h >= 170 && frames.TryGetValue("panel", out var pf)
+                && _assets.Texture(pf.Asset) is { } pt)
+            { DrawFrameTex(pt, pf, new Rectangle(x, y, w, h)); return; }
+            if (w >= 100 && h >= 80 && frames.TryGetValue("card", out var cf)
+                && _assets.Texture(cf.Asset) is { } ct)
+            { DrawFrameTex(ct, cf, new Rectangle(x, y, w, h)); return; }
+        }
         DrawGradient(x, y, w, h, PanelTop, PanelBot, GradientDir.Vertical);
         Border(x, y, w, h, Border0);
-    }
-
-    // §10 nine-slice frame: blit a painted frame asset around the rect -- fixed corners, stretched edges
-    // + centre (geometry from Core.NineSlice). False if the asset isn't loaded (caller keeps its fallback).
-    private bool DrawFrame(int x, int y, int w, int h, string name, int[] slice)
-    {
-        var tex = _assets.Frame(name);
-        if (tex is null) return false;
-        var dst = new Roguebane.Core.Layout.LayoutRect(x, y, w, h);
-        foreach (var p in Roguebane.Core.Layout.NineSlice.Patches(tex.Width, tex.Height, slice, dst))
-            _spriteBatch.Draw(tex, new Rectangle(p.Dst.X, p.Dst.Y, p.Dst.W, p.Dst.H),
-                new Rectangle(p.Src.X, p.Src.Y, p.Src.W, p.Src.H), Color.White);
-        return true;
     }
 
     // A skinned button whose state is driven by input (manifest: drives-from input/interaction).

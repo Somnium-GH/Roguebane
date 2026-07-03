@@ -85,7 +85,12 @@ remaining merchant work is design-gated (ware pricing/rarity models, pixel-compa
 - **RENDER-ACCURACY FLOOR (drive this BEFORE ever claiming "starved"):** a LOT matches the design better
   WITHOUT CD or systems — PURGE the outdated box/frame TEXTURE (old chrome still in use); apply the
   manifest v3 frames/chrome to every panel; fix the box treatments. Stream-1 fidelity isn't at its floor
-  yet; get it there first.
+  yet; get it there first. FIRST CUT DONE (2026-07-02): the legacy `Panel()` stretch-blit path is gone —
+  legacy panels (live citymap chrome, button fallback) now draw through the SAME manifest `style.frames`
+  (v3 tile + centerFill) the element renderer uses; `AssetRegistry.Frame` + the local stretch nine-slice
+  deleted. Verified live-citymap smoke: THE CASTLE panel wears the tiled hazard frame. REMAINING for the
+  floor: per-screen pixel-walks vs design PNGs to find leftover wrong box treatments (fold into the
+  SYSTEMIC fidelity-diff work below).
 
 **‼ SYSTEMIC — build UI VALIDATION / proof-of-correctness (the ROOT CAUSE of "starved before pixel-perfect"):**
 the loop has NO deterministic way to know how well a screen matches its design PNG — so it can't measure
