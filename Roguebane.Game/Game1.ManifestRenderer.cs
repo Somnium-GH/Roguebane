@@ -413,6 +413,9 @@ public partial class Game1
         "nav.close" => "CLOSE",           // Equipment's close is always available on that screen
         "nav.equipment" => "EQUIPMENT",   // the citymap Equipment button likewise
         "begin" => "BEGIN",               // NewGame's begin CTA
+        // The chart's current-position label (design/03: "YOU ARE HERE" under the ringed node; the
+        // dc.html glyph U+25BC isn't in the font regions — the ring itself marks the node).
+        "map.current" => InRun ? "YOU ARE HERE" : null,
         // CityMap gauges (design/03): the panel binds carry the live counts + their flavor line (the
         // design's inner pip strips are a flattened-extraction gap, Needs-CD — the values render now).
         "supplies" => InRun
@@ -478,6 +481,15 @@ public partial class Game1
             var datum = data is not null && i < data.Count ? data[i] : null;
             var cell = cells[i];
             if (tmpl.Parts.Length == 0) { DrawLeafTemplate(tmpl, cell, datum); continue; }
+            // v4 card chrome: a parts-carrying template may style its own CELL (root fill/border,
+            // restyled per state — spineCity's taken/current/future borders; pickerCard's
+            // idle/selected follows the chosen index). Parts stamp on top.
+            var rootState = tmpl.States.ValueKind == System.Text.Json.JsonValueKind.Object
+                && tmpl.States.TryGetProperty("family", out var famEl)
+                && famEl.GetString() == "pickerCard"
+                ? (i == selIx ? "selected" : "idle")
+                : null;
+            DrawTemplateRootChrome(tmpl, cell, datum, rootState);
             // Positional binds repeat the SAME bind N times per card (attr tiles 4x, attr-bar pips 12x,
             // in template order); count each occurrence per card to pick the right datum slice.
             int valIx = 0, keyIx = 0, pipIx = 0;
@@ -734,6 +746,21 @@ public partial class Game1
                 new MerchantLot("summons", "Summons", Exp.SummonsStock, Exp.SummonsPrice),
             }
             : new List<object>(),
+        // Campaign strip (design/03/04, ex-overlay): one spineCity chip per campaign leg —
+        // taken (good border) / current (amber) / future (dim), straight from the live campaign.
+        "campaign.cities" => InRun
+            ? Enumerable.Range(0, _campaign.LegCount).Select(i => (object)new CityLeg(
+                i < _campaign.LegIndex ? "taken" : i == _campaign.LegIndex ? "current" : "future")).ToList()
+            : new List<object>(),
+        // Castle fortifications (design/03): the structured boss's parts + their live condition.
+        // The parts only EXIST while the castle encounter is live — the panel's rows are
+        // state-gated until then (no persistent fort-damage model; §17 keeps that open).
+        "city.castle.parts" => InRun && Exp.Enemy is { Id: "castle", Frame: { } cf }
+            ? cf.Parts.Select(p => (object)new FortPart(
+                DisplayName(p.Id),
+                cf.Contribution(p) >= p.Capacity ? "INTACT"
+                : cf.Contribution(p) == 0 ? "BROKEN" : "DAMAGED")).ToList()
+            : new List<object>(),
         // PACK chips (design/03, ex-overlay homed by the 07-03 drop): the run's carried gear —
         // wielded pieces plus the packed stash. Chips read gear.name + a stat-tinted swatch.
         "Body.gear" => InRun
@@ -759,6 +786,11 @@ public partial class Game1
         => Enumerable.Range(0, row.Item4).Select(i => (object)new PoolCell(
             i < row.Item3 ? "full" : "reserved",
             (i < row.Item3 ? "pip_full_" : "pip_reserved_") + row.Item5)).ToList();
+
+    // A campaign leg on the spine strip: taken / current / future (spineCity state key).
+    private sealed record CityLeg(string Status);
+    // One castle fortification row: the structured boss's part + its live condition.
+    private sealed record FortPart(string Name, string State);
 
     // A textured gauge/strip pip: live/spent + which ui/pip PNG renders it (imageBind).
     private sealed record PipPoint(bool Live, string Asset);
@@ -888,6 +920,28 @@ public partial class Game1
         return p.EndsWith(".png") ? p[..^4] : p;
     }
 
+    // Root fill/border of a parts-carrying template, restyled by its `states` block keyed from the
+    // datum's resolved root bind (spineCity: city.status -> taken/current/future borders).
+    private void DrawTemplateRootChrome(Template t, LayoutRect cell, object? datum, string? stateKey = null)
+    {
+        if (t.Fill is null && t.Border is null) return;
+        var fillTok = t.Fill?.Token;
+        var borderTok = t.Border?.Color;
+        var key = stateKey ?? (datum is not null && t.Binds is { } b ? ResolveBind(datum, b) : null);
+        if (key is not null && t.States.ValueKind == System.Text.Json.JsonValueKind.Object
+            && t.States.TryGetProperty(key, out var st)
+            && st.ValueKind == System.Text.Json.JsonValueKind.Object)
+        {
+            if (st.TryGetProperty("fill", out var f)) fillTok = f.GetString();
+            if (st.TryGetProperty("border", out var bo)) borderTok = bo.GetString();
+        }
+        if (fillTok is { Length: > 0 })
+            DrawFill(new Rectangle(cell.X, cell.Y, cell.W, cell.H), new Fill { Token = fillTok });
+        if (borderTok is { Length: > 0 })
+            Border(cell.X, cell.Y, cell.W, cell.H, _ui.Color(borderTok, Border0),
+                BorderPx(t.Border?.W ?? 1), t.Border?.Sides);
+    }
+
     // A self-styled LEAF template (no parts): the cell itself is the visual — its fill/border restyled
     // by the template's `states` block keyed from the bound datum (shield pips: live/spent). Dashed
     // border styles draw solid for now (a 8x5 design-px pip; dash polish rides the pixel-compare pass).
@@ -973,6 +1027,17 @@ public partial class Game1
         {
             "point.asset" => pt.Asset,
             "point.live" => pt.Live ? "live" : "spent",
+            _ => null,
+        },
+        CityLeg leg => bind switch
+        {
+            "city.status" => leg.Status,
+            _ => null, // city.castle = the icon slot; its static imageBind carries the visual
+        },
+        FortPart fp => bind switch
+        {
+            "fort.name" => fp.Name,
+            "fort.state" => fp.State,
             _ => null,
         },
         PoolCell pc => bind switch

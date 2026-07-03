@@ -149,8 +149,14 @@ is ALL engine-side). Fix with P0-A numbers (before/after per-element scores):**
    ~~Body.gear rows~~ (packChips live: Dagger/Plate chips + stat swatches, city binds 13)
    ~~nav.equipment/nav.close~~ ~~icons/technique/{id} + {loadout.id} imageBinds~~ (Brace blits its
    PNG; missing icon ids fall back to the tinted tile, logged Needs-CD #4) — ALL DONE 2026-07-03.
-   REMAINING: map.current, campaign.cities/city.status + campaignTaken, city.castle.parts fort rows
-   (INTACT/DAMAGED states), equipment/citymap scene backdrops (verify resolve — equipment's renders).
+   ~~map.current~~ ("YOU ARE HERE"; U+25BC not in font) ~~campaign.cities/city.status~~ (spineCity
+   chips taken/current/future via template ROOT chrome + states — a parts-template now styles its
+   own cell; pickerCard family follows the chosen index: selected=amber ring, idle=dim, which also
+   landed the race/core card chrome) ~~city.castle.parts~~ (fortRows read the castle foe's parts +
+   INTACT/DAMAGED/BROKEN from live contributions — rows exist only while the castle encounter is
+   live; NO persistent fort-damage model invented, §17 open) — DONE 2026-07-03, city binds 15–16/17.
+   REMAINING: castlePanel container (resolves when its own datum model lands); scene backdrops
+   verify (equipment's renders).
 6. **P0-B targeting build** (block above).
 7. **Merchant buys complete** (per the click-to-buy LOCK): techniques/minions/runes purchase into
    inventory; keep page-by-measured-fit as a safety even with v2 extents.
