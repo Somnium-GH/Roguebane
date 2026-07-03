@@ -59,7 +59,7 @@ public partial class Game1
             // An element-level colorBind tints the border (the accent rule) when it resolves.
             var accent = ResolveColorToken(e.ColorBind, null);
             Border(r.X, r.Y, r.Width, r.Height, _ui.Color(accent ?? b.Color ?? "border", Border0),
-                Math.Max(2, b.W * SS), b.Sides);
+                BorderPx(b.W), b.Sides);
         }
 
         switch (e.Type)
@@ -421,7 +421,7 @@ public partial class Game1
                     else if (!skipFill && pp.Fill is { } pf) DrawFill(RectOf(pp.Rect), pf);
                     if (pp.Border is { } pb)
                         Border(pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H, _ui.Color(pb.Color, Border0),
-                            Math.Max(2, pb.W * SS), pb.Sides);
+                            BorderPx(pb.W), pb.Sides);
                 }
                 // imageBind (CD #15): a Content path template whose {bind} placeholders resolve
                 // from the bound item — the part blits that PNG instead of text/fill glyphs.
@@ -612,7 +612,7 @@ public partial class Game1
         else if (wp.Fill is { } f) DrawFill(RectOf(wp.Rect), f);
         if (wp.Border is { } b)
             Border(wp.Rect.X, wp.Rect.Y, wp.Rect.W, wp.Rect.H, _ui.Color(b.Color, Border0),
-                Math.Max(2, b.W * SS), b.Sides);
+                BorderPx(b.W), b.Sides);
         var text = bound ?? wp.Sample;
         if (string.IsNullOrEmpty(text)) return;
         var font = wp.Font == "display" ? _assets.Display : _assets.Mono;
@@ -675,7 +675,7 @@ public partial class Game1
         if (fillTok is { Length: > 0 }) DrawFill(r, new Fill { Token = fillTok });
         if (borderTok is { Length: > 0 })
             Border(r.X, r.Y, r.Width, r.Height, _ui.Color(borderTok, Border0),
-                Math.Max(2, (t.Border?.W ?? 1) * SS), t.Border?.Sides);
+                BorderPx(t.Border?.W ?? 1), t.Border?.Sides);
     }
 
     // states (CD drop 2026-07-02): a button-family element draws its interaction skin under its label.
@@ -695,7 +695,7 @@ public partial class Game1
             return false;
         foreach (var p in NineSlice.Patches(skin.Width, skin.Height, ButtonSlice,
                      new LayoutRect(r.X, r.Y, r.Width, r.Height), tile: false, centerFill: true,
-                     dstCornerScale: 1.0 / SS))
+                     dstCornerScale: 1.0 / ChromeBake))
             _spriteBatch.Draw(skin, new Rectangle(p.Dst.X, p.Dst.Y, p.Dst.W, p.Dst.H),
                 new Rectangle(p.Src.X, p.Src.Y, p.Src.W, p.Src.H), Color.White);
         return true;

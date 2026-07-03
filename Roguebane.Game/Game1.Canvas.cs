@@ -37,29 +37,33 @@ public partial class Game1
 
     private void Stretch(Texture2D? tex, int x, int y, int w, int h) => Sprite(tex, x, y, w, h, Color.White);
 
-    // Fonts are built at SSx; under the scene's SS scale matrix we draw at 1/SS so the ON-SCREEN size
-    // matches the design space while the glyph rasterizes at full 1080-class density.
+    // Fonts are built at FontBake x design px; drawing at 1/FontBake inside the scene's SS matrix keeps
+    // the DESIGN size constant while the glyph rasterizes at up to FontBake x density (native-res P0).
     private void Text(SpriteFont font, string s, int x, int y, Color color) =>
         _spriteBatch.DrawString(font, Safe(font, s), new Vector2(x, y), color, 0f, Vector2.Zero,
-            1f / SS, SpriteEffects.None, 0f);
+            1f / FontBake, SpriteEffects.None, 0f);
 
-    // The DESIGN-space px each built font draws at through Text() (its SSx size / SS): mono 28/2=14,
-    // display 40/2=20. A manifest `fontPx` is honoured by scaling relative to this base.
+    // The DESIGN-space px each built font draws at through Text() (its raster size / FontBake):
+    // mono 42/3=14, display 60/3=20. A manifest `fontPx` is honoured by scaling relative to this base.
     private const float MonoDesignPx = 14f, DisplayDesignPx = 20f;
 
+    // Manifest border weight in design px: an authored w=1 draws 2 design px — the shipped weight from
+    // the old fixed SS=2 target — independent of the scene's (now dynamic) scale.
+    private static int BorderPx(int w) => Math.Max(2, w * 2);
+
     // Draw text at a manifest-specified `fontPx` (design px): scale the built glyph so its on-screen size
-    // is fontPx, keeping the 1/SS supersample factor. Falls back to the plain size when fontPx <= 0.
+    // is fontPx, keeping the 1/FontBake density factor. Falls back to the plain size when fontPx <= 0.
     private void TextPx(SpriteFont font, string s, int x, int y, Color color, double fontPx)
     {
         if (fontPx <= 0) { Text(font, s, x, y, color); return; }
         var basePx = font == _assets.Display ? DisplayDesignPx : MonoDesignPx;
-        var scale = (1f / SS) * (float)(fontPx / basePx);
+        var scale = (1f / FontBake) * (float)(fontPx / basePx);
         _spriteBatch.DrawString(font, Safe(font, s), new Vector2(x, y), color, 0f, Vector2.Zero,
             scale, SpriteEffects.None, 0f);
     }
 
-    // Design-space text size: MeasureString is at the SSx raster, so scale back by 1/SS to match Text().
-    private Vector2 MeasureText(SpriteFont font, string s) => font.MeasureString(Safe(font, s)) / SS;
+    // Design-space text size: MeasureString is at the FontBake raster, so scale back to design space.
+    private Vector2 MeasureText(SpriteFont font, string s) => font.MeasureString(Safe(font, s)) / FontBake;
 
     // Manifest text inside a rect: greedy word-wrap to the rect width, capped at the lines the rect
     // HEIGHT can hold (a one-line-high rect never wraps, so names/values stay single-line).
@@ -143,7 +147,7 @@ public partial class Game1
         var skin = _assets.Button(state);
         if (skin is not null)
             foreach (var p in NineSlice.Patches(skin.Width, skin.Height, ButtonSlice,
-                         new LayoutRect(x, y, w, h), tile: false, centerFill: true, dstCornerScale: 1.0 / SS))
+                         new LayoutRect(x, y, w, h), tile: false, centerFill: true, dstCornerScale: 1.0 / ChromeBake))
                 _spriteBatch.Draw(skin, new Rectangle(p.Dst.X, p.Dst.Y, p.Dst.W, p.Dst.H),
                     new Rectangle(p.Src.X, p.Src.Y, p.Src.W, p.Src.H), Color.White);
         else Panel(x, y, w, h);
@@ -174,7 +178,7 @@ public partial class Game1
         => Border(x, y, w, h, color, 2, null);
 
     // §10 border.sides: a manifest border may name a subset of edges (e.g. ["top"] for an accent rule)
-    // — null/empty draws all four. Thickness is in physical px (design px * SS).
+    // — null/empty draws all four. Thickness is in design px (see BorderPx).
     private void Border(int x, int y, int w, int h, Color color, int t, string[]? sides)
     {
         bool On(string s) => sides is null || sides.Length == 0 || Array.IndexOf(sides, s) >= 0;

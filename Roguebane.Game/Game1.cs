@@ -59,8 +59,12 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     private int _frames;
 
     private const int W = 960, H = 540; // the fixed DESIGN space; the world renders here then scales
-    private const int SS = 2; // §11 supersample: the scene target is SS x design so text/glyphs rasterize
-                              // at 1080-class density (fonts built 2x, drawn 1/SS). Design COORDS unchanged.
+    // P0 native-res (2026-07-02): the scene is sized to the NATIVE backbuffer fit each frame — the old
+    // fixed 960x540x2 target UPSCALED soft on >1080 displays. SS is now the design->scene scale (float,
+    // = _viewScale); design COORDS are unchanged, the blit into the backbuffer is 1:1.
+    private float SS = 2f;
+    private const float FontBake = 3f;   // font rasters are built 3x design px (see *.spritefont sizes)
+    private const float ChromeBake = 2f; // button/frame skins are painted at 2x design (1080-class art)
 
     private RenderTarget2D _scene = null!; // world painted at design res, then letterboxed to the window
     private Rectangle _viewDest;           // where the scaled scene lands in the backbuffer
@@ -149,7 +153,23 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         _pixel.SetData(new[] { Color.White });
         _assets = new AssetRegistry(Content);
         _ui = new ManifestUi(_layout);
-        _scene = new RenderTarget2D(GraphicsDevice, W * SS, H * SS);
+        EnsureSceneMatchesBackbuffer();
+    }
+
+    // Recreate the scene target whenever the backbuffer changes (fullscreen toggle, resize): size it to
+    // the aspect-fit of the NATIVE output so chrome/fonts rasterize at full density and the final blit
+    // is 1:1 — never a soft upscale.
+    private void EnsureSceneMatchesBackbuffer()
+    {
+        var bw = GraphicsDevice.PresentationParameters.BackBufferWidth;
+        var bh = GraphicsDevice.PresentationParameters.BackBufferHeight;
+        var scale = Math.Min((float)bw / W, (float)bh / H);
+        var sw = Math.Max(1, (int)(W * scale));
+        var sh = Math.Max(1, (int)(H * scale));
+        if (_scene is not null && _scene.Width == sw && _scene.Height == sh) return;
+        _scene?.Dispose();
+        SS = scale;
+        _scene = new RenderTarget2D(GraphicsDevice, sw, sh);
     }
 
     protected override void Update(GameTime gameTime)
@@ -528,6 +548,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
 
     protected override void Draw(GameTime gameTime)
     {
+        EnsureSceneMatchesBackbuffer();
         // 2026-07-02 P0 guard: RB_MF=all smokes EVERY manifest screen with a paint-coverage check.
         if (_smoke && _mfScreen == "all") { SmokeAllScreensAndExit(); return; }
         // The world always paints at the fixed design resolution into the scene target...
@@ -546,7 +567,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         {
             GraphicsDevice.SetRenderTarget(null);
             using var fs = System.IO.File.Create(_shotPath!);
-            _scene.SaveAsPng(fs, W * SS, H * SS);
+            _scene.SaveAsPng(fs, _scene.Width, _scene.Height);
         }
         else // ...then letterbox-scale it into the window backbuffer
         {
@@ -571,10 +592,11 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     {
         var bw = GraphicsDevice.PresentationParameters.BackBufferWidth;
         var bh = GraphicsDevice.PresentationParameters.BackBufferHeight;
-        _viewScale = Math.Min((float)bw / W, (float)bh / H);
-        var dw = (int)(W * _viewScale);
-        var dh = (int)(H * _viewScale);
-        _viewDest = new Rectangle((bw - dw) / 2, (bh - dh) / 2, dw, dh);
+        // The scene is already native-fit — blit it 1:1, centered (bars only on aspect mismatch, §13
+        // aspect-fill pending). Mouse maps back through _viewScale = the scene's design->output factor.
+        _viewScale = SS;
+        _viewDest = new Rectangle((bw - _scene.Width) / 2, (bh - _scene.Height) / 2,
+            _scene.Width, _scene.Height);
     }
 
     // Touch one asset of every kind through the registry, then report what bound. A null is a gap in
@@ -616,7 +638,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     {
         var screens = _ui.Manifest?.Screens.Keys.ToArray() ?? Array.Empty<string>();
         var blank = new List<string>();
-        var total = W * SS * H * SS;
+        var total = _scene.Width * _scene.Height;
         var baseline = new Color[total];
         var full = new Color[total];
         foreach (var id in screens)
@@ -635,7 +657,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             {
                 var path = System.IO.Path.ChangeExtension(_shotPath, null) + "." + id + ".png";
                 using var fs = System.IO.File.Create(path);
-                _scene.SaveAsPng(fs, W * SS, H * SS);
+                _scene.SaveAsPng(fs, _scene.Width, _scene.Height);
             }
         }
         if (blank.Count > 0)

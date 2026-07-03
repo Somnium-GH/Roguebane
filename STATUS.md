@@ -69,13 +69,15 @@ remaining merchant work is design-gated (ware pricing/rarity models, pixel-compa
   build reads); both `.spritefont`s point at the TTF paths (char regions were already widened ①②③✓✚◉).
   Content build green, RB_MF=all green, ✓ chips render real glyphs, card copy reads in the design serif.
   Georgia/Consolas gone. (Old "awaits download approval" gate: superseded by this P0's "do it now".)
-- **RENDER AT NATIVE RES (big fidelity win, ours) — CONFIRMED root cause:** the scene paints to a FIXED
-  `960×540×SS` (≈1920×1080) RenderTarget (`Game1.cs` `_scene`), then aspect-scales into the backbuffer. On
-  a display LARGER than 1080 (fullscreen on a ~2560 monitor) that 1080 scene is UPSCALED to native = SOFT.
-  THIS is the "1080 = lower fidelity" — the 1080 was meant as AUTHORING density, but the code caps the
-  RENDER at 1080. Fix: size the scene to the NATIVE output res (map design-space 960×540 → native), so
-  hi-fi chrome/fonts render crisp; pixel-art figures nearest-neighbor-scale. Build SpriteFonts for native,
-  not the 1080 cap.
+- ~~RENDER AT NATIVE RES~~ **DONE (2026-07-02):** the scene RenderTarget is now sized to the NATIVE
+  backbuffer aspect-fit every frame (recreated on fullscreen/resize; `EnsureSceneMatchesBackbuffer`)
+  and blits 1:1 — the fixed 1080 cap + soft upscale are gone. `SS` became the float design→scene scale;
+  the two densities it conflated are split out: `FontBake=3` (SpriteFonts rebuilt at 3x design px —
+  display 60 / mono 42 — so text stays a DOWNSCALE up to ~1620p-class scenes) and `ChromeBake=2` (the
+  2x-painted button/frame skins; nine-slice corners keep their shipped proportion). Border weights
+  pinned to the shipped look (`BorderPx`: authored w=1 → 2 design px) independent of scene scale.
+  Verified RB_MF=all at a 1600×900 backbuffer → 1600×900 shots, all screens paint, layout identical.
+  Pixel-art figures still scale through the common path (nearest-neighbor via PointClamp).
 - **LETTERBOX vs §13 aspect-fill — CONFIRMED:** the shell LETTERBOXES (`Game1.cs` `Clear(Color.Black) //
   letterbox bars` + aspect-preserving fit) — but §13 LOCKED aspect-independent FILL (bg scale-to-cover +
   HUD anchored to real edges, NO bars). On a non-16:9 display you get bars. Implement §13 aspect-fill.
