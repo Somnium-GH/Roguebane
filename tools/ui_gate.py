@@ -50,22 +50,31 @@ def main():
         print("\n".join(errors[:10]))
         return 2
 
-    print("== driven all-screen smoke ==")
-    shot = build_dir / "gate.png"
-    env = {"RB_SCREEN": "encounter", "RB_MF": "all", "RB_SMOKE": "1", "RB_SHOT": str(shot)}
+    # Two driven passes so every screen is validated in its RICHEST reachable state: the encounter
+    # drive (mid castle fight) covers encounter/equipment/campaignmap/newgame; the citymap drive
+    # stops AT THE MERCHANT, so merchant + citymap validate with live stock/gauges instead of empty
+    # state-gated lists. Per-screen numbers are taken from the pass that owns the screen.
     import os
-    r = run([str(build_dir / "Roguebane.Game.exe")], cwd=str(build_dir), env={**os.environ, **env})
-    print(r.stdout.strip())
     failures = []
-    if r.returncode != 0:
-        failures.append(f"smoke exit code {r.returncode} (blank screen or blank element — see above)")
+    binds, fidelity = {}, {}
+    passes = [("encounter", ("encounter", "equipment", "campaignmap", "newgame")),
+              ("citymap", ("citymap", "merchant"))]
+    for drive, owns in passes:
+        print(f"== driven all-screen smoke (RB_SCREEN={drive}) ==")
+        shot = build_dir / f"gate-{drive}.png"
+        env = {"RB_SCREEN": drive, "RB_MF": "all", "RB_SMOKE": "1", "RB_SHOT": str(shot)}
+        r = run([str(build_dir / "Roguebane.Game.exe")], cwd=str(build_dir), env={**os.environ, **env})
+        print(r.stdout.strip())
+        if r.returncode != 0:
+            failures.append(f"{drive} drive: smoke exit {r.returncode} (blank screen/element — see above)")
+        for m in re.finditer(r"SMOKE BINDS: (\w+) resolved=(\d+)/(\d+)", r.stdout):
+            if m.group(1) in owns:
+                binds[m.group(1)] = int(m.group(2))
 
-    binds = {m.group(1): int(m.group(2))
-             for m in re.finditer(r"SMOKE BINDS: (\w+) resolved=(\d+)/(\d+)", r.stdout)}
-    fidelity = {}
     print("== fidelity ==")
     for screen, design in DESIGNS.items():
-        shot_png = build_dir / f"gate.{screen}.png"
+        drive = next(d for d, owns in passes if screen in owns)
+        shot_png = build_dir / f"gate-{drive}.{screen}.png"
         if not shot_png.exists():
             failures.append(f"{screen}: no shot rendered")
             continue

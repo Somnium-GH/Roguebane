@@ -140,7 +140,10 @@ game). Build, in order:
   positions (placeholder art), under-figure name+segmented-HP bars (heroHp/foeHp resolve text; the
   segments need pip parts — Needs-CD). MERCHANT walked: its low tiles are a STATE artifact (the
   gate's drive ends at the castle so merchant lists are legitimately empty) + the same chrome family;
-  a true merchant walk needs a merchant-state drive (gate refinement, open). All walked screens'
+  a true merchant walk needs a merchant-state drive — DONE (2026-07-02 pm): the gate now runs TWO
+  driven passes (encounter drive owns encounter/equipment/campaignmap/newgame; the citymap drive
+  stops AT THE MERCHANT and owns citymap/merchant), so merchant validates with live stock: binds
+  10/17 (residue = containers + the single-page pager's legit-null prev/next). All walked screens'
   floors are CD/art/design-gated — zero renderer-side deltas remain from the walks.
 - **GATES — PINNED (2026-07-02):** `python tools/ui_gate.py` = the ONE regression command: scratch
   build → driven all-screen smoke (blank-screen + blank-element failures are the engine's own exit
