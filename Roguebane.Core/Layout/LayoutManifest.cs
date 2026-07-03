@@ -99,6 +99,24 @@ public sealed class Element
     public string? ColorBind { get; init; } // a colour bound from live data (e.g. "preview.accent")
     public JsonElement States { get; init; } // interaction-state skins (button family asset map)
     public string[]? Frames { get; init; }  // authored animation frames, cycled on the FIXED tick (§12)
+    public string? Align { get; init; }     // text alignment: left | center | right (dc.html text-align)
+    public ElementPart[] Parts { get; init; } = []; // named sub-parts — when present, THEY carry the text (§12)
+}
+
+// A named sub-part of a screen element (§12): the dc.html source keeps value/label spans (and named
+// chrome boxes) as separate runs with their own element-local rect/font/px — an element with parts
+// draws each part's text and NEVER its own flattened sample (the A3 tile re-extraction).
+public sealed class ElementPart
+{
+    public string Part { get; init; } = "";
+    public int[] Rect { get; init; } = []; // element-local x,y,w,h (design px)
+    public string? Color { get; init; }
+    public string? Font { get; init; }
+    public double FontPx { get; init; }
+    public string? Align { get; init; }    // left | center | right (default left)
+    public string? Sample { get; init; }
+    public string? Binds { get; init; }
+    public string? Content { get; init; }  // a literal run (labels); binds-carrying parts resolve live
 }
 
 // An engine-drawn drop shadow (§10): the element silhouette offset by (Dx,Dy), softened by Blur, in the

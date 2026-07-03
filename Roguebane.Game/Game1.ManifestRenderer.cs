@@ -164,29 +164,12 @@ public partial class Game1
                             new Fill { Token = "mintActive" });
                     break;
                 }
-                // Stat TILES (design/05 source: VALUE span over a smaller LABEL span, both mono,
-                // centred; the extraction flattened them to one run — payload addendum A3): draw the
-                // two parts per the source until proper two-part tiles land.
-                if (e.Binds is "preview.hp" or "preview.budget" or "preview.techniques" or "preview.bays")
+                // §12 element parts: the dc.html source keeps value/label spans as separate runs
+                // with element-local rects — draw each part, NEVER the element's flattened sample
+                // (retires the M1 preview-tile stopgap; the A3 re-extraction authors these).
+                if (e.Parts.Length > 0)
                 {
-                    var tv = ResolveScreenBind(e.Binds);
-                    var tl = e.Binds switch
-                    {
-                        "preview.hp" => "BASE HP",
-                        "preview.budget" => "RUNE BUDGET",
-                        "preview.techniques" => "ACTIONS",
-                        _ => "MINION BAYS",
-                    };
-                    if (tv is not null)
-                    {
-                        var vs = MeasureText(_assets.Mono, tv) * (float)(9.0 / MonoDesignPx);
-                        TextPx(_assets.Mono, tv, (int)(r.X + r.Width / 2 - vs.X / 2), r.Y + 3,
-                            _ui.Color(e.Color ?? "ink", Ink), 9.0);
-                        var ls = MeasureText(_assets.Mono, tl) * (float)(4.25 / MonoDesignPx);
-                        TextPx(_assets.Mono, tl, (int)(r.X + r.Width / 2 - ls.X / 2),
-                            (int)(r.Y + 3 + vs.Y + 2), _ui.Color("muted", Muted), 4.25);
-                        RecordTextBox(new Rectangle(r.X, r.Y, r.Width, r.Height), r, tv + " " + tl, _assets.Mono);
-                    }
+                    DrawElementParts(e, r);
                     break;
                 }
                 var txt = e.Content ?? ResolveScreenBind(e.Binds);
@@ -366,6 +349,33 @@ public partial class Game1
     // The city chart (design/03): map nodes spread over the graph element's region via GraphLayout —
     // links first (dashed when uncharted), then a beacon per node (fog-aware icon), the current node
     // ringed and reachable deployments numbered. Same live rules as the legacy chart, manifest geometry.
+    // §12: each element part is one text run at an element-local rect — a literal (content) or a
+    // live bind falling back to its sample. Alignment is horizontal within the part band; text
+    // centres vertically in it (the authored band IS the line box).
+    private void DrawElementParts(Element e, Rectangle r)
+    {
+        foreach (var p in e.Parts)
+        {
+            if (p.Rect.Length != 4) continue;
+            var pr = new Rectangle(r.X + p.Rect[0], r.Y + p.Rect[1], p.Rect[2], p.Rect[3]);
+            var txt = p.Content
+                ?? (p.Binds is { Length: > 0 } ? ResolveScreenBind(p.Binds) ?? p.Sample : p.Sample);
+            if (string.IsNullOrEmpty(txt)) continue;
+            var font = p.Font == "display" ? _assets.Display : _assets.Mono;
+            var basePx = font == _assets.Display ? DisplayDesignPx : MonoDesignPx;
+            var sz = MeasureText(font, txt!) * (float)(p.FontPx / basePx);
+            var x = p.Align switch
+            {
+                "center" => (int)(pr.X + pr.Width / 2f - sz.X / 2f),
+                "right" => (int)(pr.Right - sz.X),
+                _ => pr.X,
+            };
+            var y = (int)(pr.Y + pr.Height / 2f - sz.Y / 2f);
+            RecordTextBox(new Rectangle(x, y, (int)sz.X, (int)sz.Y), r, txt!, font);
+            TextPx(font, txt!, x, y, _ui.Color(p.Color ?? e.Color ?? "ink", Ink), p.FontPx);
+        }
+    }
+
     private void DrawManifestGraph(Element e, Rectangle region)
     {
         var map = Exp.Map;
@@ -527,13 +537,12 @@ public partial class Game1
         // The chart's current-position label (design/03: "YOU ARE HERE" under the ringed node; the
         // dc.html glyph U+25BC isn't in the font regions — the ring itself marks the node).
         "map.current" => InRun ? "YOU ARE HERE" : null,
-        // CityMap gauges (design/03): the panel binds carry the live counts + their flavor line (the
-        // design's inner pip strips are a flattened-extraction gap, Needs-CD — the values render now).
-        "supplies" => InRun
-            ? $"Supplies  {Exp.Map.Supplies} / {Exp.Map.MaxSupplies}\n1 supply per deployment" : null,
-        "support" => InRun
-            ? $"Mustered Support  {Exp.Map.SupportBank} / {Exp.Map.Nodes.Count(n => n.Type == Roguebane.Core.NodeType.ResourceHold)}"
-              + $"\nCapture the {Exp.Map.Nodes.Count(n => n.Type == Roguebane.Core.NodeType.ResourceHold)} resource holds to muster" : null,
+        // CityMap gauges (07-03 drop): titles/counts/notes are REAL elements now — the panel binds
+        // ("supplies"/"support") are container-only and resolve nothing (the one-text-run stopgap
+        // header is retired); the count elements carry the live n / m.
+        "supplies.count" => InRun ? $"{Exp.Map.Supplies} / {Exp.Map.MaxSupplies}" : null,
+        "support.count" => InRun
+            ? $"{Exp.Map.SupportBank} / {Exp.Map.Nodes.Count(n => n.Type == Roguebane.Core.NodeType.ResourceHold)}" : null,
         "enemy.advance" => InRun
             ? Exp.Map.WarPartyDistance + (Exp.Map.WarPartyDistance == 1 ? " WAYPOINT" : " WAYPOINTS")
               + " AWAY FROM CAMP" : null,

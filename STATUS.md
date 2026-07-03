@@ -35,11 +35,26 @@ payload — until CD's extractor includes campaignmap again, EVERY future drop m
 key-set diff (screens/templates lost vs previous — add that diff to `drop_audit.py` as a standing
 guard: it currently checks html→manifest, not manifest→previous-manifest).
 **NEW ENGINE WORK from this drop (fold into the M1 newgame batch + adjacent screens; M0 STILL
-FIRST):** `element.parts[]` draw support (schema model + contract test + renderer: parts carry the
-text, never double-draw the element sample); per-state chip labels draw; pattern-tile imageBind;
-`CoreRune.Badge` datum; gauge-header stopgap retire; shield count/regen manifest wires; verify
-resource-strip seating; LAYOUT_CONTRACT fold now includes `parts[]`, `part`, `states.<state>.label`,
-pattern imageBind. Canon core-effect copy in `CoreRunes.cs` is STILL pending (M1).
+FIRST):** ~~`element.parts[]` draw support~~ DONE (2026-07-03 loop: `Element.Align/Parts` +
+`ElementPart` in the schema model, fixture + quantified contract tests [315 green], renderer draws
+each part's text run at its element-local rect w/ align + sample fallback and NEVER the element's
+flattened sample — the M1 preview-tile stopgap is deleted, the manifest authors those tiles now);
+~~gauge-header stopgap retire~~ DONE (same pass: `supplies`/`support` panel binds resolve null —
+containers, chrome-only; NEW `supplies.count`/`support.count` resolver cases feed the drop's real
+count elements; citymap binds hold 15). REMAINING: per-state chip labels draw; pattern-tile
+imageBind; `CoreRune.Badge` datum; shield count/regen manifest wires; verify resource-strip
+seating; LAYOUT_CONTRACT fold (`parts[]`, `part`, `states.<state>.label`, pattern imageBind).
+Canon core-effect copy in `CoreRunes.cs` LANDED in M1 (see below).
+**‼ GATE RED (pre-existing, DROP-caused — verified by stash/rerun at HEAD): text OVERFLOWS rose
+ng 6→9, city 4→6.** Membership is the drop's NEW/re-authored elements (city: suppliesTitle/
+supportTitle/castlePanelTitle/doomTitle; ng: header/preview family). Numerics: VERTICAL-only —
+drawn line box h=14–15 vs authored 11px bands (display-font line spacing; INK fits, probes read
+1.0–1.1×) — the same class as the already-baselined logo. Engine draw is per authored fontPx
+(correct); shrinking to fit would break verified sizing. **NEEDS HUMAN (M0 rule 2: measurement
+changes need approval BEFORE commit):** approve ONE of (a) baseline re-pin accepting the new
+counts (textgeom ng 9/2, city 6/0) as drop-authored content, or (b) textgeom switching to INK
+bboxes (matches probes; detector keeps catching clipped/missing text). Until then the gate stays
+red on exactly these two lines; fidelity/binds/coverage all green (city fidelity 86.5→87.0).
 **PRIORITY ORDER post-drop (standing rule, CLAUDE.md §Working):** failing gates / measurement
 integrity (M0) FIRST → drop-unblocked work (the list above + M1) → only then contingency/refactor.
 A drop RESOLVING a blocker is authoritative here — don't re-verify what the re-arm block says

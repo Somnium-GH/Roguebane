@@ -49,6 +49,56 @@ public class LayoutManifestTests
     }
 
     [Fact]
+    public void ParsesElementParts()
+    {
+        // §12 schema (test-owned fixture, not CD content): an element may carry named value/label
+        // sub-parts with element-local rects — the parts carry the text, the element keeps chrome.
+        var m = LayoutManifest.Parse("""
+        {
+          "screens": { "s": { "designSize": [960,540], "elements": [
+            { "id": "tile", "type": "text", "anchor": "TopLeft", "offset": [0,0], "size": [41,35],
+              "z": 1, "binds": "x.v", "align": "center", "parts": [
+                { "part": "value", "rect": [1,12,38,10], "color": "gold", "font": "mono",
+                  "fontPx": 10, "align": "center", "sample": "20", "binds": "x.v" },
+                { "part": "label", "rect": [1,24,38,6], "color": "mutedDim", "font": "mono",
+                  "fontPx": 4.5, "align": "center", "content": "BASE HP" } ] } ] } }
+        }
+        """);
+        var el = m.Screens["s"].Elements[0];
+        Assert.Equal("center", el.Align);
+        Assert.Equal(2, el.Parts.Length);
+        Assert.Equal("value", el.Parts[0].Part);
+        Assert.Equal("x.v", el.Parts[0].Binds);
+        Assert.Equal("20", el.Parts[0].Sample);
+        Assert.Equal("BASE HP", el.Parts[1].Content);
+        Assert.Equal(4.5, el.Parts[1].FontPx);
+    }
+
+    [Fact]
+    public void EveryElementPartIsAWellFormedTextRun()
+    {
+        // Quantifies over whatever CD authored: every element part names itself, sits INSIDE its
+        // element (4-int element-local rect), carries a text source (content/binds/sample), a
+        // positive fontPx, and a known align.
+        var m = Real();
+        foreach (var s in m.Screens.Values)
+            foreach (var e in s.Elements)
+                foreach (var p in e.Parts)
+                {
+                    Assert.False(string.IsNullOrEmpty(p.Part));
+                    Assert.Equal(4, p.Rect.Length);
+                    Assert.True(p.Rect[0] >= 0 && p.Rect[1] >= 0
+                        && p.Rect[0] + p.Rect[2] <= e.Size[0] && p.Rect[1] + p.Rect[3] <= e.Size[1],
+                        $"part '{p.Part}' rect escapes its element ({e.Id})");
+                    Assert.False(string.IsNullOrEmpty(p.Content) && string.IsNullOrEmpty(p.Binds)
+                        && string.IsNullOrEmpty(p.Sample), $"part '{p.Part}' of {e.Id} has no text source");
+                    Assert.True(p.FontPx > 0, $"part '{p.Part}' of {e.Id} has no fontPx");
+                    if (p.Align is not null)
+                        Assert.Contains(p.Align, new[] { "left", "center", "right" });
+                }
+    }
+
+    [Fact]
     public void ParsesEveryTopLevelSection()
     {
         var m = Real();
