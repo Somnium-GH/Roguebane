@@ -491,10 +491,10 @@ public partial class Game1
         // CityMap gauges (design/03): the panel binds carry the live counts + their flavor line (the
         // design's inner pip strips are a flattened-extraction gap, Needs-CD — the values render now).
         "supplies" => InRun
-            ? $"SUPPLIES {Exp.Map.Supplies}/{Exp.Map.MaxSupplies}\n1 supply per deployment" : null,
+            ? $"Supplies  {Exp.Map.Supplies} / {Exp.Map.MaxSupplies}\n1 supply per deployment" : null,
         "support" => InRun
-            ? $"MUSTERED SUPPORT {Exp.Map.SupportBank}/{Exp.Map.Nodes.Count(n => n.Type == Roguebane.Core.NodeType.ResourceHold)}"
-              + "\nbanked from held beacons" : null,
+            ? $"Mustered Support  {Exp.Map.SupportBank} / {Exp.Map.Nodes.Count(n => n.Type == Roguebane.Core.NodeType.ResourceHold)}"
+              + $"\nCapture the {Exp.Map.Nodes.Count(n => n.Type == Roguebane.Core.NodeType.ResourceHold)} resource holds to muster" : null,
         "enemy.advance" => InRun
             ? Exp.Map.WarPartyDistance + (Exp.Map.WarPartyDistance == 1 ? " WAYPOINT" : " WAYPOINTS")
               + " AWAY FROM CAMP" : null,

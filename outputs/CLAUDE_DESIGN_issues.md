@@ -31,7 +31,13 @@ are superseded by this reconcile._
    (supplies/gold/charge/summons at the authored chip size) — the engine clips the overflowing
    chips rather than spilling into the top-bar buttons, so SUMMONS drops off on encounter. Widen
    the region or shrink the chip in a future drop.
-6. **Encounter extraction gaps (found by the new `tools/drop_audit.py` at drop time):** Encounter.dc.html
+6. **Citymap gauge internals + doom hatch still flattened:** the supplies/support panels extract as
+   panel + pip list only — the design's TITLE row ("Mustered Support" serif + right-aligned "0 / 2")
+   and the caption line ("Capture the 2 resource holds to muster") aren't elements, so the engine
+   ships a one-text-run stopgap header in the design's casing. And `doomFill` extracted as a
+   `blood→blood` "gradient" — the design's diagonal HAZARD STRIPES can't be expressed (a flat red
+   draws). Give the fill a pattern token or a tileable stripe asset + imageBind next drop.
+7. **Encounter extraction gaps (found by the new `tools/drop_audit.py` at drop time):** Encounter.dc.html
    binds `ShieldPool.count` (the "n/m" text inside the heroShield header) and `ShieldPool.regenPct`
    (the fill inside heroShieldRegen) on anonymous spans, but neither datum reached layout.json —
    the manifest carries only `ShieldPool` / `ShieldPool.points` / `ShieldPool.regen`. The engine
