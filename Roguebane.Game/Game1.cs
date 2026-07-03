@@ -689,6 +689,12 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                 Console.WriteLine($"SMOKE SILENT: {id} (state-gated, ok): {string.Join(",", silent)}");
             if (occluded.Count > 0)
                 Console.WriteLine($"SMOKE OCCLUDED: {id} (border overpainted, Needs-CD z): {string.Join(",", occluded)}");
+            // Content validation: which BOUND elements resolve LIVE data in the current state. Drive a
+            // run first (RB_SCREEN=encounter RB_MF=all) to validate the in-run screens' binds.
+            var boundEls = screenDef.Elements.Where(x => !string.IsNullOrEmpty(x.Binds)).ToArray();
+            var unresolved = boundEls.Where(x => !BindResolves(x)).Select(x => x.Id ?? "?").ToList();
+            Console.WriteLine($"SMOKE BINDS: {id} resolved={boundEls.Length - unresolved.Count}/{boundEls.Length}"
+                + (unresolved.Count > 0 ? $" unresolved=[{string.Join(",", unresolved)}]" : ""));
         }
         if (blankEls.Count > 0)
             Console.WriteLine($"SMOKE ELEM-BLANK: {string.Join(",", blankEls)}");

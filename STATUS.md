@@ -100,6 +100,12 @@ game). Build, in order:
 - **Coverage + content validation (deterministic, headless, ALL 5 screens every pass):** assert EVERY
   manifest element renders NON-BLANK at its expected rect, and each BOUND element shows LIVE data (not its
   `sample`). This alone catches the combat regression + empty/overlapping labels the instant they happen.
+  BIND-RESOLUTION REPORT DONE (2026-07-02): `RB_MF=all` also reports per screen which BOUND elements
+  resolve LIVE data (`SMOKE BINDS: resolved=M/N unresolved=[...]`); drive a run first
+  (`RB_SCREEN=encounter RB_MF=all`) to validate the in-run screens (encounter resolves 14/21 driven vs
+  4/21 cold; the residue = container binds + state-gated ones + a few REAL unmapped binds:
+  `encounter.label`, `pool.legend` — small render slices when prioritized). A bind that silently goes
+  dead now shows the pass it happens. NOT yet an exit-gate (pin a baseline first).
   PER-ELEMENT COVERAGE DONE (2026-07-02): `RB_MF=all` now leave-one-out renders EVERY element and
   measures its actual pixel contribution — an element with unconditional chrome/content (fill/frame/
   content/image/button) contributing ZERO pixels fails the run (exit 1); bind-only/list elements empty
@@ -115,6 +121,11 @@ game). Build, in order:
   rects (+ optional heatmap). BASELINES (RB_MF pre-run shots, so placeholder-data regions depress the
   numbers): encounter 71.1 / equipment 66.9 / citymap 74.2 / campaignmap 85.1 / newgame 66.4 /
   merchant 76.7. REFINEMENTS open: drive run state for live-data shots; a placeholder-region mask.
+  WORST-TILE WALKS (2026-07-02, the enumerated-delta discipline): NEWGAME's 0% tiles = the known
+  Needs-CD extraction gaps (card bg/chrome parts, boxed stat tiles, SELECT buttons, race head art);
+  EQUIPMENT's = missing screen backdrop art (design/02 shows one; the manifest has no scene element
+  — Needs-CD), textured `ui/pip/*` attr-bar pips (Needs-CD, already logged), runeCard chrome
+  (Needs-CD). Both screens' remaining fidelity floors are CD-gated; no renderer-side deltas found.
 - **GATES:** a screen is "DONE" only when coverage+content pass AND the fidelity diff is under threshold.
   The loop may claim "blocked/starved" ONLY by emitting the ENUMERATED per-element remaining-delta list,
   each tagged **CD / system / human** with a reason. No backed-up list ⇒ NOT starved — keep perfecting

@@ -323,6 +323,21 @@ public partial class Game1
     // Run state exists only after a march; encounter binds fall back to samples until then.
     private bool InRun => _campaign is not null;
 
+    // Smoke content-validation: does this element's bind resolve to LIVE data right now? Mirrors the
+    // draw gating (scene images, the regen track, figures, lists, screen binds). Driven smokes
+    // (RB_SCREEN=encounter RB_MF=all) shrink the unresolved list toward zero; the report makes a
+    // bind that silently went dead visible the pass it happens.
+    private bool BindResolves(Element e)
+    {
+        var b = e.Binds!;
+        if (b.EndsWith(".scene")) return e.Image is { Length: > 0 } img && _assets.Texture(NormalizeContentPath(img)) is not null;
+        if (b == "ShieldPool.regen") return InRun && Exp.Player.Body.ShieldRegenProgress > 0f;
+        if (e.Type == "figure") return b is "preview.fig" or "Body" || (InRun && Exp.Enemy is not null);
+        if (e.Type == "list") return ListData(b) is { Count: > 0 };
+        if (e.Type == "graph") return InRun; // chart/cityGraph draw from live run/campaign state
+        return ResolveScreenBind(b) is not null;
+    }
+
     // A list container: stamp its item template into each cell (ListLayout), filling each part from the
     // i-th LIVE datum's `binds` (falling back to the manifest `sample` where a bind isn't mapped yet).
     private void DrawManifestList(Element e, Rectangle r)
