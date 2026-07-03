@@ -201,16 +201,40 @@ public partial class Game1
                         ? _assets.Texture(frames[_animTick / 10 % frames.Length])
                         : _assets.Reticle("focus");
                     var tex = picking ? _assets.Reticle("secondary") ?? focus : focus;
-                    var shown = new System.Collections.Generic.HashSet<Stat>();
-                    foreach (var t in Exp.Equipment)
-                        if (Exp.PartOf(t) is { } aimed && shown.Add(aimed.Stat)
-                            && FoePartScreenRect(ef, aimed.Stat, r) is { } fr2 && tex is not null)
+                    // Group aims per part: one reticle per part, its AIM TAG stack = the hotkey
+                    // NUMBERS of every module kept on it (design/01: several actives stack).
+                    var aims = new System.Collections.Generic.Dictionary<Stat, List<int>>();
+                    for (var ti = 0; ti < Exp.Equipment.Count; ti++)
+                        if (Exp.PartOf(Exp.Equipment[ti]) is { } aimed)
+                            (aims.TryGetValue(aimed.Stat, out var l)
+                                ? l : aims[aimed.Stat] = new List<int>()).Add(ti);
+                    var tagT = _ui.Manifest?.Templates.GetValueOrDefault("aimTag");
+                    foreach (var (stat, cardIxs) in aims)
+                    {
+                        if (FoePartScreenRect(ef, stat, r) is not { } fr2 || tex is null) continue;
+                        var scenePx = Math.Clamp(Math.Max(fr2.Width, fr2.Height) * SS * 1.5f, 64f, 136f);
+                        var d = (int)(scenePx / SS);
+                        var top = fr2.Y + fr2.Height / 2 - d / 2;
+                        Sprite(tex, fr2.X + fr2.Width / 2 - d / 2, top, d, d,
+                            picking ? Color.White * 0.55f : Color.White);
+                        if (tagT is null) continue;
+                        // Tag row ABOVE the reticle, centred: templates.aimTag per kept module.
+                        var (tw, thh, gap) = (tagT.Size[0], tagT.Size[1], 2);
+                        var rowW = cardIxs.Count * tw + (cardIxs.Count - 1) * gap;
+                        var tx = fr2.X + fr2.Width / 2 - rowW / 2;
+                        var ty = top - thh - 2;
+                        foreach (var ix in cardIxs)
                         {
-                            var scenePx = Math.Clamp(Math.Max(fr2.Width, fr2.Height) * SS * 1.5f, 64f, 136f);
-                            var d = (int)(scenePx / SS);
-                            Sprite(tex, fr2.X + fr2.Width / 2 - d / 2, fr2.Y + fr2.Height / 2 - d / 2,
-                                d, d, picking ? Color.White * 0.55f : Color.White);
+                            DrawFill(new Rectangle(tx, ty, tw, thh), tagT.Fill ?? new Fill { Token = "hit" });
+                            if (tagT.Border is { } tb)
+                                Border(tx, ty, tw, thh, _ui.Color(tb.Color, Border0), BorderPx(tb.W), tb.Sides);
+                            foreach (var tp in CardTemplate.Place(tagT, tx, ty))
+                                TextPxWrapped(tp.Font == "display" ? _assets.Display : _assets.Mono,
+                                    (ix + 1).ToString(), RectOf(tp.Rect),
+                                    _ui.Color(tp.Color ?? "outline", Ink), tp.FontPx);
+                            tx += tw + gap;
                         }
+                    }
                 }
                 break;
             case "graph" when e.Binds == "map" && InRun && e.Item is not null:
@@ -578,6 +602,10 @@ public partial class Game1
                     "race.attrs.value" => AttrTile(datum, valIx++)?.value,
                     "race.attrs.key" => AttrTile(datum, keyIx++)?.key,
                     "attr.color" => null, // the swatch is pure fill, no text
+                    // Hotkey chips (design/01, §8): the number IS the card's bar position — techniques
+                    // first, then bays continue the sequence (same order the D1..D6 keys press).
+                    "technique.hotkey" => (i + 1).ToString(),
+                    "bay.hotkey" => (TechniqueCount() + i + 1).ToString(),
                     _ => datum is not null ? ResolveBind(datum, pp.Binds) : null,
                 } ?? pp.Sample;
                 if (!string.IsNullOrEmpty(text))
@@ -586,6 +614,9 @@ public partial class Game1
             }
         }
     }
+
+    // How many technique cards precede the bay lane on the action bar (hotkey numbering).
+    private int TechniqueCount() => (InRun ? Exp.Equipment : _build.Equipment).Count;
 
     // The i-th attribute tile (STR/INT/DEX/CON order) of a Race datum, for the per-attr card tiles.
     private static (string key, string value)? AttrTile(object? datum, int i) => datum is Roguebane.Core.Race r

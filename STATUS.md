@@ -100,9 +100,14 @@ Wire ALL of it into `tools/ui_gate.py` (stays the ONE command); run every pass p
   scene px; while ANOTHER module is picking, kept targets draw the faint SECONDARY (0.55 alpha).
   Static foeReticle element gates off (bound icons suppress when their bind is unresolved — its
   authored image is a mock-position stand-in; the mock box is gone from the shot, eyeballed).
-- REMAINING P0-B: AIM TAG number stack (`templates.aimTag` + `targeting.tags`); action-bar hotkey
-  chips (`technique.hotkey`/`bay.hotkey`). Pulse cycling + hidden cursor are Update-side — verify
-  LIVE (headless smoke is single-frame); flag any repro to the targeting-FSM debt line.
+- ~~AIM TAG stack~~ DONE (2026-07-03): aims group per part; each part's reticle wears a centred tag
+  ROW above it — one `templates.aimTag` chip per kept module, reading its HOTKEY number (eyeballed:
+  "1" above the locked head). Static foeAimTags element stays gated (mock position).
+- ~~hotkey chips~~ DONE (2026-07-03): `technique.hotkey`/`bay.hotkey` parts resolve positionally —
+  techniques 1..T then bays T+1.. (the D1–D6 order); eyeballed 1–4 on the castle drive's cards.
+- **P0-B residual:** pulse cycling + hidden cursor are Update-side — verify LIVE (headless smoke is
+  single-frame); bay-lane keys beyond techniques don't PRESS yet (chips number them; input still
+  technique-only — wire when bay pressing is designed). Flag any repro to the targeting-FSM debt line.
 
 **‼ P0-C — POST-DROP ENGINE QUEUE (the 07-03 walk's CD-tagged items LANDED in the drop; what remains
 is ALL engine-side). Fix with P0-A numbers (before/after per-element scores):**
