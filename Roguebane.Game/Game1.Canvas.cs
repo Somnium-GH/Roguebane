@@ -77,7 +77,12 @@ public partial class Game1
         var maxLines = Math.Max(1, (int)Math.Round(r.Height / lineH)); // a near-2-line box (0.9x) still wraps
         if (!s.Contains('\n') && (maxLines == 1 || MeasureText(font, s).X * sc <= r.Width))
         {
-            TextPx(font, s, r.X, r.Y, color, fontPx);
+            // A single-line box that can't wrap SHRINKS its label to fit instead of spilling over the
+            // neighbouring chrome (IM Fell runs wider than the extraction font — "AUTO-ATTACK" vs its
+            // 98px chip). The authored box stays the truth; only the glyphs give.
+            var w = MeasureText(font, s).X * sc;
+            var fit = maxLines == 1 && w > r.Width && fontPx > 0 ? fontPx * r.Width / w : fontPx;
+            TextPx(font, s, r.X, r.Y, color, fit);
             return;
         }
         var ly = (float)r.Y;

@@ -24,3 +24,11 @@ Thumbs.db
 
 # UI gate scratch build (tools/ui_gate.py)
 .ui-gate-build/
+
+# Doug's local diagnostic scratch (smokeshot batch, window-rect dumps, shot output)
+.shots/
+.smokeshots.bat
+.winrects.ps1
+.winrects.txt
+.screens.ps1
+.screens.txt

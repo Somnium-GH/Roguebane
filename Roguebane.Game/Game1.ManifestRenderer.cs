@@ -343,7 +343,7 @@ public partial class Game1
         "Body.hp" => InRun ? Exp.Player.Hp + " / " + Exp.Player.MaxHp : null,
         "encounter.foe.hp" => InRun && Exp.Enemy is { } foe ? foe.Hp + " / " + foe.MaxHp : null,
         // Combat verbs (design/01 chips; labels were flattened by extraction -> authored here).
-        "combat.autoAttack" => InRun ? (Exp.IsAuto() ? "AUTO-ATTACK ON" : "AUTO-ATTACK") : null,
+        "combat.autoAttack" => InRun ? "AUTO-ATTACK" : null, // the ON state reads from the amber skin
         "combat.retreat" => InRun ? "RETREAT" : null,
         // §6b shield bar header: standing points / total layers across the body's shield sources.
         "ShieldPool" => InRun && Exp.Player.Body.ShieldLayers > 0

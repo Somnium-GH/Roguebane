@@ -575,7 +575,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Matrix.CreateScale(SS));
         if (_mfScreen is not null) DrawManifestScreen(_mfScreen); // dev: render a screen straight from the manifest
         else if (_screen == Screen.NewGame) DrawManifestScreen("newgame"); // LIVE cut-over (design/05)
-        else if (_screen == Screen.Equipment) { DrawManifestScreen("equipment"); DrawResourceStrip(); } // LIVE cut-over (design/02)
+        else if (_screen == Screen.Equipment) DrawManifestScreen("equipment"); // LIVE cut-over (design/02); its manifest resourceStrip carries the run resources
         else DrawRunScreen();
         _spriteBatch.End();
 
@@ -749,34 +749,12 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     private void DrawEncounterScreen()
     {
         Stretch(_assets.Background("combat_field"), 0, 0, W, H);
-        DrawManifestScreen("encounter");
-        DrawResourceStrip();
+        DrawManifestScreen("encounter"); // its manifest resourceStrip carries the run resources
         DrawStateOverlay();
     }
 
     // 2026-07-02 directive: the run's resource counts — supplies / gold / charge / Summons (§9) —
     // read top-right on every IN-RUN screen, under the status strip.
-    private void DrawResourceStrip()
-    {
-        if (!InRun) return;
-        var items = new (string icon, string val)[]
-        {
-            ("supplies", Exp.Map.Supplies + "/" + Exp.Map.MaxSupplies),
-            ("spoils", Exp.Gold.ToString()),
-            ("charge", Exp.Charge + "/" + Exp.MaxCharge),
-            ("summons", Exp.Summons + "/" + Exp.MaxSummons), // §9 (icon landed in the 07-02 drop)
-        };
-        var x = W - 8;
-        for (var i = items.Length - 1; i >= 0; i--)
-        {
-            var (icon, val) = items[i];
-            x -= (int)MeasureText(_assets.Mono, val).X;
-            Text(_assets.Mono, val, x, 34, Ink);
-            x -= 20;
-            Sprite(_assets.Resource(icon), x, 32, 16, 16, Color.White);
-            x -= 10;
-        }
-    }
 
     // Draw text horizontally centred on cx at y (measures the font-safe form so centring matches draw).
     private void DrawCentered(SpriteFont font, string text, Color col, int cx, int y)
