@@ -46,13 +46,15 @@ count elements; citymap binds hold 15). ~~per-state chip labels draw~~ DONE (202
 fill/border/label/opacity, state style REPLACES part style wholesale — the part's own fill was the
 extracted CHOSEN sample, inheriting it painted every card chosen (caught by fidelity: ng 76.2, fixed
 back to 78.3 = baseline; the M1 CHOOSE/SELECT stopgap is retired; LOCKED state authored but no lock
-model exists, never resolves). REMAINING: pattern-tile imageBind; `CoreRune.Badge` datum; shield
-count/regen manifest wires; verify resource-strip seating; LAYOUT_CONTRACT fold (`parts[]`, `part`,
-`states.<state>.label`, pattern imageBind). **NEW (eyeballed during chip fix): `Races.cs` copy is
-STALE vs the canon'd design/05 v2 (drop #17)** — Elf subtitle "THE KEEN KINDRED" vs ref
-"THE KEEN & FLEET", blurb "Fleet + accurate..." vs ref "Keen and fleet, but frail - punishes a
-dropped block." Same class as the CoreRunes.cs canon pass (M1, done) — sweep Races.cs roster copy
-against the ref, pure data.
+model exists, never resolves). ~~pattern-tile imageBind~~ DONE (2026-07-03 loop: `Element.ImageBind`
+parses both {bind}-templated and STATIC forms [317 tests]; static paths TILE at ChromeBake density;
+FLAGGED STOPGAP: doomFillStripes clips fill+pattern to the war-party tandem width via sibling
+advancePct rect detection — Needs-CD: bind the stripes element so the stopgap dies; verified on the
+gate shot, citymap 86.8). ~~Races.cs canon copy~~ DONE (same pass: Elf "THE KEEN & FLEET" +
+"Keen and fleet, but frail - punishes a dropped block.", Human "...fits any core it can afford." —
+ASCII dashes, font lacks em-dash). REMAINING: `CoreRune.Badge` datum; shield count/regen manifest
+wires; verify resource-strip seating; LAYOUT_CONTRACT fold (`parts[]`, `part`,
+`states.<state>.label`, pattern imageBind).
 Canon core-effect copy in `CoreRunes.cs` LANDED in M1 (see below).
 **‼ GATE RED (pre-existing, DROP-caused — verified by stash/rerun at HEAD): text OVERFLOWS rose
 ng 6→9, city 4→6.** Membership is the drop's NEW/re-authored elements (city: suppliesTitle/
