@@ -1,8 +1,8 @@
 # Status
 
-## ✅ DROP APPLIED — RESUME (2026-07-03 late; applied + verified by Cowork, tree is yours again)
-The `.drop/` staging is applied and deleted. FIRST PASS: commit the applied drop as its own commit
-("CD drop 2026-07-03 pm: residuals #1–8 + addendum A1–A4 + campaignmap repair") BEFORE any work.
+## ✅ DROP APPLIED + COMMITTED (2026-07-03; applied by Cowork, committed 57cc8a6)
+The `.drop/` staging is applied and deleted; the drop-commit first-pass directive is SATISFIED
+(guards re-verified at commit: parse 6 screens, drop_audit 0 gaps, 313 tests green).
 **What landed (all VERIFIED):** per-state chip labels (`states.<state>.label` — SELECT/LOCKED/
 ✓ CORE SET, CHOOSE/✓ CHOSEN); `core.badge` bound (engine adds the display datum: Grunt STARTER,
 Warden BULWARK, Adept CASTER, Summoner/Reaver/Ranger SPECIALIST); **NEW SCHEMA `element.parts[]`**
