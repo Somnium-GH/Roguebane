@@ -91,8 +91,12 @@ claims were made against warped refs — treat them as UNVERIFIED; re-walk with 
    time; eq binds 23→22, correct) and SHIELD-over-bar DIED (bound-panel headers now confine to the
    band ABOVE their contained children + height-fit their font; enc overflows 11→9, heroShield/
    foeHp clean). Both were Doug's live-screenshot bugs (P0-C.10 items 4+5).
-6. **Hand-shot normalizer:** crop Doug's live window screenshots (title bar + letterbox) to the scene
-   rect and rescale into ref space, so his eyeball reports run through the same diff pipeline.
+6. **Hand-shot normalizer — ✅ BUILT (2026-07-03):** `tools/normalize_shot.py <shot> [--trim-top N]
+   [--client x,y,w,h] [--design ref.png]` — auto-trims uniform margins to the client rect (an OS
+   title bar needs --trim-top; a warning fires on non-16:9 clients since §13 pins HUD to real
+   edges), rescales to 1920×1080, optionally chains fidelity_diff. ROUND-TRIP VALIDATED: a
+   synthesized window shot (scene scaled to 2560×1440 + title bar + desktop margin) recovers the
+   client exactly and scores 77.7 vs the gate's own 77.8 on the same build. **P0-A IS COMPLETE.**
 7. **DROP AUDIT — ✅ BUILT (2026-07-03):** `tools/drop_audit.py` parses each screen's dc.html and
    diffs its inventory against `layout.json`; exit 1 on gaps. First run caught 2 (ShieldPool.count/
    regenPct — Needs-CD #4). dc.html stays READ-ONLY CD source (never edit/"fix" it; PNG refs stay
