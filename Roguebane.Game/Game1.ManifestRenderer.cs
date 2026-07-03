@@ -452,6 +452,20 @@ public partial class Game1
                 // never draw it beside live data. A NESTED wares region stamps its own cards.
                 if (datum is MerchantOffer or MerchantLot or ResourceReadout or MerchantSection
                     && pp.Binds is null) continue;
+                // Nested pip strip (§12): a part carrying its OWN list stamps a leaf template per
+                // cell, the cells sliced from the ROW datum (pool rows / attr bars).
+                if (pp.List is { } nested && pp.Binds is "pool.attr.cells" or "attrs.cells"
+                    && datum is ValueTuple<string, string, int, int, string> rowD)
+                {
+                    if (_ui.Manifest is { } mN && mN.Templates.TryGetValue(nested.Template, out var pipT))
+                    {
+                        var cellsData = PoolCells(rowD);
+                        var pipCells = ListLayout.Cells(pp.Rect, nested, cellsData.Count, pipT.Size);
+                        for (var pi = 0; pi < pipCells.Count; pi++)
+                            DrawLeafTemplate(pipT, pipCells[pi], cellsData[pi]);
+                    }
+                    continue;
+                }
                 if (pp.Binds == "section.wares" && datum is MerchantSection ws)
                 {
                     if (_ui.Manifest is { } mm && mm.Templates.TryGetValue("wareCard", out var wc))
@@ -636,6 +650,19 @@ public partial class Game1
         "encounter.foe.hp.points" => InRun && Exp.Enemy is { } hpFoe
             ? Enumerable.Range(0, hpFoe.MaxHp).Select(i => (object)(i < hpFoe.Hp)).ToList()
             : new List<object>(),
+        // CityMap gauge pips (07-03 drop): textured pips via ui/pip/{point.asset} — full/empty pairs
+        // per resource family, one pip per unit (design/03).
+        "supplies.points" => InRun
+            ? Enumerable.Range(0, Exp.Map.MaxSupplies).Select(i => (object)new PipPoint(
+                i < Exp.Map.Supplies,
+                i < Exp.Map.Supplies ? "pip_full_supplies" : "pip_empty_supplies")).ToList()
+            : new List<object>(),
+        "support.points" => InRun
+            ? Enumerable.Range(0, Exp.Map.Nodes.Count(n => n.Type == Roguebane.Core.NodeType.ResourceHold))
+                .Select(i => (object)new PipPoint(
+                    i < Exp.Map.SupportBank,
+                    i < Exp.Map.SupportBank ? "pip_full_support" : "pip_empty_support")).ToList()
+            : new List<object>(),
         // Merchant (§12, design/07): the heal offers + the seeded provision lots, live-priced.
         "merchant.healing.offers" => InRun && Exp.AtMerchant
             ? new List<object>
@@ -668,6 +695,18 @@ public partial class Game1
             : new List<object>(),
         _ => null,
     };
+
+    // One pool/attr row's pip cells: capacity cells total, free-first — free points render the
+    // stat-tinted full pip, reserved ones the reserved variant (design/01 pool rows, design/02 bars).
+    private static List<object> PoolCells(ValueTuple<string, string, int, int, string> row)
+        => Enumerable.Range(0, row.Item4).Select(i => (object)new PoolCell(
+            i < row.Item3 ? "full" : "reserved",
+            (i < row.Item3 ? "pip_full_" : "pip_reserved_") + row.Item5)).ToList();
+
+    // A textured gauge/strip pip: live/spent + which ui/pip PNG renders it (imageBind).
+    private sealed record PipPoint(bool Live, string Asset);
+    // One cell of a pool/attr pip strip: full/reserved + its per-stat ui/pip PNG.
+    private sealed record PoolCell(string State, string Asset);
 
     // Merchant list data (shell-side view records — the Core sells, the shell narrates).
     private sealed record MerchantOffer(string Name, string Note, int Price);
@@ -799,7 +838,8 @@ public partial class Game1
     {
         var fillTok = t.Fill?.Token;
         var borderTok = t.Border?.Color;
-        var key = t.Binds == "point.live" && datum is bool live ? (live ? "live" : "spent") : null;
+        var key = t.Binds == "point.live" && (datum is bool || datum is PipPoint)
+            ? (datum is true or PipPoint { Live: true } ? "live" : "spent") : null;
         if (key is not null && t.States.ValueKind == System.Text.Json.JsonValueKind.Object
             && t.States.TryGetProperty(key, out var st)
             && st.ValueKind == System.Text.Json.JsonValueKind.Object)
@@ -808,6 +848,15 @@ public partial class Game1
             if (st.TryGetProperty("border", out var b)) borderTok = b.GetString();
         }
         var r = new Rectangle(cell.X, cell.Y, cell.W, cell.H);
+        // A textured pip (imageBind, §12) IS the visual — the PNG replaces fill+border chrome.
+        if (t.ImageBind is { } ib && datum is not null
+            && System.Text.RegularExpressions.Regex.Replace(ib, @"\{(.+?)\}",
+                mm => ResolveBind(datum, mm.Groups[1].Value) ?? "") is { Length: > 0 } path
+            && !path.EndsWith("/") && _assets.Texture(NormalizeContentPath(path)) is { } pip)
+        {
+            Sprite(pip, r.X, r.Y, r.Width, r.Height, Color.White);
+            return;
+        }
         if (fillTok is { Length: > 0 }) DrawFill(r, new Fill { Token = fillTok });
         if (borderTok is { Length: > 0 })
             Border(r.X, r.Y, r.Width, r.Height, _ui.Color(borderTok, Border0),
@@ -863,6 +912,18 @@ public partial class Game1
     // Missing-data binds (race tag/blurb, per-attr tiles, Core Effect text) return null pending their data.
     private static string? ResolveBind(object datum, string? bind) => datum switch
     {
+        PipPoint pt => bind switch
+        {
+            "point.asset" => pt.Asset,
+            "point.live" => pt.Live ? "live" : "spent",
+            _ => null,
+        },
+        PoolCell pc => bind switch
+        {
+            "cell.asset" => pc.Asset,
+            "cell.state" => pc.State,
+            _ => null,
+        },
         Roguebane.Core.Race r => bind switch
         {
             "race.name" => r.Name,

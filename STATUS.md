@@ -127,8 +127,11 @@ is ALL engine-side). Fix with P0-A numbers (before/after per-element scores):**
 4. **New template families:** ~~heroHpPip/foeHpPip~~ DONE (2026-07-03: segmented HP strips live —
    one point.live pip per max-HP point through the shieldPip leaf path, + hpLabel eyebrows
    ("HUMAN SUMMONER - HP", foe id + n/m; ASCII dash, font lacks U+00B7); encounter binds 16→20);
-   REMAINING pips: poolPip/attrPip/supplyPip/supportPip/healPip (nested-in-template + imageBind
-   cells); ~~`data-bind-gate`~~ DONE
+   ~~poolPip/attrPip/supplyPip/supportPip/healPip~~ DONE (2026-07-03: leaf templates carry
+   `imageBind` — textured `ui/pip/*` PNGs replace fill chrome; template parts carry a NESTED
+   `list` (PlacedPart.List) so poolRow/attrBar stamp per-stat full/reserved cells from the row
+   datum; supplies.points/support.points resolve live [city binds 12]; healPips rides
+   Body.hp.points; eyeballed: design/01 pool strips exact); ~~`data-bind-gate`~~ DONE
    (2026-07-03: content+binds = literal gated by the bind, WHOLE element suppresses on a closed gate
    — heldBadge only shows paused; nav.close/nav.equipment/begin resolver gates added, binds eq 23
    city 10 ng 13; smoke classifies gated literals as legit-silent); ~~`item.pad`~~ DONE (2026-07-03:
