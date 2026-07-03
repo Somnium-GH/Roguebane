@@ -688,6 +688,15 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         var blankEls = new List<string>();
         foreach (var id in screens)
         {
+            // M0.3 (Doug): ALIGN THE DRIVE TO THE REF, never mask the divergence — the encounter
+            // drive picks the Summoner for combat richness, but design/05 renders the DEFAULT
+            // Grunt build. Cycle the build to the ref state for the newgame shot, restore after.
+            var cycled = 0;
+            if (id == "newgame" && _build.CoreRuneIndex != 0)
+            {
+                cycled = _build.CoreRuneIndex;
+                _build.CycleCoreRune(-cycled);
+            }
             RenderSceneOnce(() => DrawManifestBackdrop(id));
             _scene.GetData(baseline);
             _textBoxes.Clear();
@@ -768,6 +777,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             var unresolved = boundEls.Where(x => !BindResolves(x)).Select(x => x.Id ?? "?").ToList();
             Console.WriteLine($"SMOKE BINDS: {id} resolved={boundEls.Length - unresolved.Count}/{boundEls.Length}"
                 + (unresolved.Count > 0 ? $" unresolved=[{string.Join(",", unresolved)}]" : ""));
+            if (cycled != 0) _build.CycleCoreRune(cycled); // restore the drive's build
         }
         if (blankEls.Count > 0)
             Console.WriteLine($"SMOKE ELEM-BLANK: {string.Join(",", blankEls)}");

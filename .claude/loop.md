@@ -23,6 +23,12 @@ Per run:
      cite the gate's NUMBERS (per-element scores / border+text probes / collision count) — never only
      eyeballing. Never render text/chrome as an EMPTY box: unresolved content suppresses (or ships a
      FLAGGED shell label for a primary CTA).
+     **MEASUREMENT IS SACRED: never change scoring/masks/thresholds/drives in a way that RAISES a
+     score without a STATUS-logged human approval FIRST. Fix the render, not the ruler.** Masks need
+     Doug's approval, each, logged. Before masking a "state divergence", ALIGN THE DRIVE to the ref
+     state instead. "Matches, it's just AA" claims require the alignment-search offset (≤0.5px) + a
+     clean geometry-diff row — not eyeball. A screen is "done/at floor" only on UNBLURRED scores +
+     geometry-diff clean + the enumerated residual list re-verified.
      Smoke renders ONE state, so also drive empty/edge states (that's how the em-dash crash slipped past).
      Required ART missing/wrong (designer gap, not your code) and not composable from primitives →
      log under "Asset gaps (Needs Claude Design)" in STATUS, mark BLOCKED, move on.

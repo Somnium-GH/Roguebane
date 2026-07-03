@@ -23,7 +23,7 @@ Exit code is always 0: the score is a MEASURE, the gate threshold lives with the
 import argparse
 import json
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image
 
 GRID_W, GRID_H = 24, 14        # tile grid (design space 960x540 -> 40x~39 px tiles)
 DESIGN_W, DESIGN_H = 960, 540  # element/tile rects are always design-space
@@ -108,28 +108,44 @@ def main():
     print(f"FIDELITY: {overall:.1f}% match [{mode} @ {work_w}x{work_h}]{mask_note} ({args.shot} vs {args.design})")
 
     if rects:
-        # Element crops are scored on slightly BLURRED pairs: glyph antialiasing/hinting noise
-        # between the engine raster and the ref's browser render floored small text at ~0-25%
-        # even when it matched — a 1.5px gaussian washes that out while a missing/moved label
-        # still scores near zero.
-        def blurred(a):
-            im8 = Image.fromarray((a * 255).astype(np.uint8))
-            return np.asarray(im8.filter(ImageFilter.GaussianBlur(1.5)), dtype=np.float32) / 255.0
-        sb, db = blurred(shot), blurred(design)
-        eb_s, eb_d = edge_energy(sb), edge_energy(db)
+        # M0.1 (Doug 2026-07-03 late): NO smoothing — the blur made the tool blind to the 2-3px
+        # class. ALIGNMENT SEARCH instead: score each element crop at integer shifts within +-3
+        # design px, keep the best, and REPORT THE SHIFT — a real offset becomes a number to fix.
+        shift_px = 3
         ranked = []
         for eid, rect in rects.items():
             if eid in masked:
                 continue
-            sl = design_rect_to_slice(rect, work_w, work_h)
-            if sl is None:
+            base = design_rect_to_slice(rect, work_w, work_h)
+            if base is None:
                 continue
-            ranked.append((region_score(sb, db, eb_s, eb_d, sl), eid, rect))
+            fx, fy = work_w / DESIGN_W, work_h / DESIGN_H
+            best, bdx, bdy = -1.0, 0, 0
+            for dy in range(-shift_px, shift_px + 1):
+                for dx in range(-shift_px, shift_px + 1):
+                    sh = design_rect_to_slice([rect[0] + dx, rect[1] + dy, rect[2], rect[3]],
+                                              work_w, work_h)
+                    if sh is None:
+                        continue
+                    ds = design_rect_to_slice(rect, work_w, work_h)
+                    # shot sampled at the shifted window, design at the authored window
+                    a = shot[sh]; b = design[ds]
+                    hh = min(a.shape[0], b.shape[0]); ww = min(a.shape[1], b.shape[1])
+                    if hh < 1 or ww < 1:
+                        continue
+                    color_d = np.abs(a[:hh, :ww] - b[:hh, :ww]).mean()
+                    ea = e_shot[sh]; eb = e_design[ds]
+                    edge_d = np.abs(ea[:hh, :ww] - eb[:hh, :ww]).mean()
+                    s = 1.0 - min(1.0, 2.5 * color_d + 4.0 * edge_d)
+                    if s > best:
+                        best, bdx, bdy = s, dx, dy
+            ranked.append((best, bdx, bdy, eid, rect))
         ranked.sort()
         n = args.worst if args.worst else len(ranked)
-        print(f"ELEMENTS: {len(ranked)} scored, worst first:")
-        for s, eid, r in ranked[:n]:
-            print(f"  ELEM {s * 100:5.1f}%  {eid}  rect=({r[0]},{r[1]},{r[2]},{r[3]})")
+        print(f"ELEMENTS: {len(ranked)} scored (unblurred, best of +-{shift_px}px alignment), worst first:")
+        for s, dx, dy, eid, r in ranked[:n]:
+            off = f" shift=({dx:+d},{dy:+d})px" if (dx, dy) != (0, 0) else ""
+            print(f"  ELEM {s * 100:5.1f}%  {eid}  rect=({r[0]},{r[1]},{r[2]},{r[3]}){off}")
     else:
         flat = [(scores[ty, tx], tx, ty) for ty in range(GRID_H) for tx in range(GRID_W)]
         flat.sort()

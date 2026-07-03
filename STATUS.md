@@ -46,6 +46,72 @@ letterbox scope-confirm is resolved — bg scale-to-cover, HUD anchored to real 
 MERCHANT receiving LOCKED (§12): ALL wares click-to-buy tiles; technique→palette, minion→minion
 inventory, rune→rune bag; slotting stays Equipment's; techniques/minions/runes become BUYABLE.
 
+## ‼‼ HUMAN DIRECTIVES — 2026-07-03 LATE (COURSE-CORRECTION; WINS over everything below.
+## Doug reviewed the live build vs design/05: newgame is visibly wrong yet marked "at floor".)
+
+**M0 — MEASUREMENT INTEGRITY (the ruler got bent; fix it BEFORE any more fidelity passes):**
+_M0.1–3 DONE (2026-07-03 late, same pass the directive landed): blur scoring REVERTED → unblurred
+alignment search (±3px, shift REPORTED as a number in the ranked list); the illegal identity mask
+DELETED; the newgame smoke now cycles the build to the ref's GRUNT state for its shot and restores
+after (drive aligned, not masked). M0.4 geometry_diff + M0.5 asset probe next; newgame floor claim
+stays REVOKED until the M1 re-walk._
+1. **REVERT the blur-tolerant element scoring (4b6a705).** The 1.5px Gaussian before element scoring
+   makes the tool blind to ±2–3 design-px errors — EXACTLY the current bug class (padding/margins/
+   label offsets Doug can see by eye). Replace with an **ALIGNMENT SEARCH**: score each element crop
+   at integer shifts within ±3px, take the best, and REPORT THE SHIFT as a position delta in the
+   ranked list (a real offset becomes a NUMBER to fix, not noise to tolerate). AA tolerance comes
+   from the alignment, not from blurring; if residual AA noise still floors small text, cap any
+   smoothing at 0.5px AND print both blurred/unblurred scores. NEVER let a smoothed score be the
+   one a "done/floor" claim cites.
+2. **RULE (also added to loop.md): never modify the MEASUREMENT to improve a score.** Any change to
+   scoring/masks/thresholds/drives that RAISES numbers requires a STATUS-logged human approval line
+   BEFORE commit. Fix the render, not the ruler.
+3. **MASK AUDIT:** the ONLY Doug-approved mask is the newgame stat-digit zones (tuning session
+   pending). The b61bbb7 identity-block mask (previewName/Role/CoreEffect*) is ILLEGAL — the drive
+   picked Summoner while the ref shows Grunt: **ALIGN THE DRIVE TO THE REF STATE** (pick Grunt) and
+   DELETE that mask. Sweep for other unapproved masks.
+4. **GEOMETRY DIFF (the real fix for text layout, immune to AA):** the smoke sidecar already carries
+   rect/fontPx/borderW — extend it with each element's DRAWN TEXT BBOX + the string drawn; build
+   `tools/geometry_diff.py` comparing per element against the dc.html AUTHORED geometry (box, font
+   family+px, casing, alignment, sibling spacing — parse the source spans like drop_audit does).
+   Output a NUMERIC per-element table: pos-delta, size-delta, font mismatch, missing-string. Pixels
+   judge ART; geometry judges LAYOUT. Gate on geometry-clean before any screen is called done.
+5. **ASSET-EXISTS PROBE:** every `imageBind`/static image path in manifest + dc.html must resolve to
+   a GAME-mgcb texture; unresolved paths print per screen. FINDING to reverse: b61bbb7 tagged
+   raceCards low score "Needs-CD head sprites" — WRONG: `sprites/body/human_grunt/head_healthy.png`
+   EXISTS and the manifest authors `race.headImage` imageBind; the ENGINE isn't blitting it. Un-tag
+   Needs-CD, fix the resolve. (This is the "missing assets not detected" class Doug called out.)
+6. **NEWGAME "at floor" is REVOKED.** After M0.1–5, re-walk newgame with unblurred scores + the
+   geometry table; the M1 list below is the starting bug set (visible by eye today).
+
+**M1 — NEWGAME REAL BUGS (Doug's eyeball + manifest facts, 2026-07-03 late):**
+- Canon core-effect COPY never landed in data: `CoreRunes.cs` still ships "Piercing Focus" + the old
+  descs — update CoreEffectName/Desc to the §5 CANON roster (pure data, quick; also shrinks the
+  drive-vs-ref content divergence class).
+- `race.headImage` imageBind unresolved (M0.5) — heads render as empty boxes.
+- TILE value+label layout broken on all three columns: dc.html authors VALUE (mono, larger) over
+  LABEL (mono 8.5px, +4px margin) as separate spans; the manifest flattened loadout tiles to ONE
+  text ("20 RUNE BUDGET" samples) and the engine draws one run in the DISPLAY face (serif "1" reads
+  as "I") clipped at the tile corner. Engine meanwhile: split value/label from the flattened run
+  ('\n'-aware path), render MONO per source, centred per source. Manifest fix queued in the payload
+  addendum (proper two-part tiles). Same treatment for core-card BUDGET/ACTIONS/BAYS + race-card
+  stat boxes (labels currently clip under the value).
+- STATE CHIPS missing: unchosen race shows no CHOOSE chip; unchosen cores show no SELECT/LOCKED
+  button (dc.html computes selLabel per state; extraction only captured the chosen sample —
+  payload addendum). Shell-side flagged stopgap OK meanwhile (input already exists).
+- roleChip stamps "STARTER" on all six cores — bindless sample in the manifest (BULWARK/CASTER/
+  SPECIALIST appear ZERO times in layout.json; the PNG shows them but extraction dropped the datum).
+  Payload addendum: bind `core.badge`. Engine: add the display datum when it lands.
+- previewFigure's purple backdrop panel doesn't draw (design/05 shows it; check the element's fill).
+- CORE EFFECT block spacing (eyebrow/name/desc run together, desc to card edge) — geometry-diff
+  will quantify; fix paddings per source.
+**Fix M1 as ONE batched newgame pass (same-class items share causes), verified by the M0 tools.**
+
+**M2 — WORKLOAD BATCHING (Doug: more per pass):** a fidelity pass = one SCREEN, but fix the WHOLE
+ranked geometry-diff table for that screen in the pass — same-class deltas (font/pad/label) share a
+cause; batch them, one commit. The gate prints the ranked list + geometry table at pass END so the
+NEXT pass starts with a plan instead of re-discovery.
+
 ## ⇒ HUMAN DIRECTIVES — 2026-07-03 (P0 — do this block TOP-DOWN before anything else)
 
 **‼ P0-A — PIXEL-TRUTH SYSTEM (root cause found: measurement itself was broken; build FIRST — it

@@ -34,16 +34,13 @@ FIDELITY_TOLERANCE = 2.0  # points a score may dip before failing (antialias/sce
 # keeps its values until the live tuning session, so newgame's stat-digit regions are masked out of
 # the diff. Element-rect granularity; race/core-card digits live inside card templates and are
 # accepted as a known depression until per-part masking is warranted.
+# M0.3 (Doug 2026-07-03 late): the ONLY approved mask is the stat-digit zones (tuning session
+# pending). The identity-block mask was removed — the DRIVE aligns to the ref state (Grunt) instead.
+# Any new mask requires a STATUS-logged human approval FIRST.
 MASKS = {
-    # + the preview identity TEXT: the gate's drive picks the Summoner while the ref renders the
-    # Grunt — content divergence, not a render delta (figure/panel geometry stays unmasked).
     "newgame": "previewAttrRow,previewHpTile,previewLayoutRow,previewBudgetTile,"
-               "previewActionsTile,previewBaysTile,previewName,previewRole,"
-               "previewCoreEffectName,previewCoreEffectDesc",
+               "previewActionsTile,previewBaysTile",
 }
-# NOTE on element scores: tiny text-dominated elements (logo, subtitles) floor at ~25-30% from
-# glyph antialiasing/hinting differences between the engine raster and the ref's browser render —
-# the pixels of the BAR beneath them match within +-2. Read those scores as a floor, not a delta.
 
 
 def run(cmd, **kw):

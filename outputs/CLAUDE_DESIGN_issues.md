@@ -49,6 +49,26 @@ are superseded by this reconcile._
    already renders both live (SHIELD n/m header + regen fill), so this is manifest-completeness
    only: next drop, extract those two spans as bound elements/parts.
 
+## ADDENDUM (2026-07-03 late — found AFTER the send, during Doug's live-vs-design/05 review)
+A1. **roleChip is bindless** — layout.json carries one `"sample": "STARTER"` and BULWARK/CASTER/
+    SPECIALIST appear NOWHERE in the manifest (the PNG shows them; the datum didn't extract).
+    Bind the chip label (`core.badge`); the engine will add the display datum.
+A2. **State-dependent labels only extracted their CHOSEN state:** NewGame's selLabel is computed
+    ('✓ CORE SET' / 'SELECT' / 'LOCKED') and the race chip ('✓ CHOSEN' / 'CHOOSE') likewise — the
+    manifest carries only the chosen samples, so unchosen cards render NO button/chip live. Ship
+    them as `states` with per-state labels (the button-skin `states` pattern already in the schema).
+A3. **Tile VALUE+LABEL flattening (again, this drop):** loadout tiles extracted as ONE text
+    ("20 RUNE BUDGET") though the source authors value + label as separate spans (mono, different
+    px, +4px margin). Same for core-card BUDGET/ACTIONS/BAYS and race stat boxes (labels clip under
+    values live). Please extract value/label as TWO parts with their real fonts/px/margins.
+    SYSTEMIC SUGGESTION: give meaningful inner spans a `data-part` name in dc.html — then both the
+    extractor AND our `tools/drop_audit.py` can track span-level fidelity (today the audit catches
+    missing elements/binds, but span-flattening is invisible to it).
+A4. **previewFigure backdrop:** design/05 shows the purple night panel behind the loadout figure —
+    verify it extracted as a fill/part (live draws none; may be engine-side, investigating).
+(NOT a CD item, for the record: race-card head sprites exist and are bound — an engine resolve gap
+we're fixing; ignore any earlier "Needs-CD head sprites" phrasing if it reached you.)
+
 ## FYI locks from Doug (2026-07-03 pm) — already folded into DESIGN_SPEC
 - Core Effect roster from design/05 v2 ADOPTED AS CANON (incl. Called Shot rename); mechanics get a
   dedicated effect-model pass later.
