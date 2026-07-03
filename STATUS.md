@@ -193,7 +193,11 @@ is ALL engine-side). Fix with P0-A numbers (before/after per-element scores):**
    EQUIPMENT[E] button + PackChipRect/PackItem/PackCount/EquipOpenRect DELETED — the manifest
    ex-overlays render live and INPUT rides their geometry (equipmentBtn click via nav.equipment;
    pack click-to-equip via the packChips cells, wielded chips no-op). Game1.CityMap.cs 119→33
-   lines. REMAINING: old encounter card-chrome fallbacks give way to the landed techCard parts.
+   lines. ~~encounter card chrome~~ DONE (2026-07-03): techCards wear the actionCard state family —
+   the frame reads the live FSM (targeting=str pulse-color, held=gold, ready=good, cooldown=dim,
+   DRY/unpowered=locked); the mock damage-highlight digit (`technique.amount`, positioned for the
+   mock's wrap) resolves EMPTY (the live description carries {power}); `technique.attr` resolves
+   live (Ember reads INT, not the STR sample). **THE WHOLE P0 QUEUE (A/B/C) IS COMPLETE.**
 10. **Engine-bug residue from the 07-03 walk:** ~~RUNE BAG regression~~ FIXED (2026-07-03: the drop
    restructured runeGroup into a bound header [runeGroups.type → live PATH name; taxonomy stays
    OPEN §17] + a NESTED runeCard list [g.runes] — the engine still ran the old flat-row path.
@@ -208,8 +212,11 @@ is ALL engine-side). Fix with P0-A numbers (before/after per-element scores):**
    ~~resource-strip~~ MEASURED: the region (~197px) can't seat 4 authored chips — engine clips
    (SUMMONS drops on encounter), extents logged Needs-CD #5. RESIDUE COMPLETE — remaining overflow
    burn-down items are the measured logo/title-width class (CD-authored tight rects, baselined).
-SEQUENCE: P0-A tools (1–2 passes, baselines re-pinned on the new refs) → P0-C.1–3 (mechanical) →
-P0-B + P0-C.4–5 (the big render slice, one screen per pass) → 6–10. Gate green EVERY pass.
+**⇒ P0 QUEUE COMPLETE (2026-07-03, ~20 loop passes):** A.1–7 (pixel-truth system), B (targeting),
+C.1–10 (drop wiring → z → frames → templates/binds → merchant buys → aspect-fill → legacy deletions
+→ residue). Gate green. NEXT ARC: per-screen pixel-walks toward the design bar using the new
+tooling (ranked per-element lists + probes + overflow burn-down), and the parked Needs-human/
+Needs-CD items as they unblock.
 
 ## ✅ CD DROP LANDED (2026-07-02 pm) — verified + committed
 layout.json (+4786 lines, parses, all 5 smokes green): NEW `merchant` screen; `states` (button skin

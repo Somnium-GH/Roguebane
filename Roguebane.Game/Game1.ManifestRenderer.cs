@@ -524,11 +524,26 @@ public partial class Game1
             // v4 card chrome: a parts-carrying template may style its own CELL (root fill/border,
             // restyled per state — spineCity's taken/current/future borders; pickerCard's
             // idle/selected follows the chosen index). Parts stamp on top.
-            var rootState = tmpl.States.ValueKind == System.Text.Json.JsonValueKind.Object
-                && tmpl.States.TryGetProperty("family", out var famEl)
-                && famEl.GetString() == "pickerCard"
-                ? (i == selIx ? "selected" : "idle")
-                : null;
+            string? rootState = null;
+            if (tmpl.States.ValueKind == System.Text.Json.JsonValueKind.Object
+                && tmpl.States.TryGetProperty("family", out var famEl))
+                rootState = famEl.GetString() switch
+                {
+                    "pickerCard" => i == selIx ? "selected" : "idle",
+                    // actionCard (design/01): the card FRAME reads the FSM — targeting pulse,
+                    // gold held, dim cooldown, dashed locked; idle/unpowered cards read locked.
+                    "actionCard" when datum is Roguebane.Core.Technique => (
+                        e.Binds == "loadout.techniques" && InRun && _ctrl.Targeting == i ? "targeting"
+                        : ResolveStateBind(datum, "technique.state") switch
+                        {
+                            "HELD" => "held",
+                            "READY" => "ready",
+                            "COOLDOWN" => "cooldown",
+                            "DRY" => "locked",
+                            _ => InRun ? "locked" : "ready", // unpowered in-run reads locked
+                        }),
+                    _ => null,
+                };
             DrawTemplateRootChrome(tmpl, cell, datum, rootState);
             // Positional binds repeat the SAME bind N times per card (attr tiles 4x, attr-bar pips 12x,
             // in template order); count each occurrence per card to pick the right datum slice.
@@ -542,6 +557,10 @@ public partial class Game1
                 // never draw it beside live data. A NESTED wares region stamps its own cards.
                 if (datum is MerchantOffer or MerchantLot or ResourceReadout or MerchantSection
                     && pp.Binds is null) continue;
+                // Technique/minion cards likewise: an UNBOUND sample part is design-mock filler
+                // (the loose damage/cost digits) — never stamp it over live card copy (P0-C.9).
+                if (datum is Roguebane.Core.Technique or Roguebane.Core.Minion
+                    && pp.Binds is null && !string.IsNullOrEmpty(pp.Sample)) continue;
                 // Nested rune list (07-03 drop): each group's region stamps runeCard rows — the
                 // held rung (or the first) then the next, the pair the player acts on (RuneRow).
                 if (pp.List is { } runeList && pp.Binds == "g.runes"
@@ -1202,6 +1221,10 @@ public partial class Game1
             "invItems.badgeLabel" or "technique.cost" => t.Stat.ToString().ToUpperInvariant(),
             "invItems.badgeNum" => t.Reserve.ToString(),
             "technique.description" => t.DescText,
+            // The mock's separately-positioned damage highlight can't land on live wrap — the
+            // description already carries the number ({power}); resolve EMPTY so the sample never stamps.
+            "technique.amount" => "",
+            "technique.attr" => t.Stat.ToString().ToUpperInvariant(),
             "technique.id" or "loadout.id" => t.Id, // icons/technique/{id} imageBinds
             _ => null,
         },
