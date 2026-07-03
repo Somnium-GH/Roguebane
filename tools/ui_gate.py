@@ -84,7 +84,7 @@ def main():
     # state-gated lists. Per-screen numbers are taken from the pass that owns the screen.
     import os
     failures = []
-    binds, fidelity = {}, {}
+    binds, fidelity, textgeom = {}, {}, {}
     passes = [("encounter", ("encounter", "equipment", "campaignmap", "newgame")),
               ("citymap", ("citymap", "merchant"))]
     for drive, owns in passes:
@@ -100,6 +100,9 @@ def main():
         for m in re.finditer(r"SMOKE BINDS: (\w+) resolved=(\d+)/(\d+)", r.stdout):
             if m.group(1) in owns:
                 binds[m.group(1)] = int(m.group(2))
+        for m in re.finditer(r"SMOKE TEXTGEOM: (\w+) overflow=(\d+) collide=(\d+)", r.stdout):
+            if m.group(1) in owns:
+                textgeom[m.group(1)] = [int(m.group(2)), int(m.group(3))]
 
     print("== fidelity ==")
     for screen, design in DESIGNS.items():
@@ -124,7 +127,7 @@ def main():
         worst = [l.strip() for l in fr.stdout.splitlines() if l.strip().startswith("ELEM ")]
         print(f"  {screen}: {fidelity[screen]:.1f}%" + (f"  worst: {'; '.join(worst[:5])}" if worst else ""))
 
-    current = {"binds_resolved": binds, "fidelity": fidelity}
+    current = {"binds_resolved": binds, "fidelity": fidelity, "textgeom": textgeom}
     if args.update or not BASELINE.exists():
         BASELINE.write_text(json.dumps(current, indent=2) + "\n")
         print(f"baseline written -> {BASELINE}")
@@ -139,6 +142,13 @@ def main():
         got = fidelity.get(screen, 0.0)
         if got < score - FIDELITY_TOLERANCE:
             failures.append(f"{screen}: fidelity dropped {score:.1f} -> {got:.1f}")
+    # P0-A.5: zero NEW text overflows/collisions — counts may only go DOWN vs the baseline.
+    for screen, (b_over, b_coll) in base.get("textgeom", {}).items():
+        got = textgeom.get(screen, [0, 0])
+        if got[0] > b_over:
+            failures.append(f"{screen}: text OVERFLOWS rose {b_over} -> {got[0]}")
+        if got[1] > b_coll:
+            failures.append(f"{screen}: text COLLISIONS rose {b_coll} -> {got[1]}")
 
     if failures:
         print("\nGATE FAILED:")

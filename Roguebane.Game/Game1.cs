@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -690,8 +690,12 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         {
             RenderSceneOnce(() => DrawManifestBackdrop(id));
             _scene.GetData(baseline);
+            _textBoxes.Clear();
+            _collectText = true;
             RenderSceneOnce(() => DrawManifestScreen(id));
+            _collectText = false;
             _scene.GetData(full);
+            ReportTextGeometry(id);
             var painted = 0;
             for (var i = 0; i < total; i++)
                 if (full[i] != baseline[i]) painted++;
@@ -764,6 +768,38 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         if (blank.Count > 0 || blankEls.Count > 0)
             Environment.ExitCode = 1;
         SmokeReportAndExit();
+    }
+
+    // P0-A.5: text-geometry validation over the FULL render — every drawn text footprint must fit
+    // its element rect (+-2 design px), and must not intersect another element's footprint unless
+    // one element NESTS the other (containers legitimately hold their children's text).
+    private void ReportTextGeometry(string screenId)
+    {
+        const int tol = 2;
+        var overflow = new List<string>();
+        foreach (var (el, box, bound) in _textBoxes)
+            if (box.X < bound.X - tol || box.Y < bound.Y - tol
+                || box.Right > bound.Right + tol || box.Bottom > bound.Bottom + tol)
+                if (!overflow.Contains(el)) overflow.Add(el);
+        var collide = new List<string>();
+        var def = _ui.ScreenDef(screenId)!;
+        Rectangle ElemRect(string id) =>
+            def.Elements.FirstOrDefault(x => x.Id == id) is { } e ? _ui.Rect(def, e) : Rectangle.Empty;
+        for (var a = 0; a < _textBoxes.Count; a++)
+            for (var b = a + 1; b < _textBoxes.Count; b++)
+            {
+                var (ea, boxA, _) = _textBoxes[a];
+                var (eb, boxB, _) = _textBoxes[b];
+                if (ea == eb || !boxA.Intersects(boxB)) continue;
+                var ra = ElemRect(ea);
+                var rb = ElemRect(eb);
+                if (ra.Contains(rb) || rb.Contains(ra)) continue; // nesting exempt
+                var key = ea + "x" + eb;
+                if (!collide.Contains(key)) collide.Add(key);
+            }
+        Console.WriteLine($"SMOKE TEXTGEOM: {screenId} overflow={overflow.Count} collide={collide.Count}"
+            + (overflow.Count > 0 ? $" over=[{string.Join(",", overflow)}]" : "")
+            + (collide.Count > 0 ? $" hits=[{string.Join(",", collide)}]" : ""));
     }
 
     private void RenderSceneOnce(Action draw)

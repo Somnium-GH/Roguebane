@@ -76,11 +76,13 @@ claims were made against warped refs — treat them as UNVERIFIED; re-walk with 
    border edges vs authored) + text-height probe (drawn glyph bbox vs fontPx expectation), reported per
    element as NUMBERS. Doug reads live text at ~1.5–2× design proportion in headers/labels — measure,
    then fix from the numbers.
-5. **Collision/overflow detector:** every drawn text bbox must fit its element rect (±tol) and not
-   intersect sibling bboxes at the same z (nesting exempt). Known instances from today's screenshots:
-   SUMMONS ↔ LAYER-2/state text (citymap + equipment top-right), doubled "Human Warden" (equipment
-   identity block), "CASTLE FORTIFICATIONSgate * wall…" run-on (citymap), SHIELD n/m label over its own
-   bar (encounter). Gate on zero NEW collisions once known CD-side ones are baselined.
+5. **Collision/overflow detector — ✅ BUILT (2026-07-03):** the smoke's full render records every
+   drawn text footprint (element-owned); `SMOKE TEXTGEOM` reports per screen OVERFLOW (bbox outside
+   its element rect ±2px) and COLLIDE (footprints of two non-nesting elements intersect); the gate
+   BASELINES both counts and fails any RISE. First measurement (baselined): overflows enc 11 eq 10
+   city 4 camp 2 ng 6 mer 7-10; collisions eq 3 camp 1 ng 2 — catching the known family
+   (heroShield=SHIELD-over-bar, currentCoreName×currentCoreRole=doubled identity, eyebrow×title).
+   Walk the lists down as slices; counts may only fall.
 6. **Hand-shot normalizer:** crop Doug's live window screenshots (title bar + letterbox) to the scene
    rect and rescale into ref space, so his eyeball reports run through the same diff pipeline.
 7. **DROP AUDIT — ✅ BUILT (2026-07-03):** `tools/drop_audit.py` parses each screen's dc.html and

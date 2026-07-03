@@ -31,8 +31,10 @@ public partial class Game1
         foreach (var e in s.Elements.OrderBy(x => x.Z))
         {
             if (ReferenceEquals(e, skip)) continue;
+            _textOwner = e.Id; // collision detector context (recorded only while _collectText)
             DrawManifestElement(e, _ui.Rect(s, e));
         }
+        _textOwner = null;
     }
 
     // The scene layer alone — the baseline the smoke paint-coverage diff measures against. A scene

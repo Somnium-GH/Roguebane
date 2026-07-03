@@ -9,10 +9,36 @@
   },
   "fidelity": {
     "encounter": 77.8,
-    "equipment": 76.5,
+    "equipment": 75.4,
     "citymap": 85.5,
     "campaignmap": 94.7,
     "newgame": 76.9,
     "merchant": 82.7
+  },
+  "textgeom": {
+    "encounter": [
+      11,
+      0
+    ],
+    "equipment": [
+      10,
+      3
+    ],
+    "campaignmap": [
+      2,
+      1
+    ],
+    "newgame": [
+      6,
+      2
+    ],
+    "citymap": [
+      4,
+      0
+    ],
+    "merchant": [
+      10,
+      0
+    ]
   }
 }

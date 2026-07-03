@@ -82,9 +82,13 @@ public partial class Game1
             // 98px chip). The authored box stays the truth; only the glyphs give.
             var w = MeasureText(font, s).X * sc;
             var fit = maxLines == 1 && w > r.Width && fontPx > 0 ? fontPx * r.Width / w : fontPx;
+            RecordTextBox(new Rectangle(r.X, r.Y,
+                (int)(fit > 0 && fontPx > 0 ? w * (fit / fontPx) : w), (int)lineH), r);
             TextPx(font, s, r.X, r.Y, color, fit);
             return;
         }
+        // Wrapped text is line-clamped to the box, so its drawn footprint IS (at most) the bound.
+        RecordTextBox(r, r);
         var ly = (float)r.Y;
         var lines = 0;
         foreach (var para in s.Split('\n'))
@@ -109,6 +113,19 @@ public partial class Game1
                 if (++lines >= maxLines) return;
             }
         }
+    }
+
+    // P0-A.5 collision detector: while the smoke's full render runs, every drawn text footprint is
+    // recorded with its element context — SmokeAllScreensAndExit diffs footprints against element
+    // bounds (overflow) and against sibling footprints (collision).
+    private bool _collectText;
+    private string? _textOwner; // the element id whose content is being drawn
+    private readonly System.Collections.Generic.List<(string El, Rectangle Box, Rectangle Bound)> _textBoxes = new();
+
+    private void RecordTextBox(Rectangle drawn, Rectangle bound)
+    {
+        if (_collectText && _textOwner is { } el)
+            _textBoxes.Add((el, drawn, bound));
     }
 
     // SpriteFonts are ASCII-only and THROW on an unknown glyph. The fold-to-ASCII policy + algorithm
