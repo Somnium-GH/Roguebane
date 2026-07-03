@@ -103,9 +103,12 @@ game). Build, in order:
   BIND-RESOLUTION REPORT DONE (2026-07-02): `RB_MF=all` also reports per screen which BOUND elements
   resolve LIVE data (`SMOKE BINDS: resolved=M/N unresolved=[...]`); drive a run first
   (`RB_SCREEN=encounter RB_MF=all`) to validate the in-run screens (encounter resolves 14/21 driven vs
-  4/21 cold; the residue = container binds + state-gated ones + a few REAL unmapped binds:
-  `encounter.label`, `pool.legend` — small render slices when prioritized). A bind that silently goes
-  dead now shows the pass it happens. NOT yet an exit-gate (pin a baseline first).
+  4/21 cold; the residue = container binds + state-gated ones). `encounter.label` now resolves to the
+  live node type (place names stay design-open); `pool.legend`'s sample IS the design copy (its pips
+  are Needs-CD, no live datum exists). First catch: the encounter smoke drive had silently rotted
+  (cleared-fight-HOLDS made post-Resolve Enter() hops no-op — the "castle" shot was really the a1
+  hold); each hop redeploys now. A bind that silently goes dead shows the pass it happens.
+  NOT yet an exit-gate (pin a baseline first).
   PER-ELEMENT COVERAGE DONE (2026-07-02): `RB_MF=all` now leave-one-out renders EVERY element and
   measures its actual pixel contribution — an element with unconditional chrome/content (fill/frame/
   content/image/button) contributing ZERO pixels fails the run (exit 1); bind-only/list elements empty
