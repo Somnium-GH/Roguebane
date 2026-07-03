@@ -1,5 +1,13 @@
 # Status
 
+## 🛑 LOOP STOP CONDITION (2026-07-03 late — Doug/Cowork; THIS LINE WINS OVER EVERYTHING)
+A new CD drop is staged in `.drop/` and will be applied to the working tree by the Cowork session
+(NOT the loop). **If you are reading this at pass start: do NO work this pass — commit NOTHING new,
+print one line ("stopped for drop application") and STOP LOOPING.** If you are mid-pass and only see
+this at commit time: finish + commit ONLY your current slice, push, then stop. Do NOT touch `.drop/`,
+do NOT pull it into Content, do NOT resume until this block is REPLACED by a "DROP APPLIED — RESUME"
+block. (Cowork applies + verifies the drop, then re-arms the queue.)
+
 ## ✅ layout.json RESTORED (2026-07-01 pm) — the PNG-clobber is fixed by a clean re-drop
 Valid JSON (5690 lines) carrying the newest CD work: `imageBind` (beaconNode → node icons as PNGs, incl.
 skirmish, via `icons/node/{node.type}` — so "skirmish" isn't a literal), frame-v3 `repeat`+`centerFill`,

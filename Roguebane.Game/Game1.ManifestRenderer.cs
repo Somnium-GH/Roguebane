@@ -508,7 +508,7 @@ public partial class Game1
         "combat.retreat" => InRun ? "RETREAT" : null,
         // §6b shield bar header: standing points / total layers across the body's shield sources.
         "ShieldPool" => InRun && Exp.Player.Body.ShieldLayers > 0
-            ? "SHIELD " + Exp.Player.Body.ShieldPoints + "/" + Exp.Player.Body.ShieldLayers : null,
+            ? "SHIELD " + Exp.Player.Body.ShieldPoints + " / " + Exp.Player.Body.ShieldLayers : null,
         // Merchant screen (design/07): header/footer readouts. The pager label waits on the wares slice.
         "merchant.label" => "MERCHANT",
         "merchant.leave" => InRun && Exp.AtMerchant ? "LEAVE" : null,
