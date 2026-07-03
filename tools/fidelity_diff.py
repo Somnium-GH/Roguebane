@@ -23,7 +23,7 @@ Exit code is always 0: the score is a MEASURE, the gate threshold lives with the
 import argparse
 import json
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 
 GRID_W, GRID_H = 24, 14        # tile grid (design space 960x540 -> 40x~39 px tiles)
 DESIGN_W, DESIGN_H = 960, 540  # element/tile rects are always design-space
@@ -108,6 +108,15 @@ def main():
     print(f"FIDELITY: {overall:.1f}% match [{mode} @ {work_w}x{work_h}]{mask_note} ({args.shot} vs {args.design})")
 
     if rects:
+        # Element crops are scored on slightly BLURRED pairs: glyph antialiasing/hinting noise
+        # between the engine raster and the ref's browser render floored small text at ~0-25%
+        # even when it matched — a 1.5px gaussian washes that out while a missing/moved label
+        # still scores near zero.
+        def blurred(a):
+            im8 = Image.fromarray((a * 255).astype(np.uint8))
+            return np.asarray(im8.filter(ImageFilter.GaussianBlur(1.5)), dtype=np.float32) / 255.0
+        sb, db = blurred(shot), blurred(design)
+        eb_s, eb_d = edge_energy(sb), edge_energy(db)
         ranked = []
         for eid, rect in rects.items():
             if eid in masked:
@@ -115,7 +124,7 @@ def main():
             sl = design_rect_to_slice(rect, work_w, work_h)
             if sl is None:
                 continue
-            ranked.append((region_score(shot, design, e_shot, e_design, sl), eid, rect))
+            ranked.append((region_score(sb, db, eb_s, eb_d, sl), eid, rect))
         ranked.sort()
         n = args.worst if args.worst else len(ranked)
         print(f"ELEMENTS: {len(ranked)} scored, worst first:")
