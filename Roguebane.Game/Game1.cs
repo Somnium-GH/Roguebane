@@ -267,14 +267,14 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             if (Pressed(keys, TechniqueKeys[i]))
                 ToggleTech(_build.Palette[i]);
 
-        var tabs = ManifestListCells("equipment", "tabs", InvTabCount);
+        var tabs = ManifestListCells("equipment", "inventory.tabs", InvTabCount);
         for (var i = 0; i < tabs.Count; i++)
             if (Click(RectOf(tabs[i]))) _invTab = i;
 
         // TECHNIQUES tab: click an inventory card to slot/unslot (pre-run) or power/unpower (in-run).
         if (_invTab == 1)
         {
-            var cards = ManifestListCells("equipment", "invItems", _build.Palette.Count);
+            var cards = ManifestListCells("equipment", "inventory.activeTab.items", _build.Palette.Count);
             for (var i = 0; i < cards.Count; i++)
                 if (Click(RectOf(cards[i]))) ToggleTech(_build.Palette[i]);
         }
@@ -693,9 +693,11 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                 for (var i = 0; i < total; i++)
                     if (full[i] != baseline[i]) { contributes = true; break; }
                 if (contributes) continue;
-                var mustPaint = el.Fill is not null || el.Frame is not null
+                // Datum-driven fills (the bar IS the value) are legitimately empty at zero.
+                var datumFill = el.Binds is "enemy.advancePct" or "runes.budgetPct" or "ShieldPool.regen";
+                var mustPaint = !datumFill && (el.Fill is not null || el.Frame is not null
                     || !string.IsNullOrEmpty(el.Content) || !string.IsNullOrEmpty(el.Image)
-                    || el.Type == "button";
+                    || el.Type == "button");
                 if (mustPaint) blankEls.Add(id + "/" + (el.Id ?? "?"));
                 else if (el.Border is not null) occluded.Add(el.Id ?? "?");
                 else silent.Add(el.Id ?? "?");

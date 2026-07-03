@@ -57,7 +57,7 @@ public partial class Game1
         // element may carry both (topBar), so draw fill first, then frame. EXCEPT the war-party
         // covered-ground fill: its width IS the datum (drawn in the text case below), so the full-rect
         // draw would always read "overrun".
-        if (e.Fill is { } fill && e.Binds != "enemy.advancePct")
+        if (e.Fill is { } fill && e.Binds is not ("enemy.advancePct" or "runes.budgetPct"))
             DrawFill(r, fill);
         if (e.Frame is { } fr && fr.Slice.Length == 4 && _assets.Texture(fr.Asset) is { } ftex)
             DrawFrameTex(ftex, fr, r);
@@ -85,6 +85,17 @@ public partial class Game1
                 if (e.Binds is { } sceneBind && sceneBind.EndsWith(".scene") && e.Image is { Length: > 0 } bg)
                 {
                     Sprite(_assets.Texture(NormalizeContentPath(bg)), r.X, r.Y, r.Width, r.Height, Color.White);
+                    break;
+                }
+                // Rune-budget bar (design/02): the fill width is the SPENT fraction of the budget.
+                if (e.Binds == "runes.budgetPct")
+                {
+                    if (e.Fill is { } bf && _build.Runes.Budget > 0)
+                    {
+                        var spent = _build.Runes.Budget - _build.Runes.Available;
+                        var bw = (int)(r.Width * (float)spent / _build.Runes.Budget);
+                        if (bw > 0) DrawFill(new Rectangle(r.X, r.Y, bw, r.Height), bf);
+                    }
                     break;
                 }
                 // War-party covered ground (design/03 rev 2): the fill loads RIGHT->LEFT in tandem
@@ -317,7 +328,15 @@ public partial class Game1
         "core" => _build.Race.Name + " " + _build.CoreRune.Title,
         // Equipment identity block (design/02): the core is fixed for the run, so the build's core
         // is the live source pre-run AND mid-run. core.coreEffect (the block) stays chrome-only.
+        "core.name" => _build.Race.Name + " " + _build.CoreRune.Title,
         "core.role" => _build.CoreRune.Archetype,
+        // Equipment strip labels (design/02). run.state reads the real expedition state in-run —
+        // pre-run the march is armed, matching the design's READY TO MARCH copy.
+        "run.state" => InRun ? Exp.State.ToString().ToUpperInvariant() : "READY TO MARCH",
+        "loadout.slotLabel" => "TECHNIQUES - "
+            + (InRun ? Exp.Equipment.Count : _build.Equipment.Count) + " / " + _build.CoreRune.Kit.Count + " slotted",
+        "minions.slotLabel" => "MINIONS - "
+            + (InRun ? Exp.Minions.Count : _build.CoreRune.MinionKit.Count) + " / " + _build.CoreRune.Bays + " slotted",
         "core.coreEffectName" => _build.CoreRune.CoreEffectName,
         "core.coreEffectDesc" => _build.CoreRune.CoreEffectDesc,
         "runes.budget" => _build.Runes.Available + " free / " + _build.Runes.Budget,
@@ -375,6 +394,7 @@ public partial class Game1
         if (b.EndsWith(".scene")) return e.Image is { Length: > 0 } img && _assets.Texture(NormalizeContentPath(img)) is not null;
         if (b == "ShieldPool.regen") return InRun && Exp.Player.Body.ShieldRegenProgress > 0f;
         if (b == "enemy.advancePct") return InRun;
+        if (b == "runes.budgetPct") return true; // build data always exists
         if (e.Type == "figure") return b is "preview.fig" or "Body" || (InRun && Exp.Enemy is not null);
         if (e.Type == "list") return ListData(b) is { Count: > 0 };
         if (e.Type == "graph") return InRun; // chart/cityGraph draw from live run/campaign state
@@ -548,7 +568,9 @@ public partial class Game1
                            : _build.CoreRune.MinionKit.Concat(_build.Runes.GrantedMinions).Cast<object>().ToList(),
         // Inventory follows the tab strip: GEAR = the run's wielded/worn/packed pieces (empty pre-run
         // — gear only exists once marching), TECHNIQUES = the palette, MINIONS = the retinue.
-        "invItems" => _invTab switch
+        // (CD's 07-02 drop renamed the bind invItems -> inventory.activeTab.items; chased clean.)
+        "inventory.tabs" => new List<object> { "GEAR", "TECHNIQUES", "MINIONS" },
+        "inventory.activeTab.items" => _invTab switch
         {
             0 => InRun
                 ? Exp.Player.Body.Hands.Cast<object>()
@@ -561,6 +583,14 @@ public partial class Game1
         // The Rune Bag (design/02): one group per PATH ladder — the MARKS/PATHS/KEYSTONES taxonomy
         // is OPEN (§17), so the model's actual grouping (ladders) is what renders.
         "runeGroups" => _build.Paths.Cast<object>().ToList(),
+        // Equipment identity block (design/02): the core's headline numbers as label/value rows —
+        // all live core/build data, no invented figures.
+        "core.stats" => new List<object>
+        {
+            ("bays", _build.CoreRune.Bays.ToString()),
+            ("actions", _build.CoreRune.Kit.Count.ToString()),
+            ("budget", _build.CoreRune.RuneBudget.ToString()),
+        },
         // CityMap chart legend (design/03): what the node icons mean — display metadata, same rows the
         // legacy legend drew; icon tokens through NodeToken so the key can't drift from the chart.
         "legend" => new List<object>
@@ -827,10 +857,10 @@ public partial class Game1
             "core.coreEffectDesc" => c.CoreEffectDesc, // core.coreEffect = block chrome, resolves to nothing
             _ => null,
         },
-        ValueTuple<string, string> lg => bind switch // (node-icon token, label) legend row
+        ValueTuple<string, string> kv => bind switch // (key, value): legend rows, core-stat rows
         {
-            "legend.type" => lg.Item1,
-            "legend.label" => lg.Item2,
+            "legend.type" or "stat.label" => kv.Item1,
+            "legend.label" or "stat.value" => kv.Item2,
             _ => null,
         },
         ValueTuple<string, string, string> a => bind switch // (key, value, swatch-token) attr tile

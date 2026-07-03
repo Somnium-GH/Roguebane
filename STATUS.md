@@ -91,6 +91,14 @@ remaining merchant work is design-gated (ware pricing/rarity models, pixel-compa
   deleted. Verified live-citymap smoke: THE CASTLE panel wears the tiled hazard frame. REMAINING for the
   floor: per-screen pixel-walks vs design PNGs to find leftover wrong box treatments (fold into the
   SYSTEMIC fidelity-diff work below).
+- **OVERSIZED frames/borders/corner-bolts (the "legacy/oversized look") = ENGINE bug, NOT CD:** in
+  `Game1.Canvas.cs`, `DrawButton` 9-slices with `dstCornerScale: 1.0/ChromeBake` (corners stay native,
+  "never chunky") — but the PANEL/CARD path `Panel`→`DrawFrameTex` is called WITHOUT that scale, so its
+  corners + border render CHUNKY/oversized. FIX: apply the SAME `dstCornerScale` (1/ChromeBake) in
+  `DrawFrameTex`. Likely a MAJOR part of the "everything oversized / wrong-asset-use" look — CD's frame
+  assets are correct hi-res.
+- **`e` doesn't exit Equipment:** the hotkey / BACK must TOGGLE — `e` (and Esc) closes Equipment and
+  returns to the caller. Wire the exit.
 
 **‼ SYSTEMIC — build UI VALIDATION / proof-of-correctness (the ROOT CAUSE of "starved before pixel-perfect"):**
 the loop has NO deterministic way to know how well a screen matches its design PNG — so it can't measure
@@ -295,7 +303,15 @@ SLICES (one screen/pass, pixel-verify vs its design PNG):
    slotted action-bar card unslots; keys 1-9 still toggle; Enter marches (the design's READY TO MARCH
    chip was flattened into the status strip by extraction — Needs-CD; Enter carries the march).
    Live binds: paperDoll figure, attr bars (§6 part labels, free/cap, positional pips), loadout/minion
-   cards, core identity, rune budget. RUNE BAG LIVE: one group per PATH ladder (MARKS/PATHS/KEYSTONES
+   cards, core identity, rune budget. BIND-RENAME RECONCILED (2026-07-02): the CD drop renamed the
+   inventory binds (`invItems`→`inventory.activeTab.items`, `tabs`→`inventory.tabs`) and neither render
+   nor input was chased — the GEAR tab had been stamping "Sword" SAMPLES instead of live gear and tab
+   clicks were dead (the bind validator surfaced it). Chased clean; PLUS the drop's new equipment binds
+   mapped live: `core.name`, `run.state` (real expedition state in-run), `loadout.slotLabel` /
+   `minions.slotLabel`, `core.stats` identity rows (bays/actions/budget), `runes.budgetPct` (spent-
+   fraction bar; datum-driven fills are exempt from the blank-element gate at zero). Equipment binds
+   21/26 driven — the 5 left are pure containers. NOTE minor CD collision: coreLabel/marchState overlap
+   the resourceStrip top-right. RUNE BAG LIVE: one group per PATH ladder (MARKS/PATHS/KEYSTONES
    taxonomy stays OPEN §17 — the model's ladders render); each group shows held-rung + next with
    `Mark.Name` display titles (Vessel Seal I/II, Hollow Vessel, ...), a data-derived effect line
    (sockets/grants — can't drift), live EQUIPPED/EQUIPPABLE/LOCKED state + discounted cost; clicking a
