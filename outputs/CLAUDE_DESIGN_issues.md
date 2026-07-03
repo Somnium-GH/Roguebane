@@ -66,6 +66,10 @@ A3. **Tile VALUE+LABEL flattening (again, this drop):** loadout tiles extracted 
     missing elements/binds, but span-flattening is invisible to it).
 A4. **previewFigure backdrop:** design/05 shows the purple night panel behind the loadout figure —
     verify it extracted as a fill/part (live draws none; may be engine-side, investigating).
+A5. **(geometry_diff findings, equipment)** `coreLabel` and `currentCoreName` share ONE bind
+    (`core.name`) but the source authors two formats ("CORE GRUNT" top-strip vs "Human Grunt"
+    identity) — give the top-strip chip its own bind (e.g. `core.label`). And the `inventory`
+    panel's "Inventory" title flattened away (panel extracts with no content/title element).
 (NOT a CD item, for the record: race-card head sprites exist and are bound — an engine resolve gap
 we're fixing; ignore any earlier "Needs-CD head sprites" phrasing if it reached you.)
 

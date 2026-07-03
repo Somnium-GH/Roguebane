@@ -49,10 +49,24 @@ class Src(HTMLParser):
             m = re.search(prop + r"\s*:\s*(-?[\d.]+)px", style)
             return float(m.group(1)) / 2 if m else None  # 1920-space -> design
 
+        # CSS absolute positioning is relative to the nearest POSITIONED ancestor — accumulate
+        # ancestor offsets so authored boxes land in page/design space (the +28px "POS" false
+        # positives were the statusStrip-height parent offset).
+        is_pos = "position:absolute" in style.replace(" ", "")             or "position:relative" in style.replace(" ", "")
+        ox = sum(o[0] for _, _, o in self.stack if o)
+        oy = sum(o[1] for _, _, o in self.stack if o)
+        off = None
+        if is_pos:
+            off = ((px("left") or 0), (px("top") or 0))
+
         if el:
+            box = None
+            if "position:absolute" in style.replace(" ", ""):
+                l, t = px("left"), px("top")
+                box = [(l + ox) if l is not None else None,
+                       (t + oy) if t is not None else None, px("width"), px("height")]
             self.els[el] = {
-                "box": [px("left"), px("top"), px("width"), px("height")]
-                       if "position:absolute" in style.replace(" ", "") else None,
+                "box": box,
                 "fontPx": px("font-size"),
                 "family": ("mono" if "Mono" in style else
                            "display" if "IM Fell" in style else None),
@@ -66,13 +80,13 @@ class Src(HTMLParser):
             if fs or fam:
                 self.els[self.cur]["spans"].append({"fontPx": fs, "family": fam})
         if tag not in VOID:
-            self.stack.append((tag, el))
+            self.stack.append((tag, el, off))
 
     def handle_endtag(self, tag):
         while self.stack:
-            t, el = self.stack.pop()
+            t, el, _ = self.stack.pop()
             if el and el == self.cur:
-                self.cur = next((e for _, e in reversed(self.stack) if e), None)
+                self.cur = next((e for _, e, _ in reversed(self.stack) if e), None)
             if t == tag:
                 break
 
