@@ -316,12 +316,21 @@ public partial class Game1
         "merchant.stock.pageNext" => InRun && Exp.AtMerchant
             && _merchantPage < MerchantPageCount() - 1 ? ">" : null,
         "combat.paused" => _paused ? "HELD" : null, // badge shows only while the fight is held
+        // Scene descriptor: the node type is live data; locale place names ("the high pass") have no
+        // model yet (design-open §17) — the type alone renders, nothing is invented.
+        "encounter.label" => InRun ? NodeLabel(Exp.Map.Current.Type) : null,
         "campaign.taken" => InRun ? _campaign.LegIndex + " / " + _campaign.LegCount : null,
         _ => null,
     };
 
     // Run state exists only after a march; encounter binds fall back to samples until then.
     private bool InRun => _campaign is not null;
+
+    private static string NodeLabel(Roguebane.Core.NodeType t) => t switch
+    {
+        Roguebane.Core.NodeType.ResourceHold => "RESOURCE HOLD",
+        _ => t.ToString().ToUpperInvariant(),
+    };
 
     // Smoke content-validation: does this element's bind resolve to LIVE data right now? Mirrors the
     // draw gating (scene images, the regen track, figures, lists, screen binds). Driven smokes

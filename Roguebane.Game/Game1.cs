@@ -115,11 +115,14 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             {
                 // March to the tanky CASTLE fight — the Summoner's minions melt the light skirmishes
                 // en route, so screenshot there (it survives long enough to show a stable combat frame).
-                _campaign.Enter("a1"); Resolve();  // a resource hold -> banks 1 support
+                // A cleared fight HOLDS on the battlefield (2026-07-02), so each hop redeploys first —
+                // without it every later Enter() silently no-ops and the "castle" smoke was really the
+                // a1 hold (caught by the bind validator's live scene label).
+                _campaign.Enter("a1"); Resolve(); _campaign.Redeploy(); // a resource hold -> banks 1 support
                 _campaign.Enter("b");              // merchant — no fight
                 Exp.BuyWeapon(Armory.Dagger); Exp.EquipWeapon(Armory.Dagger); // wield -> hand marker
                 Exp.Stash.AddArmor(Shops.Plate); Exp.EquipArmor(Shops.Plate);  // wear -> chest ring
-                _campaign.Enter("c2"); Resolve();  // another hold -> banks a 2nd
+                _campaign.Enter("c2"); Resolve(); _campaign.Redeploy(); // another hold -> banks a 2nd
                 _campaign.Enter("castle");         // the banked support rallies on the boss here
 
                 // Show the targeting surface: card 0 LOCKED on a foe's head (F1:H + limb band) with AUTO
