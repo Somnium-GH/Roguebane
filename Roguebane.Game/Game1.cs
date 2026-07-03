@@ -431,20 +431,32 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
 
     // Chart layout: a node's screen rect from its grid coords (Col = depth, Row = lane). Shared by
     // the chart render and the click hit-test so a beacon is selectable exactly where it is drawn.
-    // The chart's region, inset to clear the supply panels (top), legend (right) and gear bar (bottom).
+    // The legacy region (inset to clear the panels/gear bar) is the fallback when no manifest exists.
     private static readonly Rectangle ChartRegion = new(44, 200, 676, 210);
     private const int ChartIcon = 48;
 
     // Node position = f(region, grid extents) via GraphLayout — nodes SPREAD to fill the region, so the
-    // chart is viewport-independent instead of pinned to a fixed pixel origin.
+    // chart is viewport-independent instead of pinned to a fixed pixel origin. Cut-over step
+    // (2026-07-02): the region + icon size come from the MANIFEST chart element (located by its "map"
+    // bind, never CD's renameable ids) so clicks land exactly where DrawManifestGraph draws — the
+    // legacy chart render shares this rect, keeping render and hit-test in lockstep either way.
     private Rectangle NodeRect(MapNode n)
     {
+        var region = ChartRegion;
+        int cw = ChartIcon, ch = ChartIcon;
+        var s = _ui.ScreenDef("citymap");
+        var chart = s?.Elements.FirstOrDefault(x => x.Binds == "map" && x.Type == "graph" && x.Item is not null);
+        if (s is not null && chart is not null)
+        {
+            region = ManifestUi.Rect(s, chart);
+            if (chart.Item!.Size.Length == 2) { cw = chart.Item.Size[0]; ch = chart.Item.Size[1]; }
+        }
         var nodes = Exp.Map.Nodes;
         var cols = nodes.Max(x => x.Col) + 1;
         var rows = nodes.Max(x => x.Row) + 1;
         var cell = GraphLayout.Cell(
-            new LayoutRect(ChartRegion.X, ChartRegion.Y, ChartRegion.Width, ChartRegion.Height),
-            cols, rows, n.Col, n.Row, ChartIcon, ChartIcon);
+            new LayoutRect(region.X, region.Y, region.Width, region.Height),
+            cols, rows, n.Col, n.Row, cw, ch);
         return new Rectangle(cell.X, cell.Y, cell.W, cell.H);
     }
 

@@ -340,6 +340,14 @@ SLICES (one screen/pass, pixel-verify vs its design PNG):
    BINDLESS content literal ("1 WAYPOINT AWAY FROM CAMP" mock) — bind it (enemy.advance) and drop the
    bind from the doomBar container, else the mock shows beside the live count; legend rows overlap
    their panel's top edge (item pad).
+   **VISUAL CUT-OVER DONE (2026-07-02):** the LIVE citymap renders `DrawManifestScreen("citymap")` —
+   legacy chart/supply-panels/war-party/legend/gold-readout DELETED; node input reads the MANIFEST
+   chart geometry (NodeRect locates the chart by its `map` bind, so clicks land exactly where the
+   graph draws; legacy region is only a no-manifest fallback). STILL HAND-DRAWN, flagged un-homed
+   overlays (design/03 shows none of them — Needs-CD/human home before they can die): gear bar +
+   PACK chips, EQUIPMENT [E] button, castle panel, campaign spine (parked bottom-left). Known
+   overlaps: node[3] label under the castle panel, legend rows over their panel edge (both CD-side).
+   Verified live smoke + gate green.
    REMAINING for cut-over: map input on manifest geometry (node clicks); a home for the merchant panel,
    gear bar + EQUIPMENT button (design/03 shows none of them — surface where they live, Needs-CD/human,
    before deleting the legacy citymap screen).
