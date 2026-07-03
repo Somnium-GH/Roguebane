@@ -98,6 +98,7 @@ public sealed class Element
     public Item? Item { get; init; }       // a repeated child: list (horizontal/vertical) or graph
     public string? ColorBind { get; init; } // a colour bound from live data (e.g. "preview.accent")
     public JsonElement States { get; init; } // interaction-state skins (button family asset map)
+    public string[]? Frames { get; init; }  // authored animation frames, cycled on the FIXED tick (§12)
 }
 
 // An engine-drawn drop shadow (§10): the element silhouette offset by (Dx,Dy), softened by Blur, in the

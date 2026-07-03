@@ -184,11 +184,17 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         _scene = new RenderTarget2D(GraphicsDevice, sw, sh);
     }
 
+    // Fixed-step animation counter (authored `frames` cycle on it — render-only, sim untouched).
+    private int _animTick;
+
     protected override void Update(GameTime gameTime)
     {
+        _animTick++;
         var keys = Keyboard.GetState();
         _keys = keys;
         if (keys.IsKeyDown(Keys.Escape)) Exit();
+        // §8: while a technique actively targets, the CURSOR IS THE RETICLE — hide the OS pointer.
+        IsMouseVisible = !(InRun && _screen == Screen.Run && _ctrl.IsTargeting(Exp));
 
         var altEnter = keys.IsKeyDown(Keys.LeftAlt) && Pressed(keys, Keys.Enter);
         if (Pressed(keys, Keys.F11) || altEnter) ToggleFullscreen();
@@ -719,8 +725,9 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                 // Datum-driven fills (the bar IS the value) are legitimately empty at zero.
                 var datumFill = el.Binds is "enemy.advancePct" or "runes.budgetPct" or "ShieldPool.regen";
                 // content+binds = bind-gated literal (§12): a closed gate legitimately paints nothing.
-                var gated = !string.IsNullOrEmpty(el.Content) && !string.IsNullOrEmpty(el.Binds)
-                    && el.Type == "text";
+                // Bound icons gate the same way (mock-position stand-ins drawn live elsewhere).
+                var gated = !string.IsNullOrEmpty(el.Binds)
+                    && (el.Type == "icon" || (el.Type == "text" && !string.IsNullOrEmpty(el.Content)));
                 var mustPaint = !datumFill && !gated && (el.Fill is not null || el.Frame is not null
                     || !string.IsNullOrEmpty(el.Content) || !string.IsNullOrEmpty(el.Image)
                     || el.Type == "button");

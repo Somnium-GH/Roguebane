@@ -90,17 +90,19 @@ claims were made against warped refs — treat them as UNVERIFIED; re-walk with 
    pinned headless capture at 960K×540K.
 Wire ALL of it into `tools/ui_gate.py` (stays the ONE command); run every pass per loop.md.
 
-**‼ P0-B — TARGETING build [design LANDED (01+08 v2, assets, manifest binds); DESIGN_SPEC §8]:**
-- DELETE the whole-foe white hover BOX + any band highlight — no box affordances, ever (design/08 rule 1).
-- Cursor IS the reticle: hide the OS cursor entering TARGETING; draw `ui/reticle/aiming` (now RED,
-  dashed) at the cursor, snapping/centring to the hovered limb band; click locks; right-click cancels +
-  restores the cursor.
-- Locked mount: cycle `focus_p0→p1→p2` on the FIXED TICK (manifest `frames` on foeReticle); size =
-  part rect's larger side ×~1.5 clamped 64–136 SCREEN px (design/08 rule 2); SECONDARY (faint) = another
-  module's kept target (AUTO on).
-- AIM TAG stack above the reticle = hotkey NUMBERS via `templates.aimTag` + `targeting.tags` bind;
-  several actives on one part stack. Card-side aim tag is REMOVED (bind gone from manifest).
-- Action-bar hotkey chips render from `technique.hotkey`/`bay.hotkey` (1–6); keys already map.
+**‼ P0-B — TARGETING build [design LANDED (01+08 v2); DESIGN_SPEC §8] — CORE DONE (2026-07-03):**
+- ~~boxes~~ DELETED: whole-foe hover border, hovered-part border, band strips, no-frame fallback box
+  — zero box affordances (band strips remain the CLICK hit-test, undrawn).
+- ~~Cursor is reticle~~ DONE: OS cursor hides while a technique targets (IsMouseVisible in Update);
+  red `aiming` rides the cursor, centring on the hovered limb band; right-click cancel already wired.
+- ~~Locked mount~~ DONE: manifest `frames` (Element.Frames parses, schema-tested) cycle focus_p0→p1→p2
+  on the fixed `_animTick` (render-only counter); size = part-rect larger side ×1.5 clamped 64–136
+  scene px; while ANOTHER module is picking, kept targets draw the faint SECONDARY (0.55 alpha).
+  Static foeReticle element gates off (bound icons suppress when their bind is unresolved — its
+  authored image is a mock-position stand-in; the mock box is gone from the shot, eyeballed).
+- REMAINING P0-B: AIM TAG number stack (`templates.aimTag` + `targeting.tags`); action-bar hotkey
+  chips (`technique.hotkey`/`bay.hotkey`). Pulse cycling + hidden cursor are Update-side — verify
+  LIVE (headless smoke is single-frame); flag any repro to the targeting-FSM debt line.
 
 **‼ P0-C — POST-DROP ENGINE QUEUE (the 07-03 walk's CD-tagged items LANDED in the drop; what remains
 is ALL engine-side). Fix with P0-A numbers (before/after per-element scores):**

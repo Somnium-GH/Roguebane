@@ -1,4 +1,4 @@
-using Roguebane.Core.Layout;
+﻿using Roguebane.Core.Layout;
 
 namespace Roguebane.Core.Tests;
 
@@ -20,6 +20,32 @@ public class LayoutManifestTests
             dir = Path.GetDirectoryName(dir);
         }
         throw new FileNotFoundException("Roguebane.Content/layout.json not found above the test bin");
+    }
+
+    [Fact]
+    public void ParsesFramesAnimationAndNestedPartLists()
+    {
+        // §12 schema (test-owned fixture, not CD content): element `frames` is an ordered asset
+        // list cycled on the fixed tick; a template part may carry its OWN nested `list`.
+        var m = LayoutManifest.Parse("""
+        {
+          "screens": { "s": { "designSize": [960,540], "elements": [
+            { "id": "ret", "type": "icon", "anchor": "TopLeft", "offset": [0,0], "size": [64,64],
+              "z": 1, "frames": ["ui/reticle/focus_p0","ui/reticle/focus_p1"] } ] } },
+          "templates": { "row": { "size": [300,16], "parts": [
+            { "rect": [10,3,200,10], "binds": "pool.attr.cells",
+              "list": { "template": "pip", "flow": "horizontal", "gap": 2, "size": [16,10] } } ] },
+            "pip": { "size": [16,10], "binds": "cell.state", "imageBind": "ui/pip/{cell.asset}" } }
+        }
+        """);
+        var el = m.Screens["s"].Elements[0];
+        Assert.Equal(new[] { "ui/reticle/focus_p0", "ui/reticle/focus_p1" }, el.Frames);
+        var part = m.Templates["row"].Parts[0];
+        Assert.NotNull(part.List);
+        Assert.Equal("pip", part.List!.Template);
+        Assert.Equal("ui/pip/{cell.asset}", m.Templates["pip"].ImageBind);
+        var placed = CardTemplate.Place(m.Templates["row"], 100, 50);
+        Assert.Equal("pip", placed[0].List!.Template); // the nested list survives placement
     }
 
     [Fact]

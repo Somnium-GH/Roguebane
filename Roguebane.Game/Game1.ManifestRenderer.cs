@@ -51,9 +51,12 @@ public partial class Game1
     {
         // data-bind-gate (LAYOUT_CONTRACT §12): content+binds coexisting means the content is the
         // literal and the bind GATES the whole element — a closed gate draws nothing, chrome included
-        // (never an empty box). Buttons keep their own enabled/skin machinery below.
+        // (never an empty box). Buttons keep their own enabled/skin machinery below. Bound ICONS gate
+        // the same way (foeReticle's authored image is a mock-position stand-in; live mounts draw it).
         if (e.Type == "text" && e.Content is { Length: > 0 } && e.Binds is { Length: > 0 }
             && ResolveScreenBind(e.Binds) is null)
+            return;
+        if (e.Type == "icon" && e.Binds is { Length: > 0 } && ResolveScreenBind(e.Binds) is null)
             return;
         // A TEXT element's shadow is a text shadow (offset glyph copy, drawn with the text below) —
         // rect-shadowing it would paint a solid box behind the words.
@@ -173,30 +176,41 @@ public partial class Game1
                 // While a module is picking, the AIMING reticle centres on the hovered limb's ACTUAL
                 // part rects (band strips remain the click hit-test); a locked part-aim shows the
                 // FOCUS reticle on its part.
-                if (!ef.Down && _ctrl.IsTargeting(Exp))
+                // §8 targeting presentation (design/08, LOCKED): NO box affordances, ever — no hover
+                // border, no band highlight, no whole-foe frame. The cursor IS the reticle.
+                var picking = !ef.Down && _ctrl.IsTargeting(Exp);
+                if (picking)
                 {
-                    if (ef.Frame is not null)
-                    {
-                        var band = r.Height / 4;
-                        for (var bd = 1; bd < 4; bd++) Rect(r.X, r.Y + bd * band, r.Width, 1, new Color(Ink, 90));
-                        if (FoePartAt(ef, _cursor) is { } hov && FoePartScreenRect(ef, hov.Stat, r) is { } pr)
-                        {
-                            Border(pr.X, pr.Y, pr.Width, pr.Height, Ink);
-                            if (_assets.Reticle("aiming") is { } aim)
-                                Sprite(aim, pr.X + pr.Width / 2 - 24, pr.Y + pr.Height / 2 - 24, 48, 48, Color.White);
-                        }
-                    }
-                    else Border(r.X, r.Y, r.Width, r.Height, new Color(Ink, 110));
+                    // The red AIMING reticle rides the cursor, snapping/centring to the hovered limb
+                    // band (band strips stay the click hit-test; they just aren't drawn).
+                    var mount = ef.Frame is not null && FoePartAt(ef, _cursor) is { } hov
+                        && FoePartScreenRect(ef, hov.Stat, r) is { } pr
+                        ? new Point(pr.X + pr.Width / 2, pr.Y + pr.Height / 2)
+                        : _cursor;
+                    if (_assets.Reticle("aiming") is { } aim)
+                        Sprite(aim, mount.X - 24, mount.Y - 24, 48, 48, Color.White);
                 }
-                else if (!ef.Down && Hover(r)) Border(r.X, r.Y, r.Width, r.Height, Ink);
-                // Locked part-aims read as FOCUS reticles on their parts (deduped by stat).
-                if (!ef.Down && ef.Frame is not null && _assets.Reticle("focus") is { } focus)
+                // Locked part-aims read as reticle mounts (deduped by stat): the pulsing FOCUS frames
+                // normally; the faint SECONDARY while ANOTHER module is actively picking (design/08).
+                // Size = the part rect's larger side x1.5, clamped 64..136 SCREEN(scene) px.
+                if (!ef.Down && ef.Frame is not null)
                 {
+                    var frames = _ui.ScreenDef("encounter")?.Elements
+                        .FirstOrDefault(x => x.Binds == "targeting.focus")?.Frames;
+                    var focus = frames is { Length: > 0 }
+                        ? _assets.Texture(frames[_animTick / 10 % frames.Length])
+                        : _assets.Reticle("focus");
+                    var tex = picking ? _assets.Reticle("secondary") ?? focus : focus;
                     var shown = new System.Collections.Generic.HashSet<Stat>();
                     foreach (var t in Exp.Equipment)
                         if (Exp.PartOf(t) is { } aimed && shown.Add(aimed.Stat)
-                            && FoePartScreenRect(ef, aimed.Stat, r) is { } fr2)
-                            Sprite(focus, fr2.X + fr2.Width / 2 - 20, fr2.Y + fr2.Height / 2 - 20, 40, 40, Color.White);
+                            && FoePartScreenRect(ef, aimed.Stat, r) is { } fr2 && tex is not null)
+                        {
+                            var scenePx = Math.Clamp(Math.Max(fr2.Width, fr2.Height) * SS * 1.5f, 64f, 136f);
+                            var d = (int)(scenePx / SS);
+                            Sprite(tex, fr2.X + fr2.Width / 2 - d / 2, fr2.Y + fr2.Height / 2 - d / 2,
+                                d, d, picking ? Color.White * 0.55f : Color.White);
+                        }
                 }
                 break;
             case "graph" when e.Binds == "map" && InRun && e.Item is not null:
