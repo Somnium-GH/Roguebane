@@ -708,7 +708,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             var silent = new List<string>();
             var occluded = new List<string>();
             var screenDef = _ui.ScreenDef(id)!;
-            foreach (var el in screenDef.Elements.Where(x => x.Z != 0))
+            foreach (var el in screenDef.Elements.Where(x => !IsSceneElement(x)))
             {
                 RenderSceneOnce(() => DrawManifestScreen(id, el));
                 _scene.GetData(baseline);

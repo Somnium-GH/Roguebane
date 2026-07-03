@@ -19,13 +19,9 @@ parses every `design/dchtml/*.dc.html` (data-el/-binds/-template/-tpl/-container
 layout.json; exit 1 on any extraction gap. First run: 6 screens audited, **2 real gaps found**
 (encounter `ShieldPool.count` + `ShieldPool.regenPct` bound in html, absent from manifest — engine
 already renders both; logged Needs-CD #4). Run it on every drop alongside the parse guard.
-**GATE STATE AT COMMIT: RED — EXPECTED.** Core 304 green (contract test now accepts chrome-only v4
-card parts). `ui_gate.py`: 48 ELEM-BLANK across screens = the drop's NEW elements the engine can't
-draw yet (bind-gated labels like beginBtn/heldBadge/autoAttackBtn — content+binds coexist, engine
-lacks the gate semantics; new titles/buttons/icons awaiting P0-C.4–5 wiring). NOT a regression:
-fidelity ROSE on all 6 screens vs old baselines (enc 74.9 eq 76.3 city 78.0 camp 89.7 ng 74.3
-mer 80.4 — informational only, v1 tooling vs new refs). Gate goes green as P0-A/P0-C close;
-baselines re-pinned on v2 numbers 2026-07-03 (see P0-A.3).
+**GATE: GREEN (2026-07-03, post P0-C.2).** The post-drop 48-element BLANK class was the OLD z
+convention overpainting them (equipment backdrop covered its whole screen) — the paint-ordinal
+switch zeroed both the ELEM-BLANK and OCCLUDED classes; baselines re-pinned on the fixed render.
 VERIFIED: all `design/NN` refs exactly **1920×1080** (#11);
 targeting redesign complete in 01+08 (hotkey chips 1–6, number aim-tags w/ stacking, "no boxes ever
 drawn", pulse assets `ui/reticle/focus_p0–p2` + AIMING=red cursor) (#12); merchant fits shelves w/ real
@@ -115,9 +111,15 @@ is ALL engine-side). Fix with P0-A numbers (before/after per-element scores):**
    DROP_AUDIT schema notes folded into LAYOUT_CONTRACT §11 (ref-export contract) + NEW §12
    (z=paint-ordinal, frames animation, bind-gate, data-part, item.pad); CLAUDE.md line arrived
    WITH the drop.
-2. **z paint-ordinal switch:** renderer drops the two-convention special-case — z is back→front paint
-   order everywhere; find the scene layer by its `*.scene` bind. (The attrPool divider occlusion
-   un-breaks with it.)
+2. ~~z paint-ordinal switch~~ **✅ DONE (2026-07-03) — GATE WENT GREEN.** Renderer draws ascending z
+   (one convention); scene layer found by `*.scene` bind (`IsSceneElement`); smoke leave-one-out +
+   backdrop baseline follow the bind, not z==0. BIG un-break: the old descending order painted
+   equipment's `backdrop` (z=1) over nearly the whole screen — ALL 48 ELEM-BLANK elements and ALL 6
+   OCCLUDED elements were overpaint casualties, and both classes went to ZERO with the switch
+   (beginBtn/heldBadge/titles/buttons all render now; attrPool divider un-broke as predicted).
+   Fidelity re-pinned (enc 77.7 eq 76.5 city 85.3 camp 94.7 ng 77.0 mer 82.0) — enc/eq DIPPED vs
+   the pre-switch pins because those pins scored backdrop-covered blanks whose dark fill
+   coincidentally matched the ref (metric artifact, visually verified: full content now renders).
 3. **v4 frames 1:1:** panel/card draw border-image-width == slice (no ChromeBake corner scale);
    verify button skins vs their authored size too.
 4. **New template families:** nested pip templates instanced from live data (poolPip/attrPip/supplyPip/

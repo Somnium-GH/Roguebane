@@ -8,11 +8,11 @@
     "merchant": 10
   },
   "fidelity": {
-    "encounter": 80.5,
-    "equipment": 80.4,
-    "citymap": 84.7,
+    "encounter": 77.7,
+    "equipment": 76.5,
+    "citymap": 85.3,
     "campaignmap": 94.7,
-    "newgame": 78.1,
-    "merchant": 83.0
+    "newgame": 77.0,
+    "merchant": 82.0
   }
 }
