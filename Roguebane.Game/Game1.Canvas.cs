@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -83,12 +83,12 @@ public partial class Game1
             var w = MeasureText(font, s).X * sc;
             var fit = maxLines == 1 && w > r.Width && fontPx > 0 ? fontPx * r.Width / w : fontPx;
             RecordTextBox(new Rectangle(r.X, r.Y,
-                (int)(fit > 0 && fontPx > 0 ? w * (fit / fontPx) : w), (int)lineH), r);
+                (int)(fit > 0 && fontPx > 0 ? w * (fit / fontPx) : w), (int)lineH), r, s, font);
             TextPx(font, s, r.X, r.Y, color, fit);
             return;
         }
         // Wrapped text is line-clamped to the box, so its drawn footprint IS (at most) the bound.
-        RecordTextBox(r, r);
+        RecordTextBox(r, r, s, font);
         var ly = (float)r.Y;
         var lines = 0;
         foreach (var para in s.Split('\n'))
@@ -120,12 +120,14 @@ public partial class Game1
     // bounds (overflow) and against sibling footprints (collision).
     private bool _collectText;
     private string? _textOwner; // the element id whose content is being drawn
-    private readonly System.Collections.Generic.List<(string El, Rectangle Box, Rectangle Bound)> _textBoxes = new();
+    private readonly System.Collections.Generic.List<(string El, Rectangle Box, Rectangle Bound, string Text, string Font)>
+        _textBoxes = new();
 
-    private void RecordTextBox(Rectangle drawn, Rectangle bound)
+    private void RecordTextBox(Rectangle drawn, Rectangle bound, string text = "", SpriteFont? font = null)
     {
         if (_collectText && _textOwner is { } el)
-            _textBoxes.Add((el, drawn, bound));
+            _textBoxes.Add((el, drawn, bound, text,
+                font is not null && font == _assets.Display ? "display" : "mono"));
     }
 
     // SpriteFonts are ASCII-only and THROW on an unknown glyph. The fold-to-ASCII policy + algorithm

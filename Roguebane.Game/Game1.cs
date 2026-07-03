@@ -735,6 +735,17 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                 System.IO.File.WriteAllText(
                     System.IO.Path.ChangeExtension(_shotPath, null) + "." + id + ".rects.json",
                     "{" + string.Join(",", rects) + "}");
+                // M0.4 geometry sidecar: what text ACTUALLY drew (element, drawn bbox, bound,
+                // string, font family) — tools/geometry_diff.py checks it against the dc.html
+                // authored geometry. Design px throughout.
+                static string J(string s) => s.Replace("\\", "\\\\").Replace("\"", "\\\"");
+                var tg = _textBoxes.Select(t =>
+                    $"{{\"el\":\"{J(t.El)}\",\"box\":[{t.Box.X},{t.Box.Y},{t.Box.Width},{t.Box.Height}],"
+                    + $"\"bound\":[{t.Bound.X},{t.Bound.Y},{t.Bound.Width},{t.Bound.Height}],"
+                    + $"\"text\":\"{J(t.Text)}\",\"font\":\"{t.Font}\"}}");
+                System.IO.File.WriteAllText(
+                    System.IO.Path.ChangeExtension(_shotPath, null) + "." + id + ".textgeom.json",
+                    "[" + string.Join(",", tg) + "]");
             }
             // Per-ELEMENT coverage (the systemic validator): render the screen once per element with
             // that element left out — zero pixel difference means it contributed NOTHING.
@@ -796,7 +807,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     {
         const int tol = 2;
         var overflow = new List<string>();
-        foreach (var (el, box, bound) in _textBoxes)
+        foreach (var (el, box, bound, _, _) in _textBoxes)
             if (box.X < bound.X - tol || box.Y < bound.Y - tol
                 || box.Right > bound.Right + tol || box.Bottom > bound.Bottom + tol)
                 if (!overflow.Contains(el)) overflow.Add(el);
@@ -807,8 +818,8 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         for (var a = 0; a < _textBoxes.Count; a++)
             for (var b = a + 1; b < _textBoxes.Count; b++)
             {
-                var (ea, boxA, _) = _textBoxes[a];
-                var (eb, boxB, _) = _textBoxes[b];
+                var (ea, boxA, _, _, _) = _textBoxes[a];
+                var (eb, boxB, _, _, _) = _textBoxes[b];
                 if (ea == eb || !boxA.Intersects(boxB)) continue;
                 var ra = ElemRect(ea);
                 var rb = ElemRect(eb);

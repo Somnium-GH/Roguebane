@@ -60,7 +60,15 @@ class exactly as Doug called it: `race.id` had NO ResolveBind case, so the head 
 to an empty path and died silently. Fixed (+ part-image path normalize); HEADS NOW BLIT on both
 race cards (eyeballed). Current probe truth: 6 technique icons missing (bandage/cleave/drain/ember/
 jab/lunge — real Needs-CD), 2 placeholders unverifiable (legend.type/lot.id — domains to add).
-M0.4 geometry_diff next; newgame floor claim stays REVOKED until the M1 re-walk._
+M0.4 DONE same day: the smoke emits a
+textgeom sidecar (element, drawn bbox, string, font family per text draw) and
+`tools/geometry_diff.py <dc.html> <rects> <textgeom>` prints the numeric per-element table —
+authored(source/2) vs manifest vs drawn: pos/size deltas, fontPx, family, string, span-FLATTENED
+detection. First newgame table (9 findings) CONFIRMS Doug's list numerically: the four preview
+tiles draw the VALUE only vs the authored value+label spans; coreHeader/raceCards/raceHeader flag
+FLATTENED; all measured fontPx match. (beginBtn shows NO-TEXT-DRAWN — a recording gap: the styled
+button draws via TextPx directly, not through the recorded path; extend recording with the M1 pass.)
+Newgame floor claim stays REVOKED until the M1 re-walk._
 1. **REVERT the blur-tolerant element scoring (4b6a705).** The 1.5px Gaussian before element scoring
    makes the tool blind to ±2–3 design-px errors — EXACTLY the current bug class (padding/margins/
    label offsets Doug can see by eye). Replace with an **ALIGNMENT SEARCH**: score each element crop
