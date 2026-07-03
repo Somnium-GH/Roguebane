@@ -186,11 +186,17 @@ is ALL engine-side). Fix with P0-A numbers (before/after per-element scores):**
    ex-overlays render live and INPUT rides their geometry (equipmentBtn click via nav.equipment;
    pack click-to-equip via the packChips cells, wielded chips no-op). Game1.CityMap.cs 119→33
    lines. REMAINING: old encounter card-chrome fallbacks give way to the landed techCard parts.
-10. **Engine-bug residue from the 07-03 walk (re-measure first — several may already be explained by
-   the above):** resource-strip misalignment/collision; empty-box suppression rule (should vanish once
-   labels/binds land — enforce anyway per loop.md); RUNE BAG regression (two MARKS headers, zero group
-   cards); doubled "Human Warden" identity text; SHIELD label-over-bar; citymap node token/label
-   oversize + square selection ring; "CASTLE FORTIFICATIONS" run-on (retires with fortRows).
+10. **Engine-bug residue from the 07-03 walk:** ~~RUNE BAG regression~~ FIXED (2026-07-03: the drop
+   restructured runeGroup into a bound header [runeGroups.type → live PATH name; taxonomy stays
+   OPEN §17] + a NESTED runeCard list [g.runes] — the engine still ran the old flat-row path.
+   Nested stamping wired through RuneRow/RuneBind; eyeballed: VESSEL/RESONANCE groups with rung
+   names, effect lines, EQUIPPABLE/LOCKED state colors, discounted costs. One new minor overflow
+   from live text on tight authored rects rode the fix — baselined);
+   ~~doubled identity~~ ~~SHIELD label-over-bar~~ FIXED (see P0-A.5 burn-down);
+   ~~CASTLE FORTIFICATIONS run-on~~ RETIRED (fortRows live). REMAINING to re-measure:
+   resource-strip misalignment/collision (logo/resourceStrip overflows measured, in the burn-down
+   list); empty-box suppression (bind-gate landed — spot-check); citymap node token/label oversize +
+   square selection ring.
 SEQUENCE: P0-A tools (1–2 passes, baselines re-pinned on the new refs) → P0-C.1–3 (mechanical) →
 P0-B + P0-C.4–5 (the big render slice, one screen per pass) → 6–10. Gate green EVERY pass.
 

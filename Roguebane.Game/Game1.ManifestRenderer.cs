@@ -538,6 +538,23 @@ public partial class Game1
                 // never draw it beside live data. A NESTED wares region stamps its own cards.
                 if (datum is MerchantOffer or MerchantLot or ResourceReadout or MerchantSection
                     && pp.Binds is null) continue;
+                // Nested rune list (07-03 drop): each group's region stamps runeCard rows — the
+                // held rung (or the first) then the next, the pair the player acts on (RuneRow).
+                if (pp.List is { } runeList && pp.Binds == "g.runes"
+                    && datum is System.Collections.Generic.IReadOnlyList<Roguebane.Core.Mark> gLadder
+                    && gLadder.Count > 0 && _ui.Manifest is { } mR
+                    && mR.Templates.TryGetValue(runeList.Template, out var runeT))
+                {
+                    var rows = new List<Roguebane.Core.Mark>();
+                    if (RuneRow(datum, 0) is { } r0) rows.Add(r0);
+                    if (RuneRow(datum, 1) is { } r1 && rows.Count > 0 && !ReferenceEquals(r1, rows[0]))
+                        rows.Add(r1);
+                    var runeCells = ListLayout.Cells(pp.Rect, runeList, rows.Count, runeT.Size);
+                    for (var ri = 0; ri < runeCells.Count; ri++)
+                        foreach (var rp in CardTemplate.Place(runeT, runeCells[ri].X, runeCells[ri].Y))
+                            DrawRunePart(rp, rows[ri]);
+                    continue;
+                }
                 // Nested pip strip (§12): a part carrying its OWN list stamps a leaf template per
                 // cell, the cells sliced from the ROW datum (pool rows / attr bars).
                 if (pp.List is { } nested && pp.Binds is "pool.attr.cells" or "attrs.cells"
@@ -1065,6 +1082,13 @@ public partial class Game1
     // Missing-data binds (race tag/blurb, per-attr tiles, Core Effect text) return null pending their data.
     private static string? ResolveBind(object datum, string? bind) => datum switch
     {
+        System.Collections.Generic.IReadOnlyList<Roguebane.Core.Mark> lad => bind switch
+        {
+            // §17 keeps the MARKS/PATHS/KEYSTONES taxonomy OPEN — the group header reads the
+            // ladder's live PATH name rather than inventing a category.
+            "runeGroups.type" => lad.Count > 0 ? lad[0].Path.ToUpperInvariant() : null,
+            _ => null,
+        },
         PipPoint pt => bind switch
         {
             "point.asset" => pt.Asset,
@@ -1243,6 +1267,27 @@ public partial class Game1
         var held = _build.Runes.CurrentRank(ladder[0].Path);
         var first = held > 0 ? Math.Min(held - 1, ladder.Count - 1) : 0;
         return ladder[Math.Min(first + row, ladder.Count - 1)];
+    }
+
+    // One stamped runeCard part: bound parts resolve live copy through RuneBind (the state chip
+    // takes its states-block color); unbound parts are design-mock filler and never draw.
+    private void DrawRunePart(PlacedPart rp, Roguebane.Core.Mark m)
+    {
+        if (rp.Binds is not { } rb) return;
+        var text = RuneBind(m, rb);
+        if (string.IsNullOrEmpty(text)) return;
+        var colTok = rp.Color;
+        if (rb == "g.runes.state")
+            colTok = text switch
+            {
+                "EQUIPPED" => "good", "EQUIPPABLE" => "amber", _ => "lockText",
+            };
+        if (rp.Fill is { } f) DrawFill(RectOf(rp.Rect), f);
+        if (rp.Border is { } b)
+            Border(rp.Rect.X, rp.Rect.Y, rp.Rect.W, rp.Rect.H, _ui.Color(b.Color, Border0),
+                BorderPx(b.W), b.Sides);
+        TextPxWrapped(rp.Font == "display" ? _assets.Display : _assets.Mono, text!,
+            RectOf(rp.Rect), _ui.Color(colTok ?? "ink", Ink), rp.FontPx);
     }
 
     private string? RuneBind(Roguebane.Core.Mark m, string bind) => bind switch
