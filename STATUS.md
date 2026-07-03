@@ -144,12 +144,13 @@ is ALL engine-side). Fix with P0-A numbers (before/after per-element scores):**
    city 10 ng 13; smoke classifies gated literals as legit-silent); ~~`item.pad`~~ DONE (2026-07-03:
    [T,R,B,L] container inner padding in ListLayout, Core-tested 306 — citymap legend + equipment
    invTabs consume it); `frames` animation cycling (fixed tick) — OPEN, with the P0-B reticle.
-5. **New binds resolve live:** technique.hotkey/bay.hotkey, targeting.tags (aimTag stack),
-   Body.hp.points/hpLabel + foe.hp.points (segmented HP), pool.attr.cells/attrs.cells + ui/pip
-   imageBinds, supplies.points/support.points, Body.gear rows, nav.equipment/nav.close (✕ CLOSE +
-   equipmentBtn), map.current, campaign.cities/city.status + campaignTaken, city.castle.parts fort
-   rows (INTACT/DAMAGED states), icons/technique/{id} imageBinds (kills the "?" icons), equipment/
-   citymap scene backdrops.
+5. **New binds resolve live:** ~~technique.hotkey/bay.hotkey~~ ~~targeting.tags~~ ~~Body.hp.points/
+   hpLabel + foe.hp.points~~ ~~pool.attr.cells/attrs.cells~~ ~~supplies.points/support.points~~
+   ~~Body.gear rows~~ (packChips live: Dagger/Plate chips + stat swatches, city binds 13)
+   ~~nav.equipment/nav.close~~ ~~icons/technique/{id} + {loadout.id} imageBinds~~ (Brace blits its
+   PNG; missing icon ids fall back to the tinted tile, logged Needs-CD #4) — ALL DONE 2026-07-03.
+   REMAINING: map.current, campaign.cities/city.status + campaignTaken, city.castle.parts fort rows
+   (INTACT/DAMAGED states), equipment/citymap scene backdrops (verify resolve — equipment's renders).
 6. **P0-B targeting build** (block above).
 7. **Merchant buys complete** (per the click-to-buy LOCK): techniques/minions/runes purchase into
    inventory; keep page-by-measured-fit as a safety even with v2 extents.

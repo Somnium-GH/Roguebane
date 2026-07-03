@@ -23,7 +23,11 @@ are superseded by this reconcile._
    design/*.png stay the canon; confirm it's CD-internal.
 3. **`target_tag.png` deletion is being done repo-side** (both content dirs + game mgcb) per your
    "delete in repo" note — closing the loop here so it isn't re-shipped in a future drop.
-4. **Encounter extraction gaps (found by the new `tools/drop_audit.py` at drop time):** Encounter.dc.html
+4. **Technique icon coverage:** `icons/technique/` ships brace/disarm/firebolt/frenzy/shot/swing,
+   but the built roster also uses **bandage, block, cleave, drain, ember, jab, lunge, stoneskin** —
+   those cards fall back to the tinted glyph tile (engine keeps the tile, never a blank box).
+   Ship the missing PNGs whenever convenient.
+5. **Encounter extraction gaps (found by the new `tools/drop_audit.py` at drop time):** Encounter.dc.html
    binds `ShieldPool.count` (the "n/m" text inside the heroShield header) and `ShieldPool.regenPct`
    (the fill inside heroShieldRegen) on anonymous spans, but neither datum reached layout.json —
    the manifest carries only `ShieldPool` / `ShieldPool.points` / `ShieldPool.regen`. The engine

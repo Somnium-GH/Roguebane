@@ -594,8 +594,14 @@ public partial class Game1
                         mm => ResolveBind(datum, mm.Groups[1].Value) ?? "");
                 if (!string.IsNullOrEmpty(img))
                 {
-                    Sprite(_assets.Texture(img!), pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H, Color.White);
-                    continue;
+                    // A missing icon PNG keeps the glyph-tile fill drawn above — never Sprite's
+                    // null-texture border box (an un-shipped icon is a Needs-CD gap, not a frame).
+                    if (_assets.Texture(img!) is { } itex)
+                    {
+                        Sprite(itex, pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H, Color.White);
+                        continue;
+                    }
+                    if (pp.ImageBind is not null) continue; // icon slot stays the tinted tile
                 }
                 var text = isStatePart ? stateText : pp.Binds switch
                 {
@@ -727,6 +733,12 @@ public partial class Game1
                 new MerchantLot("charge", "Charge", Exp.ChargeStock, Exp.ChargePrice),
                 new MerchantLot("summons", "Summons", Exp.SummonsStock, Exp.SummonsPrice),
             }
+            : new List<object>(),
+        // PACK chips (design/03, ex-overlay homed by the 07-03 drop): the run's carried gear —
+        // wielded pieces plus the packed stash. Chips read gear.name + a stat-tinted swatch.
+        "Body.gear" => InRun
+            ? Exp.Player.Body.Hands.Cast<object>()
+                .Concat(Exp.Stash.Weapons).Concat(Exp.Stash.Armor).ToList()
             : new List<object>(),
         // The in-run resource strip as manifest data (id/value/label per chip).
         "run.resources" => InRun
@@ -1055,18 +1067,19 @@ public partial class Game1
             "invItems.badgeLabel" or "technique.cost" => t.Stat.ToString().ToUpperInvariant(),
             "invItems.badgeNum" => t.Reserve.ToString(),
             "technique.description" => t.DescText,
+            "technique.id" or "loadout.id" => t.Id, // icons/technique/{id} imageBinds
             _ => null,
         },
         Roguebane.Core.Weapon w => bind switch
         {
-            "invItems.name" => DisplayName(w.Id),
+            "invItems.name" or "gear.name" => DisplayName(w.Id),
             "invItems.badgeLabel" => w.Stat.ToString().ToUpperInvariant(),
             "invItems.badgeNum" => w.Reserve.ToString(),
             _ => null,
         },
         Roguebane.Core.Armor ar => bind switch
         {
-            "invItems.name" => DisplayName(ar.Id),
+            "invItems.name" or "gear.name" => DisplayName(ar.Id),
             "invItems.badgeLabel" => ar.Group.ToString().ToUpperInvariant(),
             "invItems.badgeNum" => ar.Value.ToString(),
             _ => null,
@@ -1074,6 +1087,7 @@ public partial class Game1
         Roguebane.Core.Minion mn => bind switch
         {
             "loadout.name" or "invItems.name" or "bay.name" => DisplayName(mn.Id),
+            "loadout.id" => mn.Id,
             "loadout.attr" => mn.Stat.ToString().ToUpperInvariant() + " " + mn.Reserve,
             "invItems.badgeLabel" or "bay.cost" => mn.Stat.ToString().ToUpperInvariant(),
             "invItems.badgeNum" => mn.Reserve.ToString(),
