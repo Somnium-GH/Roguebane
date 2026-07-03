@@ -72,7 +72,8 @@ public partial class Game1
         // covered-ground fill: its width IS the datum (drawn in the text case below), so the full-rect
         // draw would always read "overrun".
         // Pattern elements draw their own fill inside the pattern block below, clipped with it.
-        if (e.Fill is { } fill && e.Binds is not ("enemy.advancePct" or "runes.budgetPct")
+        if (e.Fill is { } fill
+            && e.Binds is not ("enemy.advancePct" or "runes.budgetPct" or "ShieldPool.regenPct")
             && !(e.ImageBind is { Length: > 0 } && !e.ImageBind.Contains('{')))
             DrawFill(r, fill);
         if (e.Frame is { } fr && fr.Slice.Length == 4 && _assets.Texture(fr.Asset) is { } ftex)
@@ -187,13 +188,19 @@ public partial class Game1
                     }
                     break;
                 }
-                // §6b regen readout: the element's fill/border drew the track above; the live progress
-                // toward the NEXT pip fills it in the pips' live token. No text — the bar IS the datum.
-                if (e.Binds == "ShieldPool.regen")
+                if (e.Binds == "ShieldPool.regenPct")
                 {
-                    if (InRun && Exp.Player.Body.ShieldRegenProgress is > 0f and var prog)
-                        DrawFill(new Rectangle(r.X, r.Y, (int)(r.Width * prog), r.Height),
-                            new Fill { Token = "mintActive" });
+                    // 07-03 drop: the manifest authors the regen FILL as its own element (the
+                    // track's inline draw is retired) — width = live progress across the
+                    // containing track's inner width; the authored width is the design sample.
+                    if (InRun && Exp.Player.Body.ShieldRegenProgress is > 0f and var prog
+                        && e.Fill is { } rf && _curScreen is { } regScr)
+                    {
+                        var track = regScr.Elements.FirstOrDefault(s => s.Binds == "ShieldPool.regen");
+                        var full = track is not null ? _ui.Rect(regScr, track).Width - 2 : r.Width;
+                        var fw = (int)(full * prog);
+                        if (fw > 0) DrawFill(new Rectangle(r.X, r.Y, fw, r.Height), rf);
+                    }
                     break;
                 }
                 // §12 element parts: the dc.html source keeps value/label spans as separate runs
@@ -548,9 +555,11 @@ public partial class Game1
         // Combat verbs (design/01 chips; labels were flattened by extraction -> authored here).
         "combat.autoAttack" => InRun ? "AUTO-ATTACK" : null, // the ON state reads from the amber skin
         "combat.retreat" => InRun ? "RETREAT" : null,
-        // §6b shield bar header: standing points / total layers across the body's shield sources.
-        "ShieldPool" => InRun && Exp.Player.Body.ShieldLayers > 0
-            ? "SHIELD " + Exp.Player.Body.ShieldPoints + " / " + Exp.Player.Body.ShieldLayers : null,
+        // §6b shield bar: the 07-03 drop authors the count as its OWN element — the header keeps
+        // only the label, the count element carries the live n / m.
+        "ShieldPool" => InRun && Exp.Player.Body.ShieldLayers > 0 ? "SHIELD" : null,
+        "ShieldPool.count" => InRun && Exp.Player.Body.ShieldLayers > 0
+            ? Exp.Player.Body.ShieldPoints + " / " + Exp.Player.Body.ShieldLayers : null,
         // Merchant screen (design/07): header/footer readouts. The pager label waits on the wares slice.
         "merchant.label" => "MERCHANT",
         "merchant.leave" => InRun && Exp.AtMerchant ? "LEAVE" : null,
@@ -602,7 +611,8 @@ public partial class Game1
     {
         var b = e.Binds!;
         if (b.EndsWith(".scene")) return e.Image is { Length: > 0 } img && _assets.Texture(NormalizeContentPath(img)) is not null;
-        if (b == "ShieldPool.regen") return InRun && Exp.Player.Body.ShieldRegenProgress > 0f;
+        if (b is "ShieldPool.regen" or "ShieldPool.regenPct")
+            return InRun && Exp.Player.Body.ShieldRegenProgress > 0f;
         if (b == "enemy.advancePct") return InRun;
         if (b == "runes.budgetPct") return true; // build data always exists
         if (e.Type == "figure") return b is "preview.fig" or "Body" || (InRun && Exp.Enemy is not null);
@@ -1300,6 +1310,7 @@ public partial class Game1
         {
             "core.name" => c.Title,
             "core.role" => c.Archetype,
+            "core.badge" => c.Badge, // the role chip datum (07-03 drop A1)
             "core.budget" => c.RuneBudget.ToString(),
             "core.bays" => c.Bays.ToString(),
             "core.actionSlots" => c.Kit.Count.ToString(),

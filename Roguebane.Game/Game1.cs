@@ -766,7 +766,8 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                     if (full[i] != baseline[i]) { contributes = true; break; }
                 if (contributes) continue;
                 // Datum-driven fills (the bar IS the value) are legitimately empty at zero.
-                var datumFill = el.Binds is "enemy.advancePct" or "runes.budgetPct" or "ShieldPool.regen";
+                var datumFill = el.Binds is "enemy.advancePct" or "runes.budgetPct"
+                    or "ShieldPool.regen" or "ShieldPool.regenPct";
                 // content+binds = bind-gated literal (§12): a closed gate legitimately paints nothing.
                 // Bound icons gate the same way (mock-position stand-ins drawn live elsewhere).
                 var gated = !string.IsNullOrEmpty(el.Binds)

@@ -52,8 +52,13 @@ FLAGGED STOPGAP: doomFillStripes clips fill+pattern to the war-party tandem widt
 advancePct rect detection — Needs-CD: bind the stripes element so the stopgap dies; verified on the
 gate shot, citymap 86.8). ~~Races.cs canon copy~~ DONE (same pass: Elf "THE KEEN & FLEET" +
 "Keen and fleet, but frail - punishes a dropped block.", Human "...fits any core it can afford." —
-ASCII dashes, font lacks em-dash). REMAINING: `CoreRune.Badge` datum; shield count/regen manifest
-wires; verify resource-strip seating; LAYOUT_CONTRACT fold (`parts[]`, `part`,
+ASCII dashes, font lacks em-dash). ~~`CoreRune.Badge` datum~~ DONE (2026-07-03 loop:
+Badge on the record + roster values from the dc.html source — Grunt STARTER, Warden BULWARK, Adept
+CASTER, Summoner/Reaver/Ranger SPECIALIST; `core.badge` resolver case). ~~shield count/regen
+wires~~ DONE (same pass: header resolves "SHIELD" only, NEW `ShieldPool.count` carries n / m;
+`ShieldPool.regenPct` is the fill ELEMENT — width = live progress across the track's inner width,
+the track's inline progress draw retired; datum-fill suppression + BindResolves extended; encounter
+binds 20→21). REMAINING: verify resource-strip seating; LAYOUT_CONTRACT fold (`parts[]`, `part`,
 `states.<state>.label`, pattern imageBind).
 Canon core-effect copy in `CoreRunes.cs` LANDED in M1 (see below).
 **‼ GATE RED (pre-existing, DROP-caused — verified by stash/rerun at HEAD): text OVERFLOWS rose

@@ -13,6 +13,7 @@ public static class CoreRunes
         DefaultEquipment: new[] { Techniques.Jab, Techniques.Brace, Techniques.Bandage },
         Archetype: "THE GENERALIST",
         Flavor: "No edge, no hole. A fat budget of cheap runes climbs into any keystone you pay for.",
+        Badge: "STARTER",
         CoreEffectName: "Hollow Vessel",
         CoreEffectDesc: "Healed for unspent budget points after each encounter.");
 
@@ -24,6 +25,7 @@ public static class CoreRunes
         DefaultEquipment: new[] { Techniques.Ember, Techniques.Drain, Techniques.Bandage },
         Archetype: "THE SCHOLAR",
         Flavor: "Frail chest, one arm - but a deep INT head for spells and the widest action bar.",
+        Badge: "CASTER",
         CoreEffectName: "Overchannel",
         CoreEffectDesc: "Spells reserve no INT while the head stays above three-quarters.");
 
@@ -36,6 +38,7 @@ public static class CoreRunes
         DefaultEquipment: new[] { Techniques.Cleave, Techniques.Brace, Techniques.Bandage },
         Archetype: "THE WALL",
         Flavor: "Armour on every limb, no bay, fewer actions - soaks blows and holds the line.",
+        Badge: "BULWARK",
         CoreEffectName: "Unbroken Aegis",
         CoreEffectDesc: "Shield points regenerate at twice their CON-scaled rate.");
 
@@ -49,6 +52,7 @@ public static class CoreRunes
         DefaultMinions: new[] { Minions.Skeleton, Minions.Shade }, // a Binder fields summons from the off
         Archetype: "THE BINDER",
         Flavor: "Three bays - fights through a war-party of summons while staying back. INT funds them all.",
+        Badge: "SPECIALIST",
         CoreEffectName: "Legion",
         CoreEffectDesc: "Surviving minions' Summons are refunded on Redeploy.",
         CoreEffectRefundsSummons: true); // the first REAL Core Effect [LOCKED §11]; CD reconciles the card copy
@@ -62,6 +66,7 @@ public static class CoreRunes
         DefaultEquipment: new[] { Techniques.Lunge, Techniques.Jab, Techniques.Bandage },
         Archetype: "THE DUELIST",
         Flavor: "No shield, twin blades. Glass-cannon STR-DEX - ends parts before they answer.",
+        Badge: "SPECIALIST",
         CoreEffectName: "Bloodrush",
         CoreEffectDesc: "Every part you break refunds a charging technique.");
 
@@ -78,6 +83,7 @@ public static class CoreRunes
         DefaultWeapons: new[] { Armory.Bow },
         Archetype: "THE MARKSMAN",
         Flavor: "Strikes from range with a shield-piercing bow; high DEX, thin armour - answers first.",
+        Badge: "SPECIALIST",
         CoreEffectName: "Called Shot",
         CoreEffectDesc: "Ranged techniques ignore the foe's shield and cover bonuses.");
 

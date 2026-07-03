@@ -19,8 +19,9 @@ public sealed record CoreRune(
     string CoreEffectDesc = "",   // Core Effect blurb; most effects are display-only for now (§11)...
     bool CoreEffectRefundsSummons = false, // ...EXCEPT this one [LOCKED §11]: on Redeploy, surviving
                                            // minions refund their Summons (the Summoner's real effect)
-    string Accent = "")     // colorBind accent (a palette token) for core.accent/preview.accent;
+    string Accent = "",     // colorBind accent (a palette token) for core.accent/preview.accent;
                             // empty keeps the manifest's static chrome — per-core VALUES await design
+    string Badge = "")      // the role chip (STARTER/BULWARK/CASTER/SPECIALIST), design/05 v2 `core.badge`
 {
     // Display name for the cards ("grunt" -> "Grunt"); the Id stays the lowercase content key.
     public string Title => string.IsNullOrEmpty(Id) ? Id : char.ToUpperInvariant(Id[0]) + Id[1..];
