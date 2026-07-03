@@ -3227,7 +3227,7 @@
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/ui/reticle/secondary.png;ui/reticle/secondary
 
-#begin ui/reticle/target_tag
+#begin ui/reticle/focus_p0
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyEnabled=False
@@ -3236,7 +3236,29 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:../../Roguebane.Content/ui/reticle/target_tag.png;ui/reticle/target_tag
+/build:../../Roguebane.Content/ui/reticle/focus_p0.png;ui/reticle/focus_p0
+
+#begin ui/reticle/focus_p1
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/reticle/focus_p1.png;ui/reticle/focus_p1
+
+#begin ui/reticle/focus_p2
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/reticle/focus_p2.png;ui/reticle/focus_p2
 
 #begin sprites/body/elf_adept/armL_broken
 /importer:TextureImporter

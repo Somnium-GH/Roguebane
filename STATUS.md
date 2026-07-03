@@ -37,15 +37,10 @@ scripts + CD's own `DROP_AUDIT.md`; citymap homes ALL four ex-overlays (castlePa
 states, campaignStrip, packChips, equipmentBtn); equipment gains backdrop + ✕ CLOSE; **z is now ONE
 convention (paint ordinal, back→front; find the scene by its `*.scene` bind, not z==0)**; layout.json
 structurally complete (9260 lines, new binds present — full parse = first loop guard).
-**DROP GAPS (loop fixes):** (a) GAME-side `Content.mgcb` not mirrored — lacks focus_p0/p1/p2, still
-lists target_tag; (b) `target_tag.png` still exists in Roguebane.Content — CD says DELETE (both dirs +
-mgcb entries); (c) CD's "repo docs in the same PR" did NOT land — fold into `design/LAYOUT_CONTRACT.md`
-from `design/dchtml/DROP_AUDIT.md`: z=paint-ordinal (data-z deprecated), `frames` (authored animation),
-`data-bind-gate` (content+binds coexist: content is the literal, the bind GATES visibility), `data-part`,
-`item.pad`, the 1920×1080 ref-export contract; (d) **frames are v4, authored at 1:1 draw size**
-(panel 64/slice16, card 48/slice12) — the ChromeBake=2 corner-scale assumption is WRONG for them now:
-draw border-image-width == slice, 1:1; (e) `reference/screens/` never arrived (CD-side only — fine);
-(f) ~~scratch .gitignore~~ DONE (already ignored pre-drop).
+**DROP GAPS:** (a)+(b)+(c)+(f) ~~mgcb mirror / target_tag delete / LAYOUT_CONTRACT fold / gitignore~~
+ALL DONE (2026-07-03 — see P0-C.1); (d) **frames are v4, authored at 1:1 draw size** (panel 64/slice16,
+card 48/slice12) — the ChromeBake=2 corner-scale assumption is WRONG for them now: draw
+border-image-width == slice, 1:1 (OPEN — P0-C.3); (e) `reference/screens/` never arrived (CD-side only — fine).
 
 ## ⇒ NEW LOCKS (2026-07-03 pm, Doug): core-effect roster = CANON (adopted from design/05 v2 → SPEC §5:
 Called Shot renames Piercing Focus; copy may describe unbuilt mechanics until the effect-model pass —
@@ -114,11 +109,12 @@ Wire ALL of it into `tools/ui_gate.py` (stays the ONE command); run every pass p
 
 **‼ P0-C — POST-DROP ENGINE QUEUE (the 07-03 walk's CD-tagged items LANDED in the drop; what remains
 is ALL engine-side). Fix with P0-A numbers (before/after per-element scores):**
-1. **Drop wiring, mechanical:** parse-guard layout.json (contract tests green); GAME-side mgcb mirror
-   (+focus_p0/p1/p2, −target_tag) + DELETE `target_tag.png` (clean removal, both dirs); .gitignore the
-   scratch (`.shots/ .ui-gate-build/ .screens.* .winrects.* .smokeshots.bat`); fold DROP_AUDIT's schema
-   notes into LAYOUT_CONTRACT (see DROP GAPS above); add the "CD drops ship design sources
-   (design/dchtml, read-only)" line to CLAUDE.md §Working.
+1. ~~Drop wiring, mechanical~~ **✅ DONE (2026-07-03):** parse guard = drop_audit + contract tests
+   (P0-A.7); game mgcb mirrors focus_p0/p1/p2 (asset probe pins them, 14/14), target_tag entry +
+   PNG deleted (CD's mgcb was already clean; zero code refs); scratch .gitignore predated the drop;
+   DROP_AUDIT schema notes folded into LAYOUT_CONTRACT §11 (ref-export contract) + NEW §12
+   (z=paint-ordinal, frames animation, bind-gate, data-part, item.pad); CLAUDE.md line arrived
+   WITH the drop.
 2. **z paint-ordinal switch:** renderer drops the two-convention special-case — z is back→front paint
    order everywhere; find the scene layer by its `*.scene` bind. (The attrPool divider occlusion
    un-breaks with it.)

@@ -640,6 +640,8 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             ("rune/keystone", _assets.Rune("keystone")),
             ("pip/full", _assets.Pip("full")),
             ("reticle/focus", _assets.Reticle("focus")),
+            ("reticle/focus_p2", _assets.Reticle("focus_p2")), // drop-mirror guard: pulse frames built
+
             ("button/normal", _assets.Button("normal")),
             ("bg/combat_field", _assets.Background("combat_field")),
             ("chassis/grunt", _assets.CoreRuneFigure("grunt")),

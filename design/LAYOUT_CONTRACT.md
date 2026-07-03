@@ -221,3 +221,21 @@ Render/author target = **1080-class (1920×1080)**. The manifest DESIGN-SPACE st
 grid (§1/§3), rendered ×2 to 1080 (the "2× design scale" of §9) — so coordinates are unchanged. What
 1080 governs is DENSITY: author part PNGs, frame assets, and SpriteFonts at 1080-class density so they
 read crisp, NOT upscaled from 540. The shadow/frame/gradient primitives (§10) are resolution-independent.
+**Reference-export contract (2026-07-03):** every `design/NN-<screen>.png` ships at EXACTLY
+960K×540K (integer K; currently 1920×1080). `ui_gate.py` hard-fails any other size — a warped ref
+poisons every fidelity score taken against it. Asset SHEETS (`design/00-assets-*`) are exempt.
+
+## 12. Schema additions — the 2026-07-03 drop (from CD's DROP_AUDIT)
+- **z is a PAINT ORDINAL** — back→front draw order, ONE convention for every screen. `data-z` in the
+  dc.html is DEPRECATED as depth; the manifest `z` is derived paint order. Find the scene/backdrop
+  layer by its `*.scene` bind, NEVER by `z==0`.
+- **`frames` (element field)** — authored ANIMATION frames: an ordered list of Content paths
+  (e.g. `["ui/reticle/focus_p0","ui/reticle/focus_p1","ui/reticle/focus_p2"]`). The engine cycles
+  them on the FIXED TICK (deterministic — never frame time). First use: the foeReticle pulse.
+- **`data-bind-gate` / content+binds coexistence** — an element may carry BOTH `content` (the
+  literal to draw) AND `binds`. The bind GATES visibility (truthy datum → show the literal); it does
+  NOT replace the text. Kills the doomEta double-render class (mock beside live value).
+- **`data-part`** — anonymous styled sub-blocks inside a template subtree; extracted as template
+  `parts` entries (chrome-only parts are legal: fill/border with no content).
+- **`item.pad`** — list containers may emit padding inside each stamped cell:
+  `"item": { "template":..., "flow":..., "gap":N, "pad":N }`. Fixes rows that hug their panel edge.
