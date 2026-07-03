@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:#0c0810;}
+</style>
+</helmet>
+<div data-screen-label="New Game" data-screen="newgame" data-design="1920,1080" style="position:relative;width:1920px;height:1080px;overflow:hidden;font-family:'IM Fell English',Georgia,serif;color:#ece0cb;background:radial-gradient(130% 100% at 50% -10%,#2b1f14 0%,#191109 50%,#0c0810 100%);">
+
+  <!-- TOP STRIP -->
+  <div data-el="topBar" data-anchor="Top" data-z="8" data-binds="selection" data-shadow="panel" style="position:absolute;left:0;top:0;width:1920px;height:64px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:linear-gradient(#241a12,#1a130c);border-bottom:2px solid #4a3729;box-shadow:0 4px 10px rgba(10,8,7,.5);">
+    <div style="display:flex;align-items:baseline;gap:18px;">
+      <span data-el="logo" style="font-size:24px;letter-spacing:.5px;color:#e9d6b0;">Roguebane</span>
+      <span data-el="topBarSubtitle" data-anchor="Top" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:3px;color:#9a8468;">Choose your Loadout</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;color:#b09a82;">
+      
+      
+      
+    </div>
+  </div>
+
+  <!-- LEFT: RACE -->
+  <div data-el="racePanel" data-anchor="Left" data-z="4" data-binds="races" style="position:absolute;left:0;top:64px;width:460px;height:928px;border-right:2px solid #382a1d;padding:18px 20px 0;display:flex;flex-direction:column;">
+    <div data-el="raceHeader" data-anchor="Left" style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;">
+      <span style="font-family: &quot;JetBrains Mono&quot;, monospace; font-size: 14px; font-weight: 700; color: rgb(217, 164, 65);">①</span>
+      <span style="font-size: 24px; letter-spacing: 1px; color: rgb(240, 220, 180);">Race<br></span>
+    </div>
+    <div data-el="raceCards" data-anchor="Left" data-z="4" data-container="1" data-template="raceCard" data-flow="vertical" data-binds="races" style="display:flex;flex-direction:column;gap:14px;">
+      <sc-for list="{{ races }}" as="r" hint-placeholder-count="2">
+        <div data-tpl="raceCard" data-states="pickerCard" onClick="{{ r.pick }}" style="height:158px;flex:none;border:2px solid {{ r.border }};background:{{ r.bg }};display:flex;cursor:pointer;overflow:hidden;">
+          <!-- head (bare, no helmet) — engine blits the race's own head part (payload v5 §E) -->
+          <div style="position:relative;width:106px;flex:none;background:linear-gradient(#211a2c,#151020);border-right:2px solid #2e2218;display:flex;align-items:center;justify-content:center;overflow:hidden;" data-binds="race.headImage" data-image-bind="sprites/body/{race.id}_grunt/head_healthy">
+            <div style="position:absolute;inset:0;background-image:repeating-conic-gradient(#2a2340 0% 25%,#211a33 0% 50%);background-size:7px 7px;opacity:.26;"></div>
+            {{ r.headImg }}
+          </div>
+          <!-- info -->
+          <div style="flex:1;padding:11px 14px;display:flex;flex-direction:column;">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;">
+              <span data-binds="race.name" style="font-size:27px;letter-spacing:1px;color:#f0dcb4;line-height:1;">{{ r.name }}</span>
+              <span data-binds="race.selection" data-states="{&quot;chosen&quot;:{&quot;fill&quot;:&quot;amber&quot;,&quot;color&quot;:&quot;ground&quot;,&quot;border&quot;:&quot;amber&quot;},&quot;idle&quot;:{&quot;color&quot;:&quot;mutedDim&quot;,&quot;border&quot;:&quot;borderDim&quot;}}" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:{{ r.selColor }};background:{{ r.selBg }};border:1.5px solid {{ r.selBorder }};padding:3px 7px;">{{ r.selLabel }}</span>
+            </div>
+            <div data-binds="race.tag" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:#9a8468;margin-top:4px;">{{ r.tag }}</div>
+            <!-- attr + hp mini-tiles -->
+            <div style="display:flex;gap:6px;margin-top:8px;">
+              <sc-for list="{{ r.attrs }}" as="a" hint-placeholder-count="4">
+                <div data-part="" style="flex:1;border:1px solid #3a2c1d;background:#120c07;padding:4px 2px;text-align:center;">
+                  <div style="width:9px;height:9px;margin:0 auto;border:1.5px solid #0a0807;background:{{ a.color }};"></div>
+                  <div data-binds="race.attrs.value" style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#ece0cb;line-height:1;margin-top:3px;">{{ a.val }}</div>
+                  <div data-binds="race.attrs.key" style="font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:700;color:#8d775c;margin-top:2px;">{{ a.key }}</div>
+                </div>
+              </sc-for>
+              <div data-part="" style="flex:1;border:1px solid #4a3729;background:#1d150e;padding:4px 2px;text-align:center;">
+                <div data-binds="race.hp" style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#cf9a44;line-height:1;margin-top:10px;">{{ r.hp }}</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:700;color:#8d775c;margin-top:2px;">HP</div>
+              </div>
+            </div>
+            <div data-binds="race.blurb" style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#b09a82;line-height:1.45;margin-top:7px;flex:1;overflow:hidden;">{{ r.blurb }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- CENTER: CORE RUNE GRID -->
+  <div data-el="corePanel" data-anchor="Center" data-z="4" style="position:absolute;left:460px;top:64px;width:1000px;height:928px;padding:18px 24px 0;display:flex;flex-direction:column;">
+    <div data-el="coreHeader" data-anchor="Center" style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#d9a441;">②</span>
+      <span style="font-size:24px;letter-spacing:1px;color:#f0dcb4;">Core Rune</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:#8d775c;"><br></span>
+    </div>
+    <div data-el="coreCards" data-anchor="Center" data-z="4" data-container="1" data-template="coreCard" data-flow="grid" data-cols="3" data-binds="cores" style="display:flex;flex-wrap:wrap;justify-content:center;align-content:flex-start;gap:20px;">
+      <sc-for list="{{ cores }}" as="c" hint-placeholder-count="6">
+        <div data-tpl="coreCard" data-states="pickerCard" onClick="{{ c.pick }}" style="width:304px;height:406px;border:2px solid {{ c.border }};background:{{ c.bg }};display:flex;flex-direction:column;cursor:{{ c.cursor }};position:relative;overflow:hidden;">
+          <!-- rune icon (decagon + glyph) -->
+          <div style="position:relative;height:150px;background:linear-gradient(#1c1712,#141019);border-bottom:2px solid #2e2218;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+            <div style="position:absolute;inset:0;background-image:repeating-conic-gradient(#241d16 0% 25%,#1b160f 0% 50%);background-size:7px 7px;opacity:.5;"></div>
+            <div data-binds="core.icon" data-atom="{{ c.atom }}" data-shadow="soft" style="position:relative;filter:drop-shadow(0 4px 6px #0009);">{{ c.icon }}</div>
+            <span data-binds="core.badge" data-color-bind="core.accent" style="position:absolute;right:8px;top:8px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:{{ c.badgeColor }};border:1px solid {{ c.badgeColor }};padding:3px 6px;background:#160f09cc;">{{ c.badge }}</span>
+          </div>
+          <!-- body -->
+          <div style="padding:12px 14px;display:flex;flex-direction:column;flex:1;">
+            <div data-binds="core.name" style="font-size:25px;letter-spacing:.5px;color:{{ c.nameColor }};line-height:1;">{{ c.name }}</div>
+            <div data-binds="core.role" style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:2px;color:#9a8468;margin-top:4px;">{{ c.role }}</div>
+            <!-- layout tiles -->
+            <div style="display:flex;gap:7px;margin-top:11px;">
+              <div data-part="" style="flex:1;border:1px solid #3a2c1d;background:#120c07;padding:6px 4px;text-align:center;">
+                <div data-binds="core.budget" style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#d9a441;line-height:1;">{{ c.budget }}</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;color:#8d775c;margin-top:3px;">BUDGET</div>
+              </div>
+              <div data-part="" style="flex:1;border:1px solid #3a2c1d;background:#120c07;padding:6px 4px;text-align:center;">
+                <div data-binds="core.actionSlots" style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#e9d6b0;line-height:1;">{{ c.techniques }}</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;color:#8d775c;margin-top:3px;">ACTIONS</div>
+              </div>
+              <div data-part="" style="flex:1;border:1px solid #3a2c1d;background:#120c07;padding:6px 4px;text-align:center;">
+                <div data-binds="core.bays" style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#e9d6b0;line-height:1;">{{ c.bays }}</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;color:#8d775c;margin-top:3px;">BAYS</div>
+              </div>
+            </div>
+            <!-- Core Effect (renamed from "apex" — DESIGN_SPEC §17.14) -->
+            <div data-binds="core.coreEffect" data-color-bind="core.accent" style="margin-top:10px;border-left:2px solid {{ c.accent }};padding:2px 0 2px 9px;">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:#8d775c;">CORE EFFECT</div>
+              <div data-binds="core.coreEffectName" style="font-size:15px;color:{{ c.nameColor }};line-height:1.1;margin-top:2px;">{{ c.coreEffect }}</div>
+              <div data-binds="core.coreEffectDesc" style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#9a8468;line-height:1.5;margin-top:3px;">{{ c.coreEffectDesc }}</div>
+            </div>
+            <div style="flex:1;"></div>
+            <!-- select -->
+            <div data-binds="core.selection" data-states="{&quot;selected&quot;:{&quot;fill&quot;:&quot;good&quot;,&quot;color&quot;:&quot;ground&quot;,&quot;border&quot;:&quot;good&quot;},&quot;idle&quot;:{&quot;color&quot;:&quot;mutedDim&quot;,&quot;border&quot;:&quot;borderDim&quot;},&quot;locked&quot;:{&quot;color&quot;:&quot;lockText&quot;,&quot;border&quot;:&quot;lockRed&quot;,&quot;borderStyle&quot;:&quot;dashed&quot;,&quot;opacity&quot;:0.6}}" style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:7px;color:{{ c.selColor }};background:{{ c.selBg }};border:2px {{ c.selStyle }} {{ c.selBorder }};">{{ c.selLabel }}</div>
+          </div>
+          <!-- locked overlay -->
+          <sc-if value="{{ c.locked }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;left:0;right:0;top:150px;bottom:0;background:#0c0810b0;display:flex;align-items:flex-start;justify-content:center;pointer-events:none;">
+              <div style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1px;color:#d0744a;border:1px solid #4a2c22;background:#160f09;padding:5px 9px;text-align:center;">▲ {{ c.lockNote }}</div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- RIGHT: PREVIEW -->
+  <div data-el="preview" data-anchor="Right" data-z="5" data-binds="preview" style="position:absolute;left:1460px;top:64px;width:460px;height:928px;border-left:2px solid #382a1d;background:linear-gradient(200deg,rgba(60,44,30,.28),rgba(20,14,9,.12));padding:18px 22px 0;display:flex;flex-direction:column;">
+    <div data-el="loadoutHeader" data-anchor="Right" style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px;">
+      <span style="font-size:24px;letter-spacing:1px;color:#f0dcb4;">Loadout</span>
+      
+    </div>
+    <!-- figure stage -->
+    <div style="position:relative;height:320px;border:2px solid #382a1d;background:linear-gradient(#211a2c,#141020);overflow:hidden;">
+      <div style="position:absolute;inset:0;background-image:repeating-conic-gradient(#2a2340 0% 25%,#211a33 0% 50%);background-size:8px 8px;opacity:.26;"></div>
+      <div style="position:absolute;left:0;right:0;bottom:34px;height:16px;background:radial-gradient(50% 60% at 50% 50%,#0a0710cc,transparent 70%);"></div>
+      <div data-el="previewFigure" data-type="figure" data-binds="preview.fig" style="position:absolute;left:0;right:0;bottom:30px;display:flex;justify-content:center;align-items:flex-end;">
+        <dc-import name="Figure" figure="{{ preview.fig }}" scale="0.66" gear="true" hint-size="240px,270px"></dc-import>
+      </div>
+      <span data-el="previewName" data-binds="preview.name" data-shadow="title" style="position:absolute;left:12px;top:12px;font-size:26px;color:#f0dcb4;text-shadow:0 2px 6px #000;">{{ preview.name }}</span>
+      <span data-el="previewRole" data-binds="preview.role" data-shadow="title" style="position:absolute;left:12px;top:44px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:#cdb497;text-shadow:0 1px 4px #000;">{{ preview.role }}</span>
+    </div>
+    <!-- attrs + hp -->
+    <div data-el="previewAttrRow" data-anchor="Right" data-container="1" data-template="previewAttrTile" data-flow="horizontal" data-binds="preview.attrs" style="display:flex;gap:8px;margin-top:14px;">
+      <sc-for list="{{ preview.attrs }}" as="a" hint-placeholder-count="4">
+        <div data-tpl="previewAttrTile" style="flex:1;border:1px solid #3a2c1d;background:#160f09;padding:8px 2px;text-align:center;">
+          <div data-binds="attr.color" data-color-bind="attr.color" style="width:11px;height:11px;margin:0 auto;border:2px solid #0a0807;background:{{ a.color }};"></div>
+          <div data-binds="attr.value" style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#ece0cb;line-height:1;margin-top:6px;">{{ a.val }}</div>
+          <div data-binds="attr.key" style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#8d775c;margin-top:4px;">{{ a.key }}</div>
+        </div>
+      </sc-for>
+      <div data-el="previewHpTile" data-anchor="Right" data-binds="preview.hp" style="flex:1.1;border:1px solid #4a3729;background:#1d150e;padding:8px 2px;text-align:center;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#cf9a44;line-height:1;margin-top:15px;">{{ preview.hp }}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#8d775c;margin-top:4px;">BASE HP</div>
+      </div>
+    </div>
+    <!-- layout row -->
+    <div data-el="previewLayoutRow" data-anchor="Right" style="display:flex;gap:8px;margin-top:10px;">
+      <div data-el="previewBudgetTile" data-anchor="Right" data-binds="preview.budget" style="flex:1;border:1px solid #3a2c1d;background:#160f09;padding:9px 4px;text-align:center;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#d9a441;line-height:1;">{{ preview.budget }}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:1px;color:#8d775c;margin-top:4px;">RUNE BUDGET</div>
+      </div>
+      <div data-el="previewActionsTile" data-anchor="Right" data-binds="preview.techniques" style="flex:1;border:1px solid #3a2c1d;background:#160f09;padding:9px 4px;text-align:center;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#e9d6b0;line-height:1;">{{ preview.techniques }}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:1px;color:#8d775c;margin-top:4px;">ACTIONS</div>
+      </div>
+      <div data-el="previewBaysTile" data-anchor="Right" data-binds="preview.bays" style="flex:1;border:1px solid #3a2c1d;background:#160f09;padding:9px 4px;text-align:center;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#e9d6b0;line-height:1;">{{ preview.bays }}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:1px;color:#8d775c;margin-top:4px;">MINION BAYS</div>
+      </div>
+    </div>
+    <!-- Core Effect (uniform border-left treatment, scaled up; renamed from "apex") -->
+    <div data-el="previewCoreEffect" data-anchor="Right" data-binds="preview.coreEffect" data-color-bind="preview.accent" style="margin-top:16px;border-left:4px solid {{ preview.accent }};padding:3px 0 3px 15px;">
+      <div data-el="previewCoreEffectLabel" data-anchor="Right" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:#8d775c;">CORE EFFECT</div>
+      <div data-el="previewCoreEffectName" data-anchor="Right" data-binds="preview.coreEffectName" style="font-size:26px;color:#f0dcb4;line-height:1.1;margin-top:4px;">{{ preview.coreEffect }}</div>
+      <div data-el="previewCoreEffectDesc" data-anchor="Right" data-binds="preview.coreEffectDesc" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#b09a82;line-height:1.6;margin-top:7px;">{{ preview.coreEffectDesc }}</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div data-el="confirmBar" data-anchor="Bottom" data-z="9" data-binds="selection" data-shadow="panel" style="position:absolute;left:0;bottom:0;width:1920px;height:88px;box-sizing:border-box;background:linear-gradient(#201710,#15100b);display:flex;align-items:center;justify-content:space-between;padding:0 40px;border-top:3px solid #4a3729;box-shadow:0 -6px 16px rgba(10,8,7,.55);">
+    <div style="display:flex;flex-direction:column;gap:3px;">
+      
+      
+    </div>
+    <div data-el="beginBtn" data-type="button" data-binds="begin" data-bind-gate="" data-states="{&quot;idle&quot;:{&quot;fill&quot;:&quot;good&quot;,&quot;color&quot;:&quot;ground&quot;,&quot;border&quot;:&quot;ground&quot;},&quot;disabled&quot;:{&quot;fill&quot;:&quot;slot&quot;,&quot;color&quot;:&quot;muted&quot;,&quot;opacity&quot;:0.7}}" onClick="{{ begin }}" style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;letter-spacing:2px;color:#160f09;background:#7fa05a;border:2px solid #160f09;padding:13px 30px;cursor:pointer;">BEGIN THE RUN ▶</div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1080}}">
+class Component extends DCLogic {
+  /* NEW GAME — two-axis vessel select (DESIGN_SPEC §7): pick RACE (starting attrs + base HP)
+   * then a race-allowed CORE RUNE (layout: budget / actions / bays / Core Effect). The core grid
+   * greys cores the race can't bear (the SB-style restriction matrix). Numbers, base attrs
+   * and Core Effects are PLACEHOLDER per DESIGN_SPEC §17.4/§17.10 — tuned later. Only the
+   * Summoner's Core Effect is REAL + LOCKED (§11, 2026-07-02). */
+  state = { race: 'human', coreId: 'grunt' };
+
+  renderVals() {
+    const ATTR = { STR: '#c2553f', INT: '#6f8fc4', DEX: '#82a85e', CON: '#cf9a44' };
+    const KEYS = ['STR', 'INT', 'DEX', 'CON'];
+
+    // RACE base (placeholder stat bases, §17.4)
+    const RACES = [
+      { id: 'human', name: 'Human', tag: 'THE FOUNDER LINE', hp: 20,
+        attrs: { STR: 3, INT: 3, DEX: 3, CON: 3 }, disallow: [],
+        blurb: 'No innate edge or lack — fits any core it can afford.' },
+      { id: 'elf', name: 'Elf', tag: 'THE KEEN & FLEET', hp: 14,
+        attrs: { STR: 2, INT: 4, DEX: 4, CON: 2 }, disallow: ['warden'],
+        blurb: 'Keen and fleet, but frail — punishes a dropped block.' },
+    ];
+
+    // CORE RUNE layout (placeholder budgets + Core Effects, §17.10; Hollow Vessel is canonical §11,
+    // and the SUMMONER's Core Effect is the one REAL effect — §11 LOCKED 2026-07-02)
+    const CORES = [
+      { id: 'grunt', name: 'Grunt', role: 'THE GENERALIST', badge: 'STARTER', accent: '#7fa05a',
+        budget: 20, techniques: 4, bays: 1, coreEffect: 'Hollow Vessel',
+        coreEffectDesc: 'You are healed for your unspent budget points after each encounter.',
+        blurb: 'No edge, no hole — the chassis that proves the thesis.' },
+      { id: 'warden', name: 'Warden', role: 'THE WALL', badge: 'BULWARK', accent: '#cf9a44',
+        budget: 18, techniques: 3, bays: 0, coreEffect: 'Unbroken Aegis',
+        coreEffectDesc: 'Shield points regenerate at twice their CON-scaled rate.',
+        blurb: 'Armor on every limb, fewer actions — soaks blows and holds the line.' },
+      { id: 'adept', name: 'Adept', role: 'THE SCHOLAR', badge: 'CASTER', accent: '#6f8fc4',
+        budget: 16, techniques: 5, bays: 1, coreEffect: 'Overchannel',
+        coreEffectDesc: 'Spells reserve no INT while the head stays above three-quarters.',
+        blurb: 'Frail chest, one arm — the widest action bar and a third-eye for casting.' },
+      { id: 'summoner', name: 'Summoner', role: 'THE BINDER', badge: 'SPECIALIST', accent: '#9a78b0',
+        budget: 17, techniques: 4, bays: 3, coreEffect: 'Legion',
+        coreEffectDesc: 'Surviving minions’ Summons are refunded on Redeploy.',
+        blurb: 'Three bays — fights through a war-party of summons while holding the rear.' },
+      { id: 'reaver', name: 'Reaver', role: 'THE DUELIST', badge: 'SPECIALIST', accent: '#c2553f',
+        budget: 19, techniques: 5, bays: 0, coreEffect: 'Bloodrush',
+        coreEffectDesc: 'Every part you break refunds a charging technique.',
+        blurb: 'Twin blades, no shield — ends parts before they answer.' },
+      { id: 'ranger', name: 'Ranger', role: 'THE MARKSMAN', badge: 'SPECIALIST', accent: '#82a85e',
+        budget: 18, techniques: 5, bays: 0, coreEffect: 'Called Shot',
+        coreEffectDesc: "Ranged techniques ignore the foe's shield and cover bonuses.",
+        blurb: 'A steady draw at range — trades melee bite for guaranteed hits.' },
+    ];
+
+    // Core-rune glyphs — a carved symbol per rune identity.
+    const GLYPH = { grunt: '✚', warden: '◈', adept: '✦', summoner: '❖', reaver: '⚔', ranger: '↗' };
+    // Decagon rune token: 10-gon rotated π/10 so its parallel sides sit LEFT & RIGHT (points top &
+    // bottom), filled with the core accent + a carved glyph. The rune-tier shape idiom (cf. Build.dc).
+    const NG = (n, cx, cy, r, rot) => { let s = ''; for (let i = 0; i < n; i++) { const a = rot + i * 2 * Math.PI / n; s += (cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1) + ' '; } return s.trim(); };
+    const runeIcon = (fill, glyph, size, glyphColor) => React.createElement('svg',
+      { width: size, height: size, viewBox: '0 0 100 100', style: { display: 'block', overflow: 'visible' } },
+      React.createElement('polygon', { points: NG(10, 50, 50, 46, Math.PI / 10), fill: fill, stroke: '#0a0807', strokeWidth: 5, strokeLinejoin: 'round' }),
+      React.createElement('text', { x: 50, y: 53, textAnchor: 'middle', dominantBaseline: 'central', fontFamily: "'IM Fell English',Georgia,serif", fontSize: 44, fontWeight: 700, fill: glyphColor }, glyph)
+    );
+
+    const firstAllowed = (raceObj) => CORES.find(c => !raceObj.disallow.includes(c.id)).id;
+    const selRace = RACES.find(r => r.id === this.state.race) || RACES[0];
+    let coreId = this.state.coreId;
+    if (selRace.disallow.includes(coreId)) coreId = firstAllowed(selRace);
+    const selCore = CORES.find(c => c.id === coreId) || CORES[0];
+
+    const attrRow = (attrs) => KEYS.map(k => ({ key: k, color: ATTR[k], val: '' + attrs[k] }));
+
+    const races = RACES.map(r => {
+      const on = this.state.race === r.id;
+      const repCore = r.disallow.includes(coreId) ? firstAllowed(r) : coreId;
+      return {
+        name: r.name, tag: r.tag, hp: '' + r.hp, blurb: r.blurb,
+        headImg: React.createElement('img', { src: 'Content/sprites/body/' + r.id + '_grunt/head_healthy.png',
+          'data-shadow': 'soft',
+          style: { height: '70px', width: 'auto', imageRendering: 'pixelated', position: 'relative', filter: 'drop-shadow(0 3px 4px #0009)' } }),
+        fig: r.id + '_' + repCore,
+        attrs: attrRow(r.attrs),
+        pick: () => {
+          const nc = r.disallow.includes(this.state.coreId) ? firstAllowed(r) : this.state.coreId;
+          this.setState({ race: r.id, coreId: nc });
+        },
+        border: on ? '#d9a441' : '#3a2c1d',
+        bg: on ? '#241a10' : '#161009',
+        hpColor: '#cf9a44',
+        selLabel: on ? '✓ CHOSEN' : 'CHOOSE',
+        selColor: on ? '#160f09' : '#8d775c',
+        selBg: on ? '#d9a441' : 'transparent',
+        selBorder: on ? '#d9a441' : '#3a2c1d',
+      };
+    });
+
+    const cores = CORES.map(c => {
+      const allowed = !selRace.disallow.includes(c.id);
+      const on = allowed && c.id === coreId;
+      return {
+        name: c.name, role: c.role, badge: c.badge, blurb: c.blurb,
+        coreEffect: c.coreEffect, coreEffectDesc: c.coreEffectDesc, accent: c.accent,
+        budget: '' + c.budget, techniques: '' + c.techniques, bays: '' + c.bays,
+        icon: runeIcon(allowed ? c.accent : '#2e2820', GLYPH[c.id], 104, allowed ? '#160f09' : '#4a4034'),
+        atom: 'icons/rune/core_' + c.id,
+        locked: !allowed,
+        lockNote: allowed ? '' : this.state.race.toUpperCase() + ' CANNOT BEAR THIS CORE',
+        pick: allowed ? () => this.setState({ coreId: c.id }) : () => {},
+        cursor: allowed ? 'pointer' : 'not-allowed',
+        border: on ? c.accent : (allowed ? '#3a2c1d' : '#241a12'),
+        bg: on ? '#1f2417' : (allowed ? '#161009' : '#120c07'),
+        badgeColor: allowed ? c.accent : '#5a4636',
+        nameColor: allowed ? '#f0dcb4' : '#6a5a48',
+        selLabel: on ? '✓ CORE SET' : (allowed ? 'SELECT' : 'LOCKED'),
+        selColor: on ? '#160f09' : (allowed ? '#8d775c' : '#8a5a4a'),
+        selBg: on ? '#7fa05a' : 'transparent',
+        selStyle: on ? 'solid' : 'dashed',
+        selBorder: on ? '#7fa05a' : (allowed ? '#3a2c1d' : '#4a2c22'),
+      };
+    });
+
+    const preview = {
+      fig: this.state.race + '_' + coreId,
+      name: selRace.name + ' ' + selCore.name,
+      role: selCore.role,
+      attrs: attrRow(selRace.attrs),
+      hp: '' + selRace.hp,
+      budget: '' + selCore.budget, techniques: '' + selCore.techniques, bays: '' + selCore.bays,
+      coreEffect: selCore.coreEffect, coreEffectDesc: selCore.coreEffectDesc, accent: selCore.accent,
+    };
+
+    return { races, cores, preview, begin: () => {}, selName: selRace.name, selRole: selCore.name };
+  }
+}
+
+</script>
+</body>
+</html>

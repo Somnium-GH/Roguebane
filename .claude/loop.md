@@ -19,6 +19,10 @@ Per run:
    - Core logic → headless tests. NEVER commit red.
    - UI/screen → build+run, save an RB_SMOKE shot AND confirm `crash.log` is clean; READ the shot + the
      matching `design/NN-*.png` + the `design/SCREENS.md` checklist; fix until it MATCHES — actually look.
+     Run `python tools/ui_gate.py` GREEN before commit. A claim of visual improvement/regression must
+     cite the gate's NUMBERS (per-element scores / border+text probes / collision count) — never only
+     eyeballing. Never render text/chrome as an EMPTY box: unresolved content suppresses (or ships a
+     FLAGGED shell label for a primary CTA).
      Smoke renders ONE state, so also drive empty/edge states (that's how the em-dash crash slipped past).
      Required ART missing/wrong (designer gap, not your code) and not composable from primitives →
      log under "Asset gaps (Needs Claude Design)" in STATUS, mark BLOCKED, move on.

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:#0c0810;}
+  @keyframes rb-ret{0%,100%{opacity:.6;filter:drop-shadow(0 0 4px #c2553f88)}50%{opacity:1;filter:drop-shadow(0 0 10px #c2553fcc)}}
+  @keyframes rb-retpulse{0%,32%{background-image:url('Content/ui/reticle/focus_p0.png')}33%,65%{background-image:url('Content/ui/reticle/focus_p1.png')}66%,99%{background-image:url('Content/ui/reticle/focus_p2.png')}100%{background-image:url('Content/ui/reticle/focus_p0.png')}}
+</style>
+</helmet>
+<div data-screen-label="Reticle Mounts (reference)" style="position:relative;width:1920px;height:1080px;overflow:hidden;font-family:'IM Fell English',Georgia,serif;color:#ece0cb;background:#0c0810;">
+  <div style="position:absolute;inset:0;background:url('Content/bg/combat_field.png') center top/cover no-repeat;image-rendering:pixelated;opacity:.5;"></div>
+
+  <!-- header -->
+  <div style="position:absolute;left:0;top:0;width:1920px;height:64px;display:flex;align-items:center;gap:20px;padding:0 28px;background:linear-gradient(#241a12,#1b130d);border-bottom:2px solid #4a3729;z-index:5;">
+    <span style="font-size:24px;letter-spacing:.5px;color:#e9d6b0;">Roguebane</span>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2px;color:#9a8468;">REFERENCE · TARGETING RETICLES — HOW THEY MOUNT ON A FOE'S PARTS</span>
+    <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:#b09a82;">design doc — not a game screen · not in layout.json</span>
+  </div>
+
+  <!-- ===== STAGE: the foe with limb bands + mounted reticles ===== -->
+  <div style="position:absolute;left:40px;top:64px;width:1080px;height:1016px;">
+    <!-- the one foe -->
+    <div style="position:absolute;left:330px;top:190px;width:460px;height:600px;">
+      <div style="position:absolute;left:90px;top:552px;width:280px;height:30px;background:radial-gradient(50% 50% at 50% 50%,#0a0710cc,transparent 70%);"></div>
+      <dc-import name="Figure" figure="ogre" scale="1.1" hint-size="405px,492px" style="position:absolute;left:28px;top:60px;"></dc-import>
+    </div>
+
+    <!-- (limb-band outline boxes REMOVED 2026-07-03 review — they read as hitboxes and confused the
+         doc; the game draws NO boxes, ever. The reticle simply centers on the aimed PART's rect.) -->
+
+    <!-- MOUNTED RETICLES -->
+    <!-- 1. FOCUS on the head part — PULSES by cycling authored frames focus_p0→p1→p2 on the fixed tick -->
+    <div style="position:absolute;left:487px;top:262px;width:136px;height:136px;background:url('Content/ui/reticle/focus_p0.png') center/100% 100% no-repeat;image-rendering:pixelated;animation:rb-retpulse 1.2s infinite;filter:drop-shadow(0 0 7px #c2553f99);"></div>
+    <!-- the AIM TAG stack: hotkey NUMBERS of every active aiming this part (not names — they collide) -->
+    <div style="position:absolute;left:497px;top:232px;display:flex;gap:4px;">
+      <span style="min-width:22px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;text-align:center;color:#0a0807;background:#e0654b;padding:2px 6px;border:1px solid #0a0807;box-shadow:0 0 10px #c2553f99;">3</span>
+      <span style="min-width:22px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;text-align:center;color:#0a0807;background:#e0654b;padding:2px 6px;border:1px solid #0a0807;box-shadow:0 0 10px #c2553f99;">5</span>
+    </div>
+    <!-- 2. AIMING (red, dashed) — this IS the mouse cursor while a technique actively targets:
+         click the technique tile → the pointer becomes this reticle until you click a body part
+         (lock) or right-click (cancel). Shown here hovering the left arm. -->
+    <div style="position:absolute;left:368px;top:448px;width:110px;height:110px;background:url('Content/ui/reticle/aiming.png') center/100% 100% no-repeat;image-rendering:pixelated;"></div>
+    <span style="position:absolute;left:372px;top:560px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;color:#e0654b;">= THE CURSOR (while a technique targets)</span>
+    <!-- 3. SECONDARY pending mark on the leg -->
+    <div style="position:absolute;left:520px;top:622px;width:96px;height:96px;background:url('Content/ui/reticle/secondary.png') center/100% 100% no-repeat;image-rendering:pixelated;opacity:.85;"></div>
+    <!-- (target_tag dropped-pin RETIRED 2026-07-03 review — unnecessary) -->
+
+    <!-- PULSE FRAME STRIP: the three authored frames the engine cycles (p0 = focus.png = frozen/canonical) -->
+    <div style="position:absolute;left:40px;top:790px;width:520px;background:#16100bcc;border:2px solid #382a1d;padding:12px 16px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;color:#cdb497;">FOCUS PULSE FRAMES · fixed-tick cycle p0 → p1 → p2 →</div>
+      <div style="display:flex;gap:26px;margin-top:10px;align-items:center;">
+        <div style="text-align:center;"><div style="width:96px;height:96px;background:url('Content/ui/reticle/focus_p0.png') center/100% 100% no-repeat;image-rendering:pixelated;"></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#9a8468;margin-top:4px;">focus_p0 · canonical</div></div>
+        <div style="text-align:center;"><div style="width:96px;height:96px;background:url('Content/ui/reticle/focus_p1.png') center/100% 100% no-repeat;image-rendering:pixelated;"></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#9a8468;margin-top:4px;">focus_p1</div></div>
+        <div style="text-align:center;"><div style="width:96px;height:96px;background:url('Content/ui/reticle/focus_p2.png') center/100% 100% no-repeat;image-rendering:pixelated;"></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#9a8468;margin-top:4px;">focus_p2</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RULES PANEL ===== -->
+  <div style="position:absolute;right:36px;top:100px;width:700px;box-sizing:border-box;background:#1d150e;border:16px solid transparent;padding:14px 18px;border-image-source:url('Content/ui/frame/panel.png');border-image-slice:16 fill;border-image-width:16px;border-image-repeat:round;box-shadow:0 4px 12px rgba(10,8,7,.55);">
+    <div style="font-size:26px;letter-spacing:1px;color:#f0dcb4;">Mount rules</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#b09a82;line-height:1.75;margin-top:10px;">
+      <b style="color:#e9d6b0;">1 · Reticles mount on the PART, never the figure.</b><br>
+      Center the reticle on the aimed PART's rect — <span style="color:#cdb497;">figures.&lt;id&gt;.parts.&lt;part&gt;.rect</span> in layout.json, scaled by the figure's slot scale. The figure's bbox center is never a target. No boxes, highlights, or hitbox outlines are ever drawn.<br><br>
+      <b style="color:#e9d6b0;">2 · Size follows the part, clamped.</b><br>
+      reticle box = part rect's larger side × ~1.5, clamped to 64–136 screen px, so a head lock and a leg lock read the same weight.<br><br>
+      <b style="color:#e9d6b0;">3 · One look per FSM state (§8).</b><br>
+      <span style="color:#e0654b;">FOCUS</span> (red brackets, PULSING — the engine cycles authored frames focus_p0→p1→p2 on the fixed tick) = locked target · <span style="color:#e0654b;">AIMING</span> (red, dashed) = THE CURSOR while a technique actively targets: clicking the technique tile replaces the pointer with this reticle until you click a body part (lock) or right-click (cancel) · <span style="color:#9a8468;">SECONDARY</span> (faint) = another module's kept target (AUTO on).<br><br>
+      <b style="color:#e9d6b0;">4 · The aim tag reads the HOTKEY NUMBER; the card carries the same number.</b><br>
+      The tag stack above the reticle reads each aiming technique's hotkey number — several actives on a shared part stack their numbers. Every action-bar card shows its hotkey chip (1–N); that number is the whole wire, no part-name tag on the card.
+    </div>
+  </div>
+
+  <!-- the card ↔ reticle wire: a mini tech card with its AIM TAG, wired to the head reticle -->
+  <div style="position:absolute;right:36px;bottom:60px;width:700px;display:flex;align-items:center;gap:18px;">
+    <div style="width:230px;border:2px solid #c2553f;background:#20140f;padding:9px 10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <span style="display:flex;align-items:center;gap:6px;">
+          <span style="width:30px;height:30px;border:2px solid #0a0807;background:#6f8fc4;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:15px;color:#0a0807;font-weight:700;">✦</span>
+          <span style="min-width:20px;height:20px;padding:0 5px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#e9d6b0;background:#241a12;border:1px solid #6e5026;">3</span>
+        </span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;padding:2px 5px;color:#e0654b;border:1px solid #e0654b;">TARGETING</span>
+      </div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:7px;">
+        <span style="font-size:17px;color:#ece0cb;">Firebolt</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#6f8fc4;">INT 2</span>
+      </div>
+    </div>
+    <div style="flex:1;font-family:'JetBrains Mono',monospace;font-size:11px;color:#9a8468;line-height:1.7;">← card 3 (Firebolt): its <b style="color:#e9d6b0;">HOTKEY CHIP</b> is the "3" the foe-side aim-tag stack reads — the number is the whole wire between card and reticle.</div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

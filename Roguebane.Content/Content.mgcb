@@ -4841,6 +4841,39 @@
 /processorParam:TextureFormat=Color
 /build:ui/reticle/focus.png
 
+#begin ui/reticle/focus_p0.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ui/reticle/focus_p0.png
+
+#begin ui/reticle/focus_p1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ui/reticle/focus_p1.png
+
+#begin ui/reticle/focus_p2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ui/reticle/focus_p2.png
+
 #begin ui/reticle/secondary.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -4851,17 +4884,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:ui/reticle/secondary.png
-
-#begin ui/reticle/target_tag.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:ui/reticle/target_tag.png
 
 #begin layout.json
 /copy:layout.json

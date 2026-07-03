@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:#100b07;}
+  @keyframes rb-torch{0%,100%{opacity:.5}50%{opacity:.72}}
+</style>
+</helmet>
+<div data-screen-label="Merchant" data-screen="merchant" data-design="1920,1080" style="position:relative;width:1920px;height:1080px;overflow:hidden;font-family:'IM Fell English',Georgia,serif;color:#ece0cb;background:#0c0810;">
+
+  <!-- EGA FANTASY BACKDROP (baked: Content/bg/merchant_stall.png, §10 rule A) -->
+  <div data-el="backdrop" data-anchor="Center" data-z="0" data-binds="merchant.scene" style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:url('Content/bg/merchant_stall.png') center top/cover no-repeat;image-rendering:pixelated;"></div>
+  <!-- lantern glow — animated runtime overlay on top of the baked backdrop -->
+  <div style="position:absolute;left:0;top:56px;width:820px;height:600px;background:radial-gradient(60% 60% at 26% 30%,#e0a34a44,transparent 70%);animation:rb-torch 3.4s infinite;pointer-events:none;"></div>
+
+  <!-- TOP STATUS STRIP (same family as Encounter/CityMap) -->
+  <div data-el="statusStrip" data-anchor="Top" data-z="6" style="position:absolute;left:0;top:0;width:1920px;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;background:linear-gradient(#241a12,#1b130d);border-bottom:2px solid #4a3729;z-index:6;">
+    <div style="display:flex;align-items:center;gap:18px;">
+      <span data-el="logo" style="font-size:23px;letter-spacing:.5px;color:#e9d6b0;">Roguebane</span>
+      <span data-el="nodeLabel" data-binds="merchant.label" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#9a8468;letter-spacing:1px;">MERCHANT</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:18px;">
+      <!-- RESOURCE READOUT (payload v5 §G: top-right on every IN-RUN screen) -->
+      <div data-el="resourceStrip" data-anchor="TopRight" data-z="6" data-binds="run.resources" data-container="1" data-template="resourceItem" data-flow="horizontal" style="display:flex;align-items:center;gap:16px;margin-right:6px;">
+        <sc-for list="{{ resources }}" as="res" hint-placeholder-count="4">
+          <div data-tpl="resourceItem" style="display:flex;align-items:center;gap:6px;">
+            <span data-binds="resource.icon" data-image-bind="icons/resource/{resource.id}" style="width:22px;height:22px;flex:none;background-image:{{ res.iconCss }};background-size:100% 100%;image-rendering:pixelated;"></span>
+            <span data-binds="resource.value" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#e9d6b0;">{{ res.value }}</span>
+            <span data-binds="resource.label" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:#8d775c;">{{ res.label }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div data-el="leaveBtn" data-binds="merchant.leave" data-bind-gate="" data-states="button" title="Leave the stall" style="position:relative;width:120px;height:40px;background:url('Content/ui/button/button_normal.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;letter-spacing:1px;color:#cdb497;">⮐ LEAVE</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LEFT: THE FACTOR — healing (§10: HP is restored ONLY here, gold → HP) ===== -->
+  <div data-el="factorPanel" data-anchor="Left" data-z="4" data-binds="merchant" style="position:absolute;left:0;top:56px;width:480px;height:952px;border-right:2px solid #382a1d;padding:18px 24px 0;display:flex;flex-direction:column;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <img data-el="factorToken" data-type="icon" data-shadow="soft" src="Content/icons/node/merchant.png" width="44" height="44" style="image-rendering:pixelated;filter:drop-shadow(0 2px 3px #0009);" alt="merchant">
+      <div>
+        <div data-el="factorTitle" data-shadow="title" style="font-size:24px;letter-spacing:1px;color:#f0dcb4;text-shadow:0 2px 6px #000;">Merchant</div>
+        
+      </div>
+    </div>
+
+    <!-- HEALING (frame card — static neutral chrome) -->
+    <div data-el="healPanel" data-anchor="Left" data-z="5" data-binds="merchant.healing" data-shadow="panel" data-frame="card" style="margin-top:18px;box-sizing:border-box;background:#1d150e;border:12px solid transparent;padding:8px 10px;box-shadow:0 4px 10px rgba(10,8,7,.5);border-image-source:url('Content/ui/frame/card.png');border-image-slice:12 fill;border-image-width:12px;border-image-repeat:round;">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;">
+        <span data-el="healTitle" style="font-size:20px;letter-spacing:1px;color:#f0dcb4;">Healing</span>
+        <span data-el="healHp" data-binds="Body.hp" style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#b5503e;">HP 9 / 12</span>
+      </div>
+      <!-- pip strip as PARTS (payload #3): stamped from live HP -->
+      <div data-el="healPips" data-container="1" data-template="healPip" data-flow="horizontal" data-binds="Body.hp.points" style="display:flex;gap:3px;margin:10px 0 4px;">
+        <sc-for list="{{ hpPips }}" as="h" hint-placeholder-count="12">
+          <span data-tpl="healPip" data-binds="point.live" data-states="{&quot;live&quot;:{&quot;fill&quot;:&quot;blood&quot;,&quot;border&quot;:&quot;outline&quot;},&quot;spent&quot;:{&quot;fill&quot;:&quot;slot&quot;,&quot;border&quot;:&quot;outline&quot;}}" style="flex:1;height:12px;background:{{ h.bg }};border:1px solid #0a0807;"></span>
+        </sc-for>
+      </div>
+      <div data-el="healRows" data-container="1" data-template="healRow" data-flow="vertical" data-binds="merchant.healing.offers" style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
+        <sc-for list="{{ healOffers }}" as="ho" hint-placeholder-count="2">
+          <div data-tpl="healRow" data-states="{&quot;affordable&quot;:{&quot;border&quot;:&quot;border&quot;,&quot;fill&quot;:&quot;panelCard&quot;},&quot;tooPoor&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;fill&quot;:&quot;panelDeep&quot;,&quot;opacity&quot;:0.55}}" style="display:flex;align-items:center;gap:12px;border:2px solid {{ ho.border }};background:{{ ho.bg }};padding:10px 12px;cursor:pointer;">
+            <img data-binds="offer.icon" data-image-bind="icons/resource/hp" src="Content/icons/resource/hp.png" width="26" height="26" style="image-rendering:pixelated;flex:none;" alt="">
+            <div style="flex:1;min-width:0;">
+              <div data-binds="offer.name" style="font-size:17px;color:#ece0cb;">{{ ho.name }}</div>
+              <div data-binds="offer.note" style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#9a8468;margin-top:2px;">{{ ho.note }}</div>
+            </div>
+            <span data-binds="offer.price" style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#d9a441;flex:none;">{{ ho.price }}g</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    
+    <!-- the factor at his counter -->
+    
+
+    <!-- PROVISIONS (resources for sale — small, scarce quantities) -->
+    <div data-el="provisionPanel" data-anchor="Left" data-z="5" data-binds="merchant.provisions" data-shadow="panel" data-frame="card" style="margin-top:16px;box-sizing:border-box;background:#1d150e;border:12px solid transparent;padding:8px 10px;box-shadow:0 4px 10px rgba(10,8,7,.5);border-image-source:url('Content/ui/frame/card.png');border-image-slice:12 fill;border-image-width:12px;border-image-repeat:round;">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;">
+        <span data-el="provisionTitle" style="font-size:20px;letter-spacing:1px;color:#f0dcb4;">Provisions</span>
+      </div>
+      <div data-el="provisionRows" data-container="1" data-template="provisionRow" data-flow="vertical" data-binds="merchant.provisions.stock" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+        <sc-for list="{{ provisions }}" as="pv" hint-placeholder-count="3">
+          <div data-tpl="provisionRow" data-states="{&quot;affordable&quot;:{&quot;border&quot;:&quot;border&quot;,&quot;fill&quot;:&quot;panelCard&quot;},&quot;tooPoor&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;fill&quot;:&quot;panelDeep&quot;,&quot;opacity&quot;:0.55},&quot;sold&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;borderStyle&quot;:&quot;dashed&quot;,&quot;opacity&quot;:0.4}}" style="display:flex;align-items:center;gap:12px;border:2px solid {{ pv.border }};background:{{ pv.bg }};padding:10px 12px;cursor:pointer;opacity:{{ pv.op }};">
+            <span data-binds="lot.icon" data-image-bind="icons/resource/{lot.id}" style="width:26px;height:26px;flex:none;background-image:{{ pv.iconCss }};background-size:100% 100%;image-rendering:pixelated;"></span>
+            <div style="flex:1;min-width:0;">
+              <div data-binds="lot.name" style="font-size:17px;color:#ece0cb;">{{ pv.name }}</div>
+              <div data-binds="lot.qty" style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#7fa05a;margin-top:2px;">{{ pv.qty }}</div>
+            </div>
+            <span data-binds="lot.price" style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#d9a441;flex:none;">{{ pv.price }}g</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CENTER+RIGHT: WARES — the 5-category, rarity-weighted gear shop (§12) ===== -->
+  <div data-el="waresPanel" data-anchor="Right" data-z="4" data-binds="merchant.stock" style="position:absolute;left:480px;top:56px;width:1440px;height:952px;padding:18px 28px 0;display:flex;flex-direction:column;">
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <span data-el="waresTitle" data-shadow="title" style="font-size:24px;letter-spacing:1px;color:#f0dcb4;text-shadow:0 2px 6px #000;">Wares</span>
+      
+    </div>
+
+    <!-- CATEGORY SECTIONS — one dedicated section per category in stock this visit
+         (Armor / Weapons / Techniques / Minions / Runes). Three sections to a page;
+         the footer pager flips to the rest. -->
+    <div data-el="waresShelves" data-container="1" data-template="shopSection" data-flow="vertical" data-binds="merchant.stock.sections" style="display:flex;flex-direction:column;gap:24px;margin-top:18px;">
+      <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="3">
+        <div data-tpl="shopSection">
+          <div style="display:flex;align-items:baseline;gap:10px;border-bottom:1px solid #382a1d;padding-bottom:7px;margin-bottom:12px;">
+            <span data-binds="section.label" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:3px;color:#e9d6b0;">{{ sec.label }}</span>
+            <span data-binds="section.count" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8d775c;">{{ sec.count }}</span>
+          </div>
+          <div data-container="1" data-template="wareCard" data-flow="horizontal" data-binds="section.wares" style="display:flex;gap:16px;">
+            <sc-for list="{{ sec.wares }}" as="w" hint-placeholder-count="1">
+              <div data-tpl="wareCard" data-states="{&quot;affordable&quot;:{&quot;border&quot;:&quot;border&quot;,&quot;fill&quot;:&quot;panelCard&quot;},&quot;tooPoor&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;fill&quot;:&quot;panelDeep&quot;,&quot;opacity&quot;:0.55},&quot;sold&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;borderStyle&quot;:&quot;dashed&quot;,&quot;opacity&quot;:0.4}}" style="flex:0 0 258px;min-height:198px;border:2px solid {{ w.border }};background:{{ w.bg }};display:flex;flex-direction:column;cursor:pointer;">
+                <div data-part="" style="padding:10px 12px 9px;border-bottom:1px solid #2e2218;display:flex;align-items:center;justify-content:space-between;">
+                  <span data-binds="ware.category" data-color-bind="ware.categoryColor" style="width:46px;height:32px;border:2px solid #0a0807;background:{{ w.chipColor }};display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;color:#160f09;flex:none;">{{ w.chip }}</span>
+                  <span data-binds="ware.tag" data-color-bind="ware.tagColor" style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:1.5px;color:{{ w.tagColor }};border:1.5px solid {{ w.tagColor }};background:{{ w.tagBg }};padding:3px 7px;">{{ w.tag }}</span>
+                </div>
+                <div style="padding:9px 12px;flex:1;">
+                  <div data-binds="ware.name" style="font-size:19px;color:#ece0cb;">{{ w.name }}</div>
+                  <div data-binds="ware.note" style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#9a8468;line-height:1.6;margin-top:4px;">{{ w.note }}</div>
+                  <div data-binds="ware.desc" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:14.5px;line-height:1.5;color:#cdbfa8;margin-top:7px;">{{ w.desc }}</div>
+                </div>
+                <div style="padding:0 12px 10px;display:flex;align-items:baseline;justify-content:space-between;">
+                  <span data-binds="ware.buyState" style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;padding:2px 6px;color:{{ w.buyColor }};border:1px solid {{ w.buyColor }};">{{ w.buyLabel }}</span>
+                  <span data-binds="ware.price" style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#d9a441;">{{ w.price }}g</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="flex:1;"></div>
+  </div>
+
+  <!-- FOOTER — page control + purse -->
+  <div data-el="footer" data-anchor="Bottom" data-z="6" data-shadow="panel" style="position:absolute;left:0;bottom:0;width:1920px;height:72px;border-top:3px solid #4a3729;background:linear-gradient(#201710,#17110b);display:flex;align-items:center;justify-content:space-between;padding:0 28px;box-shadow:0 -6px 16px rgba(10,8,7,.55);z-index:6;">
+    <span data-el="footerFlavor" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:17px;color:#9a8468;">Fair dealing by lantern light.</span>
+    <div style="display:flex;align-items:center;gap:26px;">
+      <div data-el="pager" data-binds="merchant.stock.page" style="display:flex;align-items:center;gap:10px;">
+        <div data-el="pagePrev" data-binds="merchant.stock.pagePrev" data-bind-gate="" data-states="button" onClick="{{ prevPage }}" style="width:44px;height:34px;background:url('Content/ui/button/button_normal.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:{{ prevOp }};"><span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#cdb497;">◀</span></div>
+        <span data-el="pageLabel" data-binds="merchant.stock.pageLabel" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2px;color:#cdb497;min-width:110px;text-align:center;">{{ pageLabel }}</span>
+        <div data-el="pageNext" data-binds="merchant.stock.pageNext" data-bind-gate="" data-states="button" onClick="{{ nextPage }}" style="width:44px;height:34px;background:url('Content/ui/button/button_normal.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:{{ nextOp }};"><span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#cdb497;">▶</span></div>
+      </div>
+      <span data-el="purseNote" data-binds="run.gold" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#b09a82;">PURSE <b style="color:#d9a441;">128g</b></span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1080}}">
+class Component extends DCLogic {
+  /* MERCHANT — the out-of-combat shop (DESIGN_SPEC §12). One DEDICATED SECTION per category in
+   * stock this visit (Armor / Weapons / Techniques / Minions / Runes); a visit carries any subset
+   * (2–3 typical, all five possible). The layout holds THREE sections per page; the footer pager
+   * flips to the rest. Sample state shows the rare all-five visit so both pages render.
+   * All names/prices are SAMPLE data. */
+  state = { page: 0 };
+  renderVals() {
+    const GOLD = 128;
+    const ATTR = { STR: '#c2553f', INT: '#6f8fc4', DEX: '#82a85e', CON: '#cf9a44' };
+    const RARITY = {
+      COMMON: { color: '#9a8c7a', bg: 'rgba(154,140,122,.12)' },
+      MAGIC:  { color: '#6f9fd6', bg: 'rgba(111,159,214,.14)' },
+      RARE:   { color: '#c66fb4', bg: 'rgba(198,111,180,.14)' },
+      EPIC:   { color: '#e0a23c', bg: 'rgba(224,162,60,.15)' },
+    };
+    const AFF = { border: '#5a4636', bg: '#1c140d', buyLabel: 'BUY', buyColor: '#7fa05a' };
+    const POOR = { border: '#382a1d', bg: '#15100b', buyLabel: 'SHORT OF COIN', buyColor: '#8a5a4a' };
+    const priced = (o) => ({ ...o, ...(o.price <= GOLD ? AFF : POOR), op: o.price <= GOLD ? '1' : '.55' });
+
+    const hpPips = [];
+    for (let i = 0; i < 9; i++) hpPips.push({ bg: '#b5503e' });
+    for (let i = 0; i < 3; i++) hpPips.push({ bg: '#2a1c12' });
+
+    const healOffers = [
+      priced({ name: 'Mend 1 HP', note: 'a careful binding', price: 14 }),
+      priced({ name: 'Full Heal', note: 'made whole again', price: 48 }),
+    ];
+
+    const provisions = [
+      priced({ id: 'supplies', name: 'Supplies', qty: '+3', price: 12 }),
+      priced({ id: 'charge',   name: 'Charge',   qty: '+2', price: 18 }),
+      priced({ id: 'summons',  name: 'Summons',  qty: '+1', price: 22 }),
+    ].map(p => ({ ...p, iconCss: "url('Content/icons/resource/" + p.id + ".png')" }));
+
+    // one card grammar for every category; tag = rarity (gear/minions/runes) or attribute (techniques)
+    const rarTag = (o) => ({ ...o, tagColor: RARITY[o.tag].color, tagBg: RARITY[o.tag].bg });
+    const attrTag = (o) => ({ ...o, tagColor: ATTR[o.tag.split(' ')[0]], tagBg: 'transparent' });
+
+    // this visit's stock — SAMPLE: the rare all-five-categories day, so both pages render.
+    // When a gear category shows, it always shows THREE; techniques always show FIVE.
+    const STOCK = {
+      armor: [
+        rarTag(priced({ name: 'Steel Helm', note: 'HEAD ARMOR', tag: 'MAGIC', price: 26,
+          desc: 'A close-fitting helm scribed against meddling voices.' })),
+        rarTag(priced({ name: 'Quilted Jack', note: 'CHEST ARMOR', tag: 'COMMON', price: 14,
+          desc: 'Boiled wool and rivets, light on the road.' })),
+        rarTag(priced({ name: 'Iron Greaves', note: 'LEG ARMOR', tag: 'MAGIC', price: 22,
+          desc: 'Heavy going, but they hold the line.' })),
+      ],
+      weapons: [
+        rarTag(priced({ name: 'Ashwood Bow', note: 'BOW \u00b7 DEX', tag: 'RARE', price: 64,
+          desc: 'Feathered ash, strung tight \u2014 it finds the gap in any guard.' })),
+        rarTag(priced({ name: 'Woodsman\u2019s Axe', note: 'AXE \u00b7 STR', tag: 'COMMON', price: 18,
+          desc: 'An honest edge, kept keen.' })),
+        rarTag(priced({ name: 'Duelist\u2019s Blade', note: 'SWORD \u00b7 DEX', tag: 'MAGIC', price: 34,
+          desc: 'Light in the hand, quick to answer.' })),
+      ],
+      techniques: [
+        attrTag(priced({ name: 'Lunge', note: 'TECHNIQUE', tag: 'DEX 1', price: 20, desc: 'A darting thrust.' })),
+        attrTag(priced({ name: 'Bandage', note: 'TECHNIQUE', tag: 'CON 1', price: 16, desc: 'Binds a wounded part.' })),
+        attrTag(priced({ name: 'Stoneskin', note: 'TECHNIQUE', tag: 'INT 2', price: 28, desc: 'A hide of living stone.' })),
+        attrTag(priced({ name: 'Shield-Wall', note: 'TECHNIQUE', tag: 'CON 2', price: 30, desc: 'Raised shields, shoulder to shoulder.' })),
+        attrTag(priced({ name: 'Firebolt', note: 'TECHNIQUE', tag: 'INT 2', price: 34, desc: 'A mote of fire hurled from afar.' })),
+      ],
+      minions: [
+        rarTag(priced({ name: 'Skeleton Thrall', note: 'MINION \u00b7 INT 1', tag: 'COMMON', price: 20,
+          desc: 'A patient servant of old bone, tireless on the march.' })),
+        rarTag(priced({ name: 'Bound Wisp', note: 'MINION \u00b7 INT 1', tag: 'MAGIC', price: 28,
+          desc: 'A mote of pale light that worries the foe.' })),
+        rarTag(priced({ name: 'Grave Hound', note: 'MINION \u00b7 INT 1', tag: 'COMMON', price: 24,
+          desc: 'It asks only a whistle and a bone.' })),
+      ],
+      runes: [
+        rarTag(priced({ name: 'Ember Mote', note: 'MARK \u00b7 STR', tag: 'RARE', price: 30,
+          desc: 'A warm coal of strength, set beneath the skin.' })),
+        rarTag(priced({ name: 'Fleetfoot Mark', note: 'MARK \u00b7 DEX', tag: 'RARE', price: 32,
+          desc: 'A runner\u2019s blessing, cut small.' })),
+        rarTag(priced({ name: 'Path of Embers', note: 'PATH \u00b7 MINOR', tag: 'EPIC', price: 55,
+          desc: 'The first step down a burning road.' })),
+      ],
+    };
+    const CAT = {
+      armor:      { label: 'ARMOR',      chip: 'ARM', color: ATTR.CON },
+      weapons:    { label: 'WEAPONS',    chip: 'WPN', color: ATTR.STR },
+      techniques: { label: 'TECHNIQUES', chip: 'TEC', color: ATTR.INT },
+      minions:    { label: 'MINIONS',    chip: 'MIN', color: '#4f9a8a' },
+      runes:      { label: 'RUNES',      chip: 'RUN', color: '#d9a441' },
+    };
+
+    // page system: three sections to a page, canonical category order
+    const present = ['armor', 'weapons', 'techniques', 'minions', 'runes'].filter(k => (STOCK[k] || []).length);
+    const PER_PAGE = 3;
+    const pageCount = Math.max(1, Math.ceil(present.length / PER_PAGE));
+    const page = Math.min(Math.max(this.state.page, 0), pageCount - 1);
+    const sections = present.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE).map(k => ({
+      label: CAT[k].label,
+      count: '' + STOCK[k].length,
+      wares: STOCK[k].map(w => ({ ...w, chip: CAT[k].chip, chipColor: CAT[k].color })),
+    }));
+
+    const resources = [
+      { id: 'supplies', label: 'SUPPLIES', value: '6' },
+      { id: 'spoils',   label: 'GOLD',     value: '' + GOLD },
+      { id: 'charge',   label: 'CHARGE',   value: '3' },
+      { id: 'summons',  label: 'SUMMONS',  value: '2' },
+    ].map(r => ({ ...r, iconCss: "url('Content/icons/resource/" + r.id + ".png')" }));
+
+    return { hpPips, healOffers, provisions, resources, sections,
+      pageLabel: 'PAGE ' + (page + 1) + ' / ' + pageCount,
+      prevPage: () => this.setState({ page: Math.max(0, page - 1) }),
+      nextPage: () => this.setState({ page: Math.min(pageCount - 1, page + 1) }),
+      prevOp: page === 0 ? '.45' : '1',
+      nextOp: page >= pageCount - 1 ? '.45' : '1',
+    };
+  }
+}
+</script>
+</body>
+</html>

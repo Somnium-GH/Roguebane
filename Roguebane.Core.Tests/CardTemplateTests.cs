@@ -18,7 +18,8 @@ public class CardTemplateTests
     public void EveryTemplateParsesWithSizeAndStyledParts()
     {
         // Schema, not literal keys: whatever templates CD ships, each is sized and every part fills its
-        // slot with a text datum (sample), an image, or a live binds. A template with NO parts must be a
+        // slot with content (sample/image/imageBind/binds) OR visible chrome (fill/border) — the v4 drop
+        // authors chrome-only card parts (dividers, slot backgrounds). A template with NO parts must be a
         // self-styled leaf (its own binds/fill carry the visual — e.g. a shield pip), never a blank box.
         var templates = Manifest().Templates;
         Assert.NotEmpty(templates);
@@ -32,7 +33,9 @@ public class CardTemplateTests
             {
                 Assert.Equal(4, p.Rect.Length);
                 Assert.False(string.IsNullOrEmpty(p.Sample) && string.IsNullOrEmpty(p.Image)
-                    && string.IsNullOrEmpty(p.Binds), $"{name} part needs a sample, image, or binds");
+                    && string.IsNullOrEmpty(p.Binds) && string.IsNullOrEmpty(p.ImageBind)
+                    && p.Fill is null && p.Border is null,
+                    $"{name} part needs content (sample/image/imageBind/binds) or chrome (fill/border)");
             }
         }
     }

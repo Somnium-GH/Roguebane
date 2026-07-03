@@ -1,0 +1,46 @@
+{
+  "note": "Assets captured from live screen [data-atom] nodes via proto/atom_capture.js. Re-run capture to regenerate. Each MUST have a matching [data-atom] in a .dc.html and a Content/<name>.png on disk.",
+  "source": "Encounter.dc.html",
+  "captured": [
+    "icons/technique/swing",
+    "icons/technique/frenzy",
+    "icons/technique/firebolt",
+    "icons/technique/disarm",
+    "icons/technique/brace",
+    "ui/pip/pip_reserved",
+    "ui/pip/pip_full",
+    "ui/pip/pip_damage",
+    "ui/pip/pip_empty",
+    "ui/pip/pip_debuff"
+  ],
+  "sources": {
+    "Encounter.dc.html (synthetic chip overlay)": {
+      "capturedVia": "proto/atom_capture.js RB_buildChipOverlay (chip reconstructed from the techCard chip spec — the locked action row has no card for it) + atom_slice.js RB_buildTechChips({techs, y:6})",
+      "captured": [
+        "icons/technique/shot"
+      ]
+    },
+    "CityMap.dc.html": {
+      "capturedVia": "proto/node_capture.js (RB_nodeOverlay dual-bg + RB_nodeSlice)",
+      "captured": [
+        "icons/node/camp",
+        "icons/node/resource",
+        "icons/node/merchant",
+        "icons/node/unknown",
+        "icons/node/castle",
+        "icons/node/skirmish"
+      ]
+    },
+    "NewGame.dc.html": {
+      "capturedVia": "proto/rune_capture.js (dedicated overlay + dual-bg, not atom_capture.js)",
+      "captured": [
+        "icons/rune/core_grunt",
+        "icons/rune/core_warden",
+        "icons/rune/core_adept",
+        "icons/rune/core_summoner",
+        "icons/rune/core_reaver",
+        "icons/rune/core_ranger"
+      ]
+    }
+  }
+}

@@ -12,6 +12,137 @@ revisions (`git show <rev>:STATUS.md`) — recoverable, so not duplicated here. 
 `design/DESIGN_SPEC.md`. This file = CURRENT state only. (Whittled 2026-07-01 from ~900 lines; nothing
 current dropped.)*
 
+## ✅ CD DROP LANDED (2026-07-03) — payload #11–18 delivered; REVIEWED (Cowork session), COMMITTED
+Drop committed 2026-07-03 with the new drop-time guard: **`tools/drop_audit.py` BUILT (P0-A.7)** —
+parses every `design/dchtml/*.dc.html` (data-el/-binds/-template/-tpl/-container/-bind-gate/-states/
+-image-bind/-color-bind/-frames, text content, data-design÷2) and diffs that inventory against
+layout.json; exit 1 on any extraction gap. First run: 6 screens audited, **2 real gaps found**
+(encounter `ShieldPool.count` + `ShieldPool.regenPct` bound in html, absent from manifest — engine
+already renders both; logged Needs-CD #4). Run it on every drop alongside the parse guard.
+**GATE STATE AT COMMIT: RED — EXPECTED.** Core 304 green (contract test now accepts chrome-only v4
+card parts). `ui_gate.py`: 48 ELEM-BLANK across screens = the drop's NEW elements the engine can't
+draw yet (bind-gated labels like beginBtn/heldBadge/autoAttackBtn — content+binds coexist, engine
+lacks the gate semantics; new titles/buttons/icons awaiting P0-C.4–5 wiring). NOT a regression:
+fidelity ROSE on all 6 screens vs old baselines (enc 74.9 eq 76.3 city 78.0 camp 89.7 ng 74.3
+mer 80.4 — informational only, v1 tooling vs new refs; re-pin via P0-A v2). Gate goes green as
+P0-A/P0-C close; do NOT --update baselines until fidelity v2 lands.
+VERIFIED: all `design/NN` refs exactly **1920×1080** (#11);
+targeting redesign complete in 01+08 (hotkey chips 1–6, number aim-tags w/ stacking, "no boxes ever
+drawn", pulse assets `ui/reticle/focus_p0–p2` + AIMING=red cursor) (#12); merchant fits shelves w/ real
+wareCard chrome + literal pager/LEAVE labels (#13); role chips per-core (#14); beginBtn/HELD labels ship
+(#15); technique icons are imageBinds + `youAreHere`/doomTitle homed (#16); Elf blurb canon'd (#17);
+**`design/dchtml/` landed (#18)** — all screens as .dc.html at native 1920×1080 with full extraction
+markup (`data-el/-binds/-template/-container/-bind-gate/-states/-image-bind`, `sc-for`) + `proto/`
+scripts + CD's own `DROP_AUDIT.md`; citymap homes ALL four ex-overlays (castlePanel+fortRows w/ per-part
+states, campaignStrip, packChips, equipmentBtn); equipment gains backdrop + ✕ CLOSE; **z is now ONE
+convention (paint ordinal, back→front; find the scene by its `*.scene` bind, not z==0)**; layout.json
+structurally complete (9260 lines, new binds present — full parse = first loop guard).
+**DROP GAPS (loop fixes):** (a) GAME-side `Content.mgcb` not mirrored — lacks focus_p0/p1/p2, still
+lists target_tag; (b) `target_tag.png` still exists in Roguebane.Content — CD says DELETE (both dirs +
+mgcb entries); (c) CD's "repo docs in the same PR" did NOT land — fold into `design/LAYOUT_CONTRACT.md`
+from `design/dchtml/DROP_AUDIT.md`: z=paint-ordinal (data-z deprecated), `frames` (authored animation),
+`data-bind-gate` (content+binds coexist: content is the literal, the bind GATES visibility), `data-part`,
+`item.pad`, the 1920×1080 ref-export contract; (d) **frames are v4, authored at 1:1 draw size**
+(panel 64/slice16, card 48/slice12) — the ChromeBake=2 corner-scale assumption is WRONG for them now:
+draw border-image-width == slice, 1:1; (e) `reference/screens/` never arrived (CD-side only — fine);
+(f) ~~scratch .gitignore~~ DONE (already ignored pre-drop).
+
+## ⇒ NEW LOCKS (2026-07-03 pm, Doug): core-effect roster = CANON (adopted from design/05 v2 → SPEC §5:
+Called Shot renames Piercing Focus; copy may describe unbuilt mechanics until the effect-model pass —
+flagged, acceptable; Summoner's stays the only BUILT effect). STAT BLOCKS in design/05 v2 are NOT
+adopted — Doug wants a LIVE TUNING session; until then the roster keeps build values and the fidelity
+diff MASKS stat-digit regions (tolerated placeholder zones). §13 ASPECT-FILL: BUILD IT (the old
+letterbox scope-confirm is resolved — bg scale-to-cover, HUD anchored to real edges, no bars).
+MERCHANT receiving LOCKED (§12): ALL wares click-to-buy tiles; technique→palette, minion→minion
+inventory, rune→rune bag; slotting stays Equipment's; techniques/minions/runes become BUYABLE.
+
+## ⇒ HUMAN DIRECTIVES — 2026-07-03 (P0 — do this block TOP-DOWN before anything else)
+
+**‼ P0-A — PIXEL-TRUTH SYSTEM (root cause found: measurement itself was broken; build FIRST — it
+multiplies every later pass):** every `design/NN-*.png` is **924×540** but design space is **960×540**
+(aspect 1.711 vs 1.778), and `fidelity_diff.py` LANCZOS-stretches BOTH images to 960×540 — so every
+score ever taken compared against a reference warped ~4% horizontally (≈18 px mid-screen), with the
+live window's letterbox bars (2560×1528 client = 1.675) baked into the shot, all at a 1× 540p working
+res where border weight + text metrics are unmeasurable. Prior "walked clean / zero renderer deltas"
+claims were made against warped refs — treat them as UNVERIFIED; re-walk with v2. Build, in order:
+1. **Reference contract + guard:** ~~re-export~~ LANDED — all refs ARE 1920×1080 now. Build the guard:
+   `ui_gate.py` HARD-FAILS any `design/NN-*.png` whose size isn't exactly 960K×540K (integer K).
+   Old 924-wide-era fidelity baselines are DEAD — re-pin everything against the new refs.
+   NEW: the diff also MASKS the stat-digit regions on newgame (tolerated placeholder zones until the
+   live tuning session — see NEW LOCKS).
+2. **Render-at-reference-resolution:** `RB_SIZE=WxH` (e.g. 1920×1080) for headless shots — scene target
+   at EXACT ref res, no letterbox, no window chrome → true 1:1 diff, zero resampling either side
+   (fidelity_diff skips resize when sizes already match).
+3. **fidelity_diff v2 — per-ELEMENT, not per-tile:** score each manifest element's rect crop (shot vs
+   ref) → a RANKED per-element delta list (id, score, design rect). The walk becomes "fix the top of
+   the list". Keep the tile heatmap as a visual only.
+4. **Numeric probes (kill "looks overscaled"):** border-width probe (rendered stroke px at manifest
+   border edges vs authored) + text-height probe (drawn glyph bbox vs fontPx expectation), reported per
+   element as NUMBERS. Doug reads live text at ~1.5–2× design proportion in headers/labels — measure,
+   then fix from the numbers.
+5. **Collision/overflow detector:** every drawn text bbox must fit its element rect (±tol) and not
+   intersect sibling bboxes at the same z (nesting exempt). Known instances from today's screenshots:
+   SUMMONS ↔ LAYER-2/state text (citymap + equipment top-right), doubled "Human Warden" (equipment
+   identity block), "CASTLE FORTIFICATIONSgate * wall…" run-on (citymap), SHIELD n/m label over its own
+   bar (encounter). Gate on zero NEW collisions once known CD-side ones are baselined.
+6. **Hand-shot normalizer:** crop Doug's live window screenshots (title bar + letterbox) to the scene
+   rect and rescale into ref space, so his eyeball reports run through the same diff pipeline.
+7. **DROP AUDIT — ✅ BUILT (2026-07-03):** `tools/drop_audit.py` parses each screen's dc.html and
+   diffs its inventory against `layout.json`; exit 1 on gaps. First run caught 2 (ShieldPool.count/
+   regenPct — Needs-CD #4). dc.html stays READ-ONLY CD source (never edit/"fix" it; PNG refs stay
+   the pixel bar). Run on every drop alongside the parse guard. Optional backstop still open:
+   pinned headless capture at 960K×540K.
+Wire ALL of it into `tools/ui_gate.py` (stays the ONE command); run every pass per loop.md.
+
+**‼ P0-B — TARGETING build [design LANDED (01+08 v2, assets, manifest binds); DESIGN_SPEC §8]:**
+- DELETE the whole-foe white hover BOX + any band highlight — no box affordances, ever (design/08 rule 1).
+- Cursor IS the reticle: hide the OS cursor entering TARGETING; draw `ui/reticle/aiming` (now RED,
+  dashed) at the cursor, snapping/centring to the hovered limb band; click locks; right-click cancels +
+  restores the cursor.
+- Locked mount: cycle `focus_p0→p1→p2` on the FIXED TICK (manifest `frames` on foeReticle); size =
+  part rect's larger side ×~1.5 clamped 64–136 SCREEN px (design/08 rule 2); SECONDARY (faint) = another
+  module's kept target (AUTO on).
+- AIM TAG stack above the reticle = hotkey NUMBERS via `templates.aimTag` + `targeting.tags` bind;
+  several actives on one part stack. Card-side aim tag is REMOVED (bind gone from manifest).
+- Action-bar hotkey chips render from `technique.hotkey`/`bay.hotkey` (1–6); keys already map.
+
+**‼ P0-C — POST-DROP ENGINE QUEUE (the 07-03 walk's CD-tagged items LANDED in the drop; what remains
+is ALL engine-side). Fix with P0-A numbers (before/after per-element scores):**
+1. **Drop wiring, mechanical:** parse-guard layout.json (contract tests green); GAME-side mgcb mirror
+   (+focus_p0/p1/p2, −target_tag) + DELETE `target_tag.png` (clean removal, both dirs); .gitignore the
+   scratch (`.shots/ .ui-gate-build/ .screens.* .winrects.* .smokeshots.bat`); fold DROP_AUDIT's schema
+   notes into LAYOUT_CONTRACT (see DROP GAPS above); add the "CD drops ship design sources
+   (design/dchtml, read-only)" line to CLAUDE.md §Working.
+2. **z paint-ordinal switch:** renderer drops the two-convention special-case — z is back→front paint
+   order everywhere; find the scene layer by its `*.scene` bind. (The attrPool divider occlusion
+   un-breaks with it.)
+3. **v4 frames 1:1:** panel/card draw border-image-width == slice (no ChromeBake corner scale);
+   verify button skins vs their authored size too.
+4. **New template families:** nested pip templates instanced from live data (poolPip/attrPip/supplyPip/
+   supportPip/healPip/heroHpPip/foeHpPip — shieldPip is the precedent); `data-bind-gate` semantics
+   (content literal + bind gates visibility — kills the doomEta double-render class); `item.pad`;
+   `frames` animation cycling (fixed tick).
+5. **New binds resolve live:** technique.hotkey/bay.hotkey, targeting.tags (aimTag stack),
+   Body.hp.points/hpLabel + foe.hp.points (segmented HP), pool.attr.cells/attrs.cells + ui/pip
+   imageBinds, supplies.points/support.points, Body.gear rows, nav.equipment/nav.close (✕ CLOSE +
+   equipmentBtn), map.current, campaign.cities/city.status + campaignTaken, city.castle.parts fort
+   rows (INTACT/DAMAGED states), icons/technique/{id} imageBinds (kills the "?" icons), equipment/
+   citymap scene backdrops.
+6. **P0-B targeting build** (block above).
+7. **Merchant buys complete** (per the click-to-buy LOCK): techniques/minions/runes purchase into
+   inventory; keep page-by-measured-fit as a safety even with v2 extents.
+8. **§13 aspect-fill** (per NEW LOCKS): bg scale-to-cover, HUD anchored to real edges, no bars.
+9. **Legacy deletions:** hand-drawn citymap overlays (castle panel/EQUIPMENT[E]/PACK chips/campaign
+   spine) die — their manifest elements landed; "you are here"/doom-title hand-draws die the same way.
+   Old encounter card-chrome fallbacks give way to the landed techCard parts.
+10. **Engine-bug residue from the 07-03 walk (re-measure first — several may already be explained by
+   the above):** resource-strip misalignment/collision; empty-box suppression rule (should vanish once
+   labels/binds land — enforce anyway per loop.md); RUNE BAG regression (two MARKS headers, zero group
+   cards); doubled "Human Warden" identity text; SHIELD label-over-bar; citymap node token/label
+   oversize + square selection ring; "CASTLE FORTIFICATIONS" run-on (retires with fortRows).
+SEQUENCE: P0-A tools (1–2 passes, baselines re-pinned on the new refs) → P0-C.1–3 (mechanical) →
+P0-B + P0-C.4–5 (the big render slice, one screen per pass) → 6–10. Gate green EVERY pass.
+
 ## ✅ CD DROP LANDED (2026-07-02 pm) — verified + committed
 layout.json (+4786 lines, parses, all 5 smokes green): NEW `merchant` screen; `states` (button skin
 families + template state styles), `border.sides` (per-side borders), `colorBind` (element + part),
@@ -78,10 +209,8 @@ remaining merchant work is design-gated (ware pricing/rarity models, pixel-compa
   pinned to the shipped look (`BorderPx`: authored w=1 → 2 design px) independent of scene scale.
   Verified RB_MF=all at a 1600×900 backbuffer → 1600×900 shots, all screens paint, layout identical.
   Pixel-art figures still scale through the common path (nearest-neighbor via PointClamp).
-- **LETTERBOX vs §13 aspect-fill — CONFIRMED:** the shell LETTERBOXES (`Game1.cs` `Clear(Color.Black) //
-  letterbox bars` + aspect-preserving fit) — but §13 LOCKED aspect-independent FILL (bg scale-to-cover +
-  HUD anchored to real edges, NO bars). On a non-16:9 display you get bars. Implement §13 aspect-fill.
-  [scope confirm w/ Doug]
+- ~~LETTERBOX vs §13 aspect-fill~~ **SCOPE CONFIRMED (Doug 2026-07-03): BUILD §13 fill** — folded into
+  the P0-C queue (#8). Bars die; bg scale-to-cover; HUD anchors to real edges.
 - **RENDER-ACCURACY FLOOR (drive this BEFORE ever claiming "starved"):** a LOT matches the design better
   WITHOUT CD or systems — PURGE the outdated box/frame TEXTURE (old chrome still in use); apply the
   manifest v3 frames/chrome to every panel; fix the box treatments. Stream-1 fidelity isn't at its floor
@@ -426,6 +555,8 @@ ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered 
 - FIDELITY: `python tools/fidelity_diff.py <shot> design/NN-*.png --map heat.png` scores a shot vs its
   design (see the SYSTEMIC block for baselines). Run after RB_MF=all; walk the worst tiles it lists.
   **GATE on it — a screen is NOT done until its score is under threshold; run every pass, all 5 screens.**
+  **⚠ 2026-07-03 pm: refs are NOW 1920×1080 (contract met) but ALL pre-drop baselines were scored
+  against the old warped 924×540 refs — they're DEAD numbers. Re-pin via fidelity v2 before gating.**
   RE Doug's ~2×-oversize note — TRIAGED (2026-07-02 pm): (1) BORDERS were genuinely 2× — `BorderPx`
   had pinned the old fixed-SS=2 weight (w=1 → 2 design px); now draws the AUTHORED design px. FIXED.
   (2) Run-together gauge text FIXED — the wrap is '\n'-aware and the gauge resolvers stack
@@ -486,18 +617,10 @@ ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered 
   have ~12 parts (§1 omits torso/legs/boots; adept/summoner are also 12); gargoyle's `back` is contract-
   legal. The renderer composes each figure from its OWN z-list — never assume 21 (fix any consumer/test
   that hardcodes it).
-- HI-FI CHROME pass on all 5 screens + backgrounds at 1080 (SENT + in progress at CD). NEXT levers
-  (tiled 9-slice EDGES + painted CENTERS) SMEAR under the engine's current STRETCH blit — needs a
-  **TILE/repeat mode added to the nine-slice blit (engine/Fable task)**. APPROVED: CD paints the full-
-  fidelity tiled edges + painted centers NOW; the engine adds tile mode to CATCH UP (principle: design to
-  the IDEAL, engine catches up — LAYOUT_CONTRACT §2). A bounded renderer change, part of the chrome arc.
-- Manifest-extraction gaps (design shows it, layout.json can't express it — renderer must NOT invent):
-  card/tile BACKGROUND+border parts (race/core cards, attr+budget tiles render chrome-less); tile
-  VALUE+LABEL flattened to one text element (BASE HP / RUNE BUDGET / ACTIONS / MINION BAYS labels lost);
-  `align` never emitted (contract has it — centred tiles/headers render left); button labels dropped
-  (beginBtn has no content — design says "BEGIN THE RUN"); STARTER/SPECIALIST chips lack bg fills;
-  equipment invTab parts carry NO label bind (all three tabs stamp "GEAR"); equipment's bottom-left
-  identity block (design/02: name/role/gear/bays/budget/apex) collapsed to a single `currentCore` text.
+- ~~HI-FI CHROME pass~~ **LANDED 2026-07-03** (v4 frames at 1:1, wareCard/techCard/race-core card
+  chrome, tile parts). Engine catches up per P0-C.3.
+- ~~Manifest-extraction gaps~~ **LANDED 2026-07-03** (labels, chips, tabs, identity block, backdrops —
+  the 07-03 drop closed the family). Any NEW gap gets caught by `tools/drop_audit.py` at drop time.
 
 ## Pointers
 - Design canon: `design/DESIGN_SPEC.md`. Capture/layout contract: `design/LAYOUT_CONTRACT.md`.

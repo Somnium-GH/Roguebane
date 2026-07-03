@@ -136,7 +136,8 @@ the pool pips `ui/pip/*` — token-stamped per colour from `proto/atom_slice.js`
 (b) **Generated as deterministic vector shapes** by **`proto/ui_atoms_gen.js`** (for atoms that are NOT on
 the screens as polished art), coloured from `style_tokens.js`: `icons/attr/{strength,intellect,dexterity,
 constitution}`, `icons/rune/{mark,path_minor,path_major,keystone}`, `icons/resource/{supplies,support,spoils,hp,charge,summons}`,
-`icons/minion/skeleton`, `ui/reticle/{focus,secondary,aiming,target_tag}`. Re-run to reproduce identically.
+`icons/minion/skeleton`, `ui/reticle/{focus,focus_p0,focus_p1,focus_p2,secondary,aiming}`. Re-run to reproduce identically.
+(`ui/reticle/target_tag` RETIRED 2026-07-03 review — the dropped-pin target pin was unnecessary; `aiming` is now RED, the cursor while a technique actively targets.)
 
 Generators + capture (the whole package is reproducible from these): `roster_gen.js` (figures+gear+layout.json),
 `bg_gen.js` (backdrops), `ui_gen.js` (buttons), `ui_atoms_gen.js`
@@ -157,8 +158,8 @@ control uses the shared `ui/button/button_{on,normal}` chrome.
 | id | type | screen | drives-from (Core) | size px | variants | status |
 |---|---|---|---|---|---|---|
 | `ui/reticle/focus` · `secondary` | locked-target brackets | Combat | `technique.aim.role` | 96×96 | 2 | hi-fi |
-| `ui/reticle/aiming` | choose-a-target cursor (distinct from locked) | Combat | targeting mode active | 96×96 | — | hi-fi |
-| `ui/reticle/target_tag` | per-technique target pin (which foe/part) | Combat | `technique.targetPartId` | 28×34 | — | hi-fi |
+| `ui/reticle/focus_p0` · `p1` · `p2` | FOCUS PULSE frames (§8: engine cycles them on the fixed tick; p0 ≡ focus, the canonical/frozen frame) | Combat | `targeting.focus` · `layout.json` foeReticle `frames` | 128×128 | 3 | hi-fi |
+| `ui/reticle/aiming` | THE CURSOR while a technique actively targets (red, dashed; click tile → cursor until click a part / right-click) | Combat | targeting mode active | 128×128 | — | hi-fi |
 | `sprites/body/overlay_disabled` | cutaway "disabled" part overlay (beyond healthy/damaged/broken) | Combat | `parts[*].disabled` | 48×48 | — | hi-fi |
 
 ## icons/ — attributes, techniques, runes, nodes, resources (PNG32, transparent)
@@ -206,7 +207,7 @@ CityMap's supplies/support cards rendered frameless until 2026-07-01). And scree
 | `ui/pip/pip_reserved_{str,int,dex,con}` (+ generic `pip_reserved`) | gear-reserved pip, per attr | Combat | gear reservation | 128×80 | 5 | hi-fi · black −45° hatch over colour |
 | `ui/pip/{pip_empty,pip_empty_supplies,pip_empty_support}` | free socket — generic + special dashed resource empties | Combat, Run Map | empty / supplies / support | 128×80 | 3 | hi-fi · dashed coloured frame on resources |
 | `ui/pip/{pip_debuff,pip_damage}` | debuff / damage pip (never recolour) | Combat | debuff\|damaged | 128×80 | 2 | hi-fi · amber/red +45° hatch (§12) |
-| `ui/reticle/{focus,secondary}` | targeting bracket | Combat | `technique.aim.role` | 96×96 | 2 | placeholder |
+| `ui/reticle/{focus,focus_p0,focus_p1,focus_p2,secondary}` | targeting bracket + pulse frames | Combat | `technique.aim.role` · `frames` cycle | 128×128 | 5 | hi-fi |
 | `ui/button/button_{normal,hover,down,disabled,on}` | button skin (one set 9-slices to EVERY button) | all | input/interaction state + toggle | 320×88 (9-slice, corners 12px) | 5 | hi-fi · v2 @ 1080-class density (§11 — 2× the 160×44 design box; engine 9-slice corners are 12px now, not 6px): black border + double engraved line + state accent + top-sheen gloss + corner rivets + bevel (`proto/ui_gen.js`) |
 
 *Button **labels are runtime text** (drawn over the skin), never baked into the asset.*

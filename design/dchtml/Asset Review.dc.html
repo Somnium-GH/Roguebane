@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="asset-manifest.js"></script>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:#13100f;color:#ece0cb;font-family:ui-sans-serif,system-ui,'Segoe UI',sans-serif}
+  ::-webkit-scrollbar{width:12px;height:12px}
+  ::-webkit-scrollbar-thumb{background:#3a2f26;border-radius:6px;border:3px solid #13100f}
+  input[type=search]{outline:none}
+  input[type=range]{accent-color:#d9a441}
+</style>
+</helmet>
+<div style="min-height:100vh">
+  <header style="position:sticky;top:0;z-index:30;display:flex;flex-wrap:wrap;align-items:center;gap:18px 22px;padding:14px 22px;background:rgba(19,16,15,.94);backdrop-filter:blur(8px);border-bottom:1px solid #3a2f26">
+    <div style="display:flex;align-items:baseline;gap:10px;margin-right:auto">
+      <span style="font-size:17px;font-weight:700;letter-spacing:.5px">Roguebane · Asset Review</span>
+      <span style="font-size:12px;color:#9a8468">{{ shown }} / {{ total }} PNG</span>
+    </div>
+    <input type="search" onInput="{{ onQ }}" placeholder="filter by path…" style="background:#1d150e;border:1px solid #4a3729;color:#ece0cb;border-radius:7px;padding:7px 11px;font-size:13px;width:220px" />
+    <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#9a8468">size
+      <input type="range" min="48" max="288" step="8" value="{{ zoom }}" onInput="{{ onZoom }}" style="width:130px" />
+    </label>
+    <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#9a8468">bg
+      <select onChange="{{ onBg }}" style="background:#1d150e;border:1px solid #4a3729;color:#ece0cb;border-radius:7px;padding:6px 8px;font-size:12px">
+        <option value="checker">Checker</option>
+        <option value="dark">Dark</option>
+        <option value="light">Light</option>
+        <option value="magenta">Magenta</option>
+      </select>
+    </label>
+    <label style="display:flex;align-items:center;gap:7px;font-size:12px;color:#9a8468;cursor:pointer">
+      <input type="checkbox" checked="{{ pixelated }}" onChange="{{ onPixel }}" style="accent-color:#d9a441" /> Pixelated
+    </label>
+    <div style="display:flex;gap:8px">
+      <button onClick="{{ expandAll }}" style="background:#1d150e;border:1px solid #4a3729;color:#ece0cb;border-radius:7px;padding:6px 11px;font-size:12px;cursor:pointer">Expand all</button>
+      <button onClick="{{ collapseAll }}" style="background:#1d150e;border:1px solid #4a3729;color:#ece0cb;border-radius:7px;padding:6px 11px;font-size:12px;cursor:pointer">Collapse all</button>
+    </div>
+  </header>
+
+  <main style="padding:8px 0 80px">
+    <sc-for list="{{ groups }}" as="group" hint-placeholder-count="8">
+      <section style="border-bottom:1px solid #241c15">
+        <button onClick="{{ group.toggle }}" style="display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;color:#ece0cb;padding:13px 22px;cursor:pointer;font-family:inherit">
+          <span style="width:12px;color:#9a8468;font-size:11px">{{ group.caret }}</span>
+          <span style="font-size:13px;font-weight:600;font-family:ui-monospace,monospace;color:#d9a441">{{ group.label }}</span>
+          <span style="font-size:11px;color:#6f5c48">{{ group.count }}</span>
+        </button>
+        <sc-if value="{{ group.open }}" hint-placeholder-val="{{ true }}">
+          <div style="{{ gridStyle }}">
+            <sc-for list="{{ group.items }}" as="item" hint-placeholder-count="10">
+              <button onClick="{{ item.open }}" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:1px solid #241c15;border-radius:9px;padding:9px;cursor:zoom-in;font-family:inherit" style-hover="border-color:#5a4636;background:#1a1410">
+                <div style="{{ stageStyle }}"><sc-if value="{{ item.path }}" hint-placeholder-val=""><img src="{{ item.path }}" style="{{ imgStyle }}" /></sc-if></div>
+                <div style="font-size:11px;color:#cdbfa8;text-align:center;word-break:break-word;line-height:1.3">{{ item.label }}</div>
+                <div data-dim="1" style="font-size:10px;color:#6f5c48;font-family:ui-monospace,monospace">·</div>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </section>
+    </sc-for>
+  </main>
+
+  <sc-if value="{{ lb }}" hint-placeholder-val="">
+    <div onClick="{{ lbClose }}" style="position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:rgba(8,6,10,.88);backdrop-filter:blur(4px);cursor:zoom-out">
+      <div style="{{ lbStageStyle }}"><sc-if value="{{ lb.path }}" hint-placeholder-val=""><img src="{{ lb.path }}" style="{{ lbImgStyle }}" /></sc-if></div>
+      <div style="text-align:center;line-height:1.6">
+        <div style="font-size:15px;font-weight:600;color:#ece0cb">{{ lb.label }}</div>
+        <div data-lbdim="1" style="font-size:12px;color:#d9a441;font-family:ui-monospace,monospace">·</div>
+        <div style="font-size:11px;color:#7a6651;font-family:ui-monospace,monospace">{{ lb.path }}</div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { assets: [], q: '', zoom: 128, bg: 'checker', pixelated: true, collapsed: {}, lb: null };
+
+  componentDidMount() {
+    const list = (typeof window !== 'undefined' && window.ROGUEBANE_ASSETS) || [];
+    this.setState({ assets: list.slice() });
+    this._sweeps = 0;
+    this._sweep = setInterval(() => { const done = this.fillDims(); if (done || ++this._sweeps > 120) { clearInterval(this._sweep); this._sweep = null; } }, 200);
+  }
+  componentWillUnmount() { if (this._sweep) clearInterval(this._sweep); }
+  componentDidUpdate() { this.fillDims(); }
+  fillDims() {
+    let pending = 0;
+    document.querySelectorAll('[data-dim]').forEach(d => {
+      if (d.textContent && d.textContent !== '\u00B7') return;
+      const b = d.closest('button'), im = b && b.querySelector('img');
+      if (im && im.naturalWidth) d.textContent = im.naturalWidth + '\u00D7' + im.naturalHeight;
+      else pending++;
+    });
+    const lb = document.querySelector('[data-lbdim]');
+    if (lb && (!lb.textContent || lb.textContent === '\u00B7')) {
+      const ov = lb.closest('div') && lb.closest('div').parentElement, im = ov && ov.querySelector('img');
+      if (im && im.naturalWidth) lb.textContent = im.naturalWidth + '\u00D7' + im.naturalHeight + ' px';
+      else pending++;
+    }
+    return pending === 0;
+  }
+
+  bgCss(bg) {
+    if (bg === 'dark') return 'background:#171019';
+    if (bg === 'light') return 'background:#e9e2d4';
+    if (bg === 'magenta') return 'background:#d800d8';
+    // checker
+    return "background-color:#39323f;background-image:linear-gradient(45deg,#2a2530 25%,transparent 25%),linear-gradient(-45deg,#2a2530 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#2a2530 75%),linear-gradient(-45deg,transparent 75%,#2a2530 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0";
+  }
+
+  renderVals() {
+    const assets = this.state.assets || [];
+    const q = (this.state.q || '').trim().toLowerCase();
+    const z = this.state.zoom, bg = this.state.bg, pix = this.state.pixelated;
+    const collapsed = this.state.collapsed;
+
+    const map = new Map();
+    let shown = 0;
+    for (const path of assets) {
+      if (q && path.toLowerCase().indexOf(q) === -1) continue;
+      shown++;
+      const idx = path.lastIndexOf('/');
+      const dir = path.slice(0, idx), name = path.slice(idx + 1);
+      if (!map.has(dir)) map.set(dir, []);
+      map.get(dir).push({ path, label: name.replace(/\.png$/i, ''), open: () => { this.setState({ lb: { path, label: name } }); let t = 0; const tick = () => { const d = document.querySelector('[data-lbdim]'); if (!d || (d.textContent && d.textContent !== '\u00B7') || t++ > 80) return; this.fillDims(); requestAnimationFrame(tick); }; requestAnimationFrame(tick); } });
+    }
+    const groups = [...map.entries()].map(([dir, items]) => {
+      const isCol = !!collapsed[dir];
+      return {
+        key: dir, label: dir.replace(/^Content\//, ''), count: items.length,
+        open: !isCol, caret: isCol ? '\u25B8' : '\u25BE',
+        toggle: () => this.setState(s => ({ collapsed: { ...s.collapsed, [dir]: !s.collapsed[dir] } })),
+        items,
+      };
+    });
+
+    const imgRender = pix ? 'pixelated' : 'auto';
+    return {
+      total: assets.length, shown, groups,
+      zoom: z, bg, pixelated: pix,
+      gridStyle: `display:grid;grid-template-columns:repeat(auto-fill,minmax(${z + 26}px,1fr));gap:12px;padding:6px 22px 22px`,
+      stageStyle: `width:100%;height:${z}px;display:flex;align-items:center;justify-content:center;border-radius:6px;${this.bgCss(bg)}`,
+      imgStyle: `max-width:${z - 14}px;max-height:${z - 14}px;image-rendering:${imgRender}`,
+      imgRef: (node) => { if (!node) return; let t = 0; const fill = () => { if (!node.naturalWidth) return false; const b = node.closest('button'); const d = b && b.querySelector('[data-dim]'); if (d) d.textContent = node.naturalWidth + '\u00D7' + node.naturalHeight; return true; }; if (fill()) return; const tick = () => { if (fill() || t++ > 150) return; requestAnimationFrame(tick); }; node.addEventListener('load', fill, { once: true }); requestAnimationFrame(tick); },
+      onQ: (e) => this.setState({ q: e.target.value }),
+      onZoom: (e) => this.setState({ zoom: +e.target.value }),
+      onBg: (e) => this.setState({ bg: e.target.value }),
+      onPixel: (e) => this.setState({ pixelated: e.target.checked }),
+      expandAll: () => this.setState({ collapsed: {} }),
+      collapseAll: () => { const c = {}; for (const g of map.keys()) c[g] = true; this.setState({ collapsed: c }); },
+      lb: this.state.lb,
+      lbClose: () => this.setState({ lb: null }),
+      lbStageStyle: `width:min(70vmin,520px);height:min(70vmin,520px);display:flex;align-items:center;justify-content:center;border-radius:10px;${this.bgCss(bg === 'light' ? 'light' : 'checker')}`,
+      lbImgStyle: `max-width:92%;max-height:92%;image-rendering:${imgRender}`,
+      lbRef: (node) => { if (!node) return; let t = 0; const fill = () => { if (!node.naturalWidth) return false; const ov = node.closest('div').parentElement; const d = ov && ov.querySelector('[data-lbdim]'); if (d) d.textContent = node.naturalWidth + '\u00D7' + node.naturalHeight + ' px'; return true; }; if (fill()) return; const tick = () => { if (fill() || t++ > 150) return; requestAnimationFrame(tick); }; node.addEventListener('load', fill, { once: true }); requestAnimationFrame(tick); },
+    };
+  }
+}
+</script>
+</body>
+</html>

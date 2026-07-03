@@ -196,6 +196,16 @@ charges, targets, or fires until powered.
 - **AUTO** (one global lit/unlit toggle, OFF by default): its only job is to **keep the target after a
   shot** so a module keeps firing at it. OFF = fire once, then clear.
 
+**Targeting PRESENTATION [LOCKED 2026-07-03]:** while TARGETING, the **cursor IS the reticle** — the OS
+cursor hides, the reticle sprite draws at the cursor position and **snaps/centres onto the hovered limb
+band**; click locks it there; cancel restores the cursor. **NO box affordances** during targeting — no
+whole-foe hover rectangle, no band outline boxes in-game (design/08's dashed bands are doc annotation
+only). A locked mount shows the **FOCUS reticle with an animated pulse** (fixed-tick driven,
+deterministic) plus an **AIM TAG reading the technique's HOTKEY NUMBER** — not its name (names overflow
+and collide when several actives aim the same part); multiple locks on one part **stack their numbers**.
+Action-bar cards are **numbered 1–N** (the hotkey), so tag ↔ card correspondence is visual. (Supersedes
+design/08's name-tag mount; CD updates design/01 + design/08.)
+
 **Foes erode the player the same way** — a foe hit deals the same simultaneous part+HP damage, mitigated
 only by the player's shields/evasion. Which limb a foe targets = a **per-foe TARGETING PERSONALITY**
 (data): **SMART** (best for its build) · **RANDOM** · **INEPT** (botches a good pick).
@@ -270,10 +280,16 @@ rune** (grown by progression). The *shape* of the rune loadout is itself a build
   OPEN: the old "aether" target is retired; redefine (vs Charge or a regenerating attribute) before it's
   real. Code currently grants a placeholder +CON — sample content, not the designed effect.]**
   Each CoreRune carries a **Core Effect** (renamed from "apex"; card label + blurb = `CoreEffectName`/
-  `CoreEffectDesc`, e.g. Grunt = *Hollow Vessel*) the build cards render (§13). Most are DISPLAY-ONLY card
-  text for now — the effects aren't built. **EXCEPTION — the Summoner's Core Effect is REAL + LOCKED
-  (2026-07-02):** on **Redeploy, surviving minions' Summons are refunded** (its economy edge, §9/§14; the
-  design/05 *Legion* label/blurb gets reconciled to this by CD). Build it right after HiFi (see STATUS).
+  `CoreEffectDesc`, e.g. Grunt = *Hollow Vessel*) the build cards render (§13).
+  **Core Effect roster CANON [ADOPTED 2026-07-03 from design/05 v2 — CD's pass accepted as the design]:**
+  Grunt *Hollow Vessel* — healed for unspent budget points after each encounter · Warden *Unbroken
+  Aegis* — shield points regenerate at twice their CON-scaled rate · Adept *Overchannel* — spells
+  reserve no INT while the head stays above three-quarters · Summoner *Legion* — surviving minions'
+  Summons are refunded on Redeploy · Reaver *Bloodrush* — every part you break refunds a charging
+  technique · Ranger *Called Shot* (renamed from *Piercing Focus*) — ranged techniques ignore the foe's
+  shield and cover bonuses. Names+copy are LOCKED; the MECHANICS get built in a dedicated effect-model
+  pass — until then card copy may describe unbuilt behavior (flagged, acceptable). **EXCEPTION — the
+  Summoner's is REAL + LOCKED (2026-07-02)** and already built (§9/§14).
 - **Prerequisite ladder [LOCKED]:** big runes need a minimum in an attribute, met by RACE base
   (efficient) **or** by spending budget on Marks to climb (mostly-refunded-but-leaks tax). Native
   qualification beats climbing.
@@ -313,8 +329,12 @@ Nested layers, macro → micro:
   - **[OPEN §17]** the weighted-shuffle / distribution algorithm (balanced attr-lean variety; e.g. "prefer
     1–2 passives, rarely 0, when techniques show") — a separate tuning pass.
   - **[NOTE]** placeholder rune behavior: POC currently just seeds runes into inventory at run start.
-  - The merchant SCREEN LAYOUT is a Claude Design item (design PNG → manifest); today's popover is a
-    flagged stopgap (§17).
+  - **Receiving [LOCKED 2026-07-03]:** every ware is a **click-to-buy tile** (per design/07) — no
+    separate ceremony. Purchases land in INVENTORY: technique → palette, minion → minion inventory,
+    rune → rune bag (Climb rules unchanged); **slotting stays Equipment's job**. Weapons/armor keep
+    their existing buy→stash flow. Blocked only by gold.
+  - The merchant SCREEN is DESIGNED: design/07 (v2, 2026-07-03) + manifest `merchant` screen — the
+    popover stopgap is retired; §17's screen-spec item is CLOSED.
 - **Layer 4 — encounter resolution:** every node is the one combat grammar (§8); the **castle is that
   grammar at max scale** (gate/wall/catapult/ballista + boss-tier, map-scaled damage; its "systems"
   are its parts).
@@ -438,9 +458,9 @@ points there so the canon stays design-focused.
 16. ITEM-RANKING / auto-unequip priority (§6): when a broken part drops an attribute below MULTIPLE items'
     requirements, a rule/ranking decides which gear disables first — needs design + tuning. Feeds the
     gear system (design-open).
-17. MERCHANT SCREEN: the merchant node's MECHANIC is designed (§12 out-of-combat HP heal + §14 gear shop),
-    but a merchant SCREEN was never specced — the game currently improvises a POPOVER. Spec it with Doug,
-    then CD designs it (design PNG → manifest → render, like every screen). The popover is a stopgap.
+17. ~~MERCHANT SCREEN~~ RESOLVED 2026-07-03: design/07 v2 + the manifest `merchant` screen ARE the
+    design; popover retired; click-to-buy receiving LOCKED in §12. Residual OPEN: ware pricing/rarity
+    economy tune (part of the balance pass).
 
 ## 18. DROPPED — must not resurface
 - **"Chassis" as the identity model** → split into **Race + Core rune** (§7).

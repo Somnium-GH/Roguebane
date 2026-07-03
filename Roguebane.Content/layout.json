@@ -1878,141 +1878,6 @@
           "image": "Content/bg/combat_field.png"
         },
         {
-          "id": "logo",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            13,
-            6
-          ],
-          "size": [
-            57,
-            15
-          ],
-          "z": 1,
-          "color": "inkWarm",
-          "font": "display",
-          "fontPx": 11.5,
-          "content": "Roguebane"
-        },
-        {
-          "id": "sceneLabel",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            79,
-            10
-          ],
-          "size": [
-            98,
-            8
-          ],
-          "z": 1,
-          "binds": "encounter.label",
-          "color": "muted",
-          "font": "mono",
-          "fontPx": 6,
-          "sample": "SKIRMISH · the high pass"
-        },
-        {
-          "id": "heldBadge",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            352,
-            6
-          ],
-          "size": [
-            48,
-            16
-          ],
-          "z": 1,
-          "binds": "combat.paused",
-          "color": "amber",
-          "fill": "slot",
-          "border": {
-            "color": "border",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "mono",
-          "fontPx": 6.5,
-          "sample": "❚❚ HELD"
-        },
-        {
-          "id": "topControls",
-          "type": "panel",
-          "anchor": "TopLeft",
-          "offset": [
-            575,
-            4
-          ],
-          "size": [
-            372,
-            20
-          ],
-          "z": 1,
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "autoAttackBtn",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            784,
-            4
-          ],
-          "size": [
-            98,
-            20
-          ],
-          "z": 1,
-          "binds": "combat.autoAttack",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "image": "Content/ui/button/button_on.png",
-          "states": {
-            "family": "button",
-            "normal": "ui/button/button_normal",
-            "hover": "ui/button/button_hover",
-            "down": "ui/button/button_down",
-            "disabled": "ui/button/button_disabled",
-            "on": "ui/button/button_on"
-          },
-          "sample": "⟳ AUTO-ATTACK"
-        },
-        {
-          "id": "retreatBtn",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            887,
-            4
-          ],
-          "size": [
-            60,
-            20
-          ],
-          "z": 1,
-          "binds": "combat.retreat",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "image": "Content/ui/button/button_normal.png",
-          "states": {
-            "family": "button",
-            "normal": "ui/button/button_normal",
-            "hover": "ui/button/button_hover",
-            "down": "ui/button/button_down",
-            "disabled": "ui/button/button_disabled",
-            "on": "ui/button/button_on"
-          },
-          "sample": "⮐ RETREAT"
-        },
-        {
           "id": "youLabel",
           "type": "text",
           "anchor": "TopLeft",
@@ -2050,7 +1915,7 @@
             18,
             13
           ],
-          "z": 1,
+          "z": 2,
           "color": "inkWarm",
           "font": "display",
           "fontPx": 10,
@@ -2065,8 +1930,26 @@
           "content": "Foe"
         },
         {
+          "id": "heroFigure",
+          "type": "figure",
+          "anchor": "BottomLeft",
+          "offset": [
+            60,
+            -222
+          ],
+          "size": [
+            180,
+            215
+          ],
+          "z": 3,
+          "binds": "Body",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
           "id": "heroHp",
-          "type": "text",
+          "type": "panel",
           "anchor": "TopLeft",
           "offset": [
             75,
@@ -2076,13 +1959,80 @@
             120,
             24
           ],
-          "z": 1,
+          "z": 4,
           "binds": "Body.hp",
           "color": "ink",
           "font": "display",
           "fontPx": 8,
+          "align": "center"
+        },
+        {
+          "id": "heroHpLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            75,
+            321
+          ],
+          "size": [
+            120,
+            7
+          ],
+          "z": 5,
+          "binds": "Body.hpLabel",
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 5,
           "align": "center",
-          "sample": "GRUNT · HP 9 / 12"
+          "sample": "GRUNT · HP"
+        },
+        {
+          "id": "heroHpPips",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            75,
+            330
+          ],
+          "size": [
+            120,
+            6
+          ],
+          "z": 6,
+          "binds": "Body.hp.points",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "align": "center",
+          "item": {
+            "template": "heroHpPip",
+            "flow": "horizontal",
+            "gap": 2,
+            "size": [
+              7,
+              6
+            ]
+          }
+        },
+        {
+          "id": "heroHpValue",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            75,
+            337
+          ],
+          "size": [
+            120,
+            7
+          ],
+          "z": 7,
+          "binds": "Body.hp",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 5.5,
+          "align": "center",
+          "sample": "9 / 12"
         },
         {
           "id": "heroShield",
@@ -2096,7 +2046,7 @@
             112,
             19
           ],
-          "z": 1,
+          "z": 8,
           "binds": "ShieldPool",
           "color": "ink",
           "font": "display",
@@ -2114,7 +2064,7 @@
             112,
             5
           ],
-          "z": 1,
+          "z": 9,
           "binds": "ShieldPool.points",
           "color": "ink",
           "font": "display",
@@ -2141,7 +2091,7 @@
             112,
             3
           ],
-          "z": 1,
+          "z": 10,
           "binds": "ShieldPool.regen",
           "color": "ink",
           "fill": "slot",
@@ -2150,6 +2100,42 @@
             "w": 1,
             "style": "solid"
           },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "minionField",
+          "type": "figure",
+          "anchor": "Bottom",
+          "offset": [
+            -214,
+            -256
+          ],
+          "size": [
+            75,
+            84
+          ],
+          "z": 11,
+          "binds": "encounter.minions",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "foeFigure",
+          "type": "figure",
+          "anchor": "BottomRight",
+          "offset": [
+            -45,
+            -217
+          ],
+          "size": [
+            180,
+            220
+          ],
+          "z": 12,
+          "binds": "encounter.foe",
+          "color": "ink",
           "font": "display",
           "fontPx": 8
         },
@@ -2165,16 +2151,48 @@
             64,
             64
           ],
-          "z": 1,
+          "z": 13,
           "binds": "targeting.focus",
           "color": "ink",
           "font": "display",
           "fontPx": 8,
-          "image": "Content/ui/reticle/focus.png"
+          "image": "Content/ui/reticle/focus_p0.png",
+          "frames": [
+            "ui/reticle/focus_p0",
+            "ui/reticle/focus_p1",
+            "ui/reticle/focus_p2"
+          ]
+        },
+        {
+          "id": "foeAimTags",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            800,
+            128
+          ],
+          "size": [
+            11,
+            11
+          ],
+          "z": 14,
+          "binds": "targeting.tags",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "aimTag",
+            "flow": "horizontal",
+            "gap": 2,
+            "size": [
+              11,
+              11
+            ]
+          }
         },
         {
           "id": "foeHp",
-          "type": "text",
+          "type": "panel",
           "anchor": "TopLeft",
           "offset": [
             750,
@@ -2184,13 +2202,253 @@
             150,
             14
           ],
-          "z": 1,
+          "z": 15,
           "binds": "encounter.foe.hp",
           "color": "ink",
           "font": "display",
           "fontPx": 8,
+          "align": "center"
+        },
+        {
+          "id": "foeHpLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            750,
+            321
+          ],
+          "size": [
+            150,
+            7
+          ],
+          "z": 16,
+          "binds": "encounter.foe.hpLabel",
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 5,
           "align": "center",
           "sample": "DIRE OGRE · HP 14 / 20"
+        },
+        {
+          "id": "foeHpPips",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            750,
+            330
+          ],
+          "size": [
+            150,
+            6
+          ],
+          "z": 17,
+          "binds": "encounter.foe.hp.points",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "align": "center",
+          "item": {
+            "template": "foeHpPip",
+            "flow": "horizontal",
+            "gap": 1,
+            "size": [
+              6,
+              6
+            ]
+          }
+        },
+        {
+          "id": "statusStrip",
+          "type": "panel",
+          "anchor": "Top",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            28
+          ],
+          "z": 18,
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "slot",
+            "to": "panelCard",
+            "dir": "vertical"
+          },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "bottom"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "logo",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            13,
+            6
+          ],
+          "size": [
+            57,
+            15
+          ],
+          "z": 19,
+          "color": "inkWarm",
+          "font": "display",
+          "fontPx": 11.5,
+          "content": "Roguebane"
+        },
+        {
+          "id": "sceneLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            79,
+            10
+          ],
+          "size": [
+            98,
+            8
+          ],
+          "z": 20,
+          "binds": "encounter.label",
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 6,
+          "sample": "SKIRMISH"
+        },
+        {
+          "id": "heldBadge",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            352,
+            6
+          ],
+          "size": [
+            48,
+            16
+          ],
+          "z": 21,
+          "binds": "combat.paused",
+          "color": "amber",
+          "fill": "slot",
+          "border": {
+            "color": "border",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 6.5,
+          "content": "❚❚ HELD"
+        },
+        {
+          "id": "topControls",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            575,
+            4
+          ],
+          "size": [
+            372,
+            20
+          ],
+          "z": 22,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "resourceStrip",
+          "type": "list",
+          "anchor": "TopRight",
+          "offset": [
+            -188,
+            8
+          ],
+          "size": [
+            197,
+            11
+          ],
+          "z": 23,
+          "binds": "run.resources",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "resourceItem",
+            "flow": "horizontal",
+            "gap": 8,
+            "size": [
+              47,
+              11
+            ]
+          }
+        },
+        {
+          "id": "autoAttackBtn",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            784,
+            4
+          ],
+          "size": [
+            98,
+            20
+          ],
+          "z": 24,
+          "binds": "combat.autoAttack",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/ui/button/button_on.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "content": "⟳ AUTO-ATTACK"
+        },
+        {
+          "id": "retreatBtn",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            887,
+            4
+          ],
+          "size": [
+            60,
+            20
+          ],
+          "z": 25,
+          "binds": "combat.retreat",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/ui/button/button_normal.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "content": "⮐ RETREAT"
         },
         {
           "id": "hudFooter",
@@ -2204,7 +2462,7 @@
             960,
             182
           ],
-          "z": 1,
+          "z": 26,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -2232,6 +2490,32 @@
           }
         },
         {
+          "id": "attrPool",
+          "type": "panel",
+          "anchor": "BottomLeft",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            330,
+            181
+          ],
+          "z": 27,
+          "binds": "Body.pool",
+          "color": "ink",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "right"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
           "id": "attrPoolTitle",
           "type": "text",
           "anchor": "TopLeft",
@@ -2243,7 +2527,7 @@
             79,
             15
           ],
-          "z": 1,
+          "z": 28,
           "color": "inkBright",
           "font": "display",
           "fontPx": 12,
@@ -2261,7 +2545,7 @@
             309,
             77
           ],
-          "z": 1,
+          "z": 29,
           "binds": "pool",
           "color": "ink",
           "font": "display",
@@ -2288,12 +2572,30 @@
             309,
             6
           ],
-          "z": 1,
+          "z": 30,
           "binds": "pool.legend",
           "color": "mutedWarm",
           "font": "mono",
           "fontPx": 4.5,
           "sample": "equipment reserved active skill free debuff damage"
+        },
+        {
+          "id": "actionBar",
+          "type": "panel",
+          "anchor": "Bottom",
+          "offset": [
+            165,
+            0
+          ],
+          "size": [
+            630,
+            181
+          ],
+          "z": 31,
+          "binds": "loadout",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
         },
         {
           "id": "actionBarTitle",
@@ -2307,7 +2609,7 @@
             59,
             15
           ],
-          "z": 1,
+          "z": 32,
           "color": "inkBright",
           "font": "display",
           "fontPx": 12,
@@ -2325,7 +2627,7 @@
             495,
             7
           ],
-          "z": 1,
+          "z": 33,
           "color": "parch",
           "font": "mono",
           "fontPx": 5,
@@ -2343,7 +2645,7 @@
             495,
             136
           ],
-          "z": 1,
+          "z": 34,
           "binds": "loadout.techniques",
           "color": "ink",
           "font": "display",
@@ -2370,7 +2672,7 @@
             100,
             7
           ],
-          "z": 1,
+          "z": 35,
           "color": "parch",
           "font": "mono",
           "fontPx": 5,
@@ -2388,7 +2690,7 @@
             100,
             136
           ],
-          "z": 1,
+          "z": 36,
           "binds": "loadout.bays",
           "color": "ink",
           "font": "display",
@@ -2402,133 +2704,29 @@
               136
             ]
           }
-        },
+        }
+      ]
+    },
+    "equipment": {
+      "designSize": [
+        960,
+        540
+      ],
+      "elements": [
         {
-          "id": "heroFigure",
-          "type": "figure",
-          "anchor": "BottomLeft",
+          "id": "equipPanel",
+          "type": "panel",
+          "anchor": "Left",
           "offset": [
-            60,
-            -222
+            0,
+            -52
           ],
           "size": [
-            180,
-            215
+            250,
+            380
           ],
-          "z": 2,
+          "z": 0,
           "binds": "Body",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "minionField",
-          "type": "figure",
-          "anchor": "Bottom",
-          "offset": [
-            -214,
-            -256
-          ],
-          "size": [
-            75,
-            84
-          ],
-          "z": 2,
-          "binds": "encounter.minions",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "foeFigure",
-          "type": "figure",
-          "anchor": "BottomRight",
-          "offset": [
-            -45,
-            -217
-          ],
-          "size": [
-            180,
-            220
-          ],
-          "z": 2,
-          "binds": "encounter.foe",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "statusStrip",
-          "type": "panel",
-          "anchor": "Top",
-          "offset": [
-            0,
-            0
-          ],
-          "size": [
-            960,
-            28
-          ],
-          "z": 6,
-          "color": "ink",
-          "fill": {
-            "type": "gradient",
-            "from": "slot",
-            "to": "panelCard",
-            "dir": "vertical"
-          },
-          "border": {
-            "color": "borderMid",
-            "w": 1,
-            "style": "solid",
-            "sides": [
-              "bottom"
-            ]
-          },
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "resourceStrip",
-          "type": "list",
-          "anchor": "TopRight",
-          "offset": [
-            -188,
-            8
-          ],
-          "size": [
-            197,
-            11
-          ],
-          "z": 6,
-          "binds": "run.resources",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "item": {
-            "template": "resourceItem",
-            "flow": "horizontal",
-            "gap": 8,
-            "size": [
-              47,
-              11
-            ]
-          }
-        },
-        {
-          "id": "attrPool",
-          "type": "panel",
-          "anchor": "BottomLeft",
-          "offset": [
-            0,
-            0
-          ],
-          "size": [
-            330,
-            181
-          ],
-          "z": 6,
-          "binds": "Body.pool",
           "color": "ink",
           "border": {
             "color": "borderDim",
@@ -2542,86 +2740,23 @@
           "fontPx": 8
         },
         {
-          "id": "actionBar",
-          "type": "panel",
-          "anchor": "Bottom",
+          "id": "backdrop",
+          "type": "text",
+          "anchor": "TopLeft",
           "offset": [
-            165,
-            0
+            0,
+            28
           ],
           "size": [
-            630,
-            181
+            249,
+            380
           ],
-          "z": 6,
-          "binds": "loadout",
+          "z": 1,
+          "binds": "equipment.scene",
           "color": "ink",
           "font": "display",
-          "fontPx": 8
-        }
-      ]
-    },
-    "equipment": {
-      "designSize": [
-        960,
-        540
-      ],
-      "elements": [
-        {
-          "id": "logo",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            13,
-            6
-          ],
-          "size": [
-            57,
-            15
-          ],
-          "z": 1,
-          "color": "inkWarm",
-          "font": "display",
-          "fontPx": 11.5,
-          "content": "Roguebane"
-        },
-        {
-          "id": "coreLabel",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            841,
-            10
-          ],
-          "size": [
-            36,
-            8
-          ],
-          "z": 1,
-          "binds": "core.name",
-          "color": "mutedWarm",
-          "font": "mono",
-          "fontPx": 6,
-          "sample": "CORE GRUNT"
-        },
-        {
-          "id": "marchState",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            888,
-            10
-          ],
-          "size": [
-            59,
-            8
-          ],
-          "z": 1,
-          "binds": "run.state",
-          "color": "good",
-          "font": "mono",
-          "fontPx": 6,
-          "sample": "▶ READY TO MARCH"
+          "fontPx": 8,
+          "image": "Content/bg/build_alcove.png"
         },
         {
           "id": "equipTitle",
@@ -2635,7 +2770,7 @@
             55,
             14
           ],
-          "z": 1,
+          "z": 2,
           "color": "inkWarm",
           "font": "display",
           "fontPx": 11,
@@ -2650,6 +2785,24 @@
           "content": "Equipment"
         },
         {
+          "id": "paperDoll",
+          "type": "figure",
+          "anchor": "Left",
+          "offset": [
+            75,
+            -59
+          ],
+          "size": [
+            120,
+            215
+          ],
+          "z": 3,
+          "binds": "Body",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
           "id": "partLabelHead",
           "type": "text",
           "anchor": "TopLeft",
@@ -2661,7 +2814,7 @@
             35,
             7
           ],
-          "z": 1,
+          "z": 4,
           "color": "int",
           "font": "mono",
           "fontPx": 5,
@@ -2679,7 +2832,7 @@
             41,
             1
           ],
-          "z": 1,
+          "z": 5,
           "color": "ink",
           "fill": "int",
           "font": "display",
@@ -2697,7 +2850,7 @@
             35,
             7
           ],
-          "z": 1,
+          "z": 6,
           "color": "str",
           "font": "mono",
           "fontPx": 5,
@@ -2715,7 +2868,7 @@
             18,
             1
           ],
-          "z": 1,
+          "z": 7,
           "color": "ink",
           "fill": "str",
           "font": "display",
@@ -2733,7 +2886,7 @@
             39,
             7
           ],
-          "z": 1,
+          "z": 8,
           "color": "gold",
           "font": "mono",
           "fontPx": 5,
@@ -2751,7 +2904,7 @@
             35,
             1
           ],
-          "z": 1,
+          "z": 9,
           "color": "ink",
           "fill": "gold",
           "font": "display",
@@ -2769,7 +2922,7 @@
             35,
             7
           ],
-          "z": 1,
+          "z": 10,
           "color": "dex",
           "font": "mono",
           "fontPx": 5,
@@ -2787,7 +2940,7 @@
             46,
             1
           ],
-          "z": 1,
+          "z": 11,
           "color": "ink",
           "fill": "dex",
           "font": "display",
@@ -2805,7 +2958,7 @@
             431,
             15
           ],
-          "z": 1,
+          "z": 12,
           "color": "ink",
           "font": "display",
           "fontPx": 11.5,
@@ -2831,7 +2984,7 @@
             431,
             67
           ],
-          "z": 1,
+          "z": 13,
           "binds": "attrs",
           "color": "ink",
           "font": "display",
@@ -2847,18 +3000,57 @@
           }
         },
         {
+          "id": "inventory",
+          "type": "panel",
+          "anchor": "Center",
+          "offset": [
+            -3,
+            -4
+          ],
+          "size": [
+            431,
+            270
+          ],
+          "z": 14,
+          "binds": "inventory",
+          "color": "ink",
+          "fill": "panelTab",
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          },
+          "frame": {
+            "token": "card",
+            "asset": "ui/frame/card",
+            "slice": [
+              12,
+              12,
+              12,
+              12
+            ],
+            "repeat": "tile",
+            "centerFill": true
+          }
+        },
+        {
           "id": "invTabs",
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            262,
-            151
+            267,
+            156
           ],
           "size": [
-            429,
+            419,
             29
           ],
-          "z": 1,
+          "z": 15,
           "binds": "inventory.tabs",
           "color": "ink",
           "font": "display",
@@ -2867,6 +3059,12 @@
             "template": "invTab",
             "flow": "horizontal",
             "gap": 4,
+            "pad": [
+              5,
+              8,
+              6,
+              8
+            ],
             "size": [
               40,
               18
@@ -2878,14 +3076,14 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            270,
-            180
+            275,
+            185
           ],
           "size": [
-            413,
+            403,
             105
           ],
-          "z": 1,
+          "z": 16,
           "binds": "inventory.activeTab.items",
           "color": "ink",
           "font": "display",
@@ -2896,10 +3094,34 @@
             "gap": 6,
             "cols": 2,
             "size": [
-              204,
+              199,
               31
             ]
           }
+        },
+        {
+          "id": "runeBag",
+          "type": "panel",
+          "anchor": "Right",
+          "offset": [
+            0,
+            -52
+          ],
+          "size": [
+            256,
+            380
+          ],
+          "z": 17,
+          "binds": "runes",
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "borderDim",
+            "to": "panelCard",
+            "dir": "vertical"
+          },
+          "font": "display",
+          "fontPx": 8
         },
         {
           "id": "runeBagTitle",
@@ -2913,7 +3135,7 @@
             51,
             15
           ],
-          "z": 1,
+          "z": 18,
           "color": "ink",
           "font": "display",
           "fontPx": 11.5,
@@ -2939,7 +3161,7 @@
             236,
             17
           ],
-          "z": 1,
+          "z": 19,
           "binds": "runes.budget",
           "color": "ink",
           "font": "display",
@@ -2958,7 +3180,7 @@
             236,
             8
           ],
-          "z": 1,
+          "z": 20,
           "binds": "runes.budgetPct",
           "color": "ink",
           "fill": "slot",
@@ -2982,7 +3204,7 @@
             117,
             6
           ],
-          "z": 1,
+          "z": 21,
           "binds": "runes.budgetPct",
           "color": "ink",
           "fill": "int",
@@ -3001,7 +3223,7 @@
             236,
             309
           ],
-          "z": 1,
+          "z": 22,
           "binds": "runeGroups",
           "color": "ink",
           "font": "display",
@@ -3017,6 +3239,187 @@
           }
         },
         {
+          "id": "statusStrip",
+          "type": "panel",
+          "anchor": "Top",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            28
+          ],
+          "z": 23,
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "slot",
+            "to": "panelCard",
+            "dir": "vertical"
+          },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "bottom"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "logo",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            13,
+            6
+          ],
+          "size": [
+            57,
+            15
+          ],
+          "z": 24,
+          "color": "inkWarm",
+          "font": "display",
+          "fontPx": 11.5,
+          "content": "Roguebane"
+        },
+        {
+          "id": "coreLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            81,
+            10
+          ],
+          "size": [
+            36,
+            8
+          ],
+          "z": 25,
+          "binds": "core.name",
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 6,
+          "sample": "CORE GRUNT"
+        },
+        {
+          "id": "marchState",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            128,
+            10
+          ],
+          "size": [
+            59,
+            8
+          ],
+          "z": 26,
+          "binds": "run.state",
+          "color": "good",
+          "font": "mono",
+          "fontPx": 6,
+          "sample": "▶ READY TO MARCH"
+        },
+        {
+          "id": "resourceStrip",
+          "type": "list",
+          "anchor": "TopRight",
+          "offset": [
+            -84,
+            8
+          ],
+          "size": [
+            197,
+            11
+          ],
+          "z": 27,
+          "binds": "run.resources",
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 6,
+          "item": {
+            "template": "resourceItem",
+            "flow": "horizontal",
+            "gap": 8,
+            "size": [
+              47,
+              11
+            ]
+          }
+        },
+        {
+          "id": "closeBtn",
+          "type": "text",
+          "anchor": "TopRight",
+          "offset": [
+            -13,
+            4
+          ],
+          "size": [
+            60,
+            20
+          ],
+          "z": 28,
+          "binds": "nav.close",
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 6,
+          "image": "Content/ui/button/button_normal.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "content": "✕ CLOSE"
+        },
+        {
+          "id": "bottomBand",
+          "type": "panel",
+          "anchor": "Bottom",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            132
+          ],
+          "z": 29,
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "panel",
+            "to": "panelTab",
+            "dir": "vertical"
+          },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "top"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          }
+        },
+        {
           "id": "currentCore",
           "type": "panel",
           "anchor": "TopLeft",
@@ -3028,7 +3431,7 @@
             150,
             131
           ],
-          "z": 1,
+          "z": 30,
           "binds": "core",
           "color": "ink",
           "border": {
@@ -3054,7 +3457,7 @@
             131,
             14
           ],
-          "z": 1,
+          "z": 31,
           "binds": "core.name",
           "color": "inkBright",
           "font": "display",
@@ -3073,7 +3476,7 @@
             131,
             7
           ],
-          "z": 1,
+          "z": 32,
           "binds": "core.role",
           "color": "muted",
           "font": "mono",
@@ -3090,9 +3493,9 @@
           ],
           "size": [
             131,
-            25
+            16
           ],
-          "z": 1,
+          "z": 33,
           "binds": "core.stats",
           "color": "ink",
           "font": "mono",
@@ -3114,13 +3517,13 @@
           "anchor": "TopLeft",
           "offset": [
             9,
-            485
+            476
           ],
           "size": [
             131,
             40
           ],
-          "z": 1,
+          "z": 34,
           "binds": "core.coreEffect",
           "color": "ink",
           "border": {
@@ -3140,13 +3543,13 @@
           "anchor": "TopLeft",
           "offset": [
             16,
-            486
+            477
           ],
           "size": [
             124,
             6
           ],
-          "z": 1,
+          "z": 35,
           "color": "mutedDim",
           "font": "mono",
           "fontPx": 4.5,
@@ -3158,13 +3561,13 @@
           "anchor": "TopLeft",
           "offset": [
             16,
-            494
+            485
           ],
           "size": [
             124,
             11
           ],
-          "z": 1,
+          "z": 36,
           "binds": "core.coreEffectName",
           "color": "inkBright",
           "font": "display",
@@ -3177,13 +3580,13 @@
           "anchor": "TopLeft",
           "offset": [
             16,
-            507
+            498
           ],
           "size": [
             124,
             16
           ],
-          "z": 1,
+          "z": 37,
           "binds": "core.coreEffectDesc",
           "color": "muted",
           "font": "mono",
@@ -3202,7 +3605,7 @@
             810,
             131
           ],
-          "z": 1,
+          "z": 38,
           "binds": "loadout",
           "color": "ink",
           "font": "display",
@@ -3220,7 +3623,7 @@
             50,
             13
           ],
-          "z": 1,
+          "z": 39,
           "color": "inkBright",
           "font": "display",
           "fontPx": 10,
@@ -3246,7 +3649,7 @@
             681,
             7
           ],
-          "z": 1,
+          "z": 40,
           "binds": "loadout.slotLabel",
           "color": "parch",
           "font": "mono",
@@ -3265,7 +3668,7 @@
             681,
             89
           ],
-          "z": 1,
+          "z": 41,
           "binds": "loadout",
           "color": "ink",
           "font": "display",
@@ -3292,7 +3695,7 @@
             94,
             7
           ],
-          "z": 1,
+          "z": 42,
           "binds": "minions.slotLabel",
           "color": "parch",
           "font": "mono",
@@ -3311,7 +3714,7 @@
             94,
             89
           ],
-          "z": 1,
+          "z": 43,
           "binds": "minions",
           "color": "ink",
           "font": "display",
@@ -3321,121 +3724,36 @@
             "flow": "horizontal",
             "gap": 6
           }
-        },
+        }
+      ]
+    },
+    "citymap": {
+      "designSize": [
+        960,
+        540
+      ],
+      "elements": [
         {
-          "id": "equipPanel",
-          "type": "panel",
-          "anchor": "Left",
+          "id": "backdrop",
+          "type": "text",
+          "anchor": "TopLeft",
           "offset": [
             0,
-            -52
+            0
           ],
           "size": [
-            250,
-            380
+            960,
+            540
           ],
-          "z": 2,
-          "binds": "Body",
+          "z": 0,
+          "binds": "citymap.scene",
           "color": "ink",
-          "border": {
-            "color": "borderDim",
-            "w": 1,
-            "style": "solid",
-            "sides": [
-              "right"
-            ]
-          },
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "paperDoll",
-          "type": "figure",
-          "anchor": "Left",
-          "offset": [
-            75,
-            -59
-          ],
-          "size": [
-            120,
-            215
-          ],
-          "z": 2,
-          "binds": "Body",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "inventory",
-          "type": "panel",
-          "anchor": "Center",
-          "offset": [
-            -3,
-            -4
-          ],
-          "size": [
-            431,
-            270
-          ],
-          "z": 5,
-          "binds": "inventory",
-          "color": "ink",
-          "fill": "panelTab",
-          "border": {
-            "color": "borderMid",
-            "w": 1,
-            "style": "solid"
-          },
           "font": "display",
           "fontPx": 8,
-          "shadow": {
-            "token": "panel",
-            "dx": 0,
-            "dy": 4,
-            "blur": 10,
-            "color": "outline",
-            "opacity": 0.5
-          },
-          "frame": {
-            "token": "card",
-            "asset": "ui/frame/card",
-            "slice": [
-              36,
-              36,
-              36,
-              36
-            ],
-            "repeat": "tile",
-            "centerFill": true
-          }
+          "image": "Content/bg/map_chart.png"
         },
         {
-          "id": "runeBag",
-          "type": "panel",
-          "anchor": "Right",
-          "offset": [
-            0,
-            -52
-          ],
-          "size": [
-            256,
-            380
-          ],
-          "z": 5,
-          "binds": "runes",
-          "color": "ink",
-          "fill": {
-            "type": "gradient",
-            "from": "borderDim",
-            "to": "panelCard",
-            "dir": "vertical"
-          },
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "statusStrip",
+          "id": "topStrip",
           "type": "panel",
           "anchor": "Top",
           "offset": [
@@ -3446,7 +3764,7 @@
             960,
             28
           ],
-          "z": 6,
+          "z": 1,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -3466,80 +3784,6 @@
           "fontPx": 8
         },
         {
-          "id": "resourceStrip",
-          "type": "list",
-          "anchor": "TopRight",
-          "offset": [
-            -130,
-            8
-          ],
-          "size": [
-            197,
-            11
-          ],
-          "z": 6,
-          "binds": "run.resources",
-          "color": "mutedWarm",
-          "font": "mono",
-          "fontPx": 6,
-          "item": {
-            "template": "resourceItem",
-            "flow": "horizontal",
-            "gap": 8,
-            "size": [
-              47,
-              11
-            ]
-          }
-        },
-        {
-          "id": "bottomBand",
-          "type": "panel",
-          "anchor": "Bottom",
-          "offset": [
-            0,
-            0
-          ],
-          "size": [
-            960,
-            132
-          ],
-          "z": 6,
-          "color": "ink",
-          "fill": {
-            "type": "gradient",
-            "from": "panel",
-            "to": "panelTab",
-            "dir": "vertical"
-          },
-          "border": {
-            "color": "borderMid",
-            "w": 1,
-            "style": "solid",
-            "sides": [
-              "top"
-            ]
-          },
-          "font": "display",
-          "fontPx": 8,
-          "shadow": {
-            "token": "panel",
-            "dx": 0,
-            "dy": 4,
-            "blur": 10,
-            "color": "outline",
-            "opacity": 0.5
-          }
-        }
-      ]
-    },
-    "citymap": {
-      "designSize": [
-        960,
-        540
-      ],
-      "elements": [
-        {
           "id": "logo",
           "type": "text",
           "anchor": "TopLeft",
@@ -3551,7 +3795,7 @@
             57,
             15
           ],
-          "z": 1,
+          "z": 2,
           "color": "inkWarm",
           "font": "display",
           "fontPx": 11.5,
@@ -3569,11 +3813,38 @@
             90,
             8
           ],
-          "z": 1,
+          "z": 3,
           "color": "muted",
           "font": "mono",
           "fontPx": 6,
           "content": "THE CITY OF THORNMARCH"
+        },
+        {
+          "id": "resourceStrip",
+          "type": "list",
+          "anchor": "TopRight",
+          "offset": [
+            -49,
+            8
+          ],
+          "size": [
+            197,
+            11
+          ],
+          "z": 4,
+          "binds": "run.resources",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "resourceItem",
+            "flow": "horizontal",
+            "gap": 8,
+            "size": [
+              47,
+              11
+            ]
+          }
         },
         {
           "id": "layerNote",
@@ -3587,180 +3858,11 @@
             25,
             8
           ],
-          "z": 1,
+          "z": 5,
           "color": "mutedWarm",
           "font": "mono",
           "fontPx": 6,
           "content": "LAYER 2"
-        },
-        {
-          "id": "doomEta",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            545,
-            46
-          ],
-          "size": [
-            103,
-            8
-          ],
-          "z": 1,
-          "color": "hit",
-          "font": "mono",
-          "fontPx": 6,
-          "content": "1 WAYPOINT AWAY FROM CAMP"
-        },
-        {
-          "id": "doomCampIcon",
-          "type": "icon",
-          "anchor": "TopLeft",
-          "offset": [
-            313,
-            60
-          ],
-          "size": [
-            22,
-            22
-          ],
-          "z": 1,
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "image": "Content/icons/node/camp.png",
-          "shadow": {
-            "token": "soft",
-            "dx": 0,
-            "dy": 3,
-            "blur": 4,
-            "color": "outline",
-            "opacity": 0.45
-          }
-        },
-        {
-          "id": "doomTrack",
-          "type": "panel",
-          "anchor": "TopLeft",
-          "offset": [
-            341,
-            60
-          ],
-          "size": [
-            277,
-            21
-          ],
-          "z": 1,
-          "color": "ink",
-          "fill": "panel",
-          "border": {
-            "color": "borderMid",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "doomFill",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            359,
-            61
-          ],
-          "size": [
-            259,
-            19
-          ],
-          "z": 1,
-          "binds": "enemy.advancePct",
-          "color": "ink",
-          "fill": {
-            "type": "gradient",
-            "from": "blood",
-            "to": "blood",
-            "dir": "diagonal"
-          },
-          "border": {
-            "color": "panel",
-            "w": 1,
-            "style": "solid",
-            "sides": [
-              "left"
-            ]
-          },
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "doomHost",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            338,
-            39
-          ],
-          "size": [
-            41,
-            41
-          ],
-          "z": 1,
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "image": "Content/icons/map/enemy_host_near.png",
-          "shadow": {
-            "token": "soft",
-            "dx": 0,
-            "dy": 3,
-            "blur": 4,
-            "color": "outline",
-            "opacity": 0.45
-          }
-        },
-        {
-          "id": "doomCastleIcon",
-          "type": "icon",
-          "anchor": "TopLeft",
-          "offset": [
-            624,
-            59
-          ],
-          "size": [
-            23,
-            23
-          ],
-          "z": 1,
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "image": "Content/icons/node/castle.png",
-          "shadow": {
-            "token": "soft",
-            "dx": 0,
-            "dy": 3,
-            "blur": 4,
-            "color": "outline",
-            "opacity": 0.45
-          }
-        },
-        {
-          "id": "exitLabel",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            862,
-            248
-          ],
-          "size": [
-            24,
-            7
-          ],
-          "z": 1,
-          "color": "parch",
-          "font": "mono",
-          "fontPx": 5,
-          "content": "EXIT →"
         },
         {
           "id": "chart",
@@ -3774,7 +3876,7 @@
             960,
             406
           ],
-          "z": 2,
+          "z": 6,
           "binds": "map",
           "color": "ink",
           "font": "display",
@@ -3809,23 +3911,41 @@
           }
         },
         {
-          "id": "castleNote",
+          "id": "exitLabel",
           "type": "text",
-          "anchor": "Right",
+          "anchor": "TopLeft",
           "offset": [
-            -35,
-            116
+            862,
+            248
           ],
           "size": [
-            150,
-            16
+            24,
+            7
           ],
-          "z": 3,
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "align": "center",
-          "content": "CASTLE FORTIFICATIONSgate · wall · catapult · ballista"
+          "z": 7,
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 5,
+          "content": "EXIT →"
+        },
+        {
+          "id": "youAreHere",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            30,
+            282
+          ],
+          "size": [
+            60,
+            7
+          ],
+          "z": 8,
+          "binds": "map.current",
+          "color": "good",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "▼ YOU ARE HERE"
         },
         {
           "id": "supplies",
@@ -3837,9 +3957,9 @@
           ],
           "size": [
             137,
-            51
+            53
           ],
-          "z": 5,
+          "z": 9,
           "binds": "supplies",
           "color": "ink",
           "fill": "panel",
@@ -3857,13 +3977,40 @@
             "token": "card",
             "asset": "ui/frame/card",
             "slice": [
-              36,
-              36,
-              36,
-              36
+              12,
+              12,
+              12,
+              12
             ],
             "repeat": "tile",
             "centerFill": true
+          }
+        },
+        {
+          "id": "suppliesPips",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            22,
+            59
+          ],
+          "size": [
+            119,
+            8
+          ],
+          "z": 10,
+          "binds": "supplies.points",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "supplyPip",
+            "flow": "horizontal",
+            "gap": 2,
+            "size": [
+              11,
+              8
+            ]
           }
         },
         {
@@ -3876,9 +4023,9 @@
           ],
           "size": [
             137,
-            51
+            53
           ],
-          "z": 5,
+          "z": 11,
           "binds": "support",
           "color": "ink",
           "fill": "panel",
@@ -3896,13 +4043,40 @@
             "token": "card",
             "asset": "ui/frame/card",
             "slice": [
-              36,
-              36,
-              36,
-              36
+              12,
+              12,
+              12,
+              12
             ],
             "repeat": "tile",
             "centerFill": true
+          }
+        },
+        {
+          "id": "supportPips",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            166,
+            59
+          ],
+          "size": [
+            119,
+            8
+          ],
+          "z": 12,
+          "binds": "support.points",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "supportPip",
+            "flow": "horizontal",
+            "gap": 3,
+            "size": [
+              58,
+              8
+            ]
           }
         },
         {
@@ -3915,17 +4089,12 @@
           ],
           "size": [
             240,
-            56
+            62
           ],
-          "z": 5,
+          "z": 13,
           "binds": "legend",
           "color": "mutedWarm",
           "fill": "panelCard",
-          "border": {
-            "color": "borderMid",
-            "w": 1,
-            "style": "solid"
-          },
           "font": "mono",
           "fontPx": 5.5,
           "shadow": {
@@ -3940,10 +4109,10 @@
             "token": "panel",
             "asset": "ui/frame/panel",
             "slice": [
-              60,
-              60,
-              60,
-              60
+              16,
+              16,
+              16,
+              16
             ],
             "repeat": "tile",
             "centerFill": true
@@ -3953,67 +4122,99 @@
             "flow": "grid",
             "gap": 4,
             "cols": 2,
+            "pad": [
+              2,
+              4,
+              2,
+              4
+            ],
             "size": [
-              107,
+              104,
               8
             ]
           }
         },
         {
-          "id": "topStrip",
+          "id": "castlePanel",
           "type": "panel",
-          "anchor": "Top",
-          "offset": [
-            0,
-            0
-          ],
-          "size": [
-            960,
-            28
-          ],
-          "z": 6,
-          "color": "ink",
-          "fill": {
-            "type": "gradient",
-            "from": "slot",
-            "to": "panelCard",
-            "dir": "vertical"
-          },
-          "border": {
-            "color": "borderMid",
-            "w": 1,
-            "style": "solid",
-            "sides": [
-              "bottom"
-            ]
-          },
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "resourceStrip",
-          "type": "list",
           "anchor": "TopRight",
           "offset": [
-            -49,
-            8
+            -13,
+            103
           ],
           "size": [
-            197,
+            150,
+            92
+          ],
+          "z": 14,
+          "binds": "city.castle",
+          "color": "ink",
+          "fill": "panel",
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          },
+          "frame": {
+            "token": "card",
+            "asset": "ui/frame/card",
+            "slice": [
+              12,
+              12,
+              12,
+              12
+            ],
+            "repeat": "tile",
+            "centerFill": true
+          }
+        },
+        {
+          "id": "castlePanelTitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            807,
+            111
+          ],
+          "size": [
+            130,
             11
           ],
-          "z": 6,
-          "binds": "run.resources",
+          "z": 15,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 9,
+          "content": "Castle Fortifications"
+        },
+        {
+          "id": "fortRows",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            807,
+            126
+          ],
+          "size": [
+            130,
+            61
+          ],
+          "z": 16,
+          "binds": "city.castle.parts",
           "color": "ink",
           "font": "display",
           "fontPx": 8,
           "item": {
-            "template": "resourceItem",
-            "flow": "horizontal",
-            "gap": 8,
+            "template": "fortRow",
+            "flow": "vertical",
+            "gap": 3,
             "size": [
-              47,
-              11
+              130,
+              13
             ]
           }
         },
@@ -4029,8 +4230,7 @@
             354,
             53
           ],
-          "z": 6,
-          "binds": "enemy.advance",
+          "z": 17,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -4047,8 +4247,178 @@
           "fontPx": 8
         },
         {
-          "id": "footer",
+          "id": "doomTitle",
           "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            313,
+            44
+          ],
+          "size": [
+            144,
+            11
+          ],
+          "z": 18,
+          "color": "parch",
+          "font": "display",
+          "fontPx": 9,
+          "content": "The Horde Marches on Thornmarch"
+        },
+        {
+          "id": "doomEta",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            545,
+            46
+          ],
+          "size": [
+            103,
+            8
+          ],
+          "z": 19,
+          "binds": "enemy.advance",
+          "color": "hit",
+          "font": "mono",
+          "fontPx": 6,
+          "sample": "1 WAYPOINT AWAY FROM CAMP"
+        },
+        {
+          "id": "doomCampIcon",
+          "type": "icon",
+          "anchor": "TopLeft",
+          "offset": [
+            313,
+            60
+          ],
+          "size": [
+            22,
+            22
+          ],
+          "z": 20,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/icons/node/camp.png",
+          "shadow": {
+            "token": "soft",
+            "dx": 0,
+            "dy": 3,
+            "blur": 4,
+            "color": "outline",
+            "opacity": 0.45
+          }
+        },
+        {
+          "id": "doomTrack",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            341,
+            60
+          ],
+          "size": [
+            277,
+            21
+          ],
+          "z": 21,
+          "color": "ink",
+          "fill": "panel",
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "doomFill",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            359,
+            61
+          ],
+          "size": [
+            259,
+            19
+          ],
+          "z": 22,
+          "binds": "enemy.advancePct",
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "blood",
+            "to": "blood",
+            "dir": "diagonal"
+          },
+          "border": {
+            "color": "panel",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "left"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "doomHost",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            338,
+            39
+          ],
+          "size": [
+            41,
+            41
+          ],
+          "z": 23,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/icons/map/enemy_host_near.png",
+          "shadow": {
+            "token": "soft",
+            "dx": 0,
+            "dy": 3,
+            "blur": 4,
+            "color": "outline",
+            "opacity": 0.45
+          }
+        },
+        {
+          "id": "doomCastleIcon",
+          "type": "icon",
+          "anchor": "TopLeft",
+          "offset": [
+            624,
+            59
+          ],
+          "size": [
+            23,
+            23
+          ],
+          "z": 24,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/icons/node/castle.png",
+          "shadow": {
+            "token": "soft",
+            "dx": 0,
+            "dy": 3,
+            "blur": 4,
+            "color": "outline",
+            "opacity": 0.45
+          }
+        },
+        {
+          "id": "footer",
+          "type": "panel",
           "anchor": "Bottom",
           "offset": [
             0,
@@ -4058,7 +4428,7 @@
             960,
             36
           ],
-          "z": 6,
+          "z": 25,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -4084,6 +4454,143 @@
             "color": "outline",
             "opacity": 0.5
           }
+        },
+        {
+          "id": "campaignStripLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            13,
+            519
+          ],
+          "size": [
+            32,
+            7
+          ],
+          "z": 26,
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 5,
+          "content": "CAMPAIGN"
+        },
+        {
+          "id": "campaignStrip",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            52,
+            515
+          ],
+          "size": [
+            110,
+            15
+          ],
+          "z": 27,
+          "binds": "campaign.cities",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "spineCity",
+            "flow": "horizontal",
+            "gap": 4,
+            "size": [
+              15,
+              15
+            ]
+          }
+        },
+        {
+          "id": "campaignTaken",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            169,
+            519
+          ],
+          "size": [
+            36,
+            7
+          ],
+          "z": 28,
+          "binds": "campaign.taken",
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 5.5,
+          "sample": "2 / 6 TAKEN"
+        },
+        {
+          "id": "packLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            433,
+            519
+          ],
+          "size": [
+            16,
+            7
+          ],
+          "z": 29,
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 5,
+          "content": "PACK"
+        },
+        {
+          "id": "packChips",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            455,
+            516
+          ],
+          "size": [
+            164,
+            13
+          ],
+          "z": 30,
+          "binds": "Body.gear",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "packChip",
+            "flow": "horizontal",
+            "gap": 4,
+            "size": [
+              37,
+              13
+            ]
+          }
+        },
+        {
+          "id": "equipmentBtn",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            847,
+            513
+          ],
+          "size": [
+            100,
+            20
+          ],
+          "z": 31,
+          "binds": "nav.equipment",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/ui/button/button_normal.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "content": "⚒ EQUIPMENT"
         }
       ]
     },
@@ -4113,6 +4620,23 @@
           "image": "Content/bg/spine_road.png"
         },
         {
+          "id": "header",
+          "type": "panel",
+          "anchor": "Top",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            47
+          ],
+          "z": 1,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
           "id": "eyebrow",
           "type": "text",
           "anchor": "TopLeft",
@@ -4124,7 +4648,7 @@
             234,
             8
           ],
-          "z": 1,
+          "z": 2,
           "color": "muted",
           "font": "mono",
           "fontPx": 6,
@@ -4150,7 +4674,7 @@
             234,
             24
           ],
-          "z": 1,
+          "z": 3,
           "color": "inkBright",
           "font": "display",
           "fontPx": 19,
@@ -4165,6 +4689,33 @@
           "content": "Advance Toward the Capital"
         },
         {
+          "id": "resourceStrip",
+          "type": "list",
+          "anchor": "TopRight",
+          "offset": [
+            -20,
+            20
+          ],
+          "size": [
+            197,
+            11
+          ],
+          "z": 4,
+          "binds": "run.resources",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "resourceItem",
+            "flow": "horizontal",
+            "gap": 8,
+            "size": [
+              47,
+              11
+            ]
+          }
+        },
+        {
           "id": "citiesTaken",
           "type": "text",
           "anchor": "TopRight",
@@ -4176,7 +4727,7 @@
             65,
             11
           ],
-          "z": 1,
+          "z": 5,
           "binds": "campaign.taken",
           "color": "mutedWarm",
           "font": "mono",
@@ -4196,7 +4747,7 @@
             960,
             410
           ],
-          "z": 2,
+          "z": 6,
           "binds": "campaign",
           "color": "ink",
           "font": "display",
@@ -4243,7 +4794,7 @@
             120,
             0
           ],
-          "z": 3,
+          "z": 7,
           "color": "ink",
           "font": "display",
           "fontPx": 8,
@@ -4258,50 +4809,6 @@
           }
         },
         {
-          "id": "header",
-          "type": "panel",
-          "anchor": "Top",
-          "offset": [
-            0,
-            0
-          ],
-          "size": [
-            960,
-            47
-          ],
-          "z": 5,
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "resourceStrip",
-          "type": "list",
-          "anchor": "TopRight",
-          "offset": [
-            -20,
-            20
-          ],
-          "size": [
-            197,
-            11
-          ],
-          "z": 5,
-          "binds": "run.resources",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "item": {
-            "template": "resourceItem",
-            "flow": "horizontal",
-            "gap": 8,
-            "size": [
-              47,
-              11
-            ]
-          }
-        },
-        {
           "id": "footer",
           "type": "text",
           "anchor": "Bottom",
@@ -4313,7 +4820,7 @@
             960,
             45
           ],
-          "z": 6,
+          "z": 8,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -4349,6 +4856,46 @@
       ],
       "elements": [
         {
+          "id": "topBar",
+          "type": "panel",
+          "anchor": "Top",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            32
+          ],
+          "z": 0,
+          "binds": "selection",
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "slot",
+            "to": "panelCard",
+            "dir": "vertical"
+          },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "bottom"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          }
+        },
+        {
           "id": "logo",
           "type": "text",
           "anchor": "TopLeft",
@@ -4378,404 +4925,11 @@
             97,
             8
           ],
-          "z": 1,
+          "z": 2,
           "color": "muted",
           "font": "mono",
           "fontPx": 6,
           "content": "Choose your Loadout"
-        },
-        {
-          "id": "raceHeader",
-          "type": "text",
-          "anchor": "Left",
-          "offset": [
-            10,
-            -221
-          ],
-          "size": [
-            209,
-            15
-          ],
-          "z": 1,
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "content": "① Race"
-        },
-        {
-          "id": "coreHeader",
-          "type": "text",
-          "anchor": "Center",
-          "offset": [
-            0,
-            -221
-          ],
-          "size": [
-            476,
-            15
-          ],
-          "z": 1,
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "content": "② Core Rune"
-        },
-        {
-          "id": "loadoutHeader",
-          "type": "text",
-          "anchor": "Right",
-          "offset": [
-            -11,
-            -221
-          ],
-          "size": [
-            207,
-            15
-          ],
-          "z": 1,
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "content": "Loadout"
-        },
-        {
-          "id": "previewFigure",
-          "type": "figure",
-          "anchor": "TopLeft",
-          "offset": [
-            743,
-            82
-          ],
-          "size": [
-            205,
-            122
-          ],
-          "z": 1,
-          "binds": "preview.fig",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "previewName",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            749,
-            67
-          ],
-          "size": [
-            76,
-            16
-          ],
-          "z": 1,
-          "binds": "preview.name",
-          "color": "inkBright",
-          "font": "display",
-          "fontPx": 13,
-          "shadow": {
-            "token": "title",
-            "dx": 0,
-            "dy": 2,
-            "blur": 3,
-            "color": "outline",
-            "opacity": 0.65
-          },
-          "sample": "Human Grunt"
-        },
-        {
-          "id": "previewRole",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            749,
-            83
-          ],
-          "size": [
-            56,
-            7
-          ],
-          "z": 1,
-          "binds": "preview.role",
-          "color": "parch",
-          "font": "mono",
-          "fontPx": 5,
-          "shadow": {
-            "token": "title",
-            "dx": 0,
-            "dy": 2,
-            "blur": 3,
-            "color": "outline",
-            "opacity": 0.65
-          },
-          "sample": "THE GENERALIST"
-        },
-        {
-          "id": "previewAttrRow",
-          "type": "list",
-          "anchor": "Right",
-          "offset": [
-            -11,
-            -25
-          ],
-          "size": [
-            207,
-            35
-          ],
-          "z": 1,
-          "binds": "preview.attrs",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "item": {
-            "template": "previewAttrTile",
-            "flow": "horizontal",
-            "gap": 4,
-            "size": [
-              38,
-              35
-            ]
-          }
-        },
-        {
-          "id": "previewHpTile",
-          "type": "text",
-          "anchor": "Right",
-          "offset": [
-            -11,
-            -25
-          ],
-          "size": [
-            41,
-            35
-          ],
-          "z": 1,
-          "binds": "preview.hp",
-          "color": "ink",
-          "fill": "panel",
-          "border": {
-            "color": "borderMid",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "align": "center",
-          "sample": "20 BASE HP"
-        },
-        {
-          "id": "previewLayoutRow",
-          "type": "panel",
-          "anchor": "Right",
-          "offset": [
-            -11,
-            12
-          ],
-          "size": [
-            207,
-            27
-          ],
-          "z": 1,
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "previewBudgetTile",
-          "type": "text",
-          "anchor": "Right",
-          "offset": [
-            -152,
-            12
-          ],
-          "size": [
-            66,
-            27
-          ],
-          "z": 1,
-          "binds": "preview.budget",
-          "color": "ink",
-          "fill": "panelDeep",
-          "border": {
-            "color": "borderDim",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "align": "center",
-          "sample": "20 RUNE BUDGET"
-        },
-        {
-          "id": "previewActionsTile",
-          "type": "text",
-          "anchor": "Right",
-          "offset": [
-            -82,
-            12
-          ],
-          "size": [
-            66,
-            27
-          ],
-          "z": 1,
-          "binds": "preview.techniques",
-          "color": "ink",
-          "fill": "panelDeep",
-          "border": {
-            "color": "borderDim",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "align": "center",
-          "sample": "4 ACTIONS"
-        },
-        {
-          "id": "previewBaysTile",
-          "type": "text",
-          "anchor": "Right",
-          "offset": [
-            -11,
-            12
-          ],
-          "size": [
-            66,
-            27
-          ],
-          "z": 1,
-          "binds": "preview.bays",
-          "color": "ink",
-          "fill": "panelDeep",
-          "border": {
-            "color": "borderDim",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "align": "center",
-          "sample": "1 MINION BAYS"
-        },
-        {
-          "id": "previewCoreEffect",
-          "type": "panel",
-          "anchor": "Right",
-          "offset": [
-            -11,
-            58
-          ],
-          "size": [
-            207,
-            49
-          ],
-          "z": 1,
-          "binds": "preview.coreEffect",
-          "color": "ink",
-          "border": {
-            "color": "good",
-            "w": 2,
-            "style": "solid",
-            "sides": [
-              "left"
-            ]
-          },
-          "font": "display",
-          "fontPx": 8,
-          "colorBind": "preview.accent"
-        },
-        {
-          "id": "previewCoreEffectLabel",
-          "type": "text",
-          "anchor": "Right",
-          "offset": [
-            -10,
-            38
-          ],
-          "size": [
-            198,
-            7
-          ],
-          "z": 1,
-          "color": "mutedDim",
-          "font": "mono",
-          "fontPx": 5,
-          "content": "CORE EFFECT"
-        },
-        {
-          "id": "previewCoreEffectName",
-          "type": "text",
-          "anchor": "Right",
-          "offset": [
-            -10,
-            50
-          ],
-          "size": [
-            198,
-            14
-          ],
-          "z": 1,
-          "binds": "preview.coreEffectName",
-          "color": "inkBright",
-          "font": "display",
-          "fontPx": 13,
-          "sample": "Hollow Vessel"
-        },
-        {
-          "id": "previewCoreEffectDesc",
-          "type": "text",
-          "anchor": "Right",
-          "offset": [
-            -10,
-            71
-          ],
-          "size": [
-            198,
-            19
-          ],
-          "z": 1,
-          "binds": "preview.coreEffectDesc",
-          "color": "mutedWarm",
-          "font": "mono",
-          "fontPx": 6,
-          "sample": "You are healed for your unspent budget points after each encounter."
-        },
-        {
-          "id": "beginBtn",
-          "type": "button",
-          "anchor": "TopLeft",
-          "offset": [
-            824,
-            506
-          ],
-          "size": [
-            116,
-            25
-          ],
-          "z": 1,
-          "binds": "begin",
-          "color": "panelDeep",
-          "fill": "good",
-          "border": {
-            "color": "panelDeep",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "mono",
-          "fontPx": 7.5,
-          "states": {
-            "idle": {
-              "fill": "good",
-              "color": "ground",
-              "border": "ground"
-            },
-            "disabled": {
-              "fill": "slot",
-              "color": "muted",
-              "opacity": 0.7
-            }
-          }
         },
         {
           "id": "racePanel",
@@ -4789,7 +4943,7 @@
             230,
             464
           ],
-          "z": 4,
+          "z": 3,
           "binds": "races",
           "color": "ink",
           "border": {
@@ -4804,6 +4958,24 @@
           "fontPx": 8
         },
         {
+          "id": "raceHeader",
+          "type": "text",
+          "anchor": "Left",
+          "offset": [
+            10,
+            -221
+          ],
+          "size": [
+            209,
+            15
+          ],
+          "z": 4,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "content": "① Race"
+        },
+        {
           "id": "raceCards",
           "type": "list",
           "anchor": "Left",
@@ -4815,7 +4987,7 @@
             209,
             165
           ],
-          "z": 4,
+          "z": 5,
           "binds": "races",
           "color": "ink",
           "font": "display",
@@ -4842,10 +5014,28 @@
             500,
             464
           ],
-          "z": 4,
+          "z": 6,
           "color": "ink",
           "font": "display",
           "fontPx": 8
+        },
+        {
+          "id": "coreHeader",
+          "type": "text",
+          "anchor": "Center",
+          "offset": [
+            0,
+            -221
+          ],
+          "size": [
+            476,
+            15
+          ],
+          "z": 7,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "content": "② Core Rune"
         },
         {
           "id": "coreCards",
@@ -4859,7 +5049,7 @@
             476,
             416
           ],
-          "z": 4,
+          "z": 8,
           "binds": "cores",
           "color": "ink",
           "font": "display",
@@ -4887,7 +5077,7 @@
             230,
             464
           ],
-          "z": 5,
+          "z": 9,
           "binds": "preview",
           "color": "ink",
           "fill": {
@@ -4908,44 +5098,325 @@
           "fontPx": 8
         },
         {
-          "id": "topBar",
-          "type": "panel",
-          "anchor": "Top",
+          "id": "loadoutHeader",
+          "type": "text",
+          "anchor": "Right",
           "offset": [
-            0,
-            0
+            -11,
+            -221
           ],
           "size": [
-            960,
-            32
+            207,
+            15
           ],
-          "z": 8,
-          "binds": "selection",
+          "z": 10,
           "color": "ink",
-          "fill": {
-            "type": "gradient",
-            "from": "slot",
-            "to": "panelCard",
-            "dir": "vertical"
+          "font": "display",
+          "fontPx": 8,
+          "content": "Loadout"
+        },
+        {
+          "id": "previewFigure",
+          "type": "figure",
+          "anchor": "TopLeft",
+          "offset": [
+            743,
+            82
+          ],
+          "size": [
+            205,
+            122
+          ],
+          "z": 11,
+          "binds": "preview.fig",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "previewName",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            749,
+            67
+          ],
+          "size": [
+            76,
+            16
+          ],
+          "z": 12,
+          "binds": "preview.name",
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 13,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
           },
+          "sample": "Human Grunt"
+        },
+        {
+          "id": "previewRole",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            749,
+            83
+          ],
+          "size": [
+            56,
+            7
+          ],
+          "z": 13,
+          "binds": "preview.role",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 5,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          },
+          "sample": "THE GENERALIST"
+        },
+        {
+          "id": "previewAttrRow",
+          "type": "list",
+          "anchor": "Right",
+          "offset": [
+            -11,
+            -25
+          ],
+          "size": [
+            207,
+            35
+          ],
+          "z": 14,
+          "binds": "preview.attrs",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "previewAttrTile",
+            "flow": "horizontal",
+            "gap": 4,
+            "size": [
+              38,
+              35
+            ]
+          }
+        },
+        {
+          "id": "previewHpTile",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -11,
+            -25
+          ],
+          "size": [
+            41,
+            35
+          ],
+          "z": 15,
+          "binds": "preview.hp",
+          "color": "ink",
+          "fill": "panel",
           "border": {
             "color": "borderMid",
             "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "align": "center",
+          "sample": "20 BASE HP"
+        },
+        {
+          "id": "previewLayoutRow",
+          "type": "panel",
+          "anchor": "Right",
+          "offset": [
+            -11,
+            12
+          ],
+          "size": [
+            207,
+            27
+          ],
+          "z": 16,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "previewBudgetTile",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -152,
+            12
+          ],
+          "size": [
+            66,
+            27
+          ],
+          "z": 17,
+          "binds": "preview.budget",
+          "color": "ink",
+          "fill": "panelDeep",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "align": "center",
+          "sample": "20 RUNE BUDGET"
+        },
+        {
+          "id": "previewActionsTile",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -82,
+            12
+          ],
+          "size": [
+            66,
+            27
+          ],
+          "z": 18,
+          "binds": "preview.techniques",
+          "color": "ink",
+          "fill": "panelDeep",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "align": "center",
+          "sample": "4 ACTIONS"
+        },
+        {
+          "id": "previewBaysTile",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -11,
+            12
+          ],
+          "size": [
+            66,
+            27
+          ],
+          "z": 19,
+          "binds": "preview.bays",
+          "color": "ink",
+          "fill": "panelDeep",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "align": "center",
+          "sample": "1 MINION BAYS"
+        },
+        {
+          "id": "previewCoreEffect",
+          "type": "panel",
+          "anchor": "Right",
+          "offset": [
+            -11,
+            58
+          ],
+          "size": [
+            207,
+            49
+          ],
+          "z": 20,
+          "binds": "preview.coreEffect",
+          "color": "ink",
+          "border": {
+            "color": "good",
+            "w": 2,
             "style": "solid",
             "sides": [
-              "bottom"
+              "left"
             ]
           },
           "font": "display",
           "fontPx": 8,
-          "shadow": {
-            "token": "panel",
-            "dx": 0,
-            "dy": 4,
-            "blur": 10,
-            "color": "outline",
-            "opacity": 0.5
-          }
+          "colorBind": "preview.accent"
+        },
+        {
+          "id": "previewCoreEffectLabel",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -10,
+            38
+          ],
+          "size": [
+            198,
+            7
+          ],
+          "z": 21,
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 5,
+          "content": "CORE EFFECT"
+        },
+        {
+          "id": "previewCoreEffectName",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -10,
+            50
+          ],
+          "size": [
+            198,
+            14
+          ],
+          "z": 22,
+          "binds": "preview.coreEffectName",
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 13,
+          "sample": "Hollow Vessel"
+        },
+        {
+          "id": "previewCoreEffectDesc",
+          "type": "text",
+          "anchor": "Right",
+          "offset": [
+            -10,
+            71
+          ],
+          "size": [
+            198,
+            19
+          ],
+          "z": 23,
+          "binds": "preview.coreEffectDesc",
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 6,
+          "sample": "You are healed for your unspent budget points after each encounter."
         },
         {
           "id": "confirmBar",
@@ -4959,7 +5430,7 @@
             960,
             44
           ],
-          "z": 9,
+          "z": 24,
           "binds": "selection",
           "color": "ink",
           "fill": {
@@ -4985,6 +5456,43 @@
             "blur": 10,
             "color": "outline",
             "opacity": 0.5
+          }
+        },
+        {
+          "id": "beginBtn",
+          "type": "button",
+          "anchor": "TopLeft",
+          "offset": [
+            824,
+            506
+          ],
+          "size": [
+            116,
+            25
+          ],
+          "z": 25,
+          "binds": "begin",
+          "color": "panelDeep",
+          "fill": "good",
+          "border": {
+            "color": "panelDeep",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 7.5,
+          "content": "BEGIN THE RUN ▶",
+          "states": {
+            "idle": {
+              "fill": "good",
+              "color": "ground",
+              "border": "ground"
+            },
+            "disabled": {
+              "fill": "slot",
+              "color": "muted",
+              "opacity": 0.7
+            }
           }
         }
       ]
@@ -5015,69 +5523,30 @@
           "image": "Content/bg/merchant_stall.png"
         },
         {
-          "id": "logo",
-          "type": "text",
-          "anchor": "TopLeft",
+          "id": "factorPanel",
+          "type": "panel",
+          "anchor": "Left",
           "offset": [
-            13,
-            6
+            0,
+            -4
           ],
           "size": [
-            57,
-            15
+            240,
+            476
           ],
           "z": 1,
-          "color": "inkWarm",
-          "font": "display",
-          "fontPx": 11.5,
-          "content": "Roguebane"
-        },
-        {
-          "id": "nodeLabel",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            79,
-            10
-          ],
-          "size": [
-            33,
-            8
-          ],
-          "z": 1,
-          "binds": "merchant.label",
-          "color": "muted",
-          "font": "mono",
-          "fontPx": 6,
-          "sample": "MERCHANT"
-        },
-        {
-          "id": "leaveBtn",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            887,
-            4
-          ],
-          "size": [
-            60,
-            20
-          ],
-          "z": 1,
-          "binds": "merchant.leave",
+          "binds": "merchant",
           "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "image": "Content/ui/button/button_normal.png",
-          "states": {
-            "family": "button",
-            "normal": "ui/button/button_normal",
-            "hover": "ui/button/button_hover",
-            "down": "ui/button/button_down",
-            "disabled": "ui/button/button_disabled",
-            "on": "ui/button/button_on"
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "right"
+            ]
           },
-          "sample": "⮐ LEAVE"
+          "font": "display",
+          "fontPx": 8
         },
         {
           "id": "factorToken",
@@ -5091,7 +5560,7 @@
             22,
             22
           ],
-          "z": 1,
+          "z": 2,
           "color": "ink",
           "font": "display",
           "fontPx": 8,
@@ -5117,7 +5586,7 @@
             52,
             15
           ],
-          "z": 1,
+          "z": 3,
           "color": "inkBright",
           "font": "display",
           "fontPx": 12,
@@ -5132,6 +5601,45 @@
           "content": "Merchant"
         },
         {
+          "id": "healPanel",
+          "type": "panel",
+          "anchor": "Left",
+          "offset": [
+            12,
+            -146
+          ],
+          "size": [
+            215,
+            111
+          ],
+          "z": 4,
+          "binds": "merchant.healing",
+          "color": "ink",
+          "fill": "panel",
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          },
+          "frame": {
+            "token": "card",
+            "asset": "ui/frame/card",
+            "slice": [
+              12,
+              12,
+              12,
+              12
+            ],
+            "repeat": "tile",
+            "centerFill": true
+          }
+        },
+        {
           "id": "healTitle",
           "type": "text",
           "anchor": "TopLeft",
@@ -5143,7 +5651,7 @@
             37,
             13
           ],
-          "z": 1,
+          "z": 5,
           "color": "inkBright",
           "font": "display",
           "fontPx": 10,
@@ -5161,12 +5669,39 @@
             32,
             8
           ],
-          "z": 1,
+          "z": 6,
           "binds": "Body.hp",
           "color": "lockRed",
           "font": "mono",
           "fontPx": 6,
           "sample": "HP 9 / 12"
+        },
+        {
+          "id": "healPips",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            22,
+            95
+          ],
+          "size": [
+            195,
+            6
+          ],
+          "z": 7,
+          "binds": "Body.hp.points",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "healPip",
+            "flow": "horizontal",
+            "gap": 2,
+            "size": [
+              15,
+              6
+            ]
+          }
         },
         {
           "id": "healRows",
@@ -5180,7 +5715,7 @@
             195,
             64
           ],
-          "z": 1,
+          "z": 8,
           "binds": "merchant.healing.offers",
           "color": "ink",
           "font": "display",
@@ -5196,6 +5731,45 @@
           }
         },
         {
+          "id": "provisionPanel",
+          "type": "panel",
+          "anchor": "Left",
+          "offset": [
+            12,
+            -15
+          ],
+          "size": [
+            215,
+            135
+          ],
+          "z": 9,
+          "binds": "merchant.provisions",
+          "color": "ink",
+          "fill": "panel",
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          },
+          "frame": {
+            "token": "card",
+            "asset": "ui/frame/card",
+            "slice": [
+              12,
+              12,
+              12,
+              12
+            ],
+            "repeat": "tile",
+            "centerFill": true
+          }
+        },
+        {
           "id": "provisionTitle",
           "type": "text",
           "anchor": "TopLeft",
@@ -5207,7 +5781,7 @@
             47,
             13
           ],
-          "z": 1,
+          "z": 10,
           "color": "inkBright",
           "font": "display",
           "fontPx": 10,
@@ -5225,7 +5799,7 @@
             195,
             98
           ],
-          "z": 1,
+          "z": 11,
           "binds": "merchant.provisions.stock",
           "color": "ink",
           "font": "display",
@@ -5241,6 +5815,24 @@
           }
         },
         {
+          "id": "waresPanel",
+          "type": "panel",
+          "anchor": "Right",
+          "offset": [
+            0,
+            -4
+          ],
+          "size": [
+            720,
+            476
+          ],
+          "z": 12,
+          "binds": "merchant.stock",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
           "id": "waresTitle",
           "type": "text",
           "anchor": "TopLeft",
@@ -5252,7 +5844,7 @@
             33,
             15
           ],
-          "z": 1,
+          "z": 13,
           "color": "inkBright",
           "font": "display",
           "fontPx": 12,
@@ -5278,7 +5870,7 @@
             692,
             377
           ],
-          "z": 1,
+          "z": 14,
           "binds": "merchant.stock.sections",
           "color": "ink",
           "font": "display",
@@ -5294,259 +5886,6 @@
           }
         },
         {
-          "id": "footerFlavor",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            14,
-            517
-          ],
-          "size": [
-            88,
-            11
-          ],
-          "z": 1,
-          "color": "muted",
-          "font": "display",
-          "fontPx": 8.5,
-          "content": "Fair dealing by lantern light."
-        },
-        {
-          "id": "pager",
-          "type": "panel",
-          "anchor": "TopLeft",
-          "offset": [
-            785,
-            514
-          ],
-          "size": [
-            109,
-            17
-          ],
-          "z": 1,
-          "binds": "merchant.stock.page",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "pagePrev",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            785,
-            514
-          ],
-          "size": [
-            22,
-            17
-          ],
-          "z": 1,
-          "binds": "merchant.stock.pagePrev",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "image": "Content/ui/button/button_normal.png",
-          "states": {
-            "family": "button",
-            "normal": "ui/button/button_normal",
-            "hover": "ui/button/button_hover",
-            "down": "ui/button/button_down",
-            "disabled": "ui/button/button_disabled",
-            "on": "ui/button/button_on"
-          },
-          "sample": "◀"
-        },
-        {
-          "id": "pageLabel",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            812,
-            519
-          ],
-          "size": [
-            55,
-            8
-          ],
-          "z": 1,
-          "binds": "merchant.stock.pageLabel",
-          "color": "parch",
-          "font": "mono",
-          "fontPx": 6,
-          "align": "center",
-          "sample": "PAGE 1 / 2"
-        },
-        {
-          "id": "pageNext",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            872,
-            514
-          ],
-          "size": [
-            22,
-            17
-          ],
-          "z": 1,
-          "binds": "merchant.stock.pageNext",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "image": "Content/ui/button/button_normal.png",
-          "states": {
-            "family": "button",
-            "normal": "ui/button/button_normal",
-            "hover": "ui/button/button_hover",
-            "down": "ui/button/button_down",
-            "disabled": "ui/button/button_disabled",
-            "on": "ui/button/button_on"
-          },
-          "sample": "▶"
-        },
-        {
-          "id": "purseNote",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            907,
-            518
-          ],
-          "size": [
-            39,
-            9
-          ],
-          "z": 1,
-          "binds": "run.gold",
-          "color": "mutedWarm",
-          "font": "mono",
-          "fontPx": 6.5,
-          "sample": "PURSE 128g"
-        },
-        {
-          "id": "factorPanel",
-          "type": "panel",
-          "anchor": "Left",
-          "offset": [
-            0,
-            -4
-          ],
-          "size": [
-            240,
-            476
-          ],
-          "z": 4,
-          "binds": "merchant",
-          "color": "ink",
-          "border": {
-            "color": "borderDim",
-            "w": 1,
-            "style": "solid",
-            "sides": [
-              "right"
-            ]
-          },
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "waresPanel",
-          "type": "panel",
-          "anchor": "Right",
-          "offset": [
-            0,
-            -4
-          ],
-          "size": [
-            720,
-            476
-          ],
-          "z": 4,
-          "binds": "merchant.stock",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "healPanel",
-          "type": "panel",
-          "anchor": "Left",
-          "offset": [
-            12,
-            -146
-          ],
-          "size": [
-            215,
-            111
-          ],
-          "z": 5,
-          "binds": "merchant.healing",
-          "color": "ink",
-          "fill": "panel",
-          "font": "display",
-          "fontPx": 8,
-          "shadow": {
-            "token": "panel",
-            "dx": 0,
-            "dy": 4,
-            "blur": 10,
-            "color": "outline",
-            "opacity": 0.5
-          },
-          "frame": {
-            "token": "card",
-            "asset": "ui/frame/card",
-            "slice": [
-              36,
-              36,
-              36,
-              36
-            ],
-            "repeat": "tile",
-            "centerFill": true
-          }
-        },
-        {
-          "id": "provisionPanel",
-          "type": "panel",
-          "anchor": "Left",
-          "offset": [
-            12,
-            -15
-          ],
-          "size": [
-            215,
-            135
-          ],
-          "z": 5,
-          "binds": "merchant.provisions",
-          "color": "ink",
-          "fill": "panel",
-          "font": "display",
-          "fontPx": 8,
-          "shadow": {
-            "token": "panel",
-            "dx": 0,
-            "dy": 4,
-            "blur": 10,
-            "color": "outline",
-            "opacity": 0.5
-          },
-          "frame": {
-            "token": "card",
-            "asset": "ui/frame/card",
-            "slice": [
-              36,
-              36,
-              36,
-              36
-            ],
-            "repeat": "tile",
-            "centerFill": true
-          }
-        },
-        {
           "id": "statusStrip",
           "type": "panel",
           "anchor": "Top",
@@ -5558,7 +5897,7 @@
             960,
             28
           ],
-          "z": 6,
+          "z": 15,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -5578,6 +5917,43 @@
           "fontPx": 8
         },
         {
+          "id": "logo",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            13,
+            6
+          ],
+          "size": [
+            57,
+            15
+          ],
+          "z": 16,
+          "color": "inkWarm",
+          "font": "display",
+          "fontPx": 11.5,
+          "content": "Roguebane"
+        },
+        {
+          "id": "nodeLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            79,
+            10
+          ],
+          "size": [
+            33,
+            8
+          ],
+          "z": 17,
+          "binds": "merchant.label",
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 6,
+          "sample": "MERCHANT"
+        },
+        {
           "id": "resourceStrip",
           "type": "list",
           "anchor": "TopRight",
@@ -5589,7 +5965,7 @@
             197,
             11
           ],
-          "z": 6,
+          "z": 18,
           "binds": "run.resources",
           "color": "ink",
           "font": "display",
@@ -5605,6 +5981,34 @@
           }
         },
         {
+          "id": "leaveBtn",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            887,
+            4
+          ],
+          "size": [
+            60,
+            20
+          ],
+          "z": 19,
+          "binds": "merchant.leave",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/ui/button/button_normal.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "content": "⮐ LEAVE"
+        },
+        {
           "id": "footer",
           "type": "panel",
           "anchor": "Bottom",
@@ -5616,7 +6020,7 @@
             960,
             36
           ],
-          "z": 6,
+          "z": 20,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -5642,6 +6046,137 @@
             "color": "outline",
             "opacity": 0.5
           }
+        },
+        {
+          "id": "footerFlavor",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            14,
+            517
+          ],
+          "size": [
+            88,
+            11
+          ],
+          "z": 21,
+          "color": "muted",
+          "font": "display",
+          "fontPx": 8.5,
+          "content": "Fair dealing by lantern light."
+        },
+        {
+          "id": "pager",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            785,
+            514
+          ],
+          "size": [
+            109,
+            17
+          ],
+          "z": 22,
+          "binds": "merchant.stock.page",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "pagePrev",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            785,
+            514
+          ],
+          "size": [
+            22,
+            17
+          ],
+          "z": 23,
+          "binds": "merchant.stock.pagePrev",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/ui/button/button_normal.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "content": "◀"
+        },
+        {
+          "id": "pageLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            812,
+            519
+          ],
+          "size": [
+            55,
+            8
+          ],
+          "z": 24,
+          "binds": "merchant.stock.pageLabel",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 6,
+          "align": "center",
+          "sample": "PAGE 1 / 2"
+        },
+        {
+          "id": "pageNext",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            872,
+            514
+          ],
+          "size": [
+            22,
+            17
+          ],
+          "z": 25,
+          "binds": "merchant.stock.pageNext",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/ui/button/button_normal.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "content": "▶"
+        },
+        {
+          "id": "purseNote",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            907,
+            518
+          ],
+          "size": [
+            39,
+            9
+          ],
+          "z": 26,
+          "binds": "run.gold",
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 6.5,
+          "sample": "PURSE 128g"
         }
       ]
     }
@@ -5795,6 +6330,24 @@
           "fontPx": 11,
           "binds": "pool.attr.available",
           "sample": "10"
+        },
+        {
+          "rect": [
+            102,
+            3,
+            207,
+            10
+          ],
+          "list": {
+            "template": "poolPip",
+            "flow": "horizontal",
+            "gap": 2,
+            "size": [
+              16,
+              10
+            ]
+          },
+          "binds": "pool.attr.cells"
         }
       ],
       "color": "ink",
@@ -5807,6 +6360,25 @@
         136
       ],
       "parts": [
+        {
+          "rect": [
+            1,
+            1,
+            92,
+            37
+          ],
+          "color": "ink",
+          "border": {
+            "color": "borderFaint",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "bottom"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8
+        },
         {
           "rect": [
             6,
@@ -5823,27 +6395,29 @@
           },
           "font": "mono",
           "fontPx": 7.5,
+          "imageBind": "icons/technique/{technique.id}",
           "colorBind": "technique.attrColor",
           "binds": "technique.icon",
           "sample": "⚔"
         },
         {
           "rect": [
-            58,
-            9,
-            9,
-            8
+            24,
+            8,
+            10,
+            10
           ],
-          "color": "border",
+          "color": "inkWarm",
+          "fill": "slot",
           "border": {
-            "color": "borderDim",
+            "color": "border",
             "w": 1,
             "style": "solid"
           },
           "font": "mono",
-          "fontPx": 4,
-          "binds": "technique.aimTag",
-          "sample": "—"
+          "fontPx": 6,
+          "binds": "technique.hotkey",
+          "sample": "1"
         },
         {
           "rect": [
@@ -5935,6 +6509,23 @@
             6,
             118,
             83,
+            5
+          ],
+          "color": "ink",
+          "fill": "slot",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "rect": [
+            6,
+            118,
+            83,
             4
           ],
           "color": "ink",
@@ -6004,6 +6595,44 @@
         136
       ],
       "parts": [
+        {
+          "rect": [
+            1,
+            1,
+            98,
+            37
+          ],
+          "color": "ink",
+          "border": {
+            "color": "borderFaint",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "bottom"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "rect": [
+            24,
+            8,
+            10,
+            10
+          ],
+          "color": "inkWarm",
+          "fill": "slot",
+          "border": {
+            "color": "border",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 6,
+          "binds": "bay.hotkey",
+          "sample": "6"
+        },
         {
           "rect": [
             71,
@@ -6148,220 +6777,6 @@
         },
         {
           "rect": [
-            63,
-            2,
-            26,
-            9
-          ],
-          "color": "ink",
-          "fill": "str",
-          "border": {
-            "color": "outline",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "binds": "attrs.pip"
-        },
-        {
-          "rect": [
-            90,
-            2,
-            26,
-            9
-          ],
-          "color": "ink",
-          "fill": "str",
-          "border": {
-            "color": "outline",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "binds": "attrs.pip"
-        },
-        {
-          "rect": [
-            118,
-            2,
-            26,
-            9
-          ],
-          "color": "ink",
-          "fill": "str",
-          "border": {
-            "color": "outline",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "binds": "attrs.pip"
-        },
-        {
-          "rect": [
-            145,
-            2,
-            26,
-            9
-          ],
-          "color": "ink",
-          "fill": "str",
-          "border": {
-            "color": "outline",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "binds": "attrs.pip"
-        },
-        {
-          "rect": [
-            172,
-            2,
-            26,
-            9
-          ],
-          "color": "ink",
-          "fill": "str",
-          "border": {
-            "color": "outline",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "binds": "attrs.pip"
-        },
-        {
-          "rect": [
-            199,
-            2,
-            26,
-            9
-          ],
-          "color": "ink",
-          "fill": "str",
-          "border": {
-            "color": "outline",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "binds": "attrs.pip"
-        },
-        {
-          "rect": [
-            227,
-            2,
-            26,
-            9
-          ],
-          "color": "ink",
-          "fill": "str",
-          "border": {
-            "color": "outline",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "binds": "attrs.pip"
-        },
-        {
-          "rect": [
-            254,
-            2,
-            26,
-            9
-          ],
-          "color": "ink",
-          "fill": "str",
-          "border": {
-            "color": "outline",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "binds": "attrs.pip"
-        },
-        {
-          "rect": [
-            281,
-            2,
-            26,
-            9
-          ],
-          "color": "ink",
-          "fill": "slot",
-          "border": {
-            "color": "outline",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "binds": "attrs.pip"
-        },
-        {
-          "rect": [
-            308,
-            2,
-            26,
-            9
-          ],
-          "color": "ink",
-          "fill": "slot",
-          "border": {
-            "color": "outline",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "binds": "attrs.pip"
-        },
-        {
-          "rect": [
-            336,
-            2,
-            26,
-            9
-          ],
-          "color": "ink",
-          "border": {
-            "color": "outline",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "binds": "attrs.pip"
-        },
-        {
-          "rect": [
-            363,
-            2,
-            26,
-            9
-          ],
-          "color": "ink",
-          "border": {
-            "color": "outline",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "display",
-          "fontPx": 8,
-          "binds": "attrs.pip"
-        },
-        {
-          "rect": [
             404,
             0,
             6,
@@ -6397,6 +6812,24 @@
           "fontPx": 10,
           "binds": "attrs.available",
           "sample": "10"
+        },
+        {
+          "rect": [
+            63,
+            2,
+            326,
+            9
+          ],
+          "list": {
+            "template": "attrPip",
+            "flow": "horizontal",
+            "gap": 2,
+            "size": [
+              26,
+              9
+            ]
+          },
+          "binds": "attrs.cells"
         }
       ],
       "color": "ink",
@@ -6617,26 +7050,26 @@
           "rect": [
             0,
             0,
-            13,
+            20,
             7
           ],
           "color": "mutedDim",
           "font": "mono",
           "fontPx": 5.5,
-          "sample": "gear",
+          "sample": "budget",
           "binds": "stat.label"
         },
         {
           "rect": [
-            58,
+            55,
             0,
-            3,
+            7,
             7
           ],
-          "color": "inkWarm",
+          "color": "amber",
           "font": "mono",
           "fontPx": 5.5,
-          "sample": "4",
+          "sample": "20",
           "binds": "stat.value"
         }
       ],
@@ -6667,6 +7100,7 @@
           "font": "mono",
           "fontPx": 13,
           "align": "center",
+          "imageBind": "icons/technique/{loadout.id}",
           "colorBind": "loadout.attrColor",
           "binds": "loadout.glyph",
           "sample": "⚔"
@@ -7058,6 +7492,24 @@
         },
         {
           "rect": [
+            61,
+            32,
+            26,
+            24
+          ],
+          "color": "ink",
+          "fill": "panelDeep",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "align": "center"
+        },
+        {
+          "rect": [
             62,
             41,
             23,
@@ -7083,6 +7535,24 @@
           "align": "center",
           "binds": "race.attrs.key",
           "sample": "STR"
+        },
+        {
+          "rect": [
+            90,
+            32,
+            26,
+            24
+          ],
+          "color": "ink",
+          "fill": "panelDeep",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "align": "center"
         },
         {
           "rect": [
@@ -7114,6 +7584,24 @@
         },
         {
           "rect": [
+            118,
+            32,
+            26,
+            24
+          ],
+          "color": "ink",
+          "fill": "panelDeep",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "align": "center"
+        },
+        {
+          "rect": [
             120,
             41,
             23,
@@ -7142,6 +7630,24 @@
         },
         {
           "rect": [
+            147,
+            32,
+            26,
+            24
+          ],
+          "color": "ink",
+          "fill": "panelDeep",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "align": "center"
+        },
+        {
+          "rect": [
             148,
             41,
             23,
@@ -7167,6 +7673,24 @@
           "align": "center",
           "binds": "race.attrs.key",
           "sample": "CON"
+        },
+        {
+          "rect": [
+            175,
+            32,
+            26,
+            24
+          ],
+          "color": "ink",
+          "fill": "panel",
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "align": "center"
         },
         {
           "rect": [
@@ -7316,6 +7840,24 @@
         },
         {
           "rect": [
+            8,
+            108,
+            43,
+            23
+          ],
+          "color": "ink",
+          "fill": "panelDeep",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "align": "center"
+        },
+        {
+          "rect": [
             10,
             112,
             38,
@@ -7343,6 +7885,24 @@
         },
         {
           "rect": [
+            55,
+            108,
+            43,
+            23
+          ],
+          "color": "ink",
+          "fill": "panelDeep",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "align": "center"
+        },
+        {
+          "rect": [
             57,
             112,
             38,
@@ -7367,6 +7927,24 @@
           "fontPx": 4,
           "align": "center",
           "sample": "ACTIONS"
+        },
+        {
+          "rect": [
+            101,
+            108,
+            43,
+            23
+          ],
+          "color": "ink",
+          "fill": "panelDeep",
+          "border": {
+            "color": "borderDim",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "align": "center"
         },
         {
           "rect": [
@@ -7925,6 +8503,25 @@
       "parts": [
         {
           "rect": [
+            1,
+            1,
+            127,
+            26
+          ],
+          "color": "ink",
+          "border": {
+            "color": "borderFaint",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "bottom"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "rect": [
             7,
             6,
             23,
@@ -8102,7 +8699,7 @@
           "font": "mono",
           "fontPx": 5,
           "binds": "section.count",
-          "sample": "1"
+          "sample": "3"
         },
         {
           "rect": [
@@ -8124,6 +8721,342 @@
         }
       ],
       "color": "ink",
+      "font": "display",
+      "fontPx": 8
+    },
+    "heroHpPip": {
+      "size": [
+        7,
+        6
+      ],
+      "parts": [],
+      "binds": "point.live",
+      "color": "ink",
+      "fill": "lockRed",
+      "border": {
+        "color": "outline",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "align": "center",
+      "states": {
+        "live": {
+          "fill": "blood",
+          "border": "outline"
+        },
+        "spent": {
+          "fill": "slot",
+          "border": "outline"
+        }
+      }
+    },
+    "aimTag": {
+      "size": [
+        11,
+        11
+      ],
+      "parts": [
+        {
+          "rect": [
+            4,
+            1,
+            4,
+            9
+          ],
+          "color": "outline",
+          "font": "mono",
+          "fontPx": 6.5,
+          "align": "center",
+          "sample": "3"
+        }
+      ],
+      "binds": "tag.hotkey",
+      "color": "outline",
+      "fill": "hit",
+      "border": {
+        "color": "outline",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "mono",
+      "fontPx": 6.5,
+      "align": "center"
+    },
+    "foeHpPip": {
+      "size": [
+        6,
+        6
+      ],
+      "parts": [],
+      "binds": "point.live",
+      "color": "ink",
+      "fill": "str",
+      "border": {
+        "color": "outline",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "align": "center",
+      "states": {
+        "live": {
+          "fill": "hit",
+          "border": "outline"
+        },
+        "spent": {
+          "fill": "slot",
+          "border": "outline"
+        }
+      }
+    },
+    "poolPip": {
+      "size": [
+        16,
+        10
+      ],
+      "parts": [],
+      "binds": "cell.state",
+      "color": "ink",
+      "fill": "str",
+      "border": {
+        "color": "outline",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "imageBind": "ui/pip/{cell.asset}"
+    },
+    "attrPip": {
+      "size": [
+        26,
+        9
+      ],
+      "parts": [],
+      "binds": "cell.state",
+      "color": "ink",
+      "fill": "str",
+      "border": {
+        "color": "outline",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "imageBind": "ui/pip/{cell.asset}"
+    },
+    "supplyPip": {
+      "size": [
+        12,
+        8
+      ],
+      "parts": [],
+      "binds": "point.live",
+      "color": "ink",
+      "fill": "good",
+      "border": {
+        "color": "panelDeep",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "imageBind": "ui/pip/{point.asset}"
+    },
+    "supportPip": {
+      "size": [
+        59,
+        8
+      ],
+      "parts": [],
+      "binds": "point.live",
+      "color": "ink",
+      "fill": "slot",
+      "border": {
+        "color": "amber",
+        "w": 1,
+        "style": "dashed"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "imageBind": "ui/pip/{point.asset}"
+    },
+    "healPip": {
+      "size": [
+        15,
+        6
+      ],
+      "parts": [],
+      "binds": "point.live",
+      "color": "ink",
+      "fill": "lockRed",
+      "border": {
+        "color": "outline",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "states": {
+        "live": {
+          "fill": "blood",
+          "border": "outline"
+        },
+        "spent": {
+          "fill": "slot",
+          "border": "outline"
+        }
+      }
+    },
+    "fortRow": {
+      "size": [
+        130,
+        13
+      ],
+      "parts": [
+        {
+          "rect": [
+            15,
+            3,
+            87,
+            8
+          ],
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 6,
+          "binds": "fort.name",
+          "sample": "Gate"
+        },
+        {
+          "rect": [
+            106,
+            4,
+            19,
+            6
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 4.5,
+          "binds": "fort.state",
+          "sample": "INTACT"
+        }
+      ],
+      "color": "ink",
+      "fill": "panelTab",
+      "border": {
+        "color": "borderDim",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "states": {
+        "intact": {
+          "color": "good"
+        },
+        "damaged": {
+          "color": "amber"
+        },
+        "razed": {
+          "color": "lockText",
+          "opacity": 0.6
+        }
+      }
+    },
+    "spineCity": {
+      "size": [
+        15,
+        15
+      ],
+      "parts": [
+        {
+          "rect": [
+            3,
+            3,
+            10,
+            10
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/icons/node/castle.png",
+          "imageBind": "icons/node/castle",
+          "binds": "city.castle"
+        }
+      ],
+      "binds": "city.status",
+      "color": "ink",
+      "fill": "panelDeep",
+      "border": {
+        "color": "good",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "states": {
+        "taken": {
+          "border": "good"
+        },
+        "current": {
+          "border": "amber"
+        },
+        "future": {
+          "border": "borderDim",
+          "opacity": 0.45
+        }
+      }
+    },
+    "packChip": {
+      "size": [
+        37,
+        13
+      ],
+      "parts": [
+        {
+          "rect": [
+            5,
+            4,
+            6,
+            6
+          ],
+          "color": "ink",
+          "fill": "str",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "colorBind": "gear.attrColor",
+          "binds": "gear.attr"
+        },
+        {
+          "rect": [
+            15,
+            3,
+            17,
+            7
+          ],
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 5.5,
+          "binds": "gear.name",
+          "sample": "Sword"
+        }
+      ],
+      "binds": "gear.item",
+      "color": "ink",
+      "fill": "panelCard",
+      "border": {
+        "color": "borderDim",
+        "w": 1,
+        "style": "solid"
+      },
       "font": "display",
       "fontPx": 8
     }
@@ -8232,10 +9165,10 @@
       "panel": {
         "asset": "ui/frame/panel",
         "slice": [
-          60,
-          60,
-          60,
-          60
+          16,
+          16,
+          16,
+          16
         ],
         "repeat": "tile",
         "centerFill": true
@@ -8243,10 +9176,10 @@
       "card": {
         "asset": "ui/frame/card",
         "slice": [
-          36,
-          36,
-          36,
-          36
+          12,
+          12,
+          12,
+          12
         ],
         "repeat": "tile",
         "centerFill": true

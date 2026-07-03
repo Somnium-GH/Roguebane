@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:#100b07;}
+  @keyframes rb-glow{0%,100%{box-shadow:0 0 0 3px #7fa05a99,0 0 22px #7fa05a55}50%{box-shadow:0 0 0 3px #7fa05add,0 0 30px #7fa05a88}}
+  @keyframes rb-ping{0%,100%{opacity:.55}50%{opacity:.95}}
+</style>
+</helmet>
+<div data-screen-label="City Map" data-screen="citymap" data-design="1920,1080" style="position:relative;width:1920px;height:1080px;overflow:hidden;font-family:'IM Fell English',Georgia,serif;color:#ece0cb;background:radial-gradient(120% 110% at 14% 30%,#382a1d 0%,#221911 50%,#100c07 78%,#0c0805 100%);">
+
+  <!-- EGA/VGA backdrop (baked: Content/bg/map_chart.png, §10 rule A) — the screen's *.scene element -->
+  <div data-el="backdrop" data-binds="citymap.scene" style="position:absolute;inset:0;background:url('Content/bg/map_chart.png') center/cover no-repeat;image-rendering:pixelated;pointer-events:none;"></div>
+
+  <!-- TOP STRIP -->
+  <div data-el="topStrip" data-anchor="Top" data-z="6" style="position:absolute;left:0;top:0;width:1920px;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;background:linear-gradient(#241a12,#1b130d);border-bottom:2px solid #4a3729;">
+    <div style="display:flex;align-items:center;gap:18px;">
+      <span data-el="logo" style="font-size:23px;letter-spacing:.5px;color:#e9d6b0;">Roguebane</span>
+      <span data-el="legSubtitle" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#9a8468;letter-spacing:1px;">THE CITY OF THORNMARCH<br></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:22px;">
+      <!-- RESOURCE READOUT (payload v5 §G: top-right on every IN-RUN screen) -->
+      <div data-el="resourceStrip" data-anchor="TopRight" data-z="6" data-binds="run.resources" data-container="1" data-template="resourceItem" data-flow="horizontal" style="display:flex;align-items:center;gap:16px;">
+        <sc-for list="{{ resources }}" as="res" hint-placeholder-count="4">
+          <div data-tpl="resourceItem" style="display:flex;align-items:center;gap:6px;">
+            <span data-binds="resource.icon" data-image-bind="icons/resource/{resource.id}" style="width:22px;height:22px;flex:none;background-image:{{ res.iconCss }};background-size:100% 100%;image-rendering:pixelated;"></span>
+            <span data-binds="resource.value" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#e9d6b0;">{{ res.value }}</span>
+            <span data-binds="resource.label" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:#8d775c;">{{ res.label }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <span data-el="layerNote" data-anchor="TopRight" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#b09a82;">LAYER 2<br></span>
+    </div>
+  </div>
+
+  <!-- RESOURCE HUD -->
+  <div style="position:absolute;left:26px;top:74px;width:560px;display:flex;gap:14px;z-index:5;">
+    <div data-el="supplies" data-type="panel" data-anchor="TopLeft" data-z="5" data-binds="supplies" data-shadow="soft" data-frame="card" style="flex:1;box-sizing:border-box;background:#1d150e;border:12px solid transparent;padding:2px 6px;box-shadow:0 3px 6px rgba(10,8,7,.4);border-image-source:url('Content/ui/frame/card.png');border-image-slice:12 fill;border-image-width:12px;border-image-repeat:round;">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;">
+        <span style="font-size:17px;letter-spacing:1px;color:#f0dcb4;">Supplies</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#7fa05a;">6 / 9</span>
+      </div>
+      <!-- pip strip as PARTS (payload #3): stamped from live supply count via ui/pip/* imageBind -->
+      <div data-el="suppliesPips" data-container="1" data-template="supplyPip" data-flow="horizontal" data-binds="supplies.points" style="display:flex;gap:4px;margin:9px 0 6px;">
+        <sc-for list="{{ suppliesPips }}" as="sp" hint-placeholder-count="9">
+          <span data-tpl="supplyPip" data-binds="point.live" data-image-bind="ui/pip/{point.asset}" style="flex:1;height:15px;background:{{ sp.bg }};border:2px {{ sp.style }} {{ sp.bd }};"></span>
+        </sc-for>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#9a8468;">Consume 1 per deployment.<br><span style="color: rgb(205, 180, 151);"></span></div>
+    </div>
+    <div data-el="musteredSupport" data-type="panel" data-anchor="TopLeft" data-z="5" data-binds="support" data-shadow="soft" data-frame="card" style="flex:1;box-sizing:border-box;background:#1d150e;border:12px solid transparent;padding:2px 6px;box-shadow:0 3px 6px rgba(10,8,7,.4);border-image-source:url('Content/ui/frame/card.png');border-image-slice:12 fill;border-image-width:12px;border-image-repeat:round;">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;">
+        <span style="font-size:17px;letter-spacing:1px;color:#f0dcb4;">Mustered Support</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#d9a441;">0 / 2</span>
+      </div>
+      <!-- pip strip as PARTS (payload #3) -->
+      <div data-el="supportPips" data-container="1" data-template="supportPip" data-flow="horizontal" data-binds="support.points" style="display:flex;gap:6px;margin:9px 0 6px;">
+        <sc-for list="{{ supportPips }}" as="sp" hint-placeholder-count="2">
+          <span data-tpl="supportPip" data-binds="point.live" data-image-bind="ui/pip/{point.asset}" style="flex:1;height:15px;background:{{ sp.bg }};border:2px {{ sp.style }} {{ sp.bd }};"></span>
+        </sc-for>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#9a8468;">Capture the&nbsp;<span style="color: rgb(217, 164, 65);">2 resource holds</span> to muster support for the fight at the castle.</div>
+    </div>
+  </div>
+
+  <!-- DOOM BAR — the war-party clock. Camp icon LEFT, castle icon RIGHT; the covered-ground fill
+       loads RIGHT→LEFT with the host on its leading (left) edge, marching on camp. Full = you lose. -->
+  <div data-el="doomBar" data-type="panel" data-anchor="Top" data-z="6" style="position:absolute;left:606px;top:74px;width:708px;height:106px;box-sizing:border-box;border:2px solid #6e3630;background:linear-gradient(180deg,#241210,#1a0d0b);padding:11px 18px 14px;z-index:6;box-shadow:0 2px 0 rgba(0,0,0,.4);display:flex;flex-direction:column;justify-content:space-between;">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;">
+      <!-- payload #16: the doom TITLE is its own element (it was falling out of the manifest, the ETA
+           landing in its slot). Literal for now — city-name templating waits on the naming model (§17). -->
+      <span data-el="doomTitle" style="font-family:'IM Fell English',Georgia,serif;font-size:18px;letter-spacing:.5px;color:#e7b0a4;">The Horde Marches on Thornmarch</span>
+      <!-- payload #2: doomEta carries the live bind (engine resolves the count); the mock text is its sample -->
+      <span data-el="doomEta" data-binds="enemy.advance" style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;letter-spacing:1px;color:#e06b52;">1 WAYPOINT AWAY FROM CAMP</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <img data-el="doomCampIcon" data-type="icon" data-shadow="soft" src="Content/icons/node/camp.png" width="44" height="44" style="image-rendering:pixelated;flex:none;filter:drop-shadow(0 1px 0 rgba(0,0,0,.5));" alt="your camp">
+      <div data-el="doomTrack" style="position:relative;flex:1;height:42px;background:#1c1610;border:2px solid #4a3729;box-shadow:inset 0 2px 4px rgba(0,0,0,.55);overflow:visible;">
+        <!-- covered ground loads RIGHT→LEFT (Doug 2026-07-02): the horde sets out from the castle
+             (right) and marches on camp (left); fill + host token advance in tandem toward camp -->
+        <div data-el="doomFill" data-binds="enemy.advancePct" style="position:absolute;right:0;top:0;bottom:0;width:94%;background:repeating-linear-gradient(-45deg,#b8382e,#b8382e 9px,#a2302810 9px,#a23028 18px);border-left:3px solid #2a0f0c;box-shadow:inset 0 3px 0 rgba(255,150,130,.26),inset 0 -4px 0 rgba(0,0,0,.35);"></div>
+        <!-- the marching host rides the leading (left) edge of the covered ground -->
+        <img data-el="doomHost" data-shadow="soft" src="Content/icons/map/enemy_host_near.png" height="82" style="position:absolute;left:6%;bottom:0px;width:auto;transform:translateX(-50%);image-rendering:pixelated;filter:drop-shadow(1px 3px 0 rgba(0,0,0,.6));pointer-events:none;" alt="enemy war party">
+      </div>
+      <img data-el="doomCastleIcon" data-type="icon" data-shadow="soft" src="Content/icons/node/castle.png" width="46" height="46" style="image-rendering:pixelated;flex:none;filter:drop-shadow(0 1px 0 rgba(0,0,0,.5));" alt="enemy castle">
+    </div>
+  </div>
+
+  <!-- LEGEND (§10: static neutral chrome — a good fit for the ornate 9-slice frame + a soft lift shadow;
+       state-coloured panels like the doom bar keep flat engine-drawn borders, see DEV_LOOP_MEMORY.md) -->
+  <div data-el="legend" data-anchor="TopRight" data-z="5" data-shadow="panel" data-frame="panel" data-container="1" data-template="legendRow" data-flow="grid" data-cols="2" data-binds="legend" style="position:absolute;right:26px;top:74px;width:480px;border:16px solid transparent;background:#1b140d;padding:4px 8px;display:grid;grid-template-columns:1fr 1fr;gap:7px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#b09a82;z-index:5;box-shadow:0 4px 10px rgba(10,8,7,.5);border-image-source:url('Content/ui/frame/panel.png');border-image-slice:16 fill;border-image-width:16px;border-image-repeat:round;">
+    <span data-tpl="legendRow" style="display:flex;align-items:center;gap:8px;"><b data-binds="legend.icon" data-image-bind="icons/node/{legend.type}" style="width: 16px; height: 16px; border-radius: 50%; background: rgb(36, 27, 19); border: 2px dashed rgb(141, 119, 92); display: flex; align-items: center; justify-content: center; font-size: 9px; color: rgb(205, 180, 151); flex: none;">?</b><span data-binds="legend.label">Unknown waypoint</span></span>
+    <span style="display:flex;align-items:center;gap:8px;"><b style="width: 16px; height: 16px; border-radius: 50%; background: rgb(217, 164, 65); display: inline-block; border: 2px solid rgb(22, 15, 9);"></b>Resource hold</span>
+    <span style="display:flex;align-items:center;gap:8px;"><b style="width: 16px; height: 16px; border-radius: 50%; background: rgb(184, 148, 106); display: inline-block; border: 2px solid rgb(22, 15, 9);"></b>Merchant</span>
+    <span style="display:flex;align-items:center;gap:8px;"><b style="width: 16px; height: 16px; border-radius: 50%; background: rgb(42, 21, 18); border: 2px solid rgb(178, 59, 50); display: flex; align-items: center; justify-content: center; font-size: 9px; color: rgb(224, 101, 75);">⚔</b>Skirmish</span>
+    <span style="display:flex;align-items:center;gap:8px;"><b style="width: 16px; height: 16px; background: rgb(67, 52, 42); display: inline-block; border: 2px solid rgb(22, 15, 9);"></b>Castle<br></span>
+    <span style="display:flex;align-items:center;gap:8px;"><b style="width: 30px; height: 0px; border-top: 3px solid rgb(217, 164, 65); display: inline-block;"></b>Charted route</span>
+    <span style="display:flex;align-items:center;gap:8px;"><b style="width: 30px; height: 0px; border-top: 2px dotted rgb(110, 88, 54); display: inline-block;"></b>Uncharted route</span>
+  </div>
+
+  <!-- CHART -->
+  <!-- CHART (edge/route styling emitted as container `states` — payload v5 §D route styling) -->
+  <div data-el="chart" data-anchor="Center" data-z="2" data-type="graph" data-binds="map" data-container="1" data-template="beaconNode" data-flow="graph" data-states="{&quot;routeFrontier&quot;:{&quot;color&quot;:&quot;amber&quot;,&quot;w&quot;:2},&quot;routeCharted&quot;:{&quot;color&quot;:&quot;mutedDim&quot;,&quot;w&quot;:1.5},&quot;routeDim&quot;:{&quot;color&quot;:&quot;borderMid&quot;,&quot;w&quot;:1},&quot;routeUncharted&quot;:{&quot;color&quot;:&quot;borderDim&quot;,&quot;w&quot;:1,&quot;dash&quot;:true}}" style="position:absolute;left:0;top:196px;width:1920px;height:812px;">
+    <div data-el="exitLabel" style="position:absolute;left:1748px;top:300px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:#cdb497;transform:translateX(-50%);">EXIT →</div>
+
+    <!-- fog veil over the far side -->
+    <div style="position:absolute;right:0;top:0;width:760px;height:812px;background:linear-gradient(90deg,transparent,rgba(12,8,5,.55));pointer-events:none;"></div>
+
+    <!-- EDGES -->
+    <svg width="1920" height="812" style="position:absolute;left:0;top:0;pointer-events:none;">
+      <sc-for list="{{ edges }}" as="e" hint-placeholder-count="28">
+        <line x1="{{ e.x1 }}" y1="{{ e.y1 }}" x2="{{ e.x2 }}" y2="{{ e.y2 }}" stroke="{{ e.color }}" stroke-width="{{ e.w }}" stroke-dasharray="{{ e.dash }}"></line>
+      </sc-for>
+    </svg>
+
+    <!-- BEACONS -->
+    <sc-for list="{{ beacons }}" as="b" hint-placeholder-count="20">
+      <div data-tpl="beaconNode" data-binds="node" style="position:absolute;left:{{ b.left }};top:{{ b.top }};width:{{ b.size }};height:{{ b.size }};opacity:{{ b.op }};">
+        <div data-atom="{{ b.atom }}" data-binds="node.type" data-image-bind="icons/node/{node.type}" style="width:100%;height:100%;border:3px {{ b.bstyle }} {{ b.bcolor }};background:{{ b.bg }};border-radius:{{ b.radius }};display:flex;align-items:center;justify-content:center;{{ b.extra }}">
+          <span data-binds="node.glyph" style="font-family:'JetBrains Mono',monospace;font-size:{{ b.glyphSize }};color:{{ b.glyphColor }};line-height:1;display:block;transform:{{ b.glyphShift }};">{{ b.glyph }}</span>
+        </div>
+        <!-- reachable-deployment COUNT badge (payload v5 §C: the "2" on a node) -->
+        <span data-binds="node.deployDistance" style="position:absolute;right:-7px;top:-7px;min-width:20px;height:20px;box-sizing:border-box;padding:0 4px;background:#160f09;border:2px solid {{ b.badgeBorder }};color:{{ b.badgeColor }};font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;visibility:{{ b.badgeVis }};z-index:2;">{{ b.badge }}</span>
+        <div data-binds="node.label" style="position:absolute;left:50%;top:calc(100% + 5px);transform:translateX(-50%);text-align:center;white-space:nowrap;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;color:{{ b.labelColor }};">{{ b.label }}</div>
+      </div>
+    </sc-for>
+
+    <!-- (enemy advance is shown by the top-center DOOM BAR, not a node token) -->
+
+    <!-- YOU ARE HERE (payload #16: existed engine-side only — now homed above the camp beacon) -->
+    <div data-el="youAreHere" data-binds="map.current" style="position:absolute;left:120px;top:368px;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;color:#7fa05a;text-shadow:0 1px 3px #000;white-space:nowrap;">▼ YOU ARE HERE</div>
+
+  </div>
+
+  <!-- CASTLE PANEL (2026-07-03: homed — was an engine hand-drawn overlay; replaces the old floating
+       castleNote, and sits clear of the castle node's own label) -->
+  <div data-el="castlePanel" data-anchor="TopRight" data-binds="city.castle" data-shadow="panel" data-frame="card" style="position:absolute;right:26px;top:206px;width:300px;box-sizing:border-box;background:#1d150e;border:12px solid transparent;border-image-source:url('Content/ui/frame/card.png');border-image-slice:12 fill;border-image-width:12px;border-image-repeat:round;box-shadow:0 4px 10px rgba(10,8,7,.5);padding:4px 8px;z-index:5;">
+    <div data-el="castlePanelTitle" style="font-size:18px;letter-spacing:1px;color:#f0dcb4;">Castle Fortifications</div>
+    <div data-el="fortRows" data-container="1" data-template="fortRow" data-flow="vertical" data-binds="city.castle.parts" style="display:flex;flex-direction:column;gap:5px;margin-top:8px;">
+      <sc-for list="{{ fortParts }}" as="f" hint-placeholder-count="4">
+        <div data-tpl="fortRow" data-states="{&quot;intact&quot;:{&quot;color&quot;:&quot;good&quot;},&quot;damaged&quot;:{&quot;color&quot;:&quot;amber&quot;},&quot;razed&quot;:{&quot;color&quot;:&quot;lockText&quot;,&quot;opacity&quot;:0.6}}" style="display:flex;align-items:center;gap:9px;border:1px solid #382a1d;background:#17110b;padding:5px 9px;">
+          <span style="width:11px;height:11px;border:2px solid #0a0807;background:#43342a;flex:none;"></span>
+          <span data-binds="fort.name" style="flex:1;font-family:'JetBrains Mono',monospace;font-size:12px;color:#cdb497;">{{ f.name }}</span>
+          <span data-binds="fort.state" style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:1px;color:{{ f.color }};">{{ f.state }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- FOOTER (2026-07-03: no longer an empty band — homes the three remaining engine hand-draws:
+       campaign progress strip · PACK gear chips · EQUIPMENT button) -->
+  <div data-el="footer" data-anchor="Bottom" data-z="6" data-shadow="panel" style="position:absolute;left:0;bottom:0;width:1920px;height:72px;border-top:3px solid #4a3729;background:linear-gradient(#201710,#17110b);box-shadow:0 -6px 16px rgba(10,8,7,.55);z-index:6;display:flex;align-items:center;justify-content:space-between;padding:0 26px;">
+    <!-- campaign spine mini — overall run progress, city by city -->
+    <div style="display:flex;align-items:center;gap:14px;">
+      <span data-el="campaignStripLabel" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:#8d775c;">CAMPAIGN</span>
+      <div data-el="campaignStrip" data-container="1" data-template="spineCity" data-flow="horizontal" data-binds="campaign.cities" style="display:flex;align-items:center;gap:8px;">
+        <sc-for list="{{ spineCities }}" as="sc" hint-placeholder-count="6">
+          <div data-tpl="spineCity" data-binds="city.status" data-states="{&quot;taken&quot;:{&quot;border&quot;:&quot;good&quot;},&quot;current&quot;:{&quot;border&quot;:&quot;amber&quot;},&quot;future&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;opacity&quot;:0.45}}" style="width:30px;height:30px;box-sizing:border-box;border:2px solid {{ sc.border }};background:#160f09;display:flex;align-items:center;justify-content:center;opacity:{{ sc.op }};">
+            <span data-binds="city.castle" data-image-bind="icons/node/castle" style="width:20px;height:20px;background:url('Content/icons/node/castle.png') center/100% 100% no-repeat;image-rendering:pixelated;"></span>
+          </div>
+        </sc-for>
+      </div>
+      <span data-el="campaignTaken" data-binds="campaign.taken" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#b09a82;">2 / 6 TAKEN</span>
+    </div>
+    <!-- PACK — quick view of what the body carries -->
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span data-el="packLabel" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:#8d775c;">PACK</span>
+      <div data-el="packChips" data-container="1" data-template="packChip" data-flow="horizontal" data-binds="Body.gear" style="display:flex;align-items:center;gap:8px;">
+        <sc-for list="{{ packChips }}" as="pc" hint-placeholder-count="3">
+          <div data-tpl="packChip" data-binds="gear.item" style="display:flex;align-items:center;gap:7px;border:1px solid #382a1d;background:#1a130c;padding:5px 10px;">
+            <span data-binds="gear.attr" data-color-bind="gear.attrColor" style="width:12px;height:12px;border:1px solid #0a0807;background:{{ pc.color }};flex:none;"></span>
+            <span data-binds="gear.name" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#cdb497;white-space:nowrap;">{{ pc.name }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <!-- jump to the Equipment screen -->
+    <div data-el="equipmentBtn" data-binds="nav.equipment" data-bind-gate="" data-states="button" title="Open the equipment screen" style="position:relative;width:200px;height:40px;background:url('Content/ui/button/button_normal.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:1.5px;color:#cdb497;">⚒ EQUIPMENT</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1080}}">
+class Component extends DCLogic {
+  renderVals() {
+    const B = {
+      b0:  { x: 120,  y: 430, type: 'camp' },
+      b1:  { x: 290,  y: 300, type: 'skirmish' },
+      b2:  { x: 300,  y: 590, type: 'merchant' },
+      b3:  { x: 470,  y: 430, type: 'resource' },
+      b4:  { x: 460,  y: 180, type: 'unknown' },
+      b5:  { x: 520,  y: 700, type: 'unknown' },
+      b6:  { x: 660,  y: 320, type: 'unknown' },
+      b7:  { x: 700,  y: 560, type: 'merchant' },
+      b8:  { x: 690,  y: 120, type: 'unknown' },
+      b9:  { x: 850,  y: 250, type: 'unknown' },
+      b10: { x: 880,  y: 470, type: 'resource' },
+      b11: { x: 870,  y: 690, type: 'unknown' },
+      b12: { x: 1010, y: 160, type: 'unknown' },
+      b13: { x: 1040, y: 380, type: 'unknown' },
+      b14: { x: 1070, y: 600, type: 'merchant' },
+      b15: { x: 1210, y: 270, type: 'unknown' },
+      b16: { x: 1240, y: 490, type: 'skirmish' },
+      b17: { x: 1260, y: 720, type: 'unknown' },
+      b18: { x: 1420, y: 360, type: 'unknown' },
+      b19: { x: 1450, y: 600, type: 'unknown' },
+      b20: { x: 1700, y: 420, type: 'castle' },
+    };
+    const edgeList = [
+      ['b0','b1'], ['b0','b2'],
+      ['b1','b3'], ['b1','b4'], ['b2','b3'], ['b2','b5'],
+      ['b3','b6'], ['b4','b6'], ['b4','b8'], ['b5','b7'], ['b5','b11'],
+      ['b6','b9'], ['b6','b13'], ['b7','b10'], ['b7','b13'], ['b8','b9'],
+      ['b9','b12'], ['b9','b13'], ['b10','b13'], ['b10','b14'], ['b11','b14'],
+      ['b13','b15'], ['b13','b16'], ['b14','b16'], ['b14','b17'],
+      ['b15','b18'], ['b16','b18'], ['b16','b19'],
+      ['b18','b20'], ['b19','b18'],
+    ];
+
+    // BFS jump-distance from current (b0)
+    const adj = {};
+    Object.keys(B).forEach(k => adj[k] = []);
+    edgeList.forEach(([a, b]) => { adj[a].push(b); adj[b].push(a); });
+    const dist = {}; Object.keys(B).forEach(k => dist[k] = Infinity);
+    dist.b0 = 0; const q = ['b0'];
+    while (q.length) { const c = q.shift(); adj[c].forEach(n => { if (dist[n] > dist[c] + 1) { dist[n] = dist[c] + 1; q.push(n); } }); }
+
+    const opByDist = d => d <= 1 ? 1 : d === 2 ? 0.82 : d === 3 ? 0.6 : d === 4 ? 0.46 : 0.34;
+
+    const TYPE = {
+      camp:     { glyph: '◉', g: '#7fa05a', bg: '#1d2417', bcolor: '#7fa05a', label: 'CAMP' },
+      resource: { glyph: '⚑', g: '#160f09', bg: '#d9a441', bcolor: '#160f09', label: 'RESOURCE HOLD' },
+      merchant: { glyph: '⌂', g: '#160f09', bg: '#b8946a', bcolor: '#160f09', label: 'MERCHANT' },
+      castle:   { glyph: '♜', g: '#e9d6b0', bg: '#43342a', bcolor: '#160f09', label: 'CASTLE' },
+      skirmish: { glyph: '⚔', g: '#e0654b', bg: '#2a1512', bcolor: '#b23b32', label: 'SKIRMISH' },
+      unknown:  { glyph: '?', g: '#cdb497', bg: '#241b13', bcolor: '#8d775c', label: '' },
+    };
+
+    const atomDone = {};  // tag ONE real exemplar per node type → data-atom capture (ASSET_GEN_METHOD.md)
+    const beacons = Object.entries(B).map(([id, n]) => {
+      const d = dist[id];
+      // reveal rules
+      let shown = n.type;
+      if (n.type === 'merchant' && d > 1) shown = 'unknown';      // merchants resolve 1 jump out
+      if (n.type === 'skirmish' && d > 1) shown = 'unknown';      // scouts hear the fighting 1 jump out
+      if (n.type === 'unknown' && d > 0) shown = 'unknown';        // generic stays ? until visited
+      // resource & castle always shown (known afar); camp shown
+      const t = TYPE[shown];
+      const isCastle = shown === 'castle';
+      const size = isCastle ? 140 : 56;
+      const landmark = shown === 'resource' || shown === 'castle';
+      let op = landmark ? Math.max(opByDist(d), 0.74) : opByDist(d);
+      const BEV = 'box-shadow:inset 3px 3px 0 rgba(255,246,222,.16),inset -4px -5px 0 rgba(0,0,0,.46)';
+      let extra = BEV + ';', labelColor = '#9a8468';
+      if (d === 0) { extra = 'animation:rb-glow 1.6s infinite;'; labelColor = '#7fa05a'; }
+      else if (d === 1) { extra = BEV + ',0 0 0 2px #d9a44188;'; labelColor = '#e9d6b0'; }
+      if (shown === 'unknown') extra += 'animation:rb-ping 2.6s infinite;';
+      const atom = atomDone[shown] ? '' : (atomDone[shown] = 'icons/node/' + shown);
+      return {
+        left: (n.x - size / 2) + 'px',
+        top: (n.y - size / 2) + 'px',
+        size: size + 'px',
+        atom,
+        bg: 'radial-gradient(58% 58% at 35% 30%,rgba(255,246,222,.24),rgba(255,246,222,0) 60%),' + t.bg, bcolor: t.bcolor, bstyle: shown === 'unknown' ? 'dashed' : 'solid',
+        radius: isCastle ? '0' : '50%',
+        glyph: t.glyph, glyphColor: t.g,
+        glyphSize: (isCastle ? 52 : 22) + 'px',
+        glyphShift: shown === 'merchant' ? 'translate(-1px,-2px)' : 'none',   // optical-centre the ⌂ house glyph
+        extra, op: '' + op,
+        // reachable-deployment count badge: deployments to reach this node (hidden on camp + fogged nodes)
+        badge: '' + d,
+        badgeVis: (d >= 1 && shown !== 'unknown') ? 'visible' : 'hidden',
+        badgeBorder: d === 1 ? '#d9a441' : '#8d775c',
+        badgeColor: d === 1 ? '#d9a441' : '#9a8468',
+        label: t.label, labelColor: shown === 'resource' ? '#d9a441' : (isCastle ? '#cdb497' : labelColor),
+      };
+    });
+
+    const edges = edgeList.map(([a, b]) => {
+      const A = B[a], C = B[b];
+      const md = Math.min(dist[a], dist[b]);
+      let color, w, dash;
+      if (md === 0) { color = '#d9a441'; w = 4; dash = '0'; }        // your jump options
+      else if (md === 1) { color = '#8a7150'; w = 3; dash = '0'; }    // charted frontier
+      else if (md === 2) { color = '#5a4734'; w = 2; dash = '0'; }    // dim
+      else { color = '#46362a'; w = 2; dash = '2 9'; }                // uncharted
+      return { x1: A.x, y1: A.y, x2: C.x, y2: C.y, color, w, dash };
+    });
+
+    // gauge pips (payload #3): live/spent cells + the ui/pip asset each blits
+    const suppliesPips = [];
+    for (let i = 0; i < 6; i++) suppliesPips.push({ bg: '#7fa05a', bd: '#160f09', style: 'solid', asset: 'pip_full_supplies' });
+    for (let i = 0; i < 3; i++) suppliesPips.push({ bg: '#241b14', bd: '#5a4636', style: 'dashed', asset: 'pip_empty_supplies' });
+    const supportPips = [];
+    for (let i = 0; i < 2; i++) supportPips.push({ bg: '#241b14', bd: '#d9a44188', style: 'dashed', asset: 'pip_empty_support' });
+
+    // 2026-07-03 homed elements — samples mirror the same Core state the other screens show
+    const fortParts = [
+      { name: 'Gate',     state: 'INTACT',  color: '#7fa05a' },
+      { name: 'Wall',     state: 'INTACT',  color: '#7fa05a' },
+      { name: 'Catapult', state: 'DAMAGED', color: '#d9a441' },
+      { name: 'Ballista', state: 'INTACT',  color: '#7fa05a' },
+    ];
+    const ST = { taken: { border: '#7fa05a', op: '1' }, current: { border: '#d9a441', op: '1' }, future: { border: '#382a1d', op: '.45' } };
+    const spineCities = ['taken', 'taken', 'current', 'future', 'future', 'future'].map(s => ({ ...ST[s] }));
+    const ATTR = { STR: '#c2553f', INT: '#6f8fc4', DEX: '#82a85e', CON: '#cf9a44' };
+    const packChips = [
+      { name: 'Sword',        color: ATTR.STR },
+      { name: 'Round Shield', color: ATTR.CON },
+      { name: 'Iron Greaves', color: ATTR.DEX },
+    ];
+
+    return { edges, beacons, suppliesPips, supportPips, fortParts, spineCities, packChips,
+      resources: [
+        { id: 'supplies', label: 'SUPPLIES', value: '6' },
+        { id: 'spoils',   label: 'GOLD',     value: '128' },
+        { id: 'charge',   label: 'CHARGE',   value: '3' },
+        { id: 'summons',  label: 'SUMMONS',  value: '2' },
+      ].map(r => ({ ...r, iconCss: "url('Content/icons/resource/" + r.id + ".png')" })) };
+  }
+}
+</script>
+</body>
+</html>

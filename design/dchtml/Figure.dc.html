@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+</helmet>
+<div style="position:relative;display:inline-block;line-height:0;">{{ composite }}</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:280,&quot;height&quot;:320},&quot;figure&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;grunt&quot;,&quot;warden&quot;,&quot;adept&quot;,&quot;summoner&quot;,&quot;reaver&quot;,&quot;skeleton&quot;,&quot;bandit&quot;,&quot;wraith&quot;,&quot;ogre&quot;,&quot;troll&quot;,&quot;gargoyle&quot;],&quot;default&quot;:&quot;grunt&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;scale&quot;:{&quot;editor&quot;:&quot;float&quot;,&quot;default&quot;:1,&quot;min&quot;:0.1,&quot;max&quot;:2,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;},&quot;gear&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  /* Modular figure assembler — THE consumer of Content/layout.json.
+   * Composes a figure from its part PNGs (sprites/body/<figure>/<part>_<state>.png)
+   * at the rects/z-order/sockets the generator emitted, then mounts gear by aligning
+   * gear.pivot to the figure socket. Regenerating parts/layout updates every screen
+   * automatically — nothing here hard-codes a position. */
+  state = { layout: null };
+
+  componentDidMount() {
+    fetch('Content/layout.json')
+      .then(r => r.json())
+      .then(layout => this.setState({ layout }))
+      .catch(() => {});
+  }
+
+  renderVals() {
+    const layout = this.state.layout;
+    const id = this.props.figure;
+    const S = parseFloat(this.props.scale) || 1;
+    const gearOn = this.props.gear !== 'false' && this.props.gear !== false;
+    let states = this.props.states || null;
+    if (typeof states === 'string') { try { states = JSON.parse(states); } catch (e) { states = null; } }
+    const stateFor = (part) => (states && states[part]) || 'healthy';
+
+    // Placeholder box (sized to mount hint) until layout.json resolves.
+    if (!layout || !id || !layout.figures[id]) {
+      return { composite: React.createElement('div', { style: { width: '100%', height: '100%' } }) };
+    }
+
+    const f = layout.figures[id];
+    const [W, H] = f.size;
+    const px = (n) => Math.round(n) + 'px';
+    const layers = [];
+
+    f.z.forEach((part, i) => {
+      if (part === 'frontGear') {
+        if (!gearOn) return;
+        (f.mounts || []).forEach((m, gi) => {
+          const g = layout.gear[m.gear]; const sock = f.sockets[m.socket];
+          if (!g || !sock) return;
+          layers.push(React.createElement('img', {
+            key: 'gear-' + i + '-' + gi,
+            src: 'Content/sprites/gear/' + m.gear + '.png',
+            style: { position: 'absolute', left: px(sock[0] - g.pivot[0]), top: px(sock[1] - g.pivot[1]),
+                     imageRendering: 'pixelated', zIndex: i }
+          }));
+        });
+        return;
+      }
+      if (stateFor(part) === 'hidden') return;
+      const pr = f.parts[part]; if (!pr) return;
+      const [x, y, w, h] = pr.rect;
+      layers.push(React.createElement('img', {
+        key: part,
+        src: 'Content/sprites/body/' + id + '/' + part + '_' + stateFor(part) + '.png',
+        style: { position: 'absolute', left: px(x), top: px(y), width: px(w), height: px(h),
+                 imageRendering: 'pixelated', zIndex: i }
+      }));
+    });
+
+    // figure-space inner, uniform-scaled into the slot (figure = ONE unit, per the contract)
+    const inner = React.createElement('div', {
+      style: { position: 'relative', width: px(W), height: px(H),
+               transform: 'scale(' + S + ')', transformOrigin: 'top left' }
+    }, layers);
+    const wrap = React.createElement('div', {
+      style: { position: 'relative', width: px(W * S), height: px(H * S) }
+    }, inner);
+
+    return { composite: wrap };
+  }
+}
+</script>
+</body>
+</html>

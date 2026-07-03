@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:#100b07;}
+  @keyframes rb-cglow{0%,100%{box-shadow:0 0 0 3px #d9a44166}50%{box-shadow:0 0 0 3px #d9a441bb,0 0 22px #d9a44155}}
+</style>
+</helmet>
+<div data-screen-label="Campaign Map" data-screen="campaignmap" data-design="1920,1080" style="position:relative;width:1920px;height:1080px;overflow:hidden;font-family:'IM Fell English',Georgia,serif;color:#ece0cb;background:radial-gradient(140% 110% at 12% 24%,#3c2b1d 0%,#241a12 50%,#130e09 100%);">
+
+  <!-- EGA/VGA backdrop (baked: Content/bg/spine_road.png, §10 rule A) — payload v5 §E: emitted as a
+       real backdrop element so the engine draws the map bg (scale-to-cover) -->
+  <div data-el="backdrop" data-anchor="Center" data-z="0" data-binds="campaign.scene" style="position:absolute;inset:0;background:url('Content/bg/spine_road.png') center/cover no-repeat;image-rendering:pixelated;pointer-events:none;"></div>
+
+  <!-- HEADER -->
+  <div data-el="header" data-anchor="Top" data-z="5" style="position:absolute;left:0;top:0;width:1920px;padding:26px 40px 0;display:flex;align-items:flex-end;justify-content:space-between;">
+    <div>
+      <div data-el="eyebrow" data-shadow="title" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:5px;color:#9a8468;">Campaign</div>
+      <div data-el="title" data-shadow="title" style="font-size:38px;letter-spacing:1px;color:#f0dcb4;margin-top:4px;">Advance Toward the Capital</div>
+      
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px;">
+      <!-- RESOURCE READOUT (payload v5 §G: top-right on every IN-RUN screen) -->
+      <div data-el="resourceStrip" data-anchor="TopRight" data-z="5" data-binds="run.resources" data-container="1" data-template="resourceItem" data-flow="horizontal" style="display:flex;align-items:center;gap:16px;">
+        <sc-for list="{{ resources }}" as="res" hint-placeholder-count="4">
+          <div data-tpl="resourceItem" style="display:flex;align-items:center;gap:6px;">
+            <span data-binds="resource.icon" data-image-bind="icons/resource/{resource.id}" style="width:22px;height:22px;flex:none;background-image:{{ res.iconCss }};background-size:100% 100%;image-rendering:pixelated;"></span>
+            <span data-binds="resource.value" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#e9d6b0;">{{ res.value }}</span>
+            <span data-binds="resource.label" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:#8d775c;">{{ res.label }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div data-el="citiesTaken" data-anchor="TopRight" data-binds="campaign.taken" style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:#b09a82;line-height:1.8;">
+        CITIES TAKEN <b style="color:#ece0cb;">2 / 6</b>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROUTE AREA (road styling emitted as container `states` — payload v5 §D taken/available/locked routes) -->
+  <div data-el="cityGraph" data-anchor="Center" data-z="2" data-type="graph" data-binds="campaign" data-container="1" data-template="cityNode" data-flow="graph" data-states="{&quot;routeTraveled&quot;:{&quot;color&quot;:&quot;good&quot;,&quot;w&quot;:2},&quot;routeReachable&quot;:{&quot;color&quot;:&quot;amber&quot;,&quot;w&quot;:2},&quot;routeSkipped&quot;:{&quot;color&quot;:&quot;borderDim&quot;,&quot;w&quot;:1,&quot;dash&quot;:true},&quot;routeFuture&quot;:{&quot;color&quot;:&quot;borderDim&quot;,&quot;w&quot;:1,&quot;dash&quot;:true}}" style="position:absolute;left:0;top:160px;width:1920px;height:820px;">
+
+    <!-- EDGES (roads) -->
+    <svg width="1920" height="820" style="position:absolute;left:0;top:0;pointer-events:none;">
+      <sc-for list="{{ roads }}" as="e" hint-placeholder-count="16">
+        <line x1="{{ e.x1 }}" y1="{{ e.y1 }}" x2="{{ e.x2 }}" y2="{{ e.y2 }}" stroke="{{ e.color }}" stroke-width="{{ e.w }}" stroke-dasharray="{{ e.dash }}"></line>
+      </sc-for>
+    </svg>
+
+    <!-- CITIES -->
+    <sc-for list="{{ cities }}" as="c" hint-placeholder-count="11">
+      <div data-tpl="cityNode" data-binds="city" data-states="{&quot;current&quot;:{&quot;border&quot;:&quot;amber&quot;,&quot;glow&quot;:true},&quot;cleared&quot;:{&quot;opacity&quot;:0.7},&quot;skipped&quot;:{&quot;opacity&quot;:0.4},&quot;future&quot;:{&quot;opacity&quot;:0.5},&quot;capital&quot;:{&quot;color&quot;:&quot;gold&quot;,&quot;opacity&quot;:0.62}}" style="position:absolute;left:{{ c.x }};top:{{ c.y }};width:16px;height:16px;opacity:{{ c.op }};">
+
+        <!-- castle (bottom-anchored at the node point; the engine blits icons/node/castle at this rect
+             — payload v5 §E: the [8,8] node dot is too small to carry a visible castle) -->
+        <div data-binds="city.castle" data-image-bind="icons/node/castle" style="position:absolute;left:-60px;top:-96px;width:120px;height:96px;transform:scale({{ c.scale }});transform-origin:bottom center;{{ c.glow }}">
+          <sc-if value="{{ c.hasKeep }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute;left:49px;bottom:0;width:22px;height:82px;background:#574636;border:2px solid #160f09;"></div>
+            <div style="position:absolute;left:47px;bottom:78px;width:26px;height:8px;background:repeating-linear-gradient(90deg,#574636 0 6px,transparent 6px 10px);"></div>
+          </sc-if>
+          <sc-if value="{{ c.hasTower }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute;left:8px;bottom:0;width:18px;height:58px;background:#62513f;border:2px solid #160f09;"></div>
+            <div style="position:absolute;left:6px;bottom:54px;width:22px;height:8px;background:repeating-linear-gradient(90deg,#62513f 0 6px,transparent 6px 10px);"></div>
+            <div style="position:absolute;left:94px;bottom:0;width:18px;height:58px;background:#62513f;border:2px solid #160f09;"></div>
+            <div style="position:absolute;left:92px;bottom:54px;width:22px;height:8px;background:repeating-linear-gradient(90deg,#62513f 0 6px,transparent 6px 10px);"></div>
+          </sc-if>
+          <div style="position:absolute;left:22px;bottom:0;width:76px;height:44px;background:#6e5c48;border:2px solid #160f09;"></div>
+          <div style="position:absolute;left:20px;bottom:40px;width:80px;height:9px;background:repeating-linear-gradient(90deg,#6e5c48 0 11px,transparent 11px 18px);"></div>
+          <div style="position:absolute;left:52px;bottom:0;width:16px;height:26px;background:#1c140d;border:2px solid #160f09;border-bottom:none;"></div>
+          <sc-if value="{{ c.hasCat }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute;left:3px;bottom:58px;width:22px;height:13px;background:#1d150e;border:2px solid #c08a3a;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:8px;color:#c08a3a;">⊿</div>
+          </sc-if>
+          <sc-if value="{{ c.hasBal }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute;left:95px;bottom:58px;width:22px;height:13px;background:#1d150e;border:2px solid #c08a3a;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:8px;color:#c08a3a;">✛</div>
+          </sc-if>
+        </div>
+
+        <!-- node dot -->
+        <div style="position:absolute;left:-8px;top:-8px;width:16px;height:16px;background:{{ c.dot }};border:3px solid #160f09;transform:rotate(45deg);"></div>
+
+        <!-- label (§0 fix: composed as "Tier <#>" alone; only a CLEARED city appends the dot separator
+             + "TAKEN ✓" — every other state (current/skipped/future/capital) shows the bare tier) -->
+        <div style="position:absolute;left:-95px;top:14px;width:190px;text-align:center;">
+          <div data-binds="city.tier" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:{{ c.subColor }};">{{ c.label }}</div>
+          <div data-binds="city.name" style="font-size:18px;color:{{ c.nameColor }};line-height:1.1;">{{ c.name }}</div>
+          <!-- city STATUS chip (payload v5 §D: TAKEN ✓ / CURRENT) -->
+          <div style="margin-top:4px;display:flex;justify-content:center;"><span data-binds="city.status" data-states="{&quot;taken&quot;:{&quot;color&quot;:&quot;good&quot;,&quot;border&quot;:&quot;good&quot;},&quot;current&quot;:{&quot;color&quot;:&quot;amber&quot;,&quot;border&quot;:&quot;amber&quot;}}" style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;padding:2px 6px;border:1px solid {{ c.statusBorder }};color:{{ c.statusColor }};background:#160f09cc;visibility:{{ c.statusVis }};">{{ c.status }}</span></div>
+        </div>
+      </div>
+    </sc-for>
+
+    <!-- CURRENT-LEG callout (§10: this is a fixed-style panel that always frames whichever city is
+         current — not a per-state colour signal like the RunMap doom bar — so it's a good fit for the
+         static ornate 9-slice frame + soft lift, same idiom as Combat/Build/RunMap chrome) -->
+    
+
+    <!-- CAPITAL flourish -->
+    <div data-el="capitalMarker" data-z="3" data-shadow="title" style="position:absolute;left:1540px;top:300px;width:240px;text-align:center;transform:translateX(-50%);">
+      
+    </div>
+  </div>
+
+  <!-- FOOTER (§10: engine-drawn drop shadow + single accent-edge border — full-bleed bar touching the
+       screen edge, so no boxed 9-slice frame, see DEV_LOOP_MEMORY) -->
+  <div data-el="footer" data-anchor="Bottom" data-z="6" data-shadow="panel" style="position:absolute;left:0;bottom:0;width:1920px;height:90px;border-top:3px solid #4a3729;background:linear-gradient(#201710,#17110b);display:flex;align-items:center;justify-content:space-between;padding:0 40px;box-shadow:0 -6px 16px rgba(10,8,7,.55);">
+    <div style="display:flex;gap:30px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#9a8468;">
+      
+      
+      
+    </div>
+    
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1080}}">
+class Component extends DCLogic {
+  renderVals() {
+    const C = {
+      c0:  { name: 'Ashford',    num: 'I',   x: 150,  y: 430, tier: 0, state: 'cleared' },
+      c1:  { name: 'Greymoor',   num: 'II',  x: 400,  y: 300, tier: 1, state: 'cleared' },
+      c2:  { name: 'Mirefen',    num: 'II',  x: 400,  y: 590, tier: 1, state: 'skipped' },
+      c3:  { name: 'Thornmarch', num: 'III', x: 680,  y: 360, tier: 2, state: 'current' },
+      c4:  { name: 'Vexhollow',  num: 'III', x: 680,  y: 660, tier: 2, state: 'future' },
+      c5:  { name: 'Duskvael',   num: 'IV',  x: 960,  y: 250, tier: 3, state: 'future' },
+      c6:  { name: 'Caer Mor',   num: 'IV',  x: 960,  y: 500, tier: 3, state: 'future' },
+      c7:  { name: 'Hollowmere', num: 'IV',  x: 960,  y: 740, tier: 3, state: 'future' },
+      c8:  { name: 'Ridgefast',  num: 'V',   x: 1240, y: 380, tier: 4, state: 'future' },
+      c9:  { name: 'Saltmarch',  num: 'V',   x: 1240, y: 650, tier: 4, state: 'future' },
+      cap: { name: 'Aurelgrave', num: 'VI',  x: 1560, y: 470, tier: 5, state: 'future', capital: true },
+    };
+    const roadList = [
+      ['c0','c1','trav'], ['c0','c2','skip'],
+      ['c1','c3','trav'], ['c2','c3','skip'], ['c2','c4','skip'],
+      ['c3','c5','reach'], ['c3','c6','reach'], ['c4','c6','future'], ['c4','c7','future'],
+      ['c5','c8','future'], ['c6','c8','future'], ['c6','c9','future'], ['c7','c9','future'],
+      ['c8','cap','future'], ['c9','cap','future'],
+    ];
+    const roads = roadList.map(([a, b, kind]) => {
+      const A = C[a], B = C[b];
+      let color, w, dash;
+      if (kind === 'trav') { color = '#7fa05a'; w = 4; dash = '0'; }
+      else if (kind === 'reach') { color = '#d9a441'; w = 4; dash = '0'; }
+      else if (kind === 'skip') { color = '#4a3a2c'; w = 2; dash = '2 8'; }
+      else { color = '#46362a'; w = 2; dash = '6 9'; }
+      return { x1: A.x, y1: A.y, x2: B.x, y2: B.y, color, w, dash };
+    });
+
+    const PARTS = [3, 4, 5, 6, 7, 8];
+    const SCALE = ['0.8', '0.86', '0.92', '0.98', '1.04', '1.28'];
+    const stStyle = (st, capital) => {
+      if (st === 'cleared') return { op: '.7', dot: '#7fa05a', nameColor: '#cdb497', subColor: '#7fa05a', cleared: true, glow: '' };
+      if (st === 'skipped') return { op: '.4', dot: '#5a4636', nameColor: '#8d775c', subColor: '#6f5c46', cleared: false, glow: '' };
+      if (st === 'current') return { op: '1', dot: '#d9a441', nameColor: '#f0dcb4', subColor: '#d9a441', cleared: false, glow: 'animation:rb-cglow 1.8s infinite;' };
+      if (capital) return { op: '.62', dot: '#c08a3a', nameColor: '#c08a3a', subColor: '#c08a3a', cleared: false, glow: '' };
+      return { op: '.5', dot: '#5a4636', nameColor: '#9a8468', subColor: '#6f5c46', cleared: false, glow: '' };
+    };
+
+    // §0: the tier label is JUST "Tier <#>" — city STATUS moved to the dedicated chip under the name
+    // (payload v5 §D): TAKEN ✓ on cleared, CURRENT on the active city, hidden otherwise.
+    const cities = Object.values(C).map(c => {
+      const st = stStyle(c.state, c.capital);
+      const status = c.state === 'cleared' ? 'TAKEN ✓' : (c.state === 'current' ? 'CURRENT' : '');
+      return {
+        name: c.name,
+        x: c.x + 'px', y: c.y + 'px',
+        parts: PARTS[c.tier], scale: SCALE[c.tier],
+        hasTower: c.tier >= 0, hasCat: c.tier >= 1, hasBal: c.tier >= 2, hasKeep: c.tier >= 3,
+        label: 'Tier ' + (c.tier + 1),
+        status,
+        statusVis: status ? 'visible' : 'hidden',
+        statusColor: c.state === 'current' ? '#d9a441' : '#7fa05a',
+        statusBorder: c.state === 'current' ? '#d9a441' : '#4a5c38',
+        ...st,
+      };
+    });
+
+    return { roads, cities,
+      resources: [
+        { id: 'supplies', label: 'SUPPLIES', value: '6' },
+        { id: 'spoils',   label: 'GOLD',     value: '128' },
+        { id: 'charge',   label: 'CHARGE',   value: '3' },
+        { id: 'summons',  label: 'SUMMONS',  value: '2' },
+      ].map(r => ({ ...r, iconCss: "url('Content/icons/resource/" + r.id + ".png')" })) };
+  }
+}
+</script>
+</body>
+</html>

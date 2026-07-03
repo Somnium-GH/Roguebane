@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:#100b07;}
+</style>
+</helmet>
+<div data-screen-label="Equipment" data-screen="equipment" data-design="1920,1080" style="position:relative;width:1920px;height:1080px;overflow:hidden;font-family:'IM Fell English',Georgia,serif;color:#ece0cb;background:#0c0810;">
+
+  <!-- TOP STRIP -->
+  <div data-el="statusStrip" data-anchor="Top" data-z="6" style="position:absolute;left:0;top:0;width:1920px;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;background:linear-gradient(#241a12,#1b130d);border-bottom:2px solid #4a3729;z-index:6;">
+    <!-- (payload #9: coreLabel/marchState moved LEFT beside the logo — they collided with the
+         top-right resourceStrip when engine-measured text ran wider than the design's) -->
+    <div style="display:flex;align-items:center;gap:22px;">
+      <span data-el="logo" style="font-size:23px;letter-spacing:.5px;color:#e9d6b0;">Roguebane</span>
+      <span data-el="coreLabel" data-binds="core.name" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#b09a82;">CORE <b style="color: rgb(236, 224, 203);">GRUNT<br></b></span>
+      <span data-el="marchState" data-binds="run.state" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#7fa05a;">▶ READY TO MARCH</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:22px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#b09a82;">
+      <!-- RESOURCE READOUT (payload v5 §G: top-right on every IN-RUN screen) -->
+      <div data-el="resourceStrip" data-anchor="TopRight" data-z="6" data-binds="run.resources" data-container="1" data-template="resourceItem" data-flow="horizontal" style="display:flex;align-items:center;gap:16px;">
+        <sc-for list="{{ resources }}" as="res" hint-placeholder-count="4">
+          <div data-tpl="resourceItem" style="display:flex;align-items:center;gap:6px;">
+            <span data-binds="resource.icon" data-image-bind="icons/resource/{resource.id}" style="width:22px;height:22px;flex:none;background-image:{{ res.iconCss }};background-size:100% 100%;image-rendering:pixelated;"></span>
+            <span data-binds="resource.value" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#e9d6b0;">{{ res.value }}</span>
+            <span data-binds="resource.label" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:#8d775c;">{{ res.label }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <!-- close — back to wherever the screen was opened from (same idiom as Merchant's LEAVE) -->
+      <div data-el="closeBtn" data-binds="nav.close" data-bind-gate="" data-states="button" title="Close equipment" style="position:relative;width:120px;height:40px;background:url('Content/ui/button/button_normal.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;letter-spacing:1px;color:#cdb497;">✕ CLOSE</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div style="position:absolute;left:0;top:56px;width:1920px;height:760px;display:flex;">
+
+    <!-- ===== LEFT: CHASSIS ANATOMY (same body, same spot as combat) ===== -->
+    <div data-el="equipPanel" data-anchor="Left" data-z="2" data-binds="Body" style="width:500px;border-right:2px solid #382a1d;position:relative;overflow:hidden;">
+      <!-- torchlit backdrop (baked: Content/bg/build_alcove.png, §10 rule A) — the screen's *.scene
+           element (payload #7: equipment had no backdrop scene element in the manifest) -->
+      <div data-el="backdrop" data-binds="equipment.scene" style="position:absolute;inset:0;background:url('Content/bg/build_alcove.png') center/cover no-repeat;image-rendering:pixelated;"></div>
+      <div style="position:absolute;left:0;top:0;width:500px;height:560px;background:radial-gradient(58% 55% at 34% 30%,#e0913a30,transparent 70%);pointer-events:none;"></div>
+
+      <!-- header -->
+      <div style="position:absolute;left:20px;top:12px;z-index:2;">
+        <span data-el="equipTitle" data-shadow="title" style="font-size:22px;letter-spacing:1px;color:#e9d6b0;text-shadow:0 2px 6px #000;">Equipment</span>
+      </div>
+
+      <!-- THE BODY — same knight sprite as combat, with part tips alongside (build-only) -->
+      <div data-el="paperDoll" data-anchor="Left" data-z="2" data-binds="Body" data-type="figure" style="position:absolute;left:150px;top:150px;width:240px;height:430px;z-index:2;">
+        <div style="position:absolute;left:36px;top:404px;width:168px;height:22px;background:radial-gradient(50% 50% at 50% 50%,#0a0710cc,transparent 70%);"></div>
+        <dc-import name="Figure" figure="human_grunt" scale="0.683" states="{&quot;armL&quot;:&quot;baredamaged&quot;,&quot;armR&quot;:&quot;baredamaged&quot;,&quot;legL&quot;:&quot;barebroken&quot;,&quot;legR&quot;:&quot;barebroken&quot;,&quot;boots&quot;:&quot;hidden&quot;}" hint-size="224px,246px" style="position:absolute;left:8px;top:182px;"></dc-import>
+      </div>
+
+      <!-- ANATOMY LEADER-LINES (payload v5 §E): part labels wired to the cutaway — one stat, one part
+           (§6). Emitted as tagged label + line elements (manifest approach, no overlay art). -->
+      <div data-el="partLabelHead" style="position:absolute;left:392px;top:344px;z-index:3;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;color:#6f8fc4;text-shadow:0 1px 3px #000;">HEAD · INT</div>
+      <div data-el="partLineHead" style="position:absolute;left:306px;top:351px;width:82px;height:2px;background:#6f8fc4;opacity:.75;z-index:3;"></div>
+      <div data-el="partLabelArms" style="position:absolute;left:392px;top:402px;z-index:3;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;color:#c2553f;text-shadow:0 1px 3px #000;">ARMS · STR</div>
+      <div data-el="partLineArms" style="position:absolute;left:352px;top:409px;width:36px;height:2px;background:#c2553f;opacity:.75;z-index:3;"></div>
+      <div data-el="partLabelChest" style="position:absolute;left:392px;top:458px;z-index:3;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;color:#cf9a44;text-shadow:0 1px 3px #000;">CHEST · CON</div>
+      <div data-el="partLineChest" style="position:absolute;left:318px;top:465px;width:70px;height:2px;background:#cf9a44;opacity:.75;z-index:3;"></div>
+      <div data-el="partLabelLegs" style="position:absolute;left:392px;top:518px;z-index:3;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;color:#82a85e;text-shadow:0 1px 3px #000;">LEGS · DEX</div>
+      <div data-el="partLineLegs" style="position:absolute;left:296px;top:525px;width:92px;height:2px;background:#82a85e;opacity:.75;z-index:3;"></div>
+
+    </div>
+
+    <!-- ===== CENTER: ATTRIBUTES (top) + INVENTORY (large) ===== -->
+    <div style="flex:1;border-right:2px solid #382a1d;padding:16px 22px;display:flex;flex-direction:column;background:linear-gradient(#1a130d,#15100b);">
+      <span data-el="attrTitle" data-shadow="title" style="font-size:23px;letter-spacing:1px;margin-bottom:10px;">Attributes</span>
+      <div data-el="attrReadout" data-container="1" data-template="attrBar" data-flow="vertical" data-binds="attrs" style="display:flex;flex-direction:column;gap:9px;">
+        <sc-for list="{{ attrs }}" as="a" hint-placeholder-count="4">
+          <div data-tpl="attrBar" style="display:flex;align-items:center;gap:11px;">
+            <span style="width:13px;height:13px;border:2px solid #0a0807;background:{{ a.color }};"></span>
+            <span data-binds="attrs.key" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;width:34px;color:#e9d6b0;">{{ a.key }}</span>
+            <span data-binds="attrs.part" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8d775c;width:46px;">{{ a.part }}</span>
+            <!-- pip strip as PARTS (payload #3): nested list stamped from live cells, textured via
+                 ui/pip/* imageBind instead of flat fills -->
+            <div data-container="1" data-template="attrPip" data-flow="horizontal" data-binds="attrs.cells" style="flex:1;display:flex;gap:3px;">
+              <sc-for list="{{ a.pips }}" as="p" hint-placeholder-count="8">
+                <span data-tpl="attrPip" data-binds="cell.state" data-image-bind="ui/pip/{cell.asset}" style="flex:1;height:18px;background:{{ p.bg }};border:1px {{ p.style }} {{ p.bd }};"></span>
+              </sc-for>
+            </div>
+            <div style="display:flex;align-items:baseline;justify-content:flex-end;gap:5px;width:74px;font-family:'JetBrains Mono',monospace;">
+              <span data-binds="attrs.alloc" style="font-size:20px;font-weight:700;color:#ece0cb;">{{ a.alloc }}</span>
+              <span style="color:#6b5a44;font-size:14px;">/</span>
+              <span data-binds="attrs.available" style="font-size:20px;font-weight:700;color:{{ a.availColor }};">{{ a.available }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <!-- INVENTORY (large; §10: static neutral chrome — ornate frame + soft lift, no state colour to protect) -->
+      <div data-el="inventory" data-anchor="Center" data-z="5" data-binds="inventory" data-shadow="panel" data-frame="card" style="margin-top:16px;flex:1;display:flex;flex-direction:column;border:12px solid transparent;background:#17110b;box-shadow:0 4px 10px rgba(10,8,7,.5);border-image-source:url('Content/ui/frame/card.png');border-image-slice:12 fill;border-image-width:12px;border-image-repeat:round;">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;padding:12px 16px 0;">
+          <span style="font-size:21px;letter-spacing:1px;color:#f0dcb4;">Inventory</span>
+        </div>
+        <div data-el="invTabs" data-container="1" data-template="invTab" data-flow="horizontal" data-binds="inventory.tabs" style="display:flex;gap:8px;padding:10px 16px 12px;">
+          <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="2">
+            <div data-tpl="invTab" data-binds="tab.label" data-states="{&quot;active&quot;:{&quot;border&quot;:&quot;amber&quot;,&quot;fill&quot;:&quot;panel&quot;,&quot;color&quot;:&quot;inkBright&quot;},&quot;idle&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;fill&quot;:&quot;panelDeep&quot;,&quot;color&quot;:&quot;mutedDim&quot;}}" onClick="{{ t.onClick }}" style="padding:8px 22px;cursor:pointer;border:2px solid {{ t.border }};background:{{ t.bg }};font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;color:{{ t.color }};">{{ t.label }}</div>
+          </sc-for>
+        </div>
+        <div style="flex:1;padding:0 16px 16px;overflow:hidden;">
+          <div data-el="invItems" data-container="1" data-template="invCard" data-flow="grid" data-cols="2" data-binds="inventory.activeTab.items" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:start;">
+            <sc-for list="{{ invItems }}" as="r" hint-placeholder-count="6">
+              <div data-tpl="invCard" data-states="{&quot;equipped&quot;:{&quot;border&quot;:&quot;good&quot;,&quot;fill&quot;:&quot;panelDeep&quot;},&quot;ready&quot;:{&quot;border&quot;:&quot;border&quot;,&quot;fill&quot;:&quot;panelCard&quot;},&quot;dropped&quot;:{&quot;border&quot;:&quot;lockRed&quot;,&quot;fill&quot;:&quot;panelDeep&quot;},&quot;neutral&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;fill&quot;:&quot;panelCard&quot;}}" onClick="{{ r.onClick }}" style="display:flex;align-items:center;gap:13px;border:2px solid {{ r.border }};background:{{ r.bg }};padding:11px 13px;cursor:pointer;opacity:{{ r.op }};">
+                <span data-binds="invItems.badge" data-color-bind="invItems.attrColor" style="width:52px;height:36px;border:2px solid #0a0807;background:{{ r.badgeColor }};display:flex;flex-direction:column;align-items:center;justify-content:center;flex:none;line-height:1;">
+                  <span data-binds="invItems.badgeLabel" style="font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;letter-spacing:1px;color:#160f09;">{{ r.badgeLabel }}</span>
+                  <span data-binds="invItems.badgeNum" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#160f09;margin-top:1px;">{{ r.badgeNum }}</span>
+                </span>
+                <div style="flex:1;min-width:0;">
+                  <div data-binds="invItems.name" style="font-size:16px;color:#ece0cb;">{{ r.name }}</div>
+                </div>
+                <sc-if value="{{ r.rarity }}" hint-placeholder-val="EPIC">
+                  <span data-binds="invItems.rarity" style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;color:{{ r.rarityColor }};border:1.5px solid {{ r.rarityColor }};background:{{ r.rarityBg }};padding:4px 8px;flex:none;">{{ r.rarity }}</span>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RIGHT: RUNE BAG (dedicated browser + budget) ===== -->
+    <div data-el="runeBag" data-anchor="Right" data-z="5" data-binds="runes" style="width:512px;padding:16px 20px;display:flex;flex-direction:column;background:linear-gradient(200deg,rgba(60,44,30,.3),rgba(28,20,13,.16));">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;">
+        <span data-el="runeBagTitle" data-shadow="title" style="font-size:23px;letter-spacing:1px;">Rune Bag</span>
+      </div>
+      <div data-el="runeBudget" data-binds="runes.budget" style="margin:10px 0 6px;display:flex;align-items:baseline;gap:12px;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#9a8468;">BUDGET</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:#f0dcb4;">10</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#9a8468;">free / 20</span>
+
+      </div>
+      <div data-el="runeBudgetBar" data-binds="runes.budgetPct" style="height:16px;background:#241b14;border:2px solid #43342a;display:flex;overflow:hidden;">
+        <div data-el="runeBudgetFill" data-binds="runes.budgetPct" style="width:50%;background:#6f8fc4;"></div><div style="flex:1;"></div>
+      </div>
+      <div data-el="runeGroups" data-container="1" data-template="runeGroup" data-flow="vertical" data-binds="runeGroups" style="margin-top:14px;flex:1;overflow:hidden;display:flex;flex-direction:column;gap:12px;">
+        <sc-for list="{{ runeGroups }}" as="g" hint-placeholder-count="3">
+          <div data-tpl="runeGroup">
+            <div data-binds="runeGroups.type" style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:#cdb497;border-bottom:1px solid #3a2c1d;padding-bottom:5px;margin-bottom:7px;">{{ g.title }}</div>
+            <div data-container="1" data-template="runeCard" data-flow="vertical" data-binds="g.runes" style="display:flex;flex-direction:column;gap:7px;">
+              <sc-for list="{{ g.runes }}" as="r" hint-placeholder-count="2">
+                <div data-tpl="runeCard" data-states="{&quot;equipped&quot;:{&quot;border&quot;:&quot;good&quot;,&quot;fill&quot;:&quot;panelDeep&quot;},&quot;equippable&quot;:{&quot;border&quot;:&quot;border&quot;,&quot;fill&quot;:&quot;panelCard&quot;},&quot;locked&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;fill&quot;:&quot;panelCard&quot;,&quot;opacity&quot;:0.82}}" style="display:flex;align-items:center;gap:11px;border:2px solid {{ r.border }};background:{{ r.bg }};padding:10px 12px;opacity:{{ r.op }};">
+                  <span data-binds="g.runes.icon" style="position:relative;flex:none;width:22px;height:22px;display:flex;align-items:center;justify-content:center;">{{ r.icon }}<span data-binds="g.runes.countLabel" style="position:absolute;right:-9px;bottom:-6px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#160f09;background:#cdb497;padding:0 3px;">{{ r.countLabel }}</span></span>
+                  <div style="flex:1;min-width:0;padding-left:5px;padding-right:14px;"><div data-binds="g.runes.name" style="font-size:15px;color:#ece0cb;">{{ r.name }}</div><div data-binds="g.runes.effect" style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#9a8468;line-height:1.5;margin-top:2px;">{{ r.effect }}</div></div>
+                  <div style="text-align:right;flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+                    <span data-binds="g.runes.state" data-states="{&quot;equipped&quot;:{&quot;color&quot;:&quot;good&quot;},&quot;equippable&quot;:{&quot;color&quot;:&quot;amber&quot;},&quot;locked&quot;:{&quot;color&quot;:&quot;lockText&quot;}}" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:{{ r.stateColor }};">{{ r.state }}</span>
+                    <span data-binds="g.runes.cost" style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#d9a441;">{{ r.cost }}p</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM BAND: CURRENT CORE · ACTION BAR (techniques + bays) (§10: engine-drawn drop shadow +
+       single accent-edge border — full-bleed bar touching the screen edge, so no boxed 9-slice frame,
+       see DEV_LOOP_MEMORY) -->
+  <div data-el="bottomBand" data-anchor="Bottom" data-z="6" data-shadow="panel" style="position:absolute;left:0;top:816px;width:1920px;height:264px;border-top:3px solid #4a3729;background:linear-gradient(#201710,#17110b);display:flex;z-index:6;box-shadow:0 -6px 16px rgba(10,8,7,.55);">
+    <div data-el="currentCore" data-binds="core" style="width:300px;padding:16px 18px;border-right:2px solid #382a1d;display:flex;flex-direction:column;">
+      <div data-el="currentCoreName" data-binds="core.name" style="font-size:28px;color:#f0dcb4;line-height:1;">Human Grunt</div>
+      <div data-el="currentCoreRole" data-binds="core.role" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:#9a8468;margin-top:6px;">THE GENERALIST</div>
+      <!-- CONCISE LOADOUT SUMMARY (2026-07-03 review: this is the NewGame Loadout panel's data,
+           condensed — ONLY values the Core actually knows (budget / actions / bays / base hp);
+           the old gear/arms/base rows were hallucinated and are gone) -->
+      <div data-el="coreStats" data-container="1" data-template="coreStatRow" data-flow="grid" data-cols="2" data-binds="core.stats" style="display:grid;grid-template-columns:1fr 1fr;gap:3px 16px;margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:11px;">
+        <div data-tpl="coreStatRow" style="display:flex;justify-content:space-between;"><span data-binds="stat.label" style="color:#8d775c;">budget</span><span data-binds="stat.value" style="color:#d9a441;">20</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:#8d775c;">actions</span><span style="color:#e9d6b0;">5</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:#8d775c;">bays</span><span style="color:#e9d6b0;">1</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:#8d775c;">base hp</span><span style="color:#cf9a44;">20</span></div>
+      </div>
+      <!-- Core Effect (renamed from "apex" — DESIGN_SPEC §17.14) -->
+      <div data-el="coreEffectBlock" data-binds="core.coreEffect" style="margin-top: 25px; border-left: 3px solid #7fa05a; padding: 3px 0 3px 12px">
+        <div data-el="coreEffectLabel" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:#8d775c;">CORE EFFECT</div>
+        <div data-el="coreEffectName" data-binds="core.coreEffectName" style="font-size:20px;color:#f0dcb4;line-height:1.1;margin-top:3px;">Hollow Vessel</div>
+        <div data-el="coreEffectDesc" data-binds="core.coreEffectDesc" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#9a8468;line-height:1.55;margin-top:5px;">You are healed for your unspent budget points after each encounter.</div>
+      </div>
+    </div>
+
+    <div data-el="actionBar" data-binds="loadout" style="flex:1;padding:14px 20px;display:flex;flex-direction:column;">
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:10px;">
+        <span data-el="actionBarTitle" data-shadow="title" style="font-size:20px;letter-spacing:1px;color:#f0dcb4;">Action Bar</span>
+      </div>
+      <div style="display:flex;gap:14px;flex:1;align-items:stretch;">
+        <div style="flex:1;display:flex;flex-direction:column;">
+          <div data-el="techSlotCount" data-binds="loadout.slotLabel" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:#cdb497;margin-bottom:7px;">TECHNIQUES · 4 / 5 slotted</div>
+          <div data-el="loadoutList" data-container="1" data-template="loadoutCard" data-flow="horizontal" data-binds="loadout" style="display:flex;gap:12px;flex:1;">
+            <sc-for list="{{ loadout }}" as="l" hint-placeholder-count="5">
+              <div data-tpl="loadoutCard" data-states="{&quot;slotted&quot;:{&quot;border&quot;:&quot;border&quot;,&quot;fill&quot;:&quot;panelCard&quot;},&quot;empty&quot;:{&quot;border&quot;:&quot;border&quot;,&quot;borderStyle&quot;:&quot;dashed&quot;,&quot;fill&quot;:&quot;panelDeep&quot;,&quot;opacity&quot;:0.8}}" style="flex:1;border:2px {{ l.style }} {{ l.border }};background:{{ l.bg }};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;padding:6px;">
+                <span data-binds="loadout.glyph" data-image-bind="icons/technique/{loadout.id}" data-color-bind="loadout.attrColor" style="width:48px;height:48px;border:{{ l.glyphBorder }};background:{{ l.glyphBg }};display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;line-height:1;color:{{ l.glyphColor }};">{{ l.glyph }}</span>
+                <span data-binds="loadout.name" style="font-size:14px;color:{{ l.nameColor }};">{{ l.name }}</span>
+                <span data-binds="loadout.attr" data-color-bind="loadout.attrColor" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:{{ l.attrColor }};">{{ l.attr }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="width:2px;background:#2e2218;"></div>
+        <div style="width:188px;display:flex;flex-direction:column;">
+          <div data-el="minionSlotCount" data-binds="minions.slotLabel" style="font-family: 'JetBrains Mono',monospace; font-size: 10px; letter-spacing: 2px; color: #cdb497; margin-bottom: 7px">MINIONS · 0 / 1 slotted</div>
+          <div data-el="buildMinions" data-container="1" data-template="loadoutCard" data-flow="horizontal" data-binds="minions" style="display:flex;gap:12px;flex:1;">
+            <div style="flex:1;border:2px solid #3a2c1d;background:#1a130c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;padding:6px;">
+              <span style="width:30px;height:30px;border:2px solid #0a0807;background-image:repeating-conic-gradient(#9aa6ae 0% 25%,#76828a 0% 50%);background-size:5px 5px;opacity:.7;"></span>
+              <span style="font-size:14px;color:#cdbfa8;">Skeleton</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#8d9aa0;">INT 1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1080}}">
+class Component extends DCLogic {
+  state = { tab: 'gear', M: null };
+  componentDidMount() { import('./attribute-model.js').then(M => this.setState({ M })); }
+  renderVals() {
+    const M = this.state.M;
+    if (!M) return { attrs: [], tabs: [], invItems: [], runeGroups: [], loadout: [], resources: [] };
+    const { KEYS, PART, COLOR, CAP, DMG, DEBUFF, GEAR, TECH, MINIONS, HASH, compute, bars, availColor } = M;
+    const ATTR = COLOR;
+    const r = compute();
+    const RARITY = {
+      COMMON: { color: '#9a8c7a', bg: 'rgba(154,140,122,.12)' },
+      MAGIC:  { color: '#6f9fd6', bg: 'rgba(111,159,214,.14)' },
+      RARE:   { color: '#c66fb4', bg: 'rgba(198,111,180,.14)' },
+      EPIC:   { color: '#e0a23c', bg: 'rgba(224,162,60,.15)' },
+    };
+
+    // The equipment screen shows the EQUIPMENT's reservation (gear only) against each pool, in the SAME
+    // divided-pip style as Combat (gear → reserved hatch, then free, then debuff, then damage).
+    const EQH = '#0a0807aa';
+    const pipCells = (k) => {
+      const cells = [], gear = r.allocGear[k], av = r.available[k], kl = k.toLowerCase();
+      const eqBg = 'repeating-linear-gradient(-45deg,' + EQH + ' 0 3px,transparent 3px 6px),' + COLOR[k];
+      for (let i = 0; i < gear; i++)      cells.push({ bg: eqBg, bd: '#0a0807', style: 'solid', state: 'reserved', asset: 'pip_reserved_' + kl });
+      for (let i = 0; i < av - gear; i++) cells.push({ bg: '#241b14', bd: '#0a0807', style: 'solid', state: 'empty', asset: 'pip_empty' });
+      for (let i = 0; i < DEBUFF[k]; i++) cells.push({ bg: HASH.deb, bd: '#0a0807', style: 'solid', state: 'debuff', asset: 'pip_debuff' });
+      for (let i = 0; i < DMG[k]; i++)    cells.push({ bg: HASH.dmg, bd: '#0a0807', style: 'solid', state: 'damage', asset: 'pip_damage' });
+      return cells;
+    };
+    const attrs = KEYS.map(k => ({
+      key: k, part: PART[k], color: COLOR[k],
+      alloc: r.allocGear[k], available: r.available[k], availColor: availColor(k),
+      pips: pipCells(k),
+    }));
+
+    const TABMETA = { gear: 'GEAR', tech: 'TECHNIQUES', minions: 'MINIONS' };
+    const tabs = Object.keys(TABMETA).map(k => {
+      const active = this.state.tab === k;
+      return { label: TABMETA[k], onClick: () => this.setState({ tab: k }),
+        border: active ? '#d9a441' : '#3a2c1d', bg: active ? '#2a1d10' : '#120c08', color: active ? '#f0dcb4' : '#8d775c' };
+    });
+
+    // green = equipped / active, red = can't hold it (dropped gear, or a locked/starved ability),
+    // gold = a benched ability that would still fit, grey = neutral.
+    const ROW = {
+      equipped: ['#7fa05a', '#1d2417'], active: ['#7fa05a', '#1d2417'],
+      ready: ['#5a4030', '#1f160d'],
+      dropped: ['#b0473a', '#271211'], locked: ['#b0473a', '#271211'], starved: ['#b0473a', '#271211'],
+      neutral: ['#3a2c1d', '#1a130c'],
+    };
+    const SRC = { gear: GEAR, tech: TECH, minions: MINIONS };
+    const invItems = (SRC[this.state.tab] || GEAR).map(i => {
+      const it = r.item[i.name] || { state: 'neutral', attr: i.attr, cost: i.cost };
+      const pair = ROW[it.state] || ROW.neutral;
+      const rar = i.rarity ? RARITY[i.rarity] : null;
+      return { name: i.name, badgeLabel: i.attr, badgeNum: i.neutral ? '—' : '' + i.cost,
+        badgeColor: i.neutral ? '#6a5a48' : (COLOR[i.attr] || '#6a5a48'),
+        rarity: i.rarity || '', rarityColor: rar ? rar.color : '', rarityBg: rar ? rar.bg : 'transparent',
+        op: '1', border: pair[0], bg: pair[1], onClick: () => {} };
+    });
+
+    // Rune-tier iconography: shape encodes tier — Mark=diamond(4), Path Minor=pentagon(5),
+    // Path Major=hexagon(6), Keystone=octagon(8). Filled in the rune's own chip colour, black border.
+    const NG = (n, cx, cy, r, rot) => { let s = ''; for (let i = 0; i < n; i++) { const a = rot + i * 2 * Math.PI / n; s += (cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1) + ' '; } return s.trim(); };
+    const TIERN = { mark: 4, path_minor: 5, path_major: 6, keystone: 8 };
+    const ricon = (tier, color) => React.createElement('svg', { width: 22, height: 22, viewBox: '0 0 22 22', style: { display: 'block', overflow: 'visible' } },
+      React.createElement('polygon', { points: NG(TIERN[tier] || 4, 11, 11, 9, -Math.PI / 2), fill: color, stroke: '#0a0807', strokeWidth: 2, strokeLinejoin: 'round' }));
+    const rune = (o) => ({ countLabel: o.count > 1 ? '×' + o.count : '', icon: ricon(o.tier || 'mark', o.chip), ...o });
+    const cnum = (n, c) => React.createElement('span', { style: { color: c, fontWeight: 700, fontFamily: "'JetBrains Mono',monospace" } }, n);
+    const EQUIPPED = { state: '✓ EQUIPPED', stateColor: '#7fa05a', border: '#7fa05a', bg: '#1d2417', op: '1' };
+    const EQUIPPABLE = { state: 'EQUIPPABLE', stateColor: '#d9a441', border: '#5a4030', bg: '#1f160d', op: '1' };
+    const locked = (need) => ({ state: '▲ ' + need, stateColor: '#d0744a', border: '#4a382a', bg: '#1a130d', op: '.82' });
+    const runeGroups = [
+      { title: 'MARKS', runes: [
+        rune({ name: 'Master INT Mark', tier: 'mark', count: 1, effect: React.createElement('span', null, 'Increases INT by ', cnum('6', ATTR.INT), '.'), cost: '6', sell: '3', chip: '#6f8fc4', ...EQUIPPED }),
+        rune({ name: 'Ember Mote', tier: 'mark', count: 3, effect: React.createElement('span', null, 'Increases STR by ', cnum('1', ATTR.STR), '.'), cost: '1', sell: '1', chip: '#c2553f', ...EQUIPPABLE }),
+      ]},
+      { title: 'PATHS', runes: [
+        rune({ name: 'Path of Embers', tier: 'path_minor', count: 1, effect: 'All sources of block except shields block twice as much damage.', cost: '3', sell: '2', chip: '#82a85e', ...EQUIPPABLE }),
+        rune({ name: 'Bloodletter', tier: 'path_major', count: 1, effect: 'When dual wielding two-handed weapons your attack speed is increased by 125%.', cost: '5', sell: '3', chip: '#5a4636', ...locked('NEED +4 STR') }),
+      ]},
+      { title: 'KEYSTONES', runes: [
+        rune({ name: 'Arcane Conduit', tier: 'keystone', count: 1, effect: 'As long as you have at least two minions active you cannot be hurt by any means of damage.', cost: '9', sell: '5', chip: '#6f8fc4', ...EQUIPPED }),
+        rune({ name: 'Ironhide Aegis', tier: 'keystone', count: 1, effect: 'Damage to a body part can never reduce its stat below half.', cost: '8', sell: '4', chip: '#5a4636', ...locked('NEED +3 CON') }),
+      ]},
+    ];
+
+    const techCard = (glyph, name, attr, glyphBg) => ({ glyph, name, attr, glyphBg, glyphBorder: '2px solid #0a0807', glyphColor: '#160f09', attrColor: ATTR[attr.split(' ')[0]] || '#8d775c', nameColor: '#ece0cb', border: '#5a4636', bg: '#1c140d', style: 'solid' });
+    const loadout = [
+      techCard('⚔', 'Swing', 'STR ' + r.item['Swing'].cost, '#c2553f'),
+      techCard('✦', 'Firebolt', 'INT ' + r.item['Firebolt'].cost, '#6f8fc4'),
+      techCard('✂', 'Disarm', 'STR ' + r.item['Disarm'].cost, '#c2553f'),
+      techCard('◈', 'Brace', 'CON ' + r.item['Brace'].cost, '#cf9a44'),
+      { glyph: '+', name: 'slot a technique', attr: '', glyphBg: '#160f09', glyphBorder: '2px dashed #5a4636', glyphColor: '#8a7256', attrColor: '#6f5c46', nameColor: '#6f5c46', border: '#5a4636', bg: '#160f09', style: 'dashed' },
+    ];
+
+    return { attrs, tabs, invItems, runeGroups, loadout,
+      resources: [
+        { id: 'supplies', label: 'SUPPLIES', value: '6' },
+        { id: 'spoils',   label: 'GOLD',     value: '128' },
+        { id: 'charge',   label: 'CHARGE',   value: '3' },
+        { id: 'summons',  label: 'SUMMONS',  value: '2' },
+      ].map(r => ({ ...r, iconCss: "url('Content/icons/resource/" + r.id + ".png')" })) };
+  }
+}
+</script>
+</body>
+</html>
