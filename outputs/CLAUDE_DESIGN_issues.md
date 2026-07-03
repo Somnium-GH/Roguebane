@@ -37,7 +37,12 @@ are superseded by this reconcile._
    ships a one-text-run stopgap header in the design's casing. And `doomFill` extracted as a
    `blood→blood` "gradient" — the design's diagonal HAZARD STRIPES can't be expressed (a flat red
    draws). Give the fill a pattern token or a tileable stripe asset + imageBind next drop.
-7. **Encounter extraction gaps (found by the new `tools/drop_audit.py` at drop time):** Encounter.dc.html
+7. **Skinned-button label styling mis-extracted:** the dc.html chips (autoAttackBtn/retreatBtn/
+   closeBtn/leaveBtn) author their labels as inner spans — JetBrains Mono 700 at 14 CSS px,
+   ground-dark, centered — but the flattened elements carry `font: display, fontPx: 8, color: ink`.
+   The engine draws skinned labels per the SOURCE styling meanwhile; extract the label spans (or
+   correct the element font/px/color) next drop.
+8. **Encounter extraction gaps (found by the new `tools/drop_audit.py` at drop time):** Encounter.dc.html
    binds `ShieldPool.count` (the "n/m" text inside the heroShield header) and `ShieldPool.regenPct`
    (the fill inside heroShieldRegen) on anonymous spans, but neither datum reached layout.json —
    the manifest carries only `ShieldPool` / `ShieldPool.points` / `ShieldPool.regen`. The engine

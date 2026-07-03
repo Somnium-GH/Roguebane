@@ -174,7 +174,17 @@ public partial class Game1
                     Sprite(_assets.Texture(NormalizeContentPath(img)), r.X, r.Y, r.Width, r.Height, Color.White);
                     break;
                 }
-                DrawStateSkin(e, r, enabled: !string.IsNullOrEmpty(txt));
+                var skinned = DrawStateSkin(e, r, enabled: !string.IsNullOrEmpty(txt));
+                if (skinned && !string.IsNullOrEmpty(txt))
+                {
+                    // Skinned-button labels are authored centered, mono-bold, ground-dark in the
+                    // dc.html source (the extraction flattens the inner spans and mis-attributes
+                    // display/ink — logged Needs-CD). Draw per the source.
+                    var bsz = MeasureText(_assets.Mono, txt!) * (float)(7.0 / MonoDesignPx);
+                    TextPx(_assets.Mono, txt!, (int)(r.X + r.Width / 2 - bsz.X / 2),
+                        (int)(r.Y + r.Height / 2 - bsz.Y / 2), _ui.Color("ground", Color.Black), 7.0);
+                    break;
+                }
                 if (!string.IsNullOrEmpty(txt))
                 {
                     var font = e.Font == "display" ? _assets.Display : _assets.Mono;
