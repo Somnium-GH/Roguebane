@@ -135,6 +135,13 @@ game). Build, in order:
   EQUIPMENT's = missing screen backdrop art (design/02 shows one; the manifest has no scene element
   — Needs-CD), textured `ui/pip/*` attr-bar pips (Needs-CD, already logged), runeCard chrome
   (Needs-CD). Both screens' remaining fidelity floors are CD-gated; no renderer-side deltas found.
+  ENCOUNTER walked (2026-07-02 pm): 0% tiles = poolRow pip strips (Needs-CD, known), action-bar CARD
+  chrome/frames + footer state lines (Needs-CD techCard parts), hero/minion/foe figure art +
+  positions (placeholder art), under-figure name+segmented-HP bars (heroHp/foeHp resolve text; the
+  segments need pip parts — Needs-CD). MERCHANT walked: its low tiles are a STATE artifact (the
+  gate's drive ends at the castle so merchant lists are legitimately empty) + the same chrome family;
+  a true merchant walk needs a merchant-state drive (gate refinement, open). All walked screens'
+  floors are CD/art/design-gated — zero renderer-side deltas remain from the walks.
 - **GATES — PINNED (2026-07-02):** `python tools/ui_gate.py` = the ONE regression command: scratch
   build → driven all-screen smoke (blank-screen + blank-element failures are the engine's own exit
   code) → per-screen bind-resolution counts vs `tools/ui_baseline.json` (a DROP = a bind went dead =
@@ -410,6 +417,16 @@ ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered 
   DefaultCharacter "?"). `Core.GlyphSafe.Sanitize` still guards anything outside the regions.
 - FIDELITY: `python tools/fidelity_diff.py <shot> design/NN-*.png --map heat.png` scores a shot vs its
   design (see the SYSTEMIC block for baselines). Run after RB_MF=all; walk the worst tiles it lists.
+  **GATE on it — a screen is NOT done until its score is under threshold; run every pass, all 5 screens.**
+  RE Doug's ~2×-oversize note — TRIAGED (2026-07-02 pm): (1) BORDERS were genuinely 2× — `BorderPx`
+  had pinned the old fixed-SS=2 weight (w=1 → 2 design px); now draws the AUTHORED design px. FIXED.
+  (2) Run-together gauge text FIXED — the wrap is '\n'-aware and the gauge resolvers stack
+  "SUPPLIES n/m" over its caption line. (3) **"wrong font" = a STALE RUNNING BUILD**: the game
+  instance that's been holding the exe lock all evening predates the font swap AND every P0 fix —
+  RESTART THE GAME to see IM Fell/JetBrains, native-res, slim corners, hairline borders. (4) Supplies
+  PIPS: the manifest supplies/support panels carry NO pip parts (flattened extraction — Needs-CD,
+  logged); the engine renders values+captions live meanwhile. No design-px/SS element-scale confusion
+  found beyond (1) — element rects come straight from manifest design px through the scene transform.
 
 ## Debt (active — with reconcile trigger)
 - Equipment: no inventory tabs (GEAR/TECH/MINIONS) + drag-to-equip + equipped-gear-on-anatomy + real

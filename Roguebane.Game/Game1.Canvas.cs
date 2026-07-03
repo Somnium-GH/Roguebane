@@ -47,9 +47,10 @@ public partial class Game1
     // mono 42/3=14, display 60/3=20. A manifest `fontPx` is honoured by scaling relative to this base.
     private const float MonoDesignPx = 14f, DisplayDesignPx = 20f;
 
-    // Manifest border weight in design px: an authored w=1 draws 2 design px — the shipped weight from
-    // the old fixed SS=2 target — independent of the scene's (now dynamic) scale.
-    private static int BorderPx(int w) => Math.Max(2, w * 2);
+    // Manifest border weight in DESIGN px, as authored (w=1 -> a 1px hairline; the scene scale keeps
+    // it crisp). The old x2 pin came from the fixed-SS=2 conflation and read ~2x OVERSIZE vs design
+    // (Doug's 2026-07-02 pm note) — borders now draw at their authored weight.
+    private static int BorderPx(int w) => Math.Max(1, w);
 
     // Draw text at a manifest-specified `fontPx` (design px): scale the built glyph so its on-screen size
     // is fontPx, keeping the 1/FontBake density factor. Falls back to the plain size when fontPx <= 0.
@@ -67,33 +68,42 @@ public partial class Game1
 
     // Manifest text inside a rect: greedy word-wrap to the rect width, capped at the lines the rect
     // HEIGHT can hold (a one-line-high rect never wraps, so names/values stay single-line).
+    // '\n' forces a break — a resolver can stack a title line over its caption (the gauge panels).
     private void TextPxWrapped(SpriteFont font, string s, Rectangle r, Color color, double fontPx)
     {
         var basePx = font == _assets.Display ? DisplayDesignPx : MonoDesignPx;
         var sc = fontPx <= 0 ? 1f : (float)(fontPx / basePx);
         var lineH = MeasureText(font, "Ay").Y * sc;
         var maxLines = Math.Max(1, (int)Math.Round(r.Height / lineH)); // a near-2-line box (0.9x) still wraps
-        if (maxLines == 1 || MeasureText(font, s).X * sc <= r.Width)
+        if (!s.Contains('\n') && (maxLines == 1 || MeasureText(font, s).X * sc <= r.Width))
         {
             TextPx(font, s, r.X, r.Y, color, fontPx);
             return;
         }
-        var line = "";
         var ly = (float)r.Y;
         var lines = 0;
-        foreach (var word in s.Split(' '))
+        foreach (var para in s.Split('\n'))
         {
-            var trial = line.Length == 0 ? word : line + " " + word;
-            if (line.Length > 0 && MeasureText(font, trial).X * sc > r.Width)
+            var line = "";
+            foreach (var word in para.Split(' '))
+            {
+                var trial = line.Length == 0 ? word : line + " " + word;
+                if (line.Length > 0 && MeasureText(font, trial).X * sc > r.Width)
+                {
+                    TextPx(font, line, r.X, (int)ly, color, fontPx);
+                    ly += lineH;
+                    if (++lines >= maxLines) return;
+                    line = word;
+                }
+                else line = trial;
+            }
+            if (line.Length > 0)
             {
                 TextPx(font, line, r.X, (int)ly, color, fontPx);
                 ly += lineH;
                 if (++lines >= maxLines) return;
-                line = word;
             }
-            else line = trial;
         }
-        if (line.Length > 0) TextPx(font, line, r.X, (int)ly, color, fontPx);
     }
 
     // SpriteFonts are ASCII-only and THROW on an unknown glyph. The fold-to-ASCII policy + algorithm
