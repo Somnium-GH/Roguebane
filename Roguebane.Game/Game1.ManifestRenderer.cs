@@ -32,6 +32,7 @@ public partial class Game1
         {
             if (ReferenceEquals(e, skip)) continue;
             _textOwner = e.Id; // collision detector context (recorded only while _collectText)
+            _curScreen = s;    // panel headers confine to the band above their contained children
             DrawManifestElement(e, _ui.Rect(s, e));
         }
         _textOwner = null;
@@ -48,6 +49,8 @@ public partial class Game1
         foreach (var e in s.Elements.Where(IsSceneElement))
             DrawManifestElement(e, _ui.Rect(s, e));
     }
+
+    private Roguebane.Core.Layout.Screen? _curScreen; // per draw pass; panel headers see siblings
 
     private void DrawManifestElement(Element e, Rectangle r)
     {
@@ -83,13 +86,32 @@ public partial class Game1
         switch (e.Type)
         {
             case "panel" when ResolveScreenBind(e.Binds) is { } ptxt:
+            {
                 // A bound panel whose bind resolves a display string is a titled gauge (SHIELD n/m,
-                // SUPPLIES n/m...): the header draws inset over the chrome. Container binds resolve
-                // null and stay chrome-only.
-                TextPxWrapped(e.Font == "display" ? _assets.Display : _assets.Mono, ptxt,
-                    new Rectangle(r.X + 6, r.Y + 5, r.Width - 12, r.Height - 10),
-                    _ui.Color(e.Color ?? "ink", Ink), e.FontPx ?? 0);
+                // SUPPLIES n/m...): the header draws inset over the chrome, CONFINED to the band
+                // above any child elements the panel contains (the SHIELD label was drawing across
+                // its own pips), height-fitting its font to that band. Container binds resolve null
+                // and stay chrome-only.
+                var bandBottom = r.Bottom - 5;
+                if (_curScreen is { } scr)
+                    foreach (var sib in scr.Elements)
+                        if (!ReferenceEquals(sib, e) && _ui.Rect(scr, sib) is var sr
+                            && sr != r && r.Contains(sr))
+                            bandBottom = Math.Min(bandBottom, sr.Y);
+                var inset = new Rectangle(r.X + 6, r.Y + 5, r.Width - 12,
+                    Math.Max(5, bandBottom - (r.Y + 5)));
+                var hFont = e.Font == "display" ? _assets.Display : _assets.Mono;
+                var hPx = e.FontPx ?? 0;
+                if (hPx > 0)
+                {
+                    var basePx = hFont == _assets.Display ? DisplayDesignPx : MonoDesignPx;
+                    var lineH = MeasureText(hFont, "Ay").Y * (float)(hPx / basePx);
+                    var lines = ptxt.Count(c => c == '\n') + 1;
+                    if (lineH * lines > inset.Height) hPx *= inset.Height / (lineH * lines);
+                }
+                TextPxWrapped(hFont, ptxt, inset, _ui.Color(e.Color ?? "ink", Ink), hPx);
                 break;
+            }
             case "text":
                 // A *.scene backdrop: the element's authored image IS the content (combat field,
                 // merchant stall). §13 aspect-fill: it SCALE-TO-COVERS the whole (extended) design
@@ -382,7 +404,8 @@ public partial class Game1
         // *.coreEffect is the BLOCK container (border chrome; label/name/desc are their own
         // elements/parts) — resolving it to the desc painted the copy TWICE (the doubled-text P0).
         "preview.coreEffectDesc" => _build.CoreRune.CoreEffectDesc,
-        "core" => _build.Race.Name + " " + _build.CoreRune.Title,
+        // "core" = the equipment identity BLOCK (chrome only) — currentCoreName/Role carry the text;
+        // resolving it printed the identity a SECOND time as a panel header (the doubled-name bug).
         // Equipment identity block (design/02): the core is fixed for the run, so the build's core
         // is the live source pre-run AND mid-run. core.coreEffect (the block) stays chrome-only.
         "core.name" => _build.Race.Name + " " + _build.CoreRune.Title,

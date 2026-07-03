@@ -82,7 +82,11 @@ claims were made against warped refs — treat them as UNVERIFIED; re-walk with 
    BASELINES both counts and fails any RISE. First measurement (baselined): overflows enc 11 eq 10
    city 4 camp 2 ng 6 mer 7-10; collisions eq 3 camp 1 ng 2 — catching the known family
    (heroShield=SHIELD-over-bar, currentCoreName×currentCoreRole=doubled identity, eyebrow×title).
-   Walk the lists down as slices; counts may only fall.
+   Walk the lists down as slices; counts may only fall. FIRST BURN-DOWN (same day): the doubled
+   identity text DIED ("core" block resolves null — the panel header was printing the name a 2nd
+   time; eq binds 23→22, correct) and SHIELD-over-bar DIED (bound-panel headers now confine to the
+   band ABOVE their contained children + height-fit their font; enc overflows 11→9, heroShield/
+   foeHp clean). Both were Doug's live-screenshot bugs (P0-C.10 items 4+5).
 6. **Hand-shot normalizer:** crop Doug's live window screenshots (title bar + letterbox) to the scene
    rect and rescale into ref space, so his eyeball reports run through the same diff pipeline.
 7. **DROP AUDIT — ✅ BUILT (2026-07-03):** `tools/drop_audit.py` parses each screen's dc.html and

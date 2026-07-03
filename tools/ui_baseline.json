@@ -1,23 +1,23 @@
 {
   "binds_resolved": {
     "encounter": 20,
-    "equipment": 23,
+    "equipment": 22,
     "campaignmap": 4,
     "newgame": 13,
     "citymap": 15,
     "merchant": 11
   },
   "fidelity": {
-    "encounter": 77.8,
-    "equipment": 75.4,
-    "citymap": 85.5,
+    "encounter": 77.9,
+    "equipment": 75.5,
+    "citymap": 85.6,
     "campaignmap": 94.7,
     "newgame": 76.9,
     "merchant": 82.7
   },
   "textgeom": {
     "encounter": [
-      11,
+      9,
       0
     ],
     "equipment": [
