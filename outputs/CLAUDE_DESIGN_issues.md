@@ -27,7 +27,11 @@ are superseded by this reconcile._
    but the built roster also uses **bandage, block, cleave, drain, ember, jab, lunge, stoneskin** —
    those cards fall back to the tinted glyph tile (engine keeps the tile, never a blank box).
    Ship the missing PNGs whenever convenient.
-5. **Encounter extraction gaps (found by the new `tools/drop_audit.py` at drop time):** Encounter.dc.html
+5. **resourceStrip extents:** the strip region (~197 design px) can't seat all four in-run chips
+   (supplies/gold/charge/summons at the authored chip size) — the engine clips the overflowing
+   chips rather than spilling into the top-bar buttons, so SUMMONS drops off on encounter. Widen
+   the region or shrink the chip in a future drop.
+6. **Encounter extraction gaps (found by the new `tools/drop_audit.py` at drop time):** Encounter.dc.html
    binds `ShieldPool.count` (the "n/m" text inside the heroShield header) and `ShieldPool.regenPct`
    (the fill inside heroShieldRegen) on anonymous spans, but neither datum reached layout.json —
    the manifest carries only `ShieldPool` / `ShieldPool.points` / `ShieldPool.regen`. The engine

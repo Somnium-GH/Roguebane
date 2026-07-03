@@ -193,10 +193,13 @@ is ALL engine-side). Fix with P0-A numbers (before/after per-element scores):**
    names, effect lines, EQUIPPABLE/LOCKED state colors, discounted costs. One new minor overflow
    from live text on tight authored rects rode the fix — baselined);
    ~~doubled identity~~ ~~SHIELD label-over-bar~~ FIXED (see P0-A.5 burn-down);
-   ~~CASTLE FORTIFICATIONS run-on~~ RETIRED (fortRows live). REMAINING to re-measure:
-   resource-strip misalignment/collision (logo/resourceStrip overflows measured, in the burn-down
-   list); empty-box suppression (bind-gate landed — spot-check); citymap node token/label oversize +
-   square selection ring.
+   ~~CASTLE FORTIFICATIONS run-on~~ RETIRED (fortRows live);
+   ~~node label oversize + chart's doubled "you are here"~~ FIXED (2026-07-03: hand label deleted —
+   the youAreHere ELEMENT carries it; option labels draw at the design's 5.5px caption size instead
+   of base-size Text; ring tightened to +2. citymap 85.5→86.3);
+   ~~resource-strip~~ MEASURED: the region (~197px) can't seat 4 authored chips — engine clips
+   (SUMMONS drops on encounter), extents logged Needs-CD #5. RESIDUE COMPLETE — remaining overflow
+   burn-down items are the measured logo/title-width class (CD-authored tight rects, baselined).
 SEQUENCE: P0-A tools (1–2 passes, baselines re-pinned on the new refs) → P0-C.1–3 (mechanical) →
 P0-B + P0-C.4–5 (the big render slice, one screen per pass) → 6–10. Gate green EVERY pass.
 

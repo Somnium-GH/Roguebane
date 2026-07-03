@@ -337,13 +337,17 @@ public partial class Game1
             var oi = IndexOf(options, node);
             if (isCurrent)
             {
-                Border(r.X - 3, r.Y - 3, cw + 6, ch + 6, Amber);
-                Text(_assets.Mono, "you are here", r.X - 8, r.Y + ch + 2, Amber);
+                // The ring alone marks the position — the youAreHere ELEMENT carries the label now
+                // (the graph's own hand-drawn copy doubled it; deleted 2026-07-03).
+                Border(r.X - 2, r.Y - 2, cw + 4, ch + 4, Amber);
             }
             else if (oi >= 0) // a reachable onward deployment
             {
                 Border(r.X - 2, r.Y - 2, cw + 4, ch + 4, Hover(r) ? Ink : new Color(150, 130, 95));
-                Text(_assets.Mono, $"[{oi + 1}] {seen.ToString().ToLower()}", r.X - 6, r.Y + ch + 2, Ink);
+                // Node labels at the design's caption size (dc.html ~11 CSS px = 5.5 design px) —
+                // base-size Text() was the "label oversize" from the 07-03 walk.
+                TextPx(_assets.Mono, $"[{oi + 1}] {seen.ToString().ToLower()}",
+                    r.X - 6, r.Y + ch + 2, Ink, 5.5);
             }
         }
     }
