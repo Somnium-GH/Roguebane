@@ -175,9 +175,11 @@ is ALL engine-side). Fix with P0-A numbers (before/after per-element scores):**
    authored 960×540 exactly (gate byte-stable); verified 1600×1000 eyeball: zero bars, full-width
    status strip, buttons at true top-right, footer at true bottom. Legacy fixed-coord overlays
    (cleared/lost) still center on 960×540 — cosmetic on exotic aspects, noted.
-9. **Legacy deletions:** hand-drawn citymap overlays (castle panel/EQUIPMENT[E]/PACK chips/campaign
-   spine) die — their manifest elements landed; "you are here"/doom-title hand-draws die the same way.
-   Old encounter card-chrome fallbacks give way to the landed techCard parts.
+9. **Legacy deletions — citymap HALF DONE (2026-07-03):** DrawSpine/DrawCastlePanel/DrawGearBar/
+   EQUIPMENT[E] button + PackChipRect/PackItem/PackCount/EquipOpenRect DELETED — the manifest
+   ex-overlays render live and INPUT rides their geometry (equipmentBtn click via nav.equipment;
+   pack click-to-equip via the packChips cells, wielded chips no-op). Game1.CityMap.cs 119→33
+   lines. REMAINING: old encounter card-chrome fallbacks give way to the landed techCard parts.
 10. **Engine-bug residue from the 07-03 walk (re-measure first — several may already be explained by
    the above):** resource-strip misalignment/collision; empty-box suppression rule (should vanish once
    labels/binds land — enforce anyway per loop.md); RUNE BAG regression (two MARKS headers, zero group

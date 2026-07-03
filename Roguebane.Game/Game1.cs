@@ -377,8 +377,9 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     private void UpdateChoosing(KeyboardState keys)
     {
         // 2026-07-02 directive: E / the EQUIPMENT button opens the REAL Equipment screen (the loadout
-        // popover is gone); BACK/Esc returns here.
-        if (Pressed(keys, Keys.E) || Click(EquipOpenRect))
+        // popover is gone); BACK/Esc returns here. The button IS the manifest equipmentBtn now.
+        if (Pressed(keys, Keys.E)
+            || (ManifestElementRect("citymap", "nav.equipment") is { } eqr && Click(eqr)))
         {
             _equipReturnTo = Screen.Run;
             _screen = Screen.Equipment;
@@ -434,12 +435,21 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         // Closed the stall but still on the node? H walks back in.
         if (Exp.AtMerchant && Pressed(keys, Keys.H)) { _merchantOpen = true; return; }
 
-        // Equip a carried pack item onto the body (out of combat, any beacon). Weapons then armor —
-        // the same order DrawGearBar lays the chips out.
+        // Equip a carried pack item onto the body (out of combat, any beacon): the manifest
+        // packChips cells ARE the click targets. Cell order mirrors the Body.gear list data —
+        // wielded pieces first (no-op chips), then stash weapons, then stash armor.
         var pw = Exp.Stash.Weapons;
-        for (var i = 0; i < pw.Count; i++) if (Click(PackChipRect(i))) { Exp.EquipWeapon(pw[i]); break; }
         var pa = Exp.Stash.Armor;
-        for (var i = 0; i < pa.Count; i++) if (Click(PackChipRect(pw.Count + i))) { Exp.EquipArmor(pa[i]); break; }
+        var wielded = Exp.Player.Body.Hands.Count;
+        var chips = ManifestListCells("citymap", "Body.gear", wielded + pw.Count + pa.Count);
+        for (var i = 0; i < chips.Count; i++)
+        {
+            if (!Click(RectOf(chips[i]))) continue;
+            var pi = i - wielded;
+            if (pi >= 0 && pi < pw.Count) Exp.EquipWeapon(pw[pi]);
+            else if (pi >= pw.Count && pi - pw.Count < pa.Count) Exp.EquipArmor(pa[pi - pw.Count]);
+            break;
+        }
 
         // Pick an onward jump: a number key, or clicking the destination beacon on the chart.
         var options = Exp.Options;
@@ -559,7 +569,6 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     }
 
     // Between-fights Equipment: open button (CityMap) + the overlay's technique cards & close button.
-    private static readonly Rectangle EquipOpenRect = new(16, 190, 150, 30); // left column, clear of the merchant panel
 
     private void ToggleFullscreen()
     {
