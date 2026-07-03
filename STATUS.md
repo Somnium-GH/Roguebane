@@ -63,9 +63,12 @@ remaining merchant work is design-gated (ware pricing/rarity models, pixel-compa
   (fixed for the run), so design/02's bottom-left block reads live. Verified RB_MF=all + eyeball:
   no doubled copy on NewGame cards or Equipment; identity block live. Residual bindless mock text
   ("gear 4" rows on Equipment = coreStats block extraction gap) tracked in Needs-CD.
-- **FONT SWAP = highest-leverage fidelity, drop-independent — do it now:** placeholder Consolas/Georgia +
-  ASCII-only char regions are the single biggest "wrong look" on EVERY screen (wrong font + "?" glyphs).
-  Bundling IM Fell English + JetBrains Mono + widening the regions jumps fidelity everywhere at once.
+- ~~FONT SWAP~~ **DONE (2026-07-02):** IM Fell English Regular (display) + JetBrains Mono Regular (mono)
+  BUNDLED — TTFs from the official google/fonts + JetBrains repos (OFL texts alongside) live in
+  `Roguebane.Content/fonts/` (CD source of truth) mirrored to `Roguebane.Game/Content/fonts/` (what the
+  build reads); both `.spritefont`s point at the TTF paths (char regions were already widened ①②③✓✚◉).
+  Content build green, RB_MF=all green, ✓ chips render real glyphs, card copy reads in the design serif.
+  Georgia/Consolas gone. (Old "awaits download approval" gate: superseded by this P0's "do it now".)
 - **RENDER AT NATIVE RES (big fidelity win, ours) — CONFIRMED root cause:** the scene paints to a FIXED
   `960×540×SS` (≈1920×1080) RenderTarget (`Game1.cs` `_scene`), then aspect-scales into the backbuffer. On
   a display LARGER than 1080 (fullscreen on a ~2560 monitor) that 1080 scene is UPSCALED to native = SOFT.
@@ -311,15 +314,7 @@ STRAIGHT to CityMap, no build gate / no Enter-through. (2) Equipment must open a
 CampaignMap). (4) MERCHANT is an IMPROVISED un-designed POPOVER stopgap — the heal+gear-shop MECHANIC is
 designed (§12/§14), the SCREEN is not; spec with Doug + a CD design PNG before building it (design-open,
 DESIGN_SPEC §17). Do NOT expand the popover as if it were the design. See DESIGN_SPEC §12.
-IMMEDIATE small tasks (not CD): the **FONT task** below — Doug's download approval or a manual TTF
-drop into `Roguebane.Content/fonts/` is the gate. (core.icon bind + mgcb icon entries: DONE 2026-07-02.)
-**FONT task (ours, no CD — fixes the "wrong font" AND the "?" glyphs in ONE move):** `display.spritefont`
-+ `mono.spritefont` still name SYSTEM **Consolas/Georgia** with an **ASCII-only** char region
-(`&#32;`–`&#126;`) — that's why every screen shows the wrong font AND why ①②③ ✚ ◉ ✓ render "?". Bundle
-the DECIDED fonts (**IM Fell English** display + **JetBrains Mono** mono — free/open; add the `.ttf` to
-Content), point each `.spritefont` `FontName` at them, and widen `CharacterRegions` to include
-①②③(U+2460–2462) ✓(2713) ✚(271A) ◉(25C9) (+ accents for i18n later). Bake an icon only for a glyph the
-font truly lacks. (Supersedes the old "swap fonts before distribution" needs-human note.)
+(core.icon bind + mgcb icon entries: DONE 2026-07-02. FONT task: DONE 2026-07-02 — see the P0 block.)
 
 ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered above:
 - **`imageBind`** — DONE (2026-07-02, CD #15): `TemplatePart.ImageBind` parses (contract-tested), the
@@ -344,10 +339,8 @@ ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered 
   renders a LIVE screen to a PNG headless.
 - A RUNNING game locks the default build output → build to a SCRATCH dir and run THAT instance.
 - On ANY crash READ `bin/Debug/net9.0/crash.log` (Program.cs writes the full exception + stack).
-- SpriteFont CharacterRegions now include ①②③ ✓ ✚ ◉ (+ DefaultCharacter "?") — the state chips render
-  real glyphs on the system fonts (crude at small sizes; the bundled-TTF swap improves them).
-  `Core.GlyphSafe.Sanitize` still guards anything outside the regions. TTF swap awaits Doug's
-  download approval (IM Fell English + JetBrains Mono).
+- Fonts are BUNDLED TTFs (IM Fell English display / JetBrains Mono mono; regions incl. ①②③ ✓ ✚ ◉,
+  DefaultCharacter "?"). `Core.GlyphSafe.Sanitize` still guards anything outside the regions.
 
 ## Debt (active — with reconcile trigger)
 - Equipment: no inventory tabs (GEAR/TECH/MINIONS) + drag-to-equip + equipped-gear-on-anatomy + real
@@ -389,11 +382,10 @@ ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered 
 
 ## Asset gaps (Needs Claude Design) — art missing/wrong, not composable from primitives
 - Ranger figure (`human_ranger`/`elf_ranger`) — placeholder card until it lands.
-- Glyph coverage (①②③ step numbers; ✚ ◉ ✓ marks) — the manifest USES these but the ASCII SpriteFont
-  renders "?". FIX = a bounded Game/font task, NOT CD art: add these codepoints to the SpriteFont
-  character regions + use a bundled font that covers them (fold into the planned system→bundled-font
-  swap). This is the ONE real dependency for NewGame pixel-perfect; bake a glyph as an icon only if the
-  chosen font lacks it.
+- ~~Glyph coverage~~ RESOLVED (2026-07-02): bundled fonts + widened regions ship; ✓ renders live.
+  RESIDUAL WATCH: if a bundled font truly lacks a used glyph (①②③ in IM Fell is unverified — MGCB
+  built green but may substitute "?"), bake that glyph as an icon; check when a screen actually
+  draws one.
 - Skirmish node icon — CD adding it (the ⚔ marker on b1 + a legend row, ~8px taller: an APPROVED intended
   CityMap delta, not drift). Deliver as a node ICON PNG (`icons/node/skirmish`), NOT a font glyph.
 - wraith + gargoyle: ART-QUALITY completion ONLY — NOT a uniform 21-part scheme. Robe figures legitimately
