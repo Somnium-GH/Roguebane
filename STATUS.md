@@ -54,9 +54,15 @@ remaining merchant work is design-gated (ware pricing/rarity models, pixel-compa
   couldn't see this — the blank build reported probes 13/13). Run it every pass. All 6 screens
   currently paint 8.8–74.5%. NOTE Needs-CD: manifest z now mixes two conventions (z=0 backmost vs
   depth-descending panels z=6 over leaf z=1) — normalize in a future drop; renderer handles both.
-- **SAMPLE-over-LIVE text bug:** template `sample` text draws ON TOP of live-bound text (the doubled/
-  overlapping card copy on NewGame/Equipment). `sample` is a FALLBACK — draw it ONLY when the bind is
-  unresolved, never over live data.
+- ~~SAMPLE-over-LIVE text bug~~ **FIXED (2026-07-02):** not the fallback logic (`?? sample` was already
+  fallback-only) — the resolver mapped `core.coreEffect`/`preview.coreEffect` (the bordered BLOCK
+  containers; label/name/desc are their own elements/parts) to CoreEffectDesc, painting the desc a
+  SECOND time across the block. Blocks now resolve to nothing (chrome + sample eyebrow only). Bonus:
+  the Equipment identity block's `core.role`/`core.coreEffectName`/`core.coreEffectDesc` screen binds
+  never got resolver mappings (elements landed in the 07-02 CD drop) — mapped to the build's core
+  (fixed for the run), so design/02's bottom-left block reads live. Verified RB_MF=all + eyeball:
+  no doubled copy on NewGame cards or Equipment; identity block live. Residual bindless mock text
+  ("gear 4" rows on Equipment = coreStats block extraction gap) tracked in Needs-CD.
 - **FONT SWAP = highest-leverage fidelity, drop-independent — do it now:** placeholder Consolas/Georgia +
   ASCII-only char regions are the single biggest "wrong look" on EVERY screen (wrong font + "?" glyphs).
   Bundling IM Fell English + JetBrains Mono + widening the regions jumps fidelity everywhere at once.

@@ -274,8 +274,15 @@ public partial class Game1
         "preview.techniques" => _build.CoreRune.Kit.Count.ToString(),
         "preview.bays" => _build.CoreRune.Bays.ToString(),
         "preview.coreEffectName" => _build.CoreRune.CoreEffectName,
-        "preview.coreEffectDesc" or "preview.coreEffect" => _build.CoreRune.CoreEffectDesc,
+        // *.coreEffect is the BLOCK container (border chrome; label/name/desc are their own
+        // elements/parts) — resolving it to the desc painted the copy TWICE (the doubled-text P0).
+        "preview.coreEffectDesc" => _build.CoreRune.CoreEffectDesc,
         "core" => _build.Race.Name + " " + _build.CoreRune.Title,
+        // Equipment identity block (design/02): the core is fixed for the run, so the build's core
+        // is the live source pre-run AND mid-run. core.coreEffect (the block) stays chrome-only.
+        "core.role" => _build.CoreRune.Archetype,
+        "core.coreEffectName" => _build.CoreRune.CoreEffectName,
+        "core.coreEffectDesc" => _build.CoreRune.CoreEffectDesc,
         "runes.budget" => _build.Runes.Available + " free / " + _build.Runes.Budget,
         "Body.hp" => InRun ? Exp.Player.Hp + " / " + Exp.Player.MaxHp : null,
         "encounter.foe.hp" => InRun && Exp.Enemy is { } foe ? foe.Hp + " / " + foe.MaxHp : null,
@@ -736,7 +743,7 @@ public partial class Game1
             "core.bays" => c.Bays.ToString(),
             "core.actionSlots" => c.Kit.Count.ToString(),
             "core.coreEffectName" => c.CoreEffectName,
-            "core.coreEffectDesc" or "core.coreEffect" => c.CoreEffectDesc,
+            "core.coreEffectDesc" => c.CoreEffectDesc, // core.coreEffect = block chrome, resolves to nothing
             _ => null,
         },
         ValueTuple<string, string, string> a => bind switch // (key, value, swatch-token) attr tile
