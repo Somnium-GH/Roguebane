@@ -101,6 +101,8 @@ public sealed class Element
     public string[]? Frames { get; init; }  // authored animation frames, cycled on the FIXED tick (§12)
     public string? Align { get; init; }     // text alignment: left | center | right (dc.html text-align)
     public ElementPart[] Parts { get; init; } = []; // named sub-parts — when present, THEY carry the text (§12)
+    public string? ImageBind { get; init; } // {bind}-templated icon path — or a STATIC ui/pattern/* path,
+                                            // which TILES that PNG across the element rect (§12)
 }
 
 // A named sub-part of a screen element (§12): the dc.html source keeps value/label spans (and named

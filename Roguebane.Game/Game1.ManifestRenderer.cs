@@ -71,7 +71,9 @@ public partial class Game1
         // element may carry both (topBar), so draw fill first, then frame. EXCEPT the war-party
         // covered-ground fill: its width IS the datum (drawn in the text case below), so the full-rect
         // draw would always read "overrun".
-        if (e.Fill is { } fill && e.Binds is not ("enemy.advancePct" or "runes.budgetPct"))
+        // Pattern elements draw their own fill inside the pattern block below, clipped with it.
+        if (e.Fill is { } fill && e.Binds is not ("enemy.advancePct" or "runes.budgetPct")
+            && !(e.ImageBind is { Length: > 0 } && !e.ImageBind.Contains('{')))
             DrawFill(r, fill);
         if (e.Frame is { } fr && fr.Slice.Length == 4 && _assets.Texture(fr.Asset) is { } ftex)
             DrawFrameTex(ftex, fr, r);
@@ -81,6 +83,36 @@ public partial class Game1
             var accent = ResolveColorToken(e.ColorBind, null);
             Border(r.X, r.Y, r.Width, r.Height, _ui.Color(accent ?? b.Color ?? "border", Border0),
                 BorderPx(b.W), b.Sides);
+        }
+
+        // §12 pattern imageBind: a STATIC path (no {bind} holes) TILES its PNG across the element
+        // rect, over the fill — the doom gauge's hazard stripes riding its blood track. Pattern art
+        // ships at the dc.html 2x paint density (same as ChromeBake), so a tile's design footprint
+        // is texture-size / ChromeBake.
+        if (e.ImageBind is { Length: > 0 } pat && !pat.Contains('{')
+            && _assets.Texture(NormalizeContentPath(pat)) is { } ptex)
+        {
+            var region = r;
+            // FLAGGED STOPGAP (Needs-CD): doomFillStripes is the covered-ground PATTERN of the
+            // doom gauge, but the extraction dropped the advance bind its sibling fill carries —
+            // clip to the same right-to-left covered width (the §war-party tandem rule) so the
+            // track doesn't always read fully overrun. Dies when CD binds the stripes element.
+            if (InRun && Exp.Map.MarchLength > 0 && _curScreen is { } patScr
+                && patScr.Elements.Any(s => s.Binds == "enemy.advancePct" && _ui.Rect(patScr, s).Intersects(r)))
+            {
+                var frac = (float)Exp.Map.WarPartyDistance / Exp.Map.MarchLength;
+                var covered = (int)((1f - frac) * r.Width);
+                region = new Rectangle(r.X + r.Width - covered, r.Y, covered, r.Height);
+            }
+            if (e.Fill is { } pfill) DrawFill(region, pfill); // the fill rides the same clip
+            int tw = Math.Max(1, (int)(ptex.Width / ChromeBake)), th = Math.Max(1, (int)(ptex.Height / ChromeBake));
+            for (var ty = region.Y; ty < region.Bottom; ty += th)
+                for (var tx = region.X; tx < region.Right; tx += tw)
+                {
+                    int dw = Math.Min(tw, region.Right - tx), dh = Math.Min(th, region.Bottom - ty);
+                    _spriteBatch.Draw(ptex, new Rectangle(tx, ty, dw, dh),
+                        new Rectangle(0, 0, (int)(dw * ChromeBake), (int)(dh * ChromeBake)), Color.White);
+                }
         }
 
         switch (e.Type)

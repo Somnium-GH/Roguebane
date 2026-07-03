@@ -75,6 +75,26 @@ public class LayoutManifestTests
     }
 
     [Fact]
+    public void ParsesElementImageBindIncludingStaticPatternPaths()
+    {
+        // §12 (test-owned fixture): an element-level imageBind is either {bind}-templated (per-datum
+        // icon) or a STATIC path — static means TILE that PNG across the element rect (patterns).
+        var m = LayoutManifest.Parse("""
+        {
+          "screens": { "s": { "designSize": [960,540], "elements": [
+            { "id": "stripes", "type": "text", "anchor": "TopLeft", "offset": [0,0], "size": [257,19],
+              "z": 1, "imageBind": "ui/pattern/doom_stripe" },
+            { "id": "icon", "type": "icon", "anchor": "TopLeft", "offset": [0,0], "size": [20,20],
+              "z": 2, "binds": "node", "imageBind": "icons/node/{node.type}" } ] } }
+        }
+        """);
+        var els = m.Screens["s"].Elements;
+        Assert.Equal("ui/pattern/doom_stripe", els[0].ImageBind);
+        Assert.DoesNotContain('{', els[0].ImageBind!); // static = pattern-tile semantics
+        Assert.Contains('{', els[1].ImageBind!);       // templated = per-datum icon
+    }
+
+    [Fact]
     public void ParsesPerStatePartLabelsAndTheySurvivePlacement()
     {
         // §12 (test-owned fixture): a template part may restyle per state INCLUDING its label
