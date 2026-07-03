@@ -54,8 +54,10 @@ public partial class Game1
         if (e.Shadow is { } sh && e.Type != "text")
             DrawShadow(r.X, r.Y, r.Width, r.Height, sh.Dx, sh.Dy, sh.Blur, (float)sh.Opacity);
         // §10: fill is the element's BACKGROUND, the nine-slice frame is chrome layered on it — an
-        // element may carry both (topBar), so draw fill first, then frame.
-        if (e.Fill is { } fill)
+        // element may carry both (topBar), so draw fill first, then frame. EXCEPT the war-party
+        // covered-ground fill: its width IS the datum (drawn in the text case below), so the full-rect
+        // draw would always read "overrun".
+        if (e.Fill is { } fill && e.Binds != "enemy.advancePct")
             DrawFill(r, fill);
         if (e.Frame is { } fr && fr.Slice.Length == 4 && _assets.Texture(fr.Asset) is { } ftex)
             DrawFrameTex(ftex, fr, r);
@@ -69,12 +71,33 @@ public partial class Game1
 
         switch (e.Type)
         {
+            case "panel" when ResolveScreenBind(e.Binds) is { } ptxt:
+                // A bound panel whose bind resolves a display string is a titled gauge (SHIELD n/m,
+                // SUPPLIES n/m...): the header draws inset over the chrome. Container binds resolve
+                // null and stay chrome-only.
+                TextPxWrapped(e.Font == "display" ? _assets.Display : _assets.Mono, ptxt,
+                    new Rectangle(r.X + 6, r.Y + 5, r.Width - 12, r.Height - 10),
+                    _ui.Color(e.Color ?? "ink", Ink), e.FontPx ?? 0);
+                break;
             case "text":
                 // A *.scene backdrop: the element's authored image IS the content (combat field,
                 // merchant stall) — blit it to the box and skip text entirely.
                 if (e.Binds is { } sceneBind && sceneBind.EndsWith(".scene") && e.Image is { Length: > 0 } bg)
                 {
                     Sprite(_assets.Texture(NormalizeContentPath(bg)), r.X, r.Y, r.Width, r.Height, Color.White);
+                    break;
+                }
+                // War-party covered ground (design/03 rev 2): the fill loads RIGHT->LEFT in tandem
+                // with the host — its leading (left) edge tracks distance-to-camp. The bar IS the datum.
+                if (e.Binds == "enemy.advancePct")
+                {
+                    if (InRun && e.Fill is { } df && Exp.Map.MarchLength > 0)
+                    {
+                        var frac = (float)Exp.Map.WarPartyDistance / Exp.Map.MarchLength;
+                        var covered = (int)((1f - frac) * r.Width);
+                        if (covered > 0)
+                            DrawFill(new Rectangle(r.X + r.Width - covered, r.Y, covered, r.Height), df);
+                    }
                     break;
                 }
                 // §6b regen readout: the element's fill/border drew the track above; the live progress
@@ -316,6 +339,16 @@ public partial class Game1
         "merchant.stock.pageNext" => InRun && Exp.AtMerchant
             && _merchantPage < MerchantPageCount() - 1 ? ">" : null,
         "combat.paused" => _paused ? "HELD" : null, // badge shows only while the fight is held
+        // CityMap gauges (design/03): the panel binds carry the live counts + their flavor line (the
+        // design's inner pip strips are a flattened-extraction gap, Needs-CD — the values render now).
+        "supplies" => InRun
+            ? $"SUPPLIES {Exp.Map.Supplies}/{Exp.Map.MaxSupplies} - 1 supply per deployment" : null,
+        "support" => InRun
+            ? $"MUSTERED SUPPORT {Exp.Map.SupportBank}/{Exp.Map.Nodes.Count(n => n.Type == Roguebane.Core.NodeType.ResourceHold)}"
+              + " - banked from held beacons" : null,
+        "enemy.advance" => InRun
+            ? Exp.Map.WarPartyDistance + (Exp.Map.WarPartyDistance == 1 ? " WAYPOINT" : " WAYPOINTS")
+              + " AWAY FROM CAMP" : null,
         // Scene descriptor: the node type is live data; locale place names ("the high pass") have no
         // model yet (design-open §17) — the type alone renders, nothing is invented.
         "encounter.label" => InRun ? NodeLabel(Exp.Map.Current.Type) : null,
@@ -341,6 +374,7 @@ public partial class Game1
         var b = e.Binds!;
         if (b.EndsWith(".scene")) return e.Image is { Length: > 0 } img && _assets.Texture(NormalizeContentPath(img)) is not null;
         if (b == "ShieldPool.regen") return InRun && Exp.Player.Body.ShieldRegenProgress > 0f;
+        if (b == "enemy.advancePct") return InRun;
         if (e.Type == "figure") return b is "preview.fig" or "Body" || (InRun && Exp.Enemy is not null);
         if (e.Type == "list") return ListData(b) is { Count: > 0 };
         if (e.Type == "graph") return InRun; // chart/cityGraph draw from live run/campaign state
@@ -527,6 +561,15 @@ public partial class Game1
         // The Rune Bag (design/02): one group per PATH ladder — the MARKS/PATHS/KEYSTONES taxonomy
         // is OPEN (§17), so the model's actual grouping (ladders) is what renders.
         "runeGroups" => _build.Paths.Cast<object>().ToList(),
+        // CityMap chart legend (design/03): what the node icons mean — display metadata, same rows the
+        // legacy legend drew; icon tokens through NodeToken so the key can't drift from the chart.
+        "legend" => new List<object>
+        {
+            (AssetRegistry.NodeToken(Roguebane.Core.NodeType.Castle), "castle / exit"),
+            (AssetRegistry.NodeToken(Roguebane.Core.NodeType.Merchant), "merchant"),
+            (AssetRegistry.NodeToken(Roguebane.Core.NodeType.ResourceHold), "resource hold"),
+            (AssetRegistry.NodeToken(Roguebane.Core.NodeType.Unknown), "unknown/fight"),
+        },
         // Encounter (design/01): the combat pool + action bar read the RUN body once marching.
         "pool" => AttrBars(),
         "loadout.techniques" => InRun ? Exp.Equipment.Cast<object>().ToList()
@@ -782,6 +825,12 @@ public partial class Game1
             "core.actionSlots" => c.Kit.Count.ToString(),
             "core.coreEffectName" => c.CoreEffectName,
             "core.coreEffectDesc" => c.CoreEffectDesc, // core.coreEffect = block chrome, resolves to nothing
+            _ => null,
+        },
+        ValueTuple<string, string> lg => bind switch // (node-icon token, label) legend row
+        {
+            "legend.type" => lg.Item1,
+            "legend.label" => lg.Item2,
             _ => null,
         },
         ValueTuple<string, string, string> a => bind switch // (key, value, swatch-token) attr tile

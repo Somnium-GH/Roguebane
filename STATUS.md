@@ -328,11 +328,18 @@ SLICES (one screen/pass, pixel-verify vs its design PNG):
    DISPLAY COPY DONE: `Technique.Desc`/`Minion.Desc` (+`DescText`) ship card copy for all 8 techniques
    + both minions; `{power}` resolves from the data at render so copy can't contradict tuning. Bound
    via technique.description/bay.description; Core-tested (290 green).
-4. **CityMap** (in progress) — `design/03`. THIS PASS: the manifest `chart` graph element renders LIVE
+4. **CityMap** (in progress) — `design/03`. The manifest `chart` graph element renders LIVE
    via `DrawManifestGraph` (GraphLayout spread over the element region): fog-aware beacon icons,
    charted solid / uncharted dashed links, the current node ringed "you are here", reachable
-   deployments numbered. Verified RB_MF=citymap at a live merchant node. Supplies/support/doom/legend panels render
-   their manifest chrome (inner pips/rows were flattened by extraction — Needs-CD).
+   deployments numbered. Verified RB_MF=citymap at a live merchant node. PANELS LIVE (2026-07-02):
+   all 7 citymap binds resolve — SUPPLIES/MUSTERED SUPPORT gauges read live counts + flavor (bound
+   PANELS now draw their resolved header inset over the chrome — same path lights encounter's SHIELD
+   header), the war-party bar fills covered-ground RIGHT→LEFT live (`enemy.advancePct`; full-rect fill
+   bypassed — the width IS the datum), the chart legend list stamps its 4 icon+label rows through
+   NodeToken. Inner pip STRIPS stay flattened-extraction Needs-CD. FRESH Needs-CD: `doomEta` is a
+   BINDLESS content literal ("1 WAYPOINT AWAY FROM CAMP" mock) — bind it (enemy.advance) and drop the
+   bind from the doomBar container, else the mock shows beside the live count; legend rows overlap
+   their panel's top edge (item pad).
    REMAINING for cut-over: map input on manifest geometry (node clicks); a home for the merchant panel,
    gear bar + EQUIPMENT button (design/03 shows none of them — surface where they live, Needs-CD/human,
    before deleting the legacy citymap screen).
