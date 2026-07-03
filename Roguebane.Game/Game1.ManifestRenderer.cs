@@ -186,7 +186,11 @@ public partial class Game1
                 }
                 break;
             case "icon" when !string.IsNullOrEmpty(e.Image):
-                Sprite(_assets.Texture(e.Image!), r.X, r.Y, r.Width, r.Height, Color.White);
+                // Authored paths may carry the project prefix + extension ("Content/icons/x.png")
+                // — normalize like every other image consumer, else the lookup misses and the
+                // null-texture box draws (the merchant factorToken was this).
+                Sprite(_assets.Texture(NormalizeContentPath(e.Image!)),
+                    r.X, r.Y, r.Width, r.Height, Color.White);
                 break;
             case "button":
                 // A manifest-STYLED button (beginBtn: states.idle fill/color) draws its authored

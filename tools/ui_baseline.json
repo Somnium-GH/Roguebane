@@ -10,10 +10,10 @@
   "fidelity": {
     "encounter": 77.9,
     "equipment": 74.7,
-    "citymap": 86.3,
+    "citymap": 86.4,
     "campaignmap": 94.7,
     "newgame": 78.7,
-    "merchant": 82.7
+    "merchant": 82.8
   },
   "textgeom": {
     "encounter": [
