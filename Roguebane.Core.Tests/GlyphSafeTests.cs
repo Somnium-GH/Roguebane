@@ -1,4 +1,4 @@
-namespace Roguebane.Core.Tests;
+﻿namespace Roguebane.Core.Tests;
 
 // The crash-guard for the ASCII-only render font: no string the shell draws may contain a glyph the
 // font lacks (one stray em-dash once crashed run-start). The fold-to-ASCII policy is tested here.
@@ -41,6 +41,17 @@ public class GlyphSafeTests
     {
         var noDash = new HashSet<char> { 'a', 'b', '?' }; // em-dash maps to '-', but '-' absent
         Assert.Equal("a?b", GlyphSafe.Sanitize("a—b", noDash));
+    }
+
+    [Fact]
+    public void DropChipGlyphsFoldToAsciiTwins()
+    {
+        // The 07-03 manifest literals ("BEGIN THE RUN ▶", "✕ CLOSE", "◀"/"▶"
+        // pager arrows) fold to readable ASCII instead of the '?' fallback.
+        Assert.Equal("BEGIN THE RUN >", GlyphSafe.Sanitize("BEGIN THE RUN ▶", Ascii));
+        Assert.Equal("x CLOSE", GlyphSafe.Sanitize("✕ CLOSE", Ascii));
+        Assert.Equal("<", GlyphSafe.Sanitize("◀", Ascii));
+        Assert.Equal("< LEAVE", GlyphSafe.Sanitize("⮐ LEAVE", Ascii));
     }
 
     [Fact]

@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 
 namespace Roguebane.Core;
 
@@ -15,6 +15,15 @@ public static class GlyphSafe
         ['→'] = '>', ['←'] = '<', ['•'] = '*', ['…'] = '.',
         ['’'] = '\'', ['‘'] = '\'', ['“'] = '"', ['”'] = '"',
         ['»'] = '>', ['«'] = '<',
+        // The 07-03 drop's chip/button glyphs (manifest content literals) -> ASCII twins instead
+        // of the '?' fallback ("BEGIN THE RUN ?" was the miss).
+        ['▶'] = '>', ['◀'] = '<', // play / back triangles
+        ['✕'] = 'x', ['✖'] = 'x', // close crosses
+        ['⮐'] = '<',                   // leave/return arrow
+        ['⟳'] = '@',                   // rotate (auto-attack)
+        ['❚'] = '|',                   // pause bar (HELD)
+        ['⚒'] = '+',                   // hammer-and-pick (equipment)
+        ['▼'] = 'v',                   // down triangle (you-are-here)
     };
 
     // Return a string every char of which the font can draw: pass-through what it has, fold a known

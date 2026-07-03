@@ -189,6 +189,34 @@ public partial class Game1
                 Sprite(_assets.Texture(e.Image!), r.X, r.Y, r.Width, r.Height, Color.White);
                 break;
             case "button":
+                // A manifest-STYLED button (beginBtn: states.idle fill/color) draws its authored
+                // chrome — fill + centered label at the authored fontPx (design/05's green CTA).
+                // The legacy stone skin remains only for style-less buttons.
+                if (e.States.ValueKind == System.Text.Json.JsonValueKind.Object
+                    && e.States.TryGetProperty("idle", out var idle)
+                    && idle.ValueKind == System.Text.Json.JsonValueKind.Object)
+                {
+                    var fillTok = idle.TryGetProperty("fill", out var bf2) ? bf2.GetString() : e.Fill?.Token;
+                    var colTok = idle.TryGetProperty("color", out var bc2) ? bc2.GetString() : e.Color;
+                    if (Hover(r) && e.States.TryGetProperty("hover", out var hov)
+                        && hov.ValueKind == System.Text.Json.JsonValueKind.Object)
+                    {
+                        if (hov.TryGetProperty("fill", out var hf)) fillTok = hf.GetString();
+                        if (hov.TryGetProperty("color", out var hc)) colTok = hc.GetString();
+                    }
+                    if (fillTok is { Length: > 0 }) DrawFill(r, new Fill { Token = fillTok });
+                    if (e.Border is { } bb)
+                        Border(r.X, r.Y, r.Width, r.Height, _ui.Color(bb.Color, Border0),
+                            BorderPx(bb.W), bb.Sides);
+                    var bfont = e.Font == "display" ? _assets.Display : _assets.Mono;
+                    var blabel = e.Content ?? "";
+                    var bpx = e.FontPx ?? 0;
+                    var bsz = MeasureText(bfont, blabel)
+                        * (bpx > 0 ? (float)(bpx / (e.Font == "display" ? DisplayDesignPx : MonoDesignPx)) : 1f);
+                    TextPx(bfont, blabel, (int)(r.X + r.Width / 2 - bsz.X / 2),
+                        (int)(r.Y + r.Height / 2 - bsz.Y / 2), _ui.Color(colTok ?? "ink", Ink), bpx);
+                    break;
+                }
                 DrawButton(e.Content ?? "", r.X, r.Y, r.Width, r.Height, true, Keys.None);
                 break;
             case "list" when e.Item is not null:
