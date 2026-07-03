@@ -24,8 +24,8 @@ card parts). `ui_gate.py`: 48 ELEM-BLANK across screens = the drop's NEW element
 draw yet (bind-gated labels like beginBtn/heldBadge/autoAttackBtn — content+binds coexist, engine
 lacks the gate semantics; new titles/buttons/icons awaiting P0-C.4–5 wiring). NOT a regression:
 fidelity ROSE on all 6 screens vs old baselines (enc 74.9 eq 76.3 city 78.0 camp 89.7 ng 74.3
-mer 80.4 — informational only, v1 tooling vs new refs; re-pin via P0-A v2). Gate goes green as
-P0-A/P0-C close; do NOT --update baselines until fidelity v2 lands.
+mer 80.4 — informational only, v1 tooling vs new refs). Gate goes green as P0-A/P0-C close;
+baselines re-pinned on v2 numbers 2026-07-03 (see P0-A.3).
 VERIFIED: all `design/NN` refs exactly **1920×1080** (#11);
 targeting redesign complete in 01+08 (hotkey chips 1–6, number aim-tags w/ stacking, "no boxes ever
 drawn", pulse assets `ui/reticle/focus_p0–p2` + AIMING=red cursor) (#12); merchant fits shelves w/ real
@@ -74,9 +74,14 @@ claims were made against warped refs — treat them as UNVERIFIED; re-walk with 
    all smokes at `RB_SIZE=1920x1080`; `fidelity_diff` now compares SAME-SIZE pairs 1:1 (zero
    resample, mode-tagged in output; mismatched sizes keep the legacy 960×540 fallback). First 1:1
    numbers (informational, not pinned): enc 80.5 eq 80.4 city 84.7 camp 94.7 ng 77.5 mer 83.0.
-3. **fidelity_diff v2 — per-ELEMENT, not per-tile:** score each manifest element's rect crop (shot vs
-   ref) → a RANKED per-element delta list (id, score, design rect). The walk becomes "fix the top of
-   the list". Keep the tile heatmap as a visual only.
+3. **fidelity_diff v2 — ✅ BUILT (2026-07-03):** the smoke emits a rects SIDECAR per shot (every
+   element's resolved design rect via ScreenLayout — no anchor math duplicated tool-side);
+   `--elements` scores each element's crop → RANKED worst-first list (id, score, design rect);
+   `--mask` neutralizes tolerated placeholder zones (newgame stat tiles/rows masked in the gate —
+   race/core-card digits live INSIDE templates, accepted depression until per-part masking is
+   warranted). Tile grid stays as the whole-frame score + heatmap visual. **BASELINES RE-PINNED**
+   on v2 numbers (1:1 + mask): binds enc 16 eq 22 camp 4 ng 12 city 9 mer 10; fidelity enc 80.5
+   eq 80.4 city 84.7 camp 94.7 ng 78.1 mer 83.0. The dead-baseline warning is CLEARED.
 4. **Numeric probes (kill "looks overscaled"):** border-width probe (rendered stroke px at manifest
    border edges vs authored) + text-height probe (drawn glyph bbox vs fontPx expectation), reported per
    element as NUMBERS. Doug reads live text at ~1.5–2× design proportion in headers/labels — measure,
@@ -556,8 +561,8 @@ ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered 
 - FIDELITY: `python tools/fidelity_diff.py <shot> design/NN-*.png --map heat.png` scores a shot vs its
   design (see the SYSTEMIC block for baselines). Run after RB_MF=all; walk the worst tiles it lists.
   **GATE on it — a screen is NOT done until its score is under threshold; run every pass, all 5 screens.**
-  **⚠ 2026-07-03 pm: refs are NOW 1920×1080 (contract met) but ALL pre-drop baselines were scored
-  against the old warped 924×540 refs — they're DEAD numbers. Re-pin via fidelity v2 before gating.**
+  ~~dead-baseline warning~~ RESOLVED 2026-07-03: baselines re-pinned on fidelity v2 (1:1 @ 1920×1080,
+  per-element ranked lists, newgame stat mask) — see P0-A.3.
   RE Doug's ~2×-oversize note — TRIAGED (2026-07-02 pm): (1) BORDERS were genuinely 2× — `BorderPx`
   had pinned the old fixed-SS=2 weight (w=1 → 2 design px); now draws the AUTHORED design px. FIXED.
   (2) Run-together gauge text FIXED — the wrap is '\n'-aware and the gauge resolvers stack

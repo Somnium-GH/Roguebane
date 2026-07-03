@@ -30,6 +30,14 @@ DESIGNS = {
     "campaignmap": "04-campaignmap", "newgame": "05-newgame", "merchant": "07-merchant",
 }
 FIDELITY_TOLERANCE = 2.0  # points a score may dip before failing (antialias/scene jitter head-room)
+# Tolerated placeholder zones (Doug 2026-07-03): design/05 v2 stat blocks are NOT adopted — the build
+# keeps its values until the live tuning session, so newgame's stat-digit regions are masked out of
+# the diff. Element-rect granularity; race/core-card digits live inside card templates and are
+# accepted as a known depression until per-part masking is warranted.
+MASKS = {
+    "newgame": "previewAttrRow,previewHpTile,previewLayoutRow,previewBudgetTile,"
+               "previewActionsTile,previewBaysTile",
+}
 
 
 def run(cmd, **kw):
@@ -100,14 +108,21 @@ def main():
         if not shot_png.exists():
             failures.append(f"{screen}: no shot rendered")
             continue
-        fr = run([sys.executable, str(ROOT / "tools" / "fidelity_diff.py"),
-                  str(shot_png), str(ROOT / "design" / f"{design}.png"), "--worst", "0"])
+        cmd = [sys.executable, str(ROOT / "tools" / "fidelity_diff.py"),
+               str(shot_png), str(ROOT / "design" / f"{design}.png"), "--worst", "5"]
+        rects_json = shot_png.parent / (shot_png.stem + ".rects.json")
+        if rects_json.exists():
+            cmd += ["--elements", str(rects_json)]
+        if screen in MASKS:
+            cmd += ["--mask", MASKS[screen]]
+        fr = run(cmd)
         m = re.search(r"FIDELITY: ([\d.]+)%", fr.stdout)
         if not m:
             failures.append(f"{screen}: fidelity_diff produced no score")
             continue
         fidelity[screen] = float(m.group(1))
-        print(f"  {screen}: {fidelity[screen]:.1f}%")
+        worst = [l.strip() for l in fr.stdout.splitlines() if l.strip().startswith("ELEM ")]
+        print(f"  {screen}: {fidelity[screen]:.1f}%" + (f"  worst: {'; '.join(worst[:5])}" if worst else ""))
 
     current = {"binds_resolved": binds, "fidelity": fidelity}
     if args.update or not BASELINE.exists():

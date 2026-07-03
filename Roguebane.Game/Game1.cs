@@ -684,6 +684,17 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                 var path = System.IO.Path.ChangeExtension(_shotPath, null) + "." + id + ".png";
                 using var fs = System.IO.File.Create(path);
                 _scene.SaveAsPng(fs, _scene.Width, _scene.Height);
+                // Sidecar: every element's resolved DESIGN-space rect, so fidelity v2 can score
+                // per-element crops without re-implementing anchor math tool-side.
+                var def = _ui.ScreenDef(id)!;
+                var rects = def.Elements.Where(x => !string.IsNullOrEmpty(x.Id)).Select(x =>
+                {
+                    var r = ScreenLayout.Resolve(def, x);
+                    return $"\"{x.Id}\":[{r.X},{r.Y},{r.W},{r.H}]";
+                });
+                System.IO.File.WriteAllText(
+                    System.IO.Path.ChangeExtension(_shotPath, null) + "." + id + ".rects.json",
+                    "{" + string.Join(",", rects) + "}");
             }
             // Per-ELEMENT coverage (the systemic validator): render the screen once per element with
             // that element left out — zero pixel difference means it contributed NOTHING.
