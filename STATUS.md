@@ -97,11 +97,11 @@ remaining merchant work is design-gated (ware pricing/rarity models, pixel-compa
   visibly slimmed to design weight). Gate green.
 - ~~`e` doesn't exit Equipment~~ **FIXED (2026-07-02):** E toggles — the key that opens Equipment now
   closes it (alongside Esc), returning to the caller.
-- **WATCH — Windows DPI scaling may still soften fullscreen:** Doug's display probe (.screens scratch)
-  reports the primary at 1707×1067 = a 150%-scaled 2560×1600. If MonoGame's DisplayMode returns the
-  SCALED size, fullscreen renders a 1707-wide scene that Windows upscales 1.5× — soft again despite
-  the native-res fix. If fullscreen still looks soft on the fresh build: make the app per-monitor
-  DPI-aware (app.manifest / SDL hint) so the backbuffer gets TRUE native pixels. [verify w/ Doug]
+- ~~WATCH — Windows DPI scaling~~ **CLOSED (2026-07-02, no code change):** the game's `app.manifest`
+  already declares per-monitor-v2 DPI awareness (MonoGame template), so fullscreen gets TRUE native
+  pixels (2560×1600 confirmed via Win32_VideoController). Doug's 1707×1067 reading came from his
+  PowerShell probe, which is itself a DPI-UNAWARE process seeing the 150%-scaled desktop — the probe
+  lies, the game doesn't. If fullscreen still looks soft on a FRESH build, reopen with a screenshot.
 
 **‼ SYSTEMIC — build UI VALIDATION / proof-of-correctness (the ROOT CAUSE of "starved before pixel-perfect"):**
 the loop has NO deterministic way to know how well a screen matches its design PNG — so it can't measure
