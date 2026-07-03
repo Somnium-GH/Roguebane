@@ -641,6 +641,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         var total = _scene.Width * _scene.Height;
         var baseline = new Color[total];
         var full = new Color[total];
+        var blankEls = new List<string>();
         foreach (var id in screens)
         {
             RenderSceneOnce(() => DrawManifestBackdrop(id));
@@ -659,12 +660,42 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                 using var fs = System.IO.File.Create(path);
                 _scene.SaveAsPng(fs, _scene.Width, _scene.Height);
             }
+            // Per-ELEMENT coverage (the systemic validator): render the screen once per element with
+            // that element left out — zero pixel difference means it contributed NOTHING.
+            // Classes: an element with unconditional chrome/content (fill/frame/content/image/button)
+            // must paint -> BLANK fails the run. Lists and bind-only elements go silent legitimately
+            // pre-run (state-gated data) -> info. A border-only element can be wholly overpainted by
+            // the mixed-z container fills (attrPool's divider under hudFooter) -> OCCLUDED info; the
+            // z-convention normalization is a flagged Needs-CD.
+            var silent = new List<string>();
+            var occluded = new List<string>();
+            var screenDef = _ui.ScreenDef(id)!;
+            foreach (var el in screenDef.Elements.Where(x => x.Z != 0))
+            {
+                RenderSceneOnce(() => DrawManifestScreen(id, el));
+                _scene.GetData(baseline);
+                var contributes = false;
+                for (var i = 0; i < total; i++)
+                    if (full[i] != baseline[i]) { contributes = true; break; }
+                if (contributes) continue;
+                var mustPaint = el.Fill is not null || el.Frame is not null
+                    || !string.IsNullOrEmpty(el.Content) || !string.IsNullOrEmpty(el.Image)
+                    || el.Type == "button";
+                if (mustPaint) blankEls.Add(id + "/" + (el.Id ?? "?"));
+                else if (el.Border is not null) occluded.Add(el.Id ?? "?");
+                else silent.Add(el.Id ?? "?");
+            }
+            if (silent.Count > 0)
+                Console.WriteLine($"SMOKE SILENT: {id} (state-gated, ok): {string.Join(",", silent)}");
+            if (occluded.Count > 0)
+                Console.WriteLine($"SMOKE OCCLUDED: {id} (border overpainted, Needs-CD z): {string.Join(",", occluded)}");
         }
+        if (blankEls.Count > 0)
+            Console.WriteLine($"SMOKE ELEM-BLANK: {string.Join(",", blankEls)}");
         if (blank.Count > 0)
-        {
             Console.WriteLine($"SMOKE BLANK: {string.Join(",", blank)}");
+        if (blank.Count > 0 || blankEls.Count > 0)
             Environment.ExitCode = 1;
-        }
         SmokeReportAndExit();
     }
 

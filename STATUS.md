@@ -100,8 +100,14 @@ game). Build, in order:
 - **Coverage + content validation (deterministic, headless, ALL 5 screens every pass):** assert EVERY
   manifest element renders NON-BLANK at its expected rect, and each BOUND element shows LIVE data (not its
   `sample`). This alone catches the combat regression + empty/overlapping labels the instant they happen.
-  STARTED (2026-07-02): the SCREEN-level non-blank gate ships (`RB_MF=all`, above). REMAINING: per-ELEMENT
-  rect coverage + bound-shows-live-not-sample assertions (fold into the sample-over-live fix — same code).
+  PER-ELEMENT COVERAGE DONE (2026-07-02): `RB_MF=all` now leave-one-out renders EVERY element and
+  measures its actual pixel contribution — an element with unconditional chrome/content (fill/frame/
+  content/image/button) contributing ZERO pixels fails the run (exit 1); bind-only/list elements empty
+  pre-run report SILENT (state-gated, ok); border-only elements overpainted by the mixed-z container
+  fills report OCCLUDED (encounter/attrPool's divider — Needs-CD z normalization). First catch: citymap
+  `doomHost` (a bindless text element whose static `image` was never blitted) — fixed, the enemy-host
+  icon renders. REMAINING: bound-shows-LIVE-not-sample assertions (needs driven run state in the smoke)
+  + the fidelity diff below.
 - **Fidelity diff vs `design/NN.png`:** a region/perceptual image compare → an objective match score +
   per-region delta map (meaningful once fonts/chrome land; tolerate known placeholder-data regions).
 - **GATES:** a screen is "DONE" only when coverage+content pass AND the fidelity diff is under threshold.

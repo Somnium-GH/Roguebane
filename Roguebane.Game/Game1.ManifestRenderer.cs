@@ -20,7 +20,9 @@ public partial class Game1
     // Draw a screen's elements straight from layout.json, in Z order. Static types (panel/text/icon/
     // button) render fully here; bound types (list/figure/graph/bar) draw only their chrome for now and
     // get live content in later slices. Each element: shadow -> frame OR fill -> border -> content (§10).
-    private void DrawManifestScreen(string screenId)
+    // `skip` (smoke only): leave ONE element out, so the coverage validator can measure that
+    // element's actual pixel contribution against the full render.
+    private void DrawManifestScreen(string screenId, Element? skip = null)
     {
         var s = _ui.ScreenDef(screenId);
         if (s is null) return;
@@ -30,7 +32,10 @@ public partial class Game1
         // ordering they'd paint LAST and blank the screen (the combat-regression). Treat 0 as the
         // scene layer behind everything. (Mixed z conventions flagged Needs-CD in STATUS.)
         foreach (var e in s.Elements.OrderByDescending(x => x.Z == 0 ? int.MaxValue : x.Z))
+        {
+            if (ReferenceEquals(e, skip)) continue;
             DrawManifestElement(e, ManifestUi.Rect(s, e));
+        }
     }
 
     // The z=0 scene layer alone — the baseline the smoke paint-coverage diff measures against.
@@ -82,6 +87,15 @@ public partial class Game1
                     break;
                 }
                 var txt = e.Content ?? ResolveScreenBind(e.Binds);
+                // A bindless text element carrying a static image (doomHost's enemy-host icon) IS
+                // that image — blit it. State-skinned elements (buttons) keep their skin machinery.
+                if (string.IsNullOrEmpty(txt) && e.Image is { Length: > 0 } img
+                    && e.States.ValueKind is System.Text.Json.JsonValueKind.Undefined
+                        or System.Text.Json.JsonValueKind.Null)
+                {
+                    Sprite(_assets.Texture(NormalizeContentPath(img)), r.X, r.Y, r.Width, r.Height, Color.White);
+                    break;
+                }
                 DrawStateSkin(e, r, enabled: !string.IsNullOrEmpty(txt));
                 if (!string.IsNullOrEmpty(txt))
                 {
