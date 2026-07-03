@@ -1,4 +1,4 @@
-using Roguebane.Core.Layout;
+﻿using Roguebane.Core.Layout;
 
 namespace Roguebane.Core.Tests;
 
@@ -68,5 +68,18 @@ public class ListLayoutTests
         var c = ListLayout.Cells(Region, terse, 1, fallbackSize: new[] { 131, 89 })[0];
         Assert.Equal(131, c.W);
         Assert.Equal(89, c.H);
+    }
+
+    [Fact]
+    public void PadInsetsTheRegionBeforeCellsFlow()
+    {
+        // item.pad [T,R,B,L] (LAYOUT_CONTRACT §12): cells start inside the padded region, and the
+        // grid's column fit uses the padded width — rows stop hugging their panel's edge.
+        var padded = new Item { Template = "legendRow", Flow = "grid", Gap = 4,
+            Size = new[] { 104, 8 }, Pad = new[] { 2, 4, 2, 4 } };
+        var cells = ListLayout.Cells(new LayoutRect(0, 0, 220, 40), padded, 3);
+        Assert.Equal(new LayoutRect(4, 2, 104, 8), cells[0]);  // +L, +T
+        Assert.Equal(4 + 108, cells[1].X);                     // 2 columns fit the 212px padded width
+        Assert.Equal(new LayoutRect(4, 2 + 12, 104, 8), cells[2]); // wraps to row 2
     }
 }

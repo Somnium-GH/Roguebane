@@ -132,6 +132,7 @@ public sealed class Item
     public string Flow { get; init; } = ""; // horizontal | vertical | graph
     public int Gap { get; init; }
     public int[] Size { get; init; } = [];
+    public int[] Pad { get; init; } = [];  // container inner padding [T,R,B,L] before cells flow (§12)
 }
 
 public sealed class Border

@@ -125,9 +125,12 @@ is ALL engine-side). Fix with P0-A numbers (before/after per-element scores):**
    native density (Core-tested, 305). Button skins verified: still ChromeBake=2 art (unchanged in
    the drop), their path keeps 1/ChromeBake.
 4. **New template families:** nested pip templates instanced from live data (poolPip/attrPip/supplyPip/
-   supportPip/healPip/heroHpPip/foeHpPip — shieldPip is the precedent); `data-bind-gate` semantics
-   (content literal + bind gates visibility — kills the doomEta double-render class); `item.pad`;
-   `frames` animation cycling (fixed tick).
+   supportPip/healPip/heroHpPip/foeHpPip — shieldPip is the precedent); ~~`data-bind-gate`~~ DONE
+   (2026-07-03: content+binds = literal gated by the bind, WHOLE element suppresses on a closed gate
+   — heldBadge only shows paused; nav.close/nav.equipment/begin resolver gates added, binds eq 23
+   city 10 ng 13; smoke classifies gated literals as legit-silent); ~~`item.pad`~~ DONE (2026-07-03:
+   [T,R,B,L] container inner padding in ListLayout, Core-tested 306 — citymap legend + equipment
+   invTabs consume it); `frames` animation cycling (fixed tick) — OPEN, with the P0-B reticle.
 5. **New binds resolve live:** technique.hotkey/bay.hotkey, targeting.tags (aimTag stack),
    Body.hp.points/hpLabel + foe.hp.points (segmented HP), pool.attr.cells/attrs.cells + ui/pip
    imageBinds, supplies.points/support.points, Body.gear rows, nav.equipment/nav.close (✕ CLOSE +

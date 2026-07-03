@@ -11,6 +11,12 @@ public static class ListLayout
     public static IReadOnlyList<LayoutRect> Cells(LayoutRect region, Item item, int count,
         int[]? fallbackSize = null)
     {
+        // item.pad (LAYOUT_CONTRACT §12): CSS-order [T,R,B,L] inner padding — cells flow inside the
+        // padded region (fixes rows hugging their panel's edge, e.g. the citymap legend).
+        if (item.Pad.Length == 4)
+            region = new LayoutRect(region.X + item.Pad[3], region.Y + item.Pad[0],
+                Math.Max(0, region.W - item.Pad[1] - item.Pad[3]),
+                Math.Max(0, region.H - item.Pad[0] - item.Pad[2]));
         var size = item.Size.Length >= 2 ? item.Size : fallbackSize ?? item.Size;
         var w = size.Length > 0 ? size[0] : 0;
         var h = size.Length > 1 ? size[1] : 0;

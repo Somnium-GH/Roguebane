@@ -49,6 +49,12 @@ public partial class Game1
 
     private void DrawManifestElement(Element e, Rectangle r)
     {
+        // data-bind-gate (LAYOUT_CONTRACT §12): content+binds coexisting means the content is the
+        // literal and the bind GATES the whole element — a closed gate draws nothing, chrome included
+        // (never an empty box). Buttons keep their own enabled/skin machinery below.
+        if (e.Type == "text" && e.Content is { Length: > 0 } && e.Binds is { Length: > 0 }
+            && ResolveScreenBind(e.Binds) is null)
+            return;
         // A TEXT element's shadow is a text shadow (offset glyph copy, drawn with the text below) —
         // rect-shadowing it would paint a solid box behind the words.
         if (e.Shadow is { } sh && e.Type != "text")
@@ -358,6 +364,11 @@ public partial class Game1
         "merchant.stock.pageNext" => InRun && Exp.AtMerchant
             && _merchantPage < MerchantPageCount() - 1 ? ">" : null,
         "combat.paused" => _paused ? "HELD" : null, // badge shows only while the fight is held
+        // Navigation gates (07-03 drop): the bound datum is "this affordance applies here" — the
+        // literal labels live in the manifest content (bind-gate semantics, LAYOUT_CONTRACT §12).
+        "nav.close" => "CLOSE",           // Equipment's close is always available on that screen
+        "nav.equipment" => "EQUIPMENT",   // the citymap Equipment button likewise
+        "begin" => "BEGIN",               // NewGame's begin CTA
         // CityMap gauges (design/03): the panel binds carry the live counts + their flavor line (the
         // design's inner pip strips are a flattened-extraction gap, Needs-CD — the values render now).
         "supplies" => InRun
