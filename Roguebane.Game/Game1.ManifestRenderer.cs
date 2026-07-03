@@ -1020,10 +1020,11 @@ public partial class Game1
     private void DrawFrameTex(Texture2D tex, Frame fr, Rectangle r)
     {
         var dst = new LayoutRect(r.X, r.Y, r.Width, r.Height);
-        // P0 (2026-07-02, Doug): the frame assets are 2x-painted like the button skins — without the
-        // same dstCornerScale the corners/borders rendered CHUNKY/oversized (the "legacy look").
+        // v4 frames (07-03 drop) are authored at 1:1 DRAW size: border-image-width == slice in
+        // SCENE px, independent of scene scale. dst here is design px, so scale by 1/SS — at SS=2
+        // that's the old ChromeBake look; at higher scenes the chrome stays native instead of soft.
         foreach (var p in NineSlice.Patches(tex.Width, tex.Height, fr.Slice, dst,
-                     tile: fr.Repeat == "tile", centerFill: fr.CenterFill, dstCornerScale: 1.0 / ChromeBake))
+                     tile: fr.Repeat == "tile", centerFill: fr.CenterFill, dstCornerScale: 1.0 / SS))
             _spriteBatch.Draw(tex, new Rectangle(p.Dst.X, p.Dst.Y, p.Dst.W, p.Dst.H),
                 new Rectangle(p.Src.X, p.Src.Y, p.Src.W, p.Src.H), Color.White);
     }

@@ -70,6 +70,24 @@ public class NineSliceTests
     }
 
     [Fact]
+    public void ScaledTilingStepsAtScaledNativeSizeAndCropsTheTailInProportion()
+    {
+        // v4 1:1 frames drawn into design px at 1/SS (P0-C.3): a 64px frame with 16px margins has a
+        // 32-src-px top-edge strip; at scale 0.5 it tiles in 32-src->16-dst chunks (native density
+        // on a 2x scene); the trailing chunk crops the SOURCE in proportion (dst px / scale).
+        var patches = NineSlice.Patches(64, 64, new[] { 16, 16, 16, 16 },
+            new LayoutRect(0, 0, 100, 64), tile: true, centerFill: false, dstCornerScale: 0.5);
+        var top = patches.Where(p => p.Src.Y == 0 && p.Src.X == 16 && p.Dst.Y == 0).ToList();
+        // corners take 8 dst px each -> 84px band = 5 full 16px tiles + one 4px tail
+        Assert.Equal(6, top.Count);
+        Assert.Equal(84, top.Sum(p => p.Dst.W));
+        Assert.All(top.Take(5), p => { Assert.Equal(32, p.Src.W); Assert.Equal(16, p.Dst.W); });
+        var tail = top.Last();
+        Assert.Equal(4, tail.Dst.W);
+        Assert.Equal(8, tail.Src.W); // 4 dst px / 0.5 scale = 8 source px
+    }
+
+    [Fact]
     public void DstCornerScaleShrinksCornersForAboveScaleArt()
     {
         // 1080-class skins (2x design): source margins stay 12 but the destination corner lands at

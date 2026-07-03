@@ -47,16 +47,19 @@ public static class NineSlice
                 if (centre && !centerFill) continue; // open middle: the frame is chrome only
                 if (!tile || (row != 1 && col != 1)) { patches.Add(new NinePatch(src, dest)); continue; }
                 // Tile along the axes this band stretches on (x for top/bottom + centre, y for the
-                // side edges + centre); the last chunk crops the SOURCE 1:1 so nothing squashes.
-                var stepX = col == 1 ? src.W : dest.W;
-                var stepY = row == 1 ? src.H : dest.H;
+                // side edges + centre); the last chunk crops the SOURCE so nothing squashes. Tile
+                // steps carry the same dstCornerScale as the corners, so scaled art (v4 1:1 frames
+                // drawn at 1/SS design px) tiles at its native density instead of stretching.
+                var stepX = col == 1 ? Math.Max(1, (int)Math.Round(src.W * dstCornerScale)) : dest.W;
+                var stepY = row == 1 ? Math.Max(1, (int)Math.Round(src.H * dstCornerScale)) : dest.H;
                 for (var oy = 0; oy < dest.H; oy += stepY)
                     for (var ox = 0; ox < dest.W; ox += stepX)
                     {
                         var w = Math.Min(stepX, dest.W - ox);
                         var h = Math.Min(stepY, dest.H - oy);
-                        var sw = col == 1 ? Math.Min(src.W, w) : src.W;
-                        var sh = row == 1 ? Math.Min(src.H, h) : src.H;
+                        // A partial trailing chunk crops the source in proportion (dst px / scale).
+                        var sw = col == 1 ? Math.Min(src.W, (int)Math.Ceiling(w / dstCornerScale)) : src.W;
+                        var sh = row == 1 ? Math.Min(src.H, (int)Math.Ceiling(h / dstCornerScale)) : src.H;
                         patches.Add(new NinePatch(
                             new LayoutRect(src.X, src.Y, sw, sh),
                             new LayoutRect(dest.X + ox, dest.Y + oy, w, h)));

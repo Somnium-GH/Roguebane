@@ -34,9 +34,8 @@ states, campaignStrip, packChips, equipmentBtn); equipment gains backdrop + ✕ 
 convention (paint ordinal, back→front; find the scene by its `*.scene` bind, not z==0)**; layout.json
 structurally complete (9260 lines, new binds present — full parse = first loop guard).
 **DROP GAPS:** (a)+(b)+(c)+(f) ~~mgcb mirror / target_tag delete / LAYOUT_CONTRACT fold / gitignore~~
-ALL DONE (2026-07-03 — see P0-C.1); (d) **frames are v4, authored at 1:1 draw size** (panel 64/slice16,
-card 48/slice12) — the ChromeBake=2 corner-scale assumption is WRONG for them now: draw
-border-image-width == slice, 1:1 (OPEN — P0-C.3); (e) `reference/screens/` never arrived (CD-side only — fine).
+ALL DONE (2026-07-03 — see P0-C.1); (d) ~~v4 frames 1:1~~ DONE (P0-C.3);
+(e) `reference/screens/` never arrived (CD-side only — fine).
 
 ## ⇒ NEW LOCKS (2026-07-03 pm, Doug): core-effect roster = CANON (adopted from design/05 v2 → SPEC §5:
 Called Shot renames Piercing Focus; copy may describe unbuilt mechanics until the effect-model pass —
@@ -120,8 +119,11 @@ is ALL engine-side). Fix with P0-A numbers (before/after per-element scores):**
    Fidelity re-pinned (enc 77.7 eq 76.5 city 85.3 camp 94.7 ng 77.0 mer 82.0) — enc/eq DIPPED vs
    the pre-switch pins because those pins scored backdrop-covered blanks whose dark fill
    coincidentally matched the ref (metric artifact, visually verified: full content now renders).
-3. **v4 frames 1:1:** panel/card draw border-image-width == slice (no ChromeBake corner scale);
-   verify button skins vs their authored size too.
+3. ~~v4 frames 1:1~~ **✅ DONE (2026-07-03):** `DrawFrameTex` scales by `1/SS` (not the fixed
+   `1/ChromeBake`) — border-image-width == slice in SCENE px at ANY scene scale (identical at SS=2,
+   native-crisp above); NineSlice tile STEPS now carry dstCornerScale too so edges tile at scaled
+   native density (Core-tested, 305). Button skins verified: still ChromeBake=2 art (unchanged in
+   the drop), their path keeps 1/ChromeBake.
 4. **New template families:** nested pip templates instanced from live data (poolPip/attrPip/supplyPip/
    supportPip/healPip/heroHpPip/foeHpPip — shieldPip is the precedent); `data-bind-gate` semantics
    (content literal + bind gates visibility — kills the doomEta double-render class); `item.pad`;
