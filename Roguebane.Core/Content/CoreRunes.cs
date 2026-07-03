@@ -1,4 +1,4 @@
-namespace Roguebane.Core.Content;
+﻿namespace Roguebane.Core.Content;
 
 // The core LAYOUTS (design/05). A core carries NO attrs — STR/INT/DEX/CON + HP are the Race's (§7).
 // Cores differ by budget / discount / bays / starting equipment / Core Effect identity only. Values are
@@ -14,7 +14,7 @@ public static class CoreRunes
         Archetype: "THE GENERALIST",
         Flavor: "No edge, no hole. A fat budget of cheap runes climbs into any keystone you pay for.",
         CoreEffectName: "Hollow Vessel",
-        CoreEffectDesc: "Unspent rune budget converts live into a regenerating resource.");
+        CoreEffectDesc: "Healed for unspent budget points after each encounter.");
 
     // A caster specialist: tight budget, the widest action bar.
     public static readonly CoreRune Adept = new(
@@ -25,7 +25,7 @@ public static class CoreRunes
         Archetype: "THE SCHOLAR",
         Flavor: "Frail chest, one arm - but a deep INT head for spells and the widest action bar.",
         CoreEffectName: "Overchannel",
-        CoreEffectDesc: "Spells hit far harder while the head holds - but burn you as they cast.");
+        CoreEffectDesc: "Spells reserve no INT while the head stays above three-quarters.");
 
     // The Wall: built to hold the line — modest budget, no bays.
     public static readonly CoreRune Warden = new(
@@ -37,7 +37,7 @@ public static class CoreRunes
         Archetype: "THE WALL",
         Flavor: "Armour on every limb, no bay, fewer actions - soaks blows and holds the line.",
         CoreEffectName: "Unbroken Aegis",
-        CoreEffectDesc: "The held shield never fully breaks while the chest still stands.");
+        CoreEffectDesc: "Shield points regenerate at twice their CON-scaled rate.");
 
     // The Binder: fights through summons — three bays, INT funds them all.
     public static readonly CoreRune Summoner = new(
@@ -50,7 +50,7 @@ public static class CoreRunes
         Archetype: "THE BINDER",
         Flavor: "Three bays - fights through a war-party of summons while staying back. INT funds them all.",
         CoreEffectName: "Legion",
-        CoreEffectDesc: "On redeploy, surviving minions refund their Summons.",
+        CoreEffectDesc: "Surviving minions' Summons are refunded on Redeploy.",
         CoreEffectRefundsSummons: true); // the first REAL Core Effect [LOCKED §11]; CD reconciles the card copy
 
     // The Duelist: glass-cannon, no bays — ends parts before they answer.
@@ -63,7 +63,7 @@ public static class CoreRunes
         Archetype: "THE DUELIST",
         Flavor: "No shield, twin blades. Glass-cannon STR-DEX - ends parts before they answer.",
         CoreEffectName: "Bloodrush",
-        CoreEffectDesc: "Each part you break quickens your next strike.");
+        CoreEffectDesc: "Every part you break refunds a charging technique.");
 
     // The Marksman: ranged core. Its signature is the shield-piercing BOW (charge #4) — Shot bypasses
     // shields for Charge. But Charge is scarce (INT-pooled, no mid-fight refill), so a pure-bow build
@@ -78,8 +78,8 @@ public static class CoreRunes
         DefaultWeapons: new[] { Armory.Bow },
         Archetype: "THE MARKSMAN",
         Flavor: "Strikes from range with a shield-piercing bow; high DEX, thin armour - answers first.",
-        CoreEffectName: "Piercing Focus",
-        CoreEffectDesc: "A held aim sharpens every shot into the same wound.");
+        CoreEffectName: "Called Shot",
+        CoreEffectDesc: "Ranged techniques ignore the foe's shield and cover bonuses.");
 
     // Roster order matches design/05's Choose-Your-Core line-up.
     public static readonly IReadOnlyList<CoreRune> Roster =

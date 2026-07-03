@@ -133,11 +133,29 @@ Newgame floor claim stays REVOKED until the M1 re-walk._
 - CORE EFFECT block spacing (eyebrow/name/desc run together, desc to card edge) — geometry-diff
   will quantify; fix paddings per source.
 **Fix M1 as ONE batched newgame pass (same-class items share causes), verified by the M0 tools.**
+_M1 BATCH LANDED (2026-07-03 late): canon §5 core-effect copy in CoreRunes.cs (all six, Called Shot
+renamed); preview tiles draw VALUE-over-LABEL mono centred per source (geometry STRING findings
+gone); unchosen cards wear FLAGGED-stopgap CHOOSE/SELECT chips (dim border, muted label — per-state
+labels remain payload A2); styled/skinned button labels now RECORD textgeom (beginBtn
+NO-TEXT-DRAWN cleared). geometry_diff newgame findings 9→4; the rest are CD-side: 3 FLATTENED
+span flags (A3) + the coreCards container heuristic. previewFigure backdrop CONFIRMED an
+extraction gap (element fill=null in layout.json — A4 stands). roleChip awaits the core.badge
+bind (A1). Core-effect block spacing: geometry shows ≤3px shifts — re-judge after the A3 tile
+re-extraction lands._
 
 **M2 — WORKLOAD BATCHING (Doug: more per pass):** a fidelity pass = one SCREEN, but fix the WHOLE
 ranked geometry-diff table for that screen in the pass — same-class deltas (font/pad/label) share a
 cause; batch them, one commit. The gate prints the ranked list + geometry table at pass END so the
 NEXT pass starts with a plan instead of re-discovery.
+
+**M3 — BASELINE RATCHET PLAN (the path to baselines that mean something):** (1) NO re-pin until M0
+lands — pinning now freezes the lies. (2) After M0: ONE `--update` — scores will DROP (newgame's
+78.7 was blur+mask-flattered); that pin is the first honest floor. (3) Each batched screen pass ends
+with `--update` — the baseline only climbs. (4) Once M1 lands, overflow/collision baselines flip
+from "may not rise" to **pinned ZERO, absolute** — the grandfathering that let loadout clipping pass
+is abolished; masks shrink to the stat digits only (dies at the tuning session). (5) A screen
+graduates from regression-floor to ABSOLUTE bar when geometry-diff is clean: done = geometry clean +
+UNBLURRED fidelity ≥ the agreed threshold + every residual enumerated and tagged CD/art/state.
 
 ## ⇒ HUMAN DIRECTIVES — 2026-07-03 (P0 — do this block TOP-DOWN before anything else)
 

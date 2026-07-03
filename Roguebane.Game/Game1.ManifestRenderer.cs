@@ -164,6 +164,31 @@ public partial class Game1
                             new Fill { Token = "mintActive" });
                     break;
                 }
+                // Stat TILES (design/05 source: VALUE span over a smaller LABEL span, both mono,
+                // centred; the extraction flattened them to one run — payload addendum A3): draw the
+                // two parts per the source until proper two-part tiles land.
+                if (e.Binds is "preview.hp" or "preview.budget" or "preview.techniques" or "preview.bays")
+                {
+                    var tv = ResolveScreenBind(e.Binds);
+                    var tl = e.Binds switch
+                    {
+                        "preview.hp" => "BASE HP",
+                        "preview.budget" => "RUNE BUDGET",
+                        "preview.techniques" => "ACTIONS",
+                        _ => "MINION BAYS",
+                    };
+                    if (tv is not null)
+                    {
+                        var vs = MeasureText(_assets.Mono, tv) * (float)(9.0 / MonoDesignPx);
+                        TextPx(_assets.Mono, tv, (int)(r.X + r.Width / 2 - vs.X / 2), r.Y + 3,
+                            _ui.Color(e.Color ?? "ink", Ink), 9.0);
+                        var ls = MeasureText(_assets.Mono, tl) * (float)(4.25 / MonoDesignPx);
+                        TextPx(_assets.Mono, tl, (int)(r.X + r.Width / 2 - ls.X / 2),
+                            (int)(r.Y + 3 + vs.Y + 2), _ui.Color("muted", Muted), 4.25);
+                        RecordTextBox(new Rectangle(r.X, r.Y, r.Width, r.Height), r, tv + " " + tl, _assets.Mono);
+                    }
+                    break;
+                }
                 var txt = e.Content ?? ResolveScreenBind(e.Binds);
                 // A bindless text element carrying a static image (doomHost's enemy-host icon) IS
                 // that image — blit it. State-skinned elements (buttons) keep their skin machinery.
@@ -181,8 +206,10 @@ public partial class Game1
                     // dc.html source (the extraction flattens the inner spans and mis-attributes
                     // display/ink — logged Needs-CD). Draw per the source.
                     var bsz = MeasureText(_assets.Mono, txt!) * (float)(7.0 / MonoDesignPx);
-                    TextPx(_assets.Mono, txt!, (int)(r.X + r.Width / 2 - bsz.X / 2),
-                        (int)(r.Y + r.Height / 2 - bsz.Y / 2), _ui.Color("ground", Color.Black), 7.0);
+                    var slx = (int)(r.X + r.Width / 2 - bsz.X / 2);
+                    var sly = (int)(r.Y + r.Height / 2 - bsz.Y / 2);
+                    RecordTextBox(new Rectangle(slx, sly, (int)bsz.X, (int)bsz.Y), r, txt!, _assets.Mono);
+                    TextPx(_assets.Mono, txt!, slx, sly, _ui.Color("ground", Color.Black), 7.0);
                     break;
                 }
                 if (!string.IsNullOrEmpty(txt))
@@ -227,8 +254,10 @@ public partial class Game1
                     var bpx = e.FontPx ?? 0;
                     var bsz = MeasureText(bfont, blabel)
                         * (bpx > 0 ? (float)(bpx / (e.Font == "display" ? DisplayDesignPx : MonoDesignPx)) : 1f);
-                    TextPx(bfont, blabel, (int)(r.X + r.Width / 2 - bsz.X / 2),
-                        (int)(r.Y + r.Height / 2 - bsz.Y / 2), _ui.Color(colTok ?? "ink", Ink), bpx);
+                    var blx = (int)(r.X + r.Width / 2 - bsz.X / 2);
+                    var bly = (int)(r.Y + r.Height / 2 - bsz.Y / 2);
+                    RecordTextBox(new Rectangle(blx, bly, (int)bsz.X, (int)bsz.Y), r, blabel, bfont);
+                    TextPx(bfont, blabel, blx, bly, _ui.Color(colTok ?? "ink", Ink), bpx);
                     break;
                 }
                 DrawButton(e.Content ?? "", r.X, r.Y, r.Width, r.Height, true, Keys.None);
@@ -594,7 +623,19 @@ public partial class Game1
             foreach (var pp in CardTemplate.Place(tmpl, cell.X, cell.Y))
             {
                 if (pp.Binds is { } sel && sel.EndsWith(".selection") && i != selIx)
-                    continue; // only the chosen card wears its selection chip
+                {
+                    // FLAGGED STOPGAP (M1; payload addendum A2): the source computes per-state
+                    // labels (CHOOSE / SELECT) but extraction only captured the chosen sample —
+                    // draw the unchosen affordance shell-side until per-state labels ship.
+                    var alt = e.Binds == "races" ? "CHOOSE" : "SELECT";
+                    if (pp.Border is { } ab)
+                        Border(pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H,
+                            _ui.Color("borderDim", Border0), BorderPx(ab.W), ab.Sides);
+                    var asz = MeasureText(_assets.Mono, alt) * (float)(pp.FontPx / MonoDesignPx);
+                    TextPx(_assets.Mono, alt, (int)(pp.Rect.X + pp.Rect.W / 2 - asz.X / 2),
+                        (int)(pp.Rect.Y + pp.Rect.H / 2 - asz.Y / 2), _ui.Color("muted", Muted), pp.FontPx);
+                    continue;
+                }
                 // Merchant rows: an UNBOUND part is design-mock filler (the sample price digits) —
                 // never draw it beside live data. A NESTED wares region stamps its own cards.
                 if (datum is MerchantOffer or MerchantLot or ResourceReadout or MerchantSection
