@@ -25,8 +25,20 @@ public partial class Game1
         var s = _ui.ScreenDef(screenId);
         if (s is null) return;
         // Manifest z is DEPTH (extracted container panels carry high z, leaf content z=1) — draw
-        // back-to-front, so a filled panel never paints over the content it contains.
-        foreach (var e in s.Elements.OrderByDescending(x => x.Z))
+        // back-to-front, so a filled panel never paints over the content it contains. EXCEPT z=0:
+        // the 07-02 drop authors full-screen *.scene backdrops at z=0 meaning BACKMOST — under depth
+        // ordering they'd paint LAST and blank the screen (the combat-regression). Treat 0 as the
+        // scene layer behind everything. (Mixed z conventions flagged Needs-CD in STATUS.)
+        foreach (var e in s.Elements.OrderByDescending(x => x.Z == 0 ? int.MaxValue : x.Z))
+            DrawManifestElement(e, ManifestUi.Rect(s, e));
+    }
+
+    // The z=0 scene layer alone — the baseline the smoke paint-coverage diff measures against.
+    private void DrawManifestBackdrop(string screenId)
+    {
+        var s = _ui.ScreenDef(screenId);
+        if (s is null) return;
+        foreach (var e in s.Elements.Where(x => x.Z == 0))
             DrawManifestElement(e, ManifestUi.Rect(s, e));
     }
 

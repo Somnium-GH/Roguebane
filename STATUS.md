@@ -43,6 +43,56 @@ remaining merchant work is design-gated (ware pricing/rarity models, pixel-compa
 
 ## ⇒ HUMAN DIRECTIVES — 2026-07-02 (revisions WIN; fold into the render arc / after the current slice)
 
+**‼ P0 (2026-07-02 pm) — regressions/bugs first:**
+- ~~COMBAT SCREEN REGRESSION~~ **FIXED (2026-07-02):** root cause = the CD drop authors full-screen
+  `*.scene` backdrops at **z=0 meaning BACKMOST**, but the renderer's depth ordering (high z first)
+  painted z=0 LAST — the backdrop covered every element on encounter/merchant/campaignmap (all three
+  z=0-backdrop screens were blank; merchant/campaignmap had silently regressed too). Fix: z=0 draws
+  as the scene layer behind everything; depth ordering unchanged above it. GUARD BUILT: `RB_SMOKE=1
+  RB_MF=all` renders EVERY manifest screen headless, diffs each against its backdrop-only baseline,
+  prints per-screen painted-% and **exits non-zero if any screen is backdrop-blank** (asset probes
+  couldn't see this — the blank build reported probes 13/13). Run it every pass. All 6 screens
+  currently paint 8.8–74.5%. NOTE Needs-CD: manifest z now mixes two conventions (z=0 backmost vs
+  depth-descending panels z=6 over leaf z=1) — normalize in a future drop; renderer handles both.
+- **SAMPLE-over-LIVE text bug:** template `sample` text draws ON TOP of live-bound text (the doubled/
+  overlapping card copy on NewGame/Equipment). `sample` is a FALLBACK — draw it ONLY when the bind is
+  unresolved, never over live data.
+- **FONT SWAP = highest-leverage fidelity, drop-independent — do it now:** placeholder Consolas/Georgia +
+  ASCII-only char regions are the single biggest "wrong look" on EVERY screen (wrong font + "?" glyphs).
+  Bundling IM Fell English + JetBrains Mono + widening the regions jumps fidelity everywhere at once.
+- **RENDER AT NATIVE RES (big fidelity win, ours) — CONFIRMED root cause:** the scene paints to a FIXED
+  `960×540×SS` (≈1920×1080) RenderTarget (`Game1.cs` `_scene`), then aspect-scales into the backbuffer. On
+  a display LARGER than 1080 (fullscreen on a ~2560 monitor) that 1080 scene is UPSCALED to native = SOFT.
+  THIS is the "1080 = lower fidelity" — the 1080 was meant as AUTHORING density, but the code caps the
+  RENDER at 1080. Fix: size the scene to the NATIVE output res (map design-space 960×540 → native), so
+  hi-fi chrome/fonts render crisp; pixel-art figures nearest-neighbor-scale. Build SpriteFonts for native,
+  not the 1080 cap.
+- **LETTERBOX vs §13 aspect-fill — CONFIRMED:** the shell LETTERBOXES (`Game1.cs` `Clear(Color.Black) //
+  letterbox bars` + aspect-preserving fit) — but §13 LOCKED aspect-independent FILL (bg scale-to-cover +
+  HUD anchored to real edges, NO bars). On a non-16:9 display you get bars. Implement §13 aspect-fill.
+  [scope confirm w/ Doug]
+- **RENDER-ACCURACY FLOOR (drive this BEFORE ever claiming "starved"):** a LOT matches the design better
+  WITHOUT CD or systems — PURGE the outdated box/frame TEXTURE (old chrome still in use); apply the
+  manifest v3 frames/chrome to every panel; fix the box treatments. Stream-1 fidelity isn't at its floor
+  yet; get it there first.
+
+**‼ SYSTEMIC — build UI VALIDATION / proof-of-correctness (the ROOT CAUSE of "starved before pixel-perfect"):**
+the loop has NO deterministic way to know how well a screen matches its design PNG — so it can't measure
+the remaining gap, can't justify "done" or "starved," and regressions slip (combat 95%-blank; the font
+bug). The manifest gives correct LAYOUT/DATA, NOT visual correctness (not a silver bullet for a visual
+game). Build, in order:
+- **Coverage + content validation (deterministic, headless, ALL 5 screens every pass):** assert EVERY
+  manifest element renders NON-BLANK at its expected rect, and each BOUND element shows LIVE data (not its
+  `sample`). This alone catches the combat regression + empty/overlapping labels the instant they happen.
+  STARTED (2026-07-02): the SCREEN-level non-blank gate ships (`RB_MF=all`, above). REMAINING: per-ELEMENT
+  rect coverage + bound-shows-live-not-sample assertions (fold into the sample-over-live fix — same code).
+- **Fidelity diff vs `design/NN.png`:** a region/perceptual image compare → an objective match score +
+  per-region delta map (meaningful once fonts/chrome land; tolerate known placeholder-data regions).
+- **GATES:** a screen is "DONE" only when coverage+content pass AND the fidelity diff is under threshold.
+  The loop may claim "blocked/starved" ONLY by emitting the ENUMERATED per-element remaining-delta list,
+  each tagged **CD / system / human** with a reason. No backed-up list ⇒ NOT starved — keep perfecting
+  what's achievable. **Missing systems/content must NOT block pixel-perfecting the elements that DO exist.**
+
 **⚡ NOT STARVED — DROP-INDEPENDENT WORK (do NOW; the pixel-perfect render POLISH is drop-gated on CD's
 states/sides/colorBind/merchant manifest, but plenty needs NO drop):**
 - Finish the flagged CODE fixes below (war-party fill R→L; Bandage target-side {enemy|self} + shield

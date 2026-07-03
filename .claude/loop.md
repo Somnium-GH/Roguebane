@@ -36,3 +36,7 @@ When everything left is in "Needs human", OR the loop is TRULY STARVED (no unblo
 valuable work remains) or BLOCKED (waiting on an external drop / a human decision): **STOP LOOPING** — say
 so in one line. Do NOT spin, invent busywork, lower the bar, or grind low-value churn to appear busy. A
 clean stop with a clear "blocked on X" beats a wasted pass.
+STARVED/BLOCKED must be PROVEN, not felt: emit the ENUMERATED per-element remaining-delta list (each
+tagged CD / system / human, with a reason). No backed-up list ⇒ you are NOT starved — keep pixel-perfecting
+what's achievable. Missing systems/content NEVER block perfecting the elements that DO exist. VERIFY
+DETERMINISTICALLY (element coverage + content bound-not-sample + a design-PNG diff), not by eyeballing.

@@ -528,6 +528,8 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
 
     protected override void Draw(GameTime gameTime)
     {
+        // 2026-07-02 P0 guard: RB_MF=all smokes EVERY manifest screen with a paint-coverage check.
+        if (_smoke && _mfScreen == "all") { SmokeAllScreensAndExit(); return; }
         // The world always paints at the fixed design resolution into the scene target...
         GraphicsDevice.SetRenderTarget(_scene);
         GraphicsDevice.Clear(new Color(0x17, 0x11, 0x0b)); // panel-dark base from the locked palette
@@ -603,6 +605,55 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         }
         Console.WriteLine($"SMOKE OK: fonts=2 probes={probes.Length} bound={bound}");
         Exit();
+    }
+
+    // 2026-07-02 P0: smoke ALL manifest screens every pass with a deterministic PAINT-COVERAGE check —
+    // a screen must paint pixels beyond its z=0 scene backdrop. The asset probes above can't see a
+    // blank screen (the combat regression rendered backdrop-only while every probe bound), so this
+    // diffs a backdrop-only render against the full render per screen and fails the process if any
+    // screen adds (almost) nothing. RB_SMOKE=1 RB_MF=all [RB_SHOT=x.png → x.<screen>.png each].
+    private void SmokeAllScreensAndExit()
+    {
+        var screens = _ui.Manifest?.Screens.Keys.ToArray() ?? Array.Empty<string>();
+        var blank = new List<string>();
+        var total = W * SS * H * SS;
+        var baseline = new Color[total];
+        var full = new Color[total];
+        foreach (var id in screens)
+        {
+            RenderSceneOnce(() => DrawManifestBackdrop(id));
+            _scene.GetData(baseline);
+            RenderSceneOnce(() => DrawManifestScreen(id));
+            _scene.GetData(full);
+            var painted = 0;
+            for (var i = 0; i < total; i++)
+                if (full[i] != baseline[i]) painted++;
+            var pct = 100.0 * painted / total;
+            Console.WriteLine($"SMOKE COVER: {id} painted={pct:0.0}%");
+            if (pct < 1.0) blank.Add(id);
+            if (_shotPath is not null)
+            {
+                var path = System.IO.Path.ChangeExtension(_shotPath, null) + "." + id + ".png";
+                using var fs = System.IO.File.Create(path);
+                _scene.SaveAsPng(fs, W * SS, H * SS);
+            }
+        }
+        if (blank.Count > 0)
+        {
+            Console.WriteLine($"SMOKE BLANK: {string.Join(",", blank)}");
+            Environment.ExitCode = 1;
+        }
+        SmokeReportAndExit();
+    }
+
+    private void RenderSceneOnce(Action draw)
+    {
+        GraphicsDevice.SetRenderTarget(_scene);
+        GraphicsDevice.Clear(new Color(0x17, 0x11, 0x0b));
+        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Matrix.CreateScale(SS));
+        draw();
+        _spriteBatch.End();
+        GraphicsDevice.SetRenderTarget(null);
     }
 
     // The run renders one of two faces of the Expedition: the chart when choosing the next jump
