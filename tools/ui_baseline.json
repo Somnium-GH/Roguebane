@@ -1,0 +1,18 @@
+{
+  "binds_resolved": {
+    "encounter": 15,
+    "equipment": 11,
+    "citymap": 2,
+    "campaignmap": 4,
+    "newgame": 12,
+    "merchant": 5
+  },
+  "fidelity": {
+    "encounter": 66.9,
+    "equipment": 65.8,
+    "citymap": 69.4,
+    "campaignmap": 84.1,
+    "newgame": 65.8,
+    "merchant": 76.4
+  }
+}

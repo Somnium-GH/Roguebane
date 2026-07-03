@@ -129,7 +129,13 @@ game). Build, in order:
   EQUIPMENT's = missing screen backdrop art (design/02 shows one; the manifest has no scene element
   — Needs-CD), textured `ui/pip/*` attr-bar pips (Needs-CD, already logged), runeCard chrome
   (Needs-CD). Both screens' remaining fidelity floors are CD-gated; no renderer-side deltas found.
-- **GATES:** a screen is "DONE" only when coverage+content pass AND the fidelity diff is under threshold.
+- **GATES — PINNED (2026-07-02):** `python tools/ui_gate.py` = the ONE regression command: scratch
+  build → driven all-screen smoke (blank-screen + blank-element failures are the engine's own exit
+  code) → per-screen bind-resolution counts vs `tools/ui_baseline.json` (a DROP = a bind went dead =
+  fail) → per-screen fidelity score vs baseline (drop past 2pts = fail). `--update` re-pins after a
+  slice that legitimately improves things — run the gate EVERY pass before commit. Baselines (driven):
+  binds enc 15/21 eq 11/26 city 2/7 camp 4/4 ng 12/18 mer 5/17; fidelity 66.9/65.8/69.4/84.1/65.8/76.4.
+- **GATES (design bar):** a screen is "DONE" only when coverage+content pass AND the fidelity diff is under threshold.
   The loop may claim "blocked/starved" ONLY by emitting the ENUMERATED per-element remaining-delta list,
   each tagged **CD / system / human** with a reason. No backed-up list ⇒ NOT starved — keep perfecting
   what's achievable. **Missing systems/content must NOT block pixel-perfecting the elements that DO exist.**

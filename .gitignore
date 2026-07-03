@@ -21,3 +21,6 @@ obj/
 # OS
 .DS_Store
 Thumbs.db
+
+# UI gate scratch build (tools/ui_gate.py)
+.ui-gate-build/
