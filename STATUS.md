@@ -110,6 +110,11 @@ game). Build, in order:
   + the fidelity diff below.
 - **Fidelity diff vs `design/NN.png`:** a region/perceptual image compare → an objective match score +
   per-region delta map (meaningful once fonts/chrome land; tolerate known placeholder-data regions).
+  BUILT (2026-07-02): `tools/fidelity_diff.py <shot> <design> [--map heat.png] [--worst N]` — 24×14
+  tile grid in design space, per-tile color+edge distance → overall % + the worst tiles as design-space
+  rects (+ optional heatmap). BASELINES (RB_MF pre-run shots, so placeholder-data regions depress the
+  numbers): encounter 71.1 / equipment 66.9 / citymap 74.2 / campaignmap 85.1 / newgame 66.4 /
+  merchant 76.7. REFINEMENTS open: drive run state for live-data shots; a placeholder-region mask.
 - **GATES:** a screen is "DONE" only when coverage+content pass AND the fidelity diff is under threshold.
   The loop may claim "blocked/starved" ONLY by emitting the ENUMERATED per-element remaining-delta list,
   each tagged **CD / system / human** with a reason. No backed-up list ⇒ NOT starved — keep perfecting
@@ -354,6 +359,8 @@ ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered 
 - On ANY crash READ `bin/Debug/net9.0/crash.log` (Program.cs writes the full exception + stack).
 - Fonts are BUNDLED TTFs (IM Fell English display / JetBrains Mono mono; regions incl. ①②③ ✓ ✚ ◉,
   DefaultCharacter "?"). `Core.GlyphSafe.Sanitize` still guards anything outside the regions.
+- FIDELITY: `python tools/fidelity_diff.py <shot> design/NN-*.png --map heat.png` scores a shot vs its
+  design (see the SYSTEMIC block for baselines). Run after RB_MF=all; walk the worst tiles it lists.
 
 ## Debt (active — with reconcile trigger)
 - Equipment: no inventory tabs (GEAR/TECH/MINIONS) + drag-to-equip + equipped-gear-on-anatomy + real
