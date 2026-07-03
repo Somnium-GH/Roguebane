@@ -173,15 +173,21 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     // is 1:1 — never a soft upscale.
     private void EnsureSceneMatchesBackbuffer()
     {
+        // §13 aspect-fill (2026-07-03): the scene covers the WHOLE backbuffer (no bars). SS stays the
+        // min-fit design->scene scale, and the design space EXTENDS on the loose axis so edge anchors
+        // pin to the real window edges (a 16:9 window resolves to exactly the authored 960x540).
         var bw = GraphicsDevice.PresentationParameters.BackBufferWidth;
         var bh = GraphicsDevice.PresentationParameters.BackBufferHeight;
         var scale = Math.Min((float)bw / W, (float)bh / H);
-        var sw = Math.Max(1, (int)(W * scale));
-        var sh = Math.Max(1, (int)(H * scale));
-        if (_scene is not null && _scene.Width == sw && _scene.Height == sh) return;
+        if (_scene is not null && _scene.Width == bw && _scene.Height == bh) return;
         _scene?.Dispose();
         SS = scale;
-        _scene = new RenderTarget2D(GraphicsDevice, sw, sh);
+        _scene = new RenderTarget2D(GraphicsDevice, Math.Max(1, bw), Math.Max(1, bh));
+        if (_ui is not null)
+        {
+            _ui.DesignW = Math.Max(W, (int)(bw / SS));
+            _ui.DesignH = Math.Max(H, (int)(bh / SS));
+        }
     }
 
     // Fixed-step animation counter (authored `frames` cycle on it — render-only, sim untouched).
@@ -252,7 +258,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         var e = s?.Elements.FirstOrDefault(x => x.Binds == binds && x.Item is not null);
         if (s is null || m is null || e is null || !m.Templates.TryGetValue(e.Item!.Template, out var tmpl))
             return Array.Empty<LayoutRect>();
-        var r = ManifestUi.Rect(s, e);
+        var r = _ui.Rect(s, e);
         return ListLayout.Cells(new LayoutRect(r.X, r.Y, r.Width, r.Height), e.Item, count, tmpl.Size);
     }
 
@@ -260,7 +266,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     {
         var s = _ui.ScreenDef(screenId);
         var e = s?.Elements.FirstOrDefault(x => x.Binds == binds);
-        return s is null || e is null ? null : ManifestUi.Rect(s, e);
+        return s is null || e is null ? null : _ui.Rect(s, e);
     }
 
     // Equipment is the BETWEEN-FIGHTS loadout for the CURRENT core (design/02) — no core switching
@@ -468,7 +474,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         var chart = s?.Elements.FirstOrDefault(x => x.Binds == "map" && x.Type == "graph" && x.Item is not null);
         if (s is not null && chart is not null)
         {
-            region = ManifestUi.Rect(s, chart);
+            region = _ui.Rect(s, chart);
             if (chart.Item!.Size.Length == 2) { cw = chart.Item.Size[0]; ch = chart.Item.Size[1]; }
         }
         var nodes = Exp.Map.Nodes;
@@ -604,10 +610,9 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             using var fs = System.IO.File.Create(_shotPath!);
             _scene.SaveAsPng(fs, _scene.Width, _scene.Height);
         }
-        else // ...then letterbox-scale it into the window backbuffer
+        else // §13: the scene IS the window — blit 1:1, no bars
         {
             GraphicsDevice.SetRenderTarget(null);
-            GraphicsDevice.Clear(Color.Black); // letterbox bars
             UpdateViewport();
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.Draw(_scene, _viewDest, Color.White);
@@ -619,19 +624,12 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         if (_smoke && ++_frames >= 1) SmokeReportAndExit();
     }
 
-    // Fit the design scene into the backbuffer aspect-preserving: scale by the FULL fractional fit so
-    // the scene FILLS the window (16:9 design in a 16:9 window = no bars; thin bars only on an
-    // aspect-mismatch axis). PointClamp keeps it crisp. (Integer-only scaling was wasteful — a wide
-    // window capped at 2x and left fat side bars.)
+    // §13 aspect-fill: the scene target matches the backbuffer exactly — blit 1:1 at the origin,
+    // zero bars. Mouse maps back through _viewScale = SS (design->scene factor).
     private void UpdateViewport()
     {
-        var bw = GraphicsDevice.PresentationParameters.BackBufferWidth;
-        var bh = GraphicsDevice.PresentationParameters.BackBufferHeight;
-        // The scene is already native-fit — blit it 1:1, centered (bars only on aspect mismatch, §13
-        // aspect-fill pending). Mouse maps back through _viewScale = the scene's design->output factor.
         _viewScale = SS;
-        _viewDest = new Rectangle((bw - _scene.Width) / 2, (bh - _scene.Height) / 2,
-            _scene.Width, _scene.Height);
+        _viewDest = new Rectangle(0, 0, _scene.Width, _scene.Height);
     }
 
     // Touch one asset of every kind through the registry, then report what bound. A null is a gap in

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -31,7 +31,7 @@ public partial class Game1
         foreach (var e in s.Elements.OrderBy(x => x.Z))
         {
             if (ReferenceEquals(e, skip)) continue;
-            DrawManifestElement(e, ManifestUi.Rect(s, e));
+            DrawManifestElement(e, _ui.Rect(s, e));
         }
     }
 
@@ -44,7 +44,7 @@ public partial class Game1
         var s = _ui.ScreenDef(screenId);
         if (s is null) return;
         foreach (var e in s.Elements.Where(IsSceneElement))
-            DrawManifestElement(e, ManifestUi.Rect(s, e));
+            DrawManifestElement(e, _ui.Rect(s, e));
     }
 
     private void DrawManifestElement(Element e, Rectangle r)
@@ -90,10 +90,21 @@ public partial class Game1
                 break;
             case "text":
                 // A *.scene backdrop: the element's authored image IS the content (combat field,
-                // merchant stall) — blit it to the box and skip text entirely.
+                // merchant stall). §13 aspect-fill: it SCALE-TO-COVERS the whole (extended) design
+                // space — source-cropped to the viewport aspect so nothing stretches, no bars.
                 if (e.Binds is { } sceneBind && sceneBind.EndsWith(".scene") && e.Image is { Length: > 0 } bg)
                 {
-                    Sprite(_assets.Texture(NormalizeContentPath(bg)), r.X, r.Y, r.Width, r.Height, Color.White);
+                    if (_assets.Texture(NormalizeContentPath(bg)) is { } bgTex)
+                    {
+                        var dw = _ui.DesignW > 0 ? _ui.DesignW : W;
+                        var dh = _ui.DesignH > 0 ? _ui.DesignH : H;
+                        var cover = Math.Min((float)bgTex.Width / dw, (float)bgTex.Height / dh);
+                        var srcW = Math.Max(1, (int)(dw * cover));
+                        var srcH = Math.Max(1, (int)(dh * cover));
+                        _spriteBatch.Draw(bgTex, new Rectangle(0, 0, dw, dh),
+                            new Rectangle((bgTex.Width - srcW) / 2, (bgTex.Height - srcH) / 2, srcW, srcH),
+                            Color.White);
+                    }
                     break;
                 }
                 // Rune-budget bar (design/02): the fill width is the SPENT fraction of the budget.

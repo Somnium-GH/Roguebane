@@ -168,7 +168,13 @@ is ALL engine-side). Fix with P0-A numbers (before/after per-element scores):**
    fidelity 81.6→82.7. NEEDS-HUMAN (new): how the RUNE BAG displays/uses a BOUGHT Mark — the bag
    renders ladder groups (climb-by-budget); a purchased Mark sits in Stash.Marks with no display
    home yet. Decide: bought rung auto-owns? shows as a bag row? (§17 rune taxonomy adjacent).
-8. **§13 aspect-fill** (per NEW LOCKS): bg scale-to-cover, HUD anchored to real edges, no bars.
+8. ~~§13 aspect-fill~~ **✅ DONE (2026-07-03):** scene target = the FULL backbuffer (blit 1:1 at
+   origin, letterbox clear gone); design space EXTENDS on the loose axis (`ManifestUi.DesignW/H`,
+   set on resize) so anchors pin to REAL window edges; `*.scene` backdrops SCALE-TO-COVER the
+   extended space (source-cropped to the viewport aspect, nothing stretches). 16:9 resolves to the
+   authored 960×540 exactly (gate byte-stable); verified 1600×1000 eyeball: zero bars, full-width
+   status strip, buttons at true top-right, footer at true bottom. Legacy fixed-coord overlays
+   (cleared/lost) still center on 960×540 — cosmetic on exotic aspects, noted.
 9. **Legacy deletions:** hand-drawn citymap overlays (castle panel/EQUIPMENT[E]/PACK chips/campaign
    spine) die — their manifest elements landed; "you are here"/doom-title hand-draws die the same way.
    Old encounter card-chrome fallbacks give way to the landed techCard parts.
