@@ -1,4 +1,4 @@
-using Roguebane.Core.Content;
+﻿using Roguebane.Core.Content;
 
 namespace Roguebane.Core.Tests;
 
@@ -216,6 +216,77 @@ public class ExpeditionTests
 
         Assert.True(exp.BuyArmor(Shops.Plate)); // price value(2)+2 = 4
         Assert.Contains(Shops.Plate, exp.Stash.Armor);
+    }
+
+    // §12 receiving (LOCKED 2026-07-03): every ware category buys into the RUN inventory —
+    // technique -> palette pool, minion -> minion inventory, rune -> rune bag. Slotting stays
+    // the Equipment screen's job. Category presence per node is the seeded roll's business, so
+    // the technique/rune tests ride nodes whose rolls stock them ("m2" / "mk20" — deterministic).
+    private static Expedition MerchantAt(string nodeId)
+    {
+        var body = Sessions.DemoBody();
+        var caster = new Caster(body, maxCharge: Forge.MagicCapacity(body), requireAim: true);
+        var nodes = new[]
+        {
+            new MapNode("camp", NodeType.Camp, nodeId),
+            new MapNode(nodeId, NodeType.Merchant, "castle"),
+            new MapNode("castle", NodeType.Castle),
+        };
+        var map = new CityMap(nodes, "camp", supplies: 8, marchLength: 9);
+        var exp = new Expedition(Forge.PlayerFighter(body), caster, Techniques.All, map);
+        exp.Stash.AddGold(50);
+        exp.Enter(nodeId);
+        Assert.True(exp.AtMerchant);
+        return exp;
+    }
+
+    [Fact]
+    public void TheMerchantSellsATechniqueIntoTheRunInventory()
+    {
+        var exp = MerchantAt("m2"); // this node's seeded roll stocks the technique section
+        Assert.NotEmpty(exp.OfferedTechniques);
+        var pick = exp.OfferedTechniques[0];
+        var gold = exp.Gold;
+
+        Assert.True(exp.BuyTechnique(pick));
+        Assert.Contains(pick, exp.Stash.Techniques);          // landed in the palette pool
+        Assert.DoesNotContain(pick, exp.OfferedTechniques);   // cleared from the shelf
+        Assert.Equal(gold - Expedition.Price(pick), exp.Gold);
+    }
+
+    [Fact]
+    public void TheMerchantSellsAMinionIntoTheRunInventory()
+    {
+        var exp = MerchantAt("b"); // minions section stocks on this roll
+        Assert.NotEmpty(exp.OfferedMinions);
+        var pick = exp.OfferedMinions[0];
+
+        Assert.True(exp.BuyMinion(pick));
+        Assert.Contains(pick, exp.Stash.Minions);
+        Assert.DoesNotContain(pick, exp.OfferedMinions);
+    }
+
+    [Fact]
+    public void TheMerchantSellsARuneIntoTheBag()
+    {
+        var exp = MerchantAt("mk20"); // this node's seeded roll stocks the rune section
+        Assert.NotEmpty(exp.OfferedMarks);
+        var pick = exp.OfferedMarks[0];
+
+        Assert.True(exp.BuyMark(pick));
+        Assert.Contains(pick, exp.Stash.Marks);
+        Assert.DoesNotContain(pick, exp.OfferedMarks);
+    }
+
+    [Fact]
+    public void WarePurchasesRejectWhenGoldRunsShort()
+    {
+        var exp = MerchantAt("b");
+        while (exp.Gold > 0) exp.Stash.TrySpend(1); // broke
+        Assert.NotEmpty(exp.OfferedMinions);
+
+        Assert.False(exp.BuyMinion(exp.OfferedMinions[0]));
+        Assert.Empty(exp.Stash.Minions);
     }
 
     [Fact]

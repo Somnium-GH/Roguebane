@@ -414,8 +414,12 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             foreach (var (item, rect) in WareRects())
                 if (Click(rect))
                 {
+                    // §12 receiving (LOCKED): every category buys into the run inventory.
                     if (item is Weapon bw) Exp.BuyWeapon(bw);
                     else if (item is Armor ba) Exp.BuyArmor(ba);
+                    else if (item is Technique bt) Exp.BuyTechnique(bt);
+                    else if (item is Roguebane.Core.Minion bm) Exp.BuyMinion(bm);
+                    else if (item is Roguebane.Core.Mark bk) Exp.BuyMark(bk);
                     break; // one purchase per click
                 }
             return; // no map click-through under the stall

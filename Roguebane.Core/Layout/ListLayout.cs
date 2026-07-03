@@ -39,6 +39,9 @@ public static class ListLayout
         {
             var x = region.X + (vertical ? 0 : i * (w + item.Gap));
             var y = region.Y + (vertical ? i * (h + item.Gap) : 0);
+            // overflow:hidden semantics — live data can outgrow the authored strip (26 HP pips in a
+            // 12-pip region); cells past the region edge drop instead of spilling into neighbours.
+            if (x + w > region.X + region.W || y + h > region.Y + region.H) break;
             cells.Add(new LayoutRect(x, y, w, h));
         }
         return cells;

@@ -670,8 +670,11 @@ public partial class Game1
                 ? Exp.Player.Body.Hands.Cast<object>()
                     .Concat(Exp.Stash.Weapons).Concat(Exp.Stash.Armor).ToList()
                 : new List<object>(),
-            1 => _build.Palette.Cast<object>().ToList(),
-            2 => _build.CoreRune.MinionKit.Concat(_build.Runes.GrantedMinions).Cast<object>().ToList(),
+            // §12: bought techniques/minions join the pool the Equipment screen slots from.
+            1 => _build.Palette.Cast<object>()
+                .Concat(InRun ? Exp.Stash.Techniques : Enumerable.Empty<object>().Cast<Roguebane.Core.Technique>()).ToList(),
+            2 => _build.CoreRune.MinionKit.Concat(_build.Runes.GrantedMinions).Cast<object>()
+                .Concat(InRun ? Exp.Stash.Minions : Enumerable.Empty<Roguebane.Core.Minion>()).ToList(),
             _ => null,
         },
         // The Rune Bag (design/02): one group per PATH ladder — the MARKS/PATHS/KEYSTONES taxonomy
@@ -810,8 +813,9 @@ public partial class Game1
     private const int WareGap = 11, SectionsPerPage = 3;
     private int _merchantPage;
 
-    // §12: the rolled stock as display sections. Weapons/armor BUY into the stash; techniques/
-    // minions/runes are OFFERED (their receiving models are design-open) so they show un-buyable.
+    // §12 (receiving LOCKED 2026-07-03): EVERY ware category is a click-to-buy tile. A purchase
+    // lands in the run inventory — technique -> palette pool, minion -> minion inventory,
+    // rune -> rune bag — and slotting stays the Equipment screen's job.
     private List<MerchantSection> MerchantSections()
     {
         var s = new List<MerchantSection>();
@@ -827,11 +831,13 @@ public partial class Game1
             a.Kind.ToString().ToUpperInvariant() + " " + a.Group.ToString().ToUpperInvariant(), "",
             Roguebane.Core.Expedition.Price(a) + "g", "BUY", a)));
         Add("TECHNIQUES", Exp.OfferedTechniques.Select(t => new Ware("TEC", DisplayName(t.Id),
-            t.Stat.ToString().ToUpperInvariant() + " " + t.Reserve, t.DescText, "-", "", t)));
+            t.Stat.ToString().ToUpperInvariant() + " " + t.Reserve, t.DescText,
+            Roguebane.Core.Expedition.Price(t) + "g", "BUY", t)));
         Add("MINIONS", Exp.OfferedMinions.Select(m => new Ware("MIN", DisplayName(m.Id),
-            m.Stat.ToString().ToUpperInvariant() + " " + m.Reserve, m.DescText, "-", "", m)));
+            m.Stat.ToString().ToUpperInvariant() + " " + m.Reserve, m.DescText,
+            Roguebane.Core.Expedition.Price(m) + "g", "BUY", m)));
         Add("RUNES", Exp.OfferedMarks.Select(k => new Ware("RUNE", k.DisplayName,
-            "RANK " + k.Rank, "", "-", "", k)));
+            "RANK " + k.Rank, "", Roguebane.Core.Expedition.Price(k) + "g", "BUY", k)));
         return s;
     }
 

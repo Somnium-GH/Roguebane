@@ -1,4 +1,4 @@
-using Roguebane.Core.Content;
+﻿using Roguebane.Core.Content;
 
 namespace Roguebane.Core;
 
@@ -120,6 +120,41 @@ public sealed class Expedition
         if (!AtMerchant || !CurrentStock().Armor.Contains(armor) || !_stash.TrySpend(Price(armor))) return false;
         CurrentStock().Armor.Remove(armor);
         _stash.AddArmor(armor);
+        return true;
+    }
+
+    // §12 receiving (LOCKED 2026-07-03): every ware category is click-to-buy. A purchase spends gold,
+    // clears the roll, and lands in the run inventory — technique -> palette pool, minion -> minion
+    // inventory, rune (Mark) -> rune bag. Slotting/climbing stays the Equipment screen's job.
+    // Prices are placeholder-sane (flagged to the economy tune with the rest).
+    public static int Price(Technique technique) => technique.Reserve + technique.Power + 2;
+    public static int Price(Minion minion) => minion.Reserve + minion.Power + 3;
+    public static int Price(Mark mark) => mark.Cost + 2;
+
+    public bool BuyTechnique(Technique technique)
+    {
+        if (!AtMerchant || !CurrentStock().Techniques.Contains(technique)
+            || !_stash.TrySpend(Price(technique))) return false;
+        CurrentStock().Techniques.Remove(technique);
+        _stash.AddTechnique(technique);
+        return true;
+    }
+
+    public bool BuyMinion(Minion minion)
+    {
+        if (!AtMerchant || !CurrentStock().Minions.Contains(minion)
+            || !_stash.TrySpend(Price(minion))) return false;
+        CurrentStock().Minions.Remove(minion);
+        _stash.AddMinion(minion);
+        return true;
+    }
+
+    public bool BuyMark(Mark mark)
+    {
+        if (!AtMerchant || !CurrentStock().Marks.Contains(mark)
+            || !_stash.TrySpend(Price(mark))) return false;
+        CurrentStock().Marks.Remove(mark);
+        _stash.AddMark(mark);
         return true;
     }
 

@@ -158,8 +158,16 @@ is ALL engine-side). Fix with P0-A numbers (before/after per-element scores):**
    REMAINING: castlePanel container (resolves when its own datum model lands); scene backdrops
    verify (equipment's renders).
 6. **P0-B targeting build** (block above).
-7. **Merchant buys complete** (per the click-to-buy LOCK): techniques/minions/runes purchase into
-   inventory; keep page-by-measured-fit as a safety even with v2 extents.
+7. ~~Merchant buys complete~~ **✅ DONE (2026-07-03, per the click-to-buy LOCK):** Stash gains
+   Techniques/Minions/Marks inventories; `BuyTechnique/BuyMinion/BuyMark` mirror the gear buys
+   (placeholder prices flagged to the economy tune); ALL five ware categories show price + BUY and
+   click-to-buy dispatches by item type; bought techniques/minions join the Equipment tabs' pools
+   (slotting stays Equipment's). Core-tested end-to-end (312: buy per category on deterministic
+   stocking nodes + broke rejection). BONUS un-break: ListLayout linear flows now CLIP overflowing
+   cells (26 HP pips were spilling out of healPips' 12-pip strip across the shelves) — merchant
+   fidelity 81.6→82.7. NEEDS-HUMAN (new): how the RUNE BAG displays/uses a BOUGHT Mark — the bag
+   renders ladder groups (climb-by-budget); a purchased Mark sits in Stash.Marks with no display
+   home yet. Decide: bought rung auto-owns? shows as a bag row? (§17 rune taxonomy adjacent).
 8. **§13 aspect-fill** (per NEW LOCKS): bg scale-to-cover, HUD anchored to real edges, no bars.
 9. **Legacy deletions:** hand-drawn citymap overlays (castle panel/EQUIPMENT[E]/PACK chips/campaign
    spine) die — their manifest elements landed; "you are here"/doom-title hand-draws die the same way.
@@ -626,6 +634,10 @@ ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered 
   decision, not auto-changed. "FTL" in comments is an allowed private design ref, leave it.)
 
 ## Needs human (loop skips)
+- BOUGHT RUNE display/consumption (2026-07-03): merchant rune buys land in `Stash.Marks` (per the
+  §12 receiving LOCK) but the rune bag renders ladder GROUPS (climb-by-budget) — a purchased Mark
+  has no display home or consumption rule yet. Decide: bought rung auto-owned? separate bag row?
+  (§17 rune-taxonomy adjacent; wire the moment it's called.)
 - Balance/feel tuning (all placeholder-sane, tune in PLAY): tick 10/s; cooldowns + damage; DEX haste
   2%/pt cap 28%; CON→HP 1:2 +base8; evasion %; shield amounts/regen; armed-foe + castle HP/strike/cadence;
   budgets/spoils/prices; supplies vs march length; race/core stat blocks (design/05).

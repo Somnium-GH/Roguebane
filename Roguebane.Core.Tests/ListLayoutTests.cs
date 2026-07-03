@@ -71,6 +71,17 @@ public class ListLayoutTests
     }
 
     [Fact]
+    public void LinearFlowsClipCellsThatOverflowTheRegion()
+    {
+        // Live data can outgrow the authored strip (26 HP pips in a 12-pip region): cells past the
+        // region edge DROP (overflow:hidden), never spill into neighbouring elements.
+        var strip = new Item { Template = "healPip", Flow = "horizontal", Gap = 2, Size = new[] { 15, 6 } };
+        var cells = ListLayout.Cells(new LayoutRect(22, 95, 195, 6), strip, 26);
+        Assert.Equal(11, cells.Count);                        // floor((195+2)/17)
+        Assert.True(cells[^1].X + 15 <= 22 + 195);            // last cell inside the region
+    }
+
+    [Fact]
     public void PadInsetsTheRegionBeforeCellsFlow()
     {
         // item.pad [T,R,B,L] (LAYOUT_CONTRACT §12): cells start inside the padded region, and the
