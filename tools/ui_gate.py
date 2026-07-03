@@ -42,6 +42,26 @@ def main():
     ap.add_argument("--build-dir", default=str(ROOT / ".ui-gate-build"))
     args = ap.parse_args()
 
+    # P0-A.1 reference contract guard: every design ref must be EXACTLY 960K x 540K (integer K).
+    # A ref at any other size means the export pipeline regressed — every score taken against it
+    # would be warped, so hard-fail before spending a build.
+    print("== reference contract ==")
+    from PIL import Image
+    bad_refs = []
+    for png in sorted((ROOT / "design").glob("[0-9][0-9]-*.png")):
+        if png.name.startswith("00-assets"):
+            continue  # asset SHEETS, not screen refs — the 960K x 540K contract is screens-only
+        w, h = Image.open(png).size
+        k = w / 960
+        if w % 960 or h % 540 or w // 960 != h // 540 or k < 1:
+            bad_refs.append(f"{png.name}: {w}x{h} (not 960K x 540K)")
+    if bad_refs:
+        print("REFERENCE CONTRACT FAILED:")
+        for b in bad_refs:
+            print("  - " + b)
+        return 2
+    print(f"  all design/NN refs are 960K x 540K")
+
     build_dir = Path(args.build_dir)
     print("== build ==")
     r = run(["dotnet", "build", str(ROOT / "Roguebane.Game"), "-v", "q", "-nologo", "-o", str(build_dir)])
@@ -62,7 +82,9 @@ def main():
     for drive, owns in passes:
         print(f"== driven all-screen smoke (RB_SCREEN={drive}) ==")
         shot = build_dir / f"gate-{drive}.png"
-        env = {"RB_SCREEN": drive, "RB_MF": "all", "RB_SMOKE": "1", "RB_SHOT": str(shot)}
+        # RB_SIZE pins shots at reference resolution -> the fidelity diff runs 1:1, zero resampling
+        env = {"RB_SCREEN": drive, "RB_MF": "all", "RB_SMOKE": "1", "RB_SHOT": str(shot),
+               "RB_SIZE": "1920x1080"}
         r = run([str(build_dir / "Roguebane.Game.exe")], cwd=str(build_dir), env={**os.environ, **env})
         print(r.stdout.strip())
         if r.returncode != 0:

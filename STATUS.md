@@ -65,14 +65,15 @@ score ever taken compared against a reference warped ~4% horizontally (≈18 px 
 live window's letterbox bars (2560×1528 client = 1.675) baked into the shot, all at a 1× 540p working
 res where border weight + text metrics are unmeasurable. Prior "walked clean / zero renderer deltas"
 claims were made against warped refs — treat them as UNVERIFIED; re-walk with v2. Build, in order:
-1. **Reference contract + guard:** ~~re-export~~ LANDED — all refs ARE 1920×1080 now. Build the guard:
-   `ui_gate.py` HARD-FAILS any `design/NN-*.png` whose size isn't exactly 960K×540K (integer K).
-   Old 924-wide-era fidelity baselines are DEAD — re-pin everything against the new refs.
-   NEW: the diff also MASKS the stat-digit regions on newgame (tolerated placeholder zones until the
-   live tuning session — see NEW LOCKS).
-2. **Render-at-reference-resolution:** `RB_SIZE=WxH` (e.g. 1920×1080) for headless shots — scene target
-   at EXACT ref res, no letterbox, no window chrome → true 1:1 diff, zero resampling either side
-   (fidelity_diff skips resize when sizes already match).
+1. **Reference contract + guard — ✅ BUILT (2026-07-03):** `ui_gate.py` step 0 hard-fails any
+   `design/NN-*.png` screen ref not exactly 960K×540K (`00-assets-*` sheets exempt — not screens).
+   Baseline re-pin still WAITS on v2 (step 3) + the newgame stat-digit MASK (fold into v2's
+   per-element crops — see NEW LOCKS).
+2. **Render-at-reference-resolution — ✅ BUILT (2026-07-03):** `RB_SIZE=WxH` pins the backbuffer
+   (scene aspect-fits to exact ref res, shots save the scene = no letterbox/chrome); the gate runs
+   all smokes at `RB_SIZE=1920x1080`; `fidelity_diff` now compares SAME-SIZE pairs 1:1 (zero
+   resample, mode-tagged in output; mismatched sizes keep the legacy 960×540 fallback). First 1:1
+   numbers (informational, not pinned): enc 80.5 eq 80.4 city 84.7 camp 94.7 ng 77.5 mer 83.0.
 3. **fidelity_diff v2 — per-ELEMENT, not per-tile:** score each manifest element's rect crop (shot vs
    ref) → a RANKED per-element delta list (id, score, design rect). The walk becomes "fix the top of
    the list". Keep the tile heatmap as a visual only.

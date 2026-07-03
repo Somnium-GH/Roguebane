@@ -79,6 +79,15 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         IsFixedTimeStep = true; // Update runs on a fixed step; the combat clock is a sub-accumulator
         _graphics.PreferredBackBufferWidth = 1600;
         _graphics.PreferredBackBufferHeight = 900;
+        // RB_SIZE=WxH pins the backbuffer for headless shots — the scene target aspect-fits to it, so
+        // a 960K x 540K size yields shots at EXACT reference resolution (1:1 fidelity diff, no resample).
+        if (Environment.GetEnvironmentVariable("RB_SIZE") is { } rbSize
+            && rbSize.Split('x', 'X') is [var rw, var rh]
+            && int.TryParse(rw, out var rbw) && int.TryParse(rh, out var rbh) && rbw > 0 && rbh > 0)
+        {
+            _graphics.PreferredBackBufferWidth = rbw;
+            _graphics.PreferredBackBufferHeight = rbh;
+        }
         Window.AllowUserResizing = true;
     }
 
