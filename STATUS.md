@@ -1,5 +1,15 @@
 # Status
 
+## ✅ BUILD-BREAKING BUG FIXED (2026-07-03, post-commit 57cc8a6): mgcb crashed on launch
+`dotnet run` failed content build (MGCB exited -532462766 / 0xE0434352 — unhandled CLR exception,
+not a normal build error). Root cause: the 57cc8a6 mgcb-mirror step wrote the 9 new entries
+(8 technique icons + doom_stripe) into `Roguebane.Game/Content/Content.mgcb` (the copy the build
+actually reads) with `\directive:` backslashes instead of MGCB's required `/directive:` — 81 lines,
+that file only. The CD-source copy (`Roguebane.Content/Content.mgcb`) was fine. Fixed in place
+(mechanical slash swap, no content change, verified by diff). **BUILD-VERIFIED (2026-07-03, loop):**
+`dotnet build Roguebane.Game` green; all 9 new xnbs produced (technique icons + doom_stripe). If a
+future drop mirrors mgcb entries again, verify the directive slash direction (`/`, not `\`) before commit.
+
 ## ✅ DROP APPLIED + COMMITTED (2026-07-03; applied by Cowork, committed 57cc8a6)
 The `.drop/` staging is applied and deleted; the drop-commit first-pass directive is SATISFIED
 (guards re-verified at commit: parse 6 screens, drop_audit 0 gaps, 313 tests green).
