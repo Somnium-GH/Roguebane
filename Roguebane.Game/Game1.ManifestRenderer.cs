@@ -348,6 +348,12 @@ public partial class Game1
         "runes.budget" => _build.Runes.Available + " free / " + _build.Runes.Budget,
         "Body.hp" => InRun ? Exp.Player.Hp + " / " + Exp.Player.MaxHp : null,
         "encounter.foe.hp" => InRun && Exp.Enemy is { } foe ? foe.Hp + " / " + foe.MaxHp : null,
+        // HP strip eyebrows (design/01: "GRUNT · HP" / "DIRE OGRE · HP 14 / 20"). ASCII dash — the
+        // bundled font regions don't carry U+00B7 and GlyphSafe would degrade it to "?".
+        "Body.hpLabel" => InRun
+            ? (_build.Race.Name + " " + _build.CoreRune.Title).ToUpperInvariant() + " - HP" : null,
+        "encounter.foe.hpLabel" => InRun && Exp.Enemy is { } f2
+            ? f2.Id.Replace('_', ' ').ToUpperInvariant() + " - HP " + f2.Hp + " / " + f2.MaxHp : null,
         // Combat verbs (design/01 chips; labels were flattened by extraction -> authored here).
         "combat.autoAttack" => InRun ? "AUTO-ATTACK" : null, // the ON state reads from the amber skin
         "combat.retreat" => InRun ? "RETREAT" : null,
@@ -621,6 +627,14 @@ public partial class Game1
         "ShieldPool.points" => InRun
             ? Enumerable.Range(0, Exp.Player.Body.ShieldLayers)
                 .Select(i => (object)(i < Exp.Player.Body.ShieldPoints)).ToList()
+            : new List<object>(),
+        // Segmented HP strips (07-03 drop, design/01): one pip per max-HP point, live-first — the
+        // same point.live leaf-template shape as shield pips.
+        "Body.hp.points" => InRun
+            ? Enumerable.Range(0, Exp.Player.MaxHp).Select(i => (object)(i < Exp.Player.Hp)).ToList()
+            : new List<object>(),
+        "encounter.foe.hp.points" => InRun && Exp.Enemy is { } hpFoe
+            ? Enumerable.Range(0, hpFoe.MaxHp).Select(i => (object)(i < hpFoe.Hp)).ToList()
             : new List<object>(),
         // Merchant (§12, design/07): the heal offers + the seeded provision lots, live-priced.
         "merchant.healing.offers" => InRun && Exp.AtMerchant

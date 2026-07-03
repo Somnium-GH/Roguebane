@@ -124,8 +124,11 @@ is ALL engine-side). Fix with P0-A numbers (before/after per-element scores):**
    native-crisp above); NineSlice tile STEPS now carry dstCornerScale too so edges tile at scaled
    native density (Core-tested, 305). Button skins verified: still ChromeBake=2 art (unchanged in
    the drop), their path keeps 1/ChromeBake.
-4. **New template families:** nested pip templates instanced from live data (poolPip/attrPip/supplyPip/
-   supportPip/healPip/heroHpPip/foeHpPip — shieldPip is the precedent); ~~`data-bind-gate`~~ DONE
+4. **New template families:** ~~heroHpPip/foeHpPip~~ DONE (2026-07-03: segmented HP strips live —
+   one point.live pip per max-HP point through the shieldPip leaf path, + hpLabel eyebrows
+   ("HUMAN SUMMONER - HP", foe id + n/m; ASCII dash, font lacks U+00B7); encounter binds 16→20);
+   REMAINING pips: poolPip/attrPip/supplyPip/supportPip/healPip (nested-in-template + imageBind
+   cells); ~~`data-bind-gate`~~ DONE
    (2026-07-03: content+binds = literal gated by the bind, WHOLE element suppresses on a closed gate
    — heldBadge only shows paused; nav.close/nav.equipment/begin resolver gates added, binds eq 23
    city 10 ng 13; smoke classifies gated literals as legit-silent); ~~`item.pad`~~ DONE (2026-07-03:
