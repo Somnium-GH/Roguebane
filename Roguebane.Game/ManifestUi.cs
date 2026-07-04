@@ -38,6 +38,15 @@ public sealed class ManifestUi
         return new Rectangle(r.X, r.Y, r.W, r.H);
     }
 
+    // Full current design-space canvas (extended when set). Scene/backdrop elements (`*.scene`
+    // binds) stretch to this instead of resolving their authored anchor/size, so the background
+    // never leaves gaps at non-16:9 aspects while edge-anchored chrome pins to the real edges —
+    // otherwise the two diverge (Doug's "anything on top of the background shifts" report).
+    public Rectangle FullCanvasRect(Screen screen) => new(
+        0, 0,
+        DesignW > 0 ? DesignW : screen.DesignSize[0],
+        DesignH > 0 ? DesignH : screen.DesignSize[1]);
+
     public Rectangle? ElementRect(string screen, string id)
     {
         var m = _layout.Manifest;

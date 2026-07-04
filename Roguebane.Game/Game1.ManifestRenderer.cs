@@ -33,7 +33,9 @@ public partial class Game1
             if (ReferenceEquals(e, skip)) continue;
             _textOwner = e.Id; // collision detector context (recorded only while _collectText)
             _curScreen = s;    // panel headers confine to the band above their contained children
-            DrawManifestElement(e, _ui.Rect(s, e));
+            // Scene/backdrop art stretches to the FULL design canvas — never its authored anchor/size
+            // — so it can't diverge from edge-anchored chrome when the canvas extends past 16:9 (§13).
+            DrawManifestElement(e, IsSceneElement(e) ? _ui.FullCanvasRect(s) : _ui.Rect(s, e));
         }
         _textOwner = null;
     }
@@ -47,7 +49,7 @@ public partial class Game1
         var s = _ui.ScreenDef(screenId);
         if (s is null) return;
         foreach (var e in s.Elements.Where(IsSceneElement))
-            DrawManifestElement(e, _ui.Rect(s, e));
+            DrawManifestElement(e, _ui.FullCanvasRect(s));
     }
 
     private Roguebane.Core.Layout.Screen? _curScreen; // per draw pass; panel headers see siblings
