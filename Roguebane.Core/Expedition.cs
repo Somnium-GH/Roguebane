@@ -373,6 +373,7 @@ public sealed class Expedition
         // The Summoner's Core Effect [LOCKED §11]: each SURVIVING minion (idle counts — it is still
         // summoned) refunds its Summons on redeploy — its economy edge.
         if (_refundSummonsOnRedeploy) _caster.RefundSummons(_caster.MinionCount);
+        ClearAllAims(); // this fight's foe is gone; a stale lock must not bleed onto the next one
     }
 
     // RETREAT: break off an ACTIVE fight and fall back to the chart (the war party keeps coming).
@@ -381,5 +382,14 @@ public sealed class Expedition
         if (State != ExpeditionState.Fighting) return;
         Battle?.Retreat();
         State = ExpeditionState.Choosing;
+        ClearAllAims();
+    }
+
+    // Bug fix (2026-07-04, Doug): a DURABLE per-technique Aim survives past this fight's end unless
+    // cleared here — the next encounter's foe is a different object, so a leftover lock could show a
+    // FOCUS reticle/aim-tag on a target the player never actually aimed at this fight.
+    private void ClearAllAims()
+    {
+        foreach (var t in _equipment) ClearAim(t);
     }
 }

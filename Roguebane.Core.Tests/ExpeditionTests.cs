@@ -117,6 +117,39 @@ public class ExpeditionTests
         Assert.Equal(ExpeditionState.Choosing, exp.State); // now back on the chart
     }
 
+    // Bug fix (2026-07-04, Doug): a technique aimed at THIS fight's foe must not carry a stale lock
+    // into the NEXT one — Redeploy() clears every equipped technique's aim.
+    [Fact]
+    public void RedeployClearsStaleAim()
+    {
+        var exp = FullLoadout();
+        exp.Enter("a2");
+        var foe = exp.Enemy!;
+        exp.Aim(Techniques.Jab, foe);
+        Assert.Same(foe, exp.AimOf(Techniques.Jab));
+
+        var guard = 0;
+        while (exp.State == ExpeditionState.Fighting && guard++ < 10000) { AimAll(exp); exp.Tick(); }
+        exp.Redeploy();
+
+        Assert.Null(exp.AimOf(Techniques.Jab));
+    }
+
+    // Same stale-lock hazard on the RETREAT path (an active fight broken off, not cleared).
+    [Fact]
+    public void RetreatClearsStaleAim()
+    {
+        var exp = Sessions.Expedition();
+        exp.Toggle(Techniques.Jab);
+        exp.Enter("a2");
+        exp.Aim(Techniques.Jab, exp.Enemy!);
+        Assert.NotNull(exp.AimOf(Techniques.Jab));
+
+        exp.Retreat();
+
+        Assert.Null(exp.AimOf(Techniques.Jab));
+    }
+
     [Fact]
     public void AMerchantIsAStopNotAFight()
     {
