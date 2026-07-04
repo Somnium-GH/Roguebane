@@ -1,5 +1,66 @@
 # Status
 
+## ‼ HUMAN DIRECTIVES — 2026-07-04 (Doug — explicit priority order, WINS over everything below;
+## work this block TOP-DOWN before returning to normal-priority bugs/debt)
+
+**P1. Fix the merchant screen** — already logged above/below as two precise bugs, nothing new to add:
+the `waresShelves` 1-pixel-short container dropping the 3rd wares section (CD ask B13), and the
+missing wareCard root border/chrome in the merchant's card-stamping path (pure engine fix, both
+already in this file).
+
+**P2. Fix Equipment/Technique inventory "button" states:**
+- All inventory cards currently render as if EQUIPPED regardless of real state — confirmed this
+  traces to the ALREADY-FLAGGED follow-up from the B5/B6 CD relay ("our own renderer had a stale
+  string literal from before the rename — not a CD ask"): CD's data is verified correct
+  (`invCard`/`loadoutCard` carry `states.family` + the locked §6e vocabulary
+  `equipped`/`disabled`/`equippable`/`locked`, plus hover overlays) — the engine's own state-key
+  resolver is what's stale. Find and fix that literal; this single fix should also restore the
+  missing EQUIPPABLE/DISABLED/LOCKED looks (today only EQUIPPED's look ever shows).
+- Placeholder box currently marks "equipped" on figure parts where real worn-armor ASSETS already
+  exist (B2-GO/B12) — wire the real assets in as they land, retire the box per-slot as its asset
+  arrives (don't wait for the whole batch; flag any slot still on the box placeholder as Needs-CD if
+  the asset genuinely isn't there yet).
+- **Enabling/disabling a technique must add/remove it from the bottom action bar** — today toggling a
+  technique in inventory doesn't sync the bar at all (can't unslot by unselecting either). This is
+  the ORDERING system already spec'd in §6e ("click slots into the first free slot; unslot compacts
+  left") — it just isn't wired to the inventory toggle action yet.
+- **Drag-and-drop reorder is ALREADY SPEC'D — DESIGN_SPEC §6e, "Reorder = DRAG-AND-DROP"** (found it,
+  no need to ask Doug): dragging a slotted card pulls it off leaving a matching ghost background in
+  its slot; snaps INSERTION-style between neighbors (sticky, easy); release locks the new order; same
+  model for minion bays. Two ASSUMED defaults flagged there if they're wrong: drop-outside-the-bar
+  snaps back (cancel), dragging a palette card onto the bar equips at the insertion point. Build to
+  that spec; only come back to Doug if something in it doesn't hold up in practice.
+
+**P3. Fix equipment reservation + the "everyone can activate their default kit" balance pass:**
+- **Equipment currently reserves nothing cumulatively.** Traced it: `Body.cs`'s equip-time checks
+  (`Capacity(item.Stat) < item.Reserve`, several call sites) gate each piece against RAW capacity only
+  — there's no running tally of what's already reserved by other equipped items, unlike techniques'
+  `_actives`/`Reserved(stat)`/`Available(stat)` accounting. Equipment needs the same kind of cumulative
+  reservation technique-activation already has correctly (§6/DESIGN_SPEC, new lock this pass).
+- **Regression, separately: techniques must NOT reserve attributes in the Equipment screen at all** —
+  only on in-combat ACTIVATION (DESIGN_SPEC lock added this pass, "Reservation timing"). Doug: this
+  used to be correct and has regressed silently. Encounter-time activation reservation is CONFIRMED
+  STILL WORKING today — don't touch that path, just strip whatever's making the Equipment screen
+  apply/show technique reservation.
+- **Balance pass:** scale race base attributes UP (keep each race's current RELATIVE STR/DEX/INT/CON
+  proportions — an Elf stays Elf-shaped, just bigger numbers) so every race×core combo can both equip
+  its full default kit AND activate every default-assigned technique simultaneously, with the
+  reservation fix above actually accounting cumulatively. This is explicitly a PROVISIONAL uniform-
+  playability baseline (Doug's words) — not a claim that every race/core should end up equally
+  capable long-term; it's so the team can actually play every combo far enough to judge whether racial
+  handicapping vs. baseline-equality is the right direction. Don't over-tune past "everything clears
+  the bar" for this pass.
+
+**Other bugs from this same pass, normal priority (not ahead of P1-P3, but don't lose them):**
+- **Techniques start fully charged at encounter start — should need to WARM UP** (start uncharged, on
+  their normal charge timer) rather than being instantly ready.
+- **Minions start ENABLED — should start DISABLED** (they consume a resource; an always-on default is
+  wasteful and wrong). Both of these are instances of the new "default activation state" LOCK in
+  DESIGN_SPEC (nothing charging/active by default, FTL parity) — build them as one consistent pass,
+  don't special-case techniques vs minions differently.
+
+**Then: all other bugs/debt in this file, business as usual for the loop.**
+
 ## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-03, Doug — Merchant only shows 2 of 3 wares sections;
 ## a 3rd appears once you buy out one of the visible two)
 Doug's screenshots show WEAPONS+ARMOR, then (after buying out Armor) WEAPONS+MINIONS — a 3rd stocked
@@ -19,8 +80,26 @@ slot — matching Doug's exact "buy one out and another appears" description. **
 (`CLAUDE_DESIGN_issues.md`) since layout.json regenerates externally; a local one-pixel patch here
 would just get overwritten on the next drop.
 
-## ⇒ BUG REPORT — HiFi, HIGH PRIORITY, NEEDS LIVE REPRO (2026-07-03, Doug — all text shifts upward
-## uniformly when the window is MAXIMIZED; windowed mode is correct)
+## ✅ FIXED (2026-07-04 loop) — background stays put, everything drawn over it shifts
+Doug refined the report: not text-specific — "anything on top of the background" shifts, screenshots
+confirmed on campaignmap and merchant (arrows: node/legend chrome adrift from the map's line art;
+wares grid and footer/purse floating away from the wall/skyline backdrop). **Root cause found by
+static read**: every screen's `*.scene`-bound backdrop element (`backdrop`, one per screen in
+layout.json) is authored `anchor:"Center"` with a size hardcoded to the base 16:9 design
+(`[960,540]`). `EnsureSceneMatchesBackbuffer` extends `_ui.DesignW`/`DesignH` past that base whenever
+the window's aspect isn't exactly 16:9 — true for almost any real monitor when maximized — and
+edge-anchored chrome correctly re-pins to the new real edges (§13 aspect-fill, working as designed).
+The backdrop's fixed-size box just recenters inside the bigger canvas instead of covering it: it
+stops moving while everything anchored to the real edges moves outward around it. Exactly Doug's
+symptom. Fixed in `Game1.ManifestRenderer.cs`: scene elements (the existing `.scene`-bind convention)
+now resolve to the full current design canvas (`ManifestUi.FullCanvasRect`) instead of their authored
+anchor/offset/size, in both `DrawManifestScreen` and `DrawManifestBackdrop`. Build clean, RB_SMOKE
+all-screens clean (no new collisions/overflow vs. baseline — smoke runs at the 16:9 base extent where
+old and new rects coincide, so it can't regress there), 350/350 tests green. **Needs Doug**: confirm
+live on an actual maximize — smoke can't drive a non-16:9 backbuffer to see the stretch itself.
+
+## (superseded by the fix above, kept for history) — HiFi BUG REPORT (2026-07-03, Doug — all text
+## shifts upward uniformly when the window is MAXIMIZED; windowed mode is correct)
 Doug: happens on "pretty much everywhere" (merchant wares, Equipment's core/technique/minion foot
 strip, others) — consistent, uniform upward shift specifically on maximize (not general resize; per
 STATUS history, resizing to other arbitrary sizes like 1600×1000 was previously verified clean, so
