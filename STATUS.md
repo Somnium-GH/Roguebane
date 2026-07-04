@@ -1219,7 +1219,14 @@ ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered 
 - No rallied-support lane in combat yet. Mouse is click+hover only (no drag-to-equip/tooltips/rebinding).
 - G1: skirmish foe-part-aim numbers placeholder — tune in play (campaign verified winnable).
 - Targeting-FSM bug (no clean repro yet): firing after a weapon charges while UNTARGETED misbehaves —
-  watch/fix as the targeting+firing FSM is refined.
+  watch/fix as the targeting+firing FSM is refined. **Investigated (2026-07-04 loop, 350 tests):** traced
+  `Caster.Step`/`Discharge` for the requireAim path — a Timered technique reaching `Countdown<=0` while
+  unaimed correctly HOLDS at zero (no decrement below it, no phantom fire), and the first `Step` after
+  `Aim()` discharges exactly once with a clean cooldown reset. New
+  `PlayerDoctrineChargesToReadyWhileUntargetedThenFiresCleanlyOnceAimed` (`CasterFiringTests.cs`) pins this.
+  No bug found in Core's FSM logic for this path — if the misbehavior is real, it's likely in the
+  `Game1.cs`/`CombatTargeting` render-shell layer (card-state chip reading, or a stale `Targeting` cursor),
+  not the discharge model itself. Still needs a live repro to pin down further.
 - Code ORGANIZATION (LOW-PRI — do NOT prioritize over HiFi): the `Game1.cs` uber-class was split (good),
   but the resulting classes lack a sensible FOLDER structure — organize into responsibility-based dirs
   (e.g. `Roguebane.Game/{Rendering,Screens,Input,Assets,...}`, `Roguebane.Core` by domain). Pure housekeeping;

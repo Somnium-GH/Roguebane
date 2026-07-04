@@ -53,6 +53,27 @@ public class CasterFiringTests
     }
 
     [Fact]
+    public void PlayerDoctrineChargesToReadyWhileUntargetedThenFiresCleanlyOnceAimed()
+    {
+        // Debt watch item: "firing after a weapon charges while UNTARGETED misbehaves" (no repro found
+        // yet). This pins the one Core-side path that could produce it: a player technique (requireAim)
+        // reaching Countdown<=0 with no aim must HOLD indefinitely (not skip/duplicate its cooldown), and
+        // the very next Step after being aimed must discharge exactly once with a clean cooldown reset.
+        var foe = new Foe("dummy", 1000);
+        var c = new Caster(Body(), foe, requireAim: true);
+        c.Activate(Techniques.Jab, auto: true); // player techs are always Auto:true; requireAim holds fire
+
+        for (var i = 0; i < 200; i++) c.Step(); // charges well past its cooldown, no aim yet
+        Assert.True(c.IsReady(Techniques.Jab));  // ready...
+        Assert.Equal(1000, foe.Hp);              // ...but untargeted -> never auto-fired
+
+        c.Aim(Techniques.Jab, foe);
+        c.Step(); // first tick after aiming
+        Assert.True(foe.Hp < 1000);              // fires cleanly, exactly once
+        Assert.False(c.IsReady(Techniques.Jab)); // cooldown reset, recharging again
+    }
+
+    [Fact]
     public void FireLandsOnTheTechniquesOwnAimNotTheDefaultFront()
     {
         var front = new Foe("front", 100);
