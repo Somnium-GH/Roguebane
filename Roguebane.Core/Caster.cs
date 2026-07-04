@@ -309,14 +309,20 @@ public sealed class Caster
         // §6c INT robe: +2 SPELL DAMAGE per worn sustained piece (2-piece cap) — damage only,
         // never heals (the Repair branch above stays unbuffed) and only INT-stat casts.
         var robe = run.Tech.Stat == Stat.Int ? _self.SpellDamageBonus : 0;
-        Hit(target, part, EffectivePower(run.Tech) + robe, run.Tech.ShieldPiercing);
+        // §10 wand redefinition: a cast consulting WANDS resolves by shield-SUBTRACTION — the
+        // standing pool blunts the damage without being consumed. (Dual wands are legal; a staff
+        // is 2H/no-dual so a mixed wand+staff consult can't arise.)
+        var consulted = _self.Consulted(run.Tech);
+        var wandCast = consulted.Count > 0 && consulted.All(w => w.Kind == WeaponKind.Wand);
+        Hit(target, part, EffectivePower(run.Tech) + robe, run.Tech.ShieldPiercing, wandCast);
         if (run.Tech.Kind == TechniqueKind.Timered) run.Countdown = EffectiveCooldown(run.Tech);
         return true;
     }
 
     // Apply a hit through the defender's §8 mitigation: a full EVASION dodge (§6c leather, global,
     // leg-gated) negates it, else a shield pool absorbs; whatever lands hits the part AND HP together.
-    private void Hit(ICombatTarget target, BodyPart? part, int power, bool pierce = false)
+    private void Hit(ICombatTarget target, BodyPart? part, int power, bool pierce = false,
+        bool subtract = false)
     {
         var frame = target.Frame;
         if (frame is not null && _rng is not null && _rng.Chance(frame.EvasionPercent()))
@@ -324,9 +330,11 @@ public sealed class Caster
 
         // §6b shields are the ONLY damage mitigation now (alongside a full evade above): points absorb
         // the hit before it lands. A SHIELD-PIERCING hit (Charge-fuelled) skips the pool entirely.
+        // A WAND cast (§10) SUBTRACTS the standing pool from its damage WITHOUT consuming it —
+        // big stacks blunt wands; wands chip through what stands.
         if (frame is not null && !pierce)
         {
-            power = frame.AbsorbShields(power);
+            power = subtract ? Math.Max(0, power - frame.ShieldPoints) : frame.AbsorbShields(power);
             if (power <= 0) return;
         }
 

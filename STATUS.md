@@ -267,8 +267,9 @@ interpreter, no per-weapon classes):**
 2. ~~Timer-multiplier~~ DONE (2026-07-03 loop, 327 tests: EffectiveCooldown scales by the
    consulted weapons' AVERAGE timer on top of DEX haste — both knobs on one counter, balance-pass
    tunes the interaction; self-contained techniques untouched).
-3. Wand shield-subtraction resolution in combat (damage − standing shield count, pool unconsumed,
-   remainder = normal part+HP hit; economy math ASSERTED in tests per CLAUDE.md).
+3. ~~Wand shield-subtraction~~ DONE (2026-07-03 loop, 332 tests: a cast whose consulted weapons
+   are ALL wands resolves damage − standing pool, pool UNCONSUMED, remainder = normal part+HP
+   hit; the spec's own 6-vs-4 example asserted, full blunt asserted, melee contrast asserted).
 4. Magic-offhand bonus hooks (minion attack ×, spell damage ×) reading the equipped offhand tier.
 5. Staff/wand equip-rule wiring into the §6e validation (wand↔ranged mutual exclusion; staff =
    shield-equivalent for ranged-block + no-shield).
