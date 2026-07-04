@@ -48,6 +48,12 @@ globalThis.RB_generateSheets = async function (H, only) {
           files: ['skeleton.png', 'golem.png', 'hound.png', 'imp.png', 'wisp.png'] },
         { head: 'GEAR — WEAPONS & SHIELDS (Content/sprites/gear)', root: 'Content/sprites/gear/',
           files: ['sword.png', 'club.png', 'dagger.png', 'staff.png', 'round_shield.png', 'tower_shield.png'] },
+        { head: 'B2-GO — WEAPON TYPES (Steel tier shown; Iron/Mithral/Dwarven Steel are palette swaps)', root: 'Content/sprites/gear/',
+          files: ['longsword_steel.png', 'claymore_steel.png', 'axe_steel.png', 'battleaxe_steel.png', 'mace_steel.png', 'warhammer_steel.png', 'dagger_steel.png', 'rapier_steel.png', 'shortsword_steel.png'] },
+        { head: 'B2-GO — NEW FAMILIES + SHIELD LADDER', root: 'Content/sprites/gear/',
+          files: ['sling_braided.png', 'staff_ornate.png', 'charm_ornate.png', 'tome_ornate.png', 'wand_gemstone.png', 'shield_wooden.png', 'shield_buckler.png', 'shield_kite.png', 'shield_tower.png'] },
+        { head: 'B2-GO — ARMOR ICONS (one tier per line shown: STR=Steel, DEX=Hardened, INT=Silk)', root: 'Content/sprites/gear/',
+          files: ['armor_str_head_steel.png', 'armor_str_chest_steel.png', 'armor_str_arms_steel.png', 'armor_str_legs_steel.png', 'armor_dex_head_hardened.png', 'armor_dex_chest_hardened.png', 'armor_int_chest_silk.png', 'armor_int_head_silk.png'] },
       ],
     },
     parts: {

@@ -113,6 +113,63 @@ Six gear PNGs from `proto/roster_gen.js`, each mounted by aligning its `gear.<id
 | `sprites/gear/tower_shield` | royal tower shield | Combat, Build | off-hand socket | hi-fi |
 | `sprites/gear/bow` | 3-segment recurve silhouette + taut string (Ranger's DEX weapon — shield-ignoring, one-handed grip only) | Combat, Build | hand socket | hi-fi |
 
+## sprites/gear/ — B2-GO weapon tiers, new item families, armor icons, shield ladder (DESIGN_SPEC §6c/§6d)
+
+Generator-produced (`proto/roster_gen.js`, same `GEAR` pipeline as the six original gear PNGs above,
+never hand-authored). 100 new PNGs; pivots live in `Content/layout.json` `gear.<id>`; a parallel
+`Content/gear_catalog.json` lists `{id,name,attr,slot,tier}` for content authors (card copy). **This
+batch is inventory/card-icon art** — actually WEARING armor on the figure (a body-layer overlay per
+slot) is a separate, not-yet-built "morph" system (see `DEV_LOOP_MEMORY.md`); these icons are the same
+kind of standalone PNG as `sword`/`round_shield` above, just not yet hand-socket-mounted for the new
+weapon types either (mounts still reference the base `sword`/`dagger`/`bow`/`staff` ids — tier-specific
+mounting is a game-state concern for later, not a generator gap).
+
+**Melee weapon TYPES** — ONE silhouette per type, palette-swapped across the 4 STR material tiers
+(`Iron → Steel → Mithral → Dwarven Steel`, ids `_iron/_steel/_mithral/_dwarven`), per §6d's locked
+type roster:
+
+| type | id prefix | hand | slot | notes |
+|---|---|---|---|---|
+| Longsword | `longsword_` | STR | 1H | straight blade, standard guard |
+| Axe | `axe_` | STR | 1H | single-bit wedge head |
+| Mace | `mace_` | STR | 1H | flanged disc head |
+| Claymore | `claymore_` | STR | 2H | longer/wider blade, bigger guard |
+| Battleaxe | `battleaxe_` | STR | 2H | double-bit head |
+| Warhammer | `warhammer_` | STR | 2H | larger flanged head |
+| Dagger | `dagger_` | DEX | 1H | short blade (distinct from the original mounted `dagger`) |
+| Rapier | `rapier_` | DEX | 1H | thin, long blade, narrow guard |
+| Short Sword | `shortsword_` | DEX | 1H | medium blade |
+
+**New gear families** (own 4-tier ladders, magic items glow ONLY on the top tier per the "tier-4
+signature" rule — mundane gear never glows):
+
+| family | id prefix | ladder | hand | notes |
+|---|---|---|---|---|
+| Sling | `sling_` | Shepherd's → Braided → Sinew → Giantsbane | DEX, 1H | pairs with a shield (§6d) |
+| Staff | `staff_` | Wooden → Twisted → Ornate → Humming | INT, 2H | tiered version of the original `staff` |
+| Charm | `charm_` | Wooden → Bone → Ornate → Humming | INT, OFF | magic offhand |
+| Tome | `tome_` | Old Worn → Leather → Ornate → Glowing | INT, OFF | magic offhand |
+| Wand | `wand_` | Adept → Twisted → Gemstone → Glowing | INT, HAND | **NEW: wands are hand items now** (§6d) — dual-wieldable, never with a bow/sling |
+
+**CON shield object ladder** (`shield_wooden` / `shield_buckler` / `shield_kite` / `shield_tower`) —
+reuses the existing `round_shield`/`tower_shield` silhouette family at escalating size/material; the
+figure-mount ids `round_shield`/`tower_shield` above are unchanged (default mounts).
+
+**Armor icons** (`armor_<line>_<slot>_<tier>`) — STR heavy plate (renamed per §6c: Head=Helm,
+Chest=Breastplate, Arms=Vambraces, Legs=Greaves — **the old Skull Cap/Barbute/etc. names are
+retired, do not regenerate under them**) × 4 metal tiers; DEX leather (same 4 slots) × 4 leather
+tiers (Leather/Hardened/Studded/Reinforced); INT robe (Chest+Head ONLY, no arm/leg robe pieces per
+§6c) × 4 cloth tiers (Cotton/Silk/Ornate/Humming). `armor_str_*`, `armor_dex_*`, `armor_int_*`.
+
+**Ranged BACK-MOUNT socket (§6d/§17 #22):** every figure now emits a `sockets.back` point (over the
+shoulder blades) in `layout.json` — a DATA addition, not new art — so the engine can render an
+equipped bow/sling there when melee hands are already full. No back-mount art exists yet; this is
+the socket the engine mounts against once it draws one.
+
+**Also this batch:** `elf_ranger`'s (and `human_ranger`'s, sharing the same core-rune spec) chest
+quiver-strap moved down off the neckline (was crowding/fusing with the head) to mid-chest, matching
+the warden's chest-emblem placement.
+
 ## sprites/minion/ — summon creatures (generator-produced, single flat-bevel sprites)
 
 Whole-sprite minions from `proto/roster_gen.js` (the `MIN.*` specs), same locked idiom as the

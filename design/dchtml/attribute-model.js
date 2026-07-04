@@ -21,8 +21,8 @@ export const DEBUFF = { STR: 0,  INT: 2, DEX: 0, CON: 0 };  // temporary debuff:
 
 export const GEAR = [
   { name: 'Sword',           attr: 'STR', cost: 3, rarity: 'EPIC' },
-  { name: 'Steel Helmet',    attr: 'STR', cost: 2, rarity: 'RARE' },
-  { name: 'Plate',           attr: 'STR', cost: 3, rarity: 'EPIC' },
+  { name: 'Steel Helm',      attr: 'STR', cost: 2, rarity: 'RARE' },   // §6c rename: old "Steel Helmet" retired
+  { name: 'Steel Breastplate', attr: 'STR', cost: 3, rarity: 'EPIC' }, // §6c rename: old "Plate" retired
   { name: 'Wooden Shield',   attr: 'CON', cost: 2, rarity: 'MAGIC' },
   { name: 'Steel Vambraces', attr: 'STR', cost: 3, rarity: 'COMMON', part: 'armL' },
   { name: 'Iron Greaves',    attr: 'STR', cost: 3, rarity: 'MAGIC',  part: 'legL' },

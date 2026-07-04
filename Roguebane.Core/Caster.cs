@@ -173,11 +173,17 @@ public sealed class Caster
 
     // DEX haste shortens a technique's cooldown a modest % per point, capped (non-OP). Quoted in
     // ticks at the 10/sec combat clock. Read live so a smashed leg (DEX drop) slows you back down.
+    // §6d: the consulting weapon's TIMER multiplies the charge timer on top (<1.0x = faster;
+    // dual-wield = the AVERAGE of both weapons') — self-contained techniques are untouched; the
+    // haste x timer interaction is a balance-pass knob, both simply scale the same counter.
     public int EffectiveCooldown(Technique t)
     {
         if (t.Cooldown <= 0) return t.Cooldown;
         var haste = Math.Min(HasteCap, _self.Capacity(Stat.Dex) * HasteRate);
-        return Math.Max(1, t.Cooldown * (100 - haste) / 100);
+        var ticks = t.Cooldown * (100 - haste) / 100.0;
+        var consulted = _self.Consulted(t);
+        if (consulted.Count > 0) ticks *= consulted.Average(w => w.Timer);
+        return Math.Max(1, (int)Math.Round(ticks, MidpointRounding.AwayFromZero));
     }
 
     // Engine primitive (NOT the player AUTO toggle): auto defaults ON so any caster discharges on

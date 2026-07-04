@@ -1,0 +1,702 @@
+[
+  {
+    "id": "longsword_iron",
+    "name": "Iron Longsword",
+    "attr": "STR",
+    "slot": "1H",
+    "tier": "iron"
+  },
+  {
+    "id": "longsword_steel",
+    "name": "Steel Longsword",
+    "attr": "STR",
+    "slot": "1H",
+    "tier": "steel"
+  },
+  {
+    "id": "longsword_mithral",
+    "name": "Mithral Longsword",
+    "attr": "STR",
+    "slot": "1H",
+    "tier": "mithral"
+  },
+  {
+    "id": "longsword_dwarven",
+    "name": "Dwarven Steel Longsword",
+    "attr": "STR",
+    "slot": "1H",
+    "tier": "dwarven"
+  },
+  {
+    "id": "axe_iron",
+    "name": "Iron Axe",
+    "attr": "STR",
+    "slot": "1H",
+    "tier": "iron"
+  },
+  {
+    "id": "axe_steel",
+    "name": "Steel Axe",
+    "attr": "STR",
+    "slot": "1H",
+    "tier": "steel"
+  },
+  {
+    "id": "axe_mithral",
+    "name": "Mithral Axe",
+    "attr": "STR",
+    "slot": "1H",
+    "tier": "mithral"
+  },
+  {
+    "id": "axe_dwarven",
+    "name": "Dwarven Steel Axe",
+    "attr": "STR",
+    "slot": "1H",
+    "tier": "dwarven"
+  },
+  {
+    "id": "mace_iron",
+    "name": "Iron Mace",
+    "attr": "STR",
+    "slot": "1H",
+    "tier": "iron"
+  },
+  {
+    "id": "mace_steel",
+    "name": "Steel Mace",
+    "attr": "STR",
+    "slot": "1H",
+    "tier": "steel"
+  },
+  {
+    "id": "mace_mithral",
+    "name": "Mithral Mace",
+    "attr": "STR",
+    "slot": "1H",
+    "tier": "mithral"
+  },
+  {
+    "id": "mace_dwarven",
+    "name": "Dwarven Steel Mace",
+    "attr": "STR",
+    "slot": "1H",
+    "tier": "dwarven"
+  },
+  {
+    "id": "claymore_iron",
+    "name": "Iron Claymore",
+    "attr": "STR",
+    "slot": "2H",
+    "tier": "iron"
+  },
+  {
+    "id": "claymore_steel",
+    "name": "Steel Claymore",
+    "attr": "STR",
+    "slot": "2H",
+    "tier": "steel"
+  },
+  {
+    "id": "claymore_mithral",
+    "name": "Mithral Claymore",
+    "attr": "STR",
+    "slot": "2H",
+    "tier": "mithral"
+  },
+  {
+    "id": "claymore_dwarven",
+    "name": "Dwarven Steel Claymore",
+    "attr": "STR",
+    "slot": "2H",
+    "tier": "dwarven"
+  },
+  {
+    "id": "battleaxe_iron",
+    "name": "Iron Battleaxe",
+    "attr": "STR",
+    "slot": "2H",
+    "tier": "iron"
+  },
+  {
+    "id": "battleaxe_steel",
+    "name": "Steel Battleaxe",
+    "attr": "STR",
+    "slot": "2H",
+    "tier": "steel"
+  },
+  {
+    "id": "battleaxe_mithral",
+    "name": "Mithral Battleaxe",
+    "attr": "STR",
+    "slot": "2H",
+    "tier": "mithral"
+  },
+  {
+    "id": "battleaxe_dwarven",
+    "name": "Dwarven Steel Battleaxe",
+    "attr": "STR",
+    "slot": "2H",
+    "tier": "dwarven"
+  },
+  {
+    "id": "warhammer_iron",
+    "name": "Iron Warhammer",
+    "attr": "STR",
+    "slot": "2H",
+    "tier": "iron"
+  },
+  {
+    "id": "warhammer_steel",
+    "name": "Steel Warhammer",
+    "attr": "STR",
+    "slot": "2H",
+    "tier": "steel"
+  },
+  {
+    "id": "warhammer_mithral",
+    "name": "Mithral Warhammer",
+    "attr": "STR",
+    "slot": "2H",
+    "tier": "mithral"
+  },
+  {
+    "id": "warhammer_dwarven",
+    "name": "Dwarven Steel Warhammer",
+    "attr": "STR",
+    "slot": "2H",
+    "tier": "dwarven"
+  },
+  {
+    "id": "dagger_iron",
+    "name": "Iron Dagger",
+    "attr": "DEX",
+    "slot": "1H",
+    "tier": "iron"
+  },
+  {
+    "id": "dagger_steel",
+    "name": "Steel Dagger",
+    "attr": "DEX",
+    "slot": "1H",
+    "tier": "steel"
+  },
+  {
+    "id": "dagger_mithral",
+    "name": "Mithral Dagger",
+    "attr": "DEX",
+    "slot": "1H",
+    "tier": "mithral"
+  },
+  {
+    "id": "dagger_dwarven",
+    "name": "Dwarven Steel Dagger",
+    "attr": "DEX",
+    "slot": "1H",
+    "tier": "dwarven"
+  },
+  {
+    "id": "rapier_iron",
+    "name": "Iron Rapier",
+    "attr": "DEX",
+    "slot": "1H",
+    "tier": "iron"
+  },
+  {
+    "id": "rapier_steel",
+    "name": "Steel Rapier",
+    "attr": "DEX",
+    "slot": "1H",
+    "tier": "steel"
+  },
+  {
+    "id": "rapier_mithral",
+    "name": "Mithral Rapier",
+    "attr": "DEX",
+    "slot": "1H",
+    "tier": "mithral"
+  },
+  {
+    "id": "rapier_dwarven",
+    "name": "Dwarven Steel Rapier",
+    "attr": "DEX",
+    "slot": "1H",
+    "tier": "dwarven"
+  },
+  {
+    "id": "shortsword_iron",
+    "name": "Iron Short Sword",
+    "attr": "DEX",
+    "slot": "1H",
+    "tier": "iron"
+  },
+  {
+    "id": "shortsword_steel",
+    "name": "Steel Short Sword",
+    "attr": "DEX",
+    "slot": "1H",
+    "tier": "steel"
+  },
+  {
+    "id": "shortsword_mithral",
+    "name": "Mithral Short Sword",
+    "attr": "DEX",
+    "slot": "1H",
+    "tier": "mithral"
+  },
+  {
+    "id": "shortsword_dwarven",
+    "name": "Dwarven Steel Short Sword",
+    "attr": "DEX",
+    "slot": "1H",
+    "tier": "dwarven"
+  },
+  {
+    "id": "sling_shepherds",
+    "name": "Shepherd's Sling",
+    "attr": "DEX",
+    "slot": "1H",
+    "tier": "shepherds"
+  },
+  {
+    "id": "sling_braided",
+    "name": "Braided Sling",
+    "attr": "DEX",
+    "slot": "1H",
+    "tier": "braided"
+  },
+  {
+    "id": "sling_sinew",
+    "name": "Sinew Sling",
+    "attr": "DEX",
+    "slot": "1H",
+    "tier": "sinew"
+  },
+  {
+    "id": "sling_giantsbane",
+    "name": "Giantsbane Sling",
+    "attr": "DEX",
+    "slot": "1H",
+    "tier": "giantsbane"
+  },
+  {
+    "id": "staff_wooden",
+    "name": "Wooden Staff",
+    "attr": "INT",
+    "slot": "2H",
+    "tier": "wooden"
+  },
+  {
+    "id": "staff_twisted",
+    "name": "Twisted Staff",
+    "attr": "INT",
+    "slot": "2H",
+    "tier": "twisted"
+  },
+  {
+    "id": "staff_ornate",
+    "name": "Ornate Staff",
+    "attr": "INT",
+    "slot": "2H",
+    "tier": "ornate"
+  },
+  {
+    "id": "staff_humming",
+    "name": "Humming Staff",
+    "attr": "INT",
+    "slot": "2H",
+    "tier": "humming"
+  },
+  {
+    "id": "charm_wooden",
+    "name": "Wooden Charm",
+    "attr": "INT",
+    "slot": "OFF",
+    "tier": "wooden"
+  },
+  {
+    "id": "charm_bone",
+    "name": "Bone Charm",
+    "attr": "INT",
+    "slot": "OFF",
+    "tier": "bone"
+  },
+  {
+    "id": "charm_ornate",
+    "name": "Ornate Charm",
+    "attr": "INT",
+    "slot": "OFF",
+    "tier": "ornate"
+  },
+  {
+    "id": "charm_humming",
+    "name": "Humming Charm",
+    "attr": "INT",
+    "slot": "OFF",
+    "tier": "humming"
+  },
+  {
+    "id": "tome_oldworn",
+    "name": "Old Worn Tome",
+    "attr": "INT",
+    "slot": "OFF",
+    "tier": "oldworn"
+  },
+  {
+    "id": "tome_leather",
+    "name": "Leather Tome",
+    "attr": "INT",
+    "slot": "OFF",
+    "tier": "leather"
+  },
+  {
+    "id": "tome_ornate",
+    "name": "Ornate Tome",
+    "attr": "INT",
+    "slot": "OFF",
+    "tier": "ornate"
+  },
+  {
+    "id": "tome_glowing",
+    "name": "Glowing Tome",
+    "attr": "INT",
+    "slot": "OFF",
+    "tier": "glowing"
+  },
+  {
+    "id": "wand_adept",
+    "name": "Adept Wand",
+    "attr": "INT",
+    "slot": "HAND",
+    "tier": "adept"
+  },
+  {
+    "id": "wand_twisted",
+    "name": "Twisted Wand",
+    "attr": "INT",
+    "slot": "HAND",
+    "tier": "twisted"
+  },
+  {
+    "id": "wand_gemstone",
+    "name": "Gemstone Wand",
+    "attr": "INT",
+    "slot": "HAND",
+    "tier": "gemstone"
+  },
+  {
+    "id": "wand_glowing",
+    "name": "Glowing Wand",
+    "attr": "INT",
+    "slot": "HAND",
+    "tier": "glowing"
+  },
+  {
+    "id": "armor_str_head_iron",
+    "name": "Iron Helm",
+    "attr": "STR",
+    "slot": "str_head",
+    "tier": "iron"
+  },
+  {
+    "id": "armor_str_head_steel",
+    "name": "Steel Helm",
+    "attr": "STR",
+    "slot": "str_head",
+    "tier": "steel"
+  },
+  {
+    "id": "armor_str_head_mithral",
+    "name": "Mithral Helm",
+    "attr": "STR",
+    "slot": "str_head",
+    "tier": "mithral"
+  },
+  {
+    "id": "armor_str_head_dwarven",
+    "name": "Dwarven Steel Helm",
+    "attr": "STR",
+    "slot": "str_head",
+    "tier": "dwarven"
+  },
+  {
+    "id": "armor_str_chest_iron",
+    "name": "Iron Breastplate",
+    "attr": "STR",
+    "slot": "str_chest",
+    "tier": "iron"
+  },
+  {
+    "id": "armor_str_chest_steel",
+    "name": "Steel Breastplate",
+    "attr": "STR",
+    "slot": "str_chest",
+    "tier": "steel"
+  },
+  {
+    "id": "armor_str_chest_mithral",
+    "name": "Mithral Breastplate",
+    "attr": "STR",
+    "slot": "str_chest",
+    "tier": "mithral"
+  },
+  {
+    "id": "armor_str_chest_dwarven",
+    "name": "Dwarven Steel Breastplate",
+    "attr": "STR",
+    "slot": "str_chest",
+    "tier": "dwarven"
+  },
+  {
+    "id": "armor_str_arms_iron",
+    "name": "Iron Vambraces",
+    "attr": "STR",
+    "slot": "str_arms",
+    "tier": "iron"
+  },
+  {
+    "id": "armor_str_arms_steel",
+    "name": "Steel Vambraces",
+    "attr": "STR",
+    "slot": "str_arms",
+    "tier": "steel"
+  },
+  {
+    "id": "armor_str_arms_mithral",
+    "name": "Mithral Vambraces",
+    "attr": "STR",
+    "slot": "str_arms",
+    "tier": "mithral"
+  },
+  {
+    "id": "armor_str_arms_dwarven",
+    "name": "Dwarven Steel Vambraces",
+    "attr": "STR",
+    "slot": "str_arms",
+    "tier": "dwarven"
+  },
+  {
+    "id": "armor_str_legs_iron",
+    "name": "Iron Greaves",
+    "attr": "STR",
+    "slot": "str_legs",
+    "tier": "iron"
+  },
+  {
+    "id": "armor_str_legs_steel",
+    "name": "Steel Greaves",
+    "attr": "STR",
+    "slot": "str_legs",
+    "tier": "steel"
+  },
+  {
+    "id": "armor_str_legs_mithral",
+    "name": "Mithral Greaves",
+    "attr": "STR",
+    "slot": "str_legs",
+    "tier": "mithral"
+  },
+  {
+    "id": "armor_str_legs_dwarven",
+    "name": "Dwarven Steel Greaves",
+    "attr": "STR",
+    "slot": "str_legs",
+    "tier": "dwarven"
+  },
+  {
+    "id": "armor_dex_head_plain",
+    "name": "Leather Leather Cap",
+    "attr": "DEX",
+    "slot": "dex_head",
+    "tier": "plain"
+  },
+  {
+    "id": "armor_dex_head_hardened",
+    "name": "Hardened Leather Cap",
+    "attr": "DEX",
+    "slot": "dex_head",
+    "tier": "hardened"
+  },
+  {
+    "id": "armor_dex_head_studded",
+    "name": "Studded Leather Cap",
+    "attr": "DEX",
+    "slot": "dex_head",
+    "tier": "studded"
+  },
+  {
+    "id": "armor_dex_head_reinforced",
+    "name": "Reinforced Leather Cap",
+    "attr": "DEX",
+    "slot": "dex_head",
+    "tier": "reinforced"
+  },
+  {
+    "id": "armor_dex_chest_plain",
+    "name": "Leather Leather Armor",
+    "attr": "DEX",
+    "slot": "dex_chest",
+    "tier": "plain"
+  },
+  {
+    "id": "armor_dex_chest_hardened",
+    "name": "Hardened Leather Armor",
+    "attr": "DEX",
+    "slot": "dex_chest",
+    "tier": "hardened"
+  },
+  {
+    "id": "armor_dex_chest_studded",
+    "name": "Studded Leather Armor",
+    "attr": "DEX",
+    "slot": "dex_chest",
+    "tier": "studded"
+  },
+  {
+    "id": "armor_dex_chest_reinforced",
+    "name": "Reinforced Leather Armor",
+    "attr": "DEX",
+    "slot": "dex_chest",
+    "tier": "reinforced"
+  },
+  {
+    "id": "armor_dex_arms_plain",
+    "name": "Leather Leather Bracers",
+    "attr": "DEX",
+    "slot": "dex_arms",
+    "tier": "plain"
+  },
+  {
+    "id": "armor_dex_arms_hardened",
+    "name": "Hardened Leather Bracers",
+    "attr": "DEX",
+    "slot": "dex_arms",
+    "tier": "hardened"
+  },
+  {
+    "id": "armor_dex_arms_studded",
+    "name": "Studded Leather Bracers",
+    "attr": "DEX",
+    "slot": "dex_arms",
+    "tier": "studded"
+  },
+  {
+    "id": "armor_dex_arms_reinforced",
+    "name": "Reinforced Leather Bracers",
+    "attr": "DEX",
+    "slot": "dex_arms",
+    "tier": "reinforced"
+  },
+  {
+    "id": "armor_dex_legs_plain",
+    "name": "Leather Leather Leggings",
+    "attr": "DEX",
+    "slot": "dex_legs",
+    "tier": "plain"
+  },
+  {
+    "id": "armor_dex_legs_hardened",
+    "name": "Hardened Leather Leggings",
+    "attr": "DEX",
+    "slot": "dex_legs",
+    "tier": "hardened"
+  },
+  {
+    "id": "armor_dex_legs_studded",
+    "name": "Studded Leather Leggings",
+    "attr": "DEX",
+    "slot": "dex_legs",
+    "tier": "studded"
+  },
+  {
+    "id": "armor_dex_legs_reinforced",
+    "name": "Reinforced Leather Leggings",
+    "attr": "DEX",
+    "slot": "dex_legs",
+    "tier": "reinforced"
+  },
+  {
+    "id": "armor_int_chest_cotton",
+    "name": "Cotton Robe",
+    "attr": "INT",
+    "slot": "int_chest",
+    "tier": "cotton"
+  },
+  {
+    "id": "armor_int_chest_silk",
+    "name": "Silk Robe",
+    "attr": "INT",
+    "slot": "int_chest",
+    "tier": "silk"
+  },
+  {
+    "id": "armor_int_chest_ornate",
+    "name": "Ornate Robe",
+    "attr": "INT",
+    "slot": "int_chest",
+    "tier": "ornate"
+  },
+  {
+    "id": "armor_int_chest_humming",
+    "name": "Humming Robe",
+    "attr": "INT",
+    "slot": "int_chest",
+    "tier": "humming"
+  },
+  {
+    "id": "armor_int_head_cotton",
+    "name": "Cotton Hood",
+    "attr": "INT",
+    "slot": "int_head",
+    "tier": "cotton"
+  },
+  {
+    "id": "armor_int_head_silk",
+    "name": "Silk Hood",
+    "attr": "INT",
+    "slot": "int_head",
+    "tier": "silk"
+  },
+  {
+    "id": "armor_int_head_ornate",
+    "name": "Ornate Hood",
+    "attr": "INT",
+    "slot": "int_head",
+    "tier": "ornate"
+  },
+  {
+    "id": "armor_int_head_humming",
+    "name": "Humming Hood",
+    "attr": "INT",
+    "slot": "int_head",
+    "tier": "humming"
+  },
+  {
+    "id": "shield_wooden",
+    "name": "Wooden Shield",
+    "attr": "CON",
+    "slot": "SHIELD",
+    "tier": "t1"
+  },
+  {
+    "id": "shield_buckler",
+    "name": "Iron Buckler",
+    "attr": "CON",
+    "slot": "SHIELD",
+    "tier": "t2"
+  },
+  {
+    "id": "shield_kite",
+    "name": "Kite Shield",
+    "attr": "CON",
+    "slot": "SHIELD",
+    "tier": "t3"
+  },
+  {
+    "id": "shield_tower",
+    "name": "Tower Shield",
+    "attr": "CON",
+    "slot": "SHIELD",
+    "tier": "t4"
+  }
+]

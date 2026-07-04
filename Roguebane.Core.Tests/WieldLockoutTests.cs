@@ -44,6 +44,32 @@ public class WieldLockoutTests
     }
 
     [Fact]
+    public void WeaponTimerScalesTheChargeTimerAndDualWieldAverages()
+    {
+        // §6d: the consulting weapon's timer multiplies the technique's CHARGE timer
+        // (<1.0 = faster); dual-wield averages both. Self-contained techniques never scale.
+        // Arms-only body: zero DEX keeps haste out of the arithmetic.
+        var b = new Body();
+        b.Add(new BodyPart("armL", Stat.Str, 3));
+        b.Add(new BodyPart("armR", Stat.Str, 3));
+        var fast = new Weapon("w-fast", Stat.Str, 1, 1, Timer: 0.6);
+        var slow = new Weapon("w-slow", Stat.Str, 1, 1, Timer: 1.4);
+        var c = new Caster(b, new Foe("f", 100));
+
+        var primary = new Technique("p", Stat.Str, 0, TechniqueKind.Timered, Cooldown: 10,
+            Power: 0, Consults: WeaponUse.Primary);
+        var dual = new Technique("d", Stat.Str, 0, TechniqueKind.Timered, Cooldown: 10,
+            Power: 0, Consults: WeaponUse.Both);
+        var self = new Technique("s", Stat.Str, 1, TechniqueKind.Timered, Cooldown: 10, Power: 1);
+
+        Assert.True(b.Wield(fast));
+        Assert.Equal(6, c.EffectiveCooldown(primary));  // 10 x 0.6
+        Assert.True(b.Wield(slow));
+        Assert.Equal(10, c.EffectiveCooldown(dual));    // 10 x avg(0.6, 1.4) = 10
+        Assert.Equal(10, c.EffectiveCooldown(self));    // self-contained: untouched
+    }
+
+    [Fact]
     public void BodiesWithoutArmsDoNotGate()
     {
         var b = new Body();

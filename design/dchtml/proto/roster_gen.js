@@ -112,6 +112,168 @@ function generateAll(createCanvas) {
     paint(g, rect(cx + 2, topY, cx + 2, topY + len - 1), C.dark, C.darkSh);                                 // taut bowstring
   }
 
+  // ============ B2-GO: MATERIAL TIER LADDERS (DESIGN_SPEC §6c/§6d) ============
+  // Same silhouette per weapon TYPE / armor SLOT across all 4 tiers — palette swap ONLY, per
+  // ART_RULES + §6c ("STR's per-tier bonus is part-damage mitigation, NOT reshaped art").
+  const METAL = {
+    iron:    { base: [132,134,140], sh: [92,94,100],   label: 'Iron' },
+    steel:   { base: C.blade,       sh: C.bladeSh,      label: 'Steel' },
+    mithral: { base: [214,226,238], sh: [166,182,200], label: 'Mithral' },
+    dwarven: { base: [88,100,136],  sh: [56,66,96],     label: 'Dwarven Steel' },
+  };
+  const METAL_ORDER = ['iron', 'steel', 'mithral', 'dwarven'];
+  // DEX leather ladder (Head/Chest/Arms/Legs) — deepening browns; the shadow tone reads as stud rivets.
+  const LEATHER = {
+    plain:      { base: [150,110,64], sh: [108,78,44], label: 'Leather' },
+    hardened:   { base: [130,92,52],  sh: [92,64,34],  label: 'Hardened' },
+    studded:    { base: [112,78,44],  sh: [78,52,26],  label: 'Studded' },
+    reinforced: { base: [96,66,36],   sh: [64,42,20],  label: 'Reinforced' },
+  };
+  const LEATHER_ORDER = ['plain', 'hardened', 'studded', 'reinforced'];
+  // INT robe ladder (Chest+Head only) — cloth deepening toward a faint arcane-blue top tier.
+  const ROBE = {
+    cotton:  { base: [196,188,168], sh: [150,142,124], label: 'Cotton' },
+    silk:    { base: [150,140,196], sh: [110,102,150], label: 'Silk' },
+    ornate:  { base: [124,108,188], sh: [88,76,140],   label: 'Ornate' },
+    humming: { base: [108,150,214], sh: [72,108,168],  label: 'Humming', glow: true },
+  };
+  const ROBE_ORDER = ['cotton', 'silk', 'ornate', 'humming'];
+  // Magic-item ladders (Sling/Staff/Charm/Tome/Wand) — each family's OWN four adjectives; mundane
+  // tiers stay flat-material, ONLY the top tier gets a faint glow tint (the "tier-4 signature" rule:
+  // magic gear's top adjective is supernatural — Humming/Glowing — mundane gear's is not).
+  const SLING_TIER = {   // Shepherd's -> Braided -> Sinew -> Giantsbane (leather/cord, no glow — mundane)
+    shepherds:  { base: [150,110,64], sh: [108,78,44], label: "Shepherd's" },
+    braided:    { base: [124,92,54],  sh: [88,64,36],  label: 'Braided' },
+    sinew:      { base: [196,188,168],sh: [150,142,124],label: 'Sinew' },
+    giantsbane: { base: [96,66,36],   sh: [64,42,20],  label: "Giantsbane" },
+  };
+  const SLING_ORDER = ['shepherds', 'braided', 'sinew', 'giantsbane'];
+  const STAFF_TIER = {   // Wooden -> Twisted -> Ornate -> Humming (magic — top tier glows)
+    wooden:  { base: C.wood,       sh: C.woodSh,       label: 'Wooden', orb: C.teal },
+    twisted: { base: [126,92,56],  sh: [90,64,36],     label: 'Twisted', orb: C.teal },
+    ornate:  { base: C.gold,       sh: C.goldSh,       label: 'Ornate', orb: [150,196,214] },
+    humming: { base: [108,150,214],sh: [72,108,168],   label: 'Humming', orb: [190,230,255], glow: true },
+  };
+  const STAFF_ORDER = ['wooden', 'twisted', 'ornate', 'humming'];
+  const CHARM_TIER = {   // Wooden -> Bone -> Ornate -> Humming (magic — top tier glows)
+    wooden:  { base: C.wood, sh: C.woodSh, label: 'Wooden' },
+    bone:    { base: C.bone, sh: C.boneSh, label: 'Bone' },
+    ornate:  { base: C.gold, sh: C.goldSh, label: 'Ornate' },
+    humming: { base: [108,150,214], sh: [72,108,168], label: 'Humming', glow: true },
+  };
+  const CHARM_ORDER = ['wooden', 'bone', 'ornate', 'humming'];
+  const TOME_TIER = {   // Old Worn -> Leather -> Ornate -> Glowing (magic — top tier glows)
+    oldworn: { base: [150,110,64], sh: [108,78,44], label: 'Old Worn' },
+    leather: { base: [112,78,44],  sh: [78,52,26],  label: 'Leather' },
+    ornate:  { base: C.gold,       sh: C.goldSh,     label: 'Ornate' },
+    glowing: { base: [108,150,214],sh: [72,108,168], label: 'Glowing', glow: true },
+  };
+  const TOME_ORDER = ['oldworn', 'leather', 'ornate', 'glowing'];
+  const WAND_TIER = {   // Adept -> Twisted -> Gemstone -> Glowing (unchanged existing ladder, magic)
+    adept:    { base: C.wood,        sh: C.woodSh,        label: 'Adept', orb: C.teal },
+    twisted:  { base: [126,92,56],   sh: [90,64,36],      label: 'Twisted', orb: C.teal },
+    gemstone: { base: C.summ,        sh: C.summSh,        label: 'Gemstone', orb: C.gold },
+    glowing:  { base: [108,150,214], sh: [72,108,168],    label: 'Glowing', orb: [190,230,255], glow: true },
+  };
+  const WAND_ORDER = ['adept', 'twisted', 'gemstone', 'glowing'];
+
+  // ---- weapon TYPE silhouettes (one per type; length/width vary, palette is the only tier axis) ----
+  function bladeSil(g, cx, topY, len, halfW, guardHalfW, gripLen, base, sh, twoHand) {
+    paint(g, rect(cx - halfW, topY, cx + halfW, topY + len - 1), base, sh);                        // blade
+    paint(g, rect(cx - guardHalfW, topY + len, cx + guardHalfW, topY + len + 1), C.gold, C.goldSh); // crossguard
+    paint(g, rect(cx - 1, topY + len + 2, cx + 1, topY + len + 1 + gripLen), C.wood, C.woodSh);      // grip
+    const pw = twoHand ? 2 : 1;
+    paint(g, rect(cx - pw, topY + len + 2 + gripLen, cx + pw, topY + len + 3 + gripLen), C.gold, C.goldSh); // pommel
+  }
+  function axeSil(g, cx, headTopY, haftLen, headSize, base, sh, twoHand) {
+    const headBotY = headTopY + headSize - 1, hw = twoHand ? 2 : 1;
+    paint(g, rect(cx - hw, headBotY + 1, cx + hw, headBotY + haftLen), C.wood, C.woodSh);           // haft
+    paint(g, (px, py) => py >= headTopY && py <= headBotY && px > cx && px <= cx + headSize - (py - headTopY), base, sh); // blade wedge (right)
+    if (twoHand) paint(g, (px, py) => py >= headTopY && py <= headBotY && px < cx && px >= cx - headSize + (py - headTopY), base, sh); // double-bit
+  }
+  function maceSil(g, cx, headCy, haftLen, headR, base, sh, twoHand) {
+    paint(g, disc(cx, headCy, headR), base, sh);                                                    // flanged head
+    const hw = twoHand ? 2 : 1;
+    paint(g, rect(cx - hw, headCy + headR, cx + hw, headCy + headR + haftLen - 1), C.wood, C.woodSh); // haft
+    if (twoHand) { paint(g, rect(cx - headR - 2, headCy - 1, cx - headR - 1, headCy + 1), base, sh); paint(g, rect(cx + headR + 1, headCy - 1, cx + headR + 2, headCy + 1), base, sh); } // flanges
+  }
+  const WEAPON_TYPES = {
+    longsword:  { paint: (g,cx,topY,pal) => bladeSil(g,cx,topY,16,1,3,4,pal.base,pal.sh,false), hand:'STR', slot:'1H' },
+    axe:        { paint: (g,cx,topY,pal) => axeSil(g,cx,topY,18,7,pal.base,pal.sh,false),        hand:'STR', slot:'1H' },
+    mace:       { paint: (g,cx,topY,pal) => maceSil(g,cx,topY,16,4,pal.base,pal.sh,false),        hand:'STR', slot:'1H' },
+    claymore:   { paint: (g,cx,topY,pal) => bladeSil(g,cx,topY,23,2,4,6,pal.base,pal.sh,true),    hand:'STR', slot:'2H' },
+    battleaxe:  { paint: (g,cx,topY,pal) => axeSil(g,cx,topY,22,9,pal.base,pal.sh,true),          hand:'STR', slot:'2H' },
+    warhammer:  { paint: (g,cx,topY,pal) => maceSil(g,cx,topY,20,5,pal.base,pal.sh,true),         hand:'STR', slot:'2H' },
+    dagger:     { paint: (g,cx,topY,pal) => bladeSil(g,cx,topY,9, 1,2,3,pal.base,pal.sh,false),   hand:'DEX', slot:'1H' },
+    rapier:     { paint: (g,cx,topY,pal) => bladeSil(g,cx,topY,20,1,1,4,pal.base,pal.sh,false),   hand:'DEX', slot:'1H' },
+    shortsword: { paint: (g,cx,topY,pal) => bladeSil(g,cx,topY,12,1,2,3,pal.base,pal.sh,false),   hand:'DEX', slot:'1H' },
+  };
+  const WEAPON_NAME = { longsword:'Longsword', axe:'Axe', mace:'Mace', claymore:'Claymore', battleaxe:'Battleaxe',
+    warhammer:'Warhammer', dagger:'Dagger', rapier:'Rapier', shortsword:'Short Sword' };
+
+  // ---- new B2-GO item silhouettes (Sling/Charm/Tome/Wand — Staff already exists via staff()) ----
+  function slingSil(g, cx, topY, pal) {
+    paint(g, rect(cx - 4, topY, cx + 4, topY + 3), pal.base, pal.sh);         // pouch
+    paint(g, rect(cx - 1, topY + 4, cx + 1, topY + 16), pal.base, pal.sh);    // gathered cords
+  }
+  function charmSil(g, cx, topY, pal) {
+    paint(g, disc(cx, topY + 3, 3), pal.base, pal.sh);
+    paint(g, rect(cx - 1, topY + 6, cx + 1, topY + 11), C.gold, C.goldSh);
+    if (pal.glow) setPx(g, cx, topY + 2, [200,230,255]);
+  }
+  function tomeSil(g, cx, topY, pal) {
+    paint(g, rect(cx - 4, topY, cx + 4, topY + 11), pal.base, pal.sh);
+    paint(g, rect(cx - 4, topY + 5, cx + 4, topY + 6), C.gold, C.goldSh);
+    if (pal.glow) setPx(g, cx, topY + 3, [200,230,255]);
+  }
+  function wandSil(g, cx, topY, len, pal) {
+    paint(g, rect(cx - 1, topY + 4, cx + 1, topY + len - 1), C.wood, C.woodSh);
+    paint(g, disc(cx, topY + 2, 2), pal.base, pal.sh);
+  }
+
+  // ---- armor SLOT silhouettes (inventory-icon scale; STR heavy / DEX leather share these shapes) ----
+  function helmSil(g, cx, topY, pal) {
+    paint(g, (px, py) => { const dy = py - topY; return dy >= 0 && dy <= 8 && Math.abs(px - cx) <= 6 - Math.max(0, dy - 5); }, pal.base, pal.sh);
+    paint(g, rect(cx - 6, topY + 8, cx + 6, topY + 9), pal.base, pal.sh);
+  }
+  function breastplateSil(g, cx, topY, pal) {
+    paint(g, rect(cx - 7, topY, cx + 7, topY + 13), pal.base, pal.sh);
+    paint(g, rect(cx - 1, topY + 2, cx + 1, topY + 11), pal.sh, pal.sh);
+  }
+  function vambraceSil(g, cx, topY, pal) {
+    paint(g, rect(cx - 3, topY, cx + 3, topY + 13), pal.base, pal.sh);
+    paint(g, rect(cx - 3, topY + 4, cx + 3, topY + 4), pal.sh, pal.sh);
+    paint(g, rect(cx - 3, topY + 9, cx + 3, topY + 9), pal.sh, pal.sh);
+  }
+  function greaveSil(g, cx, topY, pal) {
+    paint(g, rect(cx - 4, topY, cx + 4, topY + 15), pal.base, pal.sh);
+    paint(g, rect(cx - 4, topY + 5, cx + 4, topY + 5), pal.sh, pal.sh);
+    paint(g, rect(cx - 4, topY + 11, cx + 4, topY + 11), pal.sh, pal.sh);
+  }
+  function hoodSil(g, cx, topY, pal) {
+    paint(g, (px, py) => { const dy = py - topY; return dy >= 0 && dy <= 9 && Math.abs(px - cx) <= 6 - Math.max(0, dy - 4); }, pal.base, pal.sh);
+    paint(g, rect(cx - 2, topY + 9, cx + 2, topY + 11), pal.base, pal.sh);
+  }
+  function robeChestSil(g, cx, topY, pal) {
+    const topHalf = 6, botHalf = 9, h = 16;
+    paint(g, (px, py) => { const t = (py - topY) / h; const half = topHalf + (botHalf - topHalf) * t; return py >= topY && py < topY + h && Math.abs(px - cx) <= half; }, pal.base, pal.sh);
+  }
+  const ARMOR_SLOTS = {
+    // STR heavy plate — new B2-GO names (old Skull Cap/Barbute/etc. retired, see DEV_LOOP_MEMORY)
+    str_head:  { paint: helmSil,         name: 'Helm' },
+    str_chest: { paint: breastplateSil,  name: 'Breastplate' },
+    str_arms:  { paint: vambraceSil,     name: 'Vambraces' },
+    str_legs:  { paint: greaveSil,       name: 'Greaves' },
+    // DEX leather — same 4 slots, same shapes, leather palette
+    dex_head:  { paint: helmSil,         name: 'Leather Cap' },
+    dex_chest: { paint: breastplateSil,  name: 'Leather Armor' },
+    dex_arms:  { paint: vambraceSil,     name: 'Leather Bracers' },
+    dex_legs:  { paint: greaveSil,       name: 'Leather Leggings' },
+    // INT robe — chest + head ONLY (no arm/leg robe pieces exist, §6c)
+    int_chest: { paint: robeChestSil,    name: 'Robe' },
+    int_head:  { paint: hoodSil,         name: 'Hood' },
+  };
+
   // ---- humanoid assembler: paints each part into its OWN grid (z-order = push order) ----
   function human(o) {
     const W = o.W, H = o.H, mid = Math.floor(W / 2);
@@ -172,6 +334,10 @@ function generateAll(createCanvas) {
     const sockets = {
       handL: [handLx, handY], handR: [handRx, handY],
       neck: [mid, hBot], shoulderL: [tL - Math.floor((a.w+1)/2), aTop], shoulderR: [tR + Math.floor((a.w+1)/2), aTop],
+      // B2-GO ranged BACK-MOUNT (§6d/§17 #22): a point behind the torso, over the shoulder blades,
+      // so the engine can render an equipped bow/sling here when melee hands are already full —
+      // a socket, not baked art, same morph-layer idea as hand-mounted gear.
+      back: [mid, tTop + 2],
     };
     return { W, H, mid, parts, sockets };
   }
@@ -218,6 +384,7 @@ function generateAll(createCanvas) {
     const sockets = {
       handL: [sL - Math.floor((aw+1)/2), handY], handR: [sR + Math.floor((aw+1)/2), handY],
       neck: [mid, hBot], shoulderL: [sL - Math.floor((aw+1)/2), aTop], shoulderR: [sR + Math.floor((aw+1)/2), aTop],
+      back: [mid, rTop + 1],
     };
     return { W, H, mid, parts, sockets };
   }
@@ -326,7 +493,9 @@ function generateAll(createCanvas) {
     arm:   { w: 4, h: 14, base: C.leather, sh: C.leatherSh },
     legs:  { w: 5, h: 9, gap: 3, base: C.leather, sh: C.leatherSh },
     boots: { w: 6, h: 3, base: C.darkSh, sh: C.darkSh },
-    chest: (g, x) => paint(g, rect(x.mid-6, x.tTop+2, x.mid+6, x.tTop+4), C.woodSh, C.woodSh),  // quiver strap across chest
+    // B2-GO: strap moved DOWN off the neckline (was tTop+2..+4, crowded/fused into the head) —
+    // now sits mid-chest, matching the warden's chest-emblem band placement (tTop+7..+9).
+    chest: (g, x) => paint(g, rect(x.mid-6, x.tTop+7, x.mid+6, x.tTop+9), C.woodSh, C.woodSh),  // quiver strap across chest
     front: (g, x) => x.bow(g, x.handLx, x.handY-20, 20, C.wood, C.woodSh),
   });
   F.skeleton = () => human({
@@ -440,6 +609,62 @@ function generateAll(createCanvas) {
     staff:        () => makeGear(g => staff(g, 8, 6, 40, C.teal),         [8, 24]),
     bow:          () => makeGear(g => bow(g, 10, 4, 32, C.wood, C.woodSh),[10, 4+16]),
   };
+
+  // ---- B2-GO: programmatic tiered weapons + new families + armor icons (one entry per combo —
+  // never hand-authored, per the golden "every asset is script-generated" rule) ----
+  const WEAPON_PIVOT = {
+    longsword: [8,26], claymore: [8,34], dagger: [8,19], rapier: [8,30], shortsword: [8,22],
+    axe: [8,27], battleaxe: [8,32], mace: [8,22], warhammer: [8,26],
+  };
+  for (const wtype in WEAPON_TYPES) {
+    const spec = WEAPON_TYPES[wtype];
+    for (const tier of METAL_ORDER) {
+      const pal = METAL[tier];
+      GEAR[wtype + '_' + tier] = () => makeGear(g => spec.paint(g, 8, 6, pal), WEAPON_PIVOT[wtype]);
+    }
+  }
+  for (const tier of SLING_ORDER)  { const pal = SLING_TIER[tier];  GEAR['sling_' + tier]  = () => makeGear(g => slingSil(g, 8, 6, pal),        [8, 22]); }
+  for (const tier of STAFF_ORDER)  { const pal = STAFF_TIER[tier];  GEAR['staff_' + tier]  = () => makeGear(g => staff(g, 8, 6, 40, pal.orb),   [8, 24]); }
+  for (const tier of CHARM_ORDER)  { const pal = CHARM_TIER[tier];  GEAR['charm_' + tier]  = () => makeGear(g => charmSil(g, 8, 6, pal),        [8, 17]); }
+  for (const tier of TOME_ORDER)   { const pal = TOME_TIER[tier];   GEAR['tome_' + tier]   = () => makeGear(g => tomeSil(g, 8, 6, pal),         [8, 17]); }
+  for (const tier of WAND_ORDER)   { const pal = WAND_TIER[tier];   GEAR['wand_' + tier]   = () => makeGear(g => wandSil(g, 8, 6, 22, pal),     [8, 25]); }
+  // CON shield object ladder: Wooden Shield -> Iron Buckler -> Kite Shield -> Tower Shield (reuses
+  // the existing round_shield/tower_shield painters — same silhouette family, size/palette vary).
+  GEAR['shield_wooden']  = () => makeGear(g => roundShield(g, 10, 12, 6, C.wood, C.woodSh),                          [10, 12]);
+  GEAR['shield_buckler'] = () => makeGear(g => roundShield(g, 8, 9, 4, METAL.iron.base, METAL.iron.sh),               [8, 9]);
+  GEAR['shield_kite']    = () => makeGear(g => towerShield(g, 5, 3, 13, 24, METAL.steel.base, METAL.steel.sh),        [9, 14]);
+  GEAR['shield_tower']   = () => makeGear(g => towerShield(g, 4, 2, 16, 32, METAL.dwarven.base, METAL.dwarven.sh),    [10, 17]);
+  // Armor icons (inventory-card scale) — NOT hand-socket mounts, so the pivot is nominal (a body-layer
+  // morph system to actually WEAR these on the figure is future work, see DEV_LOOP_MEMORY).
+  const ARMOR_TIER_TABLE = { str: [METAL, METAL_ORDER], dex: [LEATHER, LEATHER_ORDER], int: [ROBE, ROBE_ORDER] };
+  for (const slotKey in ARMOR_SLOTS) {
+    const spec = ARMOR_SLOTS[slotKey];
+    const fam = slotKey.split('_')[0];
+    const [TABLE, ORDER] = ARMOR_TIER_TABLE[fam];
+    for (const tier of ORDER) {
+      const pal = TABLE[tier];
+      GEAR['armor_' + slotKey + '_' + tier] = () => makeGear(g => spec.paint(g, 8, 4, pal), [8, 8]);
+    }
+  }
+  // Catalog (name/attr/slot per tier) for card copy — consumed by attribute-model.js-style content,
+  // not by the pixel pipeline. Exported below alongside GEAR/layout.
+  const GEAR_CATALOG = [];
+  for (const wtype in WEAPON_TYPES) for (const tier of METAL_ORDER)
+    GEAR_CATALOG.push({ id: wtype + '_' + tier, name: METAL[tier].label + ' ' + WEAPON_NAME[wtype], attr: WEAPON_TYPES[wtype].hand, slot: WEAPON_TYPES[wtype].slot, tier });
+  for (const tier of SLING_ORDER)  GEAR_CATALOG.push({ id:'sling_'+tier, name: SLING_TIER[tier].label + ' Sling', attr:'DEX', slot:'1H', tier });
+  for (const tier of STAFF_ORDER)  GEAR_CATALOG.push({ id:'staff_'+tier, name: STAFF_TIER[tier].label + ' Staff', attr:'INT', slot:'2H', tier });
+  for (const tier of CHARM_ORDER)  GEAR_CATALOG.push({ id:'charm_'+tier, name: CHARM_TIER[tier].label + ' Charm', attr:'INT', slot:'OFF', tier });
+  for (const tier of TOME_ORDER)   GEAR_CATALOG.push({ id:'tome_'+tier,  name: TOME_TIER[tier].label + ' Tome',   attr:'INT', slot:'OFF', tier });
+  for (const tier of WAND_ORDER)   GEAR_CATALOG.push({ id:'wand_'+tier,  name: WAND_TIER[tier].label + ' Wand',   attr:'INT', slot:'HAND', tier });
+  const ARMOR_FAM_ATTR = { str:'STR', dex:'DEX', int:'INT' };
+  for (const slotKey in ARMOR_SLOTS) {
+    const spec = ARMOR_SLOTS[slotKey], fam = slotKey.split('_')[0], [TABLE, ORDER] = ARMOR_TIER_TABLE[fam];
+    for (const tier of ORDER) GEAR_CATALOG.push({ id:'armor_'+slotKey+'_'+tier, name: TABLE[tier].label + ' ' + spec.name, attr: ARMOR_FAM_ATTR[fam], slot: slotKey, tier });
+  }
+  GEAR_CATALOG.push({ id:'shield_wooden', name:'Wooden Shield', attr:'CON', slot:'SHIELD', tier:'t1' });
+  GEAR_CATALOG.push({ id:'shield_buckler', name:'Iron Buckler', attr:'CON', slot:'SHIELD', tier:'t2' });
+  GEAR_CATALOG.push({ id:'shield_kite', name:'Kite Shield', attr:'CON', slot:'SHIELD', tier:'t3' });
+  GEAR_CATALOG.push({ id:'shield_tower', name:'Tower Shield', attr:'CON', slot:'SHIELD', tier:'t4' });
   // STRIPpable parts: limbs that wear (removable) armor. When the armor is force-unequipped
   // (disabled by attribute loss) the screen asks for a 'bare<state>' sprite — the same limb
   // recolored to flesh. Maps part -> [armorBase, armorShadow] to swap out for skin.
@@ -628,7 +853,7 @@ function generateAll(createCanvas) {
     return renderRegion(comp, Math.max(0,b.minx-1), Math.max(0,b.miny-1), Math.min(fig.W-1,b.maxx+1), Math.min(fig.H-1,b.maxy+1));
   }
   return { figures: figuresOut, gear: gearOut, minions: minionsOut, layout,
-    races: RACE,
+    races: RACE, gearCatalog: GEAR_CATALOG,
     buildRaceFigure: (name, race) => ({ name, race: (race||RACE.human).id, flat: trimFlat(F[name](race||RACE.human)) }) };
 }
 

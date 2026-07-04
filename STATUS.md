@@ -225,8 +225,9 @@ interpreter, no per-weapon classes):**
    STR armor renamed to the material ladder (prestige names §18-dropped); `Armor.Requirement`
    per-tier gates live in Body.Equip/Gearing + the Equipment card LOCKED state. Shield objects
    still deferred (CON gate never dictated). Timer/wand/offhand CONSUMERS = slices 2-4.
-2. Timer-multiplier in the technique charge path (Core; consulting technique reads its gating
-   weapon's multiplier; dual = average; cooldowns untouched — DEX haste owns those).
+2. ~~Timer-multiplier~~ DONE (2026-07-03 loop, 327 tests: EffectiveCooldown scales by the
+   consulted weapons' AVERAGE timer on top of DEX haste — both knobs on one counter, balance-pass
+   tunes the interaction; self-contained techniques untouched).
 3. Wand shield-subtraction resolution in combat (damage − standing shield count, pool unconsumed,
    remainder = normal part+HP hit; economy math ASSERTED in tests per CLAUDE.md).
 4. Magic-offhand bonus hooks (minion attack ×, spell damage ×) reading the equipped offhand tier.

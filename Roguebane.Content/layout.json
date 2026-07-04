@@ -98,6 +98,10 @@
         "shoulderR": [
           228,
           100
+        ],
+        "back": [
+          140,
+          116
         ]
       },
       "mounts": [
@@ -209,6 +213,10 @@
         "shoulderR": [
           252,
           108
+        ],
+        "back": [
+          148,
+          124
         ]
       },
       "mounts": [
@@ -289,6 +297,10 @@
         "shoulderR": [
           236,
           100
+        ],
+        "back": [
+          140,
+          108
         ]
       },
       "mounts": [
@@ -369,6 +381,10 @@
         "shoulderR": [
           236,
           100
+        ],
+        "back": [
+          140,
+          108
         ]
       },
       "mounts": [
@@ -476,6 +492,10 @@
         "shoulderR": [
           212,
           100
+        ],
+        "back": [
+          124,
+          116
         ]
       },
       "mounts": [
@@ -486,6 +506,117 @@
         {
           "gear": "dagger",
           "socket": "handR"
+        }
+      ]
+    },
+    "human_ranger": {
+      "size": [
+        264,
+        352
+      ],
+      "race": "human",
+      "pivot": [
+        140,
+        344
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            88,
+            248,
+            40,
+            72
+          ]
+        },
+        "legR": {
+          "rect": [
+            152,
+            248,
+            40,
+            72
+          ]
+        },
+        "boots": {
+          "rect": [
+            80,
+            320,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            64,
+            96,
+            152,
+            152
+          ]
+        },
+        "armL": {
+          "rect": [
+            24,
+            96,
+            48,
+            112
+          ]
+        },
+        "armR": {
+          "rect": [
+            208,
+            96,
+            48,
+            112
+          ]
+        },
+        "head": {
+          "rect": [
+            88,
+            8,
+            104,
+            104
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          44,
+          196
+        ],
+        "handR": [
+          236,
+          196
+        ],
+        "neck": [
+          140,
+          108
+        ],
+        "shoulderL": [
+          52,
+          100
+        ],
+        "shoulderR": [
+          228,
+          100
+        ],
+        "back": [
+          140,
+          116
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "bow",
+          "socket": "handL"
         }
       ]
     },
@@ -587,6 +718,10 @@
         "shoulderR": [
           212,
           100
+        ],
+        "back": [
+          132,
+          116
         ]
       },
       "mounts": [
@@ -698,6 +833,10 @@
         "shoulderR": [
           236,
           108
+        ],
+        "back": [
+          140,
+          124
         ]
       },
       "mounts": [
@@ -778,6 +917,10 @@
         "shoulderR": [
           220,
           100
+        ],
+        "back": [
+          132,
+          108
         ]
       },
       "mounts": [
@@ -858,6 +1001,10 @@
         "shoulderR": [
           220,
           100
+        ],
+        "back": [
+          132,
+          108
         ]
       },
       "mounts": [
@@ -965,6 +1112,10 @@
         "shoulderR": [
           196,
           100
+        ],
+        "back": [
+          116,
+          116
         ]
       },
       "mounts": [
@@ -975,6 +1126,117 @@
         {
           "gear": "dagger",
           "socket": "handR"
+        }
+      ]
+    },
+    "elf_ranger": {
+      "size": [
+        248,
+        352
+      ],
+      "race": "elf",
+      "pivot": [
+        132,
+        344
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            80,
+            248,
+            40,
+            72
+          ]
+        },
+        "legR": {
+          "rect": [
+            144,
+            248,
+            40,
+            72
+          ]
+        },
+        "boots": {
+          "rect": [
+            72,
+            320,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            64,
+            96,
+            136,
+            152
+          ]
+        },
+        "armL": {
+          "rect": [
+            24,
+            96,
+            48,
+            112
+          ]
+        },
+        "armR": {
+          "rect": [
+            192,
+            96,
+            48,
+            112
+          ]
+        },
+        "head": {
+          "rect": [
+            56,
+            8,
+            152,
+            104
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          44,
+          196
+        ],
+        "handR": [
+          220,
+          196
+        ],
+        "neck": [
+          132,
+          108
+        ],
+        "shoulderL": [
+          52,
+          100
+        ],
+        "shoulderR": [
+          212,
+          100
+        ],
+        "back": [
+          132,
+          116
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "bow",
+          "socket": "handL"
         }
       ]
     },
@@ -1076,6 +1338,10 @@
         "shoulderR": [
           212,
           76
+        ],
+        "back": [
+          132,
+          92
         ]
       },
       "mounts": [
@@ -1187,6 +1453,10 @@
         "shoulderR": [
           212,
           100
+        ],
+        "back": [
+          124,
+          116
         ]
       },
       "mounts": [
@@ -1270,6 +1540,10 @@
         "shoulderR": [
           236,
           100
+        ],
+        "back": [
+          140,
+          108
         ]
       },
       "mounts": []
@@ -1372,6 +1646,10 @@
         "shoulderR": [
           324,
           124
+        ],
+        "back": [
+          188,
+          140
         ]
       },
       "mounts": [
@@ -1478,6 +1756,10 @@
         "shoulderR": [
           308,
           92
+        ],
+        "back": [
+          180,
+          108
         ]
       },
       "mounts": []
@@ -1588,223 +1870,13 @@
         "shoulderR": [
           356,
           140
+        ],
+        "back": [
+          252,
+          156
         ]
       },
       "mounts": []
-    },
-    "human_ranger": {
-      "size": [
-        264,
-        352
-      ],
-      "race": "human",
-      "pivot": [
-        140,
-        344
-      ],
-      "z": [
-        "legL",
-        "legR",
-        "boots",
-        "torso",
-        "armL",
-        "armR",
-        "head",
-        "frontGear"
-      ],
-      "parts": {
-        "legL": {
-          "rect": [
-            88,
-            248,
-            40,
-            72
-          ]
-        },
-        "legR": {
-          "rect": [
-            152,
-            248,
-            40,
-            72
-          ]
-        },
-        "boots": {
-          "rect": [
-            80,
-            320,
-            120,
-            24
-          ]
-        },
-        "torso": {
-          "rect": [
-            64,
-            96,
-            152,
-            152
-          ]
-        },
-        "armL": {
-          "rect": [
-            24,
-            96,
-            48,
-            112
-          ]
-        },
-        "armR": {
-          "rect": [
-            208,
-            96,
-            48,
-            112
-          ]
-        },
-        "head": {
-          "rect": [
-            88,
-            8,
-            104,
-            104
-          ]
-        }
-      },
-      "sockets": {
-        "handL": [
-          44,
-          196
-        ],
-        "handR": [
-          236,
-          196
-        ],
-        "neck": [
-          140,
-          108
-        ],
-        "shoulderL": [
-          52,
-          100
-        ],
-        "shoulderR": [
-          228,
-          100
-        ]
-      },
-      "mounts": [
-        {
-          "gear": "bow",
-          "socket": "handL"
-        }
-      ]
-    },
-    "elf_ranger": {
-      "size": [
-        248,
-        352
-      ],
-      "race": "elf",
-      "pivot": [
-        132,
-        344
-      ],
-      "z": [
-        "legL",
-        "legR",
-        "boots",
-        "torso",
-        "armL",
-        "armR",
-        "head",
-        "frontGear"
-      ],
-      "parts": {
-        "legL": {
-          "rect": [
-            80,
-            248,
-            40,
-            72
-          ]
-        },
-        "legR": {
-          "rect": [
-            144,
-            248,
-            40,
-            72
-          ]
-        },
-        "boots": {
-          "rect": [
-            72,
-            320,
-            120,
-            24
-          ]
-        },
-        "torso": {
-          "rect": [
-            64,
-            96,
-            136,
-            152
-          ]
-        },
-        "armL": {
-          "rect": [
-            24,
-            96,
-            48,
-            112
-          ]
-        },
-        "armR": {
-          "rect": [
-            192,
-            96,
-            48,
-            112
-          ]
-        },
-        "head": {
-          "rect": [
-            56,
-            8,
-            152,
-            104
-          ]
-        }
-      },
-      "sockets": {
-        "handL": [
-          44,
-          196
-        ],
-        "handR": [
-          220,
-          196
-        ],
-        "neck": [
-          132,
-          108
-        ],
-        "shoulderL": [
-          52,
-          100
-        ],
-        "shoulderR": [
-          212,
-          100
-        ]
-      },
-      "mounts": [
-        {
-          "gear": "bow",
-          "socket": "handL"
-        }
-      ]
     }
   },
   "gear": {
@@ -1848,6 +1920,606 @@
       "pivot": [
         36,
         132
+      ]
+    },
+    "longsword_iron": {
+      "pivot": [
+        28,
+        164
+      ]
+    },
+    "longsword_steel": {
+      "pivot": [
+        28,
+        164
+      ]
+    },
+    "longsword_mithral": {
+      "pivot": [
+        28,
+        164
+      ]
+    },
+    "longsword_dwarven": {
+      "pivot": [
+        28,
+        164
+      ]
+    },
+    "axe_iron": {
+      "pivot": [
+        12,
+        172
+      ]
+    },
+    "axe_steel": {
+      "pivot": [
+        12,
+        172
+      ]
+    },
+    "axe_mithral": {
+      "pivot": [
+        12,
+        172
+      ]
+    },
+    "axe_dwarven": {
+      "pivot": [
+        12,
+        172
+      ]
+    },
+    "mace_iron": {
+      "pivot": [
+        36,
+        164
+      ]
+    },
+    "mace_steel": {
+      "pivot": [
+        36,
+        164
+      ]
+    },
+    "mace_mithral": {
+      "pivot": [
+        36,
+        164
+      ]
+    },
+    "mace_dwarven": {
+      "pivot": [
+        36,
+        164
+      ]
+    },
+    "claymore_iron": {
+      "pivot": [
+        36,
+        228
+      ]
+    },
+    "claymore_steel": {
+      "pivot": [
+        36,
+        228
+      ]
+    },
+    "claymore_mithral": {
+      "pivot": [
+        36,
+        228
+      ]
+    },
+    "claymore_dwarven": {
+      "pivot": [
+        36,
+        228
+      ]
+    },
+    "battleaxe_iron": {
+      "pivot": [
+        68,
+        212
+      ]
+    },
+    "battleaxe_steel": {
+      "pivot": [
+        68,
+        212
+      ]
+    },
+    "battleaxe_mithral": {
+      "pivot": [
+        68,
+        212
+      ]
+    },
+    "battleaxe_dwarven": {
+      "pivot": [
+        68,
+        212
+      ]
+    },
+    "warhammer_iron": {
+      "pivot": [
+        60,
+        204
+      ]
+    },
+    "warhammer_steel": {
+      "pivot": [
+        60,
+        204
+      ]
+    },
+    "warhammer_mithral": {
+      "pivot": [
+        60,
+        204
+      ]
+    },
+    "warhammer_dwarven": {
+      "pivot": [
+        60,
+        204
+      ]
+    },
+    "dagger_iron": {
+      "pivot": [
+        20,
+        108
+      ]
+    },
+    "dagger_steel": {
+      "pivot": [
+        20,
+        108
+      ]
+    },
+    "dagger_mithral": {
+      "pivot": [
+        20,
+        108
+      ]
+    },
+    "dagger_dwarven": {
+      "pivot": [
+        20,
+        108
+      ]
+    },
+    "rapier_iron": {
+      "pivot": [
+        12,
+        196
+      ]
+    },
+    "rapier_steel": {
+      "pivot": [
+        12,
+        196
+      ]
+    },
+    "rapier_mithral": {
+      "pivot": [
+        12,
+        196
+      ]
+    },
+    "rapier_dwarven": {
+      "pivot": [
+        12,
+        196
+      ]
+    },
+    "shortsword_iron": {
+      "pivot": [
+        20,
+        132
+      ]
+    },
+    "shortsword_steel": {
+      "pivot": [
+        20,
+        132
+      ]
+    },
+    "shortsword_mithral": {
+      "pivot": [
+        20,
+        132
+      ]
+    },
+    "shortsword_dwarven": {
+      "pivot": [
+        20,
+        132
+      ]
+    },
+    "sling_shepherds": {
+      "pivot": [
+        36,
+        132
+      ]
+    },
+    "sling_braided": {
+      "pivot": [
+        36,
+        132
+      ]
+    },
+    "sling_sinew": {
+      "pivot": [
+        36,
+        132
+      ]
+    },
+    "sling_giantsbane": {
+      "pivot": [
+        36,
+        132
+      ]
+    },
+    "staff_wooden": {
+      "pivot": [
+        28,
+        172
+      ]
+    },
+    "staff_twisted": {
+      "pivot": [
+        28,
+        172
+      ]
+    },
+    "staff_ornate": {
+      "pivot": [
+        28,
+        172
+      ]
+    },
+    "staff_humming": {
+      "pivot": [
+        28,
+        172
+      ]
+    },
+    "charm_wooden": {
+      "pivot": [
+        28,
+        92
+      ]
+    },
+    "charm_bone": {
+      "pivot": [
+        28,
+        92
+      ]
+    },
+    "charm_ornate": {
+      "pivot": [
+        28,
+        92
+      ]
+    },
+    "charm_humming": {
+      "pivot": [
+        28,
+        92
+      ]
+    },
+    "tome_oldworn": {
+      "pivot": [
+        36,
+        92
+      ]
+    },
+    "tome_leather": {
+      "pivot": [
+        36,
+        92
+      ]
+    },
+    "tome_ornate": {
+      "pivot": [
+        36,
+        92
+      ]
+    },
+    "tome_glowing": {
+      "pivot": [
+        36,
+        92
+      ]
+    },
+    "wand_adept": {
+      "pivot": [
+        20,
+        156
+      ]
+    },
+    "wand_twisted": {
+      "pivot": [
+        20,
+        156
+      ]
+    },
+    "wand_gemstone": {
+      "pivot": [
+        20,
+        156
+      ]
+    },
+    "wand_glowing": {
+      "pivot": [
+        20,
+        156
+      ]
+    },
+    "shield_wooden": {
+      "pivot": [
+        52,
+        52
+      ]
+    },
+    "shield_buckler": {
+      "pivot": [
+        36,
+        36
+      ]
+    },
+    "shield_kite": {
+      "pivot": [
+        36,
+        92
+      ]
+    },
+    "shield_tower": {
+      "pivot": [
+        52,
+        124
+      ]
+    },
+    "armor_str_head_iron": {
+      "pivot": [
+        52,
+        36
+      ]
+    },
+    "armor_str_head_steel": {
+      "pivot": [
+        52,
+        36
+      ]
+    },
+    "armor_str_head_mithral": {
+      "pivot": [
+        52,
+        36
+      ]
+    },
+    "armor_str_head_dwarven": {
+      "pivot": [
+        52,
+        36
+      ]
+    },
+    "armor_str_chest_iron": {
+      "pivot": [
+        60,
+        36
+      ]
+    },
+    "armor_str_chest_steel": {
+      "pivot": [
+        60,
+        36
+      ]
+    },
+    "armor_str_chest_mithral": {
+      "pivot": [
+        60,
+        36
+      ]
+    },
+    "armor_str_chest_dwarven": {
+      "pivot": [
+        60,
+        36
+      ]
+    },
+    "armor_str_arms_iron": {
+      "pivot": [
+        28,
+        36
+      ]
+    },
+    "armor_str_arms_steel": {
+      "pivot": [
+        28,
+        36
+      ]
+    },
+    "armor_str_arms_mithral": {
+      "pivot": [
+        28,
+        36
+      ]
+    },
+    "armor_str_arms_dwarven": {
+      "pivot": [
+        28,
+        36
+      ]
+    },
+    "armor_str_legs_iron": {
+      "pivot": [
+        36,
+        36
+      ]
+    },
+    "armor_str_legs_steel": {
+      "pivot": [
+        36,
+        36
+      ]
+    },
+    "armor_str_legs_mithral": {
+      "pivot": [
+        36,
+        36
+      ]
+    },
+    "armor_str_legs_dwarven": {
+      "pivot": [
+        36,
+        36
+      ]
+    },
+    "armor_dex_head_plain": {
+      "pivot": [
+        52,
+        36
+      ]
+    },
+    "armor_dex_head_hardened": {
+      "pivot": [
+        52,
+        36
+      ]
+    },
+    "armor_dex_head_studded": {
+      "pivot": [
+        52,
+        36
+      ]
+    },
+    "armor_dex_head_reinforced": {
+      "pivot": [
+        52,
+        36
+      ]
+    },
+    "armor_dex_chest_plain": {
+      "pivot": [
+        60,
+        36
+      ]
+    },
+    "armor_dex_chest_hardened": {
+      "pivot": [
+        60,
+        36
+      ]
+    },
+    "armor_dex_chest_studded": {
+      "pivot": [
+        60,
+        36
+      ]
+    },
+    "armor_dex_chest_reinforced": {
+      "pivot": [
+        60,
+        36
+      ]
+    },
+    "armor_dex_arms_plain": {
+      "pivot": [
+        28,
+        36
+      ]
+    },
+    "armor_dex_arms_hardened": {
+      "pivot": [
+        28,
+        36
+      ]
+    },
+    "armor_dex_arms_studded": {
+      "pivot": [
+        28,
+        36
+      ]
+    },
+    "armor_dex_arms_reinforced": {
+      "pivot": [
+        28,
+        36
+      ]
+    },
+    "armor_dex_legs_plain": {
+      "pivot": [
+        36,
+        36
+      ]
+    },
+    "armor_dex_legs_hardened": {
+      "pivot": [
+        36,
+        36
+      ]
+    },
+    "armor_dex_legs_studded": {
+      "pivot": [
+        36,
+        36
+      ]
+    },
+    "armor_dex_legs_reinforced": {
+      "pivot": [
+        36,
+        36
+      ]
+    },
+    "armor_int_chest_cotton": {
+      "pivot": [
+        68,
+        36
+      ]
+    },
+    "armor_int_chest_silk": {
+      "pivot": [
+        68,
+        36
+      ]
+    },
+    "armor_int_chest_ornate": {
+      "pivot": [
+        68,
+        36
+      ]
+    },
+    "armor_int_chest_humming": {
+      "pivot": [
+        68,
+        36
+      ]
+    },
+    "armor_int_head_cotton": {
+      "pivot": [
+        52,
+        36
+      ]
+    },
+    "armor_int_head_silk": {
+      "pivot": [
+        52,
+        36
+      ]
+    },
+    "armor_int_head_ornate": {
+      "pivot": [
+        52,
+        36
+      ]
+    },
+    "armor_int_head_humming": {
+      "pivot": [
+        52,
+        36
       ]
     }
   },
@@ -7321,6 +7993,7 @@
       "font": "mono",
       "fontPx": 6,
       "states": {
+        "family": "invTab",
         "active": {
           "border": "amber",
           "fill": "panel",
@@ -7330,6 +8003,11 @@
           "border": "borderDim",
           "fill": "panelDeep",
           "color": "mutedDim"
+        },
+        "hover": {
+          "border": "border",
+          "fill": "panelTab",
+          "color": "ink"
         }
       }
     },
@@ -7427,21 +8105,26 @@
       "font": "display",
       "fontPx": 8,
       "states": {
+        "family": "invCard",
         "equipped": {
           "border": "good",
           "fill": "panelDeep"
         },
-        "ready": {
-          "border": "border",
-          "fill": "panelCard"
-        },
-        "dropped": {
+        "disabled": {
           "border": "lockRed",
           "fill": "panelDeep"
         },
-        "neutral": {
-          "border": "borderDim",
+        "equippable": {
+          "border": "border",
           "fill": "panelCard"
+        },
+        "locked": {
+          "border": "borderDim",
+          "fill": "panelCard",
+          "opacity": 0.6
+        },
+        "hover": {
+          "overlay": "rgba(255,255,255,.06)"
         }
       }
     },
@@ -7748,6 +8431,7 @@
       "fontPx": 8,
       "align": "center",
       "states": {
+        "family": "loadoutCard",
         "slotted": {
           "border": "border",
           "fill": "panelCard"
@@ -7757,6 +8441,9 @@
           "borderStyle": "dashed",
           "fill": "panelDeep",
           "opacity": 0.8
+        },
+        "hover": {
+          "overlay": "rgba(255,255,255,.06)"
         }
       }
     },
@@ -7915,7 +8602,17 @@
       "binds": "node",
       "color": "ink",
       "font": "display",
-      "fontPx": 8
+      "fontPx": 8,
+      "states": {
+        "family": "beaconNode",
+        "hover": {
+          "border": "parch"
+        },
+        "current": {
+          "border": "amber",
+          "glow": true
+        }
+      }
     },
     "fortRow": {
       "size": [
@@ -8095,9 +8792,7 @@
             ]
           },
           "font": "display",
-          "fontPx": 8,
-          "imageBind": "sprites/body/{race.id}_grunt/head_healthy",
-          "binds": "race.headImage"
+          "fontPx": 8
         },
         {
           "rect": [
@@ -8110,6 +8805,8 @@
           "font": "display",
           "fontPx": 8,
           "image": "Content/sprites/body/human_grunt/head_healthy.png",
+          "imageBind": "sprites/body/{race.id}_grunt/head_healthy",
+          "binds": "race.headImage",
           "shadow": {
             "token": "soft",
             "dx": 0,

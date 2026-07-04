@@ -149,6 +149,39 @@
         selected:   { border: 'good' },
         disabled:   { opacity: 0.5 },
       },
+      // E) EQUIPMENT INVENTORY card state — locked vocabulary per DESIGN_SPEC §6e (2026-07-03 states
+      // session), payload B5/B6a/B6b. Renames the old ad-hoc equipped/dropped/ready/neutral to the
+      // canon EQUIPPED / DISABLED / EQUIPPABLE / LOCKED read; hover is an OVERLAY TINT (row-family
+      // style) so it never fights the state border colour underneath it.
+      invCard: {
+        equipped:   { border: 'good',      fill: 'panelDeep' },  // active: wielded/worn/slotted/assigned
+        disabled:   { border: 'lockRed',   fill: 'panelDeep' },  // assigned but unsustainable right now
+        equippable: { border: 'border',    fill: 'panelCard' },  // unequipped, requirements met
+        locked:     { border: 'borderDim', fill: 'panelCard', opacity: 0.6 },  // unequipped, requirements NOT met
+        hover:      { overlay: 'rgba(255,255,255,.06)' },
+      },
+      // loadout-bar / minion-bay slot state (Equipment action-bar + bay cards) — slotted vs. empty,
+      // same hover tint as invCard.
+      loadoutCard: {
+        slotted: { border: 'border', fill: 'panelCard' },
+        empty:   { border: 'border', borderStyle: 'dashed', fill: 'panelDeep', opacity: 0.8 },
+        hover:   { overlay: 'rgba(255,255,255,.06)' },
+      },
+      // Equipment's GEAR/TECHNIQUES/MINIONS tab strip — same idle/active pair it already had, now with
+      // a hover step (raceCard-style: brighten one notch) per payload B6b.
+      invTab: {
+        idle:   { border: 'borderDim', fill: 'panelDeep', color: 'mutedDim' },
+        hover:  { border: 'border',    fill: 'panelTab',  color: 'ink' },
+        active: { border: 'amber',     fill: 'panel',     color: 'inkBright' },
+      },
+      // CityMap beacon-graph nodes (payload B8) — same current/hover language as CampaignMap's
+      // cityNode, so both screens share one grammar. `glow` reuses the SAME fixed-tick pulse primitive
+      // as actionCard.targeting's `pulse` flag (see the glow note in DEV_LOOP_MEMORY) — not a separate
+      // effect to build.
+      beaconNode: {
+        hover:   { border: 'parch' },
+        current: { border: 'amber', glow: true },
+      },
     },
   };
 
