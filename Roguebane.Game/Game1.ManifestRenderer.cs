@@ -652,29 +652,35 @@ public partial class Game1
             // restyled per state — spineCity's taken/current/future borders; pickerCard's
             // idle/selected follows the chosen index). Parts stamp on top.
             string? rootState = null;
-            if (tmpl.States.ValueKind == System.Text.Json.JsonValueKind.Object
-                && tmpl.States.TryGetProperty("family", out var famEl))
-                rootState = famEl.GetString() switch
-                {
-                    "pickerCard" => i == selIx ? "selected" : "idle",
-                    // actionCard (design/01): the card FRAME reads the FSM — targeting pulse,
-                    // gold held, dim cooldown, dashed locked; idle/unpowered cards read locked.
-                    "actionCard" when datum is Roguebane.Core.Technique => (
-                        e.Binds == "loadout.techniques" && InRun && _ctrl.Targeting == i ? "targeting"
-                        : ResolveStateBind(datum, "technique.state") switch
-                        {
-                            "HELD" => "held",
-                            "READY" => "ready",
-                            "COOLDOWN" => "cooldown",
-                            "DRY" => "locked",
-                            _ => InRun ? "locked" : "ready", // unpowered in-run reads locked
-                        }),
-                    _ => null,
-                };
-            // Inventory cards: §6e's state family per datum (no family key in the data — keyed
-            // by the bind; today's manifest state keys, the CD rename is B6).
-            else if (e.Binds == "inventory.activeTab.items")
-                rootState = InvCardState(datum);
+            if (tmpl.States.ValueKind == System.Text.Json.JsonValueKind.Object)
+            {
+                if (tmpl.States.TryGetProperty("family", out var famEl))
+                    rootState = famEl.GetString() switch
+                    {
+                        "pickerCard" => i == selIx ? "selected" : "idle",
+                        // actionCard (design/01): the card FRAME reads the FSM — targeting pulse,
+                        // gold held, dim cooldown, dashed locked; idle/unpowered cards read locked.
+                        "actionCard" when datum is Roguebane.Core.Technique => (
+                            e.Binds == "loadout.techniques" && InRun && _ctrl.Targeting == i ? "targeting"
+                            : ResolveStateBind(datum, "technique.state") switch
+                            {
+                                "HELD" => "held",
+                                "READY" => "ready",
+                                "COOLDOWN" => "cooldown",
+                                "DRY" => "locked",
+                                _ => InRun ? "locked" : "ready", // unpowered in-run reads locked
+                            }),
+                        _ => null,
+                    };
+                // §6e interim (FLAGGED, dies when B5 family keys land): states WITHOUT a family
+                // key resolve GENERICALLY from what they author — never per-template one-offs.
+                // "slotted"/"empty" reads datum presence (the loadout bar); the four-state
+                // inventory vocabulary reads the gear/technique/minion state.
+                else if (tmpl.States.TryGetProperty("slotted", out _))
+                    rootState = datum is not null ? "slotted" : "empty";
+                else if (tmpl.States.TryGetProperty("equipped", out _))
+                    rootState = InvCardState(datum);
+            }
             DrawTemplateRootChrome(tmpl, cell, datum, rootState);
             // FLAGGED STOPGAP (§6e: hover treatment is CD-authored; equipment authors none today —
             // B6 asks for it): a generic brighten ring on the hovered inventory card meanwhile.

@@ -1,5 +1,55 @@
 # Status
 
+## ⇒ CORRECTION to the "ghost head — FIXED" answer above (2026-07-03, Doug caught it live)
+The fix picked the WRONG part to keep. Recap: `raceCard` had two overlapping head parts — (1)
+`imageBind` bound to `race.headImage`, rect `[1,1,53,77]` (aspect 0.69, portrait); (2) a static
+unbound part hardcoded to `human_grunt`, rect `[10,22,35,35]` (aspect 1.0, square) + drop shadow. The
+P0-C.9 fix suppressed #2 as "unbound mock filler" and kept #1 — but **source head art is landscape**
+(`elf_grunt/head_healthy.png` = 152×104, aspect 1.46) and part #1's portrait rect (0.69) stretches it
+FAR worse than part #2's square rect (1.0) did. Doug's live shots confirm: keeping #1 = the visibly
+stretched/elongated head; #2 (now suppressed) was the better-proportioned one, just wrongly bound to
+`human_grunt`. **Real fix isn't "pick the other part" — it's that the imageBind almost certainly
+landed on the wrong element during extraction.** Likely intent: part #2's geometry (square, shadowed
+— reads as the actual framed portrait) should carry the LIVE `race.headImage` imageBind; part #1
+(gradient fill + right border, spanning the whole card-corner) is probably the BACKGROUND PANEL and
+was never meant to carry an image at all. This is a CD extraction mis-attribution, not a pick-one
+engine call — logged to CD (`CLAUDE_DESIGN_issues.md`) rather than re-guessing locally.
+
+## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-03, Doug — CityMap war-party icon is static, doesn't
+## track the doom bar's fill boundary)
+Doug: "the war party icon needs to follow the bar at the exact location on the edge of the bar as in
+the reference." Confirmed against `design/03-citymap.png`: at "1 WAYPOINT AWAY" the icon (`doomHost`)
+sits right at the boundary between plain track and the red stripe (near-full stripe, tiny sliver of
+plain track left) — it's supposed to RIDE that edge. **Root cause: `doomHost` (citymap element,
+`image:"Content/icons/map/enemy_host_near.png"`, offset `[338,39]` fixed size `[41,41]`) is a plain
+STATIC bindless image — no bind at all, drawn at a fixed offset regardless of progress.** Compare
+`doomFill`/`doomFillStripes` (offset ~`[359-360,61]`), which DO animate: `frac =
+Exp.Map.WarPartyDistance / Exp.Map.MarchLength`; the stripe's covered width = `(1-frac)*trackWidth`,
+so the boundary (where icon should sit) = `doomTrack.X + frac*trackWidth`. **This is the SAME
+STOPGAP CLASS already flagged for doomFillStripes** (`Game1.ManifestRenderer.cs` ~93-106: "clips
+fill+pattern to the war-party tandem width via sibling advancePct rect detection — Needs-CD: bind the
+stripes element so the stopgap dies") — extend that exact sibling-detection technique to `doomHost`:
+detect it sits near the `enemy.advancePct`-bound element, compute the same `frac`, and offset its
+draw X to `doomTrack.X + frac*doomTrack.Width - iconWidth/2` instead of the static offset. Pure
+engine fix, no CD data change needed.
+
+## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-03, Doug — Merchant wareCards render with no border/
+## chrome, "low quality little badge boxes")
+Confirmed against `design/07-merchant.png`: reference cards have a full border frame, a colored
+category pill (ARM/WPN/TEC), a separate rarity badge (MAGIC/COMMON/RARE), name, subtitle, italic
+flavor text, BUY + price. Doug's live shot has none of the frame — just the bare category tile
+floating with no card outline, no rarity badge, no flavor text. **ROOT CAUSE FOUND: this is an
+ENGINE gap, not missing CD data** — `templates.wareCard` already authors everything correctly
+(`border:{color:"border",w:1}`, `fill:"panelCard"`, a `ware.tag` rarity-badge part, `ware.note`
+subtitle, `ware.desc` flavor text — verified directly in `layout.json`). But the merchant's stamping
+path (`Game1.ManifestRenderer.cs` ~762-772, the `pp.Binds == "section.wares"` branch) calls
+`DrawWarePart` per PART only — it never calls `DrawTemplateRootChrome` (or equivalent) for the
+card's own root border+fill, unlike the generic `DrawManifestList` path every other card family goes
+through. **Fix: draw the wareCard template's root border/fill once per card before stamping its
+parts**, same as every other templated card already does. The rarity badge (`ware.tag`) is a SEPARATE,
+**already-known** gap — STATUS previously flagged "rarity chip stays gated (no rarity model)" — not
+new, don't rebuild it as part of this fix; only the missing root chrome is actionable right now.
+
 ## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-03, Doug — Equipment identity block, bays/actions/budget)
 Doug's screenshot (Elf Summoner) shows BAYS and ACTIONS crammed onto the same line and BUDGET
 orphaned alone on the next — not three clean stacked rows. **ROOT CAUSE FOUND in the manifest data,

@@ -68,6 +68,29 @@ B6. **(post-relay addendum — NOT in the batch sent 2026-07-03)** Doug's equipm
     equipped bow/wand can render while the melee hands are full (§17 #22 — until it exists the
     engine draws no ranged mount rather than inventing one).
 
+B7. **raceCard head portrait imageBind likely landed on the wrong element (causes a stretched-head
+    render, not the ghost-double we thought we'd fixed).** `raceCard` has two overlapping parts for
+    the headshot: rect `[1,1,53,77]` (portrait, aspect 0.69, gradient fill + right border — reads
+    like a BACKGROUND PANEL) carries the live `imageBind:"sprites/body/{race.id}_grunt/head_healthy"`;
+    rect `[10,22,35,35]` (square, aspect 1.0, drop-shadow — reads like the actual framed PORTRAIT) is
+    a static unbound sample hardcoded to `human_grunt`. Source head art is landscape (e.g.
+    `elf_grunt/head_healthy.png` = 152×104), so drawing it into the portrait-aspect rect stretches it
+    badly; the square rect would render it much closer to native proportions. Ask: move
+    `binds:"race.headImage"` + the imageBind path onto the SQUARE/shadowed part, and drop the
+    imageBind (if any authoring artifact remains) from the background-panel part — it should stay a
+    plain gradient panel with no image.
+B8. **CityMap beacon-graph nodes have no CD-authored hover or current-position treatment at all**
+    (Doug asked whether this was ever specified — checked DESIGN_SPEC: it isn't, anywhere). Today
+    the engine hardcodes a bare stopgap directly in C# (hover = swap border between two flat colors;
+    current node = static amber ring, no animation) because there's no template/states data for this
+    screen's nodes to read at all — unlike `cityNode` (CampaignMap's spine template), which DOES
+    author `states.current: {border:"amber", glow:true}`. Note the `glow` flag isn't implemented
+    engine-side anywhere either (dead data) — so even where you've signaled intent for a pulsing/
+    glowing current-indicator, we have no rendering primitive for it yet. Two separable asks once
+    Doug locks the design: (a) author real hover/current states for the CityMap beacon nodes (not
+    just the CampaignMap spine); (b) tell us what `glow:true` should actually look like (steady glow?
+    pulse rate?) so we can build the primitive once and wire both screens to it.
+
 ## Standing FYIs (unchanged, for context — not action items)
 - design/05 v2 STAT BLOCKS are not adopted; Doug will run a live tuning session — if a future 05
   re-render can sample stats from a handed set, ask him for the tuned numbers then.
