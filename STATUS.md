@@ -1327,10 +1327,10 @@ QUEUE worn-armor item below is UPDATED to this convention.**
   locked "Hound ×1" table entry — closing that gap, not inventing new design, since the pet itself was
   already locked content).
 - `tools/geometry_diff.py`/textgeom: ink-bbox measurement switch (item 3 above).
-- Retire `Shops.cs` legacy fixed-stock fields — CORRECTION (2026-07-04 loop): checked actual usage —
-  `Shops.Plate`/`Shops.Hide`/`Shops.ArmorPool` are all still live (tests, `Expedition.cs`, `Game1.cs`
-  seeding). Only `Shops.Armor` (the "legacy fixed stock (retiring)" field) has zero references anywhere
-  — that's the one safe to delete outright, not the whole set.
+- **Retire `Shops.cs` dead field [DONE 2026-07-04 loop, 349 tests]**: confirmed zero references
+  anywhere, deleted `Shops.Armor` (the "legacy fixed stock (retiring)" list) outright — clean removal,
+  no alias. `Shops.Plate`/`Shops.Hide`/`Shops.ArmorPool` stay; all three are still live (tests,
+  `Expedition.cs`, `Game1.cs` seeding).
 
 ## Needs human (loop skips)
 - Balance/feel tuning (all placeholder-sane, tune in PLAY): tick 10/s; cooldowns + damage; DEX haste

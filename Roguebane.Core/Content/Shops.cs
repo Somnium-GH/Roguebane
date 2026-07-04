@@ -12,6 +12,5 @@ public static class Shops
     public static readonly Armor Hide = ArmorLines.LeatherLegs[0];   // Leather Leggings (DEX line, legs)
 
     public static readonly IReadOnlyList<Weapon> Weapons = new[] { Armory.Sword, Armory.Dagger };
-    public static readonly IReadOnlyList<Armor> Armor = new[] { Plate }; // legacy fixed stock (retiring)
     public static readonly IReadOnlyList<Armor> ArmorPool = new[] { Plate, Hide }; // §12 stock pool
 }
