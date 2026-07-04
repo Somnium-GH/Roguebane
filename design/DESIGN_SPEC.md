@@ -170,7 +170,14 @@ DEX = +2% evade per tier, per body part currently worn (stacks across worn piece
 damage per piece worn (2-piece cap: robe + hat). Shield = +2% block-pool recharge per tier (§6b).
 
 **Per-tier equip gates [blessed initial, 2026-07-03]:** STR armor 2 STR · DEX armor 1 DEX · Robe
-2 INT · Cap/Circlet line 1 INT · Shield object: CON, number **[OPEN — never dictated; don't invent]**.
+2 INT · Cap/Circlet line 1 INT · **Shield object: 1 CON/tier [RESOLVED 2026-07-04, blessed initial —
+matches the DEX-low-gate principle; a hand-config accessory, not heavy plate].** Ladder: Wooden Shield
+(T1) → Iron Buckler (T2) → Kite Shield (T3) → Tower Shield (T4) — names already canon above. At 1
+CON/tier even a T2 Iron Buckler (2 CON) sits well inside base race CON (Human 3, Elf 2), so a starting
+kit can afford one without a bonus source. **Engine note:** the shield object doesn't exist as data yet
+(§6b's "block requires a shield OBJECT equipped" isn't wired) — author it as a `WeaponKind.Shield`
+1H off-hand item (reuses the existing Weapon/Wield machinery, no new type) and gate the `brace`
+technique's shield-SOURCE on one being equipped as a small, separate follow-up slice.
 
 ### 6d. Weapons — the wield model [LOCKED, 2026-07-03; corrected same day — see notes; a couple numbers
 OPEN, tagged below]
@@ -316,6 +323,18 @@ active techniques reserving it free what they can, §6c), items disable **highes
 ties break **last-equipped-first**. A pure ranking over the current attr level — deterministic,
 history-free except ties — so recovery re-enables cheapest-first automatically.
 
+**SUSTAIN MODEL [RESOLVED 2026-07-04, Doug — closes the §6d-vs-§6e ambiguity]:** gear sustain is a
+**SUMMED shared pool**, not individual per-item thresholds judged in isolation. Equipping a piece makes
+a **standing reservation** against its attribute, exactly like an active technique reserving its stat —
+worn/wielded gear AND active techniques all draw on the SAME live pool. **The cascade runs in two
+phases when the pool shrinks (part damage):** (1) **active techniques disable first** (they free their
+reservation immediately, per the ranking above); (2) **only if the pool is still insufficient after
+that** do EQUIPPED ITEMS start disabling, same ranking (highest-requirement-first, ties
+last-equipped-first). §6d's "gated purely by each weapon's own per-tier requirement" still governs
+whether a piece **can be equipped at all** (the threshold check at equip time); this resolution governs
+whether it **stays up** once several things share one shrinking pool — both are true, at different
+moments.
+
 **PAPER-DOLL [render = CAPABILITY truth]:** equipped+active gear draws its morph layers (§7);
 **DISABLED gear is REMOVED from the render** (bare part — assignment truth stays on the red card);
 a weapon in a BROKEN arm never draws (the hand slot is physically gone, §6). Handedness (§6d) picks
@@ -361,6 +380,57 @@ Three layers over the shared attribute pool:
 
 **Verbs are NOT bound to weapons.** A weapon is a stat-stick; techniques *consult* what's equipped
 ("Swing" = primary weapon; "Frenzy" = both, cost = sum). Techniques are a findable/slottable layer.
+
+### 7a. Starting kits & per-core THEME [advanced-prototype defaults, Doug 2026-07-04 — numbers blessed
+initial like §6c/§6d, tune later; the goal is a few cores past raw placeholder BEFORE the first real
+balance playtest pass]
+Each Core rune gets a real starting weapon+armor(+minion) kit and a visual THEME the figure-morph /
+armor-worn-layer art (§7, B2-GO) should express — same tier data, different silhouette/trim/palette per
+core (see the CD brief, `outputs/CLAUDE_DESIGN_issues.md` B12). **Themes are Doug's identity calls,
+LOCKED; the art execution is CD's, per usual (placeholder until delivered).**
+
+| Core | Theme | Starting weapon(s) | Starting armor | Starting minion(s) |
+|---|---|---|---|---|
+| **Grunt** | Versatility — plain, practical, no strong motif; the "middle of the run" baseline | Iron Longsword + Wooden Shield (T1) | Iron plate, all 4 slots (STR) | none |
+| **Warden** | Block & armor — heaviest-reading art, fortified/reinforced motifs | Iron Longsword + Iron Buckler (T2 shield) | Iron plate, all 4 slots (STR) | none |
+| **Adept** | Spellcasting — arcane motifs, robe silhouette | Wooden Staff (T1) | Cotton Robe + Cloth Cap (INT) | Skeleton ×1 |
+| **Summoner** | Minions/binding — necromantic/ritual motifs, robe | Adept Wand + Wooden Charm (T1) | Cotton Robe + Cloth Cap (INT) | Skeleton + Golem |
+| **Reaver** | Dual-wielding — light, aggressive, agile silhouette | 2× Iron Dagger (T1) | Plain leather, all 4 slots (DEX) | none |
+| **Ranger** | Bow & pet — tracker/nature motifs | Iron Short Sword + Short Bow (T1) | Plain leather, all 4 slots (DEX) | Hound ×1 |
+
+**Engine gap this surfaces:** `CoreRune` has `DefaultWeapons`/`DefaultEquipment`/`DefaultMinions` but no
+`DefaultArmor` — add it (mirrors `DefaultWeapons`, wired into `NewBody` via `Body.Equip`) to actually
+assemble these kits. The shield object doesn't exist as data yet either (§6c above). Both are scoped,
+separate loop slices — see STATUS.
+**CORRECTION (2026-07-04, Doug caught it):** the first pass here claimed per-core armor theming "reuses
+the existing figure-morph contract, zero new engine plumbing" — that was wrong, not verified against
+`LAYOUT_CONTRACT.md`/`ASSET_MANIFEST.md`. Actually WEARING armor on the figure (as opposed to a card/
+inventory icon) is a system that **doesn't exist yet at all** — B2-GO is its first build. Per-core THEME
+is a real new dimension on top of that (LAYOUT_CONTRACT §12a, added this pass): a `sprites/gear/worn/
+<line>/<slot>_<tier>_<condition>.png` generic layer (required, B2-GO's own scope) plus an optional
+`.../<core>/...` themed override, with an explicit fallback chain so partial theme coverage never
+breaks (themed → generic same-condition → generic healthy → bare). **Scope LOCKED (Doug, 2026-07-04):
+the FULL set** — all 4 tiers × all 3 conditions per core's own line (`outputs/CLAUDE_DESIGN_issues.md`
+B12) — flagged as likely multi-night; ship incrementally, the fallback chain covers any gap between drops.
+**CORRECTION #2 (2026-07-04, same day — Doug asked "what about race?"):** the first pass assumed
+worn-armor art mounts race-agnostically. CHECKED against `layout.json`'s actual figure rects (not
+assumed): **HEAD and CHEST/TORSO are NOT race-agnostic** — elf head rects are landscape (152×104)
+against human's near-square (~104-112²), the same stretching failure already caught on the raceCard
+head-portrait bug; elf torso is ~9-10% narrower than human's at every core sampled. **ARMS and LEGS
+ARE race-agnostic** — identical rect sizes across race in every pair checked (grunt/warden/ranger),
+only x-position shifts. LAYOUT_CONTRACT §12a now carries an optional race-specific path tier for
+exactly the slots that need it. **Corrected total: ~384 sprites, not 288** (12 race-needed slot-
+instances × 12 tier×condition cells × 2 races = 288, PLUS 8 race-agnostic slot-instances × 12 = 96).
+**NOT locked, floated only (Doug, devil's-advocate mode, 2026-07-04):** an idea to make Warden's identity
+"all armor that requires STR requires CON instead" — this would either replace or stack with the
+ALREADY-LOCKED Warden Core Effect (*Unbroken Aegis* = 2× CON-scaled shield regen, §11). Don't build
+either interpretation until Doug picks one explicitly; Warden's STARTING KIT above doesn't depend on
+this and can ship regardless.
+**Technique-weapon consult gap (observation, not a decision):** Jab/Cleave/Lunge/Ember/Drain are
+self-contained (no `Consults`) — equipping a themed weapon per the table above changes the paperdoll +
+equip-gate/cascade behavior (§6/§6d) but NOT those techniques' flat Power today (only `Shot`/`Swing`/
+`Frenzy` consult a weapon). Wiring the starting-kit techniques to consult their core's weapon is a
+bigger balance-pass question Doug hasn't called yet — flagged, not invented.
 
 ## 8. Combat: single enemy, parts, targeting/firing [LOCKED]
 **Combat is always against ONE enemy** (a human foe, an atypical creature, the castle, or a special
@@ -440,6 +510,28 @@ Minions yes; **party no** — one main character.
 - **CON-as-minion-resource: DROPPED** — the resource is **Summons** (not an attribute); the gate stays a
   reserved stat (default INT, overridable). **[OPEN]** minion-type acquisition + the stat→role table
   (which stat gates which minion + what it does; §17 #5).
+- **Minions fire on their OWN internal timer [RESOLVED 2026-07-04, Doug — fixes the "Skeleton hits every
+  tick" bug]:** a minion is content shaped like a weapon, not a free-firing add-on — it carries its own
+  **Timer** (ticks between discharges, same unit as a Technique's Cooldown), and the tick loop fires it
+  on THAT cadence, never on every combat tick or piggybacked on whatever the caster happens to be
+  pressing. **Archetype split, same total DPS at T1, different lever:** a FAST/WEAK minion (frequent,
+  small hits) vs a SLOW/STRONG minion (rare, big hits) — both tuned to roughly **T1 1H-weapon-technique
+  parity, not above it** (a minion is bonus pressure alongside the player's own kit, at the cost of a
+  bay + a reservation + Summons — it should not out-damage what the player's own action bar can do).
+  **T1 blessed-initial numbers** (10 ticks/sec clock, matching Jab/Lunge's ~0.4 dmg/s benchmark):
+  **Skeleton** (fast/weak, INT-gated, Reserve 2) — Timer 25 ticks (2.5s), Power 1 → ~0.4 dmg/s.
+  **Golem** (slow/strong, INT-gated, Reserve 3 — NEW, replaces Shade's role) — Timer 100 ticks (10s),
+  Power 4 → ~0.4 dmg/s. Tier growth (once a minion ladder exists, still OPEN) should follow the same
+  archetype logic weapons use: a fast minion's tiers mostly SHORTEN its timer, a slow minion's tiers
+  mostly RAISE its power — tier is not yet built; T1 is the placeholder per-minion baseline. **Shade is
+  likely retired** (it duplicated Skeleton's role with no distinct playstyle, which Golem now fills
+  cleanly) — confirm before the loop deletes it.
+- **Ranger's PET — DEX-gated Hound [content added 2026-07-04]:** per the DEX minion-role lean already on
+  the books (**DEX = utility/evasion, NOT raw DPS** — so a shield-pierce/bow build doesn't also double-
+  dip on a hard-hitting pet), Hound ships now as a minor chip-damage placeholder ONLY: Reserve 1 (DEX),
+  Timer 40 ticks (4s), Power 1 → ~0.25 dmg/s, deliberately the weakest of the three per-reserve-point.
+  The real distinguishing EFFECT (an evasion/accuracy/utility grant, not damage) is intentionally NOT
+  invented here — it rides the minion stat→role design pass (§17 #5) as its own slice.
 
 ## 10. HP, healing, and Charge (the shield-pierce resource) [LOCKED core; details OPEN]
 - **HP** is a small life total, separate from the part/stat layer; **permanent within an encounter**.
@@ -508,6 +600,15 @@ rune** (grown by progression). The *shape* of the rune loadout is itself a build
   surplus to reach a keystone its Core rune wasn't built for — all-in and fragile.
 - **[OPEN]** budget math (≈55% keystone / ≈120% budget-core targets); keystone taxonomy; gold buying
   low-tier runes (the "mostly found" lean is solid).
+- **The rune bag = the ONE inventory location for every owned rune [RESOLVED 2026-07-04, Doug — closes
+  the "where does a bought Mark live" Needs-human item]:** whether a rune was bought from the Core
+  rune's budget, bought at a merchant (§12), looted, or awarded, it lands in the SAME place and renders
+  the SAME way — ladder GROUPS showing the held rung + what's climbable next. There is no separate
+  "unallocated inventory row" for runes (unlike gear/techniques/minions, which DO have an
+  equipped-vs-inventory split, §6e) — **a rune you own IS allocated**, because Marks are same-attribute-
+  overwrite stepping stones (§11 above) and there are no fixed rune slots to begin with. A merchant-
+  bought Mark is treated exactly like a budget-bought one: it becomes your held rung on that ladder
+  immediately, shown via the existing ladder-group display — no new UI state needed.
 
 ## 12. Run structure & the map [LOCKED; some specifics OPEN]
 Nested layers, macro → micro:
@@ -651,7 +752,10 @@ points there so the canon stays design-focused.
 3. Keystone taxonomy; budget math (≈55%/≈120%); gold buying low-tier runes (§11).
 4. Race roster beyond Human/Elf; full Core-rune roster; the **race↔core-rune restriction matrix** (§7)
    — POC: ALL combos allowed; the matrix is a later content pass.
-5. Minion-type acquisition; **CON-as-minion-resource** (§9).
+5. Minion-type acquisition; **CON-as-minion-resource** (§9) — DROPPED, resource is Summons.
+   PARTIAL 2026-07-04: Skeleton/Golem (INT, damage-lean) + Hound (DEX, utility-lean placeholder) are
+   content now (§9). Still OPEN: the full stat→role table (STR minion undecided; DEX's real
+   utility/evasion EFFECT, not just low damage) + a formal tier ladder for minions.
 6. Campaign specifics (§12) — city count, procgen vs authored, supply costs; war-party arrival = instant
    loss vs **camp-defense last stand**; crafting from siege resources (floated).
 7. Healless compensation archetype(s) — heal-spam vs damage-tank (§6b/§10).
@@ -682,8 +786,8 @@ points there so the canon stays design-focused.
 19. ~~Weapon primary/secondary swap timing~~ MOOT (2026-07-03): retired with the "benched two-hander"
     framing it depended on — dual-wield is simultaneous, not benched (§6d correction).
 20. ~~Sling stat + names~~ RESOLVED 2026-07-03: DEX confirmed (1 DEX/tier), ladder locked (Shepherd's →
-    Braided → Sinew → Giantsbane Sling); damage/tier rides the balance pass (#9), as do bow dmg/tier
-    and the CON-shield equip-gate number (§6c).
+    Braided → Sinew → Giantsbane Sling); damage/tier rides the balance pass (#9), as does bow dmg/tier.
+    ~~CON-shield equip-gate number~~ RESOLVED 2026-07-04: 1 CON/tier (§6c).
 21. Ranged-only builds (no melee weapon at all, §6d) — viable in principle but not fully thought through;
     they lose the CON **block** shield-source specifically (needs a held shield) though other block
     sources don't need one. Revisit during the balance pass.

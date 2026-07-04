@@ -1,4 +1,6 @@
-# Claude Design payload — CURRENT only (2026-07-03 late)
+# Claude Design payload — CURRENT only (2026-07-04)
+**NEW, NOT YET SENT (2026-07-04): B12** (per-core-rune armor theme commission) — added this pass,
+pending Doug's relay to CD.
 _Everything previously in this file is CLOSED: payload #11–18, reconcile residuals #1–8, and
 addendum A1–A4 all verified LANDED across the two 2026-07-03 drops. Clear them from your dev
 memory. History lives in git (`git log -- outputs/CLAUDE_DESIGN_issues.md`). This file always
@@ -86,6 +88,61 @@ B11. **Bow sprites missing from the gear batch:** the catalog + sprite set cover
     EXCEPT bows (Short/Long/Compound/Elven — §6d ranged slot). The old sprites/gear/bow.png
     covers nothing in the new convention. Ask: 4 bow sprites (bow_short, bow_long, bow_compound,
     bow_elven) + catalog rows; engine ids will chase.
+
+B12. **NEW COMMISSION (2026-07-04, Doug) — per-CORE-RUNE THEME on the worn-armor art. CORRECTED same
+    day (Doug caught the first draft overclaiming "no new plumbing" — it hadn't been checked against
+    LAYOUT_CONTRACT/ASSET_MANIFEST; see the real path convention now in LAYOUT_CONTRACT §12a).**
+    Ground truth: actually WEARING armor on the figure (vs a card/inventory icon) is a system that
+    **doesn't exist yet** — B2-GO's "armor worn-layers" is its first build. This commission is the
+    THEME layer on top of that, NOT a reuse of something already there. Convention (§12a):
+    ```
+    sprites/gear/worn/<line>/<slot>_<tier>_<condition>.png              // GENERIC — B2-GO's own scope
+    sprites/gear/worn/<line>/<core>/<slot>_<tier>_<condition>.png       // THEMED — this commission
+    ```
+    `line` ∈ {str,dex,int}, `slot` ∈ {head,chest,arms,legs} (int: chest+head only), `tier` 1-4,
+    `condition` ∈ {healthy,damaged,broken}. **Themed art is a pure enhancement** — the engine falls
+    back themed → generic same-condition → generic healthy → bare, so shipping PARTIAL coverage
+    (e.g. healthy-only, or T1-only) never breaks anything; it's fine to ship this incrementally.
+    **Mount is race-agnostic ONLY for arms+legs — VERIFIED, not assumed, against the real figure rects
+    in `layout.json` (2026-07-04):** every elf HEAD rect is landscape (152×104, aspect 1.46) against
+    every human head's near-square (~104-112² depending on core) — the same stretch failure already
+    caught on the raceCard head-portrait bug (B7 above); elf TORSO/CHEST runs ~9-10% narrower than
+    human's at every core sampled (grunt 144 vs 160, warden 160 vs 176, ranger 136 vs 152). **Head and
+    chest each need their OWN art per race** — don't share one sprite across human/elf for those two
+    slots, it will visibly distort. Arms and legs, by contrast, have IDENTICAL rect dimensions across
+    race in every pair checked (only x-position shifts) — one sprite per cell is fine there, no race
+    split needed.
+    **Scope LOCKED (Doug, 2026-07-04): the FULL set** — all 4 tiers × all 3 conditions (healthy/
+    damaged/broken) for each core's own starting line, race-split where the geometry requires it.
+    **Corrected count: ~384 sprites** (head+chest: 6 cores × 2 slots × 4 tiers × 3 conditions × 2
+    races = 288; arms+legs: 6 cores × 2 slots × 4 tiers × 3 conditions × 1 [race-agnostic] = 96 — note
+    Adept/Summoner have no arm/leg robe pieces at all, §6c, so their full 288-worth is concentrated in
+    just head+chest). Nothing here falls back to generic art short of this; this is the complete
+    near-term target, not a partial batch. **Likely multi-night — ship incrementally by tier, condition,
+    or race if that's faster to produce; the fallback chain (§12a: race-specific themed → race-agnostic
+    themed → generic same-condition → generic healthy → bare) covers any interim gap safely** (e.g. land
+    human+healthy first, elf/damaged/broken next — nothing breaks between drops).
+    **Bounded to each core's OWN starting armor line** (DESIGN_SPEC §7a) — not a full 6-core × 4-line
+    cross-product (a Warden theming INT robes has no value; gear is swappable, §7, so cross-equipping
+    still works fine with plain generic art, it just won't carry the theme). Six themes, keyed to their
+    starting armor line:
+    - **Grunt** (STR plate) — versatility, no strong motif: plain, practical, well-kept soldier's kit.
+      The visual "middle of the road" — nothing another theme couldn't have, on purpose.
+    - **Warden** (STR plate) — block & armor: the heaviest-READING silhouette of the two STR
+      treatments — thicker plates, reinforced edges/rivets, maybe a shield-boss motif echoed on the
+      other pieces. Reads as "built to not move."
+    - **Adept** (INT robe) — spellcasting: arcane motifs — subtle runic trim/embroidery, a flowing
+      silhouette, a restrained magical accent (don't overdo glow).
+    - **Summoner** (INT robe) — minions/binding: necromantic/ritual motifs on the SAME robe silhouette
+      as Adept but reading darker/heavier — bone or chain trim, ritual sigils — so Adept and Summoner
+      stay clearly distinct even sharing a line.
+    - **Reaver** (DEX leather) — dual-wielding: light, aggressive, agile cut — streamlined, less bulk,
+      maybe twin-blade motif etching.
+    - **Ranger** (DEX leather) — bow & pet: tracker/nature motifs — fur trim, quiver details, earthy
+      palette — distinct from Reaver's leather despite sharing the line.
+    Ship with the same deliverable shape as B2-GO (figure defs + inventory in layout.json, mgcb
+    mirrors, 00-assets sheet refresh) so the two batches land together if convenient — but this is
+    additive scope, call it out separately in your drop notes so it doesn't get lost inside B2-GO.
 
 ## Standing FYIs (for context — not action items)
 - **Tier ladders for the new families** (for card copy / labels): Sling Shepherd's → Braided →

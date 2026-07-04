@@ -225,6 +225,44 @@ read crisp, NOT upscaled from 540. The shadow/frame/gradient primitives (§10) a
 960K×540K (integer K; currently 1920×1080). `ui_gate.py` hard-fails any other size — a warped ref
 poisons every fidelity score taken against it. Asset SHEETS (`design/00-assets-*`) are exempt.
 
+## 12a. Worn-armor layer + per-core THEME [NEW, 2026-07-04 — this system does NOT exist yet; see
+ASSET_MANIFEST.md's own note that "wearing armor on the figure...is a separate, not-yet-built morph
+system." B2-GO's "armor worn-layers" ask IS this system's first build, and DESIGN_SPEC §7a's per-core
+theme rides on top of it — both need this convention, not just B12's theme layer.]
+**Path convention** (mirrors the figure-part idiom of §1, extended with LINE/TIER, an optional
+CORE-THEME layer, and an optional RACE layer — see the race-dimension finding below, don't assume
+race-agnostic without checking the figure rects like this pass did):
+```
+sprites/gear/worn/<line>/<slot>_<tier>_<condition>.png                   // GENERIC — required
+sprites/gear/worn/<line>/<core>/<slot>_<tier>_<condition>.png            // THEMED, race-agnostic
+sprites/gear/worn/<line>/<core>/<race>/<slot>_<tier>_<condition>.png     // THEMED, race-specific
+```
+`line` ∈ {str, dex, int} (matches ArmorLine; CON has no body armor, §6c); `slot` ∈ {head, chest, arms,
+legs} (int only ships chest/head); `tier` ∈ 1..4; `condition` ∈ {healthy, damaged, broken}.
+
+**RACE DIMENSION — VERIFIED against `layout.json`'s actual figure rects (2026-07-04), not assumed:**
+checked human/elf pairs across grunt, warden, and ranger. **HEAD and CHEST/TORSO are NOT race-agnostic
+and need their own art per race:** every elf head rect is landscape (`152×104`, aspect 1.46) vs every
+human head rect near-square (`104×104` or `112×112`, aspect ~1.0) — the SAME stretching failure mode
+already caught on the raceCard head-portrait bug (B7); elf torso is consistently ~9-10% NARROWER than
+human at the same core (grunt 144 vs 160, warden 160 vs 176, ranger 136 vs 152), same height. **ARMS
+and LEGS ARE race-agnostic in size** — every pair checked has IDENTICAL armL/armR/legL/legR rect
+dimensions across race (only x-position shifts, because the whole figure is narrower) — so Vambraces/
+Greaves art can safely be ONE sprite per cell, no race split needed.
+**Net: race-specific art is required for head+chest (both of INT robe's only two slots; 2 of STR/DEX's
+four slots), race-agnostic is fine for arms+legs.** This changes the B12 asset count — see STATUS/B12
+for the corrected total.
+
+**Resolve order (engine, additive to the existing bare→armored-same-condition→armored-healthy figure
+fallback):** (1) THEMED + race-specific, if it exists for this wearer's race → (2) THEMED, race-agnostic
+→ (3) GENERIC, same condition → (4) GENERIC healthy → (5) bare (figure's own part, §1). **This is the
+answer to "will we get all of these" — we don't need to:** every themed/race-specific cell is a pure
+enhancement; ship zero, some, or all of them and the chain degrades gracefully with no missing-texture
+risk. CD can deliver incrementally without blocking anything on the generic set.
+**Scope is a Doug call, not an art-team default:** which `(line, core, race)` themed cells actually get
+produced — see DESIGN_SPEC §7a / STATUS for the current scope decision. The convention above is fixed
+regardless of how many cells are filled.
+
 ## 12. Schema additions — the 2026-07-03 drop (from CD's DROP_AUDIT)
 - **z is a PAINT ORDINAL** — back→front draw order, ONE convention for every screen. `data-z` in the
   dc.html is DEPRECATED as depth; the manifest `z` is derived paint order. Find the scene/backdrop

@@ -1231,17 +1231,77 @@ ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered 
   is the other FTL-ism — embedded in the `beaconNode` manifest template + comments; flagged for a
   decision, not auto-changed. "FTL" in comments is an allowed private design ref, leave it.)
 
+## ⇒ NEW LOCKS (2026-07-04, Doug — design session answering the 2026-07-03 Needs-human batch)
+Doug resolved four open blockers + greenlit prepping a few cores to "advanced prototype" BEFORE the
+first real balance playtest. All folded into DESIGN_SPEC in this pass (§6e, §6c, §9, §11, new §7a):
+1. **Cascade sustain model RESOLVED → §6e:** SUMMED shared pool (not individual thresholds in
+   isolation) — equipped gear + active techniques both reserve against the SAME live attribute pool;
+   on shrink, active techniques disable FIRST, equipment only if the pool is still short after that.
+   **UNBLOCKS the disable-cascade ranking build** (previously parked, §6/§6e Remaining).
+2. **Rune bag RESOLVED → §11:** it's the ONE inventory home for every owned rune regardless of source
+   (budget/merchant/loot/reward) — a bought Mark becomes its held rung immediately via the EXISTING
+   ladder-group display; no new UI state. Closes the bought-rune Needs-human item.
+3. **M0 textgeom RESOLVED:** switch the overflow/collision detector to INK bounding boxes (not the
+   drawn box) — matches the probes, still catches clipped/missing text. Loop-queued below.
+4. **Plate armor RESOLVED: RETIRE.** Delete `Shops.cs`'s legacy `Plate`/`Hide`/`Armor`/`ArmorPool`
+   fixed-stock fields — `MerchantStock.Roll` + `ArmorLines` already supersede them (STATUS's old
+   07-03 merchant note said as much; this just executes the retire). Clean removal, no back-compat.
+5. **Minion cadence bug RESOLVED → §9:** minions were firing every COMBAT TICK (10/s), not on their
+   own cadence — root cause of "Skeleton hits like every second." Minions now carry their own Timer
+   like a weapon; Skeleton/Golem/Hound numbers + a Shade-retire recommendation are in §9 (Golem +
+   Hound are NEW content; Shade needs Doug's confirm before the loop deletes it — flagged, not done).
+6. **Starting kits + per-core THEME → new §7a:** six cores get a real weapon+armor(+minion) kit and a
+   visual theme brief for CD (payload B12, `outputs/CLAUDE_DESIGN_issues.md`) — this + the minion fix
+   IS the "advanced prototype" prep Doug wants done before the balance-playtest pass.
+**CORRECTION (2026-07-04, same day, Doug caught it):** the first pass under-scoped what B12 actually
+needs — "reuses the existing figure-morph contract, zero new plumbing" was asserted without checking
+LAYOUT_CONTRACT/ASSET_MANIFEST. TRUTH: actually wearing armor on the figure doesn't exist as a system
+yet at all (only card/inventory icons do today); B2-GO is its first build, and per-core THEME is a real
+new dimension on top of that. `LAYOUT_CONTRACT.md` §12a (added this pass) now specs the real
+convention: a required GENERIC worn-armor layer (`sprites/gear/worn/<line>/<slot>_<tier>_<condition>`)
++ an optional THEMED override (`.../<core>/...`), with an explicit fallback chain (themed → generic
+same-condition → generic healthy → bare) so partial CD coverage never breaks anything. **Scope LOCKED
+(Doug, 2026-07-04): the FULL set** — all 4 tiers × all 3 conditions per core's own line (B12) —
+flagged likely multi-night; ship incrementally by tier/condition, the fallback chain covers any gap
+between drops.
+**CORRECTION #2 same day (Doug: "what about race?"):** checked `layout.json`'s real figure rects
+instead of assuming — HEAD + CHEST/TORSO are NOT race-agnostic (elf head is landscape 152×104 vs
+human's near-square ~104-112², same class as the raceCard head-stretch bug; elf torso runs ~9-10%
+narrower than human's at every core sampled), ARMS + LEGS ARE race-agnostic (identical rect sizes
+across race, only repositioned). LAYOUT_CONTRACT §12a now has an optional race-specific path tier for
+head/chest only. **Corrected count: ~384 sprites (not 288)** — 12 race-needed slot-instances (head+
+chest × 6 cores) × 12 cells × 2 races = 288, plus 8 race-agnostic slot-instances (arms+legs × 6 cores,
+minus Adept/Summoner who have no arm/leg robe pieces) × 12 cells = 96.
+**LOOP QUEUE from this pass (normal priority, each its own tested slice — no invention beyond §7a/§6c/
+§9's numbers):**
+- `CoreRune.DefaultArmor` field (mirrors `DefaultWeapons`, wired into `NewBody` via `Body.Equip`) +
+  assemble the six §7a kits (mechanical equip only — doesn't need the worn-art system below to ship).
+- **Worn-armor render system (NEW, replaces the too-casual "just art variety" framing):** the figure
+  compose path currently has no worn-armor-layer lookup at all (only bare-vs-armored per part, no
+  LINE/TIER distinction — verified against `Game1.cs`'s figure fallback code). Build the GENERIC
+  resolver first (`sprites/gear/worn/<line>/<slot>_<tier>_<condition>`, LAYOUT_CONTRACT §12a) — this is
+  B2-GO's own dependency, not optional. Add the THEMED override + fallback chain as the same slice's
+  second half once CD's B12 scope is confirmed and at least some art lands.
+- `WeaponKind.Shield` + a `Shields` ladder in `Armory.cs` (Con, 1 req/tier, Hands:1, off-hand-only —
+  reuses existing Weapon/Wield machinery, no new type) — Wooden Shield → Iron Buckler → Kite Shield →
+  Tower Shield. Gating `brace`'s shield-source on one being equipped (§6b) is a separate follow-up
+  slice, not required to ship the kits.
+- `Minion` gains a `Timer` field; `Caster.Step()` fires minions on their own countdown instead of every
+  tick / piggybacked on the caster's front-target check. Retune Skeleton (Timer 25/Power 1), add Golem
+  (Timer 100/Power 4/Reserve 3) + Hound (Timer 40/Power 1/Reserve 1, DEX) per §9. Confirm Shade retire
+  with Doug before deleting (recommended, not decided).
+- `tools/geometry_diff.py`/textgeom: ink-bbox measurement switch (item 3 above).
+- Retire `Shops.cs` legacy fixed-stock fields (item 4 above).
+
 ## Needs human (loop skips)
-- BOUGHT RUNE display/consumption (2026-07-03): merchant rune buys land in `Stash.Marks` (per the
-  §12 receiving LOCK) but the rune bag renders ladder GROUPS (climb-by-budget) — a purchased Mark
-  has no display home or consumption rule yet. Decide: bought rung auto-owned? separate bag row?
-  (§17 rune-taxonomy adjacent; wire the moment it's called.)
 - Balance/feel tuning (all placeholder-sane, tune in PLAY): tick 10/s; cooldowns + damage; DEX haste
   2%/pt cap 28%; CON→HP 1:2 +base8; evasion %; shield amounts/regen; armed-foe + castle HP/strike/cadence;
   budgets/spoils/prices; supplies vs march length; race/core stat blocks (design/05).
-- Plate armour role: give it a role or retire the kind (flagged in `Shops.cs`).
 - Apex EFFECTS: the 5 core signature effects are DISPLAY-ONLY placeholders — design them (+ the effect
-  model) in a dedicated pass; NO undesigned mechanics in code meanwhile (CLAUDE.md guardrail).
+  model) in a dedicated pass; NO undesigned mechanics in code meanwhile (CLAUDE.md guardrail). Tracked
+  in the space's shared-todo memory so it surfaces again next session.
+- Warden's CON-substitution idea ("STR armor requires CON instead") — FLOATED ONLY (§7a), not locked;
+  replace vs stack with the already-locked Unbroken Aegis Core Effect is still Doug's call.
 - Part→stat friction (legs = accuracy, arms = STR) — low-pri, revisit only if it nags.
 
 ## Asset gaps (Needs Claude Design) — art missing/wrong, not composable from primitives
