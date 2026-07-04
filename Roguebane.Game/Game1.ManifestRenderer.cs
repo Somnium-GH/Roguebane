@@ -938,6 +938,16 @@ public partial class Game1
         _ => null,
     };
 
+    // The GEAR tab's rows, ONE composition shared by the renderer's list bind and the click
+    // hit-test (a divergence would mis-route clicks): wielded, then worn armor (it lives on the
+    // BODY — Gearing moves it out of the pack, so listing only the stash hid it), then the pack.
+    private List<object> GearTabItems() => InRun
+        ? Exp.Player.Body.Hands.Cast<object>()
+            .Concat(new[] { Stat.Str, Stat.Int, Stat.Dex, Stat.Con }
+                .Select(s => (object?)Exp.Player.Body.ArmorOn(s)).OfType<object>())
+            .Concat(Exp.Stash.Weapons).Concat(Exp.Stash.Armor).ToList()
+        : new List<object>();
+
     // How many technique cards precede the bay lane on the action bar (hotkey numbering).
     private int TechniqueCount() => (InRun ? Exp.Equipment : _build.Equipment).Count;
 
@@ -971,14 +981,7 @@ public partial class Game1
         "inventory.tabs" => new List<object> { "GEAR", "TECHNIQUES", "MINIONS" },
         "inventory.activeTab.items" => _invTab switch
         {
-            0 => InRun
-                ? Exp.Player.Body.Hands.Cast<object>()
-                    // Worn armor lives on the BODY (Gearing moves it out of the pack) — list it or
-                    // the equipped/RED card states have nothing to mark (design/02 shows worn gear).
-                    .Concat(new[] { Stat.Str, Stat.Int, Stat.Dex, Stat.Con }
-                        .Select(s => (object?)Exp.Player.Body.ArmorOn(s)).OfType<object>())
-                    .Concat(Exp.Stash.Weapons).Concat(Exp.Stash.Armor).ToList()
-                : new List<object>(),
+            0 => GearTabItems(),
             // §12: bought techniques/minions join the pool the Equipment screen slots from.
             1 => _build.Palette.Cast<object>()
                 .Concat(InRun ? Exp.Stash.Techniques : Enumerable.Empty<object>().Cast<Roguebane.Core.Technique>()).ToList(),

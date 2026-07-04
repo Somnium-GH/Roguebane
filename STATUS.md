@@ -188,6 +188,21 @@ engine resolution + the armor model. Armor-RED per §6/§6c stands, folded into 
 - ENGINE ORDER (extends the §6d queue, normal priority, no queue-jump): armor items as data (§6c
   ladders) + gear/armor requirement checks → cascade ranking → state-family render wiring → click
   matrix + auto-displace → drag-reorder → paper-doll gear-state compose. Each slice Core-tested.
+_PROGRESS (2026-07-03 loop): ~~state-family render wiring~~ DONE (generic stateless-family
+resolution, 8d85ef7); ~~GEAR click matrix + auto-displace~~ DONE (equipped→unequip,
+equippable→equip; hands-full melee benches the OFF-hand [Hands[1] — Hands[0]=first-equipped=main
+per §6d promotion], armor swaps via Gearing's existing displacement; LOCKED inert via the Body's
+own wield gate; one GearTabItems composition shared by render + hit-test). Combat seal =
+Expedition's Choosing-only gate._
+**‼ NEEDS HUMAN — cascade SUSTAIN MODEL ambiguous, blocking the ranking build:** §6e reads
+"an attribute can't sustain EVERY equipped item" + a ranking with TIE-BREAKS + cheapest-first
+recovery — all load-bearing only under a SUMMED shared-pool demand (level 5 vs two req-3 swords:
+one disables). But §6d locks equip gating "purely by EACH weapon's OWN per-tier STR requirement"
+(individual thresholds) — and under individual thresholds the disable set is trivially
+{req > level}: ranking order never changes membership and ties are cosmetic. Doug: is gear
+sustain (a) SUMMED against the attr pool alongside technique reservations (FTL-power-budget
+style), or (b) individual thresholds (each item vs the post-reservation level)? The ranking's
+Core tests assert economy math — not building it on a guess.
 
 ## ✅ BUILD-BREAKING BUG FIXED (2026-07-03, post-commit 57cc8a6): mgcb crashed on launch
 `dotnet run` failed content build (MGCB exited -532462766 / 0xE0434352 — unhandled CLR exception,

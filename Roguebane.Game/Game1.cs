@@ -315,6 +315,32 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             for (var i = 0; i < cards.Count; i++)
                 if (Click(RectOf(cards[i]))) ToggleTech(_build.Palette[i]);
         }
+        // GEAR tab clicks (§6e, out-of-combat by Expedition's own gate): equipped → unequip;
+        // equippable → equip, AUTO-DISPLACING on conflict — hands-full melee benches the OFF-hand
+        // (index 1; main is never displaced, §6d promotion), armor swaps its slot via Gearing.
+        // LOCKED cards are inert because the Body's own wield gate rejects the equip.
+        else if (_invTab == 0 && InRun)
+        {
+            var gear = GearTabItems();
+            var cards = ManifestListCells("equipment", "inventory.activeTab.items", gear.Count);
+            for (var i = 0; i < cards.Count && i < gear.Count; i++)
+            {
+                if (!Click(RectOf(cards[i]))) continue;
+                switch (gear[i])
+                {
+                    case Roguebane.Core.Weapon w when Exp.Player.Body.Hands.Contains(w):
+                        Exp.UnequipWeapon(w); break;
+                    case Roguebane.Core.Weapon w:
+                        if (Exp.Player.Body.Hands.Count >= 2)
+                            Exp.UnequipWeapon(Exp.Player.Body.Hands[1]);
+                        Exp.EquipWeapon(w); break;
+                    case Roguebane.Core.Armor a when Exp.Player.Body.ArmorOn(a.Group) == a:
+                        Exp.UnequipArmor(a.Group); break;
+                    case Roguebane.Core.Armor a:
+                        Exp.EquipArmor(a); break; // Gearing returns the displaced piece to the pack
+                }
+            }
+        }
         var slottedData = InRun ? Exp.Equipment : _build.Equipment;
         var slotted = ManifestListCells("equipment", "loadout", slottedData.Count);
         for (var i = 0; i < slotted.Count && i < slottedData.Count; i++)
