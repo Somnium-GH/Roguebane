@@ -1,5 +1,17 @@
 # Status
 
+## ⇒ NEW LOCK (2026-07-03, Doug): merchant presence-roll weights, DESIGN_SPEC §12
+Doug: keep the RANDOMIZED per-category stocking (don't flatten to "always show all 5" for the POC) —
+"the advanced prototype" already IS `MerchantStock.cs`'s existing weighted-roll shape, just locked
+now instead of flagged placeholder/OPEN. **No new engine behavior needed — this is a doc/test-status
+change, not a code change:** Armor/Weapons/Minions = 80% independent presence roll each, Techniques =
+25%, Runes = 8% (+ a 33% survival roll for rank-2+ Marks), capped at 4-of-5 sections, keystones never.
+Folded into DESIGN_SPEC §12 as LOCKED. **Loop follow-up (small):** `MerchantStockTests.cs`'s header
+comment still says "the exact section weights are OPEN (§17) — these tests pin the locked SHAPE, not
+the odds" — update that comment (now stale) and consider adding a statistical presence-rate assertion
+across the existing 400-seed sweep (e.g. Techniques appearing in roughly 20-30% of seeds) now that
+the numbers themselves are locked, not just the shape. Not urgent, no P0 jump.
+
 ## ⇒ CORRECTION to the "ghost head — FIXED" answer above (2026-07-03, Doug caught it live)
 The fix picked the WRONG part to keep. Recap: `raceCard` had two overlapping head parts — (1)
 `imageBind` bound to `race.headImage`, rect `[1,1,53,77]` (aspect 0.69, portrait); (2) a static
@@ -194,9 +206,20 @@ equippable→equip; hands-full melee benches the OFF-hand [Hands[1] — Hands[0]
 per §6d promotion], armor swaps via Gearing's existing displacement; LOCKED inert via the Body's
 own wield gate; one GearTabItems composition shared by render + hit-test). Combat seal =
 Expedition's Choosing-only gate. ~~paper-doll gear-state compose~~ DONE (00a87b6: disabled armor
-renders BARE + un-ringed, broken arm never draws its weapon — Core-tested, 320). REMAINING from
-the §6e order: §6c armor data + requirement checks; cascade ranking (BLOCKED on the sustain-model
-question below); drag-reorder; the vestigial pre-run branch retire._
+renders BARE + un-ringed, broken arm never draws its weapon — Core-tested, 320).
+~~§6c armor data~~ DONE (2026-07-03 loop, 321 tests): Armor remodelled to (Id, Name, Slot, Line,
+Tier) — LINE names the governing attribute (§6e sustain rides IT, not the slot; blessed-initial
+threshold = line-capacity 0, §6c's "both arms break" example); `ArmorLines` ships all 10 canon
+ladders (STR/DEX ×4 slots, INT chest+head — the CON SHIELD OBJECT is a hand-config item, DEFERRED
+to the §6d wield build). Effects live: STR plate soaks the covered part's own damage (-2×tier,
+never HP); DEX leather = GLOBAL evade, +2%×tier per worn sustained piece, with the §6 broken-leg
+HARD ZERO; INT robe carries +2 spell damage per piece as data (COMBAT CONSUMER PENDING — next
+slice, hooks Caster spell power w/ 2-piece cap). RETIRED: plate-as-worn-shield-source (§6b shield
+sources are techniques + the future shield object) and the old bespoke Plate/Hide (Shops staples
+now name rung-1 canon pieces; merchant armor price = 2×tier+2 placeholder). Weapons still FALL
+OFF below threshold in Body.Damage — the §6e disable-not-drop change is its own slice, rides the
+cascade answer. REMAINING: robe spell-damage consumer; weapons disable-not-drop; cascade ranking
+(BLOCKED on the sustain-model question below); drag-reorder; vestigial pre-run branch retire._
 **‼ NEEDS HUMAN — cascade SUSTAIN MODEL ambiguous, blocking the ranking build:** §6e reads
 "an attribute can't sustain EVERY equipped item" + a ranking with TIE-BREAKS + cheapest-first
 recovery — all load-bearing only under a SUMMED shared-pool demand (level 5 vs two req-3 swords:

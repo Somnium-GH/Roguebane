@@ -486,8 +486,15 @@ Nested layers, macro → micro:
       sections appear per visit — most visits are just Armor/Weapons/Minions (a 2–3-stock rotation).
     * **Techniques: always 5 when present**, but techniques are the 2nd-rarest to appear.
     * **Runes: EXTREMELY rare; good runes EXCEEDINGLY rare; Keystones NEVER (drop-only).**
-  - **[OPEN §17]** the weighted-shuffle / distribution algorithm (balanced attr-lean variety; e.g. "prefer
-    1–2 passives, rarely 0, when techniques show") — a separate tuning pass.
+  - **Presence-roll weights [LOCKED 2026-07-03, Doug]:** the "advanced prototype" IS the shipped
+    mechanic — an independent per-category presence roll (not a guaranteed-all stock), each category
+    rolled separately against its own weight, capped at 4 of the 5 sections per visit. Locked numbers
+    (`Roguebane.Core/MerchantStock.cs`, already implemented, just de-flag it): **Armor/Weapons/Minions
+    = 80%** presence chance each ("common," independent rolls) · **Techniques = 25%** · **Runes = 8%**
+    (rank-2+ Marks additionally need a 33% survival roll on top of the section appearing at all,
+    keeping "good runes exceedingly rare" distinct from "runes rare"). No further tuning pass needed
+    to ship the POC — these ARE the numbers. (A future PASS may still reshape this — e.g. attr-lean
+    variety within a section — but that's a new idea, not finishing this one.)
   - **[NOTE]** placeholder rune behavior: POC currently just seeds runes into inventory at run start.
   - **Receiving [LOCKED 2026-07-03]:** every ware is a **click-to-buy tile** (per design/07) — no
     separate ceremony. Purchases land in INVENTORY: technique → palette, minion → minion inventory,

@@ -28,7 +28,7 @@ public static class Gearing
     public static bool EquipArmor(Stash pack, Body body, Armor piece)
     {
         if (!pack.HasArmor(piece)) return false;
-        var displaced = body.ArmorOn(piece.Group);
+        var displaced = body.ArmorOn(piece.Slot);
         body.Equip(piece);
         pack.RemoveArmor(piece);
         if (displaced is not null) pack.AddArmor(displaced);

@@ -924,8 +924,8 @@ public partial class Game1
             Exp.Player.Body.Hands.Count < 2 && Exp.Player.Body.Capacity(w.Stat) >= w.Reserve
                 ? "ready" : "neutral",
         Roguebane.Core.Weapon => "neutral", // pre-run: no body to lift it yet
-        Roguebane.Core.Armor a when InRun && Exp.Player.Body.ArmorOn(a.Group) == a =>
-            Exp.Player.Body.Capacity(a.Group) == 0 ? "dropped" : "equipped",
+        Roguebane.Core.Armor a when InRun && Exp.Player.Body.ArmorOn(a.Slot) == a =>
+            Exp.Player.Body.ArmorSustained(a) ? "equipped" : "dropped",
         Roguebane.Core.Armor => "ready", // no attr requirement in Core today (§6c ladders queued)
         Roguebane.Core.Technique t when (InRun ? Exp.Equipment : _build.Equipment).Contains(t)
             => "equipped",
@@ -1140,7 +1140,7 @@ public partial class Game1
             w.Stat.ToString().ToUpperInvariant() + " " + w.Reserve, "",
             Roguebane.Core.Expedition.Price(w) + "g", "BUY", w)));
         Add("ARMOR", Exp.OfferedArmor.Select(a => new Ware("ARM", DisplayName(a.Id),
-            a.Kind.ToString().ToUpperInvariant() + " " + a.Group.ToString().ToUpperInvariant(), "",
+            a.Line.ToString().ToUpperInvariant() + " T" + a.Tier, "",
             Roguebane.Core.Expedition.Price(a) + "g", "BUY", a)));
         Add("TECHNIQUES", Exp.OfferedTechniques.Select(t => new Ware("TEC", DisplayName(t.Id),
             t.Stat.ToString().ToUpperInvariant() + " " + t.Reserve, t.DescText,
@@ -1331,7 +1331,7 @@ public partial class Game1
                 Roguebane.Core.Technique t => t.Stat.ToString().ToLowerInvariant(),
                 Roguebane.Core.Minion m => m.Stat.ToString().ToLowerInvariant(),
                 Roguebane.Core.Weapon w => w.Stat.ToString().ToLowerInvariant(),
-                Roguebane.Core.Armor ar => ar.Group.ToString().ToLowerInvariant(),
+                Roguebane.Core.Armor ar => ar.Governing.ToString().ToLowerInvariant(),
                 _ => null,
             },
         _ => null,
@@ -1476,8 +1476,8 @@ public partial class Game1
         Roguebane.Core.Armor ar => bind switch
         {
             "invItems.name" or "gear.name" => DisplayName(ar.Id),
-            "invItems.badgeLabel" => ar.Group.ToString().ToUpperInvariant(),
-            "invItems.badgeNum" => ar.Value.ToString(),
+            "invItems.badgeLabel" => ar.Governing.ToString().ToUpperInvariant(),
+            "invItems.badgeNum" => ar.Tier.ToString(),
             _ => null,
         },
         Roguebane.Core.Minion mn => bind switch

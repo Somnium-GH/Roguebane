@@ -5,10 +5,11 @@ namespace Roguebane.Core.Content;
 // "Needs human" balance touchpoint); the mechanic is what matters here.
 public static class Shops
 {
-    // Chest plate: a worn SHIELD SOURCE (§6b/§8) — raises 2 shield layers on the chest group while it
-    // stands. Value = shield layers (placeholder).
-    public static readonly Armor Plate = new("plate", Stat.Con, ArmorKind.Plate, 2);
-    public static readonly Armor Hide = new("hide", Stat.Dex, ArmorKind.Leather, 25);    // leg leather: 25% evasion
+    // Merchant staples off the §6c ladders (rung-1 pieces; deeper rungs join the stock with the
+    // economy/rarity tune). "Plate"/"Hide" now NAME canon §6c pieces — the old bespoke shield-plate
+    // and 25%-hide are retired with the worn-shield role.
+    public static readonly Armor Plate = ArmorLines.PlateChest[0];   // Breastplate (STR line, chest)
+    public static readonly Armor Hide = ArmorLines.LeatherLegs[0];   // Leather Leggings (DEX line, legs)
 
     public static readonly IReadOnlyList<Weapon> Weapons = new[] { Armory.Sword, Armory.Dagger };
     public static readonly IReadOnlyList<Armor> Armor = new[] { Plate }; // legacy fixed stock (retiring)

@@ -34,13 +34,21 @@ public class MitigationTests
     }
 
     [Fact]
-    public void LeatherLegsCanFullyDodgeWholeHpHits()
+    public void StackedLeatherEvadesSomeHits()
     {
+        // §6c: evade stacks per worn sustained piece (full tier-4 set = 4 x 8% = 32%) — a leather
+        // build takes strictly less damage than a bare one over the same seeded exchange.
         var body = Humanoid();
-        body.Equip(new Armor("dodge", Stat.Dex, ArmorKind.Leather, 100)); // certain dodge
+        foreach (var l in new[] { Content.ArmorLines.LeatherHead, Content.ArmorLines.LeatherChest,
+            Content.ArmorLines.LeatherArms, Content.ArmorLines.LeatherLegs })
+            body.Equip(l[3]); // full tier-4 leather: 4 x 8% = 32% evade (§6c stacking)
+        Assert.Equal(32, body.EvasionPercent());
         var (attacker, target) = Duel(body);
+        var leather = DamageOver(attacker, target, 300);
 
-        Assert.Equal(0, DamageOver(attacker, target, 300)); // long enough for many Jab cooldowns
+        var (atkB, tgtB) = Duel(Humanoid());
+        var bare = DamageOver(atkB, tgtB, 300);
+        Assert.True(leather < bare, $"evade should reduce damage taken ({leather} vs {bare})");
     }
 
     [Fact]
@@ -73,7 +81,7 @@ public class MitigationTests
         int Run()
         {
             var body = Humanoid();
-            body.Equip(new Armor("dodge", Stat.Dex, ArmorKind.Leather, 50)); // half dodge
+            body.Equip(Content.ArmorLines.LeatherLegs[3]); // 8% evade, seeded RNG
             var (attacker, target) = Duel(body);
             return DamageOver(attacker, target, 300);
         }

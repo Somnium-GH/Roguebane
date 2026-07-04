@@ -105,7 +105,7 @@ public sealed class Expedition
     public IReadOnlyList<Minion> OfferedMinions => AtMerchant ? CurrentStock().Minions : Array.Empty<Minion>();
     public IReadOnlyList<Mark> OfferedMarks => AtMerchant ? CurrentStock().Marks : Array.Empty<Mark>();
     public static int Price(Weapon weapon) => weapon.Reserve + weapon.Power;
-    public static int Price(Armor armor) => armor.Value + 2;
+    public static int Price(Armor armor) => 2 * armor.Tier + 2; // placeholder pricing, economy tune
 
     public bool BuyWeapon(Weapon weapon)
     {

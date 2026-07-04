@@ -305,12 +305,12 @@ public sealed class Caster
         return true;
     }
 
-    // Apply a hit through the defender's §8 mitigation: a full leather EVASION dodge (on the struck
-    // part-group) negates it, else a shield pool absorbs; whatever lands hits the part AND HP together.
+    // Apply a hit through the defender's §8 mitigation: a full EVASION dodge (§6c leather, global,
+    // leg-gated) negates it, else a shield pool absorbs; whatever lands hits the part AND HP together.
     private void Hit(ICombatTarget target, BodyPart? part, int power, bool pierce = false)
     {
         var frame = target.Frame;
-        if (frame is not null && _rng is not null && _rng.Chance(frame.EvasionPercent(part)))
+        if (frame is not null && _rng is not null && _rng.Chance(frame.EvasionPercent()))
             return; // dodged
 
         // §6b shields are the ONLY damage mitigation now (alongside a full evade above): points absorb

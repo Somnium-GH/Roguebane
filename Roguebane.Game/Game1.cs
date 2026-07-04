@@ -334,8 +334,8 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                         if (Exp.Player.Body.Hands.Count >= 2)
                             Exp.UnequipWeapon(Exp.Player.Body.Hands[1]);
                         Exp.EquipWeapon(w); break;
-                    case Roguebane.Core.Armor a when Exp.Player.Body.ArmorOn(a.Group) == a:
-                        Exp.UnequipArmor(a.Group); break;
+                    case Roguebane.Core.Armor a when Exp.Player.Body.ArmorOn(a.Slot) == a:
+                        Exp.UnequipArmor(a.Slot); break;
                     case Roguebane.Core.Armor a:
                         Exp.EquipArmor(a); break; // Gearing returns the displaced piece to the pack
                 }

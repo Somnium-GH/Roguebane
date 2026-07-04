@@ -51,12 +51,12 @@ public static class FigureBinding
     public static bool UseBare(Body body, string visualPart)
         => BareCapable.Contains(visualPart)
            && PartStat.TryGetValue(visualPart, out var stat)
-           && (body.ArmorOn(stat) is null || body.Capacity(stat) == 0);
+           && (body.ArmorOn(stat) is not { } worn || !body.ArmorSustained(worn));
 
     // Is this visual part's group wearing SUSTAINED armour? (A disabled piece draws nothing, §6e.)
     public static bool IsArmored(Body body, string visualPart)
-        => PartStat.TryGetValue(visualPart, out var stat) && body.ArmorOn(stat) is not null
-           && body.Capacity(stat) > 0;
+        => PartStat.TryGetValue(visualPart, out var stat)
+           && body.ArmorOn(stat) is { } worn && body.ArmorSustained(worn);
 
     // §6 broken-limb hard override: a BROKEN arm's hand slot is physically gone — its weapon never
     // draws (nor swings). Hand order mirrors the shell's socket order: 0 = handR/main, 1 = handL.

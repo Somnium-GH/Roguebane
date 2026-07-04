@@ -66,8 +66,8 @@ public class GearingTests
     {
         var pack = new Stash();
         var body = StrBody(2);
-        var plate = new Armor("plate", Stat.Con, ArmorKind.Plate, 2);
-        var heavy = new Armor("heavy", Stat.Con, ArmorKind.Plate, 3); // same group (chest)
+        var plate = Content.ArmorLines.PlateChest[0];
+        var heavy = Content.ArmorLines.PlateChest[2]; // same slot (chest)
         pack.AddArmor(plate);
         pack.AddArmor(heavy);
 
@@ -85,7 +85,7 @@ public class GearingTests
     {
         var pack = new Stash();
         var body = StrBody(2);
-        var plate = new Armor("plate", Stat.Con, ArmorKind.Plate, 2);
+        var plate = Content.ArmorLines.PlateChest[0];
         pack.AddArmor(plate);
         Gearing.EquipArmor(pack, body, plate);
 

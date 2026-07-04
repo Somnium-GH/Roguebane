@@ -45,12 +45,13 @@ public sealed class Body
     public void Damage(BodyPart part, int amount)
     {
         if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));
+        // §6c STR plate: a sustained piece soaks the covered part's OWN damage per tier —
+        // never HP damage (§8: shields + full evade stay the only HP mitigations).
+        if (_armor.TryGetValue(part.Stat, out var worn) && worn.PartMitigation > 0 && ArmorSustained(worn))
+            amount = Math.Max(0, amount - worn.PartMitigation);
         _intact[part.Id] = Math.Max(0, Contribution(part) - amount);
         Cascade(part.Stat);
         _hands.RemoveAll(w => Capacity(w.Stat) < w.Reserve); // gear falls off below its threshold
-        // Plate's shield RIDES its part-group (§6): break the group and the worn shield is gone with it.
-        if (Capacity(part.Stat) == 0 && _armor.TryGetValue(part.Stat, out var a) && a.Kind == ArmorKind.Plate)
-            DropShield(PlateShieldId(part.Stat));
     }
 
     public IReadOnlyList<Weapon> Hands => _hands;
@@ -74,27 +75,20 @@ public sealed class Body
         _ => Array.Empty<Weapon>(),
     };
 
-    private const int PlateRegenEvery = 40; // plate is a slow-recovering worn buffer, not free tanking
-    private static string PlateShieldId(Stat group) => "plate-" + group;
+    // Armor covers a part-group SLOT (keyed by the group's stat, §6 anatomy) — one piece per slot,
+    // equipping replaces. §6c: armor is a light EFFECT layer (per-line tier bonuses on the record);
+    // the worn-plate-as-shield-source role is RETIRED — §6b shield sources are techniques (+ the
+    // §6d shield OBJECT when that builds). Shields + full evade stay the only HP mitigations.
+    public void Equip(Armor piece) => _armor[piece.Slot] = piece;
 
-    // Armor rides on a part-group (its Stat). One piece per group — equipping replaces. §8/§6: PLATE is
-    // a worn SHIELD SOURCE (the flat-protection role retired) — equipping it raises a shield pool (Value
-    // layers) while the group stands; leather stays evasion. Shields + full evade are the only mitigations.
-    public void Equip(Armor piece)
-    {
-        Unequip(piece.Group); // drop a prior piece's plate shield before replacing
-        _armor[piece.Group] = piece;
-        if (piece.Kind == ArmorKind.Plate && piece.Value > 0 && Capacity(piece.Group) > 0)
-            RaiseShield(PlateShieldId(piece.Group), piece.Value, PlateRegenEvery);
-    }
-
-    public void Unequip(Stat group)
-    {
-        if (_armor.TryGetValue(group, out var a) && a.Kind == ArmorKind.Plate) DropShield(PlateShieldId(group));
-        _armor.Remove(group);
-    }
+    public void Unequip(Stat group) => _armor.Remove(group);
 
     public Armor? ArmorOn(Stat group) => _armor.GetValueOrDefault(group);
+
+    // §6e sustain: a worn piece works while its LINE's governing attribute stands. The
+    // blessed-initial threshold is total collapse (capacity 0) — §6c's "both arms break and the
+    // STR armor goes RED across the board"; finer per-tier thresholds ride the tuning session.
+    public bool ArmorSustained(Armor piece) => Capacity(piece.Governing) > 0;
 
     // The part with the most stat missing (Capacity - live contribution), or null if every part is
     // whole. Drives a part-heal's target — mend where it hurts most; ties resolve by part order.
@@ -155,15 +149,15 @@ public sealed class Body
         return damage;
     }
 
-    // Leather EVASION: a dodge chance (percent) on the struck part-group, riding its condition. A
-    // whole-HP hit (no part) consults the legs (DEX) leather — body footing/dodge — while the legs
-    // still stand. Break the part (or lose the group) and its evasion goes with it.
-    public int EvasionPercent(BodyPart? part)
+    // §6c DEX/leather EVASION: +2% per tier, PER worn sustained piece (stacks across pieces) —
+    // a global dodge, not per-struck-part. §6 HARD OVERRIDE: a broken LEG zeroes evasion outright,
+    // overriding any residual DEX — the footing is gone. (A DEX-attribute-derived base evade is
+    // in the §6 table but unnumbered — not invented; leather is the only source until it lands.)
+    public int EvasionPercent()
     {
-        var group = part?.Stat ?? Stat.Dex;
-        var standing = part is null ? Capacity(group) > 0 : Contribution(part) > 0;
-        return standing && _armor.TryGetValue(group, out var a) && a.Kind == ArmorKind.Leather
-            ? a.Value : 0;
+        var legs = _parts.Where(p => p.Stat == Stat.Dex).ToList();
+        if (legs.Count > 0 && legs.Any(l => Contribution(l) == 0)) return 0; // broken leg
+        return _armor.Values.Where(a => a.EvadePct > 0 && ArmorSustained(a)).Sum(a => a.EvadePct);
     }
 
     // STR at full weight plus a quarter of DEX, kept in integer quarter-units.
