@@ -1271,7 +1271,10 @@ public partial class Game1
     // datum's resolved root bind (spineCity: city.status -> taken/current/future borders).
     private void DrawTemplateRootChrome(Template t, LayoutRect cell, object? datum, string? stateKey = null)
     {
-        if (t.Fill is null && t.Border is null) return;
+        // No early bail on "root has neither fill nor border" — coreCard (and any other family-driven
+        // template) carries its chrome ONLY inside states.idle/selected/etc, nothing at the template
+        // root. Bailing here skipped the states lookup below entirely, so pickerCard's amber selected
+        // ring never drew for ANY state, not just selected (Doug's HiFi report, NewGame core-picker).
         var fillTok = t.Fill?.Token;
         var borderTok = t.Border?.Color;
         var key = stateKey ?? (datum is not null && t.Binds is { } b ? ResolveBind(datum, b) : null);
