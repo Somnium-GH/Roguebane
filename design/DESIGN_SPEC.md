@@ -100,6 +100,11 @@ allocation economy.
   (no bonus/defense, shown **RED** in Equipment) but stays **ASSIGNED** and **re-activates when the
   attribute heals** — it does NOT leave the slot. The cascade *is* the combat depth. **[OPEN §17: when an
   attribute drops below MULTIPLE items' requirements, a rule / ITEM-RANKING decides which disables first.]**
+- **Broken-limb HARD OVERRIDE [NEW LOCKED, 2026-07-03]:** a broken ARM removes its hand-slot outright —
+  no weapon can be held there regardless of which stat it gates (a DEX bow is exactly as arm-gated as a
+  STR sword; §6d has the full wield model). A broken LEG hard-zeroes EVASION outright, overriding any
+  residual DEX from Marks or other non-leg sources. Both are a PHYSICAL-capability gate layered on top of
+  (never a replacement for) the raw attribute-pool math, and apply to player AND foe alike (§8 symmetry).
 - **Armor [LIGHT effect layer — not attribute gear]:** one piece per part-GROUP slot (Head/Chest/Arms/
   Legs); does NOT grant or gate the attribute pool itself. Four types, each keyed to the attribute whose
   part they protect — full tier ladders + blessed initial numbers in **§6c** (2026-07-03). Rides the
@@ -163,6 +168,35 @@ STR build's armor to go RED across the board when both arms break.
 **Per-tier bonuses [blessed initial, tune later]:** STR = −2 part-damage to the covered part, per tier.
 DEX = +2% evade per tier, per body part currently worn (stacks across worn pieces). INT = +2 spell
 damage per piece worn (2-piece cap: robe + hat). Shield = +2% block-pool recharge per tier (§6b).
+
+### 6d. Weapons — the wield model [LOCKED, 2026-07-03; a couple numbers OPEN, tagged below]
+Weapons are pure stat-sticks (base damage only) — techniques own ALL timing/effects (§7, unchanged).
+- **No dynamic hand-reservation.** Rejected in favor of the simpler rule: a technique doesn't reserve
+  hands over time the way it reserves an attribute — it just REQUIRES a matching weapon config to be
+  PRESENT (equipped + arms unbroken) the instant it fires. Weapon attacks are instantaneous-if-charged;
+  there's no hold/release lifecycle for hands beyond that instant check.
+- **Equip configurations:** `1h + shield` · `2×1h` (dual-wield) · `2×2h` (own two two-handers —
+  greatsword, bow, wand — but only ONE is ever physically wielded; see primary/secondary below) ·
+  `1× ranged` (bow/wand, both hands, worn on the back when not the active primary).
+- **Lockout conditions [LOCKED]:** a dual-wield technique needs BOTH arms unbroken with two 1h weapons
+  equipped, or it's locked out; a 2h technique (incl. bows/wands) needs BOTH arms unbroken, or it's
+  locked out; a shield needs a FREE arm — it drops whenever both arms are already committed to a 2h
+  weapon or a dual-wield pair. Same rule for foes (§8 symmetry): arms/legs are separately targetable and
+  breakable on both sides.
+- **Primary/secondary auto-promotion [LOCKED]:** within a hand-slot category, first-equipped = PRIMARY,
+  second = SECONDARY. Unequipping the primary promotes the secondary; a newly-equipped item always fills
+  the (now-empty) secondary slot — it never displaces an existing primary. Guarantees a technique never
+  finds a null primary while a valid secondary sits idle. **[OPEN]** whether swapping which one is active
+  mid-combat costs an action/cooldown or is free — tune later.
+- **Handedness [LOCKED]:** a player-facing Left/Right-handed setting (cosmetic only) fixes which physical
+  arm renders the primary weapon vs. the off-hand item, so a broken/bare-arm visual always matches the
+  item that would actually drop from that specific arm.
+- **Ranged weapons share the both-hands/back-slot model.** **Bows (DEX):** fully ignore the shield pool,
+  gated by Charge — unchanged, §10. **Wands (INT):** a second ranged flavor, PARTIALLY bypass the shield
+  pool (so Charge isn't a bow-only resource) — **[OPEN §17]** the exact bypass split/math; the shape
+  (partial, not full) is locked, the number is not.
+- **Names [blessed initial, tune later]:** Bows — Short Bow → Long Bow → Compound Bow → Elven Bow.
+  Wands — Adept Wand → Twisted Wand → Gemstone Wand → Glowing Wand.
 
 ## 7. Race + Core rune, and the three-layer architecture [LOCKED]
 Identity is **two axes** (FTL ship + layout):
@@ -302,6 +336,9 @@ Minions yes; **party no** — one main character.
   CoreCampaignTests. Numbers (bow power 2, reserve 2, Shot cd 3) placeholder.
 - **[OPEN]** whether shield-piercing needs any extra "damaging resolution" beyond the bypass — keep it
   simple for now (bypass + Charge cost, nothing more).
+- **WANDS (INT ranged, §6d):** a second Charge-spending weapon line, alongside bows — PARTIALLY bypasses
+  the shield pool (some of the hit still absorbs against the pool, some goes through) rather than the
+  bow's full bypass. **[OPEN]** the exact split/math — not yet designed, do not invent a number for it.
 
 ## 11. The rune system [LOCKED core; some numbers OPEN]
 The build economy. **No fixed rune slots** — runes are bought from a **point budget set by the Core
@@ -499,6 +536,10 @@ points there so the canon stays design-focused.
 17. ~~MERCHANT SCREEN~~ RESOLVED 2026-07-03: design/07 v2 + the manifest `merchant` screen ARE the
     design; popover retired; click-to-buy receiving LOCKED in §12. Residual OPEN: ware pricing/rarity
     economy tune (part of the balance pass).
+18. Wand partial-shield-bypass math (§6d/§10) — the shape (partial, unlike bows' full bypass) is locked,
+    the split is not; needs a real design pass before Core implements it.
+19. Weapon primary/secondary swap timing (§6d) — whether re-activating the secondary two-hander mid-combat
+    costs an action/cooldown or is free; tune later.
 
 ## 18. DROPPED — must not resurface
 - **"Chassis" as the identity model** → split into **Race + Core rune** (§7).

@@ -104,8 +104,13 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
 
         if (_smokeScreen is "encounter" or "citymap" or "loadout") // march the real loop for the screenshot
         {
-            _build.CycleCoreRune(3);          // -> the Summoner (3 bays; fields Skeleton+Shade) for the bay lane
-            _build.Toggle(Techniques.Jab);   // add a STR card for variety on the bar
+            if (_smokeScreen is "encounter" or "citymap")
+            {
+                _build.CycleCoreRune(3);          // -> the Summoner (3 bays; fields Skeleton+Shade) for the bay lane
+                _build.Toggle(Techniques.Jab);   // add a STR card for variety on the bar
+            }
+            // loadout keeps the DEFAULT GRUNT build — design/02's authored state (CORE GRUNT,
+            // READY TO MARCH). M0.3: align the drive to the ref state, never mask the divergence.
             _campaign = _build.Redeploy(Maps.StandardLegs(3));
             _screen = Screen.Run;
             foreach (var t in Exp.Equipment) _campaign.Toggle(t); // power the bar (both shots)
@@ -149,6 +154,10 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             else if (_smokeScreen == "loadout") // between-fights Equipment overlay, open over the chart
             {
                 _campaign.Enter("a1"); Resolve(); _campaign.Redeploy(); // clear a node -> back at the chart (Choosing)
+                // design/02's doll is ARMED (sword + worn plate) — stash-seed and equip so the
+                // gear rows/doll markers validate; no merchant detour (the stash is the source).
+                Exp.Stash.AddWeapon(Armory.Dagger); Exp.EquipWeapon(Armory.Dagger);
+                Exp.Stash.AddArmor(Shops.Plate); Exp.EquipArmor(Shops.Plate);
                 _screen = Screen.Equipment; // 2026-07-02: the FULL Equipment screen replaced the popover
                 _equipReturnTo = Screen.Run;
             }

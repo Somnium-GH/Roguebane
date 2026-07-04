@@ -1,5 +1,15 @@
 # Status
 
+## ⇒ NEW LOCK (2026-07-03, Doug — design session): weapon wield model, DESIGN_SPEC §6/§6d
+Full model in §6d + the broken-limb hard-override bullet in §6 — read there before building. Summary of
+NEW ENGINE WORK this unblocks (not urgent, no P0 queue jump — pick up in normal priority order):
+equip-config validation (1h+shield / 2×1h dual-wield / 2×2h primary-secondary / 1×ranged, both hands);
+lockout checks keyed to ARM-BROKEN state (not the STR value) for any held weapon, on both player AND foes;
+a hard evasion-zero when EITHER leg is broken, overriding residual DEX from Marks; primary/secondary
+auto-promotion bookkeeping per hand-slot category; a new Left/Right-HANDEDNESS player setting (cosmetic
+render-only — which arm shows primary vs off-hand); Bow + Wand weapon data entries (names in §6d); Wand's
+partial shield-bypass is explicitly NOT numbered yet (§17 #18) — don't invent a split, block on design.
+
 ## ⇒ NEW LOCK (2026-07-03, Doug — design session): armor system, DESIGN_SPEC §6/§6c
 STR/DEX/INT/CON armor tier ladders + names are canon (§6c, blessed-initial numbers, tune later); shield
 OBJECT equip-gate moved **STR → CON** (§6 table). **Needs-loop, not urgent — pick up whenever Equipment
@@ -97,6 +107,17 @@ build body) vs the ref's armored+armed sample — live-state class; gear draws w
 `SMOKE TEXTGEOM` emits `truncated=N trunc=[el:'snippet']`; the gate fails ANY truncation — pinned
 ZERO, absolute, no baseline ride (per M1: "label missing from every box cannot score 77+ again").
 First measurement: truncated=0 on all six screens (the M1 batch left the build clean).
+**EQUIPMENT WALK #1 (2026-07-03 loop) — drive aligned to ref per M0.3:** the whole 0%-element
+cluster (currentCoreName/coreLabel/partLines/runeBag) was ONE cause: the encounter drive's
+SUMMONER mid-fight state vs design/02's authored GRUNT "READY TO MARCH". Equipment now owns a
+THIRD gate pass (`RB_SCREEN=loadout`): default grunt build, a1 cleared, Choosing, stash-seeded
+dagger+plate equipped (the ref doll is armed). Summoner cycling stays for encounter/citymap
+(design/01 IS the summoner). eq fidelity 74.7→74.9, currentCoreName cleared to ref.
+**BASELINE HAND-EDIT (measurement change, logged per M0 rule 2):** equipment binds 22→21 — the
+honest denominator under the ref-aligned drive (buildMinions legitimately empty: grunt fields no
+minions, matching the ref). Justified by Doug's M0.3 line "ALIGN THE DRIVE TO THE REF STATE (pick
+Grunt)"; no other baseline entry touched (the contested overflow re-pin still awaits approval).
+Remaining eq 0% elements (coreLabel style, partLines, runeBagTitle) = next walk slice.
 **‼ GATE RED (pre-existing, DROP-caused — verified by stash/rerun at HEAD): text OVERFLOWS rose
 ng 6→9, city 4→6.** Membership is the drop's NEW/re-authored elements (city: suppliesTitle/
 supportTitle/castlePanelTitle/doomTitle; ng: header/preview family). Numerics: VERTICAL-only —

@@ -88,7 +88,10 @@ def main():
     import os
     failures = []
     binds, fidelity, textgeom = {}, {}, {}
-    passes = [("encounter", ("encounter", "equipment", "campaignmap", "newgame")),
+    # equipment is owned by the LOADOUT drive (grunt build, in-run, Choosing = design/02's authored
+    # "CORE GRUNT / READY TO MARCH" state) — M0.3: align the drive to the ref, never mask.
+    passes = [("encounter", ("encounter", "campaignmap", "newgame")),
+              ("loadout", ("equipment",)),
               ("citymap", ("citymap", "merchant"))]
     for drive, owns in passes:
         print(f"== driven all-screen smoke (RB_SCREEN={drive}) ==")
