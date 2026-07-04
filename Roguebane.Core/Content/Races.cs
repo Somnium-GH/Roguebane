@@ -6,11 +6,16 @@ namespace Roguebane.Core.Content;
 public static class Races
 {
     // Balanced generalist, the sturdier body.
-    public static readonly Race Human = new("human", Str: 3, Int: 3, Dex: 3, Con: 3, Hp: 20, Title: "Human",
+    // Bumped 2026-07-04 (Debt, placeholder): the cumulative gear-sustain model (SUSTAIN MODEL) sums a
+    // core's whole kit against ONE shared pool per stat, not per-item. The old 3/3/3/3 was sized for
+    // per-item gating and left several cores (Warden's full plate + Brace, Ranger's blade+bow+leather,
+    // Summoner's minions) unable to sustain their OWN starting kit. Raised just enough for every
+    // race+core combo to fight and win (CoreCampaignTests) - final numbers still "Needs human" (§7/§17).
+    public static readonly Race Human = new("human", Str: 14, Int: 14, Dex: 12, Con: 8, Hp: 20, Title: "Human",
         Tag: "THE FOUNDER LINE", Blurb: "No innate edge or lack - fits any core it can afford.");
 
-    // Dex-leaning and frail.
-    public static readonly Race Elf = new("elf", Str: 2, Int: 3, Dex: 4, Con: 2, Hp: 14, Title: "Elf",
+    // Dex-leaning and frail (see Human bump note above for why these moved off 2/3/4/2).
+    public static readonly Race Elf = new("elf", Str: 14, Int: 12, Dex: 16, Con: 7, Hp: 14, Title: "Elf",
         Tag: "THE KEEN & FLEET", Blurb: "Keen and fleet, but frail - punishes a dropped block.");
 
     // Roster order matches design/05's Race column.

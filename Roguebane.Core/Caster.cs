@@ -162,11 +162,11 @@ public sealed class Caster
 
     public int ActiveCount => _active.Count;
 
-    // A self-contained technique reserves its own stat; a weapon-consulting one reserves the sum of
-    // its consulted weapons' reserves (you can't swing what you aren't holding — reserve 0 → can't).
-    private Active Reservation(Technique t) => t.Consults == WeaponUse.None
-        ? new(t.Id, t.Stat, t.Reserve)
-        : new(t.Id, t.Stat, _self.Consulted(t).Sum(w => w.Reserve));
+    // A self-contained technique reserves its own stat. A weapon-consulting one reserves NOTHING of
+    // its own — the consulted weapon(s) already stand a reservation as equipped gear (SUSTAIN MODEL,
+    // §17 #16); baking their reserve into the technique's Active too would double-count the same
+    // stat. Activate() below gates weapon-consulting techniques on having something to swing instead.
+    private Active Reservation(Technique t) => new(t.Id, t.Stat, t.Consults == WeaponUse.None ? t.Reserve : 0);
 
     private int EffectivePower(Technique t) => t.Consults == WeaponUse.None
         ? t.Power
@@ -194,8 +194,12 @@ public sealed class Caster
     public bool Activate(Technique technique, bool auto = true)
     {
         if (_active.ContainsKey(technique.Id)) return true;
+        if (technique.Consults == WeaponUse.None)
+        {
+            if (technique.Reserve <= 0) return false;
+        }
+        else if (_self.Consulted(technique).Count == 0) return false; // nothing to swing
         var reservation = Reservation(technique);
-        if (reservation.Reserve <= 0) return false; // nothing to swing (no weapon to consult)
         if (!_self.Activate(reservation)) return false;
         _active[technique.Id] = new Run { Tech = technique, Countdown = EffectiveCooldown(technique), Auto = auto };
         if (technique.ShieldLayers > 0) _self.RaiseShield(technique.Id, technique.ShieldLayers, ShieldRegenTicks(technique));

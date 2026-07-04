@@ -13,6 +13,15 @@ public sealed class Body
     private readonly List<Weapon> _hands = new(); // up to two; anatomical hand count
     private readonly Dictionary<string, ShieldPool> _shields = new(); // §6b shield sources, keyed by source id
 
+    // Equip order, for the DISABLE CASCADE's last-equipped-first tiebreak (SUSTAIN MODEL, §17 #16).
+    // Index-parallel to _hands rather than keyed by item identity: Weapon/Armor are records
+    // (structural equality), so a value-keyed map would collide two identically-tiered pieces
+    // (e.g. dual-wielding twin daggers).
+    private int _equipSeq;
+    private readonly List<int> _handSeq = new();
+    private int? _rangedSeq;
+    private readonly Dictionary<Stat, int> _armorSeq = new();
+
     public IReadOnlyList<BodyPart> Parts => _parts;
     public IReadOnlyList<Active> Actives => _actives;
 
@@ -26,9 +35,54 @@ public sealed class Body
 
     public int Capacity(Stat stat) => _parts.Where(p => p.Stat == stat).Sum(Contribution);
 
-    public int Reserved(Stat stat) => _actives.Where(a => a.Stat == stat).Sum(a => a.Reserve);
+    // SUSTAIN MODEL [DESIGN_SPEC §17 #16, resolved 2026-07-04]: gear and active techniques draw on
+    // the SAME shared pool per stat. Reserved = techniques (always-on once activated) + whatever
+    // gear currently fits what's left (see DisabledGear) — so Available reflects the true headroom
+    // for a new technique activation, gear equip disable is separate (raw Capacity gate at equip
+    // time, unchanged) from this ongoing sustain accounting.
+    private int TechReserved(Stat stat) => _actives.Where(a => a.Stat == stat).Sum(a => a.Reserve);
+
+    public int Reserved(Stat stat) => TechReserved(stat) + DisabledGear(stat).EnabledTotal;
 
     public int Available(Stat stat) => Capacity(stat) - Reserved(stat);
+
+    private readonly record struct GearCandidate(string Kind, int Reserve, int Seq, int HandIndex, Stat ArmorSlot);
+
+    private sealed record GearDisable(HashSet<int> Hands, bool Ranged, HashSet<Stat> Armor, int EnabledTotal);
+
+    // DISABLE CASCADE (§17 #16): when gear's combined reserve exceeds what's left of the pool after
+    // techniques take their share, items disable highest-requirement-first, ties last-equipped-first
+    // — a pure ranking over current attr level, so healing re-enables cheapest-first automatically.
+    private GearDisable DisabledGear(Stat stat)
+    {
+        var candidates = new List<GearCandidate>();
+        for (var i = 0; i < _hands.Count; i++)
+            if (_hands[i].Stat == stat) candidates.Add(new GearCandidate("hand", _hands[i].Reserve, _handSeq[i], i, default));
+        if (_ranged is { } r && r.Stat == stat)
+            candidates.Add(new GearCandidate("ranged", r.Reserve, _rangedSeq ?? 0, -1, default));
+        foreach (var (slot, piece) in _armor)
+            if (piece.Governing == stat)
+                candidates.Add(new GearCandidate("armor", piece.Requirement, _armorSeq[slot], -1, slot));
+
+        var pool = Math.Max(0, Capacity(stat) - TechReserved(stat));
+        var remaining = candidates.Sum(c => c.Reserve);
+        var hands = new HashSet<int>();
+        var armor = new HashSet<Stat>();
+        var ranged = false;
+
+        foreach (var c in candidates.OrderByDescending(c => c.Reserve).ThenByDescending(c => c.Seq))
+        {
+            if (remaining <= pool) break;
+            remaining -= c.Reserve;
+            switch (c.Kind)
+            {
+                case "hand": hands.Add(c.HandIndex); break;
+                case "ranged": ranged = true; break;
+                case "armor": armor.Add(c.ArmorSlot); break;
+            }
+        }
+        return new GearDisable(hands, ranged, armor, remaining);
+    }
 
     public bool IsActive(Active active) => _actives.Contains(active);
 
@@ -67,10 +121,17 @@ public sealed class Body
         if (_hands.Count >= 2) return false;
         if (Capacity(weapon.Stat) < weapon.Reserve) return false;
         _hands.Add(weapon);
+        _handSeq.Add(++_equipSeq);
         return true;
     }
 
-    public void Unwield(Weapon weapon) => _hands.Remove(weapon);
+    public void Unwield(Weapon weapon)
+    {
+        var i = _hands.IndexOf(weapon);
+        if (i < 0) return;
+        _hands.RemoveAt(i);
+        _handSeq.RemoveAt(i);
+    }
 
     // §6d: ONE ranged slot, independent of the melee hands — a sword+shield AND a bow coexist.
     private Weapon? _ranged;
@@ -84,6 +145,7 @@ public sealed class Body
         // Mutual exclusion (§6d): a held wand excludes the ranged slot; a staff blocks it too.
         if (_hands.Any(h => h.Kind is WeaponKind.Wand or WeaponKind.Staff)) return false;
         _ranged = w;
+        _rangedSeq = ++_equipSeq;
         return true;
     }
 
@@ -91,13 +153,14 @@ public sealed class Body
     {
         var r = _ranged;
         _ranged = null;
+        _rangedSeq = null;
         return r;
     }
 
     // §6d arm gates at USE time: a BOW needs both arms unbroken (same as any 2H); the 1H SLING
     // needs one usable throwing arm. The item stays ASSIGNED either way (§6e).
     public bool RangedUsable => _ranged is { } r
-        && Capacity(r.Stat) >= r.Reserve
+        && !DisabledGear(r.Stat).Ranged
         && (r.Kind == WeaponKind.Bow ? HandUsable(0) && HandUsable(1)
                                      : HandUsable(0) || HandUsable(1));
 
@@ -116,7 +179,7 @@ public sealed class Body
     // §6/§6e: a hand item WORKS only while its arm stands AND its stat sustains its reserve —
     // otherwise it stays ASSIGNED (the red card), stops answering, and leaves the render.
     public bool HandItemUsable(int i) => i < _hands.Count
-        && HandUsable(i) && Capacity(_hands[i].Stat) >= _hands[i].Reserve;
+        && HandUsable(i) && !DisabledGear(_hands[i].Stat).Hands.Contains(i);
 
     private IEnumerable<Weapon> UsableHands() => _hands.Where((_, i) => HandItemUsable(i));
 
@@ -152,17 +215,22 @@ public sealed class Body
     {
         if (Capacity(piece.Governing) < piece.Requirement) return false;
         _armor[piece.Slot] = piece;
+        _armorSeq[piece.Slot] = ++_equipSeq;
         return true;
     }
 
-    public void Unequip(Stat group) => _armor.Remove(group);
+    public void Unequip(Stat group)
+    {
+        _armor.Remove(group);
+        _armorSeq.Remove(group);
+    }
 
     public Armor? ArmorOn(Stat group) => _armor.GetValueOrDefault(group);
 
-    // §6e sustain: a worn piece works while its LINE's governing attribute stands. The
-    // blessed-initial threshold is total collapse (capacity 0) — §6c's "both arms break and the
-    // STR armor goes RED across the board"; finer per-tier thresholds ride the tuning session.
-    public bool ArmorSustained(Armor piece) => Capacity(piece.Governing) > 0;
+    // §6e sustain: a worn piece works while the shared pool on its LINE's governing attribute can
+    // still cover its Requirement, after techniques + higher-ranked gear take their share (SUSTAIN
+    // MODEL, DISABLE CASCADE — see DisabledGear).
+    public bool ArmorSustained(Armor piece) => !DisabledGear(piece.Governing).Armor.Contains(piece.Slot);
 
     // §6c INT robe: +2 spell damage per worn sustained robe piece, capped at TWO pieces
     // (robe + hat — the line only authors those slots, the cap keeps that true under tuning).
@@ -192,7 +260,7 @@ public sealed class Body
 
     private void Cascade(Stat stat)
     {
-        for (var i = _actives.Count - 1; i >= 0 && Reserved(stat) > Capacity(stat); i--)
+        for (var i = _actives.Count - 1; i >= 0 && TechReserved(stat) > Capacity(stat); i--)
             if (_actives[i].Stat == stat) _actives.RemoveAt(i);
     }
 

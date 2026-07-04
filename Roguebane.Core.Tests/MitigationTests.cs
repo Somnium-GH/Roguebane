@@ -11,8 +11,9 @@ public class MitigationTests
         var b = new Body();
         b.Add(new BodyPart("arm-l", Stat.Str, 4));
         b.Add(new BodyPart("arm-r", Stat.Str, 4));
-        b.Add(new BodyPart("leg-l", Stat.Dex, 3));
-        b.Add(new BodyPart("leg-r", Stat.Dex, 3));
+        // Dex 20 total: sustains a full tier-4 leather set (4 x req4 = 16) at once (SUSTAIN MODEL pool).
+        b.Add(new BodyPart("leg-l", Stat.Dex, 10));
+        b.Add(new BodyPart("leg-r", Stat.Dex, 10));
         b.Add(new BodyPart("head", Stat.Int, 4));
         b.Add(new BodyPart("chest", Stat.Con, 6));
         return b;

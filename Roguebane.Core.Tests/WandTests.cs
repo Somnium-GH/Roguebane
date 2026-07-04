@@ -61,7 +61,8 @@ public class WandTests
     public void ATomeOffhandMultipliesSpellDamage()
     {
         // §6d: Glowing Tome (tier 4) = +0.4x spell damage. Gemstone Wand 6 dmg -> round(6 x 1.4) = 8.
-        var body = IntBody();
+        // INT 10: enough to sustain wand (reserve 6) + tome (reserve 4) at once (SUSTAIN MODEL pool).
+        var body = IntBody(10);
         Assert.True(body.Wield(Armory.Wands[2]));
         Assert.True(body.Wield(Armory.Tomes[3]));
         Assert.Equal(1.4, body.TomeSpellMult, 3);

@@ -59,6 +59,9 @@ public class ArmorLineTests
     public void BrokenLegZeroesEvasionOutright()
     {
         var b = Humanoid(out _, out _, out var legL, out _);
+        // Extra Dex headroom (not on legL/legR) so both pieces' cumulative reserve (4+4=8) sustains
+        // (SUSTAIN MODEL shared pool) without perturbing legL's own Contribution math below.
+        b.Add(new BodyPart("waist", Stat.Dex, 8));
         b.Equip(ArmorLines.LeatherChest[3]);
         b.Equip(ArmorLines.LeatherArms[3]);
         Assert.Equal(16, b.EvasionPercent()); // 2 pieces x 8%
