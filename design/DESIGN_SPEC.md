@@ -378,6 +378,29 @@ Three layers over the shared attribute pool:
 3. **Action bar (verbs).** **Techniques** — live actions; each **consults equipped gear and reserves
    attributes**; **timered** (charge→fire) or **passive/sustained** (holds its reservation).
 
+**Reservation timing [LOCKED 2026-07-04, Doug — clarifies a long-missed regression]:** EQUIPMENT
+reserves attributes at EQUIP time (Equipment screen / build time) — a piece of gear should occupy
+attribute capacity for as long as it's equipped, cumulatively with everything else equipped (today's
+engine gate only checks a single item's `Reserve` against raw `Capacity`, not against what's already
+reserved by other equipped items — there IS currently no real cumulative equipment reservation; see
+STATUS). **TECHNIQUES reserve attributes ONLY on ACTIVATION during an encounter** — never just for
+being slotted on the action bar or sitting in inventory. The Equipment screen must NOT show or apply
+any technique-attribute reservation at all; that reservation appears and disappears with in-combat
+activation state only. Encounter-time activation reservation (`Body.Activate`/`Reserved`/`Available`)
+already works correctly — the bug is scoped to the Equipment screen incorrectly reserving for
+techniques that aren't even active yet.
+
+**Default activation state [LOCKED 2026-07-04, Doug — FTL parity]:** nothing starts charging or
+passively active at the beginning of an encounter — every technique/minion starts NEUTRAL (off,
+uncharged) and the player must activate what they want running, same principle as FTL's system
+defaults. This deliberately accepts a new-player-confusion risk (a first-timer might not realize a
+passive shield needs manual activation) — the FIX for that is deferred to a future in-game TIP SYSTEM
+(permanently disable-able per install), not a "smart default." **Do not build any auto-activate /
+smart-default logic to compensate** — ship neutral-by-default now; the tip system is a separate later
+feature. (FTL itself solves the same problem with a safe pre-battle screen where you arm before the
+first real fight — worth keeping in mind if/when a similar staging beat gets designed here, but not
+required to ship this default-state fix.)
+
 **Verbs are NOT bound to weapons.** A weapon is a stat-stick; techniques *consult* what's equipped
 ("Swing" = primary weapon; "Frenzy" = both, cost = sum). Techniques are a findable/slottable layer.
 
