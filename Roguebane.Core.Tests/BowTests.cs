@@ -26,7 +26,9 @@ public class BowTests
         Assert.Equal(3, defBody.ShieldPoints);
 
         var body = Archer();
-        Assert.True(body.Wield(Armory.Bow));                 // wielded (DEX 4 >= reserve 2)
+        body.Add(new BodyPart("arm-l", Stat.Str, 2)); // §6d: a bow needs both arms usable
+        body.Add(new BodyPart("arm-r", Stat.Str, 2));
+        Assert.True(body.EquipRanged(Armory.Bow));           // the RANGED slot (DEX 4 >= reserve 2)
 
         var atk = new Caster(body, defender, maxCharge: 2);
         atk.Activate(Armory.Shot);
@@ -44,7 +46,7 @@ public class BowTests
         var exp = Forge.Embark(Races.Human, CoreRunes.Ranger, CoreRunes.Ranger.NewLoadout(),
             CoreRunes.Ranger.Kit, Maps.StandardLeg());
 
-        Assert.Contains(exp.Player.Body.Hands, w => w.Id == "bow"); // bow wielded at assembly
+        Assert.Equal("bow", exp.Player.Body.Ranged?.Id); // bow mounts the RANGED slot at assembly
         Assert.Contains(CoreRunes.Ranger.Kit, t => t.Id == "shot"); // the Shot verb is on the bar
         Assert.True(Armory.Shot.ShieldPiercing);                    // and it pierces
     }

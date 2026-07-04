@@ -273,8 +273,14 @@ interpreter, no per-weapon classes):**
 4. ~~Magic-offhand hooks~~ DONE (2026-07-04 loop, 334 tests: CharmMinionMult/TomeSpellMult on
    Body — best USABLE held piece, broken arm silences; tome multiplies INT-cast damage over
    base+robe [composition = balance knob], charm multiplies minion hits; away-from-zero rounding).
-5. Staff/wand equip-rule wiring into the §6e validation (wand↔ranged mutual exclusion; staff =
-   shield-equivalent for ranged-block + no-shield).
+5. ~~Ranged slot + equip exclusions~~ DONE (2026-07-04 loop, 336 tests): Body gains ONE ranged
+   slot (bows/slings only — Wield rejects them as hand items); wand/staff in hand ↔ ranged slot
+   mutually exclude both directions; the Charge/pierce verb family consults the RANGED slot
+   (melee techniques keep the hand-config); bow needs BOTH arms usable, sling ONE, item stays
+   assigned when unusable (§6e); kits/Gearing/shell route by kind (a sword+shield AND a bow
+   coexist, per the Ranger). VISIBLE: the Ranger figure no longer draws its bow — §17 #22 locks
+   "not drawn until a back-mount layer exists". Shield-object pairing rules still await the
+   shield data (CON gate OPEN).
 6. ~~Sling Charge path~~ DONE (2026-07-04 loop, 335 tests: the sling rides the bow's exact
    pierce+Charge resolution via the DEX Primary consult — end-to-end asserted: 1 dmg through 5
    standing shields, pool untouched, one Charge spent; dmg placeholder stays FLAGGED §17 #9).

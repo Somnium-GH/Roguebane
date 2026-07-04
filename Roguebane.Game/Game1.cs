@@ -328,7 +328,8 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                 if (!Click(RectOf(cards[i]))) continue;
                 switch (gear[i])
                 {
-                    case Roguebane.Core.Weapon w when Exp.Player.Body.Hands.Contains(w):
+                    case Roguebane.Core.Weapon w when Exp.Player.Body.Hands.Contains(w)
+                        || Exp.Player.Body.Ranged == w:
                         Exp.UnequipWeapon(w); break;
                     case Roguebane.Core.Weapon w:
                         if (Exp.Player.Body.Hands.Count >= 2)

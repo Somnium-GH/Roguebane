@@ -5,21 +5,26 @@ namespace Roguebane.Core;
 // the Body; this only keeps the pack and the body in sync so a piece is never in both places at once.
 public static class Gearing
 {
-    // Wield a carried weapon. Fails (leaving it in the pack) if it isn't carried or the body can't lift
-    // it (no free hand / not enough stat). On success it leaves the pack and goes onto the body.
+    // Wield a carried weapon. Fails (leaving it in the pack) if it isn't carried or the body can't
+    // lift it (no free hand / not enough stat / a §6d exclusion). Bows/slings route to the RANGED
+    // slot; everything else to the hands. On success it leaves the pack and goes onto the body.
     public static bool EquipWeapon(Stash pack, Body body, Weapon weapon)
     {
         if (!pack.HasWeapon(weapon)) return false;
-        if (!body.Wield(weapon)) return false; // gated by hands + stat capacity
+        var ok = weapon.Kind is WeaponKind.Bow or WeaponKind.Sling
+            ? body.EquipRanged(weapon)
+            : body.Wield(weapon);
+        if (!ok) return false;
         pack.RemoveWeapon(weapon);
         return true;
     }
 
-    // Return a wielded weapon to the pack.
+    // Return an equipped weapon (hand or ranged slot) to the pack.
     public static bool UnequipWeapon(Stash pack, Body body, Weapon weapon)
     {
-        if (!body.Hands.Contains(weapon)) return false;
-        body.Unwield(weapon);
+        if (body.Ranged == weapon) body.UnequipRanged();
+        else if (body.Hands.Contains(weapon)) body.Unwield(weapon);
+        else return false;
         pack.AddWeapon(weapon);
         return true;
     }

@@ -57,8 +57,12 @@ public sealed class Body
     public IReadOnlyList<Weapon> Hands => _hands;
 
     // Wield a weapon into a free hand if the body can lift it (stat capacity meets its threshold).
+    // §6d: bows/slings are RANGED-slot items, never hand items; a wand or staff cannot share a
+    // build with an occupied ranged slot (mutual exclusion; the staff blocks ranged like a shield).
     public bool Wield(Weapon weapon)
     {
+        if (weapon.Kind is WeaponKind.Bow or WeaponKind.Sling) return false;
+        if (weapon.Kind is WeaponKind.Wand or WeaponKind.Staff && _ranged is not null) return false;
         if (_hands.Count >= 2) return false;
         if (Capacity(weapon.Stat) < weapon.Reserve) return false;
         _hands.Add(weapon);
@@ -66,6 +70,35 @@ public sealed class Body
     }
 
     public void Unwield(Weapon weapon) => _hands.Remove(weapon);
+
+    // §6d: ONE ranged slot, independent of the melee hands — a sword+shield AND a bow coexist.
+    private Weapon? _ranged;
+    public Weapon? Ranged => _ranged;
+
+    public bool EquipRanged(Weapon w)
+    {
+        if (w.Kind is not (WeaponKind.Bow or WeaponKind.Sling)) return false;
+        if (_ranged is not null) return false;
+        if (Capacity(w.Stat) < w.Reserve) return false;
+        // Mutual exclusion (§6d): a held wand excludes the ranged slot; a staff blocks it too.
+        if (_hands.Any(h => h.Kind is WeaponKind.Wand or WeaponKind.Staff)) return false;
+        _ranged = w;
+        return true;
+    }
+
+    public Weapon? UnequipRanged()
+    {
+        var r = _ranged;
+        _ranged = null;
+        return r;
+    }
+
+    // §6d arm gates at USE time: a BOW needs both arms unbroken (same as any 2H); the 1H SLING
+    // needs one usable throwing arm. The item stays ASSIGNED either way (§6e).
+    public bool RangedUsable => _ranged is { } r
+        && Capacity(r.Stat) >= r.Reserve
+        && (r.Kind == WeaponKind.Bow ? HandUsable(0) && HandUsable(1)
+                                     : HandUsable(0) || HandUsable(1));
 
     // §6d/§6 hard override: a hand's weapon works only while its ARM stands — a broken arm's
     // hand slot is physically gone regardless of which stat the weapon gates on, for player and
@@ -89,12 +122,20 @@ public sealed class Body
         .Where(w => w.Kind == WeaponKind.Tome).Select(w => w.Tier).DefaultIfEmpty(0).Max();
 
     // The weapons a technique consults, by its stat (§7) — broken-arm hands never answer (§6d).
-    public IReadOnlyList<Weapon> Consulted(Technique technique) => technique.Consults switch
+    // A CHARGE/pierce verb (Shot family) looses the RANGED slot, never a hand item — that's the
+    // §6d two-layer split: melee techniques read the hand-config, ranged techniques the slot.
+    public IReadOnlyList<Weapon> Consulted(Technique technique)
     {
-        WeaponUse.Primary => UsableHands().Where(w => w.Stat == technique.Stat).Take(1).ToList(),
-        WeaponUse.Both => UsableHands().Where(w => w.Stat == technique.Stat).ToList(),
-        _ => Array.Empty<Weapon>(),
-    };
+        if (technique.ShieldPiercing)
+            return _ranged is { } r && r.Stat == technique.Stat && RangedUsable
+                ? new[] { r } : Array.Empty<Weapon>();
+        return technique.Consults switch
+        {
+            WeaponUse.Primary => UsableHands().Where(w => w.Stat == technique.Stat).Take(1).ToList(),
+            WeaponUse.Both => UsableHands().Where(w => w.Stat == technique.Stat).ToList(),
+            _ => Array.Empty<Weapon>(),
+        };
+    }
 
     // Armor covers a part-group SLOT (keyed by the group's stat, §6 anatomy) — one piece per slot,
     // equipping replaces. §6c: armor is a light EFFECT layer (per-line tier bonuses on the record),

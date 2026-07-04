@@ -98,7 +98,7 @@ public class WandTests
         body.Add(new BodyPart("armL", Stat.Str, 3));
         body.Add(new BodyPart("armR", Stat.Str, 3));
         body.Add(new BodyPart("head", Stat.Int, 3)); // INT funds the Charge pool
-        Assert.True(body.Wield(Armory.Slings[1]));   // Braided Sling: reserve 2, power 1
+        Assert.True(body.EquipRanged(Armory.Slings[1])); // Braided Sling: reserve 2, power 1
 
         var foe = Shielded(5);
         var c = new Caster(body, foe, maxCharge: 3);

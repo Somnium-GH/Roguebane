@@ -19,28 +19,41 @@ public class WieldLockoutTests
     }
 
     [Fact]
-    public void ABrokenArmSilencesItsHandsWeaponWhateverItsStat()
+    public void ABrokenArmSilencesTheBowWhateverItsStat()
     {
+        // §6d: a BOW needs BOTH arms — break either and Shot stops answering, though the bow
+        // stays ASSIGNED in its ranged slot (§6e). DEX is untouched throughout.
         var b = Armed(out _, out var armR);
-        Assert.True(b.Wield(Armory.Bow)); // DEX bow into hand 0 (dominant/armR)
+        Assert.True(b.EquipRanged(Armory.Bow));
         Assert.Single(b.Consulted(Armory.Shot));
 
-        b.Damage(armR, 9); // break the dominant arm — DEX is untouched, the bow survives fall-off
-        Assert.Contains(Armory.Bow, b.Hands);          // still assigned (§6e)
-        Assert.False(b.HandUsable(0));
-        Assert.Empty(b.Consulted(Armory.Shot));        // but it no longer answers
+        b.Damage(armR, 9);
+        Assert.Equal(Armory.Bow, b.Ranged);     // still assigned
+        Assert.False(b.RangedUsable);
+        Assert.Empty(b.Consulted(Armory.Shot)); // but it no longer answers
+    }
+
+    [Fact]
+    public void ASlingNeedsOnlyOneThrowingArm()
+    {
+        var b = Armed(out var armL, out var armR);
+        Assert.True(b.EquipRanged(Armory.Slings[0]));
+        b.Damage(armL, 9); // one arm gone -> the 1H sling still throws
+        Assert.True(b.RangedUsable);
+        b.Damage(armR, 9); // both gone -> it can't
+        Assert.False(b.RangedUsable);
     }
 
     [Fact]
     public void TheOtherHandKeepsAnswering()
     {
         var b = Armed(out var armL, out _);
-        Assert.True(b.Wield(Armory.Bow));    // hand 0
-        Assert.True(b.Wield(Armory.Dagger)); // hand 1
-        b.Damage(armL, 9);                    // break the OFF arm -> hand 1 gone, hand 0 intact
+        Assert.True(b.Wield(Armory.Maces[0])); // hand 0 (STR 6 >= req 3)
+        Assert.True(b.Wield(Armory.Dagger));   // hand 1
+        b.Damage(armL, 9);                      // break the OFF arm -> hand 1 gone, hand 0 intact
         Assert.True(b.HandUsable(0));
         Assert.False(b.HandUsable(1));
-        Assert.Single(b.Consulted(Armory.Shot)); // the bow in hand 0 still answers
+        Assert.Single(b.Consulted(Armory.Swing)); // the mace in hand 0 still answers
     }
 
     [Fact]

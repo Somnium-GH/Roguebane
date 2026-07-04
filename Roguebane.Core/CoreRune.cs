@@ -47,7 +47,10 @@ public sealed record CoreRune(
         foreach (var mark in runes.HeldMarks)
             foreach (var part in mark.Granted)
                 body.Add(part);
-        foreach (var weapon in WeaponKit) body.Wield(weapon);
+        // §6d two equip layers: bows/slings mount the RANGED slot, everything else the hands.
+        foreach (var weapon in WeaponKit)
+            if (!body.EquipRanged(weapon))
+                body.Wield(weapon);
         return body;
     }
 
