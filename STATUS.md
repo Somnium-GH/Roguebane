@@ -143,24 +143,11 @@ it never takes the leaf path, and the family lookup hits). Doug's live game proc
 today's chip/ring commits (bin\Debug locked by it since before 21be596) — STALE BUILD, same class
 as the 07-02 font case. **Doug: restart the game off a fresh build and re-shoot to close.**
 
-## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-03, Doug — race-card head portrait doubles/ghosts)
-Doug's screenshots (Elf card) show the head portrait rendering as if two head sprites overlay with a
-slight offset — a ghosted double-exposure look. **ROOT CAUSE FOUND, not a guess:** `layout.json`
-`templates.raceCard` carries TWO overlapping parts for the same headshot region —
-1. rect `[1,1,53,77]`, `binds:"race.headImage"`, `imageBind:"sprites/body/{race.id}_grunt/head_healthy"`
-   — the correct, LIVE, per-race sprite (this is the one that should draw).
-2. rect `[10,22,35,35]` (nested inside #1's box), a STATIC unbound `image:"Content/sprites/body/
-   human_grunt/head_healthy.png"` **hardcoded to human_grunt regardless of race**, plus a drop-shadow —
-   almost certainly a leftover design-mock sample the dc.html extraction didn't collapse into the
-   imageBind part. Both parts draw, back-to-back, in the same per-part loop
-   (`Game1.ManifestRenderer.cs` ~810-874) — nothing currently suppresses an unbound static-image part
-   when a live imageBind part covers the same content.
-**This is the SAME CLASS of bug already fixed once (P0-C.9, ~line 725-730): "an UNBOUND sample part is
-design-mock filler — never stamp it over live card copy," currently special-cased only for
-MerchantOffer/Technique/Minion datums. Extend that same rule to raceCard's Race datum** (skip the
-unbound static-image part at `[10,22,35,35]` when the imageBind part already covers it) rather than
-re-diagnosing from scratch. **Not a queue-jump — next pass touching NewGame's race cards; HiFi bugs
-stay flagged top-of-queue per standing rule, doesn't interrupt whatever's currently mid-pass.**
+## ✅ DUPLICATE, ALREADY FIXED (found 2026-07-04 loop) — race-card head portrait doubles/ghosts
+Same root cause and same fix as the "ghost head — FIXED" entry above: `7ad61c9` already extends the
+P0-C.9 unbound-static-image-part suppression to `Race` datums (`Game1.ManifestRenderer.cs`, the
+`datum is Roguebane.Core.Race && pp.Binds is null && pp.ImageBind is null && !string.IsNullOrEmpty
+(pp.Image)` guard) — this entry pre-dates that commit landing and was never reconciled. No new work.
 
 ## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-03, Doug — NewGame core-picker card, live screenshots)
 Doug shot the Grunt core card in three states (idle/SELECT, live selected/✓ CORE SET, and the design/05
