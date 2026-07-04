@@ -78,16 +78,19 @@ already in this file).
   what's already slotted.
 
 **P3. Fix equipment reservation + the "everyone can activate their default kit" balance pass:**
-- **Equipment currently reserves nothing cumulatively.** Traced it: `Body.cs`'s equip-time checks
-  (`Capacity(item.Stat) < item.Reserve`, several call sites) gate each piece against RAW capacity only
-  — there's no running tally of what's already reserved by other equipped items, unlike techniques'
-  `_actives`/`Reserved(stat)`/`Available(stat)` accounting. Equipment needs the same kind of cumulative
-  reservation technique-activation already has correctly (§6/DESIGN_SPEC, new lock this pass).
-- **Regression, separately: techniques must NOT reserve attributes in the Equipment screen at all** —
-  only on in-combat ACTIVATION (DESIGN_SPEC lock added this pass, "Reservation timing"). Doug: this
-  used to be correct and has regressed silently. Encounter-time activation reservation is CONFIRMED
-  STILL WORKING today — don't touch that path, just strip whatever's making the Equipment screen
-  apply/show technique reservation.
+- ~~**Equipment currently reserves nothing cumulatively.**~~ DONE (2026-07-04 loop): the SUSTAIN MODEL
+  (`Body.cs`'s `DisabledGear` DISABLE CASCADE) already gives every piece of gear sharing a stat a single
+  shared pool, disabling highest-requirement-first when the combined reserve exceeds what's left after
+  techniques take their share — equip-time (`Wield`/`EquipRanged`/`Equip`) stays a raw-capacity gate by
+  design (SUSTAIN MODEL note in `Body.cs`), sustain is the cumulative check. Covered by
+  `ArmorLineTests`/`WandTests`/`FoeArmingTests`/`FoeOffenseTests`/`MitigationTests`.
+- ~~**Regression, separately: techniques must NOT reserve attributes in the Equipment screen at all**~~
+  DONE (2026-07-04 loop): added `Body.RangedGearOnlyUsable`/`HandItemGearOnlyUsable`/
+  `ArmorGearOnlySustained` (the same disable cascade with technique reservation zeroed) and pointed the
+  Equipment screen's card resolver (`Game1.ManifestRenderer.cs`'s `InvCardState`) at them. The real,
+  TechReserved-inclusive checks (`RangedUsable`/`HandItemUsable`/`ArmorSustained`) are untouched, so
+  in-combat resolution and the paper-doll draw keep reading true capability. New tests in
+  `BodyTests.cs` prove a lingering active technique disables the real check but not the gear-only one.
 - **Balance pass:** scale race base attributes UP (keep each race's current RELATIVE STR/DEX/INT/CON
   proportions — an Elf stays Elf-shaped, just bigger numbers) so every race×core combo can both equip
   its full default kit AND activate every default-assigned technique simultaneously, with the
