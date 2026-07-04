@@ -58,6 +58,36 @@ public class WandTests
     }
 
     [Fact]
+    public void ATomeOffhandMultipliesSpellDamage()
+    {
+        // §6d: Glowing Tome (tier 4) = +0.4x spell damage. Gemstone Wand 6 dmg -> round(6 x 1.4) = 8.
+        var body = IntBody();
+        Assert.True(body.Wield(Armory.Wands[2]));
+        Assert.True(body.Wield(Armory.Tomes[3]));
+        Assert.Equal(1.4, body.TomeSpellMult, 3);
+        var foe = Shielded(0);
+        var c = new Caster(body, foe);
+        Assert.True(c.Activate(Zap));
+        c.Step();
+        Assert.Equal(92, foe.Hp); // 8 landed
+
+        // A broken off-hand arm (hand 1 = armL) silences the tome's bonus.
+        var armL = body.Parts.First(p => p.Id == "armL");
+        body.Damage(armL, 9);
+        Assert.Equal(1.0, body.TomeSpellMult, 3);
+    }
+
+    [Fact]
+    public void ACharmOffhandMultipliesMinionDamage()
+    {
+        var body = IntBody();
+        Assert.True(body.Wield(Armory.Charms[1])); // Bone Charm, tier 2 -> x1.2
+        Assert.Equal(1.2, body.CharmMinionMult, 3);
+        body.Unwield(Armory.Charms[1]);
+        Assert.Equal(1.0, body.CharmMinionMult, 3);
+    }
+
+    [Fact]
     public void OrdinaryHitsStillConsumeThePool()
     {
         // Contrast: a melee consult eats shield points (AbsorbShields), it doesn't subtract.

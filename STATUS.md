@@ -270,7 +270,9 @@ interpreter, no per-weapon classes):**
 3. ~~Wand shield-subtraction~~ DONE (2026-07-03 loop, 332 tests: a cast whose consulted weapons
    are ALL wands resolves damage − standing pool, pool UNCONSUMED, remainder = normal part+HP
    hit; the spec's own 6-vs-4 example asserted, full blunt asserted, melee contrast asserted).
-4. Magic-offhand bonus hooks (minion attack ×, spell damage ×) reading the equipped offhand tier.
+4. ~~Magic-offhand hooks~~ DONE (2026-07-04 loop, 334 tests: CharmMinionMult/TomeSpellMult on
+   Body — best USABLE held piece, broken arm silences; tome multiplies INT-cast damage over
+   base+robe [composition = balance knob], charm multiplies minion hits; away-from-zero rounding).
 5. Staff/wand equip-rule wiring into the §6e validation (wand↔ranged mutual exclusion; staff =
    shield-equivalent for ranged-block + no-shield).
 6. Sling data + Charge spend (bow-parallel path already exists — placeholder dmg flagged).

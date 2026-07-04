@@ -278,7 +278,9 @@ public sealed class Caster
         if (_default is { Down: false })
             foreach (var minion in _bays.Values)
                 if (minion.Gate != MinionGate.Stat || _self.IsActive(Reservation(minion)))
-                    Hit(_default, null, minion.Power);
+                    // §6d charm offhand: +0.1x MINION attack damage per tier of the held charm.
+                    Hit(_default, null, (int)Math.Round(
+                        minion.Power * _self.CharmMinionMult, MidpointRounding.AwayFromZero));
     }
 
     // Resolve a technique's aim and land one discharge: hits its own foe (and PART) while that foe
@@ -314,7 +316,12 @@ public sealed class Caster
         // is 2H/no-dual so a mixed wand+staff consult can't arise.)
         var consulted = _self.Consulted(run.Tech);
         var wandCast = consulted.Count > 0 && consulted.All(w => w.Kind == WeaponKind.Wand);
-        Hit(target, part, EffectivePower(run.Tech) + robe, run.Tech.ShieldPiercing, wandCast);
+        var power = EffectivePower(run.Tech) + robe;
+        // §6d tome offhand: +0.1x SPELL damage per tier — INT casts only, applied over the whole
+        // spell damage (base + robe; composition order is a balance-pass knob).
+        if (run.Tech.Stat == Stat.Int)
+            power = (int)Math.Round(power * _self.TomeSpellMult, MidpointRounding.AwayFromZero);
+        Hit(target, part, power, run.Tech.ShieldPiercing, wandCast);
         if (run.Tech.Kind == TechniqueKind.Timered) run.Countdown = EffectiveCooldown(run.Tech);
         return true;
     }
