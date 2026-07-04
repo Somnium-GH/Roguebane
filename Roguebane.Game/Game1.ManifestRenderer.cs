@@ -671,13 +671,16 @@ public partial class Game1
                         }),
                     _ => null,
                 };
-            // Inventory cards (design/02, §6/§6c lock): green only when EQUIPPED; the plain
-            // `neutral` border is the normal unequipped treatment; RED (`dropped`) marks worn
-            // armor whose part-group can no longer sustain it (broken = the piece shed its
-            // effect but stays assigned). No family key in the data — keyed by the bind.
+            // Inventory cards: §6e's state family per datum (no family key in the data — keyed
+            // by the bind; today's manifest state keys, the CD rename is B6).
             else if (e.Binds == "inventory.activeTab.items")
                 rootState = InvCardState(datum);
             DrawTemplateRootChrome(tmpl, cell, datum, rootState);
+            // FLAGGED STOPGAP (§6e: hover treatment is CD-authored; equipment authors none today —
+            // B6 asks for it): a generic brighten ring on the hovered inventory card meanwhile.
+            if (e.Binds == "inventory.activeTab.items"
+                && Hover(new Rectangle(cell.X, cell.Y, cell.W, cell.H)))
+                Border(cell.X, cell.Y, cell.W, cell.H, _ui.Color("ink", Ink) * 0.35f, BorderPx(1), null);
             // Positional binds repeat the SAME bind N times per card (attr tiles 4x, attr-bar pips 12x,
             // in template order); count each occurrence per card to pick the right datum slice.
             int valIx = 0, keyIx = 0, pipIx = 0;
@@ -900,21 +903,32 @@ public partial class Game1
         }
     }
 
-    // The invCard root-chrome state for an inventory datum (design/02, §6/§6c): equipped = green,
-    // unequipped = the plain neutral border, RED (dropped) = worn armor whose part-group broke —
-    // its effect is shed but the piece stays assigned for re-equip. Weapon arm-broken lockout
-    // joins when the §6d wield model builds (queued; don't invent its rules here).
-    private string InvCardState(object? datum) => datum switch
+    // The invCard root-chrome state per §6e's LOCKED family, expressed in TODAY'S manifest keys
+    // (CD rename queued, issues B6 — engine chases it clean when it ships):
+    //   equipped = EQUIPPED (green, active) · dropped = DISABLED (red: assigned but unsustainable)
+    //   ready = EQUIPPABLE (plain, requirements met) · neutral = LOCKED (dim: reqs unmet, or the
+    //   bar/bays are FULL — capacity reads as locked, never a displacement conflict).
+    // Only gates that EXIST in Core apply: weapon = free hand + stat capacity >= Reserve; worn
+    // armor disables when its part-group breaks; §6c armor attr-requirements and §6d arm-broken
+    // weapon lockout join when those models build (queued — not invented here).
+    private string? InvCardState(object? datum) => datum switch
     {
-        Roguebane.Core.Weapon w => InRun && Exp.Player.Body.Hands.Contains(w) ? "equipped" : "neutral",
+        Roguebane.Core.Weapon w when InRun && Exp.Player.Body.Hands.Contains(w) => "equipped",
+        Roguebane.Core.Weapon w when InRun =>
+            Exp.Player.Body.Hands.Count < 2 && Exp.Player.Body.Capacity(w.Stat) >= w.Reserve
+                ? "ready" : "neutral",
+        Roguebane.Core.Weapon => "neutral", // pre-run: no body to lift it yet
         Roguebane.Core.Armor a when InRun && Exp.Player.Body.ArmorOn(a.Group) == a =>
             Exp.Player.Body.Capacity(a.Group) == 0 ? "dropped" : "equipped",
-        Roguebane.Core.Armor => "neutral",
-        Roguebane.Core.Technique t =>
-            (InRun ? Exp.Equipment : _build.Equipment).Contains(t) ? "equipped" : "neutral",
-        Roguebane.Core.Minion m => (InRun
-            ? Exp.Minions.Contains(m)
-            : _build.CoreRune.MinionKit.Contains(m)) ? "equipped" : "neutral",
+        Roguebane.Core.Armor => "ready", // no attr requirement in Core today (§6c ladders queued)
+        Roguebane.Core.Technique t when (InRun ? Exp.Equipment : _build.Equipment).Contains(t)
+            => "equipped",
+        Roguebane.Core.Technique => (InRun ? Exp.Equipment.Count : _build.Equipment.Count)
+            >= _build.CoreRune.Kit.Count ? "neutral" : "ready",
+        Roguebane.Core.Minion m when (InRun
+            ? Exp.Minions.Contains(m) : _build.CoreRune.MinionKit.Contains(m)) => "equipped",
+        Roguebane.Core.Minion => (InRun ? Exp.Minions.Count : _build.CoreRune.MinionKit.Count)
+            >= _build.CoreRune.Bays ? "neutral" : "ready",
         _ => null,
     };
 

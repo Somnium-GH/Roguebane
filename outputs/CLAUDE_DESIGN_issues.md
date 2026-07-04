@@ -56,6 +56,18 @@ B5. **Equipment card state families never fire engine-side: no `family` key.** `
     after Doug's equipment-states design session locks the mapping (e.g. `dropped`→`disabled`);
     hold renames until we send the locked table.
 
+B6. **(post-relay addendum — NOT in the batch sent 2026-07-03)** Doug's equipment-states session
+    LOCKED the card-state semantics (DESIGN_SPEC §6e). Asks, for the next authoring pass:
+    (a) rename the invCard states to the locked vocabulary — `dropped`→`disabled`,
+    `ready`→`equippable`, `neutral`→`locked` (engine chases the rename, clean, no shims);
+    (b) author HOVER variants for `invCard`/`loadoutCard`/`invTab` (brighten treatment,
+    raceCard-style) — equipment authors no hover today; engine ships a flagged generic brighten
+    stopgap until yours lands; (c) per the §6e paper-doll lock, DISABLED gear is REMOVED from the
+    figure render — so NO dimmed/desaturated armor layer variants are needed (scope savings for
+    the B2 regen batch); instead that batch should include a ranged BACK-MOUNT layer so an
+    equipped bow/wand can render while the melee hands are full (§17 #22 — until it exists the
+    engine draws no ranged mount rather than inventing one).
+
 ## Standing FYIs (unchanged, for context — not action items)
 - design/05 v2 STAT BLOCKS are not adopted; Doug will run a live tuning session — if a future 05
   re-render can sample stats from a handed set, ask him for the tuned numbers then.

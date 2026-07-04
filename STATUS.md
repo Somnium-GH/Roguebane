@@ -103,13 +103,41 @@ and tier names aren't set — don't invent those two.
 ## ⇒ NEW LOCK (2026-07-03, Doug — design session): armor system, DESIGN_SPEC §6/§6c
 STR/DEX/INT/CON armor tier ladders + names are canon (§6c, blessed-initial numbers, tune later); shield
 OBJECT equip-gate moved **STR → CON** (§6 table). **Needs-loop, not urgent — pick up whenever Equipment
-gear cards are next touched:** the Equipment screen's item-card border needs a THIRD state alongside the
-existing green=EQUIPPED: a plain/no-color border for **UNEQUIPPED** (technique cards on the design show
-this as their normal, un-highlighted border) — Doug flagged the loop likely only knows equipped(green)/
-disabled(red) and may be missing the plain unequipped treatment entirely. Same design also needs the
-**DISABLED/RED** state wired for ARMOR specifically (not just weapons) — an armor piece goes RED when its
-governing attribute can't sustain it (after active techniques reserving that attribute free what they
-can), stays ASSIGNED for re-equip, per §6/§6c.
+gear cards are next touched:** ~~third border state~~ SUPERSEDED same day by the §6e states-session
+LOCK (block below) — ALL FOUR states turn out to be CD-authored on `invCard` already (equipped=green /
+dropped=red / ready=plain / neutral=dim); what's missing is the `states.family` key (payload B5) +
+engine resolution + the armor model. Armor-RED per §6/§6c stands, folded into §6e.
+
+## ⇒ NEW LOCK (2026-07-03, Doug — equipment-states session): DESIGN_SPEC §6e — Equipment card
+## states, clicks, ordering, paper-doll. READ §6e before building; this is the summary, not the spec.
+- **ONE 4-state family, all three inv tabs:** EQUIPPED(green) · DISABLED(red — assigned but
+  unsustainable; incl. slotted techniques whose §6d weapon-gate is lost) · EQUIPPABLE(plain) ·
+  LOCKED(dim — reqs unmet, or bar/bays FULL). Manifest names `equipped/dropped/ready/neutral`;
+  CD asked for `states.family` keys (B5) + renames + HOVER variants (B6). ENGINE: resolve these
+  state families on invCard/loadoutCard once family keys land — suggested interim (FLAGGED
+  stopgap): a GENERIC fallback resolving states-without-family by template id; never a
+  per-template enumerated special case (see the ghost-head lesson). A FLAGGED generic
+  hover-brighten stopgap is approved until CD's hover states land.
+- **Clicks (out-of-combat only):** equippable→equip · equipped→unequip · disabled→unequip · locked→
+  inert. **AUTO-DISPLACE on conflicts:** legal equips always succeed; bow/wand benches a held shield;
+  hands-full melee equip displaces the OFF-hand (never main, §6d promotion); armor swaps its slot.
+  Capacity ≠ conflict (full bar/bays = dim palette cards, no displacement).
+- **Ordering [hotkeys ARE slot order]:** click = slot into first free, unslot compacts, hotkeys
+  renumber positionally. **DRAG-AND-DROP reorder (NEW input capability):** drag pulls the card off
+  leaving a ghost in its slot, snaps insertion-style between neighbors, release locks the order; same
+  model for minion bays. Supersedes the "mouse is click+hover only" Debt line WHEN BUILT. Assumed
+  defaults flagged in §6e (drop-outside cancels; palette-drag equips at insertion point).
+- **Disable cascade [§17 #16 RESOLVED — buildable now]:** highest-requirement-first, ties last-
+  equipped-first; a pure ranking over the live attr level (recovery re-enables cheapest-first
+  automatically). Core-test the ranking exhaustively — thesis-adjacent economy math.
+- **Paper-doll = capability truth:** DISABLED gear is REMOVED from the render (no dimmed-armor art
+  needed — scope savings flagged to CD in B6); a broken arm never draws its weapon; ranged mount
+  while melee hands are full = §17 #22 (assumed NOT drawn — don't invent art).
+- **Equipment renders LIVE run state only; the legacy pre-run build branch is vestigial — retire when
+  next touched.** (BEGIN → CityMap; the screen is unreachable pre-run.)
+- ENGINE ORDER (extends the §6d queue, normal priority, no queue-jump): armor items as data (§6c
+  ladders) + gear/armor requirement checks → cascade ranking → state-family render wiring → click
+  matrix + auto-displace → drag-reorder → paper-doll gear-state compose. Each slice Core-tested.
 
 ## ✅ BUILD-BREAKING BUG FIXED (2026-07-03, post-commit 57cc8a6): mgcb crashed on launch
 `dotnet run` failed content build (MGCB exited -532462766 / 0xE0434352 — unhandled CLR exception,

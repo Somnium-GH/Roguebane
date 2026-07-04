@@ -98,8 +98,8 @@ allocation economy.
   independently and each carry a SHARE of their stat (one arm = ½ STR). Weapons held in hands; lose an
   arm → lose its STR share → can fall below a gear's equip threshold, and that gear is then **DISABLED**
   (no bonus/defense, shown **RED** in Equipment) but stays **ASSIGNED** and **re-activates when the
-  attribute heals** — it does NOT leave the slot. The cascade *is* the combat depth. **[OPEN §17: when an
-  attribute drops below MULTIPLE items' requirements, a rule / ITEM-RANKING decides which disables first.]**
+  attribute heals** — it does NOT leave the slot. The cascade *is* the combat depth. **[RESOLVED
+  2026-07-03 → §6e: highest-requirement-first, ties last-equipped-first.]**
 - **Broken-limb HARD OVERRIDE [NEW LOCKED, 2026-07-03]:** a broken ARM removes its hand-slot outright —
   no weapon can be held there regardless of which stat it gates (a DEX bow is exactly as arm-gated as a
   STR sword; §6d has the full wield model). A broken LEG hard-zeroes EVASION outright, overriding any
@@ -237,6 +237,48 @@ weapon never adds its own timer, it only gates + scales.
   locked, the number is not.
 - **Names [blessed initial, tune later]:** Bows — Short Bow → Long Bow → Compound Bow → Elven Bow.
   Wands — Adept Wand → Twisted Wand → Gemstone Wand → Glowing Wand.
+
+### 6e. Equipment screen — card states, clicks, ordering, paper-doll [LOCKED 2026-07-03, states session]
+**ONE state family for every inventory card** (GEAR / TECHNIQUES / MINIONS tabs):
+- **EQUIPPED** (green border) — active: wielded/worn · slotted on the bar · assigned to a bay.
+- **DISABLED** (red) — still ASSIGNED but currently unsustainable: attribute below requirement, arm
+  broken, or a §6d gear-gate lost (a slotted technique whose required weapon left). Re-activates when
+  the requirement is met again (§6).
+- **EQUIPPABLE** (plain) — unequipped, requirements MET.
+- **LOCKED** (dim) — unequipped, requirements NOT met; also technique/minion cards when the bar/bays
+  are FULL (capacity reads as locked, it is never a displacement conflict).
+*(Manifest today authors these as `equipped`/`dropped`/`ready`/`neutral` on `invCard` — rename +
+`states.family` keys + hover variants are CD payload items; hover treatment is CD-authored, engine may
+ship a FLAGGED generic brighten stopgap meanwhile.)*
+
+**CLICKS (Equipment is only reachable OUT of combat; everything is sealed in combat, §7):**
+EQUIPPABLE click → equip/slot/assign · EQUIPPED click → unequip · DISABLED click → unequip (allowed
+out of combat) · LOCKED click → inert. **Conflicts AUTO-DISPLACE:** a legal equip always succeeds and
+the conflicting piece is unequipped back to inventory — equipping a bow/wand benches a held shield
+(§6d incompatibility); a new melee weapon with both hands full displaces the OFF-HAND (main-hand is
+never displaced, §6d promotion); armor over an occupied slot displaces the old piece.
+
+**ORDERING [slot index IS the hotkey — techniques 1..T, then bays]:** click slots into the first free
+slot; unslot compacts left (no holes); hotkeys renumber positionally. **Reorder = DRAG-AND-DROP:**
+dragging a slotted card pulls it off leaving a matching ghost background in its slot; it snaps
+INSERTION-style between neighbors (sticky but easy); release locks the new order. Same model for
+minion bays. *[ASSUMED defaults, flag if wrong: drop outside the bar snaps back (cancel); dragging a
+palette card onto the bar equips at the insertion point.]*
+
+**DISABLE CASCADE [resolves §17 #16]:** when an attribute can't sustain every equipped item (after
+active techniques reserving it free what they can, §6c), items disable **highest-requirement-first**;
+ties break **last-equipped-first**. A pure ranking over the current attr level — deterministic,
+history-free except ties — so recovery re-enables cheapest-first automatically.
+
+**PAPER-DOLL [render = CAPABILITY truth]:** equipped+active gear draws its morph layers (§7);
+**DISABLED gear is REMOVED from the render** (bare part — assignment truth stays on the red card);
+a weapon in a BROKEN arm never draws (the hand slot is physically gone, §6). Handedness (§6d) picks
+which physical arm renders main-hand. Ranged-weapon mount while melee hands are full = **[OPEN §17
+#22]** (assumed NOT drawn until a back-mount layer exists — never invent art).
+
+**Screen state:** Equipment always renders the LIVE run state (it is only reachable in-run; BEGIN
+marches straight to CityMap). The code's legacy "pre-run build mode" branch is vestigial — retire it
+when next touched.
 
 ## 7. Race + Core rune, and the three-layer architecture [LOCKED]
 Identity is **two axes** (FTL ship + layout):
@@ -573,9 +615,9 @@ points there so the canon stays design-focused.
     equipped-gear parts (a morph model, not per-race×core×gear art); a piece may cover multiple part slots
     (robe = all/most). Exact morph mechanics + the multi-slot slot model — design BEFORE building the
     gear-swap system (today gear is starting-set only; GEAR cards are sample/design-open).
-16. ITEM-RANKING / auto-unequip priority (§6): when a broken part drops an attribute below MULTIPLE items'
-    requirements, a rule/ranking decides which gear disables first — needs design + tuning. Feeds the
-    gear system (design-open).
+16. ~~ITEM-RANKING / auto-unequip priority~~ RESOLVED 2026-07-03 (§6e): disables highest-requirement-
+    first, ties last-equipped-first — a pure ranking over the live attr level. Numbers ride the
+    balance pass like everything else.
 17. ~~MERCHANT SCREEN~~ RESOLVED 2026-07-03: design/07 v2 + the manifest `merchant` screen ARE the
     design; popover retired; click-to-buy receiving LOCKED in §12. Residual OPEN: ware pricing/rarity
     economy tune (part of the balance pass).
@@ -589,6 +631,9 @@ points there so the canon stays design-focused.
 21. Ranged-only builds (no melee weapon at all, §6d) — viable in principle but not fully thought through;
     they lose the CON **block** shield-source specifically (needs a held shield) though other block
     sources don't need one. Revisit during the balance pass.
+22. Ranged-weapon RENDER MOUNT (§6e): where an equipped bow/wand draws while the melee hands are full —
+    assumed default: NOT drawn until a back-mount figure layer exists (fold into the figure-art regen
+    batch, payload B2); do not invent art meanwhile.
 
 ## 18. DROPPED — must not resurface
 - **"Chassis" as the identity model** → split into **Race + Core rune** (§7).
