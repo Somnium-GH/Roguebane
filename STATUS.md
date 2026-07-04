@@ -94,23 +94,13 @@ landed on the wrong element during extraction.** Likely intent: part #2's geomet
 was never meant to carry an image at all. This is a CD extraction mis-attribution, not a pick-one
 engine call — logged to CD (`CLAUDE_DESIGN_issues.md`) rather than re-guessing locally.
 
-## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-03, Doug — CityMap war-party icon is static, doesn't
-## track the doom bar's fill boundary)
-Doug: "the war party icon needs to follow the bar at the exact location on the edge of the bar as in
-the reference." Confirmed against `design/03-citymap.png`: at "1 WAYPOINT AWAY" the icon (`doomHost`)
-sits right at the boundary between plain track and the red stripe (near-full stripe, tiny sliver of
-plain track left) — it's supposed to RIDE that edge. **Root cause: `doomHost` (citymap element,
-`image:"Content/icons/map/enemy_host_near.png"`, offset `[338,39]` fixed size `[41,41]`) is a plain
-STATIC bindless image — no bind at all, drawn at a fixed offset regardless of progress.** Compare
-`doomFill`/`doomFillStripes` (offset ~`[359-360,61]`), which DO animate: `frac =
-Exp.Map.WarPartyDistance / Exp.Map.MarchLength`; the stripe's covered width = `(1-frac)*trackWidth`,
-so the boundary (where icon should sit) = `doomTrack.X + frac*trackWidth`. **This is the SAME
-STOPGAP CLASS already flagged for doomFillStripes** (`Game1.ManifestRenderer.cs` ~93-106: "clips
-fill+pattern to the war-party tandem width via sibling advancePct rect detection — Needs-CD: bind the
-stripes element so the stopgap dies") — extend that exact sibling-detection technique to `doomHost`:
-detect it sits near the `enemy.advancePct`-bound element, compute the same `frac`, and offset its
-draw X to `doomTrack.X + frac*doomTrack.Width - iconWidth/2` instead of the static offset. Pure
-engine fix, no CD data change needed.
+## ✅ FIXED (2026-07-04 loop) — CityMap war-party icon now tracks the doom bar's fill boundary
+`doomHost` was a plain static bindless image at a fixed offset. Extended the same sibling-detection
+stopgap already used for `doomFillStripes`: find the `enemy.advancePct`-bound sibling, find the plain
+panel sharing its right edge (the track), offset the icon's draw X to `trackR.X + frac*trackR.Width -
+iconWidth/2`. Structural detection, not a doomHost-specific case. Build clean, Core.Tests 350 green.
+**Needs Doug**: RB_SMOKE runs pre-run so this branch is inert there by design — needs a live in-run
+screenshot to visually confirm.
 
 ## ✅ FIXED (2026-07-04 loop) — Merchant wareCards render with no border/chrome
 Root chrome was missing because `section.wares` stamping (`Game1.ManifestRenderer.cs`) called
