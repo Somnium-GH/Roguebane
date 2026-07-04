@@ -43,9 +43,17 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     private double _combatAccum;
 
     private MouseState _prevMouse;
-    private Point _cursor;  // mouse position mapped into design space (through the letterbox)
-    private bool _clicked;  // left button went down this frame
-    private bool _rclicked; // right button went down this frame (FSM: dismiss target / deactivate card)
+    private Point _cursor;   // mouse position mapped into design space (through the letterbox)
+    private bool _clicked;   // left button went down this frame
+    private bool _rclicked;  // right button went down this frame (FSM: dismiss target / deactivate card)
+    private bool _mouseDown; // left button currently held (for drag tracking)
+    private bool _released;  // left button went up this frame
+
+    // §6e bar drag-and-drop: which slotted technique is under a live press, and whether the press has
+    // moved far enough to count as a drag rather than a plain click.
+    private Roguebane.Core.Technique? _dragTech;
+    private Point _dragAnchor;
+    private bool _dragging;
 
     // The leg under way is the campaign's current Expedition — most of the run screen reads it.
     private Expedition Exp => _campaign.Current;
@@ -227,6 +235,8 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             _viewScale > 0 ? (int)((mouse.Y - _viewDest.Y) / _viewScale) : 0);
         _clicked = mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released;
         _rclicked = mouse.RightButton == ButtonState.Pressed && _prevMouse.RightButton == ButtonState.Released;
+        _mouseDown = mouse.LeftButton == ButtonState.Pressed;
+        _released = mouse.LeftButton == ButtonState.Released && _prevMouse.LeftButton == ButtonState.Pressed;
 
         if (_screen == Screen.NewGame) UpdateNewGame(keys);
         else if (_screen == Screen.Equipment) UpdateEquipment(keys);
@@ -354,8 +364,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         }
         var slottedData = InRun ? Exp.Equipment : _build.Equipment;
         var slotted = ManifestListCells("equipment", "loadout", slottedData.Count);
-        for (var i = 0; i < slotted.Count && i < slottedData.Count; i++)
-            if (Click(RectOf(slotted[i]))) ToggleTech(slottedData[i]);
+        UpdateBarDrag(slotted, slottedData, ToggleTech);
 
         if (!InRun)
         {
@@ -555,6 +564,72 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     private bool Hover(Rectangle r) => !_smoke && r.Contains(_cursor);
     private bool Click(Rectangle r) => _clicked && r.Contains(_cursor);
     private bool RightClick(Rectangle r) => _rclicked && r.Contains(_cursor);
+
+    private const int DragThresholdPx = 6; // §6e: a small press-move is still a click, not a drag
+
+    // §6e reorder: press a slotted card, drag past the threshold, release to drop at the nearest
+    // slot to the cursor. A press that never crosses the threshold is a plain click (toggle). Only
+    // wired in-run (Campaign.ReorderTechnique) — pre-run has no persisted bar order to reorder yet.
+    private void UpdateBarDrag(
+        System.Collections.Generic.IReadOnlyList<LayoutRect> slots,
+        System.Collections.Generic.IReadOnlyList<Roguebane.Core.Technique> data,
+        Action<Roguebane.Core.Technique> toggle)
+    {
+        if (_clicked)
+            for (var i = 0; i < slots.Count && i < data.Count; i++)
+                if (RectOf(slots[i]).Contains(_cursor)) { _dragTech = data[i]; _dragAnchor = _cursor; _dragging = false; break; }
+
+        if (_dragTech is { } t && _mouseDown)
+        {
+            if (!_dragging && (Math.Abs(_cursor.X - _dragAnchor.X) > DragThresholdPx
+                                || Math.Abs(_cursor.Y - _dragAnchor.Y) > DragThresholdPx))
+                _dragging = InRun && data.Contains(t); // pre-run: fall through to plain click on release
+        }
+
+        if (_released)
+        {
+            if (_dragTech is { } dropped)
+            {
+                if (_dragging && WithinBar(slots))
+                    _campaign.ReorderTechnique(dropped, DragInsertionIndex(slots));
+                else
+                {
+                    var origin = -1;
+                    for (var i = 0; i < data.Count; i++) if (data[i] == dropped) { origin = i; break; }
+                    if (origin >= 0 && origin < slots.Count && RectOf(slots[origin]).Contains(_cursor))
+                        toggle(dropped);
+                }
+            }
+            _dragTech = null;
+            _dragging = false;
+        }
+    }
+
+    // §6e ASSUMED default: drop outside the bar cancels (snaps back) rather than reordering.
+    private bool WithinBar(System.Collections.Generic.IReadOnlyList<LayoutRect> slots)
+    {
+        if (slots.Count == 0) return false;
+        var x0 = slots.Min(s => s.X);
+        var y0 = slots.Min(s => s.Y);
+        var x1 = slots.Max(s => s.X + s.W);
+        var y1 = slots.Max(s => s.Y + s.H);
+        return _cursor.X >= x0 && _cursor.X <= x1 && _cursor.Y >= y0 && _cursor.Y <= y1;
+    }
+
+    // Nearest slot index to the cursor's X (bar is a single horizontal row) — the insertion point a
+    // release commits to.
+    private int DragInsertionIndex(System.Collections.Generic.IReadOnlyList<LayoutRect> slots)
+    {
+        var best = 0;
+        var bestDist = int.MaxValue;
+        for (var i = 0; i < slots.Count; i++)
+        {
+            var cx = slots[i].X + slots[i].W / 2;
+            var dist = Math.Abs(_cursor.X - cx);
+            if (dist < bestDist) { bestDist = dist; best = i; }
+        }
+        return best;
+    }
 
     // Interactive layout rects — single source of truth shared by Update (hit-test) and Draw (paint
     // + hover). Mirrors the coordinates used in the Draw* methods.

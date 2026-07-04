@@ -715,6 +715,16 @@ public partial class Game1
             if (e.Binds == "inventory.activeTab.items"
                 && Hover(new Rectangle(cell.X, cell.Y, cell.W, cell.H)))
                 Border(cell.X, cell.Y, cell.W, cell.H, _ui.Color("ink", Ink) * 0.35f, BorderPx(1), null);
+            // §6e drag feedback (PLACEHOLDER visual, Needs Claude Design for real chrome): the card
+            // being dragged reads as a dimmed "ghost" left behind in its vacated slot; the slot nearest
+            // the cursor draws an insertion ring — the two cues a mid-drag bar needs to read at all.
+            if (e.Binds == "loadout" && _dragging && datum is not null)
+            {
+                if (Equals(datum, _dragTech))
+                    Rect(cell.X, cell.Y, cell.W, cell.H, Color.Black * 0.5f);
+                else if (WithinBar(cells) && i == DragInsertionIndex(cells))
+                    Border(cell.X, cell.Y, cell.W, cell.H, _ui.Color("accent", Color.Gold), BorderPx(2), null);
+            }
             // Positional binds repeat the SAME bind N times per card (attr tiles 4x, attr-bar pips 12x,
             // in template order); count each occurrence per card to pick the right datum slice.
             int valIx = 0, keyIx = 0, pipIx = 0;
