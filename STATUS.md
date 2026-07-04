@@ -70,10 +70,16 @@ already in this file).
   **PART 1 DONE (2026-07-04):** Core primitive landed —
   `Expedition.ReorderTechnique(technique, newIndex)`/`Campaign.ReorderTechnique` (out-of-combat gated,
   clamps out-of-range index, mirrors into `_loadout` so order survives a leg advance; touches neither
-  reservation nor activation). **STILL OPEN:** the Game1 interactive half — drag-threshold detection,
-  ghost-slot rendering, insertion-point-from-mouse-position, release-to-commit, drop-outside cancel —
-  plus minion-bay reorder (no Core primitive yet; same shape as the technique one once bay-index
-  semantics are confirmed against `Caster`'s bay model).
+  reservation nor activation).
+  **PART 2 DONE (2026-07-04):** Game1 interactive half landed — press a slotted card, cross a small
+  drag threshold, release to drop at the slot nearest the cursor (`Campaign.ReorderTechnique`); a press
+  under threshold still plain-clicks (toggle); drop outside the bar cancels (the ASSUMED default).
+  Draw side has a PLACEHOLDER ghost-dim + insertion-ring visual (flagged Needs Claude Design for real
+  chrome — no authored drag chrome exists yet). Only wired in-run; pre-run has no persisted bar order.
+  **STILL OPEN:** minion-bay reorder (no Core primitive yet; same shape as the technique one once
+  bay-index semantics are confirmed against `Caster`'s bay model); dragging a palette card onto the bar
+  to equip-at-insertion-point (the other ASSUMED default) isn't built — today the bar only reorders
+  what's already slotted.
 
 **P3. Fix equipment reservation + the "everyone can activate their default kit" balance pass:**
 - **Equipment currently reserves nothing cumulatively.** Traced it: `Body.cs`'s equip-time checks
