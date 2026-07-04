@@ -1,5 +1,16 @@
 # Status
 
+## ⇒ NEW LOCK (2026-07-03, Doug — design session): armor system, DESIGN_SPEC §6/§6c
+STR/DEX/INT/CON armor tier ladders + names are canon (§6c, blessed-initial numbers, tune later); shield
+OBJECT equip-gate moved **STR → CON** (§6 table). **Needs-loop, not urgent — pick up whenever Equipment
+gear cards are next touched:** the Equipment screen's item-card border needs a THIRD state alongside the
+existing green=EQUIPPED: a plain/no-color border for **UNEQUIPPED** (technique cards on the design show
+this as their normal, un-highlighted border) — Doug flagged the loop likely only knows equipped(green)/
+disabled(red) and may be missing the plain unequipped treatment entirely. Same design also needs the
+**DISABLED/RED** state wired for ARMOR specifically (not just weapons) — an armor piece goes RED when its
+governing attribute can't sustain it (after active techniques reserving that attribute free what they
+can), stays ASSIGNED for re-equip, per §6/§6c.
+
 ## ✅ BUILD-BREAKING BUG FIXED (2026-07-03, post-commit 57cc8a6): mgcb crashed on launch
 `dotnet run` failed content build (MGCB exited -532462766 / 0xE0434352 — unhandled CLR exception,
 not a normal build error). Root cause: the 57cc8a6 mgcb-mirror step wrote the 9 new entries
@@ -74,6 +85,13 @@ BUILT (M1 directive, rides SMOKE ASSETS): every figure × z-part × armored row 
 informational). Element-level imageBind joined the asset probe. Same compose path serves the
 Equipment paper-doll + encounter foes, so those heal too. Doug: eyeball Warden/Elf-Ranger limbs
 live to close the report.
+**NEWGAME RE-JUDGE post-A3 (2026-07-03 loop):** geometry_diff findings 4→3, ALL CD-side
+(coreCards container heuristic + coreHeader/raceCards FLATTENED 2-span extractions); previewStage
+renders (A4's gradient fill landed, generic panel draw). NEW FIX: `preview.fig` on newgame drew
+the RUN body during an in-run smoke (the drive's Summoner under Grunt card copy — the identity
+mask class M0.3 killed, resurfacing via the figure). preview.fig now ALWAYS previews the BUILD;
+`Body` keeps the live run body. ng fidelity 78.3→78.6. Preview figure wears bare limbs (unarmored
+build body) vs the ref's armored+armed sample — live-state class; gear draws when wielded.
 **‼ GATE RED (pre-existing, DROP-caused — verified by stash/rerun at HEAD): text OVERFLOWS rose
 ng 6→9, city 4→6.** Membership is the drop's NEW/re-authored elements (city: suppliesTitle/
 supportTitle/castlePanelTitle/doomTitle; ng: header/preview family). Numerics: VERTICAL-only —

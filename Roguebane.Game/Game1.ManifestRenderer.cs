@@ -288,9 +288,11 @@ public partial class Game1
                 DrawManifestList(e, r);
                 break;
             case "figure" when e.Binds is "preview.fig" or "Body":
-                // Composed figure: feet at the box bottom-centre, scaled to the box height. In a run
-                // the LIVE body draws (part conditions, worn gear); pre-run the build preview does.
-                if (InRun)
+                // Composed figure: feet at the box bottom-centre, scaled to the box height.
+                // preview.fig ALWAYS previews the BUILD (newgame's stage must match its own card
+                // copy — an in-run smoke was drawing the run's Summoner under Grunt text);
+                // Body draws the LIVE run body (part conditions, worn gear) once marching.
+                if (e.Binds == "Body" && InRun)
                     DrawHumanoid(Exp.Player.Body, Exp.FigureId, r.X + r.Width / 2, r.Y + r.Height, r.Height);
                 else
                     DrawHumanoid(_build.Preview(), _build.CoreRune.FigureKey(_build.Race),

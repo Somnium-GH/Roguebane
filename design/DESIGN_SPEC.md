@@ -83,10 +83,10 @@ allocation economy.
 
 | Attribute | Part | Governs / scales | Gates |
 |---|---|---|---|
-| **STR** | Arms (×2) | attack power (1.0×); STR actives | STR weapons; wields the shield OBJECT (heavy = STR) |
+| **STR** | Arms (×2) | attack power (1.0×); STR actives | STR weapons |
 | **INT** | Head (×1) | spell power; keeps spell actives + passives up | spells need INT reserved *(absorbs old WIS)* |
 | **DEX** | Legs (×2) | evasion; accuracy; +0.25× attack; **HASTE** (shortens cooldowns ~1.5–2%/pt, cap ~28%) | DEX weapons; **bows** (shield-ignoring, §10) |
-| **CON** | Chest (×1) | **bonus HP** (1 CON = 2 HP on a natural base); stun resist; powers shields (§6b) | body-extending runes |
+| **CON** | Chest (×1) | **bonus HP** (1 CON = 2 HP on a natural base); stun resist; powers shields (§6b) | body-extending runes; wields the shield OBJECT (heavy = CON, moved off STR 2026-07-03) |
 
 - **WIS** merged into INT; **CHA** dropped (§18).
 - **CON → HP [LOCKED]:** CON grants BONUS HP atop a natural base (1:2). The base is the **RACE's HP**
@@ -100,11 +100,13 @@ allocation economy.
   (no bonus/defense, shown **RED** in Equipment) but stays **ASSIGNED** and **re-activates when the
   attribute heals** — it does NOT leave the slot. The cascade *is* the combat depth. **[OPEN §17: when an
   attribute drops below MULTIPLE items' requirements, a rule / ITEM-RANKING decides which disables first.]**
-- **Armor [LIGHT effect layer — not attribute gear]:** one piece per part-group; does NOT grant or gate
-  attributes. Effect keyed to TYPE: heavy/**plate → a worn SHIELD SOURCE** (raises `Value` §6b shield
-  layers on its group while it stands; the flat-protection role is retired since §8 — shields + full evade
-  are the only mitigations); **leather (DEX)** → **evasion**; head spell-armor → spell/blind protection.
-  Rides the part's condition (break the part → effect/shield gone). Weapons/shields gate on their stat.
+- **Armor [LIGHT effect layer — not attribute gear]:** one piece per part-GROUP slot (Head/Chest/Arms/
+  Legs); does NOT grant or gate the attribute pool itself. Four types, each keyed to the attribute whose
+  part they protect — full tier ladders + blessed initial numbers in **§6c** (2026-07-03). Rides the
+  part's condition: damage a part enough (after any active techniques reserving that attribute have
+  already freed what they can) and its armor drops to the same **DISABLED (shown RED in Equipment)**
+  state gear already uses above — it stays ASSIGNED (remembered) for re-equip, but stops giving its
+  bonus, until the governing attribute heals past its threshold. Weapons/shields gate on their own stat.
 
 ### 6b. Blocks & the shield system [LOCKED]
 A **shield SOURCE is a PASSIVE technique** that **reserves its stat** in the action bar and is **ON by
@@ -127,6 +129,40 @@ limited. *(Supersedes the earlier "sustained CON-block, flat-while-held, capped"
   regen cadence is CON-scaled, §6b). FTL-reminiscent read, our own skin — no trade-dress. The pip count is
   **NOT capped at ~4** (that was FTL's damage scale); ours scales HIGHER (likely 8+) to mitigate this
   game's larger damage numbers — so the bar must render a **variable, larger N** of pips gracefully.
+
+### 6c. Armor tiers & body-slot ladders [LOCKED core structure; tier-bonus numbers + names are BLESSED
+INITIAL values (Doug, 2026-07-03) — an advanced-prototype pass, tune later like §6b/§11]
+Four rungs per line (escalating protection/coverage), one line per attribute type, one piece per slot.
+**STR's per-tier bonus is PART-damage mitigation only** (reduces how much of the covered part's OWN
+attribute a landed hit costs) — this is distinct from, and does NOT reopen, the flat-HP-mitigation role
+retired in §8: a hit's HP damage is still stopped only by a shield block or a full evade. STR armor is
+the single highest-payoff type and the single highest-risk: STR is one shared pool across both arms, so
+a build leaning on it is the one most exposed to the arms-broken cascade (§6 disable, above) — expect a
+STR build's armor to go RED across the board when both arms break.
+
+**STR — heavy/plate (Head, Chest, Arms, Legs):**
+- Head: Skull Cap → Barbute → Great Helm → Crowned Helm
+- Chest: Breastplate → Splint Mail → Half Plate → Full Plate
+- Arms: Vambraces → Splint Vambraces → Banded Gauntlets → Plate Gauntlets
+- Legs: Greaves → Splint Greaves → Half-Plate Legs → Full Plate Legs
+
+**DEX — leather (Head, Chest, Arms, Legs):**
+- Head: Leather Cap → Hardened Cap → Studded Cap → Reinforced Hood
+- Chest: Padded Armor → Leather Armor → Studded Leather → Reinforced Leather *(corrected 2026-07-03: the
+  4-rung dictation repeated "Studded Armor" as both rung 2 and rung 4 — read as the intended escalation)*
+- Arms: Leather Bracers → Hardened Bracers → Studded Bracers → Reinforced Bracers
+- Legs: Leather Leggings → Hardened Leggings → Studded Leggings → Reinforced Leggings
+
+**INT — robe (Chest + Head ONLY — no arm/leg robe pieces exist):**
+- Chest: Cotton Robe → Silk Robe → Ornate Robe → Humming Robe
+- Head: Cloth Cap → Silk Hood → Ornate Circlet → Humming Circlet
+
+**CON — shield object (one slot, not a body-part group; equip gate = CON, §6 table):**
+- Wooden Shield → Iron Buckler → Kite Shield → Tower Shield
+
+**Per-tier bonuses [blessed initial, tune later]:** STR = −2 part-damage to the covered part, per tier.
+DEX = +2% evade per tier, per body part currently worn (stacks across worn pieces). INT = +2 spell
+damage per piece worn (2-piece cap: robe + hat). Shield = +2% block-pool recharge per tier (§6b).
 
 ## 7. Race + Core rune, and the three-layer architecture [LOCKED]
 Identity is **two axes** (FTL ship + layout):
@@ -171,8 +207,10 @@ there is no multi-foe list and no default/front target.
 
 - **Every hit deals BOTH [LOCKED]:** part damage (subtracts from the targeted part's stat, graded §6,
   persistent) **and** HP damage — simultaneously, from the same hit. There is NO part-vs-HP split and no
-  HP-only-on-overkill path. The ONLY mitigations are a **shield block** (points absorb it, §6b) or a
-  **full evade** (nothing lands). Restored: parts by a heal (§10); HP only out of combat (§10).
+  HP-only-on-overkill path. The ONLY mitigations of a landed hit's HP damage are a **shield block**
+  (points absorb it, §6b) or a **full evade** (nothing lands) — STR armor's part-damage mitigation (§6c)
+  is a narrower, separate thing: it blunts how much of a landed hit's PART-damage sub-component costs the
+  covered part, never the HP damage. Restored: parts by a heal (§10); HP only out of combat (§10).
 - **Disable** switches a part off temporarily (disarm/silence/blind/stun/shieldbreak) and returns its
   reserved attribute; recovers over time. **Silence-on-head is emergent** (head damage drains INT →
   spells can't stay reserved; a head *disable* is the hard off).
@@ -487,7 +525,8 @@ points there so the canon stays design-focused.
 - **Party members / companions** → minions only, §9.
 - **Summoning as an action-bar technique** → bays with instant toggle, §9.
 - **Armor on the action bar; armor that gates/grants attributes** → per-group slots; light effect layer
-  (flat protection or evasion), §6/§13.
+  keyed to type (STR = part-damage mitigation, DEX = evasion, INT = spell dmg, shield = block recharge —
+  full ladders §6c), §6/§13.
 - **Verbs bound to weapons** → weapons grant zero verbs; techniques consult gear, §7.
 - **Multiple consumable stockpiles** → one **Charge** resource + gated bays, §10.
 - **Charge as a generic "magic-tier" cost (any spell/magic verb draws it)** → Charge is spent ONLY by
