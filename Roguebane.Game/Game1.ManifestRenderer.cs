@@ -921,8 +921,11 @@ public partial class Game1
     // weapon lockout join when those models build (queued — not invented here).
     private string? InvCardState(object? datum) => datum switch
     {
-        Roguebane.Core.Weapon w when InRun
-            && (Exp.Player.Body.Hands.Contains(w) || Exp.Player.Body.Ranged == w) => "equipped",
+        Roguebane.Core.Weapon w when InRun && Exp.Player.Body.Ranged == w =>
+            Exp.Player.Body.RangedUsable ? "equipped" : "dropped",
+        Roguebane.Core.Weapon w when InRun && Exp.Player.Body.Hands.Contains(w) =>
+            Exp.Player.Body.HandItemUsable(
+                Exp.Player.Body.Hands.ToList().IndexOf(w)) ? "equipped" : "dropped",
         Roguebane.Core.Weapon w when InRun =>
             Exp.Player.Body.Hands.Count < 2 && Exp.Player.Body.Capacity(w.Stat) >= w.Reserve
                 ? "ready" : "neutral",

@@ -312,8 +312,11 @@ Discharge HITS only — heals stay unbuffed; dies when INT collapses). ~~§6d ar
 326 tests: Body.HandUsable [hand 0 = dominant armR, hand 1 = armL; armless bodies don't gate];
 Consulted() filters broken-arm hands so the weapon stays ASSIGNED but stops answering, whatever
 stat it gates — player AND foe via the shared Body path; FigureBinding.HandUsable delegates, one
-truth for render + combat). REMAINING: weapons disable-not-drop (stat-threshold fall-off still
-lives in Body.Damage); cascade ranking
+truth for render + combat). ~~weapons disable-not-drop~~ DONE (2026-07-04 loop, 336 tests:
+the Body.Damage fall-off is DELETED — a hand item below its reserve stays ASSIGNED, reads
+DISABLED red on the card [HandItemUsable feeds InvCardState], stops answering Consulted, leaves
+the paper-doll render, and re-activates by itself when the stat heals; asserted end to end incl.
+the self-re-activation). REMAINING: cascade ranking
 (BLOCKED on the sustain-model question below); drag-reorder; vestigial pre-run branch retire._
 **‼ NEEDS HUMAN — cascade SUSTAIN MODEL ambiguous, blocking the ranking build:** §6e reads
 "an attribute can't sustain EVERY equipped item" + a ranking with TIE-BREAKS + cheapest-first

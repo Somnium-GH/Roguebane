@@ -51,7 +51,8 @@ public sealed class Body
             amount = Math.Max(0, amount - worn.PartMitigation);
         _intact[part.Id] = Math.Max(0, Contribution(part) - amount);
         Cascade(part.Stat);
-        _hands.RemoveAll(w => Capacity(w.Stat) < w.Reserve); // gear falls off below its threshold
+        // §6 [LOCKED]: gear does NOT fall off below its threshold — it stays ASSIGNED, reads
+        // DISABLED (red), stops answering (UsableHands), and re-activates when the stat heals.
     }
 
     public IReadOnlyList<Weapon> Hands => _hands;
@@ -112,7 +113,12 @@ public sealed class Body
         return Contribution(arms[ix]) > 0;
     }
 
-    private IEnumerable<Weapon> UsableHands() => _hands.Where((_, i) => HandUsable(i));
+    // §6/§6e: a hand item WORKS only while its arm stands AND its stat sustains its reserve —
+    // otherwise it stays ASSIGNED (the red card), stops answering, and leaves the render.
+    public bool HandItemUsable(int i) => i < _hands.Count
+        && HandUsable(i) && Capacity(_hands[i].Stat) >= _hands[i].Reserve;
+
+    private IEnumerable<Weapon> UsableHands() => _hands.Where((_, i) => HandItemUsable(i));
 
     // §6d magic offhands (+0.1x per tier): ONE off-hand slot exists, so the best USABLE held
     // piece counts — a broken arm silences its bonus like any other hand item.

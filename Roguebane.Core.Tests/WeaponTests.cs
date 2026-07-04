@@ -74,13 +74,21 @@ public class WeaponTests
     }
 
     [Fact]
-    public void SmashingAnArmDropsAWeaponItCanNoLongerLift()
+    public void SmashingAnArmDisablesAWeaponButItStaysAssigned()
     {
+        // §6 [LOCKED]: below its threshold the weapon does NOT leave the slot — it reads
+        // DISABLED, stops answering, and re-activates when the attribute heals.
         var (body, l, r) = ArmsBody(2); // 4 STR, the Iron Mace needs 3
         body.Wield(Armory.Maces[0]);
         Assert.Single(body.Hands);
 
-        body.Damage(l, 2); // STR 4 -> 2, below the mace's threshold
-        Assert.Empty(body.Hands);
+        body.Damage(l, 2); // STR 4 -> 2, below the mace's threshold (arm damaged, not broken)
+        Assert.Single(body.Hands);                 // still assigned
+        Assert.False(body.HandItemUsable(0));
+        Assert.Empty(body.Consulted(Armory.Swing)); // but it no longer answers
+
+        body.Repair(l, 2); // the attribute heals -> the mace re-activates by itself
+        Assert.True(body.HandItemUsable(0));
+        Assert.Single(body.Consulted(Armory.Swing));
     }
 }
