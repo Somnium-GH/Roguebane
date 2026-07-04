@@ -34,7 +34,14 @@ immediately after the OS maximize event (a known MonoGame/SDL timing quirk) — 
 print of `bw,bh,_scene.Width,_scene.Height` right after maximizing; (2) the early-return guard in
 `EnsureSceneMatchesBackbuffer` (`if (_scene is not null && _scene.Width==bw && _scene.Height==bh)
 return;`) — if maximize fires the resize event more than once with an intermediate wrong size, the
-scene could latch onto that intermediate size and never get corrected. Flagging as HiFi/high-priority
+scene could latch onto that intermediate size and never get corrected. **(2) is largely RULED OUT by
+static reading (2026-07-04 loop):** `EnsureSceneMatchesBackbuffer` isn't event-driven — it's called
+unconditionally at the top of every `Draw` (`Game1.cs:643`), not once off a resize callback. Any
+single-frame stale/intermediate `bw,bh` would just fail the `==` check again next frame and re-resize
+to the (by-then-correct) value — a persistent forever-shifted result can't come from a one-time latch
+on this path. Doesn't rule out (1) (a PresentationParameters read that's stale for the FULL session,
+not just one frame) or something maximize-specific outside this file (OS chrome/DPI scaling changing
+`W`/`H`/`SS` inputs some other way) — still needs the live instrumented run. Flagging as HiFi/high-priority
 since it's visible everywhere, but it's a repro-and-instrument task, not something foldable from a
 screenshot alone.
 
