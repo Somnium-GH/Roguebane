@@ -218,7 +218,27 @@ public partial class Game1
                     && e.States.ValueKind is System.Text.Json.JsonValueKind.Undefined
                         or System.Text.Json.JsonValueKind.Null)
                 {
-                    Sprite(_assets.Texture(NormalizeContentPath(img)), r.X, r.Y, r.Width, r.Height, Color.White);
+                    var dest = r;
+                    // FLAGGED STOPGAP (Needs-CD): this bindless icon (doomHost) carries no advance
+                    // bind of its own — ride the same war-party tandem rule as doomFillStripes,
+                    // riding the covered/uncovered boundary of the sibling track that shares the
+                    // advancePct fill's right edge. Dies when CD binds the icon's own position.
+                    if (InRun && Exp.Map.MarchLength > 0 && _curScreen is { } hostScr
+                        && hostScr.Elements.FirstOrDefault(s => s.Binds == "enemy.advancePct") is { } fillSib)
+                    {
+                        var fillR = _ui.Rect(hostScr, fillSib);
+                        var track = hostScr.Elements.FirstOrDefault(s => s.Type == "panel" && s.Binds is null
+                            && Math.Abs(_ui.Rect(hostScr, s).Right - fillR.Right) <= 2
+                            && _ui.Rect(hostScr, s).Bottom >= r.Y && _ui.Rect(hostScr, s).Y <= r.Bottom);
+                        if (track is not null)
+                        {
+                            var trackR = _ui.Rect(hostScr, track);
+                            var frac = (float)Exp.Map.WarPartyDistance / Exp.Map.MarchLength;
+                            var cx = trackR.X + (int)(frac * trackR.Width);
+                            dest = new Rectangle(cx - r.Width / 2, r.Y, r.Width, r.Height);
+                        }
+                    }
+                    Sprite(_assets.Texture(NormalizeContentPath(img)), dest.X, dest.Y, dest.Width, dest.Height, Color.White);
                     break;
                 }
                 var skinned = DrawStateSkin(e, r, enabled: !string.IsNullOrEmpty(txt));
