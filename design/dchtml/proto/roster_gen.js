@@ -176,6 +176,34 @@ function generateAll(createCanvas) {
     glowing:  { base: [108,150,214], sh: [72,108,168],    label: 'Glowing', orb: [190,230,255], glow: true },
   };
   const WAND_ORDER = ['adept', 'twisted', 'gemstone', 'glowing'];
+  // B11: bow ladder (§6d names locked: Short Bow → Long Bow → Compound Bow → Elven Bow). Ids are
+  // bow_short/bow_long/bow_compound/bow_elven per the engine's ask — tier adjective, not material.
+  // Bows are MUNDANE (tier-4 signature rule: no supernatural adjective, so no glow tier).
+  const BOW_TIER = {
+    short:    { len: 20, base: C.wood,       sh: C.woodSh,       label: 'Short Bow' },
+    long:     { len: 30, base: C.wood,       sh: C.woodSh,       label: 'Long Bow' },
+    compound: { len: 26, base: C.dark,       sh: C.darkSh,       label: 'Compound Bow', cams: true },
+    elven:    { len: 28, base: C.bone,       sh: C.boneSh,       label: 'Elven Bow', goldGrip: true },
+  };
+  const BOW_ORDER = ['short', 'long', 'compound', 'elven'];
+  function bowTierSil(g, cx, topY, pal) {
+    bow(g, cx, topY, pal.len, pal.base, pal.sh);
+    if (pal.cams) { paint(g, disc(cx, topY + 1, 2), C.mail, C.mailSh); paint(g, disc(cx, topY + pal.len - 2, 2), C.mail, C.mailSh); } // pulley cams
+    if (pal.goldGrip) paint(g, rect(cx - 4, topY + Math.floor(pal.len/2) - 1, cx - 2, topY + Math.floor(pal.len/2) + 1), C.gold, C.goldSh); // wrapped grip on the belly
+  }
+  // B2-GO(2) residual: ranged BACK-MOUNT layer art (bow/sling slung diagonally across the back).
+  // Mounted by aligning the sprite pivot (its centre) to figure sockets.back; drawn BEHIND all parts.
+  function bowBackSil(g, pal) {
+    const L = Math.min(24, pal.len + 2), x0 = 4, y0 = 4;
+    paint(g, (px, py) => { const t = px - x0, d = (py - y0) - t; return t >= 0 && t <= L && d >= 0 && d <= 2; }, pal.base, pal.sh); // slanted stave (45°, 3px so the tier palette reads)
+    paint(g, (px, py) => { const t = px - x0; return t >= 4 && t <= L - 4 && (py - y0) === t - 4; }, C.dark, C.darkSh);            // string chord
+    if (pal.cams) { paint(g, disc(x0 + 1, y0 + 2, 2), C.mail, C.mailSh); paint(g, disc(x0 + L - 1, y0 + L, 2), C.mail, C.mailSh); }
+  }
+  function slingBackSil(g, pal) {
+    const L = 12, x0 = 5, y0 = 5;
+    paint(g, (px, py) => { const t = px - x0, d = (py - y0) - t; return t >= 0 && t <= L && d >= 0 && d <= 2; }, pal.base, pal.sh); // coiled cord band (3px so the tier palette reads)
+    paint(g, disc(x0 + Math.floor(L/2), y0 + Math.floor(L/2) + 1, 3), pal.base, pal.sh);                                           // pouch at the crossing
+  }
 
   // ---- weapon TYPE silhouettes (one per type; length/width vary, palette is the only tier axis) ----
   function bladeSil(g, cx, topY, len, halfW, guardHalfW, gripLen, base, sh, twoHand) {
@@ -259,19 +287,22 @@ function generateAll(createCanvas) {
     paint(g, (px, py) => { const t = (py - topY) / h; const half = topHalf + (botHalf - topHalf) * t; return py >= topY && py < topY + h && Math.abs(px - cx) <= half; }, pal.base, pal.sh);
   }
   const ARMOR_SLOTS = {
-    // STR heavy plate — new B2-GO names (old Skull Cap/Barbute/etc. retired, see DEV_LOOP_MEMORY)
+    // STR heavy plate — new B2-GO names (old Skull Cap/Barbute/etc. retired, see DEV_LOOP_MEMORY).
+    // STR catalog names COMPOSE material + piece ("Steel Helm") — that composition IS the locked
+    // convention (attribute-model.js samples match). DEX/INT instead carry the §6c canon ladder
+    // per tier in `names` (payload B10: composing label+noun made "Leather Leather Cap" etc.).
     str_head:  { paint: helmSil,         name: 'Helm' },
     str_chest: { paint: breastplateSil,  name: 'Breastplate' },
     str_arms:  { paint: vambraceSil,     name: 'Vambraces' },
     str_legs:  { paint: greaveSil,       name: 'Greaves' },
-    // DEX leather — same 4 slots, same shapes, leather palette
-    dex_head:  { paint: helmSil,         name: 'Leather Cap' },
-    dex_chest: { paint: breastplateSil,  name: 'Leather Armor' },
-    dex_arms:  { paint: vambraceSil,     name: 'Leather Bracers' },
-    dex_legs:  { paint: greaveSil,       name: 'Leather Leggings' },
-    // INT robe — chest + head ONLY (no arm/leg robe pieces exist, §6c)
-    int_chest: { paint: robeChestSil,    name: 'Robe' },
-    int_head:  { paint: hoodSil,         name: 'Hood' },
+    // DEX leather — same 4 slots, same shapes, leather palette; §6c canon names per tier
+    dex_head:  { paint: helmSil,         names: ['Leather Cap', 'Hardened Cap', 'Studded Cap', 'Reinforced Hood'] },
+    dex_chest: { paint: breastplateSil,  names: ['Padded Armor', 'Leather Armor', 'Studded Leather', 'Reinforced Leather'] },
+    dex_arms:  { paint: vambraceSil,     names: ['Leather Bracers', 'Hardened Bracers', 'Studded Bracers', 'Reinforced Bracers'] },
+    dex_legs:  { paint: greaveSil,       names: ['Leather Leggings', 'Hardened Leggings', 'Studded Leggings', 'Reinforced Leggings'] },
+    // INT robe — chest + head ONLY (no arm/leg robe pieces exist, §6c); canon names per tier
+    int_chest: { paint: robeChestSil,    names: ['Cotton Robe', 'Silk Robe', 'Ornate Robe', 'Humming Robe'] },
+    int_head:  { paint: hoodSil,         names: ['Cloth Cap', 'Silk Hood', 'Ornate Circlet', 'Humming Circlet'] },
   };
 
   // ---- humanoid assembler: paints each part into its OWN grid (z-order = push order) ----
@@ -339,7 +370,18 @@ function generateAll(createCanvas) {
       // a socket, not baked art, same morph-layer idea as hand-mounted gear.
       back: [mid, tTop + 2],
     };
-    return { W, H, mid, parts, sockets };
+    // geometry record for the WORN armor painters (same rect math as the base parts above —
+    // worn layers repaint the EXACT base silhouettes so part rects in layout.json are unchanged)
+    const legsGeom = o.legs ? (() => { const lg = o.legs, half = Math.floor(lg.gap/2);
+      const lLx1 = mid - half - 1, lLx0 = lLx1 - lg.w + 1;
+      const rRx0 = mid + (lg.gap - half), rRx1 = rRx0 + lg.w - 1;
+      return { lLx0, lLx1, rRx0, rRx1, top: tBot + 1, bot: tBot + lg.h }; })() : null;
+    const geom = { kind: 'human', mid, tL, tR, tTop, tBot,
+      arm: { w: a.w, top: aTop, bot: aBot },
+      legs: legsGeom,
+      head: { hL, hR, hTop, hBot, mask: headMask, eye: h.eye,
+              eyeY: (h.eyeY != null ? h.eyeY : hTop + Math.floor(h.h*0.5)) } };
+    return { W, H, mid, parts, sockets, geom };
   }
 
   // ---- robe assembler (robe replaces torso+legs; arms stay, IN FRONT) ----
@@ -386,7 +428,11 @@ function generateAll(createCanvas) {
       neck: [mid, hBot], shoulderL: [sL - Math.floor((aw+1)/2), aTop], shoulderR: [sR + Math.floor((aw+1)/2), aTop],
       back: [mid, rTop + 1],
     };
-    return { W, H, mid, parts, sockets };
+    const torsoMask = (x,y) => y>=rTop && y<=rHem - notch(x) && x>=lX(y) && x<=rX(y);
+    const geom = { kind: 'robe', mid, rTop, rHem, sL, sR, torsoMask,
+      arm: { w: aw, top: aTop, bot: aBot },
+      head: { hL, hR, hTop, hBot, mask: headMask, eye: h.eye, eyeY: eY } };
+    return { W, H, mid, parts, sockets, geom };
   }
 
   // ---- recolor a part grid (armor material -> bare flesh) keeping its outline ----
@@ -628,6 +674,16 @@ function generateAll(createCanvas) {
   for (const tier of CHARM_ORDER)  { const pal = CHARM_TIER[tier];  GEAR['charm_' + tier]  = () => makeGear(g => charmSil(g, 8, 6, pal),        [8, 17]); }
   for (const tier of TOME_ORDER)   { const pal = TOME_TIER[tier];   GEAR['tome_' + tier]   = () => makeGear(g => tomeSil(g, 8, 6, pal),         [8, 17]); }
   for (const tier of WAND_ORDER)   { const pal = WAND_TIER[tier];   GEAR['wand_' + tier]   = () => makeGear(g => wandSil(g, 8, 6, 22, pal),     [8, 25]); }
+  // B11: bow ladder (bow_short/bow_long/bow_compound/bow_elven) + the ranged BACK-MOUNT layer
+  // (bow/sling slung across the back — pivot = sprite centre, aligned to figure sockets.back,
+  // drawn BEHIND all parts while melee hands are full; §6d/§17 #22).
+  for (const tier of BOW_ORDER)   { const pal = BOW_TIER[tier];
+    GEAR['bow_' + tier]           = () => makeGear(g => bowTierSil(g, 10, 4, pal), [10, 4 + Math.floor(pal.len/2)]);
+    GEAR['bow_' + tier + '_back'] = () => makeGear(g => bowBackSil(g, pal), [16, 17]);
+  }
+  for (const tier of SLING_ORDER) { const pal = SLING_TIER[tier];
+    GEAR['sling_' + tier + '_back'] = () => makeGear(g => slingBackSil(g, pal), [11, 12]);
+  }
   // CON shield object ladder: Wooden Shield -> Iron Buckler -> Kite Shield -> Tower Shield (reuses
   // the existing round_shield/tower_shield painters — same silhouette family, size/palette vary).
   GEAR['shield_wooden']  = () => makeGear(g => roundShield(g, 10, 12, 6, C.wood, C.woodSh),                          [10, 12]);
@@ -656,15 +712,217 @@ function generateAll(createCanvas) {
   for (const tier of CHARM_ORDER)  GEAR_CATALOG.push({ id:'charm_'+tier, name: CHARM_TIER[tier].label + ' Charm', attr:'INT', slot:'OFF', tier });
   for (const tier of TOME_ORDER)   GEAR_CATALOG.push({ id:'tome_'+tier,  name: TOME_TIER[tier].label + ' Tome',   attr:'INT', slot:'OFF', tier });
   for (const tier of WAND_ORDER)   GEAR_CATALOG.push({ id:'wand_'+tier,  name: WAND_TIER[tier].label + ' Wand',   attr:'INT', slot:'HAND', tier });
+  // B11: bows fill the §6d RANGED slot (labels are the full locked names, no composed noun)
+  for (const tier of BOW_ORDER)    GEAR_CATALOG.push({ id:'bow_'+tier,   name: BOW_TIER[tier].label,              attr:'DEX', slot:'RANGED', tier });
   const ARMOR_FAM_ATTR = { str:'STR', dex:'DEX', int:'INT' };
   for (const slotKey in ARMOR_SLOTS) {
     const spec = ARMOR_SLOTS[slotKey], fam = slotKey.split('_')[0], [TABLE, ORDER] = ARMOR_TIER_TABLE[fam];
-    for (const tier of ORDER) GEAR_CATALOG.push({ id:'armor_'+slotKey+'_'+tier, name: TABLE[tier].label + ' ' + spec.name, attr: ARMOR_FAM_ATTR[fam], slot: slotKey, tier });
+    // B10: DEX/INT carry the §6c canon ladder verbatim (spec.names); STR composes material + piece
+    // ("Steel Helm") — that composition is the locked new-name convention.
+    for (const tier of ORDER) GEAR_CATALOG.push({ id:'armor_'+slotKey+'_'+tier,
+      name: spec.names ? spec.names[ORDER.indexOf(tier)] : TABLE[tier].label + ' ' + spec.name,
+      attr: ARMOR_FAM_ATTR[fam], slot: slotKey, tier });
   }
   GEAR_CATALOG.push({ id:'shield_wooden', name:'Wooden Shield', attr:'CON', slot:'SHIELD', tier:'t1' });
   GEAR_CATALOG.push({ id:'shield_buckler', name:'Iron Buckler', attr:'CON', slot:'SHIELD', tier:'t2' });
   GEAR_CATALOG.push({ id:'shield_kite', name:'Kite Shield', attr:'CON', slot:'SHIELD', tier:'t3' });
   GEAR_CATALOG.push({ id:'shield_tower', name:'Tower Shield', attr:'CON', slot:'SHIELD', tier:'t4' });
+  // ============ B12 (CORRECTED 2026-07-04) — WORN-ARMOR PART SET (supersedes the per-figure themed
+  // layers + B2-GO item 3's generic layers; they were one system, this is the single spec) ============
+  // FULL PART SPRITES: each file is a COMPLETE ready-to-blit part image — the race's body part with
+  // the armor already drawn in, NOT a transparent overlay. The engine swaps the whole part sprite by
+  // (race, slot, wear-state); no runtime compositing.
+  //   sprites/gear/worn/<race>/<slot>/bare_<condition>.png                  // unarmored — fallback terminal
+  //   sprites/gear/worn/<race>/<slot>/<type>_<tier>_<condition>.png         // GENERIC armored (core-agnostic)
+  //   sprites/gear/worn/<race>/<slot>/<core>/<type>_<tier>_<condition>.png  // THEMED — ONLY the core's favored line
+  // race ∈ RACE keys — EVERY slot authored for EVERY race (the share-arms/legs-across-races
+  // optimization is deliberately dropped); slot ∈ head/chest/arms/legs — ONE sprite per slot (the
+  // engine reuses it for both arms / both legs); type ∈ str/dex/int — there is NO "plain" type, the
+  // unarmored part is `bare` (bare has no tier); tier ∈ 1..4; condition ∈ healthy/damaged/broken
+  // (no disabled variants — §6e disabled gear un-renders). int = chest+head only (§6c); CON shields
+  // are hand items — no worn body parts. THEMED = FAVORED LINE ONLY, never a cross-product: a core
+  // wearing a non-favored line renders the GENERIC art. Geometry = the race BASE body plan (human
+  // baseline ± race build), core-agnostic — how these compose with per-core figure geometry is the
+  // engine's §7/§17 #15 morph question. Engine fallback chain: themed → generic → generic healthy →
+  // bare → bare healthy — partial coverage is always safe.
+  const WORN_TYPES = { str: [METAL, METAL_ORDER], dex: [LEATHER, LEATHER_ORDER], int: [ROBE, ROBE_ORDER] };
+  const WORN_SLOTS = { str: ['head','chest','arms','legs'], dex: ['head','chest','arms','legs'], int: ['head','chest'] };
+  const FAVORED_LINE = { grunt:'str', warden:'str', adept:'int', summoner:'int', reaver:'dex', ranger:'dex' };
+  // stamp a detail INSIDE an already-painted part (never touches the outline ring or empty px)
+  function detail(g, mask, col) {
+    for (let y=0;y<g.H;y++) for (let x=0;x<g.W;x++)
+      if (mask(x,y) && g.px[y][x] && g.px[y][x] !== OUT) g.px[y][x] = col;
+  }
+  const dot = (g,x,y,col) => { if (g.px[y] && g.px[y][x] && g.px[y][x] !== OUT) g.px[y][x] = col; };
+  const capMask = (G, D) => (px,py) => G.head.mask(px,py) && (py <= G.head.hTop + D || px <= G.head.hL + 1 || px >= G.head.hR - 1);
+  const hoodMask = (G, D) => (px,py) => { const hd = G.head;
+    if (py === hd.hTop - 1 && px >= G.mid - 2 && px <= G.mid + 2) return true;   // hood peak (base robe heads carry it too)
+    if (px < hd.hL || px > hd.hR || py < hd.hTop || py > hd.hBot) return false;
+    return py <= hd.hTop + D || px <= hd.hL + 1 || px >= hd.hR - 1; };
+  // B12 theme hooks — each draws INTO the freshly base-coated part. Accents use the locked palette
+  // only (gold/royal/dark/tusk/bone/teal/mail/wood); tiers stay a pure palette swap underneath.
+  const WORN_THEMES = {
+    generic_str: {   // plain serviceable plate (the cross-equip look on DEX-core figures)
+      head:  (g,G,pal) => paint(g, capMask(G, 2), pal.base, pal.sh),
+      chest: (g,G,pal) => detail(g, (x,y) => x === G.mid && y >= G.tTop+2 && y <= G.tBot-2, pal.sh),
+      arms:  (g,G,pal,side,r) => detail(g, (x,y) => y === r.top + Math.floor((r.bot-r.top)/2), pal.sh),
+      legs:  (g,G,pal,side,r) => detail(g, (x,y) => y === r.top + 2, pal.sh),
+    },
+    grunt: {   // B12 Grunt: versatile — practical, well-kept soldier's kit, deliberately unshowy
+      head:  (g,G,pal) => paint(g, capMask(G, 2), pal.base, pal.sh),
+      chest: (g,G,pal) => { detail(g, (x,y) => x === G.mid && y >= G.tTop+2 && y <= G.tBot-2, pal.sh);
+                            detail(g, (x,y) => y === G.tBot-3 && x >= G.tL+2 && x <= G.tR-2, C.woodSh); },   // plain kit belt
+      arms:  (g,G,pal,side,r) => detail(g, (x,y) => y === r.top + Math.floor((r.bot-r.top)/2), pal.sh),
+      legs:  (g,G,pal,side,r) => detail(g, (x,y) => y === r.top + 2, pal.sh),
+    },
+    warden: {   // B12 Warden: block & armor — heaviest READ: thick edges, rivets, shield-boss motif
+      headEyes: false,   // full-face helm, visor slit instead
+      head:  (g,G,pal) => { const hd = G.head;
+        paint(g, (px,py) => px >= hd.hL && px <= hd.hR && py >= hd.hTop && py <= hd.hBot, pal.base, pal.sh);
+        detail(g, (x,y) => y === hd.hTop+6 && x >= hd.hL+2 && x <= hd.hR-2, C.dark);   // visor slit
+        detail(g, (x,y) => x === G.mid && y >= hd.hTop+3 && y <= hd.hBot-2, C.dark);   // nasal ridge
+        dot(g, G.mid, hd.hTop+1, C.gold); },                                            // boss crest stud
+      chest: (g,G,pal) => { detail(g, (x,y) => (x <= G.tL+2 || x >= G.tR-2) && y >= G.tTop+1 && y <= G.tBot-1, pal.sh);   // reinforced edge plates
+        for (let x = G.tL+3; x <= G.tR-3; x += 3) { dot(g, x, G.tTop+1, C.dark); dot(g, x, G.tBot-1, C.dark); }           // rivet rows
+        paint(g, disc(G.mid, G.tTop + Math.floor((G.tBot-G.tTop)/2), 2), C.gold, C.goldSh); },                            // shield-boss motif
+      arms:  (g,G,pal,side,r) => { const cy = r.top + Math.floor((r.bot-r.top)/2);
+        detail(g, (x,y) => y === r.top+1 || y === cy || y === cy+1, pal.sh); dot(g, Math.floor((r.x0+r.x1)/2), r.top+1, C.dark); },
+      legs:  (g,G,pal,side,r) => detail(g, (x,y) => y === r.top+1 || y === r.top+3, pal.sh),
+    },
+    generic_dex: {   // plain leathers (the cross-equip look on non-dex cores; display "Plain leather" is a NAME — the type token is dex)
+      head:  (g,G,pal) => paint(g, capMask(G, 2), pal.base, pal.sh),
+      chest: (g,G,pal) => detail(g, (x,y) => (x === G.tL+3 || x === G.tR-3) && y >= G.tTop+1 && y <= G.tBot-1, pal.sh),   // vest panel seams
+      arms:  (g,G,pal,side,r) => detail(g, (x,y) => y === r.bot-1, pal.sh),
+      legs:  (g,G,pal,side,r) => detail(g, (x,y) => y === r.top, pal.sh),
+    },
+    generic_int: {   // plain cloth robes (the cross-equip look on non-caster cores)
+      head:  (g,G,pal) => paint(g, hoodMask(G, 3), pal.base, pal.sh),
+      chest: (g,G,pal) => { detail(g, (x,y) => y === G.tBot-1 && x >= G.tL+1 && x <= G.tR-1, pal.sh);   // hem band
+        dot(g, G.mid-1, G.tTop+1, pal.sh); dot(g, G.mid+1, G.tTop+1, pal.sh); dot(g, G.mid, G.tTop+2, pal.sh); },   // neckline V
+      arms:  (g,G,pal,side,r) => detail(g, (x,y) => y === r.bot-1, pal.sh),
+    },
+    reaver: {   // B12 Reaver: dual-wield — light, aggressive cut; twin-blade X etching, dark studs
+      head:  (g,G,pal) => { paint(g, capMask(G, 3), pal.base, pal.sh);
+        dot(g, G.head.hL+2, G.head.hTop+1, C.dark); dot(g, G.head.hR-2, G.head.hTop+1, C.dark); },
+      chest: (g,G,pal) => { const cy = G.tTop + Math.floor((G.tBot-G.tTop)/2);
+        for (let i = -3; i <= 3; i++) { dot(g, G.mid+i, cy+i, C.dark); dot(g, G.mid+i, cy-i, C.dark); } },   // twin-blade X
+      arms:  (g,G,pal,side,r) => { detail(g, (x,y) => y === r.bot-1, pal.sh); dot(g, Math.floor((r.x0+r.x1)/2), r.top+1, C.dark); },
+      legs:  (g,G,pal,side,r) => detail(g, (x,y) => (side === 'L' ? x === r.x0+1 : x === r.x1-1) && y >= r.top && y <= r.bot, pal.sh),
+    },
+    ranger: {   // B12 Ranger: bow & pet — tracker/nature: fur (tusk) trim, quiver strap kept
+      head:  (g,G,pal) => { paint(g, capMask(G, 2), pal.base, pal.sh);
+        for (let x = G.head.hL+1; x <= G.head.hR-1; x += 2) dot(g, x, G.head.hTop+3, C.tusk); },   // fur brow line
+      chest: (g,G,pal) => { detail(g, (x,y) => y >= G.tTop+7 && y <= G.tTop+9 && x >= G.mid-6 && x <= G.mid+6, C.woodSh);   // quiver strap (kept from the kit)
+        for (let x = G.tL+1; x <= G.tR-1; x += 2) dot(g, x, G.tTop+1, C.tusk); },                                            // fur collar
+      arms:  (g,G,pal,side,r) => detail(g, (x,y) => y === r.bot-1, C.tusk),                                                  // fur cuffs
+      legs:  (g,G,pal,side,r) => { for (let x = r.x0; x <= r.x1; x += 2) dot(g, x, r.top, C.tusk); },                        // fur tops
+    },
+    adept: {   // B12 Adept: spellcasting — runic trim, flowing read, restrained arcane accent
+      head:  (g,G,pal) => { paint(g, hoodMask(G, 3), pal.base, pal.sh);
+        if (pal.glow) setPx(g, G.mid, G.head.hTop, [200,230,255]); },                                  // humming-tier brow gleam
+      chest: (g,G,pal) => { detail(g, (x,y) => y === G.tTop+8 && x >= G.mid-5 && x <= G.mid+5, pal.sh);   // sash
+        const rc = pal.glow ? [190,230,255] : C.teal;
+        for (let x = G.tL+1; x <= G.tR-1; x += 3) dot(g, x, G.tBot-1, rc);                                // runic hem trim
+        dot(g, G.mid, G.tTop+3, rc); dot(g, G.mid-1, G.tTop+4, rc); dot(g, G.mid+1, G.tTop+4, rc); dot(g, G.mid, G.tTop+5, rc); },   // chest sigil (diamond)
+      arms:  (g,G,pal,side,r) => dot(g, Math.floor((r.x0+r.x1)/2), r.bot-1, pal.glow ? [190,230,255] : C.teal),   // cuff rune
+    },
+    summoner: {   // B12 Summoner: minions/binding — same robe silhouette, darker/heavier: bone + chain trim, ritual sigil
+      head:  (g,G,pal) => { paint(g, hoodMask(G, 4), pal.base, pal.sh); dot(g, G.mid, G.head.hBot-1, C.bone); },   // deeper hood + bone clasp
+      chest: (g,G,pal) => { detail(g, (x,y) => (y === G.tTop+7 || y === G.tTop+8) && x >= G.mid-6 && x <= G.mid+6, C.dark);   // heavy dark band
+        for (let x = G.tL+1; x <= G.tR-1; x += 3) { dot(g, x, G.tBot-1, C.bone); dot(g, x+1, G.tBot-1, C.bone); }             // bone hem trim
+        for (let x = G.mid-6; x <= G.mid+6; x += 2) dot(g, x, G.tBot-4, C.mail);                                              // chain links
+        dot(g, G.mid, G.tTop+2, C.bone); dot(g, G.mid-1, G.tTop+3, C.bone); dot(g, G.mid+1, G.tTop+3, C.bone); dot(g, G.mid, G.tTop+4, C.bone); },   // ritual sigil
+      arms:  (g,G,pal,side,r) => { const cx = Math.floor((r.x0+r.x1)/2); dot(g, cx, r.bot-1, C.bone); dot(g, cx, r.bot-3, C.bone); },   // bone cuff beads
+    },
+  };
+  // Synthetic per-slot geometry on the race BASE body plan (human baseline: torso 20×20, head 13²,
+  // arm 4×14 (6-wide mask incl. border cols, matching the figure arm masks), leg 5×9; race build
+  // permutes width/ears/skin). One grid per sprite; bbox-trimmed on export like every other part.
+  function wornGeom(race) {
+    const W = 30, H = 28, mid = 15;
+    const tw = 20 - (race.slim || 0), tL = mid - Math.floor(tw/2), tR = tL + tw - 1, tTop = 4, tBot = tTop + 19;
+    const hL = mid - 6, hR = mid + 6, hTop = 4, hBot = hTop + 12;
+    const ears = race.ears || 0, earY = hTop + Math.floor(13 * 0.45);
+    const headMask = (px,py) => {
+      if (px>=hL && px<=hR && py>=hTop && py<=hBot) return true;
+      if (ears) for (const s of [-1,1]) { const ex = s<0 ? hL : hR;
+        if (px===ex+s   && py>=earY-1 && py<=earY+1) return true;
+        if (px===ex+2*s && py>=earY-1 && py<=earY)   return true;
+        if (ears>1 && px===ex+3*s && py===earY-1)     return true; }
+      return false;
+    };
+    return { W, H, mid, tL, tR, tTop, tBot,
+      head: { hL, hR, hTop, hBot, mask: headMask, eyeY: hTop + 6 },
+      arm: { x0: 12, x1: 17, top: 4, bot: 17 },
+      leg: { x0: 13, x1: 17, top: 4, bot: 12 } };
+  }
+  // One armored slot sprite (base coat in the tier palette + theme detailing).
+  function wornSlotGrid(race, G, slot, pal, T) {
+    const g = grid(G.W, G.H);
+    if (slot === 'head') {
+      paint(g, G.head.mask, race.skin, race.skinSh);
+      T.head(g, G, pal);
+      if (T.headEyes !== false) { setPx(g, G.mid-3, G.head.eyeY, OUT); setPx(g, G.mid+3, G.head.eyeY, OUT); }
+    } else if (slot === 'chest') {
+      paint(g, rect(G.tL, G.tTop, G.tR, G.tBot), pal.base, pal.sh); T.chest(g, G, pal);
+    } else if (slot === 'arms') {
+      const r = G.arm; paint(g, rect(r.x0, r.top, r.x1, r.bot), pal.base, pal.sh); T.arms(g, G, pal, 'R', r);
+    } else {
+      const r = G.leg; paint(g, rect(r.x0, r.top, r.x1, r.bot), pal.base, pal.sh); if (T.legs) T.legs(g, G, pal, 'R', r);
+    }
+    return g;
+  }
+  // The `bare` terminal: the unarmored body part (flesh; head gets a simple hair cap + eyes so a
+  // bare head doesn't read as a blank block).
+  function bareSlotGrid(race, G, slot) {
+    const g = grid(G.W, G.H);
+    if (slot === 'head') {
+      paint(g, G.head.mask, race.skin, race.skinSh);
+      paint(g, capMask(G, 2), race.hair, race.hairSh);
+      setPx(g, G.mid-3, G.head.eyeY, OUT); setPx(g, G.mid+3, G.head.eyeY, OUT);
+    } else if (slot === 'chest') paint(g, rect(G.tL, G.tTop, G.tR, G.tBot), race.skin, race.skinSh);
+    else if (slot === 'arms') { const r = G.arm; paint(g, rect(r.x0, r.top, r.x1, r.bot), race.skin, race.skinSh); }
+    else { const r = G.leg; paint(g, rect(r.x0, r.top, r.x1, r.bot), race.skin, race.skinSh); }
+    return g;
+  }
+  // Build the whole worn set: [{path, canvas}] + the layout.json `worn` inventory block.
+  function buildWornSet() {
+    const files = [];
+    const emit = (path, g, state) => {
+      const dg = damage(g, state); const b = bbox(dg); if (b.empty) return;
+      files.push({ path, canvas: renderRegion(dg, b.minx, b.miny, b.maxx, b.maxy) });
+    };
+    for (const rid in RACE) {
+      const race = RACE[rid], G = wornGeom(race);
+      for (const slot of ['head','chest','arms','legs']) {
+        const g = bareSlotGrid(race, G, slot);
+        for (const state of STATES) emit('sprites/gear/worn/' + rid + '/' + slot + '/bare_' + state + '.png', g, state);
+      }
+      for (const type in WORN_SLOTS) {
+        const [TAB, ORDER] = WORN_TYPES[type];
+        for (const slot of WORN_SLOTS[type]) for (let t = 1; t <= 4; t++) {
+          const g = wornSlotGrid(race, G, slot, TAB[ORDER[t-1]], WORN_THEMES['generic_' + type]);
+          for (const state of STATES) emit('sprites/gear/worn/' + rid + '/' + slot + '/' + type + '_' + t + '_' + state + '.png', g, state);
+        }
+      }
+      for (const core in FAVORED_LINE) {
+        const type = FAVORED_LINE[core], [TAB, ORDER] = WORN_TYPES[type];
+        for (const slot of WORN_SLOTS[type]) for (let t = 1; t <= 4; t++) {
+          const g = wornSlotGrid(race, G, slot, TAB[ORDER[t-1]], WORN_THEMES[core]);
+          for (const state of STATES) emit('sprites/gear/worn/' + rid + '/' + slot + '/' + core + '/' + type + '_' + t + '_' + state + '.png', g, state);
+        }
+      }
+    }
+    const inv = { root: 'sprites/gear/worn', races: Object.keys(RACE),
+      slots: { str: WORN_SLOTS.str, dex: WORN_SLOTS.dex, int: WORN_SLOTS.int },
+      tiers: [1, 2, 3, 4], conditions: STATES,
+      bare: { slots: ['head','chest','arms','legs'], conditions: STATES },
+      themes: FAVORED_LINE,
+      sprite: '<race>/<slot>/[<core>/]<type>_<tier>_<condition>',
+      fallback: ['themed', 'generic', 'generic healthy', 'bare', 'bare healthy'] };
+    return { files, inv };
+  }
+
   // STRIPpable parts: limbs that wear (removable) armor. When the armor is force-unequipped
   // (disabled by attribute loss) the screen asks for a 'bare<state>' sprite — the same limb
   // recolored to flesh. Maps part -> [armorBase, armorShadow] to swap out for skin.
@@ -745,44 +1003,17 @@ function generateAll(createCanvas) {
     return finishSprite(g);
   };
 
-  // ============ SCREENS (design-space 960×540 responsive manifests) ============
-  const SCREENS = {
-    combat: { designSize: [960,540], elements: [
-      { id:'foeStage',   anchor:'Top',         offset:[0,40],    size:[520,300], z:1,  binds:'encounter.foes' },
-      { id:'heroStage',  anchor:'BottomLeft',  offset:[40,-150], size:[220,300], z:2,  binds:'Body' },
-      { id:'attrPool',   anchor:'BottomLeft',  offset:[16,-16],  size:[220,120], z:10, binds:'Body.pool' },
-      { id:'actionBar',  anchor:'Bottom',      offset:[0,-12],   size:[760,76],  z:10, binds:'loadout' },
-      { id:'foePanel',   anchor:'TopRight',    offset:[-24,24],  size:[300,180], z:5,  binds:'encounter.foe' },
-      { id:'logRail',    anchor:'Right',       offset:[-16,0],   size:[260,220], z:4,  binds:'combatLog' },
-    ]},
-    build: { designSize: [960,540], elements: [
-      { id:'paperDoll',  anchor:'Left',        offset:[60,0],    size:[260,420], z:2,  binds:'Body' },
-      { id:'partList',   anchor:'TopRight',    offset:[-24,24],  size:[360,300], z:5,  binds:'Body.parts' },
-      { id:'attrPanel',  anchor:'BottomRight', offset:[-24,-24], size:[360,150], z:5,  binds:'Body.attrs' },
-      { id:'gearTray',   anchor:'Bottom',      offset:[0,-12],   size:[640,84],  z:10, binds:'inventory' },
-    ]},
-    runmap: { designSize: [960,540], elements: [
-      { id:'mapBoard',   anchor:'Center',      offset:[0,-10],   size:[820,400], z:1,  binds:'run.map' },
-      { id:'runHeader',  anchor:'Top',         offset:[0,16],    size:[820,56],  z:10, binds:'run.meta' },
-      { id:'legend',     anchor:'BottomLeft',  offset:[24,-24],  size:[240,120], z:8,  binds:'run.legend' },
-    ]},
-    campaign: { designSize: [960,540], elements: [
-      { id:'spine',      anchor:'Center',      offset:[0,0],     size:[880,360], z:1,  binds:'campaign.spine' },
-      { id:'chapterCard',anchor:'TopLeft',     offset:[24,24],   size:[320,200], z:6,  binds:'campaign.current' },
-      { id:'metaBar',    anchor:'Bottom',      offset:[0,-16],   size:[760,64],  z:10, binds:'campaign.meta' },
-    ]},
-    newrun: { designSize: [960,540], elements: [
-      { id:'coreCards',  anchor:'Center',      offset:[0,10],    size:[860,320], z:2,  binds:'cores' },
-      { id:'title',      anchor:'Top',         offset:[0,28],    size:[600,60],  z:10, binds:null },
-      { id:'confirmBar', anchor:'Bottom',      offset:[0,-20],   size:[420,72],  z:10, binds:'selection' },
-    ]},
-  };
+  // ============ SCREENS ============
+  // Screen manifests are NOT emitted here: `Content/layout.json`'s screens/templates/style sections
+  // are produced by the dc.html extraction pipeline (proto/extract_all.html + proto/extract_merge.js,
+  // LAYOUT_CONTRACT §9) and MERGED alongside the figures/gear this generator owns. The old inline
+  // SCREENS stub (pre-rename combat/build/runmap/campaign/newrun ids) was a clobber footgun — removed.
 
   // ============ BUILD EVERYTHING ============
   const RACE_CORES = ['grunt','warden','adept','summoner','reaver','ranger'];   // the 6 player core runes (race × core)
   const MONSTERS   = ['skeleton','bandit','wraith','ogre','troll','gargoyle'];  // standalone foes (no race axis)
   const figuresOut = [];
-  const layout = { figures: {}, gear: {}, screens: SCREENS };
+  const layout = { figures: {}, gear: {} };
 
   // Emit ONE figure (modular parts + layout entry + flat). `key` is the output id (e.g. 'elf_grunt'),
   // `specName` is the F[] spec + STRIP/MOUNTS lookup key (e.g. 'grunt'), `race` is the base-body axis.
@@ -845,6 +1076,10 @@ function generateAll(createCanvas) {
     layout.gear[gname] = { pivot: r.pivot };
   }
 
+  // B12 (corrected): the worn-armor part set — files + the layout.json `worn` inventory block
+  const wornSet = buildWornSet();
+  layout.worn = wornSet.inv;
+
   const minionOrder = ['skeleton','wisp','hound','golem','imp'];
   const minionsOut = minionOrder.map(name => ({ name, canvas: MIN[name]() }));
 
@@ -853,7 +1088,7 @@ function generateAll(createCanvas) {
     return renderRegion(comp, Math.max(0,b.minx-1), Math.max(0,b.miny-1), Math.min(fig.W-1,b.maxx+1), Math.min(fig.H-1,b.maxy+1));
   }
   return { figures: figuresOut, gear: gearOut, minions: minionsOut, layout,
-    races: RACE, gearCatalog: GEAR_CATALOG,
+    races: RACE, gearCatalog: GEAR_CATALOG, worn: wornSet.files,
     buildRaceFigure: (name, race) => ({ name, race: (race||RACE.human).id, flat: trimFlat(F[name](race||RACE.human)) }) };
 }
 

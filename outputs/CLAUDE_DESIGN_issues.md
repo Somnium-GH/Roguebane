@@ -7,8 +7,10 @@ bullet + its race-split addendum — they were one system described twice on a l
 which is how the mistake slipped in. Two fixes at the heart of it: **(1) "plain" is not an armor type**
 — the unarmored part is `bare` (DEX's display name "Plain leather" + the bare-body fallback are what got
 conflated); **(2) themed art exists ONLY for each core's OWN favored line, never the cross-product.**
-Please regenerate against B12. Everything else in the earlier relay (weapons, new gear families, figure
-regen) stands.
+**RESOLVED 2026-07-04 — CD regenerated to B12's convention, verified clean on landing (744 files, no
+cross-product, no "plain" type, 0 missing / 0 extra). Confirm-to-close B12 below; remaining wiring is
+loop-side (game-mgcb mirror + engine), not a CD ask.** Everything else in the earlier relay (weapons,
+new gear families, figure regen) stands.
 **SENT to CD 2026-07-04 (Doug): B12 + the race-split addendum — now CORRECTED per the banner above.**
 Sending is NOT the close signal (same rule as every prior relay) — items stay OPEN below until verified
 LANDED in the repo on the next audit; don't clear from dev memory yet.
@@ -25,6 +27,10 @@ memory. B9 is FOLDED into B2-GO (it was scoping for a batch that was on hold; th
 
 ## Confirm-to-close (no action — just clear your memory)
 B0 ✅ · B0b ✅ · B1a ✅ · B3 ✅ landed in the evening drop. B9 → merged into B2-GO below.
+**B12 ✅ (2026-07-04) — the CORRECTED worn-armor set landed clean:** 744 files on the race-first
+full-part convention, cross-product leak check EMPTY, no "plain" type, complete (0 missing / 0 extra),
+elf_ranger neckline strap now mid-chest. Thank you — clear from your dev memory. Remaining worn wiring
+(game-side mgcb mirror + engine themed-half/draw) is OURS, not a CD ask.
 **B5 ✅ · B6 ✅ (2026-07-03, reconciled against your latest memory dump):** verified in `layout.json`
 — `invCard`/`loadoutCard`/`invTab` all carry `states.family`, the locked §6e vocabulary
 (`equipped`/`disabled`/`equippable`/`locked`), and `hover` overlays. Thank you — both fully landed,
@@ -102,7 +108,10 @@ B11. **Bow sprites missing from the gear batch:** the catalog + sprite set cover
     covers nothing in the new convention. Ask: 4 bow sprites (bow_short, bow_long, bow_compound,
     bow_elven) + catalog rows; engine ids will chase.
 
-B12. **WORN-ARMOR PART SET — CORRECTED & CONSOLIDATED CONVENTION (2026-07-04, Doug). SUPERSEDES the
+B12. **CLOSED 2026-07-04 — delivered + verified clean (744 files, no cross-product, no "plain",
+    0 missing / 0 extra); see Confirm-to-close above. Convention is now canon in LAYOUT_CONTRACT §12a /
+    DESIGN_SPEC §7a. Kept below for reference.** WORN-ARMOR PART SET — CONSOLIDATED CONVENTION (Doug).
+    SUPERSEDES the
     earlier B12 (per-core theme) AND B2-GO item 3 (generic layers)** — they were one system described
     twice on a line-first path, which is how the type×core×race cross-product + a "plain" type slipped
     into your build. Build the ENTIRE worn-armor set from this one spec.

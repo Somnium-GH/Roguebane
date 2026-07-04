@@ -60,6 +60,11 @@
       <div data-el="retreatBtn" data-binds="combat.retreat" data-bind-gate="" data-states="button" title="Retreat" style="position:relative;width:120px;height:40px;background:url('Content/ui/button/button_normal.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;">
         <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;letter-spacing:1px;color:#cdb497;">⮐ RETREAT</span>
       </div>
+      <!-- open Equipment (payload B4): reachable from every non-Equipment screen, DISABLED here —
+           Equipment is sealed during combat (DESIGN_SPEC §12/§6e) -->
+      <div data-el="equipmentBtn" data-binds="nav.equipment" data-bind-gate="" data-states="button" title="Equipment is sealed during combat" style="position:relative;width:160px;height:40px;background:url('Content/ui/button/button_disabled.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:not-allowed;opacity:0.6;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:1.5px;color:#6b5a44;">⚒ EQUIPMENT</span>
+      </div>
     </div>
   </div>
 

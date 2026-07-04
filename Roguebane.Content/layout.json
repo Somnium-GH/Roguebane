@@ -2258,6 +2258,78 @@
         156
       ]
     },
+    "bow_short": {
+      "pivot": [
+        36,
+        84
+      ]
+    },
+    "bow_short_back": {
+      "pivot": [
+        100,
+        108
+      ]
+    },
+    "bow_long": {
+      "pivot": [
+        36,
+        124
+      ]
+    },
+    "bow_long_back": {
+      "pivot": [
+        100,
+        108
+      ]
+    },
+    "bow_compound": {
+      "pivot": [
+        36,
+        116
+      ]
+    },
+    "bow_compound_back": {
+      "pivot": [
+        108,
+        108
+      ]
+    },
+    "bow_elven": {
+      "pivot": [
+        36,
+        116
+      ]
+    },
+    "bow_elven_back": {
+      "pivot": [
+        100,
+        108
+      ]
+    },
+    "sling_shepherds_back": {
+      "pivot": [
+        52,
+        60
+      ]
+    },
+    "sling_braided_back": {
+      "pivot": [
+        52,
+        60
+      ]
+    },
+    "sling_sinew_back": {
+      "pivot": [
+        52,
+        60
+      ]
+    },
+    "sling_giantsbane_back": {
+      "pivot": [
+        52,
+        60
+      ]
+    },
     "shield_wooden": {
       "pivot": [
         52,
@@ -10297,5 +10369,70 @@
         }
       }
     }
+  },
+  "worn": {
+    "root": "sprites/gear/worn",
+    "races": [
+      "human",
+      "elf"
+    ],
+    "slots": {
+      "str": [
+        "head",
+        "chest",
+        "arms",
+        "legs"
+      ],
+      "dex": [
+        "head",
+        "chest",
+        "arms",
+        "legs"
+      ],
+      "int": [
+        "head",
+        "chest"
+      ]
+    },
+    "tiers": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "conditions": [
+      "healthy",
+      "damaged",
+      "broken"
+    ],
+    "bare": {
+      "slots": [
+        "head",
+        "chest",
+        "arms",
+        "legs"
+      ],
+      "conditions": [
+        "healthy",
+        "damaged",
+        "broken"
+      ]
+    },
+    "themes": {
+      "grunt": "str",
+      "warden": "str",
+      "adept": "int",
+      "summoner": "int",
+      "reaver": "dex",
+      "ranger": "dex"
+    },
+    "sprite": "<race>/<slot>/[<core>/]<type>_<tier>_<condition>",
+    "fallback": [
+      "themed",
+      "generic",
+      "generic healthy",
+      "bare",
+      "bare healthy"
+    ]
   }
 }

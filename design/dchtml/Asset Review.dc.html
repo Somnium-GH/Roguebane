@@ -58,7 +58,7 @@
           <div style="{{ gridStyle }}">
             <sc-for list="{{ group.items }}" as="item" hint-placeholder-count="10">
               <button onClick="{{ item.open }}" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:1px solid #241c15;border-radius:9px;padding:9px;cursor:zoom-in;font-family:inherit" style-hover="border-color:#5a4636;background:#1a1410">
-                <div style="{{ stageStyle }}"><sc-if value="{{ item.path }}" hint-placeholder-val=""><img src="{{ item.path }}" style="{{ imgStyle }}" /></sc-if></div>
+                <div style="{{ stageStyle }}"><sc-if value="{{ item.path }}" hint-placeholder-val=""><img loading="lazy" decoding="async" src="{{ item.path }}" style="{{ imgStyle }}" /></sc-if></div>
                 <div style="font-size:11px;color:#cdbfa8;text-align:center;word-break:break-word;line-height:1.3">{{ item.label }}</div>
                 <div data-dim="1" style="font-size:10px;color:#6f5c48;font-family:ui-monospace,monospace">·</div>
               </button>
@@ -90,8 +90,27 @@ class Component extends DCLogic {
     this.setState({ assets: list.slice() });
     this._sweeps = 0;
     this._sweep = setInterval(() => { const done = this.fillDims(); if (done || ++this._sweeps > 120) { clearInterval(this._sweep); this._sweep = null; } }, 200);
+    // Delegated capture-phase img load/error handling for ALL imgs (1908 lazy cells + lightbox).
+    // Deliberately NOT on*="{{ }}" template attrs: pre-hydration the raw markup exists briefly and
+    // the browser would execute the literal "{{ … }}" attribute string as JS (ReferenceError).
+    this._imgLoad = (e) => { const n = e.target; if (!n || n.tagName !== 'IMG') return;
+      const b = n.closest('button'), d = b && b.querySelector('[data-dim]');
+      if (d) d.textContent = n.naturalWidth + '\u00D7' + n.naturalHeight; };
+    this._imgErr = (e) => { const n = e.target; if (!n || n.tagName !== 'IMG') return;
+      if (n.src.indexOf('%7B%7B') !== -1 || n.src.indexOf('{{') !== -1) return;   // pre-hydration placeholder src — ignore
+      const tries = +(n.dataset.retry || 0);
+      if (tries < 2) { n.dataset.retry = tries + 1; const base = n.src.split('?')[0];
+        setTimeout(() => { n.src = base + '?r=' + Date.now(); }, 300 * (tries + 1) + Math.random() * 300); }
+      else { const b = n.closest('button'), d = b && b.querySelector('[data-dim]');
+        if (d) { d.textContent = '\u26A0 load failed'; d.style.color = '#b23b32'; } } };
+    document.addEventListener('load', this._imgLoad, true);
+    document.addEventListener('error', this._imgErr, true);
   }
-  componentWillUnmount() { if (this._sweep) clearInterval(this._sweep); }
+  componentWillUnmount() {
+    if (this._sweep) clearInterval(this._sweep);
+    if (this._imgLoad) document.removeEventListener('load', this._imgLoad, true);
+    if (this._imgErr) document.removeEventListener('error', this._imgErr, true);
+  }
   componentDidUpdate() { this.fillDims(); }
   fillDims() {
     let pending = 0;

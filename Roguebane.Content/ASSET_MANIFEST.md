@@ -76,6 +76,35 @@ off-hand piece, unlike grunt/warden's shield hand). Standalone foes (`skeleton b
 ogre troll gargoyle`) keep bare ids — they have no race axis. Adding a race = one entry in the `RACE`
 table in `roster_gen.js`, then rerun the driver.
 
+### Worn-armor part set — `sprites/gear/worn/…` (B12, CORRECTED convention 2026-07-04)
+
+**Supersedes the mis-built per-figure themed layers (removed same day — never shipped to the repo).**
+FULL PART SPRITES: each file is a complete, ready-to-blit part image — the race's body part with the
+armor already drawn in, NOT a transparent overlay. The engine swaps the whole part sprite by
+(race, slot, wear-state); no runtime compositing.
+```
+sprites/gear/worn/<race>/<slot>/bare_<condition>.png                  — unarmored part, the fallback terminal
+sprites/gear/worn/<race>/<slot>/<type>_<tier>_<condition>.png         — GENERIC armored part (core-agnostic)
+sprites/gear/worn/<race>/<slot>/<core>/<type>_<tier>_<condition>.png  — THEMED, ONLY the core's favored line
+```
+- `race` ∈ {human, elf} — EVERY slot authored for EVERY race (no shared-arms/legs optimization).
+  `slot` ∈ {head, chest, arms, legs} — ONE sprite per slot; the engine reuses it for both arms/legs.
+- `type` ∈ {str, dex, int} — **there is NO "plain" type**; the unarmored part is `bare` (DEX's
+  "Plain leather" is a display NAME only). `tier` ∈ 1..4 (bare has no tier); `condition` ∈
+  {healthy, damaged, broken} — no disabled variants (§6e: disabled gear un-renders).
+- str & dex cover all four slots; **int = chest + head only** (§6c); CON shields are hand items — no
+  worn body parts.
+- **THEMED = favored line ONLY, never a cross-product:** Grunt→str (practical kit) · Warden→str
+  (reinforced edges, rivets, shield-boss, visor helm) · Adept→int (runic trim, restrained accent) ·
+  Summoner→int (bone/chain trim, ritual sigil, darker) · Reaver→dex (twin-blade etch, studs) ·
+  Ranger→dex (fur trim, quiver strap). A core in a non-favored line renders the GENERIC art.
+- **Engine fallback chain:** themed → generic → generic healthy → bare → bare healthy — partial
+  coverage is always safe.
+- Geometry = the race BASE body plan (human baseline ± race build), deliberately core-agnostic —
+  composition with per-core figure geometry is the engine's §7/§17 #15 morph question.
+- **744 files** (bare 24 + generic 240 + themed 480); machine inventory = `layout.json` top-level
+  `worn` block; curated review sheet = `design/00-assets-4-armor.png`.
+
 **`Content/layout.json`** is the coordinate source of truth (per `LAYOUT_CONTRACT.md`): `figures.<id>` =
 `{size, pivot, z, parts:{<part>:{rect:[x,y,w,h]}}, sockets:{handL,handR,neck,shoulderL,shoulderR}, mounts}`
 in figure-space px; `gear.<id>` = `{pivot}`; `screens.<id>` = responsive design-space (960×540) UI manifests.
@@ -116,13 +145,14 @@ Six gear PNGs from `proto/roster_gen.js`, each mounted by aligning its `gear.<id
 ## sprites/gear/ — B2-GO weapon tiers, new item families, armor icons, shield ladder (DESIGN_SPEC §6c/§6d)
 
 Generator-produced (`proto/roster_gen.js`, same `GEAR` pipeline as the six original gear PNGs above,
-never hand-authored). 100 new PNGs; pivots live in `Content/layout.json` `gear.<id>`; a parallel
-`Content/gear_catalog.json` lists `{id,name,attr,slot,tier}` for content authors (card copy). **This
-batch is inventory/card-icon art** — actually WEARING armor on the figure (a body-layer overlay per
-slot) is a separate, not-yet-built "morph" system (see `DEV_LOOP_MEMORY.md`); these icons are the same
-kind of standalone PNG as `sword`/`round_shield` above, just not yet hand-socket-mounted for the new
-weapon types either (mounts still reference the base `sword`/`dagger`/`bow`/`staff` ids — tier-specific
-mounting is a game-state concern for later, not a generator gap).
+never hand-authored). Pivots live in `Content/layout.json` `gear.<id>`; a parallel
+`Content/gear_catalog.json` lists `{id,name,attr,slot,tier}` for content authors (card copy — names
+follow the §6c canon ladders verbatim since payload B10). **This batch is inventory/card-icon art** —
+WEARING armor on the figure is the separate worn-armor part set under `sprites/gear/worn/` (see the
+worn-armor section above); the icons are the same kind of standalone PNG as `sword`/`round_shield`,
+just not yet hand-socket-mounted for the new weapon types either (mounts still reference the base
+`sword`/`dagger`/`bow`/`staff` ids — tier-specific mounting is a game-state concern for later, not a
+generator gap).
 
 **Melee weapon TYPES** — ONE silhouette per type, palette-swapped across the 4 STR material tiers
 (`Iron → Steel → Mithral → Dwarven Steel`, ids `_iron/_steel/_mithral/_dwarven`), per §6d's locked
@@ -150,6 +180,7 @@ signature" rule — mundane gear never glows):
 | Charm | `charm_` | Wooden → Bone → Ornate → Humming | INT, OFF | magic offhand |
 | Tome | `tome_` | Old Worn → Leather → Ornate → Glowing | INT, OFF | magic offhand |
 | Wand | `wand_` | Adept → Twisted → Gemstone → Glowing | INT, HAND | **NEW: wands are hand items now** (§6d) — dual-wieldable, never with a bow/sling |
+| Bow | `bow_` | Short → Long → Compound → Elven (ids `bow_short/bow_long/bow_compound/bow_elven`) | DEX, RANGED | **payload B11** — fills the §6d ranged slot; mundane, no glow tier; the legacy un-tiered `bow` stays (still figure-mounted) |
 
 **CON shield object ladder** (`shield_wooden` / `shield_buckler` / `shield_kite` / `shield_tower`) —
 reuses the existing `round_shield`/`tower_shield` silhouette family at escalating size/material; the
@@ -160,11 +191,16 @@ Chest=Breastplate, Arms=Vambraces, Legs=Greaves — **the old Skull Cap/Barbute/
 retired, do not regenerate under them**) × 4 metal tiers; DEX leather (same 4 slots) × 4 leather
 tiers (Leather/Hardened/Studded/Reinforced); INT robe (Chest+Head ONLY, no arm/leg robe pieces per
 §6c) × 4 cloth tiers (Cotton/Silk/Ornate/Humming). `armor_str_*`, `armor_dex_*`, `armor_int_*`.
+**Catalog display names are the §6c canon ladders** (payload B10 fix): DEX head `Leather Cap →
+Hardened Cap → Studded Cap → Reinforced Hood`, DEX chest `Padded Armor → Leather Armor → Studded
+Leather → Reinforced Leather`, INT head `Cloth Cap → Silk Hood → Ornate Circlet → Humming Circlet`,
+etc.; STR composes material + piece ("Steel Helm") per the locked new-name convention.
 
-**Ranged BACK-MOUNT socket (§6d/§17 #22):** every figure now emits a `sockets.back` point (over the
-shoulder blades) in `layout.json` — a DATA addition, not new art — so the engine can render an
-equipped bow/sling there when melee hands are already full. No back-mount art exists yet; this is
-the socket the engine mounts against once it draws one.
+**Ranged BACK-MOUNT (§6d/§17 #22):** every figure emits a `sockets.back` point (over the shoulder
+blades) in `layout.json`, and the batch now ALSO ships the slung art: `bow_<tier>_back` +
+`sling_<tier>_back` (diagonal stave/cord + pouch, pivot = sprite centre) — the engine aligns that
+pivot to `sockets.back` and draws it BEHIND all parts (z: before `legL`) whenever the equipped
+ranged weapon can't render in the hands.
 
 **Also this batch:** `elf_ranger`'s (and `human_ranger`'s, sharing the same core-rune spec) chest
 quiver-strap moved down off the neckline (was crowding/fusing with the head) to mid-chest, matching

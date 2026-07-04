@@ -41,7 +41,7 @@
       <sc-for list="{{ races }}" as="r" hint-placeholder-count="2">
         <div data-tpl="raceCard" data-states="pickerCard" onClick="{{ r.pick }}" style="height:158px;flex:none;border:2px solid {{ r.border }};background:{{ r.bg }};display:flex;cursor:pointer;overflow:hidden;">
           <!-- head (bare, no helmet) — engine blits the race's own head part (payload v5 §E) -->
-          <div style="position:relative;width:106px;flex:none;background:linear-gradient(#211a2c,#151020);border-right:2px solid #2e2218;display:flex;align-items:center;justify-content:center;overflow:hidden;" data-binds="race.headImage" data-image-bind="sprites/body/{race.id}_grunt/head_healthy">
+          <div style="position:relative;width:106px;flex:none;background:linear-gradient(#211a2c,#151020);border-right:2px solid #2e2218;display:flex;align-items:center;justify-content:center;overflow:hidden;">
             <div style="position:absolute;inset:0;background-image:repeating-conic-gradient(#2a2340 0% 25%,#211a33 0% 50%);background-size:7px 7px;opacity:.26;"></div>
             {{ r.headImg }}
           </div>
@@ -273,8 +273,13 @@ class Component extends DCLogic {
       const repCore = r.disallow.includes(coreId) ? firstAllowed(r) : coreId;
       return {
         name: r.name, tag: r.tag, hp: '' + r.hp, blurb: r.blurb,
+        // bind lands HERE, on the actual shadowed portrait element — not the background panel it sits
+        // in (payload B7: the panel's portrait-aspect rect was stretching the landscape head source;
+        // this element's own box is what should carry imageBind/binds).
         headImg: React.createElement('img', { src: 'Content/sprites/body/' + r.id + '_grunt/head_healthy.png',
           'data-shadow': 'soft',
+          'data-binds': 'race.headImage',
+          'data-image-bind': 'sprites/body/{race.id}_grunt/head_healthy',
           style: { height: '70px', width: 'auto', imageRendering: 'pixelated', position: 'relative', filter: 'drop-shadow(0 3px 4px #0009)' } }),
         fig: r.id + '_' + repCore,
         attrs: attrRow(r.attrs),

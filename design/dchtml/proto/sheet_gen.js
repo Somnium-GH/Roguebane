@@ -36,6 +36,32 @@ globalThis.RB_generateSheets = async function (H, only) {
   }
 
   const SHEETS = {
+    armor: {   // B12 (corrected 2026-07-04) worn-armor part set — curated samples (full set = 744 files; inventory = layout.json `worn`)
+      file: 'design/00-assets-4-armor.png',
+      title: 'Asset Sheet · 4 — Worn-Armor Part Set (B12 corrected)',
+      sub: 'FULL part sprites, race-first · sprites/gear/worn/<race>/<slot>/[<core>/]<type>_<tier>_<cond> · bare = unarmored terminal (no "plain" type) · themed = favored line ONLY · fallback: themed→generic→bare',
+      cw: 104, imgH: 100, gap: 9, pixel: true,
+      sections: [
+        { head: 'BARE — the unarmored fallback terminal (human) + conditions', root: 'Content/sprites/gear/worn/human/',
+          files: ['head/bare_healthy.png','chest/bare_healthy.png','arms/bare_healthy.png','legs/bare_healthy.png','chest/bare_damaged.png','chest/bare_broken.png'] },
+        { head: 'GENERIC STR (core-agnostic) — chest tiers 1→4 + slots @2', root: 'Content/sprites/gear/worn/human/',
+          files: ['chest/str_1_healthy.png','chest/str_2_healthy.png','chest/str_3_healthy.png','chest/str_4_healthy.png','head/str_2_healthy.png','arms/str_2_healthy.png','legs/str_2_healthy.png'] },
+        { head: 'GENERIC DEX (core-agnostic) — chest tiers 1→4 + slots @2', root: 'Content/sprites/gear/worn/human/',
+          files: ['chest/dex_1_healthy.png','chest/dex_2_healthy.png','chest/dex_3_healthy.png','chest/dex_4_healthy.png','head/dex_2_healthy.png','arms/dex_2_healthy.png','legs/dex_2_healthy.png'] },
+        { head: 'GENERIC INT (chest + head only, §6c) — chest tiers 1→4 + head @2', root: 'Content/sprites/gear/worn/human/',
+          files: ['chest/int_1_healthy.png','chest/int_2_healthy.png','chest/int_3_healthy.png','chest/int_4_healthy.png','head/int_2_healthy.png','arms/bare_healthy.png'] },
+        { head: 'THEMED STR — GRUNT (practical kit) vs WARDEN (edges/rivets/boss, visor helm) @2', root: 'Content/sprites/gear/worn/human/',
+          files: ['chest/grunt/str_2_healthy.png','head/grunt/str_2_healthy.png','arms/grunt/str_2_healthy.png','chest/warden/str_2_healthy.png','head/warden/str_2_healthy.png','arms/warden/str_2_healthy.png','legs/warden/str_2_healthy.png'] },
+        { head: 'THEMED DEX — REAVER (twin-blade etch, studs) vs RANGER (fur trim, quiver strap) @2', root: 'Content/sprites/gear/worn/human/',
+          files: ['chest/reaver/dex_2_healthy.png','head/reaver/dex_2_healthy.png','arms/reaver/dex_2_healthy.png','chest/ranger/dex_2_healthy.png','head/ranger/dex_2_healthy.png','arms/ranger/dex_2_healthy.png','legs/ranger/dex_2_healthy.png'] },
+        { head: 'THEMED INT — ADEPT (runic trim, restrained) vs SUMMONER (bone/chain, darker) @2', root: 'Content/sprites/gear/worn/human/',
+          files: ['chest/adept/int_2_healthy.png','head/adept/int_2_healthy.png','chest/summoner/int_2_healthy.png','head/summoner/int_2_healthy.png','chest/adept/int_4_healthy.png','chest/summoner/int_4_healthy.png'] },
+        { head: 'ELF — every slot authored per race (ears clear the headgear; slimmer chest)', root: 'Content/sprites/gear/worn/elf/',
+          files: ['head/bare_healthy.png','chest/bare_healthy.png','head/warden/str_3_healthy.png','chest/ranger/dex_4_healthy.png','chest/summoner/int_3_healthy.png','arms/str_2_healthy.png'] },
+        { head: 'CONDITIONS — healthy → damaged → broken (warden chest @2)', root: 'Content/sprites/gear/worn/human/',
+          files: ['chest/warden/str_2_healthy.png','chest/warden/str_2_damaged.png','chest/warden/str_2_broken.png'] },
+      ],
+    },
     figures: {
       file: 'design/00-assets-1-figures.png',
       title: 'Asset Sheet · 1 — Figures, Cores, Minions, Gear',
@@ -52,6 +78,8 @@ globalThis.RB_generateSheets = async function (H, only) {
           files: ['longsword_steel.png', 'claymore_steel.png', 'axe_steel.png', 'battleaxe_steel.png', 'mace_steel.png', 'warhammer_steel.png', 'dagger_steel.png', 'rapier_steel.png', 'shortsword_steel.png'] },
         { head: 'B2-GO — NEW FAMILIES + SHIELD LADDER', root: 'Content/sprites/gear/',
           files: ['sling_braided.png', 'staff_ornate.png', 'charm_ornate.png', 'tome_ornate.png', 'wand_gemstone.png', 'shield_wooden.png', 'shield_buckler.png', 'shield_kite.png', 'shield_tower.png'] },
+        { head: 'B11 — BOW LADDER + RANGED BACK-MOUNTS (slung art, pivots to sockets.back)', root: 'Content/sprites/gear/',
+          files: ['bow_short.png', 'bow_long.png', 'bow_compound.png', 'bow_elven.png', 'bow_long_back.png', 'bow_elven_back.png', 'sling_braided_back.png', 'sling_giantsbane_back.png'] },
         { head: 'B2-GO — ARMOR ICONS (one tier per line shown: STR=Steel, DEX=Hardened, INT=Silk)', root: 'Content/sprites/gear/',
           files: ['armor_str_head_steel.png', 'armor_str_chest_steel.png', 'armor_str_arms_steel.png', 'armor_str_legs_steel.png', 'armor_dex_head_hardened.png', 'armor_dex_chest_hardened.png', 'armor_int_chest_silk.png', 'armor_int_head_silk.png'] },
       ],
@@ -93,13 +121,14 @@ globalThis.RB_generateSheets = async function (H, only) {
     },
   };
 
-  // parts sheet: one section per figure
+  // parts sheet: one section per figure — BASE parts only (worn armor layers have their own sheet 4;
+  // 112 worn files per standard figure would swamp this one)
   SHEETS.parts.sections = [];
   for (const fig of BODY) {
     // discover this figure's files via the manifest-independent ls
     const root = 'Content/sprites/body/' + fig + '/';
     let files;
-    try { files = (await H.ls('Content/sprites/body/' + fig)).filter(f => f.endsWith('.png')); }
+    try { files = (await H.ls('Content/sprites/body/' + fig)).filter(f => f.endsWith('.png') && !/_(str|dex|int)_/.test(f)); }
     catch (e) { files = []; }
     files.sort(partOrder);
     SHEETS.parts.sections.push({ head: fig.toUpperCase() + ' (' + files.length + ' parts)', root, files });

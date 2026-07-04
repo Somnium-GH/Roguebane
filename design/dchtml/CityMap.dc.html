@@ -137,7 +137,7 @@
 
     <!-- BEACONS -->
     <sc-for list="{{ beacons }}" as="b" hint-placeholder-count="20">
-      <div data-tpl="beaconNode" data-binds="node" style="position:absolute;left:{{ b.left }};top:{{ b.top }};width:{{ b.size }};height:{{ b.size }};opacity:{{ b.op }};">
+      <div data-tpl="beaconNode" data-binds="node" data-states="beaconNode" style="position:absolute;left:{{ b.left }};top:{{ b.top }};width:{{ b.size }};height:{{ b.size }};opacity:{{ b.op }};">
         <div data-atom="{{ b.atom }}" data-binds="node.type" data-image-bind="icons/node/{node.type}" style="width:100%;height:100%;border:3px {{ b.bstyle }} {{ b.bcolor }};background:{{ b.bg }};border-radius:{{ b.radius }};display:flex;align-items:center;justify-content:center;{{ b.extra }}">
           <span data-binds="node.glyph" style="font-family:'JetBrains Mono',monospace;font-size:{{ b.glyphSize }};color:{{ b.glyphColor }};line-height:1;display:block;transform:{{ b.glyphShift }};">{{ b.glyph }}</span>
         </div>
