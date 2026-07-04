@@ -58,8 +58,11 @@ CASTER, Summoner/Reaver/Ranger SPECIALIST; `core.badge` resolver case). ~~shield
 wires~~ DONE (same pass: header resolves "SHIELD" only, NEW `ShieldPool.count` carries n / m;
 `ShieldPool.regenPct` is the fill ELEMENT — width = live progress across the track's inner width,
 the track's inline progress draw retired; datum-fill suppression + BindResolves extended; encounter
-binds 20→21). REMAINING: verify resource-strip seating; LAYOUT_CONTRACT fold (`parts[]`, `part`,
-`states.<state>.label`, pattern imageBind).
+binds 20→21). ~~verify resource-strip seating~~ DONE (2026-07-03 loop: encounter seats ALL FOUR —
+203 = 4×47+3×5, SUMMONS visible on the gate shot; citymap/equipment still clip to 3 (197 authored,
+212 needed at gap 8) — numbers logged Needs-CD B0). ~~LAYOUT_CONTRACT fold~~ DONE (same pass: §12
+gains `element.parts[]`/`part`, `states.<state>.label` replace-wholesale semantics, pattern
+`imageBind` static-path tiling). **DROP ENGINE QUEUE COMPLETE** — every 07-03 pm drop item landed.
 Canon core-effect copy in `CoreRunes.cs` LANDED in M1 (see below).
 **‼ GATE RED (pre-existing, DROP-caused — verified by stash/rerun at HEAD): text OVERFLOWS rose
 ng 6→9, city 4→6.** Membership is the drop's NEW/re-authored elements (city: suppliesTitle/

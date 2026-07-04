@@ -239,3 +239,17 @@ poisons every fidelity score taken against it. Asset SHEETS (`design/00-assets-*
   `parts` entries (chrome-only parts are legal: fill/border with no content).
 - **`item.pad`** — list containers may emit padding inside each stamped cell:
   `"item": { "template":..., "flow":..., "gap":N, "pad":N }`. Fixes rows that hug their panel edge.
+- **`element.parts[]` / `part`** (2026-07-03 pm drop) — a screen ELEMENT may carry named sub-parts
+  (`"parts": [{ "part": "value", "rect": [x,y,w,h], "color":…, "font":…, "fontPx":…, "align":…,
+  "sample":…, "binds":… | "content":… }]`). Rects are ELEMENT-LOCAL design px and must sit inside
+  the element. When parts are present THEY carry the text — the engine never also draws the
+  element's own flattened sample (the A3 value/label tile split). Each part needs a text source
+  (content, binds, or sample) and a positive fontPx; `align` ∈ left|center|right.
+- **`states.<state>.label`** (2026-07-03 pm drop) — a template PART's `states` entries may carry a
+  per-state `label` (selection chips: idle CHOOSE/SELECT vs chosen/selected check-labels). The
+  state style REPLACES the part style wholesale (fill/border/color/opacity/label) — the part's own
+  fill/border are the extracted CHOSEN-sample look and must not leak into other states.
+- **pattern `imageBind`** (2026-07-03 pm drop) — an element-level `imageBind` with a STATIC path
+  (no `{bind}` holes, e.g. `ui/pattern/doom_stripe`) means TILE that PNG across the element rect.
+  Pattern art ships at the dc.html 2x paint density. Templated paths (`icons/node/{node.type}`)
+  keep the per-datum icon semantics.
