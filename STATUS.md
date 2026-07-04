@@ -112,22 +112,12 @@ detect it sits near the `enemy.advancePct`-bound element, compute the same `frac
 draw X to `doomTrack.X + frac*doomTrack.Width - iconWidth/2` instead of the static offset. Pure
 engine fix, no CD data change needed.
 
-## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-03, Doug — Merchant wareCards render with no border/
-## chrome, "low quality little badge boxes")
-Confirmed against `design/07-merchant.png`: reference cards have a full border frame, a colored
-category pill (ARM/WPN/TEC), a separate rarity badge (MAGIC/COMMON/RARE), name, subtitle, italic
-flavor text, BUY + price. Doug's live shot has none of the frame — just the bare category tile
-floating with no card outline, no rarity badge, no flavor text. **ROOT CAUSE FOUND: this is an
-ENGINE gap, not missing CD data** — `templates.wareCard` already authors everything correctly
-(`border:{color:"border",w:1}`, `fill:"panelCard"`, a `ware.tag` rarity-badge part, `ware.note`
-subtitle, `ware.desc` flavor text — verified directly in `layout.json`). But the merchant's stamping
-path (`Game1.ManifestRenderer.cs` ~762-772, the `pp.Binds == "section.wares"` branch) calls
-`DrawWarePart` per PART only — it never calls `DrawTemplateRootChrome` (or equivalent) for the
-card's own root border+fill, unlike the generic `DrawManifestList` path every other card family goes
-through. **Fix: draw the wareCard template's root border/fill once per card before stamping its
-parts**, same as every other templated card already does. The rarity badge (`ware.tag`) is a SEPARATE,
-**already-known** gap — STATUS previously flagged "rarity chip stays gated (no rarity model)" — not
-new, don't rebuild it as part of this fix; only the missing root chrome is actionable right now.
+## ✅ FIXED (2026-07-04 loop) — Merchant wareCards render with no border/chrome
+Root chrome was missing because `section.wares` stamping (`Game1.ManifestRenderer.cs`) called
+`DrawWarePart` per part only, skipping `DrawTemplateRootChrome`. Added the root-chrome call per
+ware card before its parts stamp, same as every other templated card family. Build clean,
+RB_SMOKE=1 RB_MF=all clean on merchant, Core.Tests 350 green. The rarity badge (`ware.tag`) gap
+is untouched — separate, already-known, no rarity model built yet.
 
 ## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-03, Doug — Equipment identity block, bays/actions/budget)
 Doug's screenshot (Elf Summoner) shows BAYS and ACTIONS crammed onto the same line and BUDGET
