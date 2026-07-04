@@ -92,6 +92,11 @@ the RUN body during an in-run smoke (the drive's Summoner under Grunt card copy 
 mask class M0.3 killed, resurfacing via the figure). preview.fig now ALWAYS previews the BUILD;
 `Body` keeps the live run body. ng fidelity 78.3→78.6. Preview figure wears bare limbs (unarmored
 build body) vs the ref's armored+armed sample — live-state class; gear draws when wielded.
+**M1 DETECTOR GAP — CLOSED (2026-07-03 loop):** the wrap clamp's silent drop is now RECORDED
+(`RecordTextTruncation` at both clamp exits: mid-paragraph word drop + whole-paragraph drop);
+`SMOKE TEXTGEOM` emits `truncated=N trunc=[el:'snippet']`; the gate fails ANY truncation — pinned
+ZERO, absolute, no baseline ride (per M1: "label missing from every box cannot score 77+ again").
+First measurement: truncated=0 on all six screens (the M1 batch left the build clean).
 **‼ GATE RED (pre-existing, DROP-caused — verified by stash/rerun at HEAD): text OVERFLOWS rose
 ng 6→9, city 4→6.** Membership is the drop's NEW/re-authored elements (city: suppliesTitle/
 supportTitle/castlePanelTitle/doomTitle; ng: header/preview family). Numerics: VERTICAL-only —

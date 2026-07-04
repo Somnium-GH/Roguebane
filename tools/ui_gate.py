@@ -103,9 +103,9 @@ def main():
         for m in re.finditer(r"SMOKE BINDS: (\w+) resolved=(\d+)/(\d+)", r.stdout):
             if m.group(1) in owns:
                 binds[m.group(1)] = int(m.group(2))
-        for m in re.finditer(r"SMOKE TEXTGEOM: (\w+) overflow=(\d+) collide=(\d+)", r.stdout):
+        for m in re.finditer(r"SMOKE TEXTGEOM: (\w+) overflow=(\d+) collide=(\d+)(?: truncated=(\d+))?", r.stdout):
             if m.group(1) in owns:
-                textgeom[m.group(1)] = [int(m.group(2)), int(m.group(3))]
+                textgeom[m.group(1)] = [int(m.group(2)), int(m.group(3)), int(m.group(4) or 0)]
 
     print("== fidelity ==")
     for screen, design in DESIGNS.items():
@@ -146,12 +146,18 @@ def main():
         if got < score - FIDELITY_TOLERANCE:
             failures.append(f"{screen}: fidelity dropped {score:.1f} -> {got:.1f}")
     # P0-A.5: zero NEW text overflows/collisions — counts may only go DOWN vs the baseline.
-    for screen, (b_over, b_coll) in base.get("textgeom", {}).items():
-        got = textgeom.get(screen, [0, 0])
+    for screen, counts in base.get("textgeom", {}).items():
+        b_over, b_coll = counts[0], counts[1]
+        got = textgeom.get(screen, [0, 0, 0])
         if got[0] > b_over:
             failures.append(f"{screen}: text OVERFLOWS rose {b_over} -> {got[0]}")
         if got[1] > b_coll:
             failures.append(f"{screen}: text COLLISIONS rose {b_coll} -> {got[1]}")
+    # M1 detector gap: TRUNCATED text (invisible words — the wrap clamp dropped content) is pinned
+    # ZERO, absolute. No baseline ride: any truncation anywhere fails the gate outright.
+    for screen, counts in textgeom.items():
+        if len(counts) > 2 and counts[2] > 0:
+            failures.append(f"{screen}: {counts[2]} TRUNCATED text element(s) — invisible words (pinned zero)")
 
     if failures:
         print("\nGATE FAILED:")

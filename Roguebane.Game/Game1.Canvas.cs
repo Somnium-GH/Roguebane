@@ -88,21 +88,28 @@ public partial class Game1
             return;
         }
         // Wrapped text is line-clamped to the box, so its drawn footprint IS (at most) the bound.
+        // A clamp that DROPS content records the truncation — invisible words must fail the smoke.
         RecordTextBox(r, r, s, font);
         var ly = (float)r.Y;
         var lines = 0;
-        foreach (var para in s.Split('\n'))
+        var paras = s.Split('\n');
+        for (var pi = 0; pi < paras.Length; pi++)
         {
+            var words = paras[pi].Split(' ');
             var line = "";
-            foreach (var word in para.Split(' '))
+            for (var wi = 0; wi < words.Length; wi++)
             {
-                var trial = line.Length == 0 ? word : line + " " + word;
+                var trial = line.Length == 0 ? words[wi] : line + " " + words[wi];
                 if (line.Length > 0 && MeasureText(font, trial).X * sc > r.Width)
                 {
                     TextPx(font, line, r.X, (int)ly, color, fontPx);
                     ly += lineH;
-                    if (++lines >= maxLines) return;
-                    line = word;
+                    if (++lines >= maxLines)
+                    {
+                        RecordTextTruncation(string.Join(" ", words[wi..]));
+                        return;
+                    }
+                    line = words[wi];
                 }
                 else line = trial;
             }
@@ -110,7 +117,12 @@ public partial class Game1
             {
                 TextPx(font, line, r.X, (int)ly, color, fontPx);
                 ly += lineH;
-                if (++lines >= maxLines) return;
+                if (++lines >= maxLines)
+                {
+                    if (pi < paras.Length - 1)
+                        RecordTextTruncation(string.Join("\n", paras[(pi + 1)..]));
+                    return;
+                }
             }
         }
     }
@@ -128,6 +140,17 @@ public partial class Game1
         if (_collectText && _textOwner is { } el)
             _textBoxes.Add((el, drawn, bound, text,
                 font is not null && font == _assets.Display ? "display" : "mono"));
+    }
+
+    // M1 detector gap: a drawn string whose VISIBLE portion != the full string (the wrap clamp
+    // dropped words/paragraphs) is recorded here — "label missing from every box" must fail the
+    // smoke, never ride an overflow baseline.
+    private readonly System.Collections.Generic.List<(string El, string Dropped)> _textTruncated = new();
+
+    private void RecordTextTruncation(string dropped)
+    {
+        if (_collectText && _textOwner is { } el && dropped.Trim().Length > 0)
+            _textTruncated.Add((el, dropped.Trim()));
     }
 
     // SpriteFonts are ASCII-only and THROW on an unknown glyph. The fold-to-ASCII policy + algorithm

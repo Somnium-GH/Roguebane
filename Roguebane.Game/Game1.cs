@@ -700,6 +700,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             RenderSceneOnce(() => DrawManifestBackdrop(id));
             _scene.GetData(baseline);
             _textBoxes.Clear();
+            _textTruncated.Clear();
             _collectText = true;
             RenderSceneOnce(() => DrawManifestScreen(id));
             _collectText = false;
@@ -828,9 +829,17 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                 var key = ea + "x" + eb;
                 if (!collide.Contains(key)) collide.Add(key);
             }
+        // M1 detector gap: truncated strings (the wrap clamp dropped words) are their own counter —
+        // an invisible label is a harder failure than a visible spill and never rides its baseline.
+        var truncated = _textTruncated.Select(t => t.El).Distinct().ToList();
         Console.WriteLine($"SMOKE TEXTGEOM: {screenId} overflow={overflow.Count} collide={collide.Count}"
+            + $" truncated={truncated.Count}"
             + (overflow.Count > 0 ? $" over=[{string.Join(",", overflow)}]" : "")
-            + (collide.Count > 0 ? $" hits=[{string.Join(",", collide)}]" : ""));
+            + (collide.Count > 0 ? $" hits=[{string.Join(",", collide)}]" : "")
+            + (truncated.Count > 0
+                ? $" trunc=[{string.Join(",", _textTruncated.Select(t => $"{t.El}:'{Snip(t.Dropped)}'").Distinct())}]"
+                : ""));
+        static string Snip(string s) => s.Length <= 24 ? s : s[..24] + "...";
     }
 
     // M0.5 (Doug 2026-07-03 late): every authored image/imageBind path must resolve to a texture
