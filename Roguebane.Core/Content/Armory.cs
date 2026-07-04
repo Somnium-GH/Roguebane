@@ -9,36 +9,39 @@ namespace Roguebane.Core.Content;
 public static class Armory
 {
     private static readonly string[] Materials = { "Iron", "Steel", "Mithral", "Dwarven Steel" };
+    private static readonly string[] MaterialIds = { "iron", "steel", "mithral", "dwarven" };
 
-    // A melee material ladder: 4 tiers of one silhouette. Tier-1 ids stay the legacy keys where
-    // gear sprites already exist (sword/axe/dagger); the rest await the B2 art regen batch.
+    // A melee material ladder: 4 tiers of one silhouette. Ids follow the CD gear-catalog sprite
+    // convention ({noun}_{material}) so sprites/gear/{w.Id} resolves with zero mapping.
     private static Weapon[] Melee(string noun, Stat stat, double timer, int dmgPerTier,
-        int reqPerTier, int hands, string? t1Id = null)
+        int reqPerTier, int hands)
         => Enumerable.Range(1, 4).Select(t => new Weapon(
-            t == 1 && t1Id is not null ? t1Id : Slug(noun) + "-" + t,
+            Slug(noun) + "_" + MaterialIds[t - 1],
             stat, reqPerTier * t, dmgPerTier * t,
             Materials[t - 1] + " " + noun, t, timer, hands)).ToArray();
 
-    // A named ladder (bows, slings, INT implements): explicit tier names, uniform per-tier gates.
+    // A named ladder (INT implements): explicit tier names, uniform per-tier gates. Ids follow the
+    // CD gear-catalog sprite convention — "{slug}_{tier adjective, spaces squeezed}" (wand_adept,
+    // staff_wooden, tome_oldworn).
     private static Weapon[] Named(string slug, Stat stat, WeaponKind kind, double timer,
         int dmgPerTier, int reqPerTier, int hands, params string[] names)
         => names.Select((n, i) => new Weapon(
-            slug + "-" + (i + 1),
+            slug + "_" + n[..n.LastIndexOf(' ')].ToLowerInvariant().Replace(" ", "").Replace("'", ""),
             stat, reqPerTier * (i + 1), dmgPerTier * (i + 1),
             n, i + 1, timer, hands, kind)).ToArray();
 
     private static string Slug(string noun) => noun.ToLowerInvariant().Replace(" ", "");
 
     // STR melee: 1H Longsword/Axe/Mace, 2H Claymore/Battleaxe/Warhammer (§6d table).
-    public static readonly IReadOnlyList<Weapon> Longswords = Melee("Longsword", Stat.Str, 1.0, 4, 2, 1, "sword");
-    public static readonly IReadOnlyList<Weapon> Axes = Melee("Axe", Stat.Str, 0.9, 3, 1, 1, "axe");
+    public static readonly IReadOnlyList<Weapon> Longswords = Melee("Longsword", Stat.Str, 1.0, 4, 2, 1);
+    public static readonly IReadOnlyList<Weapon> Axes = Melee("Axe", Stat.Str, 0.9, 3, 1, 1);
     public static readonly IReadOnlyList<Weapon> Maces = Melee("Mace", Stat.Str, 1.1, 5, 3, 1);
     public static readonly IReadOnlyList<Weapon> Claymores = Melee("Claymore", Stat.Str, 1.3, 7, 5, 2);
     public static readonly IReadOnlyList<Weapon> Battleaxes = Melee("Battleaxe", Stat.Str, 1.2, 6, 4, 2);
     public static readonly IReadOnlyList<Weapon> Warhammers = Melee("Warhammer", Stat.Str, 1.4, 8, 5, 2);
 
     // DEX melee: 1H only — the bow is DEX's two-hander (§6d).
-    public static readonly IReadOnlyList<Weapon> Daggers = Melee("Dagger", Stat.Dex, 0.6, 1, 1, 1, "dagger");
+    public static readonly IReadOnlyList<Weapon> Daggers = Melee("Dagger", Stat.Dex, 0.6, 1, 1, 1);
     public static readonly IReadOnlyList<Weapon> Rapiers = Melee("Rapier", Stat.Dex, 0.7, 2, 2, 1);
     public static readonly IReadOnlyList<Weapon> ShortSwords = Melee("Short Sword", Stat.Dex, 0.8, 3, 3, 1);
 
@@ -50,7 +53,8 @@ public static class Armory
         new[] { "Short Bow", "Long Bow", "Compound Bow", "Elven Bow" }[t - 1],
         t, 1.0, Hands: 2, WeaponKind.Bow)).ToArray();
     public static readonly IReadOnlyList<Weapon> Slings = Enumerable.Range(1, 4).Select(t => new Weapon(
-        "sling-" + t, Stat.Dex, t, Power: 1 /* PLACEHOLDER §17 #9 */,
+        "sling_" + new[] { "shepherds", "braided", "sinew", "giantsbane" }[t - 1],
+        Stat.Dex, t, Power: 1 /* PLACEHOLDER §17 #9 */,
         new[] { "Shepherd's Sling", "Braided Sling", "Sinew Sling", "Giantsbane Sling" }[t - 1],
         t, 1.0, Hands: 1, WeaponKind.Sling)).ToArray();
 

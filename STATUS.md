@@ -1,5 +1,40 @@
 # Status
 
+## ⇒ CD MEMORY-DROP RECONCILE (2026-07-03, Cowork) — CD's dev-loop memory audited vs repo; most
+## items were STALE ON CD'S SIDE (already landed here), one real NEW engine bug surfaced.
+Reconciled CD's 11-item OPEN list against actual repo state (grepped layout.json/renderer, didn't
+trust either side's claim). **CLOSED/LANDED, no action (CD's memory is stale, nothing to do):**
+`core.label` bind (B0b, already closed); border.sides (fully wired, 8 call sites); shield-pool
+pips (variable-N instancing + wrap already built, STATUS 756-758); merchant screen consumer + buy/
+leave (already wired — CD's "still shows popover stopgap" claim is stale, only the wareCard root-
+chrome bug, already tracked below, remains real). **No action, CD-side or non-blocking:** chrome/
+background fidelity (CD's own art priority); rich-text-run flattening (accepted, tracked as A3);
+merchant-specific pagination is built, but the GENERIC container overflow/scroll model CD asked for
+doesn't exist as a primitive — low-priority engine debt, nothing currently blocked on it.
+**‼ NEW HIGH-PRIORITY ENGINE BUG surfaced by this pass — invCard/loadoutCard/invTab states (§6e):**
+CD's B5 (family keys) and B6 (vocabulary rename + hover variants) are BOTH fully LANDED in
+`layout.json` — verified: `invCard`/`loadoutCard`/`invTab` templates all carry `states.family` +
+the locked vocabulary (`equipped`/`disabled`/`equippable`/`locked`) + `hover` overlays
+(`layout.json` ~7996/8108/8434). But `Game1.ManifestRenderer.cs`'s `InvCardState()` (~line 922)
+still RETURNS THE OLD VOCABULARY (`equipped`/`dropped`/`ready`/`neutral`) — only `"equipped"`
+still matches a manifest key; `disabled`/`equippable`/`locked` never resolve, so those three states
+silently fall back to base template chrome (the exact bug B5 was meant to fix, reintroduced by a
+stale string literal). **Separately, `invTab` never resolves AT ALL:** the generic family-less
+fallback (`DrawManifestList` ~line 677-684) only recognizes templates whose `states` object has a
+literal `"slotted"` or `"equipped"` property — `invTab`'s states (`active`/`idle`/`hover`) match
+neither, so tab active/idle highlighting never fires; tabs draw base chrome only, and the hover
+brighten stopgap (line 687-691) only covers `inventory.activeTab.items`, not the tab bar itself.
+**Fix (pure engine, no CD ask — the manifest is correct):** (1) rewrite `InvCardState()`'s return
+values to the locked vocabulary; (2) either add an explicit `"invTab" => i == _invTab ? "active" :
+"idle"` case to the family switch (~line 660-676, alongside pickerCard/actionCard), or extend the
+generic fallback to read `active`/`idle` from datum context — the family switch is cleaner since
+invTab's index-vs-active-tab check doesn't need per-datum inspection. Fold into the next Equipment
+pass; this is a real regression against §6e's locked states, not a placeholder.
+**Outbox update:** B5 and B6 marked confirm-to-close in `outputs/CLAUDE_DESIGN_issues.md` (CD
+delivered; thank them, clear from CD's dev memory) — the follow-up above is ours, not relayed.
+**Item 27 reminder reconfirmed unchanged:** NewGame stat-block tuning session still pending
+(don't adopt design/05 v2 numbers); §13 aspect-fill already DONE (STATUS 691-696) — no action.
+
 ## ⇒ NEW LOCK (2026-07-03, Doug): merchant presence-roll weights, DESIGN_SPEC §12
 Doug: keep the RANDOMIZED per-category stocking (don't flatten to "always show all 5" for the POC) —
 "the advanced prototype" already IS `MerchantStock.cs`'s existing weighted-roll shape, just locked
@@ -224,7 +259,11 @@ interpreter, no per-weapon classes):**
    sword/axe/dagger/bow ids kept on tier-1 pieces — gear sprites for the rest ride B2);
    STR armor renamed to the material ladder (prestige names §18-dropped); `Armor.Requirement`
    per-tier gates live in Body.Equip/Gearing + the Equipment card LOCKED state. Shield objects
-   still deferred (CON gate never dictated). Timer/wand/offhand CONSUMERS = slices 2-4.
+   still deferred (CON gate never dictated). GEAR-CATALOG JOIN (2026-07-03 loop, 329 tests):
+   weapon/armor ids RENAMED to the CD sprite convention (longsword_iron, armor_dex_head_plain...)
+   so sprites/gear/{id} resolves mapping-free; contract test pins the join (bows exempt — no bow
+   art shipped, Needs-CD B11); merchant/inventory rows read canon record Names (catalog display
+   names DRIFTED from §6c — Needs-CD B10). Wand/offhand CONSUMERS = slices 3-4.
 2. ~~Timer-multiplier~~ DONE (2026-07-03 loop, 327 tests: EffectiveCooldown scales by the
    consulted weapons' AVERAGE timer on top of DEX haste — both knobs on one counter, balance-pass
    tunes the interaction; self-contained techniques untouched).

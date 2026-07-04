@@ -12,6 +12,11 @@ memory. B9 is FOLDED into B2-GO (it was scoping for a batch that was on hold; th
 
 ## Confirm-to-close (no action — just clear your memory)
 B0 ✅ · B0b ✅ · B1a ✅ · B3 ✅ landed in the evening drop. B9 → merged into B2-GO below.
+**B5 ✅ · B6 ✅ (2026-07-03, reconciled against your latest memory dump):** verified in `layout.json`
+— `invCard`/`loadoutCard`/`invTab` all carry `states.family`, the locked §6e vocabulary
+(`equipped`/`disabled`/`equippable`/`locked`), and `hover` overlays. Thank you — both fully landed,
+clear them from your dev memory. (The follow-up work is ours: our own renderer had a stale string
+literal from before the rename — not a CD ask, nothing more needed from your side on this.)
 
 ## Open
 B1b. **Add a key-set diff (screens/templates vs the previous manifest) to your pre-ship audit** so a
@@ -47,22 +52,6 @@ B4. **"open Equipment" button elements missing on Encounter + CampaignMap** (lon
     every non-Equipment screen offers the Equipment entry; Encounter's is DISABLED in combat.
     CityMap already has `nav.equipment`; please author the same element (+ disabled state for
     Encounter) on the other two screens.
-B5. **Equipment card state families never fire engine-side: no `family` key.** `invCard` authors
-    the four border states we need (`equipped`=good/green, `ready`=plain, `dropped`=lockRed,
-    `neutral`=dim) and `loadoutCard` authors `slotted`/`empty` — but neither carries a
-    `states.family` key (compare `raceCard`/`coreCard`/`techCard`, which do), so the engine's
-    family→state resolution skips them and inv cards draw base chrome only. Ask: add `family`
-    keys (e.g. `"invCard"`, `"loadoutCard"`). Also flagging a probable naming/semantics pass
-    after Doug's equipment-states design session locks the mapping (e.g. `dropped`→`disabled`);
-    hold renames until we send the locked table.
-
-B6. **Equipment card-state semantics are LOCKED (DESIGN_SPEC §6e) — two asks, still open after the
-    evening drop:** (a) rename the invCard states to the locked vocabulary — `dropped`→`disabled`,
-    `ready`→`equippable`, `neutral`→`locked` (engine chases the rename, clean, no shims);
-    (b) author HOVER variants for `invCard`/`loadoutCard`/`invTab` (brighten treatment,
-    raceCard-style) — equipment authors no hover today; our generic brighten stopgap holds until
-    yours lands. (The former (c) — no-disabled-variants + ranged back-mount — now lives in B2-GO.)
-
 B7. **raceCard head portrait imageBind likely landed on the wrong element (causes a stretched-head
     render, not the ghost-double we thought we'd fixed).** `raceCard` has two overlapping parts for
     the headshot: rect `[1,1,53,77]` (portrait, aspect 0.69, gradient fill + right border — reads
@@ -85,6 +74,18 @@ B8. **CityMap beacon-graph nodes have no CD-authored hover or current-position t
     Doug locks the design: (a) author real hover/current states for the CityMap beacon nodes (not
     just the CampaignMap spine); (b) tell us what `glow:true` should actually look like (steady glow?
     pulse rate?) so we can build the primitive once and wire both screens to it.
+
+B10. **Gear catalog display-name drift vs the §6c canon (engine uses the spec names; your
+    catalog names are display-only today, but fix before anything binds them):** DEX head reads
+    "Leather Leather Cap"/"Hardened Leather Cap"/... (canon: Leather Cap → Hardened Cap →
+    Studded Cap → Reinforced Hood); DEX chest "Leather Leather Armor"... (canon: Padded Armor →
+    Leather Armor → Studded Leather → Reinforced Leather); INT head "Cotton/Silk/Ornate/Humming
+    Hood" (canon: Cloth Cap → Silk Hood → Ornate Circlet → Humming Circlet). Sprite IDS are fine —
+    the engine adopted them as gear ids (armor_dex_head_plain etc.); only the `name` fields drift.
+B11. **Bow sprites missing from the gear batch:** the catalog + sprite set covers every ladder
+    EXCEPT bows (Short/Long/Compound/Elven — §6d ranged slot). The old sprites/gear/bow.png
+    covers nothing in the new convention. Ask: 4 bow sprites (bow_short, bow_long, bow_compound,
+    bow_elven) + catalog rows; engine ids will chase.
 
 ## Standing FYIs (for context — not action items)
 - **Tier ladders for the new families** (for card copy / labels): Sling Shepherd's → Braided →

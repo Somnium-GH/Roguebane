@@ -1139,10 +1139,10 @@ public partial class Game1
             var list = wares.ToList();
             if (list.Count > 0) s.Add(new MerchantSection(label, list));
         }
-        Add("WEAPONS", Exp.OfferedWeapons.Select(w => new Ware("WPN", DisplayName(w.Id),
+        Add("WEAPONS", Exp.OfferedWeapons.Select(w => new Ware("WPN", w.Name is { Length: > 0 } ? w.Name : DisplayName(w.Id),
             w.Stat.ToString().ToUpperInvariant() + " " + w.Reserve, "",
             Roguebane.Core.Expedition.Price(w) + "g", "BUY", w)));
-        Add("ARMOR", Exp.OfferedArmor.Select(a => new Ware("ARM", DisplayName(a.Id),
+        Add("ARMOR", Exp.OfferedArmor.Select(a => new Ware("ARM", a.Name,
             a.Line.ToString().ToUpperInvariant() + " T" + a.Tier, "",
             Roguebane.Core.Expedition.Price(a) + "g", "BUY", a)));
         Add("TECHNIQUES", Exp.OfferedTechniques.Select(t => new Ware("TEC", DisplayName(t.Id),
@@ -1471,14 +1471,14 @@ public partial class Game1
         },
         Roguebane.Core.Weapon w => bind switch
         {
-            "invItems.name" or "gear.name" => DisplayName(w.Id),
+            "invItems.name" or "gear.name" => w.Name is { Length: > 0 } ? w.Name : DisplayName(w.Id),
             "invItems.badgeLabel" => w.Stat.ToString().ToUpperInvariant(),
             "invItems.badgeNum" => w.Reserve.ToString(),
             _ => null,
         },
         Roguebane.Core.Armor ar => bind switch
         {
-            "invItems.name" or "gear.name" => DisplayName(ar.Id),
+            "invItems.name" or "gear.name" => ar.Name,
             "invItems.badgeLabel" => ar.Governing.ToString().ToUpperInvariant(),
             "invItems.badgeNum" => ar.Tier.ToString(),
             _ => null,
