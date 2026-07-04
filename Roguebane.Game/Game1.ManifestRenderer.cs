@@ -788,6 +788,7 @@ public partial class Game1
                         {
                             var wx = pp.Rect.X + wi * (wc.Size[0] + WareGap);
                             if (wx + wc.Size[0] > pp.Rect.X + pp.Rect.W + 1) break;
+                            DrawTemplateRootChrome(wc, new LayoutRect(wx, pp.Rect.Y, wc.Size[0], wc.Size[1]), ws.Wares[wi]);
                             foreach (var wp in CardTemplate.Place(wc, wx, pp.Rect.Y))
                                 DrawWarePart(wp, ws.Wares[wi]);
                         }
