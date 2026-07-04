@@ -953,16 +953,16 @@ public partial class Game1
     private string? InvCardState(object? datum) => datum switch
     {
         Roguebane.Core.Weapon w when InRun && Exp.Player.Body.Ranged == w =>
-            Exp.Player.Body.RangedUsable ? "equipped" : "disabled",
+            Exp.Player.Body.RangedGearOnlyUsable ? "equipped" : "disabled",
         Roguebane.Core.Weapon w when InRun && Exp.Player.Body.Hands.Contains(w) =>
-            Exp.Player.Body.HandItemUsable(
+            Exp.Player.Body.HandItemGearOnlyUsable(
                 Exp.Player.Body.Hands.ToList().IndexOf(w)) ? "equipped" : "disabled",
         Roguebane.Core.Weapon w when InRun =>
             Exp.Player.Body.Hands.Count < 2 && Exp.Player.Body.Capacity(w.Stat) >= w.Reserve
                 ? "equippable" : "locked",
         Roguebane.Core.Weapon => "locked", // pre-run: no body to lift it yet
         Roguebane.Core.Armor a when InRun && Exp.Player.Body.ArmorOn(a.Slot) == a =>
-            Exp.Player.Body.ArmorSustained(a) ? "equipped" : "disabled",
+            Exp.Player.Body.ArmorGearOnlySustained(a) ? "equipped" : "disabled",
         Roguebane.Core.Armor ar2 => InRun
             && Exp.Player.Body.Capacity(ar2.Governing) >= ar2.Requirement ? "equippable" : "locked",
         Roguebane.Core.Technique t when (InRun ? Exp.Equipment : _build.Equipment).Contains(t)

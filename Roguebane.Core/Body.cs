@@ -53,7 +53,7 @@ public sealed class Body
     // DISABLE CASCADE (§17 #16): when gear's combined reserve exceeds what's left of the pool after
     // techniques take their share, items disable highest-requirement-first, ties last-equipped-first
     // — a pure ranking over current attr level, so healing re-enables cheapest-first automatically.
-    private GearDisable DisabledGear(Stat stat)
+    private GearDisable DisabledGear(Stat stat, int? techReservedOverride = null)
     {
         var candidates = new List<GearCandidate>();
         for (var i = 0; i < _hands.Count; i++)
@@ -64,7 +64,7 @@ public sealed class Body
             if (piece.Governing == stat)
                 candidates.Add(new GearCandidate("armor", piece.Requirement, _armorSeq[slot], -1, slot));
 
-        var pool = Math.Max(0, Capacity(stat) - TechReserved(stat));
+        var pool = Math.Max(0, Capacity(stat) - (techReservedOverride ?? TechReserved(stat)));
         var remaining = candidates.Sum(c => c.Reserve);
         var hands = new HashSet<int>();
         var armor = new HashSet<Stat>();
@@ -231,6 +231,21 @@ public sealed class Body
     // still cover its Requirement, after techniques + higher-ranked gear take their share (SUSTAIN
     // MODEL, DISABLE CASCADE — see DisabledGear).
     public bool ArmorSustained(Armor piece) => !DisabledGear(piece.Governing).Armor.Contains(piece.Slot);
+
+    // Reservation timing [DESIGN_SPEC lock 2026-07-04]: techniques reserve attributes only on
+    // in-combat ACTIVATION, never for sitting equipped — so the Equipment screen must read gear
+    // sustain against the GEAR-ONLY pool, ignoring whatever's still active from the last fight.
+    // The real (TechReserved-inclusive) checks above stay untouched for actual combat resolution.
+    public bool RangedGearOnlyUsable => _ranged is { } r
+        && !DisabledGear(r.Stat, techReservedOverride: 0).Ranged
+        && (r.Kind == WeaponKind.Bow ? HandUsable(0) && HandUsable(1)
+                                     : HandUsable(0) || HandUsable(1));
+
+    public bool HandItemGearOnlyUsable(int i) => i < _hands.Count
+        && HandUsable(i) && !DisabledGear(_hands[i].Stat, techReservedOverride: 0).Hands.Contains(i);
+
+    public bool ArmorGearOnlySustained(Armor piece) =>
+        !DisabledGear(piece.Governing, techReservedOverride: 0).Armor.Contains(piece.Slot);
 
     // §6c INT robe: +2 spell damage per worn sustained robe piece, capped at TWO pieces
     // (robe + hat — the line only authors those slots, the cap keeps that true under tuning).

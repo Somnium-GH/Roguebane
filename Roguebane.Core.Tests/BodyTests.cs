@@ -90,4 +90,48 @@ public class BodyTests
         var body = Build(out _, out _);
         Assert.Equal(8 + 6 / 4, body.AttackPower); // 8 + 1 = 9, integer quarter-units
     }
+
+    // Reservation timing [DESIGN_SPEC lock 2026-07-04]: a technique left active from a finished
+    // fight (nothing deactivates it between encounters) must NOT leak into the Equipment screen's
+    // gear-usability read — only the real (combat-time) checks see TechReserved.
+    [Fact]
+    public void GearOnlyChecksIgnoreLingeringTechniqueReservation()
+    {
+        var body = Build(out _, out _); // STR 8
+        // Wield gates on raw Capacity only (SUSTAIN MODEL: equip-time gate is separate from ongoing
+        // sustain) — so activate the technique FIRST, then wield a piece the shared pool can't cover.
+        var stance = new Active("stance", Stat.Str, 5);
+        Assert.True(body.Activate(stance));
+        Assert.True(body.Wield(new Weapon("sword", Stat.Str, 6, Power: 1))); // 5 + 6 = 11 > STR 8
+
+        Assert.False(body.HandItemUsable(0));       // real check: sword sheds under the tech's draw
+        Assert.True(body.HandItemGearOnlyUsable(0)); // Equipment screen: sword alone fits STR 8
+    }
+
+    [Fact]
+    public void RangedGearOnlyUsableIgnoresLingeringTechniqueReservation()
+    {
+        var body = new Body();
+        body.Add(new BodyPart("leg-l", Stat.Dex, 4));
+        body.Add(new BodyPart("leg-r", Stat.Dex, 4));
+        var stance = new Active("stance", Stat.Dex, 5);
+        Assert.True(body.Activate(stance));
+        Assert.True(body.EquipRanged(new Weapon("bow", Stat.Dex, 7, Power: 1, Kind: WeaponKind.Bow))); // 5 + 7 = 12 > DEX 8
+
+        Assert.False(body.RangedUsable);
+        Assert.True(body.RangedGearOnlyUsable);
+    }
+
+    [Fact]
+    public void ArmorGearOnlySustainedIgnoresLingeringTechniqueReservation()
+    {
+        var body = Build(out _, out _); // STR 8
+        var plate = Content.ArmorLines.PlateLegs[1]; // Str-governed, Requirement 4
+        var stance = new Active("stance", Stat.Str, 5);
+        Assert.True(body.Activate(stance));
+        Assert.True(body.Equip(plate)); // 5 + 4 = 9 > STR 8
+
+        Assert.False(body.ArmorSustained(plate));
+        Assert.True(body.ArmorGearOnlySustained(plate));
+    }
 }
