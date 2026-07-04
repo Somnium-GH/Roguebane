@@ -1,5 +1,24 @@
 # Status
 
+## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-03, Doug — Equipment identity block, bays/actions/budget)
+Doug's screenshot (Elf Summoner) shows BAYS and ACTIONS crammed onto the same line and BUDGET
+orphaned alone on the next — not three clean stacked rows. **ROOT CAUSE FOUND in the manifest data,
+not engine math** — traced `ListLayout.Cells` (`Roguebane.Core/Layout/ListLayout.cs`, pure/tested,
+behaving exactly per its documented grid contract: wraps left→right then top→bottom, columns fit by
+region width) against the actual authored element. Equipment's `coreStats` list element (bind
+`core.stats`, 3 items: bays/actions/budget) is authored `"flow":"grid", "cols":2, "size":[131,16]`
+with its row template (`coreStatRow`) at `size:[62,7]`, `gap:2`. Region width 131 fits floor(133/64)=2
+columns — so item 0 (bays) lands col0/row0, item 1 (actions) lands col1/row0 (**same row as bays**),
+item 2 (budget) lands col0/row1 alone. (Note: the authored `"cols":2` hint isn't even read by
+`ListLayout.Cells` — it derives column count itself from region width — so it's redundant with, not
+the cause of, the 2-col wrap; removing it alone won't fix anything.) **This is a CD data-authoring
+mismatch, not an engine bug** — a 3-item label/value list wants a single-column vertical stack (e.g.
+`flow:"vertical"`, container sized ~`[62,25]` for 3 rows of 7px + 2 gaps), not a 2-col grid sized for
+4 cells. Logged to CD (`outputs/CLAUDE_DESIGN_issues.md` B3) for the generator-side fix since
+layout.json is regenerated externally and a local hand-patch here would just get clobbered on the
+next drop. **Not a queue-jump — HiFi bugs stay flagged top-of-queue per standing rule, fold into the
+next pass/drop that touches Equipment's identity block.**
+
 ## ✅ ANSWERED (2026-07-03 loop, same day — all three HiFi items below)
 1. **Ghost head — FIXED:** the P0-C.9 unbound-filler rule now covers Race datums' STATIC-IMAGE
 parts — the leftover human_grunt head mock no longer draws under the live `race.headImage`

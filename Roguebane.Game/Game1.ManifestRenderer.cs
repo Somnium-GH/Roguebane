@@ -671,6 +671,12 @@ public partial class Game1
                         }),
                     _ => null,
                 };
+            // Inventory cards (design/02, §6/§6c lock): green only when EQUIPPED; the plain
+            // `neutral` border is the normal unequipped treatment; RED (`dropped`) marks worn
+            // armor whose part-group can no longer sustain it (broken = the piece shed its
+            // effect but stays assigned). No family key in the data — keyed by the bind.
+            else if (e.Binds == "inventory.activeTab.items")
+                rootState = InvCardState(datum);
             DrawTemplateRootChrome(tmpl, cell, datum, rootState);
             // Positional binds repeat the SAME bind N times per card (attr tiles 4x, attr-bar pips 12x,
             // in template order); count each occurrence per card to pick the right datum slice.
@@ -894,6 +900,24 @@ public partial class Game1
         }
     }
 
+    // The invCard root-chrome state for an inventory datum (design/02, §6/§6c): equipped = green,
+    // unequipped = the plain neutral border, RED (dropped) = worn armor whose part-group broke —
+    // its effect is shed but the piece stays assigned for re-equip. Weapon arm-broken lockout
+    // joins when the §6d wield model builds (queued; don't invent its rules here).
+    private string InvCardState(object? datum) => datum switch
+    {
+        Roguebane.Core.Weapon w => InRun && Exp.Player.Body.Hands.Contains(w) ? "equipped" : "neutral",
+        Roguebane.Core.Armor a when InRun && Exp.Player.Body.ArmorOn(a.Group) == a =>
+            Exp.Player.Body.Capacity(a.Group) == 0 ? "dropped" : "equipped",
+        Roguebane.Core.Armor => "neutral",
+        Roguebane.Core.Technique t =>
+            (InRun ? Exp.Equipment : _build.Equipment).Contains(t) ? "equipped" : "neutral",
+        Roguebane.Core.Minion m => (InRun
+            ? Exp.Minions.Contains(m)
+            : _build.CoreRune.MinionKit.Contains(m)) ? "equipped" : "neutral",
+        _ => null,
+    };
+
     // How many technique cards precede the bay lane on the action bar (hotkey numbering).
     private int TechniqueCount() => (InRun ? Exp.Equipment : _build.Equipment).Count;
 
@@ -929,6 +953,10 @@ public partial class Game1
         {
             0 => InRun
                 ? Exp.Player.Body.Hands.Cast<object>()
+                    // Worn armor lives on the BODY (Gearing moves it out of the pack) — list it or
+                    // the equipped/RED card states have nothing to mark (design/02 shows worn gear).
+                    .Concat(new[] { Stat.Str, Stat.Int, Stat.Dex, Stat.Con }
+                        .Select(s => (object?)Exp.Player.Body.ArmorOn(s)).OfType<object>())
                     .Concat(Exp.Stash.Weapons).Concat(Exp.Stash.Armor).ToList()
                 : new List<object>(),
             // §12: bought techniques/minions join the pool the Equipment screen slots from.

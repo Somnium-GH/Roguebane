@@ -4,6 +4,10 @@ addendum A1–A4 all verified LANDED across the two 2026-07-03 drops. Clear them
 memory. History lives in git (`git log -- outputs/CLAUDE_DESIGN_issues.md`). This file always
 holds ONLY the open items._
 
+**SENT to CD 2026-07-03 (Doug relayed this exact batch: B0, B0b, B1, B2, B3, B4, B5).** Sending is
+NOT the close signal — per process, an item only clears once it's verified LANDED in the repo (send
+confirmations drift). Anything added to this file AFTER this note was not part of that relay.
+
 ## Open
 B0. **resourceStrip still clips SUMMONS on citymap + equipment** (encounter is FIXED by your
     uniform-chip pass: 203 = 4x47 + 3x5 gap, all four seat — verified on the gate shot). The other
@@ -29,6 +33,28 @@ B2. **HOLD for the next figure-art batch (don't do solo — ride it with the wea
     naming locks, this batch needs to regenerate figure art across the full **race × core rune ×
     equipment** permutation set anyway (new wield/armor system, DESIGN_SPEC §6/§6c/§6d) — fix this
     positioning in that same pass rather than a one-off patch now.
+B3. **Equipment `coreStats` list (bays/actions/budget) authored as a 2-col grid, wraps wrong:**
+    element size `[131,16]` + `item: {flow:"grid", cols:2, size:[62,7], gap:2}` fits 2 columns at
+    that width, so a 3-item list wraps: bays+actions share one row, budget lands alone on the next
+    (live screenshot, Elf Summoner). This reads as a single label:value stat column elsewhere in the
+    design (bays / actions / budget stacked) — please re-author as a single-column vertical list
+    (e.g. `flow:"vertical"`, container ~`[62,25]` for 3 rows) rather than a 2-col grid sized for 4
+    cells. (FYI: our engine's list layout derives column count from region width and ignores an
+    authored `cols` hint, so `cols:2` alone isn't the fix — the size/flow combo is.)
+
+B4. **"open Equipment" button elements missing on Encounter + CampaignMap** (long-standing STATUS
+    Debt line, never made a payload — housekeeping catch 2026-07-03). Design intent (locked flow):
+    every non-Equipment screen offers the Equipment entry; Encounter's is DISABLED in combat.
+    CityMap already has `nav.equipment`; please author the same element (+ disabled state for
+    Encounter) on the other two screens.
+B5. **Equipment card state families never fire engine-side: no `family` key.** `invCard` authors
+    the four border states we need (`equipped`=good/green, `ready`=plain, `dropped`=lockRed,
+    `neutral`=dim) and `loadoutCard` authors `slotted`/`empty` — but neither carries a
+    `states.family` key (compare `raceCard`/`coreCard`/`techCard`, which do), so the engine's
+    family→state resolution skips them and inv cards draw base chrome only. Ask: add `family`
+    keys (e.g. `"invCard"`, `"loadoutCard"`). Also flagging a probable naming/semantics pass
+    after Doug's equipment-states design session locks the mapping (e.g. `dropped`→`disabled`);
+    hold renames until we send the locked table.
 
 ## Standing FYIs (unchanged, for context — not action items)
 - design/05 v2 STAT BLOCKS are not adopted; Doug will run a live tuning session — if a future 05
