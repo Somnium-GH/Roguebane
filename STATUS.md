@@ -1312,11 +1312,20 @@ QUEUE worn-armor item below is UPDATED to this convention.**
   THEMED override (favored-line lookup, §7a) are the remaining half of this slice. My prior
   (uncommitted) `Game1.cs`/`WornArmorBinding.cs` pass, built against the line-first overlay draft
   before CORRECTION #3 landed, was reverted rather than salvaged — different sprite model entirely.
-- `Minion` gains a `Timer` field; `Caster.Step()` fires minions on their own countdown instead of every
-  tick / piggybacked on the caster's front-target check. Retune Skeleton (Timer 25/Power 1), add Golem
-  (Timer 100/Power 4/Reserve 3) + Hound (Timer 40/Power 1/Reserve 1, DEX) per §9. Confirm Shade retire
-  with Doug before deleting (recommended, not decided). Adept's kit now fields a Skeleton (§7a); Ranger's
-  Hound and Summoner's Golem wait on this slice landing.
+- **Minion Timer cadence [DONE 2026-07-04 loop, 349 tests]**: `Minion` gained a required `Timer` field
+  (ticks between discharges, same unit as `Technique.Cooldown`). `Caster.Step()` now decrements a
+  per-bay `_minionCountdown` unconditionally every Step (mirrors the existing `Run.Countdown` technique
+  pattern — keeps charging while idle) and only discharges + resets to `Timer` when it hits zero AND
+  the gate is live AND the front is up; Summon seeds the countdown, Dismiss clears it. Content: Skeleton
+  retuned (Timer 25/Power 1, unchanged DPS), new Golem (Timer 100/Power 4/Reserve 3, replaces Shade's
+  slow/strong role) and Hound (Timer 40/Power 1/Reserve 1 DEX, deliberately weakest per-reserve-point —
+  DEX is utility/evasion not DPS, per §9). Shade kept defined (still the Conclave keystone Mark's
+  reward, `Paths.cs`) but dropped from `Minions.All` so it no longer surfaces in merchant stock —
+  **confirm retirement of the field entirely with Doug before deleting**, since it's genuinely used
+  outside the starting-kit path now. Wired into content: Summoner's kit is now Skeleton+Golem (Shade
+  removed), Ranger gained `Bays: 1` + a Hound (its kit was `Bays: 0` with no pet slot despite §7a's
+  locked "Hound ×1" table entry — closing that gap, not inventing new design, since the pet itself was
+  already locked content).
 - `tools/geometry_diff.py`/textgeom: ink-bbox measurement switch (item 3 above).
 - Retire `Shops.cs` legacy fixed-stock fields — CORRECTION (2026-07-04 loop): checked actual usage —
   `Shops.Plate`/`Shops.Hide`/`Shops.ArmorPool` are all still live (tests, `Expedition.cs`, `Game1.cs`

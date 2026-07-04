@@ -14,13 +14,18 @@ public class MinionTests
     }
 
     [Fact]
-    public void AMinionAutoFiresOnTheFront()
+    public void AMinionAutoFiresOnItsOwnTimerNotEveryTick()
     {
+        // §9 [RESOLVED 2026-07-04]: a minion charges to its OWN Timer before its first discharge,
+        // same as a Timered technique — never on every combat tick.
         var foe = new Foe("front", 100);
         var caster = new Caster(IntBody(9), foe);
-        Assert.True(caster.Summon(Minions.Skeleton, bayCap: 3)); // power 1
+        Assert.True(caster.Summon(Minions.Skeleton, bayCap: 3)); // power 1, Timer 25
 
-        caster.Step();
+        for (var i = 0; i < Minions.Skeleton.Timer - 1; i++) caster.Step();
+        Assert.Equal(100, foe.Hp); // still charging
+
+        caster.Step(); // the 25th tick -> discharge
         Assert.Equal(99, foe.Hp);
     }
 
@@ -54,12 +59,16 @@ public class MinionTests
 
         var head = body.Parts.Single();
         body.Damage(head, 2);                    // drain INT -> the reservation cascades off
-        caster.Step();
+        caster.Step();                           // countdown keeps ticking in the background while idle
         Assert.Equal(1, caster.MinionCount);     // still SUMMONED (idle), not dismissed
         Assert.Equal(100, foe.Hp);               // but silent while idle
 
         body.Repair(head, 2);                    // stat recovers
-        caster.Step();                           // free re-raise (no Summons left, none needed) + fires
+        // free re-raise (no Summons left, none needed); the countdown that kept ticking while idle
+        // (Timer - 2 steps so far) must still run out before the first post-recovery discharge.
+        for (var i = 0; i < Minions.Skeleton.Timer - 2; i++) caster.Step();
+        Assert.Equal(100, foe.Hp);               // still charging
+        caster.Step();
         Assert.Equal(99, foe.Hp);                // firing again
     }
 
@@ -90,7 +99,7 @@ public class MinionTests
         var body = IntBody(0); // no INT at all
         var foe = new Foe("front", 100);
         var caster = new Caster(body, foe);
-        var retinue = new Minion("retinue", Stat.Int, 0, 1, MinionGate.None);
+        var retinue = new Minion("retinue", Stat.Int, 0, 1, Timer: 1, Gate: MinionGate.None);
 
         Assert.True(caster.Summon(retinue, bayCap: 3)); // ungated -> succeeds with zero INT
         body.Damage(body.Parts[0], 5);                  // drain does nothing it depends on
@@ -132,7 +141,7 @@ public class MinionTests
         // Charge untouched (its real HP/stat cost is TBD until an alt-cost minion is authored).
         var body = IntBody(0);            // no INT to reserve
         var caster = new Caster(body, null, maxCharge: 3);
-        var imp = new Minion("imp", Stat.Int, 0, 1, MinionGate.AltCost, AltCost: 2);
+        var imp = new Minion("imp", Stat.Int, 0, 1, Timer: 1, Gate: MinionGate.AltCost, AltCost: 2);
 
         Assert.True(caster.Summon(imp, bayCap: 3)); // succeeds without a stat reservation
         Assert.Equal(3, caster.Charge);             // Charge untouched

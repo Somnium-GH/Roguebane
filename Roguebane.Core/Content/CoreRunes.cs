@@ -67,7 +67,7 @@ public static class CoreRunes
         DefaultEquipment: new[] { Techniques.Ember, Techniques.Brace, Techniques.Bandage },
         DefaultWeapons: new[] { Armory.Wands[0], Armory.Charms[0] }, // Adept Wand + Wooden Charm
         DefaultArmor: RobeKitT1,
-        DefaultMinions: new[] { Minions.Skeleton, Minions.Shade }, // a Binder fields summons from the off
+        DefaultMinions: new[] { Minions.Skeleton, Minions.Golem }, // a Binder fields summons from the off (§9: Golem replaces Shade's role)
         Archetype: "THE BINDER",
         Flavor: "Three bays - fights through a war-party of summons while staying back. INT funds them all.",
         Badge: "SPECIALIST",
@@ -98,10 +98,11 @@ public static class CoreRunes
         "ranger",
         RuneBudget: 12,
         RuneDiscount: 0,
-        Bays: 0,
+        Bays: 1, // one bay for its DEX-gated Hound pet (§7a kit table)
         DefaultEquipment: new[] { Armory.Shot, Techniques.Lunge, Techniques.Brace, Techniques.Bandage },
         DefaultWeapons: new[] { Armory.ShortSwords[0], Armory.Bow }, // Iron Short Sword + Short Bow
         DefaultArmor: LeatherKitT1,
+        DefaultMinions: new[] { Minions.Hound }, // §7a: the Marksman's tracker pet
         Archetype: "THE MARKSMAN",
         Flavor: "Strikes from range with a shield-piercing bow; high DEX, thin armour - answers first.",
         Badge: "SPECIALIST",

@@ -25,6 +25,7 @@ public sealed class Caster
     private ICombatTarget? _default;
     private readonly SortedDictionary<string, Run> _active = new(StringComparer.Ordinal);
     private readonly SortedDictionary<string, Minion> _bays = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, int> _minionCountdown = new();
 
     public int Tick { get; private set; }
 
@@ -239,12 +240,14 @@ public sealed class Caster
         }
         SummonsLeft--;
         _bays[minion.Id] = minion;
+        _minionCountdown[minion.Id] = minion.Timer; // fresh summon starts charging, same as a technique
         return true;
     }
 
     public void Dismiss(Minion minion)
     {
         if (!_bays.Remove(minion.Id)) return;
+        _minionCountdown.Remove(minion.Id);
         if (minion.Gate == MinionGate.Stat) _self.Deactivate(Reservation(minion)); // free the stat
     }
 
@@ -273,14 +276,24 @@ public sealed class Caster
             }
         }
 
-        // Minions auto-fire on whatever the caster is pressing (the default front); an IDLE minion
-        // (gate stat drained, §9) holds its bay but stays silent until the stat recovers.
-        if (_default is { Down: false })
-            foreach (var minion in _bays.Values)
-                if (minion.Gate != MinionGate.Stat || _self.IsActive(Reservation(minion)))
-                    // §6d charm offhand: +0.1x MINION attack damage per tier of the held charm.
-                    Hit(_default, null, (int)Math.Round(
-                        minion.Power * _self.CharmMinionMult, MidpointRounding.AwayFromZero));
+        // §9 [RESOLVED 2026-07-04]: a minion fires on its OWN Timer, not every combat tick / piggybacked
+        // on the caster's front-target check. The countdown ticks unconditionally each Step (same as a
+        // Timered technique's Run.Countdown) so an idle minion (gate stat drained) keeps charging in the
+        // background; only the actual discharge is gated on being active + a live front.
+        foreach (var minion in _bays.Values)
+        {
+            var countdown = _minionCountdown.GetValueOrDefault(minion.Id, minion.Timer);
+            if (countdown > 0) countdown--;
+            var canFire = minion.Gate != MinionGate.Stat || _self.IsActive(Reservation(minion));
+            if (countdown <= 0 && canFire && _default is { Down: false })
+            {
+                // §6d charm offhand: +0.1x MINION attack damage per tier of the held charm.
+                Hit(_default, null, (int)Math.Round(
+                    minion.Power * _self.CharmMinionMult, MidpointRounding.AwayFromZero));
+                countdown = minion.Timer;
+            }
+            _minionCountdown[minion.Id] = countdown;
+        }
     }
 
     // Resolve a technique's aim and land one discharge: hits its own foe (and PART) while that foe

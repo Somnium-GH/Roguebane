@@ -11,11 +11,13 @@ namespace Roguebane.Core;
 public enum MinionGate { Stat, None, AltCost }
 
 // A minion occupies a BAY (not an action-bar slot). Its GATE decides what summoning costs; while
-// powered it auto-fires on whatever the caster is pressing. AltCost holds the (designed, non-Charge)
-// alt cost amount. Minion VARIETY (re-gating onto STR/DEX/CON) rides on this Gate field now.
+// powered it fires on its own TIMER (ticks between discharges, same unit as a Technique's Cooldown —
+// §9, 2026-07-04) instead of every combat tick. AltCost holds the (designed, non-Charge) alt cost
+// amount. Minion VARIETY (re-gating onto STR/DEX/CON) rides on the Gate field.
 public sealed record Minion(
-    string Id, Stat Stat, int Reserve, int Power, MinionGate Gate = MinionGate.Stat, int AltCost = 0,
-    string Desc = "") // DISPLAY-ONLY card copy (design/01); {power} resolves from the data at render.
+    string Id, Stat Stat, int Reserve, int Power, int Timer,
+    MinionGate Gate = MinionGate.Stat, int AltCost = 0,
+    string Desc = "") // DISPLAY-ONLY card copy (design/01); {power}/{timer} resolve from data at render.
 {
-    public string DescText => Desc.Replace("{power}", Power.ToString());
+    public string DescText => Desc.Replace("{power}", Power.ToString()).Replace("{timer}", Timer.ToString());
 }
