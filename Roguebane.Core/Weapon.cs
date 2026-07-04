@@ -10,7 +10,27 @@ public enum WeaponUse
     Both,
 }
 
-// A weapon is a hand-held stat-stick with properties, granting ZERO abilities of its own. Reserve is
-// the stat you need to wield it (and the cost a consulting technique pays to swing it); Power is the
-// damage it lends that technique. Lose the arm that carries the stat and the weapon falls off.
-public sealed record Weapon(string Id, Stat Stat, int Reserve, int Power);
+// What kind of implement a hand item is (§6d roster): melee ladders, the two RANGED-slot families
+// (bow = full shield bypass + Charge; sling = its 1H shield-compatible cousin), and the INT
+// implements (wand = shield-SUBTRACTION hand item; staff = 2H blockable melee; charm/tome =
+// pure-bonus offhands). Kind decides which combat resolution and equip layer the piece uses.
+public enum WeaponKind
+{
+    Melee,
+    Bow,
+    Sling,
+    Wand,
+    Staff,
+    Charm,
+    Tome,
+}
+
+// A weapon is a hand-held stat-stick with properties, granting ZERO abilities of its own. Reserve
+// is the stat you need to wield it (and the cost a consulting technique pays to swing it); Power is
+// the damage it lends that technique. §6d roster identity: Name/Tier ride the material ladder;
+// Timer multiplies the consulting technique's CHARGE timer (<1.0 = faster; dual-wield averages —
+// consumer is its own slice); Hands = 1 or 2 (§6: a 2H needs BOTH arms; a broken arm silences the
+// hand either way).
+public sealed record Weapon(string Id, Stat Stat, int Reserve, int Power,
+    string Name = "", int Tier = 0, double Timer = 1.0, int Hands = 1,
+    WeaponKind Kind = WeaponKind.Melee);

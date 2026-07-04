@@ -218,8 +218,13 @@ sling stat+names locked (DEX 1/t, Shepherd's→Braided→Sinew→Giantsbane).
 placeholder-flagged values fine where content already exists (bow power 2 stays flagged).
 **NEW ENGINE WORK (normal priority order, each slice Core-tested; content is DATA — one
 interpreter, no per-weapon classes):**
-1. Weapon/armor DATA roster per §6c/§6d (36 melee + bows/slings/wands/staffs/charms/tomes + armor
-   ladders w/ material naming) — supersedes the old "Bow + Wand data entries" line in the §6d block.
+1. ~~Weapon/armor DATA roster~~ DONE (2026-07-03 loop, 326 tests): Weapon gains
+   Name/Tier/Timer/Hands/Kind; `Armory` ships all 15 ladders (9 melee ×4 material tiers, bows,
+   slings [dmg placeholders FLAGGED §17 #9], wands, staffs, charms, tomes; legacy
+   sword/axe/dagger/bow ids kept on tier-1 pieces — gear sprites for the rest ride B2);
+   STR armor renamed to the material ladder (prestige names §18-dropped); `Armor.Requirement`
+   per-tier gates live in Body.Equip/Gearing + the Equipment card LOCKED state. Shield objects
+   still deferred (CON gate never dictated). Timer/wand/offhand CONSUMERS = slices 2-4.
 2. Timer-multiplier in the technique charge path (Core; consulting technique reads its gating
    weapon's multiplier; dual = average; cooldowns untouched — DEX haste owns those).
 3. Wand shield-subtraction resolution in combat (damage − standing shield count, pool unconsumed,

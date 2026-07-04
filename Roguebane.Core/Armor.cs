@@ -30,4 +30,13 @@ public sealed record Armor(string Id, string Name, Stat Slot, ArmorLine Line, in
     public int PartMitigation => Line == ArmorLine.Plate ? 2 * Tier : 0; // part-damage soaked
     public int EvadePct => Line == ArmorLine.Leather ? 2 * Tier : 0;     // per worn piece
     public int SpellDamage => Line == ArmorLine.Robe ? 2 : 0;            // per piece, 2-piece cap
+
+    // §6c per-tier equip gate (blessed initial, 2026-07-03) on the GOVERNING attribute:
+    // STR armor 2/t · DEX armor 1/t · Robe (chest) 2 INT/t · Cap/Circlet (head) 1 INT/t.
+    public int Requirement => Line switch
+    {
+        ArmorLine.Plate => 2 * Tier,
+        ArmorLine.Leather => Tier,
+        _ => (Slot == Stat.Con ? 2 : 1) * Tier,
+    };
 }

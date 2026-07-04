@@ -928,7 +928,8 @@ public partial class Game1
         Roguebane.Core.Weapon => "neutral", // pre-run: no body to lift it yet
         Roguebane.Core.Armor a when InRun && Exp.Player.Body.ArmorOn(a.Slot) == a =>
             Exp.Player.Body.ArmorSustained(a) ? "equipped" : "dropped",
-        Roguebane.Core.Armor => "ready", // no attr requirement in Core today (§6c ladders queued)
+        Roguebane.Core.Armor ar2 => InRun
+            && Exp.Player.Body.Capacity(ar2.Governing) >= ar2.Requirement ? "ready" : "neutral",
         Roguebane.Core.Technique t when (InRun ? Exp.Equipment : _build.Equipment).Contains(t)
             => "equipped",
         Roguebane.Core.Technique => (InRun ? Exp.Equipment.Count : _build.Equipment.Count)

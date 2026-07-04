@@ -24,12 +24,13 @@ public static class Gearing
         return true;
     }
 
-    // Wear a carried armor piece. One piece per part-group: any piece it displaces returns to the pack.
+    // Wear a carried armor piece — gated by the body's own §6c requirement check. One piece per
+    // slot: any piece it displaces returns to the pack.
     public static bool EquipArmor(Stash pack, Body body, Armor piece)
     {
         if (!pack.HasArmor(piece)) return false;
         var displaced = body.ArmorOn(piece.Slot);
-        body.Equip(piece);
+        if (!body.Equip(piece)) return false; // requirement unmet -> stays in the pack
         pack.RemoveArmor(piece);
         if (displaced is not null) pack.AddArmor(displaced);
         return true;

@@ -11,15 +11,17 @@ public static class ArmorLines
         names.Select((n, i) => new Armor(
             prefix + "-" + (i + 1), n, slot, line, i + 1)).ToArray();
 
-    // STR — heavy/plate (all four slots).
-    public static readonly IReadOnlyList<Armor> PlateHead =
-        Ladder(ArmorLine.Plate, Stat.Int, "plate-head", "Skull Cap", "Barbute", "Great Helm", "Crowned Helm");
-    public static readonly IReadOnlyList<Armor> PlateChest =
-        Ladder(ArmorLine.Plate, Stat.Con, "plate-chest", "Breastplate", "Splint Mail", "Half Plate", "Full Plate");
-    public static readonly IReadOnlyList<Armor> PlateArms =
-        Ladder(ArmorLine.Plate, Stat.Str, "plate-arms", "Vambraces", "Splint Vambraces", "Banded Gauntlets", "Plate Gauntlets");
-    public static readonly IReadOnlyList<Armor> PlateLegs =
-        Ladder(ArmorLine.Plate, Stat.Dex, "plate-legs", "Greaves", "Splint Greaves", "Half-Plate Legs", "Full Plate Legs");
+    // STR — heavy/plate (all four slots). RENAMED 2026-07-03 naming session: the material ladder
+    // (Iron → Steel → Mithral → Dwarven Steel) on one plain noun per slot, matching the weapon
+    // roster; the prestige names (Barbute/Great Helm/...) are §18-DROPPED.
+    private static Armor[] Material(Stat slot, string noun) => Ladder(ArmorLine.Plate, slot,
+        "plate-" + noun.ToLowerInvariant(),
+        "Iron " + noun, "Steel " + noun, "Mithral " + noun, "Dwarven Steel " + noun);
+
+    public static readonly IReadOnlyList<Armor> PlateHead = Material(Stat.Int, "Helm");
+    public static readonly IReadOnlyList<Armor> PlateChest = Material(Stat.Con, "Breastplate");
+    public static readonly IReadOnlyList<Armor> PlateArms = Material(Stat.Str, "Vambraces");
+    public static readonly IReadOnlyList<Armor> PlateLegs = Material(Stat.Dex, "Greaves");
 
     // DEX — leather (all four slots).
     public static readonly IReadOnlyList<Armor> LeatherHead =

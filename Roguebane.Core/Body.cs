@@ -90,10 +90,16 @@ public sealed class Body
     };
 
     // Armor covers a part-group SLOT (keyed by the group's stat, §6 anatomy) — one piece per slot,
-    // equipping replaces. §6c: armor is a light EFFECT layer (per-line tier bonuses on the record);
-    // the worn-plate-as-shield-source role is RETIRED — §6b shield sources are techniques (+ the
-    // §6d shield OBJECT when that builds). Shields + full evade stay the only HP mitigations.
-    public void Equip(Armor piece) => _armor[piece.Slot] = piece;
+    // equipping replaces. §6c: armor is a light EFFECT layer (per-line tier bonuses on the record),
+    // GATED at equip time on its governing attribute (per-tier requirement); the
+    // worn-plate-as-shield-source role is RETIRED — §6b shield sources are techniques (+ the §6d
+    // shield OBJECT when that builds). Shields + full evade stay the only HP mitigations.
+    public bool Equip(Armor piece)
+    {
+        if (Capacity(piece.Governing) < piece.Requirement) return false;
+        _armor[piece.Slot] = piece;
+        return true;
+    }
 
     public void Unequip(Stat group) => _armor.Remove(group);
 

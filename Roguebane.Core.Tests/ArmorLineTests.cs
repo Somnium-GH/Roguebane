@@ -27,8 +27,8 @@ public class ArmorLineTests
         Assert.All(ArmorLines.Ladders, l => Assert.Equal(4, l.Count)); // four rungs each
         Assert.All(ArmorLines.All, a => Assert.InRange(a.Tier, 1, 4));
         // Names are canon spot-checks at the ladder ends, not a full pin.
-        Assert.Equal("Skull Cap", ArmorLines.PlateHead[0].Name);
-        Assert.Equal("Full Plate", ArmorLines.PlateChest[3].Name);
+        Assert.Equal("Iron Helm", ArmorLines.PlateHead[0].Name);
+        Assert.Equal("Dwarven Steel Breastplate", ArmorLines.PlateChest[3].Name);
         Assert.Equal("Reinforced Leather", ArmorLines.LeatherChest[3].Name);
         Assert.Equal("Humming Circlet", ArmorLines.RobeHead[3].Name);
     }
@@ -48,7 +48,7 @@ public class ArmorLineTests
     public void PlateStopsSoakingWhenItsGoverningAttributeCollapses()
     {
         var b = Humanoid(out var armL, out var armR, out var legL, out _);
-        b.Equip(ArmorLines.PlateLegs[3]); // tier 4 legs plate, GOVERNED by STR
+        b.Equip(ArmorLines.PlateLegs[1]); // Steel Greaves (req 4 <= STR 6), GOVERNED by STR
         b.Damage(armL, 9); b.Damage(armR, 9); // both arms break -> STR 0 -> plate disabled
         Assert.False(b.ArmorSustained(ArmorLines.PlateLegs[3]));
         b.Damage(legL, 2);
@@ -94,7 +94,7 @@ public class ArmorLineTests
         Assert.Equal(0, b.SpellDamageBonus);
         b.Equip(ArmorLines.RobeChest[0]);
         Assert.Equal(2, b.SpellDamageBonus);
-        b.Equip(ArmorLines.RobeHead[3]);
+        b.Equip(ArmorLines.RobeHead[0]); // tier 1: within the head's 3-INT gate
         Assert.Equal(4, b.SpellDamageBonus); // two pieces = the cap
         var head = b.Parts.Single(p => p.Stat == Stat.Int);
         b.Damage(head, 9); // INT collapses -> the robe line is disabled

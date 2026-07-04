@@ -31,12 +31,12 @@ public class GearingTests
     public void AWeaponTheBodyCannotLiftStaysInThePack()
     {
         var pack = new Stash();
-        var body = StrBody(1); // STR 2 total — under the Axe's reserve 4
-        pack.AddWeapon(Armory.Axe);
+        var body = StrBody(1); // STR 2 total — under the Iron Warhammer's reserve 5
+        pack.AddWeapon(Armory.Warhammers[0]);
 
-        Assert.False(Gearing.EquipWeapon(pack, body, Armory.Axe));
-        Assert.True(pack.HasWeapon(Armory.Axe));     // still carried
-        Assert.DoesNotContain(Armory.Axe, body.Hands);
+        Assert.False(Gearing.EquipWeapon(pack, body, Armory.Warhammers[0]));
+        Assert.True(pack.HasWeapon(Armory.Warhammers[0]));     // still carried
+        Assert.DoesNotContain(Armory.Warhammers[0], body.Hands);
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public class GearingTests
         var pack = new Stash();
         var body = StrBody(2);
         var plate = Content.ArmorLines.PlateChest[0];
-        var heavy = Content.ArmorLines.PlateChest[2]; // same slot (chest)
+        var heavy = Content.ArmorLines.PlateChest[1]; // same slot (chest); Steel req 4 fits STR 4
         pack.AddArmor(plate);
         pack.AddArmor(heavy);
 
