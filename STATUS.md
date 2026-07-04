@@ -22,13 +22,9 @@ missing wareCard root border/chrome in the merchant's card-stamping path (pure e
 already in this file).
 
 **P2. Fix Equipment/Technique inventory "button" states:**
-- All inventory cards currently render as if EQUIPPED regardless of real state — confirmed this
-  traces to the ALREADY-FLAGGED follow-up from the B5/B6 CD relay ("our own renderer had a stale
-  string literal from before the rename — not a CD ask"): CD's data is verified correct
-  (`invCard`/`loadoutCard` carry `states.family` + the locked §6e vocabulary
-  `equipped`/`disabled`/`equippable`/`locked`, plus hover overlays) — the engine's own state-key
-  resolver is what's stale. Find and fix that literal; this single fix should also restore the
-  missing EQUIPPABLE/DISABLED/LOCKED looks (today only EQUIPPED's look ever shows).
+- ~~All inventory cards render as if EQUIPPED regardless of real state~~ RESOLVED — see the
+  "✅ FIXED (2026-07-04 loop) — invCard/loadoutCard states (§6e)" entry further down this file;
+  duplicate bullet, nothing left to do here.
 - Placeholder box currently marks "equipped" on figure parts where real worn-armor ASSETS already
   exist (B2-GO/B12) — wire the real assets in as they land, retire the box per-slot as its asset
   arrives (don't wait for the whole batch; flag any slot still on the box placeholder as Needs-CD if
