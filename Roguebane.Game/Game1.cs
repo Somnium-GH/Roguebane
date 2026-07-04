@@ -648,24 +648,6 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     private Rectangle FoeRect() => ManifestElementRect("encounter", "encounter.foe")
         ?? new Rectangle(632, 96, 224, 252);
 
-    // Anatomical part bands stacked on the foe sprite, top->bottom: head, arms, chest, legs. A
-    // structured foe is aimed limb-by-limb by clicking the band; an unstructured foe has no bands.
-    private static int PartBand(Stat stat) => stat switch
-    {
-        Stat.Int => 0, // head
-        Stat.Str => 1, // arms
-        Stat.Con => 2, // chest
-        Stat.Dex => 3, // legs
-        _ => 1,
-    };
-
-    private Rectangle FoePartRect(Stat stat)
-    {
-        var r = FoeRect();
-        var band = r.Height / 4;
-        return new Rectangle(r.X, r.Y + PartBand(stat) * band, r.Width, band);
-    }
-
     // The SCREEN rect a foe stat-group occupies (union of its visual part rects, e.g. both arms),
     // via the same manifest transform DrawHumanoid uses — so reticles land on the drawn limbs.
     private Rectangle? FoePartScreenRect(Foe foe, Stat stat, Rectangle box)
@@ -686,13 +668,30 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         return acc;
     }
 
-    // The foe PART under a screen point (structured foe only), else null = whole-HP aim.
+    // The foe PART under a screen point (structured foe only), else null = whole-HP aim. Uses each
+    // visual part's REAL rect (not a proportional band guess) and, where parts overlap on screen
+    // (arms sit behind the chest in every figure's Z order), resolves to whichever is FRONTMOST —
+    // same paint-ordinal convention (back->front) already used for UI element rendering.
     private BodyPart? FoePartAt(Foe foe, Point p)
     {
         if (foe.Frame is null) return null;
-        foreach (var part in foe.Frame.Parts)
-            if (FoePartRect(part.Stat).Contains(p)) return part;
-        return null;
+        var manifest = _layout.Manifest;
+        if (manifest is null || !manifest.Figures.TryGetValue(foe.Figure, out var fig)) return null;
+        var box = FoeRect();
+        var f = (float)box.Height / fig.Size[1];
+        int cx = box.X + box.Width / 2, cy = box.Y + box.Height;
+        var px = fig.Pivot[0]; var py = fig.Pivot[1];
+        BodyPart? hit = null;
+        foreach (var name in fig.Z) // back -> front; the last match under the cursor is frontmost
+        {
+            if (!fig.Parts.TryGetValue(name, out var part) || FigureBinding.StatOf(name) is not { } stat) continue;
+            var rr = new Rectangle(cx + (int)((part.Rect[0] - px) * f), cy + (int)((part.Rect[1] - py) * f),
+                (int)(part.Rect[2] * f), (int)(part.Rect[3] * f));
+            if (!rr.Contains(p)) continue;
+            var match = foe.Frame.Parts.FirstOrDefault(bp => bp.Stat == stat);
+            if (match is not null) hit = match;
+        }
+        return hit;
     }
 
     // Between-fights Equipment: open button (CityMap) + the overlay's technique cards & close button.
