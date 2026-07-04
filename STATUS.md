@@ -1278,6 +1278,16 @@ explicit). Corollary: B2-GO's own GENERIC layer (already sent to CD) needs the s
 race-split too, flagged as an addendum in `outputs/CLAUDE_DESIGN_issues.md`. Also explicitly OUT OF
 SCOPE: no new body-shape variation — this is a flat art layer, doesn't touch the already-distinct
 per-core figure geometry.
+**CORRECTION #3 (2026-07-04, Doug — CD MIS-BUILT the sent batch; convention REVISED, supersedes the two
+corrections above):** CD's first build generated themed art for EVERY armor type × core × race (a full
+cross-product) + a "plain" armor type — not the design. The worn-armor convention is now RACE-FIRST,
+FULL-PART sprites (canonical: LAYOUT_CONTRACT §12a; CD brief: `outputs/CLAUDE_DESIGN_issues.md` B12;
+DESIGN_SPEC §7a): `sprites/gear/worn/<race>/<slot>/{bare_<cond> | <type>_<tier>_<cond> |
+<core>/<type>_<tier>_<cond>}`. Each file is a COMPLETE part sprite (bare body + armor drawn in), NOT a
+runtime overlay; themed = each core's FAVORED line only (never the cross-product); `bare` (not "plain")
+is the unarmored part; EVERY body part is cooked per race (drops the arms/legs-shared optimization —
+future races may differ). Revised count ≈744 (bare 24 + generic 240 + themed 480, 2 races). **The LOOP
+QUEUE worn-armor item below is UPDATED to this convention.**
 **LOOP QUEUE from this pass (normal priority, each its own tested slice — no invention beyond §7a/§6c/
 §9's numbers):**
 - ~~`CoreRune.DefaultArmor` field + assemble the six §7a kits~~ DONE (2026-07-04 loop, 343 tests):
@@ -1288,12 +1298,20 @@ per-core figure geometry.
   equipped (§6b) stays a separate follow-up, not built here. Shield sprites don't exist yet — logged
   to Asset gaps, exempted in `GearCatalogTests` like the bow gap. New `StartingKitTests.cs` pins all
   six kits (weapon + armor + minion) against §7a.
-- **Worn-armor render system (NEW, replaces the too-casual "just art variety" framing):** the figure
-  compose path currently has no worn-armor-layer lookup at all (only bare-vs-armored per part, no
-  LINE/TIER distinction — verified against `Game1.cs`'s figure fallback code). Build the GENERIC
-  resolver first (`sprites/gear/worn/<line>/<slot>_<tier>_<condition>`, LAYOUT_CONTRACT §12a) — this is
-  B2-GO's own dependency, not optional. Add the THEMED override + fallback chain as the same slice's
-  second half once CD's B12 scope is confirmed and at least some art lands.
+- ~~Worn-armor render system, GENERIC half~~ DONE (2026-07-04 loop, 349 tests): new pure
+  `WornArmorBinding.SpriteKeys(body, visualPart, race)` in `Roguebane.Core/Layout/` resolves the §12a
+  race-first candidate chain — armored same-condition → armored healthy → `bare_<condition>` → bare
+  healthy — for the four worn slots (head/chest/arms/legs; boots has none). 8 tests in
+  `WornArmorBindingTests.cs` pin the order, the mitigation-aware condition math, and the §6e
+  disabled-armor-falls-to-bare rule already proven in `FigureBindingTests`.
+  **NOT wired into `Game1.cs`** — deliberately: the doc's own "per-core body-silhouette vs worn-part
+  composition" question (§17 #15) is still OURS/deferred, i.e. undecided whether a resolved worn-part
+  key replaces the existing per-core figure-part draw outright, is masked to its silhouette, or
+  something else. Wiring the draw loop ahead of that answer would invent an undesigned mechanic
+  (CLAUDE.md). **Needs human**: Doug picks the composition approach; then the draw-loop wiring +
+  THEMED override (favored-line lookup, §7a) are the remaining half of this slice. My prior
+  (uncommitted) `Game1.cs`/`WornArmorBinding.cs` pass, built against the line-first overlay draft
+  before CORRECTION #3 landed, was reverted rather than salvaged — different sprite model entirely.
 - `Minion` gains a `Timer` field; `Caster.Step()` fires minions on their own countdown instead of every
   tick / piggybacked on the caster's front-target check. Retune Skeleton (Timer 25/Power 1), add Golem
   (Timer 100/Power 4/Reserve 3) + Hound (Timer 40/Power 1/Reserve 1, DEX) per §9. Confirm Shade retire

@@ -225,22 +225,39 @@ read crisp, NOT upscaled from 540. The shadow/frame/gradient primitives (§10) a
 960K×540K (integer K; currently 1920×1080). `ui_gate.py` hard-fails any other size — a warped ref
 poisons every fidelity score taken against it. Asset SHEETS (`design/00-assets-*`) are exempt.
 
-## 12a. Worn-armor layer + per-core THEME [NEW, 2026-07-04 — this system does NOT exist yet; see
-ASSET_MANIFEST.md's own note that "wearing armor on the figure...is a separate, not-yet-built morph
-system." B2-GO's "armor worn-layers" ask IS this system's first build, and DESIGN_SPEC §7a's per-core
-theme rides on top of it — both need this convention, not just B12's theme layer.]
-**Path convention** (mirrors the figure-part idiom of §1, extended with LINE/TIER, an optional
-CORE-THEME layer, and an optional RACE layer — see the race-dimension finding below, don't assume
-race-agnostic without checking the figure rects like this pass did):
+## 12a. Worn-armor PART set [CONVENTION REVISED 2026-07-04 — race-first, full-part sprites; this
+supersedes the line-first draft in git history. The system does NOT exist engine-side yet — B2-GO/B12's
+asset batch is its first build, and DESIGN_SPEC §7a's per-core theme rides on it.]
+**Sprite model = FULL PART SPRITES (Doug, 2026-07-04):** each file is a COMPLETE, ready-to-blit part
+image — the race's body part with that armor drawn in — NOT a transparent overlay. The engine selects
+ONE part sprite per (race, slot, wear-state); no runtime compositing.
+**Path convention (race-first; extends the figure-part idiom of §1):**
 ```
-sprites/gear/worn/<line>/<slot>_<tier>_<condition>.png                   // GENERIC — required
-sprites/gear/worn/<line>/<core>/<slot>_<tier>_<condition>.png            // THEMED, race-agnostic
-sprites/gear/worn/<line>/<core>/<race>/<slot>_<tier>_<condition>.png     // THEMED, race-specific
+sprites/gear/worn/<race>/<slot>/bare_<condition>.png                    // unarmored part — fallback terminal
+sprites/gear/worn/<race>/<slot>/<type>_<tier>_<condition>.png           // GENERIC armored part (core-agnostic)
+sprites/gear/worn/<race>/<slot>/<core>/<type>_<tier>_<condition>.png    // THEMED — each core's FAVORED line only
 ```
-`line` ∈ {str, dex, int} (matches ArmorLine; CON has no body armor, §6c); `slot` ∈ {head, chest, arms,
-legs} (int only ships chest/head); `tier` ∈ 1..4; `condition` ∈ {healthy, damaged, broken}.
-
-**RACE DIMENSION — VERIFIED against `layout.json`'s actual figure rects (2026-07-04), not assumed:**
+- `race` — one folder per race; **every slot is authored for every race.** Doug (2026-07-04): cook a
+  part for each body part per race even where the current morph doesn't articulate it — future races may
+  differ. This DELIBERATELY drops the earlier "arms/legs are identical across race, share one sprite"
+  optimization (verified-true today, but not future-proof).
+- `slot` ∈ {head, chest, arms, legs}. `bare`: all four, every race. Armored slots follow the line:
+  str & dex = all four; **int = chest + head only** (§6c); CON is a hand item — no worn body parts.
+- `type` ∈ {str, dex, int}. **No "plain" type** — the unarmored part is `bare`. (DEX's display name
+  "Plain leather" is not a path token; the token is `dex`. The stray "plain" in the first CD build came
+  from conflating that name + the bare-body fallback.)
+- `tier` ∈ 1..4 (bare has none). `condition` ∈ {healthy, damaged, broken}.
+**THEMED = favored line only, NOT a cross-product:** `<core>/<type>` exists ONLY where `type` is that
+core's own favored line (§7a: Grunt/Warden→str, Adept/Summoner→int, Reaver/Ranger→dex). Any other line a
+core wears renders the GENERIC art — core is irrelevant to the render there.
+**Fallback chain:** themed → generic (same type/tier/condition) → generic same type healthy → bare (same
+condition) → bare healthy. Partial coverage never breaks; ship incrementally.
+**Completeness target (2 races):** bare 24 + generic 240 (str 96 / dex 96 / int 48) + themed 480
+(Grunt 96 / Warden 96 / Adept 48 / Summoner 48 / Reaver 96 / Ranger 96) ≈ **744**.
+**Composition NOTE (engine/OURS, §7/§17 #15, deferred — not a CD blocker):** these parts are per
+(race, slot), core-agnostic except themed, so they do NOT carry the per-CORE body silhouette (Warden
+bulk etc.) that `sprites/body/{race}_{core}/…` figures do. How the worn-part set composes with per-core
+figure geometry is an open OUR-side question; no new body-shape variation is authored in this batch.
 checked human/elf pairs across grunt, warden, and ranger. **HEAD and CHEST/TORSO are NOT race-agnostic
 and need their own art per race:** every elf head rect is landscape (`152×104`, aspect 1.46) vs every
 human head rect near-square (`104×104` or `112×112`, aspect ~1.0) — the SAME stretching failure mode

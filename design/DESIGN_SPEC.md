@@ -429,6 +429,18 @@ can end up wearing any line generically) — flagged back to CD as a B2-GO adden
 OUT OF SCOPE: no new body-shape variation** — worn armor is a flat layer over each figure's EXISTING
 part rect; the 6 cores' already-distinct body geometry (e.g. Warden's bulkier torso) isn't touched or
 expanded by this work.
+**CORRECTION #3 (2026-07-04, Doug — CD mis-built the sent batch; convention revised):** the batch CD
+produced generated themed art for EVERY armor type × core × race (a full cross-product) plus a "plain"
+armor type — neither is the design. The worn-armor art convention is now RACE-FIRST full-part sprites
+(canonical: LAYOUT_CONTRACT §12a; CD brief: `outputs/CLAUDE_DESIGN_issues.md` B12), superseding the
+line-first path + overlay model + head/chest-only race split above. Three load-bearing corrections:
+(1) each file is a COMPLETE part sprite (bare body + armor drawn in), not a runtime overlay; (2) EVERY
+body part is authored per race (Doug: future races may need differently-shaped limbs — drops the earlier
+arms/legs-shared optimization); (3) the unarmored part is `bare`, there is NO "plain" type, and THEMED
+art is favored-line-only (never the cross-product). Revised completeness target ≈744 sprites (bare 24 +
+generic 240 + themed 480, 2 races) — multi-night, ship incrementally behind the §12a fallback chain. The
+per-core body-silhouette vs worn-part composition is an OPEN our-side engine question (§17 #15), deferred;
+no new body-shape art in this batch.
 **NOT locked, floated only (Doug, devil's-advocate mode, 2026-07-04):** an idea to make Warden's identity
 "all armor that requires STR requires CON instead" — this would either replace or stack with the
 ALREADY-LOCKED Warden Core Effect (*Unbroken Aegis* = 2× CON-scaled shield regen, §11). Don't build
