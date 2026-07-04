@@ -19,7 +19,7 @@ public sealed class Expedition
 {
     private readonly Fighter _player;
     private readonly Caster _caster;
-    private readonly IReadOnlyList<Technique> _equipment;
+    private readonly List<Technique> _equipment;
     private readonly Stash _stash;
     // §12 gear stock: rolled ONCE per merchant node from its seed (reproducible), purchases consume
     // it. Techniques/minions/runes are OFFERED but not yet buyable — their receiving models (mid-run
@@ -61,16 +61,24 @@ public sealed class Expedition
     private readonly bool _refundSummonsOnRedeploy; // the Summoner's Core Effect [LOCKED §11]
 
     public Expedition(Fighter player, Caster caster, IReadOnlyList<Technique> equipment, CityMap map,
-        Stash? stash = null, string figureId = "human_grunt", bool refundSummonsOnRedeploy = false)
+        Stash? stash = null, string figureId = "human_grunt", bool refundSummonsOnRedeploy = false,
+        int techniqueSlots = int.MaxValue)
     {
         _refundSummonsOnRedeploy = refundSummonsOnRedeploy;
         _player = player;
         _caster = caster;
-        _equipment = equipment;
+        _equipment = equipment.ToList();
         Map = map;
         _stash = stash ?? new Stash();
         FigureId = figureId;
+        TechniqueSlots = techniqueSlots;
     }
+
+    // The technique action bar's fixed slot count (the CoreRune's starting Kit size, §6e "techniques
+    // 1..T") — a capacity cap on the EQUIPPED roster, not a reservation; equip/unequip below is pure
+    // roster membership and never touches attribute reservation (that's Activate/Deactivate's job
+    // alone, and only fires on real in-combat activation per the "Reservation timing" DESIGN_SPEC lock).
+    public int TechniqueSlots { get; }
 
     // The chassis figure to render the player with (manifest figure key); carried from assembly so
     // the shell picks the right modular sprite set. Defaults keep legacy/test construction working.
@@ -169,6 +177,25 @@ public sealed class Expedition
         State == ExpeditionState.Choosing && Gearing.EquipArmor(_stash, _player.Body, armor);
     public bool UnequipArmor(Stat group) =>
         State == ExpeditionState.Choosing && Gearing.UnequipArmor(_stash, _player.Body, group);
+
+    // Technique roster membership — out of combat only (§6e: "Equipment is only reachable OUT of
+    // combat"). Ordering per §6e: equip lands in the first free slot (append; the list has no gaps to
+    // begin with), unequip compacts left for free (List.Remove closes the gap). A technique that's
+    // currently powered gets deactivated on unequip so it can't leave a dangling FSM reference.
+    public bool EquipTechnique(Technique technique)
+    {
+        if (State != ExpeditionState.Choosing) return false;
+        if (_equipment.Contains(technique) || _equipment.Count >= TechniqueSlots) return false;
+        _equipment.Add(technique);
+        return true;
+    }
+
+    public bool UnequipTechnique(Technique technique)
+    {
+        if (State != ExpeditionState.Choosing || !_equipment.Remove(technique)) return false;
+        if (_caster.IsActive(technique)) _caster.Deactivate(technique);
+        return true;
+    }
 
     // The merchant's HP service price (§10): gold per 1 HP, randomized within a loot-bounded range and
     // STABLE per merchant node (same node id => same price, so the run stays reproducible).

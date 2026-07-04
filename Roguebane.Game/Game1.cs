@@ -292,11 +292,18 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         // P0 (2026-07-02, Doug): E TOGGLES — the same key that opened Equipment closes it (with Esc).
         if (Pressed(keys, Keys.Escape) || Pressed(keys, Keys.E)) { _screen = _equipReturnTo; return; }
 
-        // Toggling routes to the RUN when marching (power/unpower on the live bar) and to the build
-        // session otherwise. Mid-run rune mutation stays design-open, so Climb is pre-run only.
+        // §6e click semantics: the Equipment screen is a pure roster equip/unequip surface, never
+        // activation (that's the encounter screen's card-press, via CombatTargeting/Exp.Toggle) —
+        // slotting/unslotting here is what the bottom action bar reads (Exp.Equipment), so a toggle
+        // must actually add/remove the technique, not just power it. Pre-run routes to the build
+        // session's palette-membership toggle instead (no roster/bar distinction before embarking).
         void ToggleTech(Roguebane.Core.Technique t)
         {
-            if (InRun) _campaign.Toggle(t);
+            if (InRun)
+            {
+                if (Exp.Equipment.Contains(t)) _campaign.UnequipTechnique(t);
+                else _campaign.EquipTechnique(t);
+            }
             else _build.Toggle(t);
         }
 
@@ -308,12 +315,15 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         for (var i = 0; i < tabs.Count; i++)
             if (Click(RectOf(tabs[i]))) _invTab = i;
 
-        // TECHNIQUES tab: click an inventory card to slot/unslot (pre-run) or power/unpower (in-run).
+        // TECHNIQUES tab: click an inventory card to slot/unslot. §12: in-run the pool is the build
+        // palette PLUS whatever the merchant sold into the stash — same list the renderer stamps
+        // (Game1.ManifestRenderer.cs "inventory.activeTab.items" case 1), so cards line up with clicks.
         if (_invTab == 1)
         {
-            var cards = ManifestListCells("equipment", "inventory.activeTab.items", _build.Palette.Count);
-            for (var i = 0; i < cards.Count; i++)
-                if (Click(RectOf(cards[i]))) ToggleTech(_build.Palette[i]);
+            var items = InRun ? _build.Palette.Concat(Exp.Stash.Techniques).ToList() : _build.Palette;
+            var cards = ManifestListCells("equipment", "inventory.activeTab.items", items.Count);
+            for (var i = 0; i < cards.Count && i < items.Count; i++)
+                if (Click(RectOf(cards[i]))) ToggleTech(items[i]);
         }
         // GEAR tab clicks (§6e, out-of-combat by Expedition's own gate): equipped → unequip;
         // equippable → equip, AUTO-DISPLACING on conflict — hands-full melee benches the OFF-hand

@@ -32,7 +32,8 @@ public static class Forge
             maxSummons: chassis.Bays + 2); // §9 deploy budget — placeholder size, economy tune owns it
         SummonKit(caster, chassis, runes);
         return new Expedition(PlayerFighter(body, race), caster, WithRuneGrants(equipment, runes), map,
-            figureId: chassis.FigureKey(race), refundSummonsOnRedeploy: chassis.CoreEffectRefundsSummons);
+            figureId: chassis.FigureKey(race), refundSummonsOnRedeploy: chassis.CoreEffectRefundsSummons,
+            techniqueSlots: chassis.Kit.Count);
     }
 
     // The same mint, marching a multi-leg campaign to the Capital instead of one leg.
@@ -48,7 +49,8 @@ public static class Forge
             maxSummons: chassis.Bays + 2); // §9 deploy budget — placeholder size, economy tune owns it
         SummonKit(caster, chassis, runes);
         return new Campaign(PlayerFighter(body, race), caster, WithRuneGrants(equipment, runes), legs,
-            figureId: chassis.FigureKey(race), refundSummonsOnRedeploy: chassis.CoreEffectRefundsSummons);
+            figureId: chassis.FigureKey(race), refundSummonsOnRedeploy: chassis.CoreEffectRefundsSummons,
+            techniqueSlots: chassis.Kit.Count);
     }
 
     // Field the chassis's minion kit plus any rune-granted minions into its bays at assembly, so the

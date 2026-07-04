@@ -390,4 +390,88 @@ public class ExpeditionTests
         }
         Assert.Equal(Play(), Play());
     }
+
+    // §6e technique roster: equip/unequip is the bar-sync mechanism (Equipment screen toggles
+    // membership, the encounter bar just reads Equipment) — never attribute reservation, which is
+    // Activate/Deactivate's job alone (the "Reservation timing" DESIGN_SPEC lock).
+    private static Expedition CappedExpedition(int slots, params Technique[] starting)
+    {
+        var body = Sessions.DemoBody();
+        var caster = new Caster(body, maxCharge: Forge.MagicCapacity(body), requireAim: true);
+        return new Expedition(Forge.PlayerFighter(body), caster, starting, Maps.StandardLeg(),
+            techniqueSlots: slots);
+    }
+
+    [Fact]
+    public void EquippingATechniqueAddsItToTheBar()
+    {
+        var exp = CappedExpedition(2, Techniques.Jab);
+        Assert.True(exp.EquipTechnique(Techniques.Cleave));
+        Assert.Contains(Techniques.Cleave, exp.Equipment);
+    }
+
+    [Fact]
+    public void EquippingAnAlreadyEquippedTechniqueIsANoOp()
+    {
+        var exp = CappedExpedition(2, Techniques.Jab);
+        Assert.False(exp.EquipTechnique(Techniques.Jab));
+        Assert.Single(exp.Equipment);
+    }
+
+    [Fact]
+    public void EquipRefusesPastTheChassisKitCap()
+    {
+        var exp = CappedExpedition(1, Techniques.Jab); // Kit.Count-sized cap, already full
+        Assert.False(exp.EquipTechnique(Techniques.Cleave));
+        Assert.DoesNotContain(Techniques.Cleave, exp.Equipment);
+    }
+
+    [Fact]
+    public void UnequippingATechniqueRemovesItFromTheBar()
+    {
+        var exp = CappedExpedition(2, Techniques.Jab, Techniques.Cleave);
+        Assert.True(exp.UnequipTechnique(Techniques.Jab));
+        Assert.DoesNotContain(Techniques.Jab, exp.Equipment);
+        Assert.Contains(Techniques.Cleave, exp.Equipment); // unslot compacts left, no holes — not a wipe
+    }
+
+    [Fact]
+    public void UnequippingAPoweredTechniqueDeactivatesItFirst()
+    {
+        var exp = CappedExpedition(2, Techniques.Jab, Techniques.Cleave);
+        exp.Toggle(Techniques.Jab); // power it on
+        Assert.True(exp.IsActive(Techniques.Jab));
+
+        Assert.True(exp.UnequipTechnique(Techniques.Jab));
+        Assert.False(exp.IsActive(Techniques.Jab)); // no dangling FSM reference to an unequipped card
+    }
+
+    [Fact]
+    public void UnequippingAnUnequippedTechniqueIsANoOp()
+    {
+        var exp = CappedExpedition(2, Techniques.Jab);
+        Assert.False(exp.UnequipTechnique(Techniques.Cleave));
+    }
+
+    [Fact]
+    public void EquipAndUnequipAreOutOfCombatOnly()
+    {
+        var exp = CappedExpedition(2, Techniques.Jab);
+        exp.Enter("a1"); // State -> Fighting
+        Assert.False(exp.EquipTechnique(Techniques.Cleave));
+        Assert.False(exp.UnequipTechnique(Techniques.Jab));
+        Assert.Single(exp.Equipment); // untouched
+    }
+
+    [Fact]
+    public void EquipTechniqueNeverReservesAttributes()
+    {
+        // "Reservation timing" DESIGN_SPEC lock: equipping a technique is pure roster membership —
+        // reservation only ever happens on real in-combat Activate, never from being slotted.
+        var exp = CappedExpedition(2, Techniques.Jab);
+        var before = exp.Player.Body.Capacity(Stat.Str);
+        Assert.True(exp.EquipTechnique(Techniques.Cleave));
+        Assert.Equal(before, exp.Player.Body.Capacity(Stat.Str));
+        Assert.False(exp.IsActive(Techniques.Cleave)); // slotted, not powered
+    }
 }

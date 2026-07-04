@@ -15,10 +15,11 @@ public sealed class Campaign
 {
     private readonly Fighter _player;
     private readonly Caster _caster;
-    private readonly IReadOnlyList<Technique> _loadout;
+    private readonly List<Technique> _loadout;
     private readonly IReadOnlyList<Func<CityMap>> _legs;
     private readonly Stash _stash;
     private readonly string _figureId;
+    private readonly int _techniqueSlots;
     private int _legIndex;
 
     public Expedition Current { get; private set; }
@@ -31,16 +32,18 @@ public sealed class Campaign
         IReadOnlyList<Func<CityMap>> legs,
         Stash? stash = null,
         string figureId = "human_grunt",
-        bool refundSummonsOnRedeploy = false)
+        bool refundSummonsOnRedeploy = false,
+        int techniqueSlots = int.MaxValue)
     {
         _refundSummonsOnRedeploy = refundSummonsOnRedeploy;
         if (legs.Count == 0) throw new ArgumentException("a campaign needs at least one leg", nameof(legs));
         _player = player;
         _caster = caster;
-        _loadout = loadout;
+        _loadout = loadout.ToList();
         _legs = legs;
         _stash = stash ?? new Stash();
         _figureId = figureId;
+        _techniqueSlots = techniqueSlots;
         Current = NewLeg();
     }
 
@@ -52,7 +55,8 @@ public sealed class Campaign
     private readonly bool _refundSummonsOnRedeploy;
 
     private Expedition NewLeg() =>
-        new(_player, _caster, _loadout, _legs[_legIndex](), _stash, _figureId, _refundSummonsOnRedeploy);
+        new(_player, _caster, _loadout, _legs[_legIndex](), _stash, _figureId, _refundSummonsOnRedeploy,
+            _techniqueSlots);
 
     // Top-level passthroughs so a driver talks to the campaign, not the swapping leg underneath.
     public bool Enter(string nodeId)
@@ -65,6 +69,22 @@ public sealed class Campaign
 
     public void Toggle(Technique technique) => Current.Toggle(technique);
     public bool IsActive(Technique technique) => Current.IsActive(technique);
+
+    // Roster equip/unequip mirrored into the campaign-level loadout (not just the live leg) so a
+    // mid-leg change survives NewLeg() rebuilding Current from _loadout when the party advances.
+    public bool EquipTechnique(Technique technique)
+    {
+        if (!Current.EquipTechnique(technique)) return false;
+        if (!_loadout.Contains(technique)) _loadout.Add(technique);
+        return true;
+    }
+
+    public bool UnequipTechnique(Technique technique)
+    {
+        if (!Current.UnequipTechnique(technique)) return false;
+        _loadout.Remove(technique);
+        return true;
+    }
     public void Redeploy() => Current.Redeploy(); // leave a cleared fight -> back to the chart
 
     // FTL targeting surface (delegates to the current leg's expedition).
