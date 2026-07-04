@@ -28,12 +28,18 @@ already in this file).
   dead-card bug found in the same pass: the TECHNIQUES-tab click loop only indexed `_build.Palette`,
   so a merchant-bought technique's card (rendered per §12) was unclickable — click loop now matches
   the renderer's combined list.
-- **Drag-and-drop reorder is ALREADY SPEC'D — DESIGN_SPEC §6e, "Reorder = DRAG-AND-DROP"** (found it,
-  no need to ask Doug): dragging a slotted card pulls it off leaving a matching ghost background in
-  its slot; snaps INSERTION-style between neighbors (sticky, easy); release locks the new order; same
-  model for minion bays. Two ASSUMED defaults flagged there if they're wrong: drop-outside-the-bar
-  snaps back (cancel), dragging a palette card onto the bar equips at the insertion point. Build to
-  that spec; only come back to Doug if something in it doesn't hold up in practice.
+- **Drag-and-drop reorder — DESIGN_SPEC §6e, "Reorder = DRAG-AND-DROP"** (found it, no need to ask
+  Doug): dragging a slotted card pulls it off leaving a matching ghost background in its slot; snaps
+  INSERTION-style between neighbors (sticky, easy); release locks the new order; same model for
+  minion bays. Two ASSUMED defaults flagged there if they're wrong: drop-outside-the-bar snaps back
+  (cancel), dragging a palette card onto the bar equips at the insertion point.
+  **PART 1 DONE (2026-07-04):** Core primitive landed —
+  `Expedition.ReorderTechnique(technique, newIndex)`/`Campaign.ReorderTechnique` (out-of-combat gated,
+  clamps out-of-range index, mirrors into `_loadout` so order survives a leg advance; touches neither
+  reservation nor activation). **STILL OPEN:** the Game1 interactive half — drag-threshold detection,
+  ghost-slot rendering, insertion-point-from-mouse-position, release-to-commit, drop-outside cancel —
+  plus minion-bay reorder (no Core primitive yet; same shape as the technique one once bay-index
+  semantics are confirmed against `Caster`'s bay model).
 
 **P3. Fix equipment reservation + the "everyone can activate their default kit" balance pass:**
 - **Equipment currently reserves nothing cumulatively.** Traced it: `Body.cs`'s equip-time checks
