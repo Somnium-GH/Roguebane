@@ -1,6 +1,7 @@
 # Claude Design payload — CURRENT only (2026-07-04)
-**NEW, NOT YET SENT (2026-07-04): B12** (per-core-rune armor theme commission) — added this pass,
-pending Doug's relay to CD.
+**SENT to CD 2026-07-04 (Doug): B12 (per-core-rune armor theme commission) + the race-split ADDENDUM
+folded into B2-GO's item 3.** Sending is NOT the close signal (same rule as every prior relay) — both
+stay OPEN below until verified LANDED in the repo on the next audit; don't clear from dev memory yet.
 _Everything previously in this file is CLOSED: payload #11–18, reconcile residuals #1–8, and
 addendum A1–A4 all verified LANDED across the two 2026-07-03 drops. Clear them from your dev
 memory. History lives in git (`git log -- outputs/CLAUDE_DESIGN_issues.md`). This file always
@@ -39,6 +40,15 @@ B2-GO. **FIGURE + GEAR ASSET REGEN BATCH — the HOLD IS LIFTED (2026-07-03): th
        under the retired prestige names; DEX leather / INT robe / CON shields per their unchanged
        ladders. **No dimmed/disabled variants** (§6e: disabled gear un-renders — scope savings).
        Preserve the existing condition rows (healthy/damaged/broken) + bare-variant fallback scheme.
+       **ADDENDUM (2026-07-04, found after this item was sent — please fold in): HEAD and CHEST
+       pieces need a RACE-SPECIFIC variant, not one generic sprite shared across human/elf.** Checked
+       the real figure rects (`layout.json`): elf heads are landscape (152×104) vs human's near-square
+       (~104-112²) — a shared sprite will stretch exactly like the raceCard head-portrait bug; elf
+       torsos run ~9-10% narrower than human's at the same core. ARMS and LEGS are confirmed fine as
+       ONE sprite (identical rect sizes across race, only repositioned) — no race split needed there.
+       So: Helm/Breastplate/Cap/Circlet/Cloth-Cap-etc. (any head or chest piece, any line) → author
+       TWO variants (human, elf); Vambraces/Greaves/Bracers/Leggings → ONE is fine. Path convention
+       + full reasoning: LAYOUT_CONTRACT §12a.
     4. **Race × core figure regen** on the established part/z-list contract (robe figures stay
        legitimately ~12-part); **fix the elf_ranger chest-accent neckline in this batch** (the
        original B2 — strap sits too high, reads as fused to the head).
@@ -96,13 +106,23 @@ B12. **NEW COMMISSION (2026-07-04, Doug) — per-CORE-RUNE THEME on the worn-arm
     **doesn't exist yet** — B2-GO's "armor worn-layers" is its first build. This commission is the
     THEME layer on top of that, NOT a reuse of something already there. Convention (§12a):
     ```
-    sprites/gear/worn/<line>/<slot>_<tier>_<condition>.png              // GENERIC — B2-GO's own scope
-    sprites/gear/worn/<line>/<core>/<slot>_<tier>_<condition>.png       // THEMED — this commission
+    sprites/gear/worn/<line>/<slot>_<tier>_<condition>.png                  // GENERIC, race-agnostic slots (arms/legs) — B2-GO
+    sprites/gear/worn/<line>/<race>/<slot>_<tier>_<condition>.png           // GENERIC, race-specific slots (head/chest) — B2-GO addendum above
+    sprites/gear/worn/<line>/<core>/<slot>_<tier>_<condition>.png           // THEMED, race-agnostic slots (arms/legs) — this commission
+    sprites/gear/worn/<line>/<core>/<race>/<slot>_<tier>_<condition>.png    // THEMED, race-specific slots (head/chest) — this commission
     ```
     `line` ∈ {str,dex,int}, `slot` ∈ {head,chest,arms,legs} (int: chest+head only), `tier` 1-4,
     `condition` ∈ {healthy,damaged,broken}. **Themed art is a pure enhancement** — the engine falls
-    back themed → generic same-condition → generic healthy → bare, so shipping PARTIAL coverage
-    (e.g. healthy-only, or T1-only) never breaks anything; it's fine to ship this incrementally.
+    back race-specific-themed → race-agnostic-themed → race-specific-generic (if the slot needs it) →
+    race-agnostic-generic → bare, so shipping PARTIAL coverage (e.g. healthy-only, or T1-only, or
+    human-before-elf) never breaks anything; it's fine to ship this incrementally.
+    **Clarified (Doug, 2026-07-04): theme applies ONLY when a core wears its OWN favored/starting
+    line** (Grunt/Warden=STR, Adept/Summoner=INT, Reaver/Ranger=DEX) — a Warden in DEX leather or an
+    Adept in STR vambraces (gear is swappable, nothing stops mixing) gets plain GENERIC art, no theme,
+    same as any other core would. Don't author "what if a Summoner wore plate" themed variants — out
+    of scope, not needed. **Also out of scope: no new BODY-shape variation.** This is a flat art layer
+    over each figure's EXISTING part rect; it doesn't touch the figure's own silhouette (that's the
+    already-built race+core figure geometry, untouched by this commission).
     **Mount is race-agnostic ONLY for arms+legs — VERIFIED, not assumed, against the real figure rects
     in `layout.json` (2026-07-04):** every elf HEAD rect is landscape (152×104, aspect 1.46) against
     every human head's near-square (~104-112² depending on core) — the same stretch failure already

@@ -421,6 +421,14 @@ ARE race-agnostic** — identical rect sizes across race in every pair checked (
 only x-position shifts. LAYOUT_CONTRACT §12a now carries an optional race-specific path tier for
 exactly the slots that need it. **Corrected total: ~384 sprites, not 288** (12 race-needed slot-
 instances × 12 tier×condition cells × 2 races = 288, PLUS 8 race-agnostic slot-instances × 12 = 96).
+**CLARIFIED (2026-07-04, Doug):** theme applies ONLY when a core wears its OWN favored line above —
+any other line (gear is swappable, §7) renders plain GENERIC race+type art, no theming; core rune is
+irrelevant to the render in that case (the fallback chain already does this, this just makes it
+explicit). This also means B2-GO's own GENERIC layer needs the same head/chest race-split (any core
+can end up wearing any line generically) — flagged back to CD as a B2-GO addendum. **Also explicitly
+OUT OF SCOPE: no new body-shape variation** — worn armor is a flat layer over each figure's EXISTING
+part rect; the 6 cores' already-distinct body geometry (e.g. Warden's bulkier torso) isn't touched or
+expanded by this work.
 **NOT locked, floated only (Doug, devil's-advocate mode, 2026-07-04):** an idea to make Warden's identity
 "all armor that requires STR requires CON instead" — this would either replace or stack with the
 ALREADY-LOCKED Warden Core Effect (*Unbroken Aegis* = 2× CON-scaled shield regen, §11). Don't build

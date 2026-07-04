@@ -13,6 +13,7 @@ public sealed record CoreRune(
     IReadOnlyList<Technique>? DefaultEquipment = null,
     IReadOnlyList<Minion>? DefaultMinions = null,
     IReadOnlyList<Weapon>? DefaultWeapons = null, // wielded at assembly so a consulting verb has a stick
+    IReadOnlyList<Armor>? DefaultArmor = null, // worn at assembly, one piece per slot (§7a starting kits)
     string Archetype = "",  // the one-line identity ("THE GENERALIST") shown on the New Run / build cards
     string Flavor = "",     // the card's short pitch (design/05)
     string CoreEffectName = "",   // Core Effect label (the core's signature effect) shown on the cards
@@ -39,8 +40,13 @@ public sealed record CoreRune(
     // reads its power/cost from these. Wielded at assembly if the body can lift them (stat threshold).
     public IReadOnlyList<Weapon> WeaponKit => DefaultWeapons ?? Array.Empty<Weapon>();
 
+    // The armor the core starts worn in (§7a) — mechanical equip only, no worn-art render yet
+    // (LAYOUT_CONTRACT §12a is a separate slice). Gated the same as any other Equip: a piece that
+    // doesn't meet its governing attribute simply doesn't go on.
+    public IReadOnlyList<Armor> ArmorKit => DefaultArmor ?? Array.Empty<Armor>();
+
     // The socketed body: the RACE supplies the anatomy + attrs, then each held rune rung sockets its
-    // extension parts on top, and the core's starting weapons are wielded into its hands.
+    // extension parts on top, and the core's starting weapons/armor are equipped.
     public Body NewBody(Race race, RuneLoadout runes)
     {
         var body = race.NewBody();
@@ -51,6 +57,8 @@ public sealed record CoreRune(
         foreach (var weapon in WeaponKit)
             if (!body.EquipRanged(weapon))
                 body.Wield(weapon);
+        foreach (var piece in ArmorKit)
+            body.Equip(piece);
         return body;
     }
 

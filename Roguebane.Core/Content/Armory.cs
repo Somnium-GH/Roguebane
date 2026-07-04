@@ -5,7 +5,8 @@ namespace Roguebane.Core.Content;
 // naming session; damage/req/timer = blessed initial): melee rides ONE material ladder
 // (Iron → Steel → Mithral → Dwarven Steel); ranged + INT implements carry their own tier names.
 // Bow/sling damage stays PLACEHOLDER-FLAGGED (§17 #9 — never dictated). The CON shield-object
-// ladder is DEFERRED: its equip-gate number was never dictated (§6c) — don't invent.
+// ladder's equip-gate resolved 2026-07-04 (§6c): 1 CON/tier — gating brace's shield-source off an
+// equipped shield is a separate follow-up slice, not built here.
 public static class Armory
 {
     private static readonly string[] Materials = { "Iron", "Steel", "Mithral", "Dwarven Steel" };
@@ -70,10 +71,15 @@ public static class Armory
     public static readonly IReadOnlyList<Weapon> Tomes = Named("tome", Stat.Int, WeaponKind.Tome,
         1.0, 0, 1, 1, "Old Worn Tome", "Leather Tome", "Ornate Tome", "Glowing Tome");
 
+    // CON shield OBJECT (§6c): 1H off-hand item, Power 0 (blocks nothing on its own — the shield
+    // pool it feeds is a technique's job, §6b), gate 1 CON/tier (resolved 2026-07-04).
+    public static readonly IReadOnlyList<Weapon> Shields = Named("shield", Stat.Con, WeaponKind.Shield,
+        1.0, 0, 1, 1, "Wooden Shield", "Iron Buckler", "Kite Shield", "Tower Shield");
+
     public static readonly IReadOnlyList<IReadOnlyList<Weapon>> Ladders = new[]
     {
         Longswords, Axes, Maces, Claymores, Battleaxes, Warhammers,
-        Daggers, Rapiers, ShortSwords, Bows, Slings, Wands, Staffs, Charms, Tomes,
+        Daggers, Rapiers, ShortSwords, Bows, Slings, Wands, Staffs, Charms, Tomes, Shields,
     };
 
     public static IEnumerable<Weapon> AllWeapons => Ladders.SelectMany(l => l);

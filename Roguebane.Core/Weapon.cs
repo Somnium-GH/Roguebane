@@ -11,9 +11,10 @@ public enum WeaponUse
 }
 
 // What kind of implement a hand item is (§6d roster): melee ladders, the two RANGED-slot families
-// (bow = full shield bypass + Charge; sling = its 1H shield-compatible cousin), and the INT
+// (bow = full shield bypass + Charge; sling = its 1H shield-compatible cousin), the INT
 // implements (wand = shield-SUBTRACTION hand item; staff = 2H blockable melee; charm/tome =
-// pure-bonus offhands). Kind decides which combat resolution and equip layer the piece uses.
+// pure-bonus offhands), and the CON shield OBJECT (§6c, a 1H hand item, equip-gate resolved
+// 2026-07-04: 1 CON/tier). Kind decides which combat resolution and equip layer the piece uses.
 public enum WeaponKind
 {
     Melee,
@@ -23,6 +24,7 @@ public enum WeaponKind
     Staff,
     Charm,
     Tome,
+    Shield,
 }
 
 // A weapon is a hand-held stat-stick with properties, granting ZERO abilities of its own. Reserve

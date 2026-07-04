@@ -263,6 +263,25 @@ risk. CD can deliver incrementally without blocking anything on the generic set.
 produced — see DESIGN_SPEC §7a / STATUS for the current scope decision. The convention above is fixed
 regardless of how many cells are filled.
 
+**THEME APPLIES ONLY TO A CORE'S OWN FAVORED LINE [clarified 2026-07-04, Doug]:** a Warden wearing STR
+plate (its favored line) gets the themed art; a Warden wearing DEX leather or an Adept wearing STR
+vambraces (gear is swappable, §7 — nothing stops mixing) gets **plain GENERIC race+type art, no
+theming at all — core rune is irrelevant to the render in that case.** This was already how the
+resolve-order fallback behaves (no themed cell exists off-line, so it falls straight to generic); this
+note just makes it explicit so it's never mis-read as "every core needs themed art for every line."
+**Corollary this exposes: the GENERIC layer itself (B2-GO's own scope, not just B12's theme layer)
+ALSO needs the race split on head+chest** — since ANY core can end up wearing ANY line generically
+(an Adept found a Steel Helm; a Warden tried DEX leather), the untamed/generic art for those two slots
+must exist per-race too, same reasoning as the themed layer above. Flagged back to CD as a B2-GO
+addendum (`outputs/CLAUDE_DESIGN_issues.md`), since B2-GO was already relayed before this was found.
+
+**NO BODY-MORPH EXPANSION [boundary, Doug 2026-07-04]:** worn-armor art (generic or themed) is a FLAT
+layer drawn onto each figure's EXISTING part `rect` (§1) — it does not introduce new body-SHAPE
+variation. The 6 cores already have distinct figure geometry today (e.g. `human_warden`'s torso is
+already bigger than `human_grunt`'s — that's the existing "core-rune morph" layer, already built); this
+work does not add another layer of body-shape difference on top of what already exists. Explicitly OUT
+OF SCOPE for now, don't build toward it.
+
 ## 12. Schema additions — the 2026-07-03 drop (from CD's DROP_AUDIT)
 - **z is a PAINT ORDINAL** — back→front draw order, ONE convention for every screen. `data-z` in the
   dc.html is DEPRECATED as depth; the manifest `z` is derived paint order. Find the scene/backdrop

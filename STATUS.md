@@ -1272,26 +1272,38 @@ across race, only repositioned). LAYOUT_CONTRACT §12a now has an optional race-
 head/chest only. **Corrected count: ~384 sprites (not 288)** — 12 race-needed slot-instances (head+
 chest × 6 cores) × 12 cells × 2 races = 288, plus 8 race-agnostic slot-instances (arms+legs × 6 cores,
 minus Adept/Summoner who have no arm/leg robe pieces) × 12 cells = 96.
+**CLARIFIED same day (Doug):** theming only ever applies to a core's OWN favored line — any other
+line renders plain generic art, core is irrelevant then (fallback chain already does this; now
+explicit). Corollary: B2-GO's own GENERIC layer (already sent to CD) needs the same head/chest
+race-split too, flagged as an addendum in `outputs/CLAUDE_DESIGN_issues.md`. Also explicitly OUT OF
+SCOPE: no new body-shape variation — this is a flat art layer, doesn't touch the already-distinct
+per-core figure geometry.
 **LOOP QUEUE from this pass (normal priority, each its own tested slice — no invention beyond §7a/§6c/
 §9's numbers):**
-- `CoreRune.DefaultArmor` field (mirrors `DefaultWeapons`, wired into `NewBody` via `Body.Equip`) +
-  assemble the six §7a kits (mechanical equip only — doesn't need the worn-art system below to ship).
+- ~~`CoreRune.DefaultArmor` field + assemble the six §7a kits~~ DONE (2026-07-04 loop, 343 tests):
+  `DefaultArmor`/`ArmorKit` mirrors `DefaultWeapons`/`WeaponKit`, wired into `NewBody` via `Body.Equip`
+  (mechanical equip only — worn-art system below is still unbuilt). Also landed `WeaponKind.Shield` +
+  an `Armory.Shields` ladder (Con, 1 req/tier, Hands:1 — Wooden Shield → Iron Buckler → Kite Shield →
+  Tower Shield) since Grunt/Warden's kits needed it; gating `brace`'s shield-source on one being
+  equipped (§6b) stays a separate follow-up, not built here. Shield sprites don't exist yet — logged
+  to Asset gaps, exempted in `GearCatalogTests` like the bow gap. New `StartingKitTests.cs` pins all
+  six kits (weapon + armor + minion) against §7a.
 - **Worn-armor render system (NEW, replaces the too-casual "just art variety" framing):** the figure
   compose path currently has no worn-armor-layer lookup at all (only bare-vs-armored per part, no
   LINE/TIER distinction — verified against `Game1.cs`'s figure fallback code). Build the GENERIC
   resolver first (`sprites/gear/worn/<line>/<slot>_<tier>_<condition>`, LAYOUT_CONTRACT §12a) — this is
   B2-GO's own dependency, not optional. Add the THEMED override + fallback chain as the same slice's
   second half once CD's B12 scope is confirmed and at least some art lands.
-- `WeaponKind.Shield` + a `Shields` ladder in `Armory.cs` (Con, 1 req/tier, Hands:1, off-hand-only —
-  reuses existing Weapon/Wield machinery, no new type) — Wooden Shield → Iron Buckler → Kite Shield →
-  Tower Shield. Gating `brace`'s shield-source on one being equipped (§6b) is a separate follow-up
-  slice, not required to ship the kits.
 - `Minion` gains a `Timer` field; `Caster.Step()` fires minions on their own countdown instead of every
   tick / piggybacked on the caster's front-target check. Retune Skeleton (Timer 25/Power 1), add Golem
   (Timer 100/Power 4/Reserve 3) + Hound (Timer 40/Power 1/Reserve 1, DEX) per §9. Confirm Shade retire
-  with Doug before deleting (recommended, not decided).
+  with Doug before deleting (recommended, not decided). Adept's kit now fields a Skeleton (§7a); Ranger's
+  Hound and Summoner's Golem wait on this slice landing.
 - `tools/geometry_diff.py`/textgeom: ink-bbox measurement switch (item 3 above).
-- Retire `Shops.cs` legacy fixed-stock fields (item 4 above).
+- Retire `Shops.cs` legacy fixed-stock fields — CORRECTION (2026-07-04 loop): checked actual usage —
+  `Shops.Plate`/`Shops.Hide`/`Shops.ArmorPool` are all still live (tests, `Expedition.cs`, `Game1.cs`
+  seeding). Only `Shops.Armor` (the "legacy fixed stock (retiring)" field) has zero references anywhere
+  — that's the one safe to delete outright, not the whole set.
 
 ## Needs human (loop skips)
 - Balance/feel tuning (all placeholder-sane, tune in PLAY): tick 10/s; cooldowns + damage; DEX haste
@@ -1305,6 +1317,8 @@ minus Adept/Summoner who have no arm/leg robe pieces) × 12 cells = 96.
 - Part→stat friction (legs = accuracy, arms = STR) — low-pri, revisit only if it nags.
 
 ## Asset gaps (Needs Claude Design) — art missing/wrong, not composable from primitives
+- Shield ladder (`shield_wooden`/`shield_iron`/`shield_kite`/`shield_tower`) — no sprites shipped yet
+  (new 2026-07-04 §6c/§7a content); exempt in GearCatalogTests like the bow gap until CD delivers them.
 - Ranger figure (`human_ranger`/`elf_ranger`) — placeholder card until it lands.
 - ~~Glyph coverage~~ RESOLVED (2026-07-02): bundled fonts + widened regions ship; ✓ renders live.
   RESIDUAL WATCH: if a bundled font truly lacks a used glyph (①②③ in IM Fell is unverified — MGCB
