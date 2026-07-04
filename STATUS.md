@@ -1,14 +1,19 @@
 # Status
 
 ## ⇒ NEW LOCK (2026-07-03, Doug — design session): weapon wield model, DESIGN_SPEC §6/§6d
-Full model in §6d + the broken-limb hard-override bullet in §6 — read there before building. Summary of
-NEW ENGINE WORK this unblocks (not urgent, no P0 queue jump — pick up in normal priority order):
-equip-config validation (1h+shield / 2×1h dual-wield / 2×2h primary-secondary / 1×ranged, both hands);
-lockout checks keyed to ARM-BROKEN state (not the STR value) for any held weapon, on both player AND foes;
-a hard evasion-zero when EITHER leg is broken, overriding residual DEX from Marks; primary/secondary
-auto-promotion bookkeeping per hand-slot category; a new Left/Right-HANDEDNESS player setting (cosmetic
-render-only — which arm shows primary vs off-hand); Bow + Wand weapon data entries (names in §6d); Wand's
-partial shield-bypass is explicitly NOT numbered yet (§17 #18) — don't invent a split, block on design.
+**CORRECTED same day — §6d was rewritten twice; read the CURRENT §6d, not this summary, before building.**
+Two independent equip layers: a MELEE hand-config (main-hand + off-hand, any 1H/2H pairing incl. 2H/2H,
+gated purely by each weapon's own per-tier STR requirement — no separate one-hand-vs-two-hand threshold)
+and ONE separate RANGED slot (bow/wand — does NOT compete with melee hands; a sword+shield AND a bow can
+both be equipped at once, per the Ranger core). NEW ENGINE WORK this unblocks (not urgent, no P0 queue
+jump — pick up in normal priority order): equip-config validation for both layers; lockout checks keyed
+to ARM-BROKEN state (not the STR value) for ANY held weapon incl. ranged, on both player AND foes; a hard
+evasion-zero when EITHER leg is broken, overriding residual DEX from Marks; main-hand/off-hand
+auto-promotion bookkeeping (first-equipped wins main-hand); a new Left/Right-HANDEDNESS player setting
+(cosmetic render-only); Bow + Wand weapon data entries (names in §6d). Wand's partial shield-bypass is
+explicitly NOT numbered yet (§17 #18) — don't invent a split, block on design. Also OPEN, not yet
+answered: whether powering a ranged technique visually sheaths the melee hand-config (and drops a held
+shield's block while drawn) — don't build either behavior until Doug calls it.
 
 ## ⇒ NEW LOCK (2026-07-03, Doug — design session): armor system, DESIGN_SPEC §6/§6c
 STR/DEX/INT/CON armor tier ladders + names are canon (§6c, blessed-initial numbers, tune later); shield
@@ -118,6 +123,13 @@ honest denominator under the ref-aligned drive (buildMinions legitimately empty:
 minions, matching the ref). Justified by Doug's M0.3 line "ALIGN THE DRIVE TO THE REF STATE (pick
 Grunt)"; no other baseline entry touched (the contested overflow re-pin still awaits approval).
 Remaining eq 0% elements (coreLabel style, partLines, runeBagTitle) = next walk slice.
+**EQUIPMENT WALK #2 (2026-07-03 loop):** the loadout drive now really CLEARS a1 (aim card 0 at
+the foe + AUTO after Enter — an untargeted technique just holds; SetAuto alone was a stalemate) →
+topbar reads the design's READY TO MARCH (run.state maps Choosing to that copy); `runes.budget`
+resolves the authored "BUDGET n free / m" form. coreLabel logged Needs-CD B0b (one bind
+`core.name` feeds two different authored copies — "Human Grunt" block vs "CORE GRUNT" chip; no
+id hacks). Still-0% residue: partLines/runeBagTitle (figure-underlay + title-style class), next
+slice.
 **‼ GATE RED (pre-existing, DROP-caused — verified by stash/rerun at HEAD): text OVERFLOWS rose
 ng 6→9, city 4→6.** Membership is the drop's NEW/re-authored elements (city: suppliesTitle/
 supportTitle/castlePanelTitle/doomTitle; ng: header/preview family). Numerics: VERTICAL-only —

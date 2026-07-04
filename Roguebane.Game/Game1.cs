@@ -115,7 +115,9 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             _screen = Screen.Run;
             foreach (var t in Exp.Equipment) _campaign.Toggle(t); // power the bar (both shots)
             // (build/newrun smoke handled after this block)
-            void Resolve() { for (var i = 0; i < 200 && Exp.State == ExpeditionState.Fighting; i++) _campaign.Tick(); }
+            // 1000-tick cap: the grunt (loadout drive) clears a1 slower than the summoner's
+            // minion screen — 200 left the fight running and the shot read FIGHTING.
+            void Resolve() { for (var i = 0; i < 1000 && Exp.State == ExpeditionState.Fighting; i++) _campaign.Tick(); }
 
             if (_smokeScreen == "citymap") // stop at the merchant so the shot shows the gear stock + gear bar
             {
@@ -153,7 +155,11 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             }
             else if (_smokeScreen == "loadout") // between-fights Equipment overlay, open over the chart
             {
-                _campaign.Enter("a1"); Resolve(); _campaign.Redeploy(); // clear a node -> back at the chart (Choosing)
+                // The grunt has no minions fighting for it — aim its lead card at the foe and arm
+                // AUTO (an untargeted technique just holds), or a1 never clears.
+                _campaign.Enter("a1");
+                if (Exp.Enemy is { } sk) { _campaign.Aim(Exp.Equipment[0], sk); _campaign.SetAuto(true); }
+                Resolve(); _campaign.Redeploy(); // clear a node -> back at the chart (Choosing)
                 // design/02's doll is ARMED (sword + worn plate) — stash-seed and equip so the
                 // gear rows/doll markers validate; no merchant detour (the stash is the source).
                 Exp.Stash.AddWeapon(Armory.Dagger); Exp.EquipWeapon(Armory.Dagger);

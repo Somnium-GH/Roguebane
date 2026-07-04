@@ -119,7 +119,8 @@ default** (most builds carry one for baseline survivability); it can be toggled 
 the stat. It maintains a **pool of SHIELD POINTS** (FTL-style layers, no hard cap): **each point absorbs
 1 damage and is consumed on hit; points REGENERATE on a timer scaled by CON** (+ rune effects). The
 source sets the amount/regen and its stat:
-- **block** (CON), **stoneskin/barkskin/steelskin/diamondskin** (INT, passive spell), **parry** (DEX,
+- **block** (CON, REQUIRES a shield OBJECT equipped — §6c/§6d; the only source gated on a physical item,
+  not just its stat), **stoneskin/barkskin/steelskin/diamondskin** (INT, passive spell), **parry** (DEX,
   low cap), **bind** (STR, low cap), **shield-wall** (CON, scales with rallied troops).
 CON is the through-line: it powers the CON block source AND scales shield-point regen for all sources.
 Every class should have a viable block source; a build with none must compensate (heavy heals, or high
@@ -169,32 +170,55 @@ STR build's armor to go RED across the board when both arms break.
 DEX = +2% evade per tier, per body part currently worn (stacks across worn pieces). INT = +2 spell
 damage per piece worn (2-piece cap: robe + hat). Shield = +2% block-pool recharge per tier (§6b).
 
-### 6d. Weapons — the wield model [LOCKED, 2026-07-03; a couple numbers OPEN, tagged below]
-Weapons are pure stat-sticks (base damage only) — techniques own ALL timing/effects (§7, unchanged).
+### 6d. Weapons — the wield model [LOCKED, 2026-07-03; corrected same day — see notes; a couple numbers
+OPEN, tagged below]
+**Weapons/equipment are stat-sticks AND technique GATES** — not just a damage number. A technique
+requires its matching equipment to be PRESENT to be usable at all (same tier of requirement as its
+attribute reservation, not a bonus layered on an otherwise-available technique): a dual-wield technique
+needs two weapons equipped, one per hand-slot; the CON **block** shield-source (§6b) needs a shield
+OBJECT equipped, not just CON reserved — it's the strongest block source, and the only one gated on a
+physical item rather than its stat alone. Techniques still own ALL timing/effects (§7, unchanged) — the
+weapon never adds its own timer, it only gates + scales.
 - **No dynamic hand-reservation.** Rejected in favor of the simpler rule: a technique doesn't reserve
   hands over time the way it reserves an attribute — it just REQUIRES a matching weapon config to be
   PRESENT (equipped + arms unbroken) the instant it fires. Weapon attacks are instantaneous-if-charged;
   there's no hold/release lifecycle for hands beyond that instant check.
-- **Equip configurations:** `1h + shield` · `2×1h` (dual-wield) · `2×2h` (own two two-handers —
-  greatsword, bow, wand — but only ONE is ever physically wielded; see primary/secondary below) ·
-  `1× ranged` (bow/wand, both hands, worn on the back when not the active primary).
-- **Lockout conditions [LOCKED]:** a dual-wield technique needs BOTH arms unbroken with two 1h weapons
-  equipped, or it's locked out; a 2h technique (incl. bows/wands) needs BOTH arms unbroken, or it's
-  locked out; a shield needs a FREE arm — it drops whenever both arms are already committed to a 2h
-  weapon or a dual-wield pair. Same rule for foes (§8 symmetry): arms/legs are separately targetable and
-  breakable on both sides.
-- **Primary/secondary auto-promotion [LOCKED]:** within a hand-slot category, first-equipped = PRIMARY,
-  second = SECONDARY. Unequipping the primary promotes the secondary; a newly-equipped item always fills
-  the (now-empty) secondary slot — it never displaces an existing primary. Guarantees a technique never
-  finds a null primary while a valid secondary sits idle. **[OPEN]** whether swapping which one is active
-  mid-combat costs an action/cooldown or is free — tune later.
+- **Two independent equip layers [CORRECTED 2026-07-03]:** a **MELEE hand-config** (main-hand + off-hand,
+  2 slots total) and a separate, independent **RANGED slot** (bows/wands) — a bow does NOT compete with
+  melee hands for an equip slot; a character can have a sword+shield AND a bow equipped at once (the
+  Ranger core already ships exactly this, §10). Only ONE ranged slot exists at all, so "which of two bows"
+  was never actually a contention — there's just one. Both layers still gate on arms: **RANGED weapons
+  need BOTH arms unbroken to use, same as any 2-handed melee weapon**, even though they don't occupy the
+  melee hand-slots.
+- **Melee hand-config, 1H/2H is per-weapon, not a fixed slot shape:** main-hand + off-hand can each hold a
+  1H weapon, a shield (off-hand only, needs a free arm), or — dual-wielding — ANY pairing across the two
+  slots, including 2H/2H or 2H/1H, gated purely by **each weapon's own STR requirement** (§6 table, "STR
+  weapons" — this is the SAME generic per-weapon threshold everything else already uses, not a separate
+  one-hand-vs-two-hand gate). **2H weapons carry a steep, per-tier STR requirement** so that affording two
+  at once (or a 2H+heavy-1H pair) is a genuine build-cost tradeoff through the shared STR pool (§5/§6) —
+  likely capping such a build below max tier on both pieces rather than being flatly disallowed. Numbers
+  OPEN (§17 #9, the balance pass); the SHAPE (single per-weapon threshold, no bespoke dual-wield tax) is
+  locked.
+- **Lockout conditions [LOCKED]:** a dual-wield technique needs BOTH arms unbroken with two weapons
+  equipped (any 1H/2H mix, per the STR gate above), or it's locked out; a solo 2H melee technique needs
+  BOTH arms unbroken; a ranged technique (bow/wand) needs BOTH arms unbroken; a shield needs a FREE
+  arm — it drops whenever both arms are already committed to a dual-wield pair. Same rule for foes (§8
+  symmetry): arms/legs are separately targetable and breakable on both sides.
+- **Main-hand/off-hand auto-promotion [LOCKED]:** within the melee hand-config, first-equipped = MAIN-
+  HAND, second = OFF-HAND. Unequipping main-hand promotes off-hand; a newly-equipped item always fills
+  the (now-empty) off-hand slot — it never displaces an existing main-hand. Guarantees a technique never
+  finds a null main-hand while a valid off-hand sits idle.
 - **Handedness [LOCKED]:** a player-facing Left/Right-handed setting (cosmetic only) fixes which physical
-  arm renders the primary weapon vs. the off-hand item, so a broken/bare-arm visual always matches the
+  arm renders the main-hand weapon vs. the off-hand item, so a broken/bare-arm visual always matches the
   item that would actually drop from that specific arm.
-- **Ranged weapons share the both-hands/back-slot model.** **Bows (DEX):** fully ignore the shield pool,
-  gated by Charge — unchanged, §10. **Wands (INT):** a second ranged flavor, PARTIALLY bypass the shield
-  pool (so Charge isn't a bow-only resource) — **[OPEN §17]** the exact bypass split/math; the shape
-  (partial, not full) is locked, the number is not.
+- **[OPEN, flagged not invented]:** does POWERING a ranged technique force the melee hand-config to
+  visually sheath (since a bow needs both hands) — and if so, does that drop a held shield's block while
+  the bow is drawn? Physically plausible given only 2 hands total, but Doug hasn't called it; don't build
+  it either way until it's answered.
+- **Ranged — bypass degree:** **Bows (DEX):** fully ignore the shield pool, gated by Charge — unchanged,
+  §10. **Wands (INT):** a second ranged flavor, PARTIALLY bypasses the shield pool (so Charge isn't a
+  bow-only resource) — **[OPEN §17]** the exact bypass split/math; the shape (partial, not full) is
+  locked, the number is not.
 - **Names [blessed initial, tune later]:** Bows — Short Bow → Long Bow → Compound Bow → Elven Bow.
   Wands — Adept Wand → Twisted Wand → Gemstone Wand → Glowing Wand.
 

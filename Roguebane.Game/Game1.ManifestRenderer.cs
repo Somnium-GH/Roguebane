@@ -537,15 +537,18 @@ public partial class Game1
         "core.name" => _build.Race.Name + " " + _build.CoreRune.Title,
         "core.role" => _build.CoreRune.Archetype,
         // Equipment strip labels (design/02). run.state reads the real expedition state in-run —
-        // pre-run the march is armed, matching the design's READY TO MARCH copy.
-        "run.state" => InRun ? Exp.State.ToString().ToUpperInvariant() : "READY TO MARCH",
+        // pre-run AND at the chart (Choosing) the march is armed, matching the design's
+        // READY TO MARCH copy; a live fight reads FIGHTING.
+        "run.state" => !InRun || Exp.State == Roguebane.Core.ExpeditionState.Choosing
+            ? "READY TO MARCH" : Exp.State.ToString().ToUpperInvariant(),
         "loadout.slotLabel" => "TECHNIQUES - "
             + (InRun ? Exp.Equipment.Count : _build.Equipment.Count) + " / " + _build.CoreRune.Kit.Count + " slotted",
         "minions.slotLabel" => "MINIONS - "
             + (InRun ? Exp.Minions.Count : _build.CoreRune.MinionKit.Count) + " / " + _build.CoreRune.Bays + " slotted",
         "core.coreEffectName" => _build.CoreRune.CoreEffectName,
         "core.coreEffectDesc" => _build.CoreRune.CoreEffectDesc,
-        "runes.budget" => _build.Runes.Available + " free / " + _build.Runes.Budget,
+        // The authored copy is "BUDGET n free / m" (design/02's rune bag readout).
+        "runes.budget" => "BUDGET " + _build.Runes.Available + " free / " + _build.Runes.Budget,
         "Body.hp" => InRun ? Exp.Player.Hp + " / " + Exp.Player.MaxHp : null,
         "encounter.foe.hp" => InRun && Exp.Enemy is { } foe ? foe.Hp + " / " + foe.MaxHp : null,
         // HP strip eyebrows (design/01: "GRUNT · HP" / "DIRE OGRE · HP 14 / 20"). ASCII dash — the

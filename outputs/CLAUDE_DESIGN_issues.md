@@ -10,6 +10,11 @@ B0. **resourceStrip still clips SUMMONS on citymap + equipment** (encounter is F
     two screens author the strip at 197 wide with gap 8: four 47-wide chips need 4x47 + 3x8 = 212.
     Numbers to make 4 seat at 197: gap 3 (188+9=197 exact), or widen the strips to 212, or narrow
     the chips. Engine clips overflowing cells, so SUMMONS drops silently there today.
+B0b. **equipment `coreLabel` binds `core.name` but authors "CORE GRUNT"** — the same bind feeds
+    `currentCoreName` ("Human Grunt"), so ONE resolver can't produce both copies. The dc.html
+    source styles the chip as muted "CORE" + bold core title; extraction flattened that to the
+    shared bind. Ask: bind the chip to its own datum (e.g. `core.chipLabel`) or author it as
+    parts, so the engine can render "CORE <TITLE>" without guessing from element ids.
 B1. **Your extract merge silently DROPPED `screens.campaignmap` + `templates.cityNode`** in the
     late 2026-07-03 drop (DROP_AUDIT said "04 untouched," but the manifest no longer carried the
     screen at all). We restored both VERBATIM repo-side from the previous manifest — no design
