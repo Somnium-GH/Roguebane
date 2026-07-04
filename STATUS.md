@@ -151,28 +151,26 @@ P0-C.9 unbound-static-image-part suppression to `Race` datums (`Game1.ManifestRe
 
 ## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-03, Doug — NewGame core-picker card, live screenshots)
 Doug shot the Grunt core card in three states (idle/SELECT, live selected/✓ CORE SET, and the design/05
-reference) and found two real defects. **Not a stop-the-loop interrupt — fold into the next pass that
-touches NewGame's core/race cards**, but don't let it go stale; HiFi visual bugs stay top-of-queue by
-standing rule.
+reference) and found two real defects.
 1. **CORE EFFECT text collision, CONFIRMED STILL OPEN:** the "CORE EFFECT" eyebrow visibly overlaps the
    "Hollow Vessel" title line in ALL THREE of Doug's shots (idle + selected) — this is the **`eyebrow×title`**
    member of the 3 known collisions baselined 2026-07-03 (STATUS history: heroShield-over-bar and the
    doubled-identity collision both DIED same day; eyebrow×title was never confirmed dead — the "post-A3
    re-judge (findings 4→3, ALL CD-side)" note covers NewGame's geometry deltas generally, NOT a specific
-   re-check of this collision). Treat as a real, still-open regression, not a dupe to dismiss.
-2. **Selected-card highlight (amber ring) NOT RENDERING — engine bug, root cause partially isolated:**
-   the reference (design/05) shows a clear amber border + panelCard fill on the CHOSEN card; Doug's live
-   "✓ CORE SET" shot shows the SAME plain/dim border as the unselected card — the highlight never applies.
-   **This is NOT a CD/data gap** — verified `layout.json`'s `templates.coreCard.states.selected` carries
-   `border:"amber", fill:"panelCard", badge:"✓ CHOSEN"` correctly, and `style.palette.amber` (`#d9a441`)
-   resolves fine through `PaletteColor.Named`. The `.selection` PART's own label chip clearly DOES update
-   (SELECT → ✓ CORE SET), proving `_build.CoreRuneIndex == i` matches correctly — so the bug is isolated to
-   the ROOT CHROME path: `Game1.ManifestRenderer.cs` `DrawManifestList` (~line 640-674, the
-   `"pickerCard" => i == selIx ? "selected" : "idle"` switch) feeding `DrawTemplateRootChrome` (~line
-   1174-1192). Candidates to check live (needs the actual build — no dotnet in this sandbox to verify):
-   (a) `tmpl.Parts.Length == 0` sends coreCard down the `DrawLeafTemplate` path instead (line 650), which
-   has NO family/selected handling at all; (b) the `family`/state key lookup silently misses for some
-   other reason. Confirm which, then fix — don't re-derive the manifest data, it's already correct.
+   re-check of this collision). Treat as a real, still-open regression, not a dupe to dismiss. **Not a
+   stop-the-loop interrupt — fold into the next pass touching NewGame's cards**, HiFi bugs stay
+   top-of-queue by standing rule regardless.
+
+## ✅ FIXED (2026-07-04 loop) — Selected-card highlight (amber ring) NOT RENDERING
+Root cause: `DrawTemplateRootChrome` (`Game1.ManifestRenderer.cs`) bailed out early whenever the
+TEMPLATE'S OWN root had no `fill`/`border` — before ever looking at its `states` block. coreCard defines
+chrome ONLY per-state (`states.idle/hover/selected/locked`), nothing at the template root, so the guard
+tripped unconditionally and the root ring never drew in ANY state, selected included. Manifest data was
+already correct (`states.selected` carries `border:"amber", fill:"panelCard"` and resolved fine) — this
+was purely an engine short-circuit. Removed the early-return guard; the existing per-token
+`{Length:>0}` checks already no-op correctly for templates with genuinely no chrome at all. Build clean,
+RB_SMOKE=1 RB_MF=all clean (no new collisions/coverage regressions), Core.Tests 350 green. **Needs Doug**:
+confirm live — RB_SMOKE can't visually verify actual amber pixel output, only that nothing crashed/regressed.
 
 ## ⇒ NEW LOCK (2026-07-03, Doug — design session): weapon wield model, DESIGN_SPEC §6/§6d
 **CORRECTED same day — §6d was rewritten twice; read the CURRENT §6d, not this summary, before building.**
