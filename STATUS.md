@@ -167,27 +167,19 @@ chrome bug, already tracked below, remains real). **No action, CD-side or non-bl
 background fidelity (CD's own art priority); rich-text-run flattening (accepted, tracked as A3);
 merchant-specific pagination is built, but the GENERIC container overflow/scroll model CD asked for
 doesn't exist as a primitive — low-priority engine debt, nothing currently blocked on it.
-**‼ NEW HIGH-PRIORITY ENGINE BUG surfaced by this pass — invCard/loadoutCard/invTab states (§6e):**
-CD's B5 (family keys) and B6 (vocabulary rename + hover variants) are BOTH fully LANDED in
-`layout.json` — verified: `invCard`/`loadoutCard`/`invTab` templates all carry `states.family` +
-the locked vocabulary (`equipped`/`disabled`/`equippable`/`locked`) + `hover` overlays
-(`layout.json` ~7996/8108/8434). But `Game1.ManifestRenderer.cs`'s `InvCardState()` (~line 922)
-still RETURNS THE OLD VOCABULARY (`equipped`/`dropped`/`ready`/`neutral`) — only `"equipped"`
-still matches a manifest key; `disabled`/`equippable`/`locked` never resolve, so those three states
-silently fall back to base template chrome (the exact bug B5 was meant to fix, reintroduced by a
-stale string literal). **Separately, `invTab` never resolves AT ALL:** the generic family-less
-fallback (`DrawManifestList` ~line 677-684) only recognizes templates whose `states` object has a
-literal `"slotted"` or `"equipped"` property — `invTab`'s states (`active`/`idle`/`hover`) match
-neither, so tab active/idle highlighting never fires; tabs draw base chrome only, and the hover
-brighten stopgap (line 687-691) only covers `inventory.activeTab.items`, not the tab bar itself.
-**Fix (pure engine, no CD ask — the manifest is correct):** (1) rewrite `InvCardState()`'s return
-values to the locked vocabulary; (2) either add an explicit `"invTab" => i == _invTab ? "active" :
-"idle"` case to the family switch (~line 660-676, alongside pickerCard/actionCard), or extend the
-generic fallback to read `active`/`idle` from datum context — the family switch is cleaner since
-invTab's index-vs-active-tab check doesn't need per-datum inspection. Fold into the next Equipment
-pass; this is a real regression against §6e's locked states, not a placeholder.
+**✅ FIXED (2026-07-04 loop) — invCard/loadoutCard states (§6e):** CD's B5 (family keys) and B6
+(vocabulary rename + hover variants) were fully landed in `layout.json`, but `InvCardState()`
+(`Game1.ManifestRenderer.cs`) still returned the pre-rename vocabulary (`equipped`/`dropped`/
+`ready`/`neutral`), and the root-chrome family switch didn't recognize the `invCard`/`loadoutCard`
+family values at all (unrecognized family short-circuited to null, bypassing the generic
+`equipped`-key fallback that used to resolve them pre-B5) — so every inventory/loadout card drew
+base chrome regardless of real state. Fixed both: added explicit `"invCard" or "loadoutCard" =>
+InvCardState(datum)` family cases, and rewrote `InvCardState()`'s return values to the locked
+`equipped`/`disabled`/`equippable`/`locked` vocabulary. Verified: build clean, RB_SMOKE all-screens
+no regressions, 350/350 Core.Tests green. (The `invTab` portion of this report is stale — no
+`invTab` template exists in current `layout.json`; nothing to fix there.)
 **Outbox update:** B5 and B6 marked confirm-to-close in `outputs/CLAUDE_DESIGN_issues.md` (CD
-delivered; thank them, clear from CD's dev memory) — the follow-up above is ours, not relayed.
+delivered; thank them, clear from CD's dev memory) — the follow-up above was ours, not relayed.
 **Item 27 reminder reconfirmed unchanged:** NewGame stat-block tuning session still pending
 (don't adopt design/05 v2 numbers); §13 aspect-fill already DONE (STATUS 691-696) — no action.
 
