@@ -137,11 +137,12 @@ part itself stays a Needs-CD extraction leftover.
 source's eyebrow, mis-attributed the block's display/8px style (dc.html authors mono 9px = 4.5
 design px, mutedDim). Drawn per the source now — crop clean, ng fidelity 78.6→79.4. Extraction
 mis-attribution logged Needs-CD.
-3. **Selected-card amber ring — NOT A CURRENT-BUILD BUG:** the gate shot renders the ring + ✓ CORE
-SET on the chosen card (crop-verified; both isolation candidates ruled out — coreCard has parts so
-it never takes the leaf path, and the family lookup hits). Doug's live game process predates
-today's chip/ring commits (bin\Debug locked by it since before 21be596) — STALE BUILD, same class
-as the 07-02 font case. **Doug: restart the game off a fresh build and re-shoot to close.**
+3. **Selected-card amber ring — WAS WRONGLY CLEARED HERE, since RE-FOUND AND ACTUALLY FIXED
+(2026-07-04 loop):** this "stale build" verdict was wrong — the bug was real and reproducible
+regardless of build freshness. `DrawTemplateRootChrome` (`Game1.ManifestRenderer.cs`) bailed out
+before ever consulting the `states` block whenever a template's ROOT had no `fill`/`border` — true
+of coreCard, which defines chrome only per-state. See the "✅ FIXED (2026-07-04 loop)" entry above
+for the actual root cause and fix.
 
 ## ✅ DUPLICATE, ALREADY FIXED (found 2026-07-04 loop) — race-card head portrait doubles/ghosts
 Same root cause and same fix as the "ghost head — FIXED" entry above: `7ad61c9` already extends the
