@@ -193,7 +193,10 @@ resolution, 8d85ef7); ~~GEAR click matrix + auto-displace~~ DONE (equipped→une
 equippable→equip; hands-full melee benches the OFF-hand [Hands[1] — Hands[0]=first-equipped=main
 per §6d promotion], armor swaps via Gearing's existing displacement; LOCKED inert via the Body's
 own wield gate; one GearTabItems composition shared by render + hit-test). Combat seal =
-Expedition's Choosing-only gate._
+Expedition's Choosing-only gate. ~~paper-doll gear-state compose~~ DONE (00a87b6: disabled armor
+renders BARE + un-ringed, broken arm never draws its weapon — Core-tested, 320). REMAINING from
+the §6e order: §6c armor data + requirement checks; cascade ranking (BLOCKED on the sustain-model
+question below); drag-reorder; the vestigial pre-run branch retire._
 **‼ NEEDS HUMAN — cascade SUSTAIN MODEL ambiguous, blocking the ranking build:** §6e reads
 "an attribute can't sustain EVERY equipped item" + a ranking with TIE-BREAKS + cheapest-first
 recovery — all load-bearing only under a SUMMED shared-pool demand (level 5 vs two req-3 swords:
