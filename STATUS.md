@@ -1,5 +1,37 @@
 # Status
 
+## ✅ DROP REVIEWED — B12 CORRECTED worn-armor set LANDED CLEAN (2026-07-04, Cowork). The morning
+## mis-build (type×core×race cross-product + a "plain" type) is FULLY FIXED. Art verified exact; the
+## build-integration steps below are the loop's — a few couldn't be verified from the Cowork sandbox
+## (git desynced from the working tree + layout.json mount serves stale reads + no dotnet), so they're
+## flagged to VERIFY, not asserted broken.
+**VERIFIED GREEN (reliable file/dir checks):** `Roguebane.Content/sprites/gear/worn/<race>/<slot>/…`
+= **744 files, 0 missing / 0 extra** against the enumerated target (bare 24 + generic 240 + themed 480).
+No `plain` type (unarmored terminal is `bare`); **cross-product leak check EMPTY** — every themed
+sprite's type equals its core's favored line (grunt/warden→str, adept/summoner→int, reaver/ranger→dex).
+Slot coverage correct: arms/legs carry str+dex only (no int, no adept/summoner themes); int = chest+head
+only; every part cooked per race (human+elf). No leftover mis-built `sprites/body/*_(str|dex|int)_*`
+contamination. CD's `design/dchtml/DROP_AUDIT.md` documents the retraction of the morning cross-product
+build + matches the spec (themes per core; elf_ranger neckline strap now mid-chest; bow/sling back-mount
+art also shipped). **The mis-build Doug flagged is resolved.**
+**LOOP FOLLOW-UPS (build integration — the art is done, these wire it in; normal priority):**
+1. ~~GAME-side mgcb mirror~~ DONE (2026-07-04 loop). Transformed all 744 `sprites/gear/worn/…`
+   CD-source blocks into the game-side path/output-name convention and appended to
+   `Roguebane.Game/Content/Content.mgcb`; `dotnet build` clean, all 744 worn xnbs produced.
+2. ~~layout.json top-level `worn` block~~ VERIFIED PRESENT (2026-07-04 loop): `layout.json:10373`
+   carries the compact `worn` inventory (root/races/slots); manifest parses fine under SMOKE.
+3. **Engine: themed half + DRAW code.** e1c8291 landed the GENERIC resolver half; still pending — the
+   THEMED override (fires only when the worn line == figure core's favored line, §7a) + the actual
+   worn-part/back-mount DRAW (part selection by race/slot/wear-state; back-mount behind legL), per CD
+   audit → DEV_LOOP_MEMORY #32. Fallback chain per §12a. **Only item still open from this drop.**
+4. ~~Build-verify + SMOKE asset-exists probe~~ DONE (2026-07-04 loop): `RB_SMOKE=1 RB_MF=all` reports
+   `SMOKE ASSETS: missing=0` (2 unverifiable are pre-existing, unrelated placeholders) and
+   `SMOKE FIGURES: armored-missing=0`; Core.Tests 350 green. Eyeballing a themed figure live still
+   wants item 3's DRAW code first — nothing renders differently yet, only the pipeline is proven.
+_Scope note: this review targeted the worn-armor correction Doug flagged. The rest of the drop CD's
+audit claims (B1b/B4/B7/B8/B10/B11, weapons/families/back-mount) rides the loop's normal landed-audit —
+not re-verified here._
+
 ## ⇒ CD MEMORY-DROP RECONCILE (2026-07-03, Cowork) — CD's dev-loop memory audited vs repo; most
 ## items were STALE ON CD'S SIDE (already landed here), one real NEW engine bug surfaced.
 Reconciled CD's 11-item OPEN list against actual repo state (grepped layout.json/renderer, didn't
