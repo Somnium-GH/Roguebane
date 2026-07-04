@@ -694,6 +694,10 @@ public partial class Game1
                                 "DRY" => "locked",
                                 _ => InRun ? "locked" : "ready", // unpowered in-run reads locked
                             }),
+                        // invCard/loadoutCard (§6e, B5/B6 landed): family is now a literal template
+                        // name, not a shared shape like pickerCard/actionCard — route both to the
+                        // same equipped/disabled/equippable/locked resolver.
+                        "invCard" or "loadoutCard" => InvCardState(datum),
                         _ => null,
                     };
                 // §6e interim (FLAGGED, dies when B5 family keys land): states WITHOUT a family
@@ -934,10 +938,10 @@ public partial class Game1
         }
     }
 
-    // The invCard root-chrome state per §6e's LOCKED family, expressed in TODAY'S manifest keys
-    // (CD rename queued, issues B6 — engine chases it clean when it ships):
-    //   equipped = EQUIPPED (green, active) · dropped = DISABLED (red: assigned but unsustainable)
-    //   ready = EQUIPPABLE (plain, requirements met) · neutral = LOCKED (dim: reqs unmet, or the
+    // The invCard/loadoutCard root-chrome state per §6e's LOCKED vocabulary (B5/B6 landed —
+    // invCard/loadoutCard's manifest states carry these four keys directly, no rename left to chase):
+    //   equipped = EQUIPPED (green, active) · disabled = DISABLED (red: assigned but unsustainable)
+    //   equippable = EQUIPPABLE (plain, requirements met) · locked = LOCKED (dim: reqs unmet, or the
     //   bar/bays are FULL — capacity reads as locked, never a displacement conflict).
     // Only gates that EXIST in Core apply: weapon = free hand + stat capacity >= Reserve; worn
     // armor disables when its part-group breaks; §6c armor attr-requirements and §6d arm-broken
@@ -945,26 +949,26 @@ public partial class Game1
     private string? InvCardState(object? datum) => datum switch
     {
         Roguebane.Core.Weapon w when InRun && Exp.Player.Body.Ranged == w =>
-            Exp.Player.Body.RangedUsable ? "equipped" : "dropped",
+            Exp.Player.Body.RangedUsable ? "equipped" : "disabled",
         Roguebane.Core.Weapon w when InRun && Exp.Player.Body.Hands.Contains(w) =>
             Exp.Player.Body.HandItemUsable(
-                Exp.Player.Body.Hands.ToList().IndexOf(w)) ? "equipped" : "dropped",
+                Exp.Player.Body.Hands.ToList().IndexOf(w)) ? "equipped" : "disabled",
         Roguebane.Core.Weapon w when InRun =>
             Exp.Player.Body.Hands.Count < 2 && Exp.Player.Body.Capacity(w.Stat) >= w.Reserve
-                ? "ready" : "neutral",
-        Roguebane.Core.Weapon => "neutral", // pre-run: no body to lift it yet
+                ? "equippable" : "locked",
+        Roguebane.Core.Weapon => "locked", // pre-run: no body to lift it yet
         Roguebane.Core.Armor a when InRun && Exp.Player.Body.ArmorOn(a.Slot) == a =>
-            Exp.Player.Body.ArmorSustained(a) ? "equipped" : "dropped",
+            Exp.Player.Body.ArmorSustained(a) ? "equipped" : "disabled",
         Roguebane.Core.Armor ar2 => InRun
-            && Exp.Player.Body.Capacity(ar2.Governing) >= ar2.Requirement ? "ready" : "neutral",
+            && Exp.Player.Body.Capacity(ar2.Governing) >= ar2.Requirement ? "equippable" : "locked",
         Roguebane.Core.Technique t when (InRun ? Exp.Equipment : _build.Equipment).Contains(t)
             => "equipped",
         Roguebane.Core.Technique => (InRun ? Exp.Equipment.Count : _build.Equipment.Count)
-            >= _build.CoreRune.Kit.Count ? "neutral" : "ready",
+            >= _build.CoreRune.Kit.Count ? "locked" : "equippable",
         Roguebane.Core.Minion m when (InRun
             ? Exp.Minions.Contains(m) : _build.CoreRune.MinionKit.Contains(m)) => "equipped",
         Roguebane.Core.Minion => (InRun ? Exp.Minions.Count : _build.CoreRune.MinionKit.Count)
-            >= _build.CoreRune.Bays ? "neutral" : "ready",
+            >= _build.CoreRune.Bays ? "locked" : "equippable",
         _ => null,
     };
 
