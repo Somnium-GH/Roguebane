@@ -464,6 +464,41 @@ public class ExpeditionTests
     }
 
     [Fact]
+    public void ReorderMovesATechniqueToTheGivenSlot()
+    {
+        var exp = CappedExpedition(3, Techniques.Jab, Techniques.Cleave, Techniques.Lunge);
+        Assert.True(exp.ReorderTechnique(Techniques.Lunge, 0)); // drag the 3rd slot to the front
+        Assert.Equal(
+            new[] { Techniques.Lunge, Techniques.Jab, Techniques.Cleave },
+            exp.Equipment);
+    }
+
+    [Fact]
+    public void ReorderClampsAnOutOfRangeIndexToTheLastSlot()
+    {
+        var exp = CappedExpedition(3, Techniques.Jab, Techniques.Cleave, Techniques.Lunge);
+        Assert.True(exp.ReorderTechnique(Techniques.Jab, 99));
+        Assert.Equal(
+            new[] { Techniques.Cleave, Techniques.Lunge, Techniques.Jab },
+            exp.Equipment);
+    }
+
+    [Fact]
+    public void ReorderOfAnUnequippedTechniqueIsANoOp()
+    {
+        var exp = CappedExpedition(3, Techniques.Jab, Techniques.Cleave);
+        Assert.False(exp.ReorderTechnique(Techniques.Lunge, 0));
+    }
+
+    [Fact]
+    public void ReorderIsOutOfCombatOnly()
+    {
+        var exp = CappedExpedition(3, Techniques.Jab, Techniques.Cleave);
+        exp.Enter("a1"); // State -> Fighting
+        Assert.False(exp.ReorderTechnique(Techniques.Cleave, 0));
+    }
+
+    [Fact]
     public void EquipTechniqueNeverReservesAttributes()
     {
         // "Reservation timing" DESIGN_SPEC lock: equipping a technique is pure roster membership —

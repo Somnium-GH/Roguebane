@@ -85,6 +85,17 @@ public sealed class Campaign
         _loadout.Remove(technique);
         return true;
     }
+
+    // Mirrors the reorder into _loadout too, else the position would revert on the next NewLeg().
+    public bool ReorderTechnique(Technique technique, int newIndex)
+    {
+        if (!Current.ReorderTechnique(technique, newIndex)) return false;
+        var i = _loadout.IndexOf(technique);
+        if (i < 0) return true;
+        _loadout.RemoveAt(i);
+        _loadout.Insert(Math.Clamp(newIndex, 0, _loadout.Count - 1), technique);
+        return true;
+    }
     public void Redeploy() => Current.Redeploy(); // leave a cleared fight -> back to the chart
 
     // FTL targeting surface (delegates to the current leg's expedition).

@@ -197,6 +197,20 @@ public sealed class Expedition
         return true;
     }
 
+    // §6e reorder: drag-and-drop insertion on the bar — pure position mutation, no equip/unequip and
+    // no reservation change (same "out of combat only" gate as equip/unequip above).
+    public bool ReorderTechnique(Technique technique, int newIndex)
+    {
+        if (State != ExpeditionState.Choosing) return false;
+        var i = _equipment.IndexOf(technique);
+        if (i < 0) return false;
+        newIndex = Math.Clamp(newIndex, 0, _equipment.Count - 1);
+        if (i == newIndex) return true;
+        _equipment.RemoveAt(i);
+        _equipment.Insert(newIndex, technique);
+        return true;
+    }
+
     // The merchant's HP service price (§10): gold per 1 HP, randomized within a loot-bounded range and
     // STABLE per merchant node (same node id => same price, so the run stays reproducible).
     public int HealPricePerHp => 1 + new Rng(Seed(Map.Current.Id) ^ HealSalt).Next(2); // 1..2 gold / HP

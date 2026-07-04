@@ -135,6 +135,28 @@ public class CampaignTests
     }
 
     [Fact]
+    public void CampaignReorderMovesATechniqueInTheCurrentLegsBar()
+    {
+        var c = CappedCampaign(2);
+        c.EquipTechnique(Techniques.Cleave); // [Jab, Cleave]
+        Assert.True(c.ReorderTechnique(Techniques.Cleave, 0));
+        Assert.Equal(new[] { Techniques.Cleave, Techniques.Jab }, c.Current.Equipment);
+    }
+
+    [Fact]
+    public void ReorderedTechniqueOrderSurvivesALegAdvance()
+    {
+        var c = FullLoadout(); // Techniques.All, uncapped, active + AUTO
+        var reordered = c.Current.Equipment[^1];
+        Assert.True(c.ReorderTechnique(reordered, 0));
+        Assert.Equal(reordered, c.Current.Equipment[0]);
+
+        ClearLeg(c); // NewLeg() rebuilds Current from _loadout
+
+        Assert.Equal(reordered, c.Current.Equipment[0]); // order preserved, not reset by the rebuild
+    }
+
+    [Fact]
     public void UnequippedTechniqueStaysUnequippedAfterALegAdvance()
     {
         var c = FullLoadout(); // Techniques.All, uncapped, active + AUTO
