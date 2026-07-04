@@ -45,15 +45,23 @@ public static class FigureBinding
         return ConditionOf(body, parts);
     }
 
-    // A bare-capable part shows its bare row only while NOTHING armours its group.
+    // A bare-capable part shows its bare row while nothing armours its group — or while the worn
+    // piece is DISABLED (§6e: the render is CAPABILITY truth; a piece whose group broke sheds its
+    // effect and its look — assignment truth stays on the Equipment card).
     public static bool UseBare(Body body, string visualPart)
         => BareCapable.Contains(visualPart)
            && PartStat.TryGetValue(visualPart, out var stat)
-           && body.ArmorOn(stat) is null;
+           && (body.ArmorOn(stat) is null || body.Capacity(stat) == 0);
 
-    // Is this visual part's group wearing armour?
+    // Is this visual part's group wearing SUSTAINED armour? (A disabled piece draws nothing, §6e.)
     public static bool IsArmored(Body body, string visualPart)
-        => PartStat.TryGetValue(visualPart, out var stat) && body.ArmorOn(stat) is not null;
+        => PartStat.TryGetValue(visualPart, out var stat) && body.ArmorOn(stat) is not null
+           && body.Capacity(stat) > 0;
+
+    // §6 broken-limb hard override: a BROKEN arm's hand slot is physically gone — its weapon never
+    // draws (nor swings). Hand order mirrors the shell's socket order: 0 = handR/main, 1 = handL.
+    public static bool HandUsable(Body body, int handIndex)
+        => Condition(body, handIndex == 0 ? "armR" : "armL") != PartCondition.Broken;
 
     // Whether this part has a bare/armoured sprite ROW. Parts without one (torso/head/boots) can't show
     // armour through the sprite, so the shell draws a composed indicator instead.

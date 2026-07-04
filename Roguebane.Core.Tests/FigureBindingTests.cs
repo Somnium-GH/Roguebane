@@ -66,6 +66,37 @@ public class FigureBindingTests
     }
 
     [Fact]
+    public void DisabledArmorRendersBareAndUnringed()
+    {
+        // §6e: the paper-doll is CAPABILITY truth — a worn piece whose part-group broke sheds its
+        // rendered look (bare limb / no composed ring); assignment stays on the Equipment card.
+        var b = Humanoid(out _, out _, out var legs, out var torso);
+        b.Equip(Shops.Hide);  // leather on the DEX (legs) group
+        b.Equip(Shops.Plate); // plate on the CON (torso) group
+        Assert.False(FigureBinding.UseBare(b, "legL"));
+        Assert.True(FigureBinding.IsArmored(b, "torso"));
+
+        b.Damage(legs, 4);  // the whole DEX group breaks (one legs part in this fixture)
+        b.Damage(torso, 6); // the CON group breaks
+        Assert.True(FigureBinding.UseBare(b, "legL"));      // disabled leather -> bare row
+        Assert.False(FigureBinding.IsArmored(b, "torso"));  // disabled plate -> no ring
+    }
+
+    [Fact]
+    public void BrokenArmLosesItsHandSlot()
+    {
+        // §6 hard override: hand 0 = handR = the SECOND Str part (add order armL, armR).
+        var b = Humanoid(out var armL, out var armR, out _, out _);
+        Assert.True(FigureBinding.HandUsable(b, 0));
+        Assert.True(FigureBinding.HandUsable(b, 1));
+        b.Damage(armR, 4); // break the right arm -> hand 0 gone, hand 1 intact
+        Assert.False(FigureBinding.HandUsable(b, 0));
+        Assert.True(FigureBinding.HandUsable(b, 1));
+        b.Damage(armL, 4);
+        Assert.False(FigureBinding.HandUsable(b, 1));
+    }
+
+    [Fact]
     public void OnlyLimbsHaveABareVariant()
     {
         Assert.True(FigureBinding.HasBareVariant("armL"));

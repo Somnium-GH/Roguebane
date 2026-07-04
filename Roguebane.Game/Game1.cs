@@ -1087,6 +1087,8 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         var hands = new[] { "handR", "handL" }; // dominant hand first
         for (var i = 0; i < body.Hands.Count && i < hands.Length; i++)
         {
+            // §6 hard override: a broken arm's hand slot is physically gone — its weapon never draws.
+            if (!FigureBinding.HandUsable(body, i)) continue;
             var w = body.Hands[i];
             var tex = _assets.Texture($"sprites/gear/{w.Id}");
             if (tex is null || !fig.Sockets.TryGetValue(hands[i], out var anchor)) continue;
