@@ -1393,6 +1393,10 @@ QUEUE worn-armor item below is UPDATED to this convention.**
 - Warden's CON-substitution idea ("STR armor requires CON instead") — FLOATED ONLY (§7a), not locked;
   replace vs stack with the already-locked Unbroken Aegis Core Effect is still Doug's call.
 - Part→stat friction (legs = accuracy, arms = STR) — low-pri, revisit only if it nags.
+- Worn-armor DRAW wiring (§17 #15): per-core body-silhouette vs worn-part composition — does a
+  resolved worn sprite (race-first, complete part per §12a CORRECTION #3) REPLACE the existing
+  per-core figure-part draw outright, get masked to its silhouette, or something else? `WornArmorBinding`
+  (e1c8291) resolves the sprite KEY only and is deliberately not wired into `Game1.cs` pending this call.
 
 ## Asset gaps (Needs Claude Design) — art missing/wrong, not composable from primitives
 - Shield ladder (`shield_wooden`/`shield_iron`/`shield_kite`/`shield_tower`) — no sprites shipped yet
