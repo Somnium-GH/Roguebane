@@ -328,20 +328,14 @@ public partial class Game1
                 // While a module is picking, the AIMING reticle centres on the hovered limb's ACTUAL
                 // part rects (band strips remain the click hit-test); a locked part-aim shows the
                 // FOCUS reticle on its part.
-                // §8 targeting presentation (design/08, LOCKED): NO box affordances, ever — no hover
-                // border, no band highlight, no whole-foe frame. The cursor IS the reticle.
+                // §8 targeting presentation (design/08, LOCKED; CORRECTED 2026-07-04, Doug): NO box
+                // affordances, ever — no hover border, no band highlight, no whole-foe frame. The
+                // cursor IS the reticle: it draws AT THE RAW CURSOR and never snaps/warps onto a part.
+                // Hovering still runs the part hit-test every frame (FoePartAt below) — that's what
+                // click-to-aim locks onto — it just no longer repositions the drawn sprite.
                 var picking = !ef.Down && _ctrl.IsTargeting(Exp);
-                if (picking)
-                {
-                    // The red AIMING reticle rides the cursor, snapping/centring to the hovered limb
-                    // band (band strips stay the click hit-test; they just aren't drawn).
-                    var mount = ef.Frame is not null && FoePartAt(ef, _cursor) is { } hov
-                        && FoePartScreenRect(ef, hov.Stat, r) is { } pr
-                        ? new Point(pr.X + pr.Width / 2, pr.Y + pr.Height / 2)
-                        : _cursor;
-                    if (_assets.Reticle("aiming") is { } aim)
-                        Sprite(aim, mount.X - 24, mount.Y - 24, 48, 48, Color.White);
-                }
+                if (picking && _assets.Reticle("aiming") is { } aim)
+                    Sprite(aim, _cursor.X - 24, _cursor.Y - 24, 48, 48, Color.White);
                 // Locked part-aims read as reticle mounts (deduped by stat): the pulsing FOCUS frames
                 // normally; the faint SECONDARY while ANOTHER module is actively picking (design/08).
                 // Size = the part rect's larger side x1.5, clamped 64..136 SCREEN(scene) px.
