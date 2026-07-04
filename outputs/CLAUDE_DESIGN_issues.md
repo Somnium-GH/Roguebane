@@ -107,6 +107,13 @@ B11. **Bow sprites missing from the gear batch:** the catalog + sprite set cover
     EXCEPT bows (Short/Long/Compound/Elven — §6d ranged slot). The old sprites/gear/bow.png
     covers nothing in the new convention. Ask: 4 bow sprites (bow_short, bow_long, bow_compound,
     bow_elven) + catalog rows; engine ids will chase.
+B13. **Merchant `waresShelves` list is ONE PIXEL short of fitting its own authored 3-row layout.**
+    Element size `[692,377]`, item `{template:"shopSection", flow:"vertical", gap:12, size:[692,118]}`
+    — three rows need `3×118 + 2×12 = 378px`, the container is `377px`. Our list layout's overflow
+    rule silently drops any cell that doesn't fully fit rather than partial-rendering it, so the whole
+    3rd wares section (e.g. Minions) vanishes even though the page-count math says it should show
+    (Doug: "buy out one category and another appears that was invisible" — that's this). Ask: bump
+    `waresShelves.size[1]` to at least 378, ideally 382+ for margin.
 
 B12. **CLOSED 2026-07-04 — delivered + verified clean (744 files, no cross-product, no "plain",
     0 missing / 0 extra); see Confirm-to-close above. Convention is now canon in LAYOUT_CONTRACT §12a /

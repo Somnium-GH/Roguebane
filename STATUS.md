@@ -1,5 +1,43 @@
 # Status
 
+## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-03, Doug — Merchant only shows 2 of 3 wares sections;
+## a 3rd appears once you buy out one of the visible two)
+Doug's screenshots show WEAPONS+ARMOR, then (after buying out Armor) WEAPONS+MINIONS — a 3rd stocked
+section is present in the DATA the whole time but invisible until an earlier row empties out and the
+list re-flows. **ROOT CAUSE FOUND, exact and tiny:** `layout.json`'s merchant `waresShelves` list
+(`offset [254,61]`, **size `[692,377]`**) stamps `item:{template:"shopSection", flow:"vertical",
+gap:12, size:[692,118]}`. Three rows need `3×118 + 2×12 = 378px` — the container is **377px, ONE
+PIXEL SHORT.** `ListLayout.Cells`'s vertical-flow overflow rule (`Roguebane.Core/Layout/ListLayout.cs`:
+"cells past the region edge drop instead of spilling") silently drops the entire 3rd row for missing
+by 1px — it doesn't clip/partial-render, it just omits it. `MerchantPageCount()` (`SectionsPerPage=3`)
+correctly computes "1 page" for a 3-section stock, since its math never touches this geometry — so
+"PAGE 1/1" is technically correct, the bug is purely that only 2 of the page's 3 rows fit on screen.
+When a bought-out section's ware list empties, that section drops from `MerchantSections()` entirely,
+the remaining sections re-index, and the previously-clipped 3rd section slides into a now-visible
+slot — matching Doug's exact "buy one out and another appears" description. **Fix: bump
+`waresShelves.size[1]` from 377 to at least 378 (fresh margin recommended, e.g. 382+)** — logged to CD
+(`CLAUDE_DESIGN_issues.md`) since layout.json regenerates externally; a local one-pixel patch here
+would just get overwritten on the next drop.
+
+## ⇒ BUG REPORT — HiFi, HIGH PRIORITY, NEEDS LIVE REPRO (2026-07-03, Doug — all text shifts upward
+## uniformly when the window is MAXIMIZED; windowed mode is correct)
+Doug: happens on "pretty much everywhere" (merchant wares, Equipment's core/technique/minion foot
+strip, others) — consistent, uniform upward shift specifically on maximize (not general resize; per
+STATUS history, resizing to other arbitrary sizes like 1600×1000 was previously verified clean, so
+this looks maximize-specific, not a generic aspect-fill bug). **Traced the render pipeline
+(`Game1.cs` `EnsureSceneMatchesBackbuffer` / `UpdateViewport` / the final scene blit) and it's clean —
+no hardcoded offsets, no title-bar math, `_viewDest` is always `(0,0,scene.Width,scene.Height)` and
+the scene is drawn at 1:1.** Couldn't find a static-code smoking gun; this needs a LIVE repro (no
+dotnet in this sandbox to run it). Two concrete things to check on an actual build: (1) whether
+`GraphicsDevice.PresentationParameters.BackBufferWidth/Height` reports a stale/transient value
+immediately after the OS maximize event (a known MonoGame/SDL timing quirk) — add a one-line debug
+print of `bw,bh,_scene.Width,_scene.Height` right after maximizing; (2) the early-return guard in
+`EnsureSceneMatchesBackbuffer` (`if (_scene is not null && _scene.Width==bw && _scene.Height==bh)
+return;`) — if maximize fires the resize event more than once with an intermediate wrong size, the
+scene could latch onto that intermediate size and never get corrected. Flagging as HiFi/high-priority
+since it's visible everywhere, but it's a repro-and-instrument task, not something foldable from a
+screenshot alone.
+
 ## ✅ DROP REVIEWED — B12 CORRECTED worn-armor set LANDED CLEAN (2026-07-04, Cowork). The morning
 ## mis-build (type×core×race cross-product + a "plain" type) is FULLY FIXED. Art verified exact; the
 ## build-integration steps below are the loop's — a few couldn't be verified from the Cowork sandbox
