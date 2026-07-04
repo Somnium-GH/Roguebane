@@ -7,7 +7,12 @@ namespace Roguebane.Core.Layout;
 public enum PartCondition { Healthy, Damaged, Broken }
 
 // A part to draw: sprite content key (figure-local), source rect in figure space, z-order.
-public readonly record struct PartPlacement(string Part, string SpriteKey, int[] Rect, int Z);
+// Fallbacks are ORDERED substitute keys for figures that don't ship every sprite row (bare art is
+// optional; a damaged row may be absent): bare -> armored same-condition -> armored healthy. The
+// shell tries them in order before admitting a gap — a missing optional row must never draw the
+// null-texture box (the Warden empty-limb bug).
+public readonly record struct PartPlacement(
+    string Part, string SpriteKey, int[] Rect, int Z, string[] Fallbacks);
 
 // A gear piece to mount: drawn at the socket point (figure space), positioned by its own pivot.
 public readonly record struct GearPlacement(string Gear, string Socket, int[] Anchor, int Z);
@@ -32,8 +37,13 @@ public sealed class StageComposer
         {
             var part = fig.Z[z];
             if (!fig.Parts.TryGetValue(part, out var p)) continue; // z slot with no part rect (e.g. frontGear)
-            var suffix = StateSuffix(resolveCondition(part), useBare(part));
-            placed.Add(new PartPlacement(part, $"sprites/body/{figureId}/{part}_{suffix}", p.Rect, z));
+            var cond = resolveCondition(part);
+            var bare = useBare(part);
+            string Key(PartCondition c, bool b) => $"sprites/body/{figureId}/{part}_{StateSuffix(c, b)}";
+            var fallbacks = new List<string>();
+            if (bare) fallbacks.Add(Key(cond, false));                      // bare art is optional per figure
+            if (cond != PartCondition.Healthy) fallbacks.Add(Key(PartCondition.Healthy, false));
+            placed.Add(new PartPlacement(part, Key(cond, bare), p.Rect, z, fallbacks.ToArray()));
         }
         return placed;
     }

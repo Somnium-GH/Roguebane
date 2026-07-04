@@ -64,6 +64,16 @@ binds 20→21). ~~verify resource-strip seating~~ DONE (2026-07-03 loop: encount
 gains `element.parts[]`/`part`, `states.<state>.label` replace-wholesale semantics, pattern
 `imageBind` static-path tiling). **DROP ENGINE QUEUE COMPLETE** — every 07-03 pm drop item landed.
 Canon core-effect copy in `CoreRunes.cs` LANDED in M1 (see below).
+**M1 previewFigure MISSING PARTS — FIXED (2026-07-03 loop):** root cause = bare-variant sprite
+keys: only the grunt figures ship bare art; an unarmored body asked warden/ranger for
+`*_barehealthy` → null texture → the null-texture BORDER BOX (Doug's empty limbs). Composer now
+emits ORDERED FALLBACKS (bare → armored same-condition → armored healthy; Core-tested, 318) and
+the shell resolves through them — only a figure missing its whole part row still boxes. PROBE
+BUILT (M1 directive, rides SMOKE ASSETS): every figure × z-part × armored row must resolve
+(`SMOKE FIGURES`) — first truth: 18 figures, armored-missing=0, 16 bare-less (fallback covers,
+informational). Element-level imageBind joined the asset probe. Same compose path serves the
+Equipment paper-doll + encounter foes, so those heal too. Doug: eyeball Warden/Elf-Ranger limbs
+live to close the report.
 **‼ GATE RED (pre-existing, DROP-caused — verified by stash/rerun at HEAD): text OVERFLOWS rose
 ng 6→9, city 4→6.** Membership is the drop's NEW/re-authored elements (city: suppliesTitle/
 supportTitle/castlePanelTitle/doomTitle; ng: header/preview family). Numerics: VERTICAL-only —

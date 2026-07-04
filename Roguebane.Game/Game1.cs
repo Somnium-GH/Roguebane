@@ -878,6 +878,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             foreach (var el in s.Elements)
             {
                 Check(el.Image);
+                Check(el.ImageBind); // static pattern paths probe like any texture; {bind} via domains
                 if (el.Frames is { } fr) foreach (var f in fr) Check(f);
             }
         foreach (var t in m.Templates.Values)
@@ -888,6 +889,33 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         Console.WriteLine($"SMOKE ASSETS: missing={missing.Count} unverifiable={unverifiable.Count}"
             + (missing.Count > 0 ? $" miss=[{string.Join(",", missing)}]" : "")
             + (unverifiable.Count > 0 ? $" unk=[{string.Join(",", unverifiable)}]" : ""));
+
+        // Figure part-resolve probe (M1 directive): for EVERY figure def, attempt-resolve every
+        // z-list part at every ARMORED condition row — those are mandatory (a miss is the class
+        // that drew Warden's empty limb boxes). Bare rows are optional per figure (the composer
+        // falls back); figures shipping no bare art are reported informationally, never failed.
+        var figMissing = new SortedSet<string>();
+        var bareLess = new SortedSet<string>();
+        var armored = new[] { "ok", "damaged", "broken" };
+        var bare = new[] { "bareOk", "bareDmg", "bareBroke" };
+        string Suffix(string key) => m.Style.PartStates.GetValueOrDefault(key, key);
+        foreach (var (figId, fig) in m.Figures)
+        {
+            var anyBare = false;
+            foreach (var part in fig.Z)
+            {
+                if (!fig.Parts.ContainsKey(part)) continue;
+                foreach (var st in armored)
+                    if (_assets.Texture($"sprites/body/{figId}/{part}_{Suffix(st)}") is null)
+                        figMissing.Add($"{figId}/{part}_{Suffix(st)}");
+                foreach (var st in bare)
+                    anyBare |= _assets.Texture($"sprites/body/{figId}/{part}_{Suffix(st)}") is not null;
+            }
+            if (!anyBare) bareLess.Add(figId);
+        }
+        Console.WriteLine($"SMOKE FIGURES: figures={m.Figures.Count} armored-missing={figMissing.Count}"
+            + (figMissing.Count > 0 ? $" miss=[{string.Join(",", figMissing)}]" : "")
+            + (bareLess.Count > 0 ? $" bare-less(fallback)=[{string.Join(",", bareLess)}]" : ""));
     }
 
     private void RenderSceneOnce(Action draw)
@@ -987,7 +1015,16 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                      part => allowBare && FigureBinding.UseBare(body, part)))
         {
             var r = p.Rect; // x,y,w,h in figure space
-            Sprite(_assets.Texture(p.SpriteKey), SX(r[0]), SY(r[1]), (int)(r[2] * f), (int)(r[3] * f), color);
+            // Optional sprite rows (bare art, a missing condition row) resolve through the
+            // composer's ordered fallbacks — only a figure missing its WHOLE part row still
+            // draws the null-texture gap box (a real Needs-CD art gap, probed headless).
+            var ptex = _assets.Texture(p.SpriteKey);
+            foreach (var fb in p.Fallbacks)
+            {
+                if (ptex is not null) break;
+                ptex = _assets.Texture(fb);
+            }
+            Sprite(ptex, SX(r[0]), SY(r[1]), (int)(r[2] * f), (int)(r[3] * f), color);
             // Composed armour indicator for parts with no armoured sprite row (torso/head/boots):
             // ring the part so worn plate is visible (bare-capable parts already show armour via sprite).
             if (allowBare && !FigureBinding.HasBareVariant(p.Part) && FigureBinding.IsArmored(body, p.Part))

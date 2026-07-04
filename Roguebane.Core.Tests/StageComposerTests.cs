@@ -52,6 +52,28 @@ public class StageComposerTests
     }
 
     [Fact]
+    public void OptionalSpriteRowsCarryOrderedFallbackKeys()
+    {
+        // Bare art is optional per figure and a condition row may be absent — the composer emits
+        // ordered substitutes (bare -> armored same-condition -> armored healthy) so the shell
+        // never draws the null-texture gap box for a merely-optional row.
+        var m = Manifest();
+        var (name, fig) = m.Figures.First();
+        var part = fig.Z.First(z => fig.Parts.ContainsKey(z));
+        var sc = new StageComposer(m);
+
+        var bareDamaged = sc.ComposeFigure(name, _ => PartCondition.Damaged, _ => true).Single(p => p.Part == part);
+        Assert.Equal(new[]
+        {
+            $"sprites/body/{name}/{part}_damaged",
+            $"sprites/body/{name}/{part}_healthy",
+        }, bareDamaged.Fallbacks);
+
+        var armoredHealthy = sc.ComposeFigure(name, _ => PartCondition.Healthy, _ => false).Single(p => p.Part == part);
+        Assert.Empty(armoredHealthy.Fallbacks); // the base row IS the ask; a miss there is a real gap
+    }
+
+    [Fact]
     public void GearMountsAnchorAtTheirSocket()
     {
         var m = Manifest();
