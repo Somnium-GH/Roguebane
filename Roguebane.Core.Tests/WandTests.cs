@@ -88,6 +88,30 @@ public class WandTests
     }
 
     [Fact]
+    public void ASlingLoosesThroughShieldsForChargeLikeABow()
+    {
+        // §6d slice 6: the sling rides the bow's exact pierce+Charge path — weaker (placeholder
+        // damage 1, §17 #9), one-handed. Shot consults the primary DEX weapon, whichever it is.
+        var body = new Body();
+        body.Add(new BodyPart("legL", Stat.Dex, 3));
+        body.Add(new BodyPart("legR", Stat.Dex, 3));
+        body.Add(new BodyPart("armL", Stat.Str, 3));
+        body.Add(new BodyPart("armR", Stat.Str, 3));
+        body.Add(new BodyPart("head", Stat.Int, 3)); // INT funds the Charge pool
+        Assert.True(body.Wield(Armory.Slings[1]));   // Braided Sling: reserve 2, power 1
+
+        var foe = Shielded(5);
+        var c = new Caster(body, foe, maxCharge: 3);
+        var charge0 = c.Charge;
+        Assert.True(c.Activate(Armory.Shot));
+        for (var i = 0; i < 3; i++) c.Step(); // Shot: timered cd 3
+
+        Assert.Equal(99, foe.Hp);                 // 1 landed THROUGH 5 shield points
+        Assert.Equal(5, foe.Frame!.ShieldPoints); // full bypass, pool untouched
+        Assert.Equal(charge0 - 1, c.Charge);      // one Charge spent per loose
+    }
+
+    [Fact]
     public void OrdinaryHitsStillConsumeThePool()
     {
         // Contrast: a melee consult eats shield points (AbsorbShields), it doesn't subtract.

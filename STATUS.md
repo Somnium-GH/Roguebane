@@ -275,7 +275,9 @@ interpreter, no per-weapon classes):**
    base+robe [composition = balance knob], charm multiplies minion hits; away-from-zero rounding).
 5. Staff/wand equip-rule wiring into the §6e validation (wand↔ranged mutual exclusion; staff =
    shield-equivalent for ranged-block + no-shield).
-6. Sling data + Charge spend (bow-parallel path already exists — placeholder dmg flagged).
+6. ~~Sling Charge path~~ DONE (2026-07-04 loop, 335 tests: the sling rides the bow's exact
+   pierce+Charge resolution via the DEX Primary consult — end-to-end asserted: 1 dmg through 5
+   standing shields, pool untouched, one Charge spent; dmg placeholder stays FLAGGED §17 #9).
 **CD payload updated (B9)** — roster relay for the B2 figure-art regen batch. **PROCESS CHANGE
 (Doug, 2026-07-03; also in loop.md):** every NEW Needs-CD finding gets BOTH a STATUS line AND a
 relay-ready item appended to `outputs/CLAUDE_DESIGN_issues.md` in the same pass — keeping that
