@@ -230,7 +230,7 @@ public partial class Game1
                     var bsz = MeasureText(_assets.Mono, txt!) * (float)(7.0 / MonoDesignPx);
                     var slx = (int)(r.X + r.Width / 2 - bsz.X / 2);
                     var sly = (int)(r.Y + r.Height / 2 - bsz.Y / 2);
-                    RecordTextBox(new Rectangle(slx, sly, (int)bsz.X, (int)bsz.Y), r, txt!, _assets.Mono);
+                    RecordTextBox(InkBox(_assets.Mono, txt!, slx, sly, 7.0), r, txt!, _assets.Mono);
                     TextPx(_assets.Mono, txt!, slx, sly, _ui.Color("ground", Color.Black), 7.0);
                     break;
                 }
@@ -278,7 +278,7 @@ public partial class Game1
                         * (bpx > 0 ? (float)(bpx / (e.Font == "display" ? DisplayDesignPx : MonoDesignPx)) : 1f);
                     var blx = (int)(r.X + r.Width / 2 - bsz.X / 2);
                     var bly = (int)(r.Y + r.Height / 2 - bsz.Y / 2);
-                    RecordTextBox(new Rectangle(blx, bly, (int)bsz.X, (int)bsz.Y), r, blabel, bfont);
+                    RecordTextBox(InkBox(bfont, blabel, blx, bly, bpx), r, blabel, bfont);
                     TextPx(bfont, blabel, blx, bly, _ui.Color(colTok ?? "ink", Ink), bpx);
                     break;
                 }
@@ -412,7 +412,7 @@ public partial class Game1
                 _ => pr.X,
             };
             var y = (int)(pr.Y + pr.Height / 2f - sz.Y / 2f);
-            RecordTextBox(new Rectangle(x, y, (int)sz.X, (int)sz.Y), r, txt!, font);
+            RecordTextBox(InkBox(font, txt!, x, y, p.FontPx), r, txt!, font);
             TextPx(font, txt!, x, y, _ui.Color(p.Color ?? e.Color ?? "ink", Ink), p.FontPx);
         }
     }
@@ -729,7 +729,7 @@ public partial class Game1
                             var lsz = MeasureText(cfont, label!) * (float)(pp.FontPx / cbase);
                             var lx = (int)(pp.Rect.X + pp.Rect.W / 2 - lsz.X / 2);
                             var ly = (int)(pp.Rect.Y + pp.Rect.H / 2 - lsz.Y / 2);
-                            RecordTextBox(new Rectangle(lx, ly, (int)lsz.X, (int)lsz.Y),
+                            RecordTextBox(InkBox(cfont, label!, lx, ly, pp.FontPx),
                                 RectOf(pp.Rect), label!, cfont);
                             TextPx(cfont, label!, lx, ly,
                                 _ui.Color(St("color") ?? pp.Color ?? "ink", Ink) * op, pp.FontPx);
@@ -899,7 +899,7 @@ public partial class Game1
                 if (pp.Binds == "core.coreEffect")
                 {
                     var esz = MeasureText(_assets.Mono, text!) * (float)(4.5 / MonoDesignPx);
-                    RecordTextBox(new Rectangle(pp.Rect.X + 5, pp.Rect.Y + 1, (int)esz.X, (int)esz.Y),
+                    RecordTextBox(InkBox(_assets.Mono, text!, pp.Rect.X + 5, pp.Rect.Y + 1, 4.5),
                         RectOf(pp.Rect), text!, _assets.Mono);
                     TextPx(_assets.Mono, text!, pp.Rect.X + 5, pp.Rect.Y + 1,
                         _ui.Color("mutedDim", Muted), 4.5);

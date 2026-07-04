@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -66,6 +67,71 @@ public partial class Game1
     // Design-space text size: MeasureString is at the FontBake raster, so scale back to design space.
     private Vector2 MeasureText(SpriteFont font, string s) => font.MeasureString(Safe(font, s)) / FontBake;
 
+    // NEW LOCKS #3 (2026-07-04): the textgeom detector's "drawn box" was MeasureString's full
+    // ascent/descent line box, not the pixels a string actually inks — a short line with no
+    // descenders (no "gjpqy") always measured taller than its real footprint, false-flagging
+    // overflow/collide that tools/probes.py's pixel-scanned ink bbox never saw. This walks
+    // SpriteFont.Glyphs the same way MeasureString advances, but unions each glyph's Cropping
+    // rect (its actual ink, not its advance cell) instead of the cell itself.
+    // SpriteFont.Glyphs is a flat array (sorted for the engine's own binary search, no public
+    // TryGetValue) — index it once per font instead of scanning it per character per string.
+    private static readonly Dictionary<SpriteFont, Dictionary<char, SpriteFont.Glyph>> _glyphMaps = new();
+
+    private static Dictionary<char, SpriteFont.Glyph> GlyphMap(SpriteFont font)
+    {
+        if (_glyphMaps.TryGetValue(font, out var map)) return map;
+        map = new Dictionary<char, SpriteFont.Glyph>();
+        foreach (var g in font.Glyphs) map[g.Character] = g;
+        _glyphMaps[font] = map;
+        return map;
+    }
+
+    private Rectangle InkBoundsRaster(SpriteFont font, string s)
+    {
+        s = Safe(font, s);
+        float minX = float.MaxValue, minY = float.MaxValue, maxX = float.MinValue, maxY = float.MinValue;
+        float penX = 0, penY = 0;
+        var lineH = font.LineSpacing;
+        var any = false;
+        var glyphs = GlyphMap(font);
+        foreach (var ch in s)
+        {
+            if (ch == '\n') { penX = 0; penY += lineH; continue; }
+            if (!glyphs.TryGetValue(ch, out var g))
+            {
+                if (font.DefaultCharacter is { } dc && glyphs.TryGetValue(dc, out var dg)) g = dg;
+                else continue;
+            }
+            if (g.Cropping.Width > 0 && g.Cropping.Height > 0)
+            {
+                var x0 = penX + g.Cropping.X;
+                var y0 = penY + g.Cropping.Y;
+                minX = Math.Min(minX, x0); minY = Math.Min(minY, y0);
+                maxX = Math.Max(maxX, x0 + g.Cropping.Width); maxY = Math.Max(maxY, y0 + g.Cropping.Height);
+                any = true;
+            }
+            penX += g.WidthIncludingBearings + font.Spacing;
+        }
+        return any
+            ? new Rectangle((int)MathF.Floor(minX), (int)MathF.Floor(minY),
+                (int)MathF.Ceiling(maxX - minX), (int)MathF.Ceiling(maxY - minY))
+            : Rectangle.Empty;
+    }
+
+    // Ink bbox at (x, y), scaled from FontBake raster down to the actual drawn design-px size
+    // (same scale TextPx itself draws at) — this is the Rectangle every RecordTextBox call should
+    // pass as `drawn`.
+    private Rectangle InkBox(SpriteFont font, string s, int x, int y, double fontPx)
+    {
+        var basePx = font == _assets.Display ? DisplayDesignPx : MonoDesignPx;
+        var scale = fontPx <= 0 ? 1f / FontBake : (1f / FontBake) * (float)(fontPx / basePx);
+        var raster = InkBoundsRaster(font, s);
+        if (raster == Rectangle.Empty) return new Rectangle(x, y, 0, 0);
+        return new Rectangle(
+            x + (int)MathF.Round(raster.X * scale), y + (int)MathF.Round(raster.Y * scale),
+            (int)MathF.Round(raster.Width * scale), (int)MathF.Round(raster.Height * scale));
+    }
+
     // Manifest text inside a rect: greedy word-wrap to the rect width, capped at the lines the rect
     // HEIGHT can hold (a one-line-high rect never wraps, so names/values stay single-line).
     // '\n' forces a break — a resolver can stack a title line over its caption (the gauge panels).
@@ -82,14 +148,13 @@ public partial class Game1
             // 98px chip). The authored box stays the truth; only the glyphs give.
             var w = MeasureText(font, s).X * sc;
             var fit = maxLines == 1 && w > r.Width && fontPx > 0 ? fontPx * r.Width / w : fontPx;
-            RecordTextBox(new Rectangle(r.X, r.Y,
-                (int)(fit > 0 && fontPx > 0 ? w * (fit / fontPx) : w), (int)lineH), r, s, font);
+            RecordTextBox(InkBox(font, s, r.X, r.Y, fit), r, s, font);
             TextPx(font, s, r.X, r.Y, color, fit);
             return;
         }
-        // Wrapped text is line-clamped to the box, so its drawn footprint IS (at most) the bound.
-        // A clamp that DROPS content records the truncation — invisible words must fail the smoke.
-        RecordTextBox(r, r, s, font);
+        // Wrapped text records its INK box per rendered line (not the whole bound up front) — each
+        // line's actual footprint, not a worst-case stand-in. A clamp that DROPS content still
+        // records the truncation — invisible words must fail the smoke.
         var ly = (float)r.Y;
         var lines = 0;
         var paras = s.Split('\n');
@@ -103,6 +168,7 @@ public partial class Game1
                 if (line.Length > 0 && MeasureText(font, trial).X * sc > r.Width)
                 {
                     TextPx(font, line, r.X, (int)ly, color, fontPx);
+                    RecordTextBox(InkBox(font, line, r.X, (int)ly, fontPx), r, line, font);
                     ly += lineH;
                     if (++lines >= maxLines)
                     {
@@ -116,6 +182,7 @@ public partial class Game1
             if (line.Length > 0)
             {
                 TextPx(font, line, r.X, (int)ly, color, fontPx);
+                RecordTextBox(InkBox(font, line, r.X, (int)ly, fontPx), r, line, font);
                 ly += lineH;
                 if (++lines >= maxLines)
                 {

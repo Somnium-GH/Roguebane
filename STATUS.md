@@ -1326,7 +1326,19 @@ QUEUE worn-armor item below is UPDATED to this convention.**
   removed), Ranger gained `Bays: 1` + a Hound (its kit was `Bays: 0` with no pet slot despite §7a's
   locked "Hound ×1" table entry — closing that gap, not inventing new design, since the pet itself was
   already locked content).
-- `tools/geometry_diff.py`/textgeom: ink-bbox measurement switch (item 3 above).
+- **textgeom ink-bbox switch [DONE 2026-07-04 loop, build+349 tests]**: `Game1.Canvas.cs` gained
+  `InkBoundsRaster`/`InkBox` — walks `SpriteFont.Glyphs` the way `MeasureString` advances but unions
+  each glyph's `Cropping` rect (real ink) instead of the advance cell, then scales to the drawn design
+  px. Every `RecordTextBox` call site (both in `TextPxWrapped`, plus the 5 in
+  `Game1.ManifestRenderer.cs`) now passes an `InkBox(...)` result instead of a font-metric box.
+  Wrapped text also changed HOW it records: previously one `RecordTextBox(r, r, ...)` per element (box
+  == bound, so a wrapped label's overflow could never be detected — box can't exceed itself); now one
+  ink box PER RENDERED LINE, at its actual drawn position. Verified via `RB_SMOKE=1 RB_MF=all`
+  before/after: overflow/collide counts ROSE on every screen (e.g. equipment 10/3 -> 26/8, encounter
+  7/0 -> 9/3) — root cause is the wrapped-box blind spot above, now closed; the new hits are real
+  (previously-invisible) overflow/collisions, not a detector bug. **Needs human**: triage the newly-
+  surfaced per-screen overflow/collide lists (`SMOKE TEXTGEOM` console output) — this slice fixed the
+  ruler, not the ~16-40 layout spillovers it now reveals.
 - **Retire `Shops.cs` dead field [DONE 2026-07-04 loop, 349 tests]**: confirmed zero references
   anywhere, deleted `Shops.Armor` (the "legacy fixed stock (retiring)" list) outright — clean removal,
   no alias. `Shops.Plate`/`Shops.Hide`/`Shops.ArmorPool` stay; all three are still live (tests,
