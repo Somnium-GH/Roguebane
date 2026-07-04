@@ -509,15 +509,27 @@ charges, targets, or fires until powered.
 - **AUTO** (one global lit/unlit toggle, OFF by default): its only job is to **keep the target after a
   shot** so a module keeps firing at it. OFF = fire once, then clear.
 
-**Targeting PRESENTATION [LOCKED 2026-07-03]:** while TARGETING, the **cursor IS the reticle** — the OS
-cursor hides, the reticle sprite draws at the cursor position and **snaps/centres onto the hovered limb
-band**; click locks it there; cancel restores the cursor. **NO box affordances** during targeting — no
-whole-foe hover rectangle, no band outline boxes in-game (design/08's dashed bands are doc annotation
-only). A locked mount shows the **FOCUS reticle with an animated pulse** (fixed-tick driven,
+**Targeting PRESENTATION [LOCKED 2026-07-03; CORRECTED 2026-07-04, Doug]:** while TARGETING, the
+**cursor IS the reticle** — the OS cursor hides, the reticle sprite draws AT THE RAW CURSOR POSITION,
+following the mouse continuously. **The earlier "snaps/centres onto the hovered limb band" wording is
+WRONG and retracted** — the reticle must never snap/warp to a part's center; hovering only DETECTS
+which part the cursor is over (for the click-to-aim hit-test and any highlight/tag logic), it never
+repositions the drawn reticle. Click locks the aim on whatever part was detected under the cursor at
+that moment; cancel restores the free cursor. **NO box affordances** during targeting — no whole-foe
+hover rectangle, no band outline boxes in-game (design/08's dashed bands are doc annotation only). A
+locked mount (post-click) shows the **FOCUS reticle with an animated pulse** (fixed-tick driven,
 deterministic) plus an **AIM TAG reading the technique's HOTKEY NUMBER** — not its name (names overflow
 and collide when several actives aim the same part); multiple locks on one part **stack their numbers**.
 Action-bar cards are **numbered 1–N** (the hotkey), so tag ↔ card correspondence is visual. (Supersedes
 design/08's name-tag mount; CD updates design/01 + design/08.)
+
+**Part hit-test must use REAL geometry + Z-ORDER [LOCKED 2026-07-04, Doug]:** which part the cursor is
+"over" is decided by the figure's ACTUAL painted part rects (per `Figure.Parts`/the LAYOUT_CONTRACT
+figure data), never a generic proportional band guess. Where two parts' rects overlap on screen (e.g.
+arms sit BEHIND the chest in every figure's paint order), the hit-test must resolve to whichever part
+is drawn LAST/frontmost in the figure's `Z` paint order — a click on visually-occluding chest must
+register as chest, never the arm hidden behind it. This is the same paint-ordinal convention already
+used for UI element rendering (z = paint order, back→front); apply it to part hit-testing too.
 
 **Foes erode the player the same way** — a foe hit deals the same simultaneous part+HP damage, mitigated
 only by the player's shields/evasion. Which limb a foe targets = a **per-foe TARGETING PERSONALITY**

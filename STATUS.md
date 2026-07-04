@@ -1,5 +1,39 @@
 # Status
 
+## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-04, Doug — three targeting bugs, all root-caused;
+## DESIGN_SPEC's targeting-presentation section corrected to match)
+1. **Reticle SNAPS to a part's center instead of following the raw cursor — retracts a bad LOCK.**
+   `Game1.ManifestRenderer.cs` ~333-341: while picking, the AIMING reticle's draw position ("mount")
+   is computed as `FoePartAt(cursor)` → `FoePartScreenRect(part).Center` when a part is detected,
+   falling back to the raw cursor only when no part is hit. **This conflates DETECTION (which part is
+   under the cursor — needed for click-to-aim) with POSITION (where the reticle sprite draws).** Fix:
+   the reticle always draws at the raw cursor; part detection still runs every frame (for the
+   click-to-aim hit-test), it just never repositions the sprite. DESIGN_SPEC's targeting-presentation
+   section previously LOCKED the snap behavior in writing ("snaps/centres onto the hovered limb
+   band") — that wording is now corrected in this pass; don't re-derive the old behavior from it.
+2. **Hit-test uses a crude 4-band approximation, not real part geometry or Z-order.** `Game1.cs`
+   `FoePartAt`/`FoePartRect` (~lines 595-629) divides the foe's bounding box into four EQUAL-HEIGHT
+   horizontal bands (head/arms/torso/legs by vertical position only) — completely disconnected from
+   the actual rendered part rects (`FoePartScreenRect`, used correctly elsewhere for drawing reticles
+   on the real limb position, already reads `fig.Parts` transformed to screen space). Two bugs at
+   once: (a) band sizing doesn't match real part extents, so hit areas are often visually wrong-sized;
+   (b) **no Z-ORDER awareness at all** — arms sit BEHIND the chest in every figure's paint order
+   (`Figure.Z`), so where their screen rects overlap, a click must resolve to the FRONTMOST part
+   (chest), never the occluded arm. Fix: replace the band approximation with a real per-part rect
+   test (reuse `FoePartScreenRect`'s geometry, iterated per part) and, on overlapping hits, pick the
+   part LATEST in `Figure.Z` (front-most wins) — same paint-ordinal convention already used for UI
+   element rendering. DESIGN_SPEC now has this as its own locked clause (targeting-presentation
+   section) so it doesn't get re-litigated as "just a hitbox tweak."
+3. **Targeting/aim state isn't cleared at fight end — stale locks can appear on the NEXT foe.**
+   `Expedition.Redeploy()` and `Expedition.Retreat()` (`Roguebane.Core/Expedition.cs` ~369-384) only
+   flip `State`; neither clears any equipped technique's `Aim` (`Caster.Aim`/`ClearAim`, set via
+   `CombatTargeting.FoePress`). An aim assigned during the fight just ended persists into the next
+   encounter's DIFFERENT foe object, so a FOCUS reticle/aim-tag can appear on a target the player
+   never actually aimed at this fight. Fix: call `ClearAim` on every equipped technique in both
+   `Redeploy()` and `Retreat()` before returning to Choosing. (`CombatTargeting.Targeting`, the
+   transient "currently picking" cursor, already resets fine via `Sync`/`IsTargeting` — this is
+   specifically about the DURABLE per-technique `Aim` assignments, which live on Expedition.)
+
 ## ‼ HUMAN DIRECTIVES — 2026-07-04 (Doug — explicit priority order, WINS over everything below;
 ## work this block TOP-DOWN before returning to normal-priority bugs/debt)
 
