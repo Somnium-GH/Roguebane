@@ -20,10 +20,14 @@ already in this file).
   exist (B2-GO/B12) — wire the real assets in as they land, retire the box per-slot as its asset
   arrives (don't wait for the whole batch; flag any slot still on the box placeholder as Needs-CD if
   the asset genuinely isn't there yet).
-- **Enabling/disabling a technique must add/remove it from the bottom action bar** — today toggling a
-  technique in inventory doesn't sync the bar at all (can't unslot by unselecting either). This is
-  the ORDERING system already spec'd in §6e ("click slots into the first free slot; unslot compacts
-  left") — it just isn't wired to the inventory toggle action yet.
+- ~~Enabling/disabling a technique must add/remove it from the bottom action bar~~ RESOLVED
+  (2026-07-04): the inventory toggle only flipped Caster activation, never roster membership. Added
+  `Expedition.EquipTechnique`/`UnequipTechnique` (roster-only, capped at the chassis's `Kit.Count`,
+  never touches attribute reservation per the "Reservation timing" lock) and mirrored on `Campaign` so
+  the change survives a leg advance; `Game1`'s `ToggleTech` now calls these in-run. Also fixed a
+  dead-card bug found in the same pass: the TECHNIQUES-tab click loop only indexed `_build.Palette`,
+  so a merchant-bought technique's card (rendered per §12) was unclickable — click loop now matches
+  the renderer's combined list.
 - **Drag-and-drop reorder is ALREADY SPEC'D — DESIGN_SPEC §6e, "Reorder = DRAG-AND-DROP"** (found it,
   no need to ask Doug): dragging a slotted card pulls it off leaving a matching ghost background in
   its slot; snaps INSERTION-style between neighbors (sticky, easy); release locks the new order; same
