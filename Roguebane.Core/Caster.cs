@@ -300,7 +300,10 @@ public sealed class Caster
         // CHARGE = shield-pierce fuel: only a shield-piercing technique spends it; dry => HOLD the pierce.
         if (run.Tech.ShieldPiercing && !TrySpendCharge(Math.Max(1, run.Tech.ChargeCost))) return false;
 
-        Hit(target, part, EffectivePower(run.Tech), run.Tech.ShieldPiercing);
+        // §6c INT robe: +2 SPELL DAMAGE per worn sustained piece (2-piece cap) — damage only,
+        // never heals (the Repair branch above stays unbuffed) and only INT-stat casts.
+        var robe = run.Tech.Stat == Stat.Int ? _self.SpellDamageBonus : 0;
+        Hit(target, part, EffectivePower(run.Tech) + robe, run.Tech.ShieldPiercing);
         if (run.Tech.Kind == TechniqueKind.Timered) run.Countdown = EffectiveCooldown(run.Tech);
         return true;
     }

@@ -90,6 +90,11 @@ public sealed class Body
     // STR armor goes RED across the board"; finer per-tier thresholds ride the tuning session.
     public bool ArmorSustained(Armor piece) => Capacity(piece.Governing) > 0;
 
+    // §6c INT robe: +2 spell damage per worn sustained robe piece, capped at TWO pieces
+    // (robe + hat — the line only authors those slots, the cap keeps that true under tuning).
+    public int SpellDamageBonus =>
+        Math.Min(2, _armor.Values.Count(a => a.SpellDamage > 0 && ArmorSustained(a))) * 2;
+
     // The part with the most stat missing (Capacity - live contribution), or null if every part is
     // whole. Drives a part-heal's target — mend where it hurts most; ties resolve by part order.
     public BodyPart? MostDamagedPart()

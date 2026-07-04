@@ -83,7 +83,40 @@ public class ArmorLineTests
     public void RobeCarriesSpellDamagePerPiece()
     {
         Assert.All(ArmorLines.RobeChest.Concat(ArmorLines.RobeHead),
-            a => Assert.Equal(2, a.SpellDamage)); // +2 per piece, 2-piece cap (consumer pending)
+            a => Assert.Equal(2, a.SpellDamage)); // +2 per piece, 2-piece cap
         Assert.All(ArmorLines.PlateChest, a => Assert.Equal(0, a.SpellDamage));
+    }
+
+    [Fact]
+    public void RobeBonusStacksToTwoPiecesAndDiesWithInt()
+    {
+        var b = Humanoid(out _, out _, out _, out _);
+        Assert.Equal(0, b.SpellDamageBonus);
+        b.Equip(ArmorLines.RobeChest[0]);
+        Assert.Equal(2, b.SpellDamageBonus);
+        b.Equip(ArmorLines.RobeHead[3]);
+        Assert.Equal(4, b.SpellDamageBonus); // two pieces = the cap
+        var head = b.Parts.Single(p => p.Stat == Stat.Int);
+        b.Damage(head, 9); // INT collapses -> the robe line is disabled
+        Assert.Equal(0, b.SpellDamageBonus);
+    }
+
+    [Fact]
+    public void RobeBuffsSpellHitsButNeverHeals()
+    {
+        // §6c: +spell DAMAGE only — an INT bolt lands harder in robes; the heal path is unbuffed.
+        static int FoeDamage(bool robes)
+        {
+            var atk = new Body();
+            atk.Add(new BodyPart("head", Stat.Int, 6));
+            atk.Add(new BodyPart("chest", Stat.Con, 4));
+            if (robes) { atk.Equip(ArmorLines.RobeChest[0]); atk.Equip(ArmorLines.RobeHead[0]); }
+            var foe = new Foe("t", 100, new Body());
+            var c = new Caster(atk, foe);
+            c.Activate(new Technique("bolt", Stat.Int, 1, TechniqueKind.Sustained, 0, Power: 2));
+            c.Step();
+            return 100 - foe.Hp;
+        }
+        Assert.Equal(FoeDamage(false) + 4, FoeDamage(true));
     }
 }

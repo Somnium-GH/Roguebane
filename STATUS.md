@@ -218,7 +218,10 @@ slice, hooks Caster spell power w/ 2-piece cap). RETIRED: plate-as-worn-shield-s
 sources are techniques + the future shield object) and the old bespoke Plate/Hide (Shops staples
 now name rung-1 canon pieces; merchant armor price = 2×tier+2 placeholder). Weapons still FALL
 OFF below threshold in Body.Damage — the §6e disable-not-drop change is its own slice, rides the
-cascade answer. REMAINING: robe spell-damage consumer; weapons disable-not-drop; cascade ranking
+cascade answer. ~~robe spell-damage consumer~~ DONE (2026-07-03 loop, 323
+tests: Body.SpellDamageBonus = +2 per worn sustained robe piece, 2-piece cap; applied on INT-stat
+Discharge HITS only — heals stay unbuffed; dies when INT collapses). REMAINING: weapons
+disable-not-drop; cascade ranking
 (BLOCKED on the sustain-model question below); drag-reorder; vestigial pre-run branch retire._
 **‼ NEEDS HUMAN — cascade SUSTAIN MODEL ambiguous, blocking the ranking build:** §6e reads
 "an attribute can't sustain EVERY equipped item" + a ranking with TIE-BREAKS + cheapest-first
