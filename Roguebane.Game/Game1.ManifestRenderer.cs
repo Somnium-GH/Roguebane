@@ -728,6 +728,11 @@ public partial class Game1
                 // (the loose damage/cost digits) — never stamp it over live card copy (P0-C.9).
                 if (datum is Roguebane.Core.Technique or Roguebane.Core.Minion
                     && pp.Binds is null && !string.IsNullOrEmpty(pp.Sample)) continue;
+                // Race cards: the same P0-C.9 rule for an unbound STATIC-IMAGE part — raceCard
+                // ships a leftover human_grunt head mock under the live race.headImage imageBind,
+                // and both drew (Doug's ghosted double-head). Mock filler never draws on live data.
+                if (datum is Roguebane.Core.Race && pp.Binds is null && pp.ImageBind is null
+                    && !string.IsNullOrEmpty(pp.Image)) continue;
                 // Nested rune list (07-03 drop): each group's region stamps runeCard rows — the
                 // held rung (or the first) then the next, the pair the player acts on (RuneRow).
                 if (pp.List is { } runeList && pp.Binds == "g.runes"
@@ -869,9 +874,22 @@ public partial class Game1
                     "bay.hotkey" => (TechniqueCount() + i + 1).ToString(),
                     _ => datum is not null ? ResolveBind(datum, pp.Binds) : null,
                 } ?? pp.Sample;
-                if (!string.IsNullOrEmpty(text))
-                    TextPxWrapped(pp.Font == "display" ? _assets.Display : _assets.Mono,
-                        text!, RectOf(pp.Rect), _ui.Color(pp.Color ?? "ink", Ink), pp.FontPx);
+                if (string.IsNullOrEmpty(text)) continue;
+                // The core.coreEffect BLOCK's flattened sample IS the source's eyebrow ("CORE
+                // EFFECT": mono 9px source = 4.5 design px, mutedDim) — extraction attributed the
+                // block's display/8px style to it, overlapping the name line 8px below (Doug's
+                // eyebrow x title collision). Draw per the dc.html source; mis-attribution Needs-CD.
+                if (pp.Binds == "core.coreEffect")
+                {
+                    var esz = MeasureText(_assets.Mono, text!) * (float)(4.5 / MonoDesignPx);
+                    RecordTextBox(new Rectangle(pp.Rect.X + 5, pp.Rect.Y + 1, (int)esz.X, (int)esz.Y),
+                        RectOf(pp.Rect), text!, _assets.Mono);
+                    TextPx(_assets.Mono, text!, pp.Rect.X + 5, pp.Rect.Y + 1,
+                        _ui.Color("mutedDim", Muted), 4.5);
+                    continue;
+                }
+                TextPxWrapped(pp.Font == "display" ? _assets.Display : _assets.Mono,
+                    text!, RectOf(pp.Rect), _ui.Color(pp.Color ?? "ink", Ink), pp.FontPx);
             }
         }
     }

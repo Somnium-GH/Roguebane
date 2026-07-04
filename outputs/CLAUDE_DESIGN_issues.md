@@ -22,6 +22,13 @@ B1. **Your extract merge silently DROPPED `screens.campaignmap` + `templates.cit
     natively; (b) add a key-set diff (screens/templates vs the previous manifest) to your pre-ship
     audit so a silently dropped screen can't ship again. Everything else in that drop verified
     clean (0 extraction gaps, refs on contract).
+B2. **HOLD for the next figure-art batch (don't do solo — ride it with the weapon/armor permutation
+    regen once §6/§6c/§6d weapon+armor names are locked):** Elf Ranger figure (`elf_ranger`) — the
+    brown chest-armor accent/strap sits too high, crowding the neckline so it visually reads as
+    fused to the head rather than sitting on the torso (Doug, live screenshot). Once weapon + armor
+    naming locks, this batch needs to regenerate figure art across the full **race × core rune ×
+    equipment** permutation set anyway (new wield/armor system, DESIGN_SPEC §6/§6c/§6d) — fix this
+    positioning in that same pass rather than a one-off patch now.
 
 ## Standing FYIs (unchanged, for context — not action items)
 - design/05 v2 STAT BLOCKS are not adopted; Doug will run a live tuning session — if a future 05

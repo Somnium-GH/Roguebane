@@ -204,6 +204,15 @@ weapon never adds its own timer, it only gates + scales.
   BOTH arms unbroken; a ranged technique (bow/wand) needs BOTH arms unbroken; a shield needs a FREE
   arm — it drops whenever both arms are already committed to a dual-wield pair. Same rule for foes (§8
   symmetry): arms/legs are separately targetable and breakable on both sides.
+- **Shield vs. 2H ranged [LOCKED 2026-07-03]:** a bow/wand needs both hands the same way a shield needs
+  one — so a SHIELD equipped is an equip-time incompatibility with bows/wands (this is a static
+  equip-compatibility rule, same family as "shield needs a free arm" above, NOT a live timer-contention
+  case — doesn't reopen the "no hand-timer gating" resolution just above).
+- **Sling [LOCKED shape 2026-07-03; gating stat + names OPEN]:** a ONE-HANDED ranged weapon, compatible
+  with a shield in the off-hand — the shield-build's ranged option, filling the gap bows/wands can't.
+  **Fully ignores the shield pool like a bow** (spends Charge, §10) but at LOWER damage than a bow — a
+  weaker, always-available pierce option, not a free upgrade. Assumed DEX-gated by default (matching the
+  bow/DEX-weapon convention, §6 table) — flag if that's wrong; tier names not yet set.
 - **Main-hand/off-hand auto-promotion [LOCKED]:** within the melee hand-config, first-equipped = MAIN-
   HAND, second = OFF-HAND. Unequipping main-hand promotes off-hand; a newly-equipped item always fills
   the (now-empty) off-hand slot — it never displaces an existing main-hand. Guarantees a technique never
@@ -211,10 +220,17 @@ weapon never adds its own timer, it only gates + scales.
 - **Handedness [LOCKED]:** a player-facing Left/Right-handed setting (cosmetic only) fixes which physical
   arm renders the main-hand weapon vs. the off-hand item, so a broken/bare-arm visual always matches the
   item that would actually drop from that specific arm.
-- **[OPEN, flagged not invented]:** does POWERING a ranged technique force the melee hand-config to
-  visually sheath (since a bow needs both hands) — and if so, does that drop a held shield's block while
-  the bow is drawn? Physically plausible given only 2 hands total, but Doug hasn't called it; don't build
-  it either way until it's answered.
+- **NO hand-timer gating between weapon families [RESOLVED 2026-07-03, POC-scope]:** a ranged technique
+  and a melee/shield technique may be powered/charged/fired in parallel — techniques never contend for
+  "is this hand free right now." The ONLY hand-related gate is the static requirement check already
+  above (do you have the necessary unbroken arms + the right weapon equipped); there is no live
+  reservation/contention layer on top of it. **Animation (sheathing/drawing) is explicitly OUT OF SCOPE
+  for the prototype** — how a bow and a held shield coexist on-screen is a later presentation problem,
+  not a rules one; do not let a rendering concern invent a gameplay restriction.
+- **[OPEN]** ranged-ONLY builds (no melee weapon equipped at all): viable, but not fully thought through
+  (Doug, 2026-07-03) — e.g. they lose access to the CON **block** shield-source specifically (needs the
+  shield OBJECT, which lives in melee's off-hand), though other block sources (stoneskin/parry/bind/
+  shield-wall, §6b) don't need a held shield and stay available. Revisit during the balance pass.
 - **Ranged — bypass degree:** **Bows (DEX):** fully ignore the shield pool, gated by Charge — unchanged,
   §10. **Wands (INT):** a second ranged flavor, PARTIALLY bypasses the shield pool (so Charge isn't a
   bow-only resource) — **[OPEN §17]** the exact bypass split/math; the shape (partial, not full) is
@@ -363,6 +379,9 @@ Minions yes; **party no** — one main character.
 - **WANDS (INT ranged, §6d):** a second Charge-spending weapon line, alongside bows — PARTIALLY bypasses
   the shield pool (some of the hit still absorbs against the pool, some goes through) rather than the
   bow's full bypass. **[OPEN]** the exact split/math — not yet designed, do not invent a number for it.
+- **SLING (§6d, 2026-07-03):** a third Charge-spending line — ONE-HANDED (compatible with a shield,
+  unlike bows/wands), fully bypasses the shield pool like a bow, but at lower damage. The shield-build's
+  answer to "how do I pierce at all."
 
 ## 11. The rune system [LOCKED core; some numbers OPEN]
 The build economy. **No fixed rune slots** — runes are bought from a **point budget set by the Core
@@ -562,8 +581,14 @@ points there so the canon stays design-focused.
     economy tune (part of the balance pass).
 18. Wand partial-shield-bypass math (§6d/§10) — the shape (partial, unlike bows' full bypass) is locked,
     the split is not; needs a real design pass before Core implements it.
-19. Weapon primary/secondary swap timing (§6d) — whether re-activating the secondary two-hander mid-combat
-    costs an action/cooldown or is free; tune later.
+19. ~~Weapon primary/secondary swap timing~~ MOOT (2026-07-03): retired with the "benched two-hander"
+    framing it depended on — dual-wield is simultaneous, not benched (§6d correction).
+20. Sling (§6d/§10) — shape LOCKED 2026-07-03 (1H, full shield-bypass like a bow, lower damage, spends
+    Charge); gating stat is an ASSUMED default (DEX, matching bows) not yet confirmed, and tier names are
+    still undecided.
+21. Ranged-only builds (no melee weapon at all, §6d) — viable in principle but not fully thought through;
+    they lose the CON **block** shield-source specifically (needs a held shield) though other block
+    sources don't need one. Revisit during the balance pass.
 
 ## 18. DROPPED — must not resurface
 - **"Chassis" as the identity model** → split into **Race + Core rune** (§7).

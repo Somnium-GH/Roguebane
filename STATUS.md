@@ -1,5 +1,64 @@
 # Status
 
+## ✅ ANSWERED (2026-07-03 loop, same day — all three HiFi items below)
+1. **Ghost head — FIXED:** the P0-C.9 unbound-filler rule now covers Race datums' STATIC-IMAGE
+parts — the leftover human_grunt head mock no longer draws under the live `race.headImage`
+imageBind (verified on the gate crop: single head per card, Elf wears its own sprite). The mock
+part itself stays a Needs-CD extraction leftover.
+2. **eyebrow×title collision — FIXED:** the `core.coreEffect` BLOCK's flattened sample IS the
+source's eyebrow, mis-attributed the block's display/8px style (dc.html authors mono 9px = 4.5
+design px, mutedDim). Drawn per the source now — crop clean, ng fidelity 78.6→79.4. Extraction
+mis-attribution logged Needs-CD.
+3. **Selected-card amber ring — NOT A CURRENT-BUILD BUG:** the gate shot renders the ring + ✓ CORE
+SET on the chosen card (crop-verified; both isolation candidates ruled out — coreCard has parts so
+it never takes the leaf path, and the family lookup hits). Doug's live game process predates
+today's chip/ring commits (bin\Debug locked by it since before 21be596) — STALE BUILD, same class
+as the 07-02 font case. **Doug: restart the game off a fresh build and re-shoot to close.**
+
+## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-03, Doug — race-card head portrait doubles/ghosts)
+Doug's screenshots (Elf card) show the head portrait rendering as if two head sprites overlay with a
+slight offset — a ghosted double-exposure look. **ROOT CAUSE FOUND, not a guess:** `layout.json`
+`templates.raceCard` carries TWO overlapping parts for the same headshot region —
+1. rect `[1,1,53,77]`, `binds:"race.headImage"`, `imageBind:"sprites/body/{race.id}_grunt/head_healthy"`
+   — the correct, LIVE, per-race sprite (this is the one that should draw).
+2. rect `[10,22,35,35]` (nested inside #1's box), a STATIC unbound `image:"Content/sprites/body/
+   human_grunt/head_healthy.png"` **hardcoded to human_grunt regardless of race**, plus a drop-shadow —
+   almost certainly a leftover design-mock sample the dc.html extraction didn't collapse into the
+   imageBind part. Both parts draw, back-to-back, in the same per-part loop
+   (`Game1.ManifestRenderer.cs` ~810-874) — nothing currently suppresses an unbound static-image part
+   when a live imageBind part covers the same content.
+**This is the SAME CLASS of bug already fixed once (P0-C.9, ~line 725-730): "an UNBOUND sample part is
+design-mock filler — never stamp it over live card copy," currently special-cased only for
+MerchantOffer/Technique/Minion datums. Extend that same rule to raceCard's Race datum** (skip the
+unbound static-image part at `[10,22,35,35]` when the imageBind part already covers it) rather than
+re-diagnosing from scratch. **Not a queue-jump — next pass touching NewGame's race cards; HiFi bugs
+stay flagged top-of-queue per standing rule, doesn't interrupt whatever's currently mid-pass.**
+
+## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-03, Doug — NewGame core-picker card, live screenshots)
+Doug shot the Grunt core card in three states (idle/SELECT, live selected/✓ CORE SET, and the design/05
+reference) and found two real defects. **Not a stop-the-loop interrupt — fold into the next pass that
+touches NewGame's core/race cards**, but don't let it go stale; HiFi visual bugs stay top-of-queue by
+standing rule.
+1. **CORE EFFECT text collision, CONFIRMED STILL OPEN:** the "CORE EFFECT" eyebrow visibly overlaps the
+   "Hollow Vessel" title line in ALL THREE of Doug's shots (idle + selected) — this is the **`eyebrow×title`**
+   member of the 3 known collisions baselined 2026-07-03 (STATUS history: heroShield-over-bar and the
+   doubled-identity collision both DIED same day; eyebrow×title was never confirmed dead — the "post-A3
+   re-judge (findings 4→3, ALL CD-side)" note covers NewGame's geometry deltas generally, NOT a specific
+   re-check of this collision). Treat as a real, still-open regression, not a dupe to dismiss.
+2. **Selected-card highlight (amber ring) NOT RENDERING — engine bug, root cause partially isolated:**
+   the reference (design/05) shows a clear amber border + panelCard fill on the CHOSEN card; Doug's live
+   "✓ CORE SET" shot shows the SAME plain/dim border as the unselected card — the highlight never applies.
+   **This is NOT a CD/data gap** — verified `layout.json`'s `templates.coreCard.states.selected` carries
+   `border:"amber", fill:"panelCard", badge:"✓ CHOSEN"` correctly, and `style.palette.amber` (`#d9a441`)
+   resolves fine through `PaletteColor.Named`. The `.selection` PART's own label chip clearly DOES update
+   (SELECT → ✓ CORE SET), proving `_build.CoreRuneIndex == i` matches correctly — so the bug is isolated to
+   the ROOT CHROME path: `Game1.ManifestRenderer.cs` `DrawManifestList` (~line 640-674, the
+   `"pickerCard" => i == selIx ? "selected" : "idle"` switch) feeding `DrawTemplateRootChrome` (~line
+   1174-1192). Candidates to check live (needs the actual build — no dotnet in this sandbox to verify):
+   (a) `tmpl.Parts.Length == 0` sends coreCard down the `DrawLeafTemplate` path instead (line 650), which
+   has NO family/selected handling at all; (b) the `family`/state key lookup silently misses for some
+   other reason. Confirm which, then fix — don't re-derive the manifest data, it's already correct.
+
 ## ⇒ NEW LOCK (2026-07-03, Doug — design session): weapon wield model, DESIGN_SPEC §6/§6d
 **CORRECTED same day — §6d was rewritten twice; read the CURRENT §6d, not this summary, before building.**
 Two independent equip layers: a MELEE hand-config (main-hand + off-hand, any 1H/2H pairing incl. 2H/2H,
@@ -11,9 +70,16 @@ to ARM-BROKEN state (not the STR value) for ANY held weapon incl. ranged, on bot
 evasion-zero when EITHER leg is broken, overriding residual DEX from Marks; main-hand/off-hand
 auto-promotion bookkeeping (first-equipped wins main-hand); a new Left/Right-HANDEDNESS player setting
 (cosmetic render-only); Bow + Wand weapon data entries (names in §6d). Wand's partial shield-bypass is
-explicitly NOT numbered yet (§17 #18) — don't invent a split, block on design. Also OPEN, not yet
-answered: whether powering a ranged technique visually sheaths the melee hand-config (and drops a held
-shield's block while drawn) — don't build either behavior until Doug calls it.
+explicitly NOT numbered yet (§17 #18) — don't invent a split, block on design. **RESOLVED (2026-07-03,
+POC-scope): no hand-timer gating between weapon families** — ranged and melee/shield techniques may
+power/charge/fire in parallel; the only hand-related gate is the static arms-unbroken+equipped check
+above, never a live "is this hand free" contention. Animation/sheathing is explicitly OUT OF SCOPE for
+the prototype — don't let it invent a gameplay restriction. Separately, a SHIELD equipped IS a static
+equip-time incompatibility with bows/wands (both need 2 free hands, same family as "shield needs a free
+arm") — that's a real, LOCKED rule, not a timer thing. **Sling** (§6d/§10, §17 #20) is now shape-LOCKED:
+1H (shield-compatible), fully bypasses the shield pool like a bow at lower damage, spends Charge — safe
+to build against that shape; gating stat is an ASSUMED default (DEX, matching bows), not yet confirmed,
+and tier names aren't set — don't invent those two.
 
 ## ⇒ NEW LOCK (2026-07-03, Doug — design session): armor system, DESIGN_SPEC §6/§6c
 STR/DEX/INT/CON armor tier ladders + names are canon (§6c, blessed-initial numbers, tune later); shield
