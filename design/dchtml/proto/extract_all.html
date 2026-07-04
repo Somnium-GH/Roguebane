@@ -9,7 +9,7 @@
 <body style="margin:0;background:#000;color:#0f0;font:12px monospace;">
 <div id="log" style="white-space:pre-wrap;padding:8px;"></div>
 <script>
-const SCREENS = ['Encounter', 'Equipment', 'CityMap', 'NewGame', 'Merchant'];   // <- edit per run: only screens whose dc/extractor changed
+const SCREENS = ['Encounter', 'Equipment', 'CityMap', 'NewGame', 'CampaignMap', 'Merchant'];   // ALWAYS the FULL set (payload B1 2026-07-03 late: running a subset silently DROPPED screens.campaignmap + templates.cityNode from layout.json — the merge replaces those sections wholesale). extract_merge.js also key-set-diffs against the previous manifest as a backstop.
 const put = m => { document.getElementById('log').textContent += m + '\n'; };
 
 async function srcText(p) { return (await fetch(p)).text(); }

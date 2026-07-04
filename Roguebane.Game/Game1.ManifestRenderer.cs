@@ -536,6 +536,8 @@ public partial class Game1
         // is the live source pre-run AND mid-run. core.coreEffect (the block) stays chrome-only.
         "core.name" => _build.Race.Name + " " + _build.CoreRune.Title,
         "core.role" => _build.CoreRune.Archetype,
+        // The topbar chip (B0b landed: CD split it off core.name) — "CORE GRUNT" per the source.
+        "core.label" => "CORE " + _build.CoreRune.Title.ToUpperInvariant(),
         // Equipment strip labels (design/02). run.state reads the real expedition state in-run —
         // pre-run AND at the chart (Choosing) the march is armed, matching the design's
         // READY TO MARCH copy; a live fight reads FIGHTING.

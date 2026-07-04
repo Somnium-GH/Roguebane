@@ -4,9 +4,10 @@ addendum A1–A4 all verified LANDED across the two 2026-07-03 drops. Clear them
 memory. History lives in git (`git log -- outputs/CLAUDE_DESIGN_issues.md`). This file always
 holds ONLY the open items._
 
-**SENT to CD 2026-07-03 (Doug relayed this exact batch: B0, B0b, B1, B2, B3, B4, B5).** Sending is
+**SENT to CD 2026-07-03, two relays (Doug): first batch B0, B0b, B1, B2, B3, B4, B5; second relay
+same day added B6, B7, B8, B9 — the ENTIRE file as it stands is now relayed.** Sending is
 NOT the close signal — per process, an item only clears once it's verified LANDED in the repo (send
-confirmations drift). Anything added to this file AFTER this note was not part of that relay.
+confirmations drift). Anything added AFTER this note is not yet relayed.
 
 ## Open
 B0. **resourceStrip still clips SUMMONS on citymap + equipment** (encounter is FIXED by your
@@ -90,6 +91,27 @@ B8. **CityMap beacon-graph nodes have no CD-authored hover or current-position t
     Doug locks the design: (a) author real hover/current states for the CityMap beacon nodes (not
     just the CampaignMap spine); (b) tell us what `glow:true` should actually look like (steady glow?
     pulse rate?) so we can build the primitive once and wire both screens to it.
+
+B9. **(post-relay addendum) WEAPON + ARMOR ROSTER LOCKED (DESIGN_SPEC §6c/§6d, 2026-07-03) — this
+    unblocks and SCOPES your B2 figure-art regen batch.** The art-relevant facts:
+    - **Melee tiers are a MATERIAL ladder: Iron → Steel → Mithral → Dwarven Steel.** One silhouette
+      per weapon TYPE; tiers should read as material (palette/finish swap), NOT reshaped art.
+      Types: Longsword, Axe, Mace (STR 1H) · Claymore, Battleaxe, Warhammer (STR 2H) · Dagger,
+      Rapier, Short Sword (DEX 1H).
+    - **STR armor RENAMED to the same material ladder** on plain slot nouns: Helm / Breastplate /
+      Vambraces / Greaves (old Skull Cap/Barbute/etc. names retired — don't regenerate art under
+      the old names). DEX leather / INT robe / CON shield ladders unchanged.
+    - **NEW art items:** Sling (Shepherd's → Braided → Sinew → Giantsbane; 1H, pairs with shield) ·
+      Staff (Wooden → Twisted → Ornate → Humming; 2H) · magic OFFHANDS Charm (Wooden → Bone →
+      Ornate → Humming) + Tome (Old Worn → Leather → Ornate → Glowing). Wands/bows keep their
+      existing ladders.
+    - **Wands are now HAND items** (can dual-wield; never alongside a bow/sling) — figure mounts:
+      wand(s) in hand sockets; the ranged BACK-MOUNT layer ask (B6c) covers bow/sling only.
+    - **Tier-4 signature rule:** MAGIC gear's top-tier adjective is supernatural (Humming/Glowing);
+      mundane gear's is not — keep that split in any generated copy.
+    - **Name lengths:** "Dwarven Steel Short Sword" (24ch) class overflows current card name rects —
+      Doug ACCEPTS overflow for now; final treatment (wider rects? material chip? wrap?) is a parked
+      Doug+Cowork decision — don't unilaterally re-rect, but flag preferred options if you have them.
 
 ## Standing FYIs (unchanged, for context — not action items)
 - design/05 v2 STAT BLOCKS are not adopted; Doug will run a live tuning session — if a future 05

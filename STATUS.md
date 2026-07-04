@@ -200,6 +200,38 @@ engine resolution + the armor model. Armor-RED per §6/§6c stands, folded into 
 - ENGINE ORDER (extends the §6d queue, normal priority, no queue-jump): armor items as data (§6c
   ladders) + gear/armor requirement checks → cascade ranking → state-family render wiring → click
   matrix + auto-displace → drag-reorder → paper-doll gear-state compose. Each slice Core-tested.
+
+## ⇒ NEW LOCK (2026-07-03, Doug — weapon/armor NAMING + numbers session): DESIGN_SPEC §6c/§6d/§10
+## rewritten — READ THE SPEC before building; this block is the engine queue, not the rules.
+**What locked:** full weapon roster (STR/DEX melee ×3 types each ×2 hands, material tiers
+Iron→Steel→**Mithral**→Dwarven Steel), per-tier damage + equip requirement + **technique-TIMER
+MULTIPLIER** per weapon (<1.0 = faster; multiplies the consulting technique's charge timer;
+dual-wield = AVERAGE of both weapons' multipliers, damage from BOTH); STR armor RENAMED to the same
+material ladder on plain slot nouns (Helm/Breastplate/Vambraces/Greaves — old prestige names are §18
+DROPPED, clean-rename any code/data usages); armor equip gates (STR 2/t · DEX 1/t · Robe 2 INT/t ·
+Cap 1 INT/t); INT REDESIGN: wand = 1H hand item (dual-OK, excludes ranged slot, shield-legal,
+**shield-SUBTRACTION damage** — reduced by standing shields, NOT consumed, NO Charge — supersedes
+partial-bypass), staff = 2H plain blockable melee (blocks ranged like a held shield, no shield,
+1 INT/t), magic offhands Charm/Tome (+0.1× minion/spell dmg per tier, 1 INT/t, pair with any main);
+sling stat+names locked (DEX 1/t, Shepherd's→Braided→Sinew→Giantsbane).
+**Still OPEN — do NOT invent:** bow + sling damage/tier; CON-shield equip-gate number (§6c);
+placeholder-flagged values fine where content already exists (bow power 2 stays flagged).
+**NEW ENGINE WORK (normal priority order, each slice Core-tested; content is DATA — one
+interpreter, no per-weapon classes):**
+1. Weapon/armor DATA roster per §6c/§6d (36 melee + bows/slings/wands/staffs/charms/tomes + armor
+   ladders w/ material naming) — supersedes the old "Bow + Wand data entries" line in the §6d block.
+2. Timer-multiplier in the technique charge path (Core; consulting technique reads its gating
+   weapon's multiplier; dual = average; cooldowns untouched — DEX haste owns those).
+3. Wand shield-subtraction resolution in combat (damage − standing shield count, pool unconsumed,
+   remainder = normal part+HP hit; economy math ASSERTED in tests per CLAUDE.md).
+4. Magic-offhand bonus hooks (minion attack ×, spell damage ×) reading the equipped offhand tier.
+5. Staff/wand equip-rule wiring into the §6e validation (wand↔ranged mutual exclusion; staff =
+   shield-equivalent for ranged-block + no-shield).
+6. Sling data + Charge spend (bow-parallel path already exists — placeholder dmg flagged).
+**CD payload updated (B9)** — roster relay for the B2 figure-art regen batch. **PROCESS CHANGE
+(Doug, 2026-07-03; also in loop.md):** every NEW Needs-CD finding gets BOTH a STATUS line AND a
+relay-ready item appended to `outputs/CLAUDE_DESIGN_issues.md` in the same pass — keeping that
+outbox current is part of DONE.
 _PROGRESS (2026-07-03 loop): ~~state-family render wiring~~ DONE (generic stateless-family
 resolution, 8d85ef7); ~~GEAR click matrix + auto-displace~~ DONE (equipped→unequip,
 equippable→equip; hands-full melee benches the OFF-hand [Hands[1] — Hands[0]=first-equipped=main
@@ -220,8 +252,12 @@ now name rung-1 canon pieces; merchant armor price = 2×tier+2 placeholder). Wea
 OFF below threshold in Body.Damage — the §6e disable-not-drop change is its own slice, rides the
 cascade answer. ~~robe spell-damage consumer~~ DONE (2026-07-03 loop, 323
 tests: Body.SpellDamageBonus = +2 per worn sustained robe piece, 2-piece cap; applied on INT-stat
-Discharge HITS only — heals stay unbuffed; dies when INT collapses). REMAINING: weapons
-disable-not-drop; cascade ranking
+Discharge HITS only — heals stay unbuffed; dies when INT collapses). ~~§6d arm-broken weapon lockout~~ DONE (2026-07-03 loop,
+326 tests: Body.HandUsable [hand 0 = dominant armR, hand 1 = armL; armless bodies don't gate];
+Consulted() filters broken-arm hands so the weapon stays ASSIGNED but stops answering, whatever
+stat it gates — player AND foe via the shared Body path; FigureBinding.HandUsable delegates, one
+truth for render + combat). REMAINING: weapons disable-not-drop (stat-threshold fall-off still
+lives in Body.Damage); cascade ranking
 (BLOCKED on the sustain-model question below); drag-reorder; vestigial pre-run branch retire._
 **‼ NEEDS HUMAN — cascade SUSTAIN MODEL ambiguous, blocking the ranking build:** §6e reads
 "an attribute can't sustain EVERY equipped item" + a ranking with TIE-BREAKS + cheapest-first
@@ -345,8 +381,9 @@ drawn line box h=14–15 vs authored 11px bands (display-font line spacing; INK 
 (correct); shrinking to fit would break verified sizing. **NEEDS HUMAN (M0 rule 2: measurement
 changes need approval BEFORE commit):** approve ONE of (a) baseline re-pin accepting the new
 counts (textgeom ng 9/2, city 6/0) as drop-authored content, or (b) textgeom switching to INK
-bboxes (matches probes; detector keeps catching clipped/missing text). Until then the gate stays
-red on exactly these two lines; fidelity/binds/coverage all green (city fidelity 86.5→87.0).
+bboxes (matches probes; detector keeps catching clipped/missing text). 2026-07-03 late addendum: the evening CD drop adds equipment
+`invTitle` to the same class (overflow 11→12) — fold into the same decision. Until then the gate
+stays red on exactly these lines; fidelity/binds/coverage all green (city fidelity 86.5→87.0).
 **PRIORITY ORDER post-drop (standing rule, CLAUDE.md §Working):** failing gates / measurement
 integrity (M0) FIRST → drop-unblocked work (the list above + M1) → only then contingency/refactor.
 A drop RESOLVING a blocker is authoritative here — don't re-verify what the re-arm block says

@@ -67,11 +67,25 @@ public sealed class Body
 
     public void Unwield(Weapon weapon) => _hands.Remove(weapon);
 
-    // The weapons a technique consults, by its stat (§7). Power/cost flow from these.
+    // §6d/§6 hard override: a hand's weapon works only while its ARM stands — a broken arm's
+    // hand slot is physically gone regardless of which stat the weapon gates on, for player and
+    // foe alike (§8 symmetry). Hand 0 rides the SECOND Str part (armR, dominant), hand 1 the
+    // first (armL), mirroring the figure's socket order. Bodies without arm parts don't gate.
+    public bool HandUsable(int handIndex)
+    {
+        var arms = _parts.Where(p => p.Stat == Stat.Str).ToList();
+        if (arms.Count == 0) return true;
+        var ix = handIndex == 0 ? Math.Min(1, arms.Count - 1) : 0;
+        return Contribution(arms[ix]) > 0;
+    }
+
+    private IEnumerable<Weapon> UsableHands() => _hands.Where((_, i) => HandUsable(i));
+
+    // The weapons a technique consults, by its stat (§7) — broken-arm hands never answer (§6d).
     public IReadOnlyList<Weapon> Consulted(Technique technique) => technique.Consults switch
     {
-        WeaponUse.Primary => _hands.Where(w => w.Stat == technique.Stat).Take(1).ToList(),
-        WeaponUse.Both => _hands.Where(w => w.Stat == technique.Stat).ToList(),
+        WeaponUse.Primary => UsableHands().Where(w => w.Stat == technique.Stat).Take(1).ToList(),
+        WeaponUse.Both => UsableHands().Where(w => w.Stat == technique.Stat).ToList(),
         _ => Array.Empty<Weapon>(),
     };
 

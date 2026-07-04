@@ -45,6 +45,13 @@ async function RB_mergeExtract(env) {
   const json = new TextDecoder().decode(all);
   const extract = JSON.parse(json);                       // throws if any byte corrupted
   const layout = JSON.parse(await readFile('Content/layout.json'));
+  // KEY-SET DIFF GUARD (payload B1 2026-07-03 late): the merge replaces screens/templates WHOLESALE,
+  // so a screen missing from the harness run would silently vanish from the manifest (campaignmap +
+  // cityNode shipped dropped once). Refuse to merge if any previous key disappears.
+  const lost = [];
+  for (const k in layout.screens) if (!extract.screens[k]) lost.push('screens.' + k);
+  for (const k in layout.templates) if (!extract.templates[k]) lost.push('templates.' + k);
+  if (lost.length) throw new Error('REFUSING MERGE — extract lost keys vs previous manifest: ' + lost.join(', ') + ' (run the FULL screen set in extract_all.html, or intentional removals must be deleted from Content/layout.json first)');
   layout.screens = extract.screens;
   layout.templates = extract.templates;
   layout.style = extract.style;

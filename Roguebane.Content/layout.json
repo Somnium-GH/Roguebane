@@ -2194,7 +2194,7 @@
           "color": "ink",
           "font": "display",
           "fontPx": 8,
-          "image": "Content/ui/reticle/focus_p2.png",
+          "image": "Content/ui/reticle/focus_p0.png",
           "frames": [
             "ui/reticle/focus_p0",
             "ui/reticle/focus_p1",
@@ -3077,6 +3077,24 @@
           }
         },
         {
+          "id": "invTitle",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            275,
+            143
+          ],
+          "size": [
+            48,
+            13
+          ],
+          "z": 15,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 10.5,
+          "content": "Inventory"
+        },
+        {
           "id": "invTabs",
           "type": "list",
           "anchor": "TopLeft",
@@ -3088,7 +3106,7 @@
             419,
             29
           ],
-          "z": 15,
+          "z": 16,
           "binds": "inventory.tabs",
           "color": "ink",
           "font": "display",
@@ -3121,7 +3139,7 @@
             403,
             105
           ],
-          "z": 16,
+          "z": 17,
           "binds": "inventory.activeTab.items",
           "color": "ink",
           "font": "display",
@@ -3149,7 +3167,7 @@
             256,
             380
           ],
-          "z": 17,
+          "z": 18,
           "binds": "runes",
           "color": "ink",
           "fill": {
@@ -3173,7 +3191,7 @@
             51,
             15
           ],
-          "z": 18,
+          "z": 19,
           "color": "ink",
           "font": "display",
           "fontPx": 11.5,
@@ -3199,7 +3217,7 @@
             236,
             17
           ],
-          "z": 19,
+          "z": 20,
           "binds": "runes.budget",
           "color": "muted",
           "font": "mono",
@@ -3218,7 +3236,7 @@
             236,
             8
           ],
-          "z": 20,
+          "z": 21,
           "binds": "runes.budgetPct",
           "color": "ink",
           "fill": "slot",
@@ -3242,7 +3260,7 @@
             117,
             6
           ],
-          "z": 21,
+          "z": 22,
           "binds": "runes.budgetPct",
           "color": "ink",
           "fill": "int",
@@ -3261,7 +3279,7 @@
             236,
             309
           ],
-          "z": 22,
+          "z": 23,
           "binds": "runeGroups",
           "color": "ink",
           "font": "display",
@@ -3288,7 +3306,7 @@
             960,
             28
           ],
-          "z": 23,
+          "z": 24,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -3319,7 +3337,7 @@
             57,
             15
           ],
-          "z": 24,
+          "z": 25,
           "color": "inkWarm",
           "font": "display",
           "fontPx": 11.5,
@@ -3337,8 +3355,8 @@
             36,
             8
           ],
-          "z": 25,
-          "binds": "core.name",
+          "z": 26,
+          "binds": "core.label",
           "color": "mutedWarm",
           "font": "mono",
           "fontPx": 6,
@@ -3356,7 +3374,7 @@
             59,
             8
           ],
-          "z": 26,
+          "z": 27,
           "binds": "run.state",
           "color": "good",
           "font": "mono",
@@ -3372,10 +3390,10 @@
             8
           ],
           "size": [
-            197,
+            203,
             11
           ],
-          "z": 27,
+          "z": 28,
           "binds": "run.resources",
           "color": "mutedWarm",
           "font": "mono",
@@ -3383,7 +3401,7 @@
           "item": {
             "template": "resourceItem",
             "flow": "horizontal",
-            "gap": 8,
+            "gap": 5,
             "size": [
               47,
               11
@@ -3402,7 +3420,7 @@
             60,
             20
           ],
-          "z": 28,
+          "z": 29,
           "binds": "nav.close",
           "color": "parch",
           "font": "mono",
@@ -3430,7 +3448,7 @@
             960,
             132
           ],
-          "z": 29,
+          "z": 30,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -3469,7 +3487,7 @@
             150,
             131
           ],
-          "z": 30,
+          "z": 31,
           "binds": "core",
           "color": "ink",
           "border": {
@@ -3495,7 +3513,7 @@
             131,
             14
           ],
-          "z": 31,
+          "z": 32,
           "binds": "core.name",
           "color": "inkBright",
           "font": "display",
@@ -3514,7 +3532,7 @@
             131,
             7
           ],
-          "z": 32,
+          "z": 33,
           "binds": "core.role",
           "color": "muted",
           "font": "mono",
@@ -3530,21 +3548,20 @@
             447
           ],
           "size": [
-            131,
-            16
+            66,
+            34
           ],
-          "z": 33,
+          "z": 34,
           "binds": "core.stats",
           "color": "ink",
           "font": "mono",
           "fontPx": 5.5,
           "item": {
             "template": "coreStatRow",
-            "flow": "grid",
+            "flow": "vertical",
             "gap": 2,
-            "cols": 2,
             "size": [
-              62,
+              66,
               7
             ]
           }
@@ -3555,13 +3572,13 @@
           "anchor": "TopLeft",
           "offset": [
             9,
-            476
+            493
           ],
           "size": [
             131,
             40
           ],
-          "z": 34,
+          "z": 35,
           "binds": "core.coreEffect",
           "color": "ink",
           "border": {
@@ -3581,13 +3598,13 @@
           "anchor": "TopLeft",
           "offset": [
             16,
-            477
+            495
           ],
           "size": [
             124,
             6
           ],
-          "z": 35,
+          "z": 36,
           "color": "mutedDim",
           "font": "mono",
           "fontPx": 4.5,
@@ -3599,13 +3616,13 @@
           "anchor": "TopLeft",
           "offset": [
             16,
-            485
+            502
           ],
           "size": [
             124,
             11
           ],
-          "z": 36,
+          "z": 37,
           "binds": "core.coreEffectName",
           "color": "inkBright",
           "font": "display",
@@ -3618,13 +3635,13 @@
           "anchor": "TopLeft",
           "offset": [
             16,
-            498
+            516
           ],
           "size": [
             124,
             16
           ],
-          "z": 37,
+          "z": 38,
           "binds": "core.coreEffectDesc",
           "color": "muted",
           "font": "mono",
@@ -3643,7 +3660,7 @@
             810,
             131
           ],
-          "z": 38,
+          "z": 39,
           "binds": "loadout",
           "color": "ink",
           "font": "display",
@@ -3661,7 +3678,7 @@
             50,
             13
           ],
-          "z": 39,
+          "z": 40,
           "color": "inkBright",
           "font": "display",
           "fontPx": 10,
@@ -3687,7 +3704,7 @@
             681,
             7
           ],
-          "z": 40,
+          "z": 41,
           "binds": "loadout.slotLabel",
           "color": "parch",
           "font": "mono",
@@ -3706,7 +3723,7 @@
             681,
             89
           ],
-          "z": 41,
+          "z": 42,
           "binds": "loadout",
           "color": "ink",
           "font": "display",
@@ -3733,7 +3750,7 @@
             94,
             7
           ],
-          "z": 42,
+          "z": 43,
           "binds": "minions.slotLabel",
           "color": "parch",
           "font": "mono",
@@ -3752,7 +3769,7 @@
             94,
             89
           ],
-          "z": 43,
+          "z": 44,
           "binds": "minions",
           "color": "ink",
           "font": "display",
@@ -3866,7 +3883,7 @@
             8
           ],
           "size": [
-            197,
+            203,
             11
           ],
           "z": 4,
@@ -3877,7 +3894,7 @@
           "item": {
             "template": "resourceItem",
             "flow": "horizontal",
-            "gap": 8,
+            "gap": 5,
             "size": [
               47,
               11
@@ -5556,6 +5573,261 @@
         }
       ]
     },
+    "campaignmap": {
+      "designSize": [
+        960,
+        540
+      ],
+      "elements": [
+        {
+          "id": "backdrop",
+          "type": "text",
+          "anchor": "Center",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            540
+          ],
+          "z": 0,
+          "binds": "campaign.scene",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "image": "Content/bg/spine_road.png"
+        },
+        {
+          "id": "header",
+          "type": "panel",
+          "anchor": "Top",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            47
+          ],
+          "z": 1,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "eyebrow",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            20,
+            13
+          ],
+          "size": [
+            234,
+            8
+          ],
+          "z": 2,
+          "color": "muted",
+          "font": "mono",
+          "fontPx": 6,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          },
+          "content": "Campaign"
+        },
+        {
+          "id": "title",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            20,
+            23
+          ],
+          "size": [
+            234,
+            24
+          ],
+          "z": 3,
+          "color": "inkBright",
+          "font": "display",
+          "fontPx": 19,
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          },
+          "content": "Advance Toward the Capital"
+        },
+        {
+          "id": "resourceStrip",
+          "type": "list",
+          "anchor": "TopRight",
+          "offset": [
+            -20,
+            20
+          ],
+          "size": [
+            203,
+            11
+          ],
+          "z": 4,
+          "binds": "run.resources",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "resourceItem",
+            "flow": "horizontal",
+            "gap": 5,
+            "size": [
+              47,
+              11
+            ]
+          }
+        },
+        {
+          "id": "citiesTaken",
+          "type": "text",
+          "anchor": "TopRight",
+          "offset": [
+            -20,
+            36
+          ],
+          "size": [
+            65,
+            11
+          ],
+          "z": 5,
+          "binds": "campaign.taken",
+          "color": "mutedWarm",
+          "font": "mono",
+          "fontPx": 6,
+          "align": "right",
+          "sample": "CITIES TAKEN 2 / 6"
+        },
+        {
+          "id": "cityGraph",
+          "type": "graph",
+          "anchor": "Center",
+          "offset": [
+            0,
+            15
+          ],
+          "size": [
+            960,
+            410
+          ],
+          "z": 6,
+          "binds": "campaign",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "states": {
+            "routeTraveled": {
+              "color": "good",
+              "w": 2
+            },
+            "routeReachable": {
+              "color": "amber",
+              "w": 2
+            },
+            "routeSkipped": {
+              "color": "borderDim",
+              "w": 1,
+              "dash": true
+            },
+            "routeFuture": {
+              "color": "borderDim",
+              "w": 1,
+              "dash": true
+            }
+          },
+          "item": {
+            "template": "cityNode",
+            "flow": "graph",
+            "gap": 0,
+            "size": [
+              8,
+              8
+            ]
+          }
+        },
+        {
+          "id": "capitalMarker",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            710,
+            230
+          ],
+          "size": [
+            120,
+            0
+          ],
+          "z": 7,
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "align": "center",
+          "shadow": {
+            "token": "title",
+            "dx": 0,
+            "dy": 2,
+            "blur": 3,
+            "color": "outline",
+            "opacity": 0.65
+          }
+        },
+        {
+          "id": "footer",
+          "type": "text",
+          "anchor": "Bottom",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            960,
+            45
+          ],
+          "z": 8,
+          "color": "ink",
+          "fill": {
+            "type": "gradient",
+            "from": "panel",
+            "to": "panelTab",
+            "dir": "vertical"
+          },
+          "border": {
+            "color": "borderMid",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "top"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8,
+          "shadow": {
+            "token": "panel",
+            "dx": 0,
+            "dy": 4,
+            "blur": 10,
+            "color": "outline",
+            "opacity": 0.5
+          }
+        }
+      ]
+    },
     "merchant": {
       "designSize": [
         960,
@@ -6021,7 +6293,7 @@
             8
           ],
           "size": [
-            197,
+            203,
             11
           ],
           "z": 18,
@@ -6032,7 +6304,7 @@
           "item": {
             "template": "resourceItem",
             "flow": "horizontal",
-            "gap": 8,
+            "gap": 5,
             "size": [
               47,
               11
@@ -6236,261 +6508,6 @@
           "font": "mono",
           "fontPx": 6.5,
           "sample": "PURSE 128g"
-        }
-      ]
-    },
-    "campaignmap": {
-      "designSize": [
-        960,
-        540
-      ],
-      "elements": [
-        {
-          "id": "backdrop",
-          "type": "text",
-          "anchor": "Center",
-          "offset": [
-            0,
-            0
-          ],
-          "size": [
-            960,
-            540
-          ],
-          "z": 0,
-          "binds": "campaign.scene",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "image": "Content/bg/spine_road.png"
-        },
-        {
-          "id": "header",
-          "type": "panel",
-          "anchor": "Top",
-          "offset": [
-            0,
-            0
-          ],
-          "size": [
-            960,
-            47
-          ],
-          "z": 1,
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "eyebrow",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            20,
-            13
-          ],
-          "size": [
-            234,
-            8
-          ],
-          "z": 2,
-          "color": "muted",
-          "font": "mono",
-          "fontPx": 6,
-          "shadow": {
-            "token": "title",
-            "dx": 0,
-            "dy": 2,
-            "blur": 3,
-            "color": "outline",
-            "opacity": 0.65
-          },
-          "content": "Campaign"
-        },
-        {
-          "id": "title",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            20,
-            23
-          ],
-          "size": [
-            234,
-            24
-          ],
-          "z": 3,
-          "color": "inkBright",
-          "font": "display",
-          "fontPx": 19,
-          "shadow": {
-            "token": "title",
-            "dx": 0,
-            "dy": 2,
-            "blur": 3,
-            "color": "outline",
-            "opacity": 0.65
-          },
-          "content": "Advance Toward the Capital"
-        },
-        {
-          "id": "resourceStrip",
-          "type": "list",
-          "anchor": "TopRight",
-          "offset": [
-            -20,
-            20
-          ],
-          "size": [
-            197,
-            11
-          ],
-          "z": 4,
-          "binds": "run.resources",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "item": {
-            "template": "resourceItem",
-            "flow": "horizontal",
-            "gap": 8,
-            "size": [
-              47,
-              11
-            ]
-          }
-        },
-        {
-          "id": "citiesTaken",
-          "type": "text",
-          "anchor": "TopRight",
-          "offset": [
-            -20,
-            36
-          ],
-          "size": [
-            65,
-            11
-          ],
-          "z": 5,
-          "binds": "campaign.taken",
-          "color": "mutedWarm",
-          "font": "mono",
-          "fontPx": 6,
-          "align": "right",
-          "sample": "CITIES TAKEN 2 / 6"
-        },
-        {
-          "id": "cityGraph",
-          "type": "graph",
-          "anchor": "Center",
-          "offset": [
-            0,
-            15
-          ],
-          "size": [
-            960,
-            410
-          ],
-          "z": 6,
-          "binds": "campaign",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "states": {
-            "routeTraveled": {
-              "color": "good",
-              "w": 2
-            },
-            "routeReachable": {
-              "color": "amber",
-              "w": 2
-            },
-            "routeSkipped": {
-              "color": "borderDim",
-              "w": 1,
-              "dash": true
-            },
-            "routeFuture": {
-              "color": "borderDim",
-              "w": 1,
-              "dash": true
-            }
-          },
-          "item": {
-            "template": "cityNode",
-            "flow": "graph",
-            "gap": 0,
-            "size": [
-              8,
-              8
-            ]
-          }
-        },
-        {
-          "id": "capitalMarker",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            710,
-            230
-          ],
-          "size": [
-            120,
-            0
-          ],
-          "z": 7,
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "align": "center",
-          "shadow": {
-            "token": "title",
-            "dx": 0,
-            "dy": 2,
-            "blur": 3,
-            "color": "outline",
-            "opacity": 0.65
-          }
-        },
-        {
-          "id": "footer",
-          "type": "text",
-          "anchor": "Bottom",
-          "offset": [
-            0,
-            0
-          ],
-          "size": [
-            960,
-            45
-          ],
-          "z": 8,
-          "color": "ink",
-          "fill": {
-            "type": "gradient",
-            "from": "panel",
-            "to": "panelTab",
-            "dir": "vertical"
-          },
-          "border": {
-            "color": "borderMid",
-            "w": 1,
-            "style": "solid",
-            "sides": [
-              "top"
-            ]
-          },
-          "font": "display",
-          "fontPx": 8,
-          "shadow": {
-            "token": "panel",
-            "dx": 0,
-            "dy": 4,
-            "blur": 10,
-            "color": "outline",
-            "opacity": 0.5
-          }
         }
       ]
     }
@@ -7627,7 +7644,7 @@
     },
     "coreStatRow": {
       "size": [
-        62,
+        66,
         7
       ],
       "parts": [
@@ -7646,7 +7663,7 @@
         },
         {
           "rect": [
-            55,
+            59,
             0,
             7,
             7
@@ -8838,6 +8855,108 @@
       "fontPx": 8,
       "align": "center"
     },
+    "cityNode": {
+      "size": [
+        8,
+        8
+      ],
+      "parts": [
+        {
+          "rect": [
+            -24,
+            -38,
+            48,
+            38
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "imageBind": "icons/node/castle",
+          "binds": "city.castle"
+        },
+        {
+          "rect": [
+            -47,
+            7,
+            95,
+            6
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 4.5,
+          "align": "center",
+          "binds": "city.tier",
+          "sample": "Tier 1"
+        },
+        {
+          "rect": [
+            -47,
+            13,
+            95,
+            10
+          ],
+          "color": "parch",
+          "font": "display",
+          "fontPx": 9,
+          "align": "center",
+          "binds": "city.name",
+          "sample": "Ashford"
+        },
+        {
+          "rect": [
+            -16,
+            25,
+            31,
+            8
+          ],
+          "color": "good",
+          "fill": "panelDeep",
+          "border": {
+            "color": "border",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 4,
+          "align": "center",
+          "states": {
+            "taken": {
+              "color": "good",
+              "border": "good"
+            },
+            "current": {
+              "color": "amber",
+              "border": "amber"
+            }
+          },
+          "binds": "city.status",
+          "sample": "TAKEN ✓"
+        }
+      ],
+      "binds": "city",
+      "color": "ink",
+      "font": "display",
+      "fontPx": 8,
+      "states": {
+        "current": {
+          "border": "amber",
+          "glow": true
+        },
+        "cleared": {
+          "opacity": 0.7
+        },
+        "skipped": {
+          "opacity": 0.4
+        },
+        "future": {
+          "opacity": 0.5
+        },
+        "capital": {
+          "color": "gold",
+          "opacity": 0.62
+        }
+      }
+    },
     "healPip": {
       "size": [
         15,
@@ -9284,108 +9403,6 @@
       "color": "ink",
       "font": "display",
       "fontPx": 8
-    },
-    "cityNode": {
-      "size": [
-        8,
-        8
-      ],
-      "parts": [
-        {
-          "rect": [
-            -24,
-            -38,
-            48,
-            38
-          ],
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "imageBind": "icons/node/castle",
-          "binds": "city.castle"
-        },
-        {
-          "rect": [
-            -47,
-            7,
-            95,
-            6
-          ],
-          "color": "good",
-          "font": "mono",
-          "fontPx": 4.5,
-          "align": "center",
-          "binds": "city.tier",
-          "sample": "Tier 1"
-        },
-        {
-          "rect": [
-            -47,
-            13,
-            95,
-            10
-          ],
-          "color": "parch",
-          "font": "display",
-          "fontPx": 9,
-          "align": "center",
-          "binds": "city.name",
-          "sample": "Ashford"
-        },
-        {
-          "rect": [
-            -16,
-            25,
-            31,
-            8
-          ],
-          "color": "good",
-          "fill": "panelDeep",
-          "border": {
-            "color": "border",
-            "w": 1,
-            "style": "solid"
-          },
-          "font": "mono",
-          "fontPx": 4,
-          "align": "center",
-          "states": {
-            "taken": {
-              "color": "good",
-              "border": "good"
-            },
-            "current": {
-              "color": "amber",
-              "border": "amber"
-            }
-          },
-          "binds": "city.status",
-          "sample": "TAKEN ✓"
-        }
-      ],
-      "binds": "city",
-      "color": "ink",
-      "font": "display",
-      "fontPx": 8,
-      "states": {
-        "current": {
-          "border": "amber",
-          "glow": true
-        },
-        "cleared": {
-          "opacity": 0.7
-        },
-        "skipped": {
-          "opacity": 0.4
-        },
-        "future": {
-          "opacity": 0.5
-        },
-        "capital": {
-          "color": "gold",
-          "opacity": 0.62
-        }
-      }
     }
   },
   "style": {

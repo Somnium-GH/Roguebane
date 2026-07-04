@@ -59,9 +59,8 @@ public static class FigureBinding
            && body.ArmorOn(stat) is { } worn && body.ArmorSustained(worn);
 
     // §6 broken-limb hard override: a BROKEN arm's hand slot is physically gone — its weapon never
-    // draws (nor swings). Hand order mirrors the shell's socket order: 0 = handR/main, 1 = handL.
-    public static bool HandUsable(Body body, int handIndex)
-        => Condition(body, handIndex == 0 ? "armR" : "armL") != PartCondition.Broken;
+    // draws (nor swings; Body.Consulted applies the same gate combat-side, one truth).
+    public static bool HandUsable(Body body, int handIndex) => body.HandUsable(handIndex);
 
     // Whether this part has a bare/armoured sprite ROW. Parts without one (torso/head/boots) can't show
     // armour through the sprite, so the shell draws a composed indicator instead.

@@ -146,11 +146,10 @@ the single highest-payoff type and the single highest-risk: STR is one shared po
 a build leaning on it is the one most exposed to the arms-broken cascade (§6 disable, above) — expect a
 STR build's armor to go RED across the board when both arms break.
 
-**STR — heavy/plate (Head, Chest, Arms, Legs):**
-- Head: Skull Cap → Barbute → Great Helm → Crowned Helm
-- Chest: Breastplate → Splint Mail → Half Plate → Full Plate
-- Arms: Vambraces → Splint Vambraces → Banded Gauntlets → Plate Gauntlets
-- Legs: Greaves → Splint Greaves → Half-Plate Legs → Full Plate Legs
+**STR — heavy/plate (Head, Chest, Arms, Legs) [RENAMED 2026-07-03 — material ladder, matching
+weapons; the old prestige names → §18]:** tiers = **Iron → Steel → Mithral → Dwarven Steel**, one
+plain noun per slot — Head: **Helm** · Chest: **Breastplate** · Arms: **Vambraces** · Legs:
+**Greaves** (so "Iron Helm" … "Dwarven Steel Greaves").
 
 **DEX — leather (Head, Chest, Arms, Legs):**
 - Head: Leather Cap → Hardened Cap → Studded Cap → Reinforced Hood
@@ -170,6 +169,9 @@ STR build's armor to go RED across the board when both arms break.
 DEX = +2% evade per tier, per body part currently worn (stacks across worn pieces). INT = +2 spell
 damage per piece worn (2-piece cap: robe + hat). Shield = +2% block-pool recharge per tier (§6b).
 
+**Per-tier equip gates [blessed initial, 2026-07-03]:** STR armor 2 STR · DEX armor 1 DEX · Robe
+2 INT · Cap/Circlet line 1 INT · Shield object: CON, number **[OPEN — never dictated; don't invent]**.
+
 ### 6d. Weapons — the wield model [LOCKED, 2026-07-03; corrected same day — see notes; a couple numbers
 OPEN, tagged below]
 **Weapons/equipment are stat-sticks AND technique GATES** — not just a damage number. A technique
@@ -184,12 +186,13 @@ weapon never adds its own timer, it only gates + scales.
   PRESENT (equipped + arms unbroken) the instant it fires. Weapon attacks are instantaneous-if-charged;
   there's no hold/release lifecycle for hands beyond that instant check.
 - **Two independent equip layers [CORRECTED 2026-07-03]:** a **MELEE hand-config** (main-hand + off-hand,
-  2 slots total) and a separate, independent **RANGED slot** (bows/wands) — a bow does NOT compete with
+  2 slots total) and a separate, independent **RANGED slot** (bows/slings — WANDS moved to the
+  hand-config 2026-07-03, see the roster below) — a bow does NOT compete with
   melee hands for an equip slot; a character can have a sword+shield AND a bow equipped at once (the
   Ranger core already ships exactly this, §10). Only ONE ranged slot exists at all, so "which of two bows"
-  was never actually a contention — there's just one. Both layers still gate on arms: **RANGED weapons
-  need BOTH arms unbroken to use, same as any 2-handed melee weapon**, even though they don't occupy the
-  melee hand-slots.
+  was never actually a contention — there's just one. Both layers still gate on arms: **BOWS
+  need BOTH arms unbroken to use, same as any 2-handed melee weapon** (the 1H SLING needs its one
+  throwing arm), even though ranged items don't occupy the melee hand-slots.
 - **Melee hand-config, 1H/2H is per-weapon, not a fixed slot shape:** main-hand + off-hand can each hold a
   1H weapon, a shield (off-hand only, needs a free arm), or — dual-wielding — ANY pairing across the two
   slots, including 2H/2H or 2H/1H, gated purely by **each weapon's own STR requirement** (§6 table, "STR
@@ -204,15 +207,17 @@ weapon never adds its own timer, it only gates + scales.
   BOTH arms unbroken; a ranged technique (bow/wand) needs BOTH arms unbroken; a shield needs a FREE
   arm — it drops whenever both arms are already committed to a dual-wield pair. Same rule for foes (§8
   symmetry): arms/legs are separately targetable and breakable on both sides.
-- **Shield vs. 2H ranged [LOCKED 2026-07-03]:** a bow/wand needs both hands the same way a shield needs
-  one — so a SHIELD equipped is an equip-time incompatibility with bows/wands (this is a static
-  equip-compatibility rule, same family as "shield needs a free arm" above, NOT a live timer-contention
-  case — doesn't reopen the "no hand-timer gating" resolution just above).
-- **Sling [LOCKED shape 2026-07-03; gating stat + names OPEN]:** a ONE-HANDED ranged weapon, compatible
-  with a shield in the off-hand — the shield-build's ranged option, filling the gap bows/wands can't.
-  **Fully ignores the shield pool like a bow** (spends Charge, §10) but at LOWER damage than a bow — a
-  weaker, always-available pierce option, not a free upgrade. Assumed DEX-gated by default (matching the
-  bow/DEX-weapon convention, §6 table) — flag if that's wrong; tier names not yet set.
+- **Shield vs. 2H ranged [LOCKED 2026-07-03; updated same day]:** a BOW needs both hands the same way
+  a shield needs one — SHIELD × BOW stays an equip-time incompatibility. Same-day update: WANDS left
+  the ranged slot, so **wand + shield is LEGAL**; the **STAFF inherits the shield-block** (it counts as
+  a held-shield-equivalent for these rules), and SLINGS are 1H shield-COMPATIBLE. Same static-rule
+  family, NOT a live timer-contention case — doesn't reopen "no hand-timer gating" above.
+- **Sling [LOCKED 2026-07-03 — shape, stat, names; damage number with the balance pass]:** a ONE-HANDED
+  ranged weapon, compatible with a shield in the off-hand — the shield-build's ranged option, filling
+  the gap bows can't. **Fully ignores the shield pool like a bow** (spends Charge, §10) but at LOWER
+  damage than a bow — a weaker, always-available pierce option, not a free upgrade. **DEX-gated,
+  1 DEX/tier (confirmed).** Tiers: **Shepherd's Sling → Braided Sling → Sinew Sling → Giantsbane
+  Sling.** Damage/tier OPEN (§17 #9).
 - **Main-hand/off-hand auto-promotion [LOCKED]:** within the melee hand-config, first-equipped = MAIN-
   HAND, second = OFF-HAND. Unequipping main-hand promotes off-hand; a newly-equipped item always fills
   the (now-empty) off-hand slot — it never displaces an existing main-hand. Guarantees a technique never
@@ -231,12 +236,53 @@ weapon never adds its own timer, it only gates + scales.
   (Doug, 2026-07-03) — e.g. they lose access to the CON **block** shield-source specifically (needs the
   shield OBJECT, which lives in melee's off-hand), though other block sources (stoneskin/parry/bind/
   shield-wall, §6b) don't need a held shield and stay available. Revisit during the balance pass.
+  (2026-07-03: wands are hand items now — "ranged-only" means bow/sling-focused.)
 - **Ranged — bypass degree:** **Bows (DEX):** fully ignore the shield pool, gated by Charge — unchanged,
-  §10. **Wands (INT):** a second ranged flavor, PARTIALLY bypasses the shield pool (so Charge isn't a
-  bow-only resource) — **[OPEN §17]** the exact bypass split/math; the shape (partial, not full) is
-  locked, the number is not.
-- **Names [blessed initial, tune later]:** Bows — Short Bow → Long Bow → Compound Bow → Elven Bow.
-  Wands — Adept Wand → Twisted Wand → Gemstone Wand → Glowing Wand.
+  §10. **Wands: REDEFINED 2026-07-03** — no longer ranged-slot, no bypass, no Charge; the
+  shield-SUBTRACTION model (roster below + §10). Charge stays non-bow-exclusive via the sling.
+
+**THE WEAPON ROSTER [LOCKED 2026-07-03 naming session; damage/req/timer = blessed initial, tune
+later].** Every weapon carries a **technique-TIMER MULTIPLIER** (multiplies the consulting
+technique's charge timer; **below 1.0× = faster**; cooldowns remain DEX-haste's lever — the
+interaction is fine-tuned in balance, attribute benefits stay modest since RUNES are the stronger
+effects) plus a **per-tier DAMAGE** and **per-tier equip REQUIREMENT** that consulting techniques
+read (§7 — verbs stay techniques; the weapon never adds its own timer entity). **Dual-wield:**
+damage formulates from BOTH weapons per the technique's text (rules-text exceptions allowed);
+timer multiplier = the **AVERAGE** of the two weapons'.
+
+**Melee tiers = ONE material ladder: Iron → Steel → Mithral → Dwarven Steel** ("Steel Mace",
+"Dwarven Steel Claymore"). One silhouette per type; tiers read as material (palette). Card
+name-length overflow is ACCEPTED for now (final presentation call parked, Doug+Claude).
+
+| Family | Type | Timer | Dmg/tier | Req/tier |
+|---|---|---|---|---|
+| STR 1H | Longsword | 1.0× | 4 | 2 STR |
+| STR 1H | Axe | 0.9× | 3 | 1 STR |
+| STR 1H | Mace | 1.1× | 5 | 3 STR |
+| STR 2H | Claymore | 1.3× | 7 | 5 STR |
+| STR 2H | Battleaxe | 1.2× | 6 | 4 STR |
+| STR 2H | Warhammer | 1.4× | 8 | 5 STR |
+| DEX 1H | Dagger | 0.6× | 1 | 1 DEX |
+| DEX 1H | Rapier | 0.7× | 2 | 2 DEX |
+| DEX 1H | Short Sword | 0.8× | 3 | 3 DEX |
+
+**NO DEX 2H — the bow is DEX's two-hander.** Ranged slot: **Bow** (Short → Long → Compound → Elven;
+full bypass + Charge; 2 DEX/tier; dmg/tier OPEN §17 #9) · **Sling** (bullet above; 1 DEX/tier).
+
+**INT implements:** **Wand** (Adept → Twisted → Gemstone → Glowing) — 1H hand item, DUAL-WIELDABLE,
+mutually exclusive with the ranged slot (no bow/sling alongside), shield-LEGAL; 2 dmg/tier,
+2 INT/tier; damage resolves by shield-SUBTRACTION (§10). **Staff** (Wooden → Twisted → Ornate →
+Humming) — 2H, no dual-wield, blocks the ranged slot like a held shield, cannot pair with a shield;
+plain BLOCKABLE melee (no subtraction model), 2 dmg/tier, **1 INT/tier — kept deliberately cheap:**
+it's the INT build's backup damage + technique gate (insurance when spells drop); raise only if it
+gains benefits. **Magic offhands** (off-hand slot; pair with ANY main-hand — "nothing is anyone's
+only"): **Charm** (Wooden → Bone → Ornate → Humming) +0.1× MINION attack damage per tier, 1 INT/tier
+· **Tome** (Old Worn → Leather → Ornate → Glowing) +0.1× SPELL damage per tier, 1 INT/tier.
+
+**Naming principle [LOCKED]:** MAGIC gear's tier-4 adjective carries a supernatural quality
+(Humming/Glowing); mundane lines don't — the split is intentional, never unify it.
+**DEX pricing principle [tuning]:** DEX gear requirements stay LOW (raw DEX already pays
+evasion/haste/accuracy/+0.25×) — DEX **techniques** are the expensive lever.
 
 ### 6e. Equipment screen — card states, clicks, ordering, paper-doll [LOCKED 2026-07-03, states session]
 **ONE state family for every inventory card** (GEAR / TECHNIQUES / MINIONS tabs):
@@ -418,11 +464,14 @@ Minions yes; **party no** — one main character.
   CoreCampaignTests. Numbers (bow power 2, reserve 2, Shot cd 3) placeholder.
 - **[OPEN]** whether shield-piercing needs any extra "damaging resolution" beyond the bypass — keep it
   simple for now (bypass + Charge cost, nothing more).
-- **WANDS (INT ranged, §6d):** a second Charge-spending weapon line, alongside bows — PARTIALLY bypasses
-  the shield pool (some of the hit still absorbs against the pool, some goes through) rather than the
-  bow's full bypass. **[OPEN]** the exact split/math — not yet designed, do not invent a number for it.
-- **SLING (§6d, 2026-07-03):** a third Charge-spending line — ONE-HANDED (compatible with a shield,
-  unlike bows/wands), fully bypasses the shield pool like a bow, but at lower damage. The shield-build's
+- **WANDS [REDEFINED 2026-07-03 — supersedes the partial-bypass + Charge model, §18]:** wands are 1H
+  HAND items now (§6d roster — dual-wieldable, mutually exclusive with the ranged slot, shield-legal).
+  **No bypass, no Charge.** Wand damage is **REDUCED by the foe's standing shield-point count; the
+  shields are NOT consumed** — e.g. tier-3 wand (2 dmg/tier = 6) vs 4 shield points → 2 damage lands,
+  the pool stays 4. Wands chip through standing shields; big stacks blunt them. What lands is a normal
+  hit (part + HP, §8). Resolves the old split/math OPEN (§17 #18).
+- **SLING (§6d, 2026-07-03):** the second Charge-spending line — ONE-HANDED (compatible with a shield,
+  unlike bows), fully bypasses the shield pool like a bow, but at lower damage. The shield-build's
   answer to "how do I pierce at all."
 
 ## 11. The rune system [LOCKED core; some numbers OPEN]
@@ -628,13 +677,13 @@ points there so the canon stays design-focused.
 17. ~~MERCHANT SCREEN~~ RESOLVED 2026-07-03: design/07 v2 + the manifest `merchant` screen ARE the
     design; popover retired; click-to-buy receiving LOCKED in §12. Residual OPEN: ware pricing/rarity
     economy tune (part of the balance pass).
-18. Wand partial-shield-bypass math (§6d/§10) — the shape (partial, unlike bows' full bypass) is locked,
-    the split is not; needs a real design pass before Core implements it.
+18. ~~Wand partial-shield-bypass math~~ RESOLVED 2026-07-03: wands REDEFINED — 1H hand items, no
+    bypass, no Charge; damage minus the foe's STANDING shield count, shields not consumed (§6d/§10).
 19. ~~Weapon primary/secondary swap timing~~ MOOT (2026-07-03): retired with the "benched two-hander"
     framing it depended on — dual-wield is simultaneous, not benched (§6d correction).
-20. Sling (§6d/§10) — shape LOCKED 2026-07-03 (1H, full shield-bypass like a bow, lower damage, spends
-    Charge); gating stat is an ASSUMED default (DEX, matching bows) not yet confirmed, and tier names are
-    still undecided.
+20. ~~Sling stat + names~~ RESOLVED 2026-07-03: DEX confirmed (1 DEX/tier), ladder locked (Shepherd's →
+    Braided → Sinew → Giantsbane Sling); damage/tier rides the balance pass (#9), as do bow dmg/tier
+    and the CON-shield equip-gate number (§6c).
 21. Ranged-only builds (no melee weapon at all, §6d) — viable in principle but not fully thought through;
     they lose the CON **block** shield-source specifically (needs a held shield) though other block
     sources don't need one. Revisit during the balance pass.
@@ -683,3 +732,10 @@ points there so the canon stays design-focused.
   only out-of-combat HP healing (gold → HP at 1 HP per randomized cost), §10/§12.
 - **Auto-attack as a per-weapon setting** → AUTO is ONE GLOBAL toggle; when on, a fired weapon re-fires
   on its next charge at the kept target, §8.
+- **Wand as a RANGED-slot, Charge-spending, partial-bypass weapon** → wands are 1H HAND items with the
+  shield-SUBTRACTION model (no Charge, shields not consumed), §6d/§10 (2026-07-03).
+- **STR-armor prestige names** (Skull Cap/Barbute/Great Helm/Crowned Helm; Splint Mail/Half Plate/Full
+  Plate; Splint/Banded/Plate Gauntlet lines; Half-Plate/Full Plate Legs) → the weapon MATERIAL ladder
+  (Iron/Steel/Mithral/Dwarven Steel) on plain slot nouns (Helm/Breastplate/Vambraces/Greaves), §6c.
+- **"Mithril" spelling** → **Mithral** (IP-safe), §6d ladder.
+- **DEX 2H spear** (floated + reversed same day, 2026-07-03) → NO DEX two-hander; the bow is DEX's 2H.

@@ -37,7 +37,10 @@ Per run:
 4. Genuine human-need (unmade decision, feel call, secret)? Add to "Needs human" with cold-start
    context; route around it. Can't go green after a real try? Park it the same way. Don't thrash.
 5. COMMIT one small semantic slice. Update `STATUS.md`: check off, fix Debt + "Needs human", set the
-   next target. Keep STATUS LEAN (prune resolved/stale lines). If the slice changed LOCKED design, also
+   next target. Any NEW Needs-CD finding goes BOTH places in the same pass: the STATUS line AND a
+   relay-ready item appended to `outputs/CLAUDE_DESIGN_issues.md` (the standing CD outbox — one entry
+   per item, cold-start context, concrete ask). Items clear from that file only when verified LANDED
+   in the repo, never on "sent". Keeping the outbox current is part of DONE. Keep STATUS LEAN (prune resolved/stale lines). If the slice changed LOCKED design, also
    reconcile `design/DESIGN_SPEC.md` (the canon). PUSH the commit when you can (remote reachable); never
    force-push. If the step-1 pull or the push hits a CONFLICT you can't resolve cleanly, park it in
    "Needs human" rather than forcing. Then STOP — one task done.
