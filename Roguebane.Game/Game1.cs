@@ -825,6 +825,26 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             }
             RenderSceneOnce(() => DrawManifestBackdrop(id));
             _scene.GetData(baseline);
+            // NEW DIRECTIVE (Doug 2026-07-04): the backdrop-drift fix (scene binds paint at
+            // _ui.FullCanvasRect, §13 aspect-fill) only ever gets exercised at a non-16:9 RB_SIZE —
+            // the gate previously only ran at 1920x1080, an EXACT 16:9, where DesignW/DesignH never
+            // extend past 960x540 and the bug class structurally can't occur. Sample the backdrop-only
+            // render's corners/edge-midpoints against the raw clear colour: any sample still showing
+            // clear means the backdrop didn't reach that part of the CURRENT (possibly extended) canvas.
+            if (_ui.ScreenDef(id) is { } backdropDef && backdropDef.Elements.Any(IsSceneElement))
+            {
+                var sw = _scene.Width;
+                var sh = _scene.Height;
+                var samples = new (int x, int y, string label)[]
+                {
+                    (0, 0, "TL"), (sw - 1, 0, "TR"), (0, sh - 1, "BL"), (sw - 1, sh - 1, "BR"),
+                    (sw / 2, 0, "TM"), (sw / 2, sh - 1, "BM"), (0, sh / 2, "LM"), (sw - 1, sh / 2, "RM"),
+                };
+                var clear = new Color(0x17, 0x11, 0x0b);
+                var gaps = samples.Where(s => baseline[s.y * sw + s.x] == clear).Select(s => s.label).ToList();
+                Console.WriteLine($"SMOKE SCENECOVER: {id} gaps={gaps.Count}"
+                    + (gaps.Count > 0 ? $" at=[{string.Join(",", gaps)}]" : ""));
+            }
             _textBoxes.Clear();
             _textTruncated.Clear();
             _collectText = true;

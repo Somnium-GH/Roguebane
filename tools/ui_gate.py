@@ -5,13 +5,22 @@
 
 Pipeline:
   1. dotnet build Roguebane.Game into a scratch dir (a running game locks the default output).
-  2. Run the driven all-screen smoke (RB_SCREEN=encounter RB_MF=all RB_SMOKE=1): the engine itself
-     fails the run on a backdrop-blank screen or a chrome-carrying element that paints nothing.
-  3. Parse SMOKE BINDS per screen and compare resolved counts against tools/ui_baseline.json —
-     a count DROP means a bind went dead; fail. (A rise is progress: rerun with --update.)
+  2. Run the driven all-screen smoke (RB_SCREEN=encounter RB_MF=all RB_SMOKE=1) TWICE per drive: once
+     at the 1920x1080 reference size, once at a non-16:9 RB_SIZE (1600x1000) — the reference size
+     never exercises the §13 aspect-fill extension, so a non-16:9 pass is the only way to catch
+     scene-backdrop-vs-canvas drift. The engine itself fails the run on a backdrop-blank screen or a
+     chrome-carrying element that paints nothing.
+  3. Parse SMOKE BINDS per screen (reference pass only) and compare resolved counts against
+     tools/ui_baseline.json — a count DROP means a bind went dead; fail. (A rise is progress: rerun
+     with --update.)
   4. Score every screen's shot against its design PNG with fidelity_diff and compare against the
      baseline — a drop past the tolerance fails. (Scores are placeholder-data-depressed; the
-     baseline tracks the CURRENT floor, not the pixel-perfect bar.)
+     baseline tracks the CURRENT floor, not the pixel-perfect bar.) Reference size only — the
+     off-aspect pass has no matching-aspect design PNG to score against.
+  5. Parse SMOKE SCENECOVER (both sizes): every `*.scene`-bound backdrop must paint every sampled
+     canvas corner/edge — pinned zero, no baseline ride.
+  6. Parse SMOKE TEXTGEOM at the off-aspect size same as the reference pass, own baseline lane
+     (tools/ui_baseline.json's textgeom_offaspect) — overflow/collision/truncation must not regress.
 
 --update rewrites the baseline from this run (use after a slice that legitimately improves things).
 Exit 0 = no regression. Nonzero = the printed reasons.
@@ -88,27 +97,44 @@ def main():
     import os
     failures = []
     binds, fidelity, textgeom = {}, {}, {}
+    textgeom_offaspect, scenecover_gaps = {}, {}
     # equipment is owned by the LOADOUT drive (grunt build, in-run, Choosing = design/02's authored
     # "CORE GRUNT / READY TO MARCH" state) — M0.3: align the drive to the ref, never mask.
     passes = [("encounter", ("encounter", "campaignmap", "newgame")),
               ("loadout", ("equipment",)),
               ("citymap", ("citymap", "merchant"))]
-    for drive, owns in passes:
-        print(f"== driven all-screen smoke (RB_SCREEN={drive}) ==")
-        shot = build_dir / f"gate-{drive}.png"
-        # RB_SIZE pins shots at reference resolution -> the fidelity diff runs 1:1, zero resampling
-        env = {"RB_SCREEN": drive, "RB_MF": "all", "RB_SMOKE": "1", "RB_SHOT": str(shot),
-               "RB_SIZE": "1920x1080"}
-        r = run([str(build_dir / "Roguebane.Game.exe")], cwd=str(build_dir), env={**os.environ, **env})
-        print(r.stdout.strip())
-        if r.returncode != 0:
-            failures.append(f"{drive} drive: smoke exit {r.returncode} (blank screen/element — see above)")
-        for m in re.finditer(r"SMOKE BINDS: (\w+) resolved=(\d+)/(\d+)", r.stdout):
-            if m.group(1) in owns:
-                binds[m.group(1)] = int(m.group(2))
-        for m in re.finditer(r"SMOKE TEXTGEOM: (\w+) overflow=(\d+) collide=(\d+)(?: truncated=(\d+))?", r.stdout):
-            if m.group(1) in owns:
-                textgeom[m.group(1)] = [int(m.group(2)), int(m.group(3)), int(m.group(4) or 0)]
+    # NEW DIRECTIVE (Doug 2026-07-04): 1920x1080 is an EXACT 16:9, so DesignW/DesignH never extend
+    # past the base 960x540 there and the whole backdrop-vs-canvas drift class structurally can't
+    # occur. Re-run every drive at a NON-16:9 size too so the aspect-fill path is actually exercised.
+    sizes = [("1920x1080", True), ("1600x1000", False)]
+    for rb_size, is_reference in sizes:
+        for drive, owns in passes:
+            print(f"== driven all-screen smoke (RB_SCREEN={drive} RB_SIZE={rb_size}) ==")
+            env = {"RB_SCREEN": drive, "RB_MF": "all", "RB_SMOKE": "1", "RB_SIZE": rb_size}
+            if is_reference:
+                # RB_SIZE pins shots at reference resolution -> fidelity diff runs 1:1, zero resampling
+                shot = build_dir / f"gate-{drive}.png"
+                env["RB_SHOT"] = str(shot)
+            r = run([str(build_dir / "Roguebane.Game.exe")], cwd=str(build_dir), env={**os.environ, **env})
+            print(r.stdout.strip())
+            if r.returncode != 0:
+                failures.append(f"{drive} drive @ {rb_size}: smoke exit {r.returncode} "
+                                 "(blank screen/element — see above)")
+            for m in re.finditer(r"SMOKE SCENECOVER: (\w+) gaps=(\d+)", r.stdout):
+                if m.group(1) in owns and int(m.group(2)) > 0:
+                    scenecover_gaps[f"{m.group(1)}@{rb_size}"] = int(m.group(2))
+            if not is_reference:
+                for m in re.finditer(r"SMOKE TEXTGEOM: (\w+) overflow=(\d+) collide=(\d+)(?: truncated=(\d+))?",
+                                      r.stdout):
+                    if m.group(1) in owns:
+                        textgeom_offaspect[m.group(1)] = [int(m.group(2)), int(m.group(3)), int(m.group(4) or 0)]
+                continue
+            for m in re.finditer(r"SMOKE BINDS: (\w+) resolved=(\d+)/(\d+)", r.stdout):
+                if m.group(1) in owns:
+                    binds[m.group(1)] = int(m.group(2))
+            for m in re.finditer(r"SMOKE TEXTGEOM: (\w+) overflow=(\d+) collide=(\d+)(?: truncated=(\d+))?", r.stdout):
+                if m.group(1) in owns:
+                    textgeom[m.group(1)] = [int(m.group(2)), int(m.group(3)), int(m.group(4) or 0)]
 
     print("== fidelity ==")
     for screen, design in DESIGNS.items():
@@ -133,7 +159,13 @@ def main():
         worst = [l.strip() for l in fr.stdout.splitlines() if l.strip().startswith("ELEM ")]
         print(f"  {screen}: {fidelity[screen]:.1f}%" + (f"  worst: {'; '.join(worst[:5])}" if worst else ""))
 
-    current = {"binds_resolved": binds, "fidelity": fidelity, "textgeom": textgeom}
+    # Scene-backdrop canvas coverage (any RB_SIZE, any drive): pinned ZERO, no baseline ride — a gap
+    # means a `*.scene` backdrop stopped short of the current (possibly non-16:9-extended) canvas.
+    for key, gaps in scenecover_gaps.items():
+        failures.append(f"{key}: backdrop leaves {gaps} canvas sample(s) uncovered (scene-drift regression)")
+
+    current = {"binds_resolved": binds, "fidelity": fidelity, "textgeom": textgeom,
+               "textgeom_offaspect": textgeom_offaspect}
     if args.update or not BASELINE.exists():
         BASELINE.write_text(json.dumps(current, indent=2) + "\n")
         print(f"baseline written -> {BASELINE}")
@@ -161,6 +193,20 @@ def main():
     for screen, counts in textgeom.items():
         if len(counts) > 2 and counts[2] > 0:
             failures.append(f"{screen}: {counts[2]} TRUNCATED text element(s) — invisible words (pinned zero)")
+    # NEW DIRECTIVE (Doug 2026-07-04): overflow/collide/truncation must not regress at the off-aspect
+    # size either — same rules as the reference-size textgeom checks above, own baseline lane so a
+    # legitimate reflow difference between aspects doesn't get conflated with the 16:9 numbers.
+    for screen, counts in base.get("textgeom_offaspect", {}).items():
+        b_over, b_coll = counts[0], counts[1]
+        got = textgeom_offaspect.get(screen, [0, 0, 0])
+        if got[0] > b_over:
+            failures.append(f"{screen}@offaspect: text OVERFLOWS rose {b_over} -> {got[0]}")
+        if got[1] > b_coll:
+            failures.append(f"{screen}@offaspect: text COLLISIONS rose {b_coll} -> {got[1]}")
+    for screen, counts in textgeom_offaspect.items():
+        if len(counts) > 2 and counts[2] > 0:
+            failures.append(f"{screen}@offaspect: {counts[2]} TRUNCATED text element(s) — invisible words "
+                             "(pinned zero)")
 
     if failures:
         print("\nGATE FAILED:")
