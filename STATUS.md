@@ -395,14 +395,38 @@ P0-C.9 unbound-static-image-part suppression to `Race` datums (`Game1.ManifestRe
 ## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-03, Doug — NewGame core-picker card, live screenshots)
 Doug shot the Grunt core card in three states (idle/SELECT, live selected/✓ CORE SET, and the design/05
 reference) and found two real defects.
-1. **CORE EFFECT text collision, CONFIRMED STILL OPEN:** the "CORE EFFECT" eyebrow visibly overlaps the
-   "Hollow Vessel" title line in ALL THREE of Doug's shots (idle + selected) — this is the **`eyebrow×title`**
-   member of the 3 known collisions baselined 2026-07-03 (STATUS history: heroShield-over-bar and the
-   doubled-identity collision both DIED same day; eyebrow×title was never confirmed dead — the "post-A3
-   re-judge (findings 4→3, ALL CD-side)" note covers NewGame's geometry deltas generally, NOT a specific
-   re-check of this collision). Treat as a real, still-open regression, not a dupe to dismiss. **Not a
-   stop-the-loop interrupt — fold into the next pass touching NewGame's cards**, HiFi bugs stay
-   top-of-queue by standing rule regardless.
+1. **CORE EFFECT text collision, CONFIRMED STILL OPEN — root cause NEEDS HUMAN (2026-07-04 loop):** the
+   "CORE EFFECT" eyebrow visibly overlaps the "Hollow Vessel" title line in ALL THREE of Doug's shots —
+   this is the **`eyebrow×title`** member of the 3 known collisions baselined 2026-07-03. Re-verified LIVE
+   this pass (`RB_SMOKE=1 RB_MF=all`, current build): `SMOKE TEXTGEOM: newgame ... collide=3
+   hits=[previewNamexpreviewRole,previewCoreEffectLabelxpreviewCoreEffectName,
+   previewCoreEffectNamexpreviewCoreEffectDesc]` — NOT resolved by `6edd5f5`'s ink-bbox detector fix, still
+   flags on the current code. Two structural findings block a confident fix:
+   - NewGame's coreEffect card is **3 separate elements** (`previewCoreEffectLabel`/`Name`/`Desc`, each its
+     own `text` element with its own rect/fontPx), unlike Equipment's single flattened `core.coreEffect`
+     BLOCK — the existing eyebrow-style special-case (`Game1.ManifestRenderer.cs` ~930,
+     `pp.Binds == "core.coreEffect"`) does not cover `preview.coreEffect` and cannot be copy-pasted; any
+     fix here needs its own targeted logic.
+   - Root-caused the raw numbers (temp debug print on `_textBoxes`, reverted after): `previewCoreEffectLabel`
+     (mono, fontPx 5, declared bound 198×7) ink-measures 45×22 — **~4.4x** its declared height.
+     `previewCoreEffectName` (display, fontPx 13, declared 198×14) ink-measures ~103×56 — **~4x**.
+     `previewCoreEffectDesc` (mono, fontPx 6, wrapped) ink-measures ~27 tall per line, closer but still over.
+     The ~4.3-4.4x inflation is near-IDENTICAL across two unrelated fonts (JetBrains Mono Size 42, IM Fell
+     English Size 60) and both no-descender (all-caps label) and mixed-case (title) content — too
+     consistent to be a font-glyph/hinting quirk of either specific typeface. Smells like a shared bug in
+     `InkBoundsRaster`/`InkBox`'s raster→design-px scale math (`Game1.Canvas.cs`, the mechanism `6edd5f5`
+     landed), not something NewGame- or CD-layout-specific.
+   - **Cannot distinguish without an actual rendered screenshot** whether (a) the smoke tool's ink-box
+     MEASUREMENT over-reports here (a tooling bug — real visual overlap likely much smaller than 22px), or
+     (b) glyphs genuinely draw ~4x oversized, since `TextPx`'s real `_spriteBatch.DrawString` call uses the
+     SAME scale value the ink-box math derives from — which would make this a global, project-wide font-size
+     bug (every mono/display draw runs through this scale), not a one-card issue. Both are consistent with
+     Doug's screenshot. **NEEDS HUMAN**: an eyeball check of the live build (zoomed on this card, or any
+     other small-fontPx mono/display text) decides which — if glyphs really draw oversized this jumps to
+     P0 (global rendering defect); if it's measurement-only, the smoke tool's overflow/collide counts are
+     unreliable below some fontPx threshold and need their own fix before being trusted again. Not a
+     stop-the-loop interrupt — HiFi bugs stay top-of-queue by standing rule, but this one needs a human's
+     eyes before the next code change, not another guess.
 
 ## ✅ FIXED (2026-07-04 loop) — Selected-card highlight (amber ring) NOT RENDERING
 Root cause: `DrawTemplateRootChrome` (`Game1.ManifestRenderer.cs`) bailed out early whenever the
