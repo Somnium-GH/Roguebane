@@ -1,5 +1,15 @@
 # Status
 
+## ⇒ CONTENT DRIFT FLAGGED (2026-07-05 loop) — Techniques/minion numbers vs `design/systems/TECHNIQUES.md`
+Doug edited that doc directly this pass (two External commits, no LOCKED marker, no STATUS work-item
+attached) — not chasing a code sync without one, per usual, but noting the drift so whoever picks this
+up doesn't have to re-discover it: `Minions.cs` still has Skeleton (Reserve 2/Timer 25), Golem
+(Reserve 3/Timer 100, no T2 label) against the doc's new Skeleton T1 (1/3s) and Iron Golem T2 (2/5s);
+Hound has no accuracy-bonus effect at all against the doc's new "+5%/tier" spec. `Techniques.cs`'s
+`Stoneskin` (id `stoneskin`, Reserve 2) also predates the doc's tier-1 rename to `barkskin`
+(Reserve 1) with `stoneskin` moving to rung 2 — no rung-2 technique object exists yet either. Leave
+for a normal-priority pass (or Doug's explicit go-ahead) rather than guessing at numbers mid-edit.
+
 ## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-04, Doug — Equipment's minion bay renders completely
 ## blank; can't enable/disable a minion)
 Doug's screenshot: "MINIONS - 1 / 1 slotted" header is correct, but the card area below is entirely
