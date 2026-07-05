@@ -8,7 +8,7 @@ public static class Builds
         new("power-line", new[] { Techniques.Jab, Techniques.Cleave, Techniques.Lunge });
 
     public static readonly BuildSpec Sustainers =
-        new("sustainers", new[] { Techniques.Ember, Techniques.Drain, Techniques.Brace });
+        new("sustainers", new[] { Techniques.Ember, Techniques.Siphon, Techniques.Brace });
 
     public static readonly BuildSpec GlassEmber =
         new("glass-ember", new[] { Techniques.Ember });

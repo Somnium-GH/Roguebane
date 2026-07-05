@@ -2,14 +2,14 @@ using Roguebane.Core.Content;
 
 namespace Roguebane.Core.Tests;
 
-// §6b shields wired onto the body: a shield SOURCE (Stoneskin) raises a regenerating pool that absorbs
+// §6b shields wired onto the body: a shield SOURCE (Barkskin) raises a regenerating pool that absorbs
 // incoming hits before HP/parts, sheds when its stat is smashed, and stays opt-in content.
 public class ShieldWiringTests
 {
     private static Body Shielded()
     {
         var body = new Body();
-        body.Add(new BodyPart("head", Stat.Int, 4));  // powers Stoneskin (INT 2 reserve)
+        body.Add(new BodyPart("head", Stat.Int, 4));  // powers Barkskin (INT 1 reserve)
         body.Add(new BodyPart("chest", Stat.Con, 4));
         return body;
     }
@@ -18,7 +18,7 @@ public class ShieldWiringTests
     public void RaisingAShieldSourcePutsLayersOnTheBody()
     {
         var body = Shielded();
-        new Caster(body).Activate(Techniques.Stoneskin);
+        new Caster(body).Activate(Techniques.Barkskin);
         Assert.Equal(3, body.ShieldPoints); // 3 stone layers
     }
 
@@ -26,7 +26,7 @@ public class ShieldWiringTests
     public void ShieldsAbsorbHitsBeforeHpThenSpill()
     {
         var body = Shielded();
-        new Caster(body).Activate(Techniques.Stoneskin);
+        new Caster(body).Activate(Techniques.Barkskin);
         var defender = new Fighter(body, maxHp: 20);
 
         var atkBody = new Body();
@@ -49,7 +49,7 @@ public class ShieldWiringTests
     {
         var body = Shielded();
         var caster = new Caster(body);
-        caster.Activate(Techniques.Stoneskin);
+        caster.Activate(Techniques.Barkskin);
         body.AbsorbShields(3); // drain
         Assert.Equal(0, body.ShieldPoints);
 
@@ -61,21 +61,21 @@ public class ShieldWiringTests
     public void SmashingTheSourceStatShedsTheShield()
     {
         var body = new Body();
-        body.Add(new BodyPart("head", Stat.Int, 2)); // exactly Stoneskin's reserve
+        body.Add(new BodyPart("head", Stat.Int, 1)); // exactly Barkskin's reserve
         body.Add(new BodyPart("chest", Stat.Con, 4));
         var caster = new Caster(body);
-        caster.Activate(Techniques.Stoneskin);
+        caster.Activate(Techniques.Barkskin);
         Assert.Equal(3, body.ShieldPoints);
 
-        body.Damage(body.Parts[0], 1); // INT 2 -> 1, below the reserve
+        body.Damage(body.Parts[0], 1); // INT 1 -> 0, below the reserve
         caster.Step();                  // prune the silenced source + shed its shield
         Assert.Equal(0, body.ShieldPoints);
     }
 
     [Fact]
-    public void StoneskinIsAShieldSourceAndNotInTheDefaultPalette()
+    public void BarkskinIsAShieldSourceAndNotInTheDefaultPalette()
     {
-        Assert.True(Techniques.Stoneskin.ShieldLayers > 0);
-        Assert.DoesNotContain(Techniques.Stoneskin, Techniques.All);
+        Assert.True(Techniques.Barkskin.ShieldLayers > 0);
+        Assert.DoesNotContain(Techniques.Barkskin, Techniques.All);
     }
 }

@@ -10,29 +10,30 @@ public class HasteTests
     {
         var b = new Body();
         b.Add(new BodyPart("leg-l", Stat.Dex, dex)); // all DEX in one part for the test
-        b.Add(new BodyPart("arm", Stat.Str, 4));     // enough STR to wield Jab
+        b.Add(new BodyPart("arm", Stat.Str, 4));     // enough STR to wield Jab's sword
+        b.Wield(Armory.Sword);                       // Jab consults it (timer 1.0 -- haste-neutral)
         return new Caster(b);
     }
 
     [Fact]
     public void NoDexLeavesTheBaseCooldown()
     {
-        Assert.Equal(50, CasterWithDex(0).EffectiveCooldown(Techniques.Jab));
+        Assert.Equal(40, CasterWithDex(0).EffectiveCooldown(Techniques.Jab));
     }
 
     [Fact]
     public void DexShortensTheCooldown()
     {
-        // 10 DEX -> 20% haste -> 50 * 80/100 = 40.
-        Assert.Equal(40, CasterWithDex(10).EffectiveCooldown(Techniques.Jab));
+        // 10 DEX -> 20% haste -> 40 * 80/100 = 32.
+        Assert.Equal(32, CasterWithDex(10).EffectiveCooldown(Techniques.Jab));
     }
 
     [Fact]
     public void HasteIsCappedNonOp()
     {
-        // 20 DEX -> capped at 28% -> 50 * 72/100 = 36; more DEX cannot beat the cap.
-        Assert.Equal(36, CasterWithDex(20).EffectiveCooldown(Techniques.Jab));
-        Assert.Equal(36, CasterWithDex(99).EffectiveCooldown(Techniques.Jab));
+        // 20 DEX -> capped at 28% -> 40 * 72/100 = 28.8, rounds to 29; more DEX cannot beat the cap.
+        Assert.Equal(29, CasterWithDex(20).EffectiveCooldown(Techniques.Jab));
+        Assert.Equal(29, CasterWithDex(99).EffectiveCooldown(Techniques.Jab));
     }
 
     [Fact]

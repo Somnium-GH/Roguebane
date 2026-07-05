@@ -16,6 +16,7 @@ public class MitigationTests
         b.Add(new BodyPart("leg-r", Stat.Dex, 10));
         b.Add(new BodyPart("head", Stat.Int, 4));
         b.Add(new BodyPart("chest", Stat.Con, 6));
+        b.Wield(Armory.Sword); // Jab consults it
         return b;
     }
 
@@ -66,7 +67,7 @@ public class MitigationTests
         // (the defender's caster isn't ticked here, so the layers drain and don't regen) -> the shielded
         // build takes strictly less than a bare one.
         var shieldedBody = Humanoid();
-        new Caster(shieldedBody).Activate(Techniques.Stoneskin); // INT-powered 3-layer shield
+        new Caster(shieldedBody).Activate(Techniques.Barkskin); // INT-powered 3-layer shield
         var (atkS, tgtS) = Duel(shieldedBody);
         var shielded = DamageOver(atkS, tgtS, 300);
 

@@ -22,7 +22,7 @@ public class BowTests
         defBody.Add(new BodyPart("head", Stat.Int, 4));
         defBody.Add(new BodyPart("chest", Stat.Con, 6));
         var defender = new Fighter(defBody, maxHp: 20);
-        new Caster(defBody).Activate(Techniques.Stoneskin); // 3-layer shield
+        new Caster(defBody).Activate(Techniques.Barkskin); // 3-layer shield
         Assert.Equal(3, defBody.ShieldPoints);
 
         var body = Archer();

@@ -12,7 +12,8 @@ public class PlayerTargetingFsmTests
     private static Body Body()
     {
         var b = new Body();
-        b.Add(new BodyPart("arm", Stat.Str, 6)); // powers Jab (reserve 1); no DEX => cooldown is exactly 50
+        b.Add(new BodyPart("arm", Stat.Str, 6)); // no DEX => cooldown is exactly Jab's base (40)
+        b.Wield(Armory.Sword); // Jab consults it: power 4 * .5x = 2, same as the old flat Power 2
         return b;
     }
 
@@ -79,6 +80,8 @@ public class PlayerTargetingFsmTests
             var b = new Body();
             b.Add(new BodyPart("arm", Stat.Str, 6)); // Jab (reserve 1)
             b.Add(new BodyPart("leg", Stat.Dex, 6)); // Lunge (reserve 1); no shared-stat contention
+            b.Wield(Armory.Sword);      // Jab consults it: power 4 * .5x = 2
+            b.Wield(Armory.Rapiers[0]); // Lunge consults it: power 2 * .75x = 1.5 -> rounds to 2
             var c = new Caster(b, null, requireAim: true);
             var f1 = new Foe("f1", 1000);
             var f2 = new Foe("f2", 1000);

@@ -33,7 +33,7 @@ public static class CoreRunes
         "adept",
         RuneBudget: 10,
         RuneDiscount: 0,
-        DefaultEquipment: new[] { Techniques.Ember, Techniques.Drain, Techniques.Bandage },
+        DefaultEquipment: new[] { Techniques.Ember, Techniques.Siphon, Techniques.Bandage },
         DefaultWeapons: new[] { Armory.Staffs[0] }, // Wooden Staff
         DefaultArmor: RobeKitT1,
         DefaultMinions: new[] { Minions.Skeleton }, // §7a: the Scholar fields one Skeleton from the off
@@ -76,12 +76,17 @@ public static class CoreRunes
         CoreEffectRefundsSummons: true); // the first REAL Core Effect [LOCKED §11]; CD reconciles the card copy
 
     // The Duelist: glass-cannon, no minion capacity — ends parts before they answer.
+    // Interim kit fix: dropped Jab (Stat.Str) — twin daggers are Stat.Dex, so Jab could never consult
+    // them and silently failed to activate. CORE_RUNES.md's real Reaver kit is Frenzy/Flurry, but those
+    // verbs are themselves Stat.Str pending Armory.cs's own flagged Open/TBD (a possible DEX dual-wield
+    // gate, not yet locked) — swapping to them now would trade one silent-activation-failure for another.
+    // Needs human: resolve the dual-wield stat question, then give Reaver its real Task #3 kit.
     public static readonly CoreRune Reaver = new(
         "reaver",
         RuneBudget: 12,
         RuneDiscount: 0,
         MinionCap: 0,
-        DefaultEquipment: new[] { Techniques.Lunge, Techniques.Jab, Techniques.Bandage },
+        DefaultEquipment: new[] { Techniques.Lunge, Techniques.Bandage },
         DefaultWeapons: new[] { Armory.Daggers[0], Armory.Daggers[0] }, // twin Iron Daggers
         DefaultArmor: LeatherKitT1,
         Archetype: "THE DUELIST",

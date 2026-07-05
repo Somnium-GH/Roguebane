@@ -328,6 +328,7 @@ public class ExpeditionTests
         var exp = FullLoadout();
         exp.Enter("a1"); FightToEnd(exp); // gold
         exp.Enter("b"); exp.BuyWeapon(Armory.Dagger); // into the pack
+        exp.UnequipWeapon(Armory.Sword); // DemoBody starts with both hands full -- free one first
 
         Assert.True(exp.EquipWeapon(Armory.Dagger));   // Choosing -> legal
         Assert.Contains(Armory.Dagger, exp.Player.Body.Hands);

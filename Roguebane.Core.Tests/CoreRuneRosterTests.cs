@@ -44,7 +44,7 @@ public class CoreRuneRosterTests
         // Card DESCRIPTIONS are display data (design/01) like the Core Effect copy: every palette technique
         // (+ the opt-in shield/heal content) and every minion must ship copy, and {power} must resolve
         // so the rendered text never contradicts the data.
-        var techs = Techniques.All.Concat(new[] { Techniques.Bandage, Techniques.Stoneskin });
+        var techs = Techniques.All.Concat(new[] { Techniques.Bandage, Techniques.Barkskin });
         foreach (var t in techs)
         {
             Assert.False(string.IsNullOrEmpty(t.Desc), $"{t.Id} desc");

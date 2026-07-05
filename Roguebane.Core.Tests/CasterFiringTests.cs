@@ -9,7 +9,8 @@ public class CasterFiringTests
     private static Body Body()
     {
         var b = new Body();
-        b.Add(new BodyPart("arm", Stat.Str, 6)); // powers Jab (reserve 1); no DEX => base cooldown
+        b.Add(new BodyPart("arm", Stat.Str, 6)); // no DEX => base cooldown
+        b.Wield(Armory.Sword); // Jab consults it: power 4 * .5x = 2
         return b;
     }
 

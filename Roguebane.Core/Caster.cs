@@ -384,20 +384,32 @@ public sealed class Caster
         // spell damage (base + robe; composition order is a balance-pass knob).
         if (run.Tech.Stat == Stat.Int)
             power = (int)Math.Round(power * _self.TomeSpellMult, MidpointRounding.AwayFromZero);
-        Hit(target, part, power, run.Tech.ShieldPiercing, wandCast);
+        var landed = Hit(target, part, power, run.Tech.ShieldPiercing, wandCast);
+        // Siphon lifesteal (TECHNIQUES.md, shared on-hit-boon gate): only on a CLEAN landed part-hit —
+        // never a shield-absorbed hit, never an already-broken part. Heals by the damage just dealt.
+        if (run.Tech.Lifesteal && landed)
+        {
+            var wound = _self.MostDamagedPart();
+            if (wound is not null) _self.Repair(wound, power);
+        }
         if (run.Tech.Kind == TechniqueKind.Timered) run.Countdown = EffectiveCooldown(run.Tech);
         return true;
     }
 
     // Apply a hit through the defender's §8 mitigation: a full EVASION dodge (§6c leather, global,
     // leg-gated) negates it, else a shield pool absorbs; whatever lands hits the part AND HP together.
-    private void Hit(ICombatTarget target, BodyPart? part, int power, bool pierce = false,
+    // Returns whether it was a CLEAN part-hit (not dodged/absorbed/on-an-already-broken-part) — the
+    // shared on-hit-boon gate (Siphon lifesteal today; any future on-hit boon reuses this signal).
+    private bool Hit(ICombatTarget target, BodyPart? part, int power, bool pierce = false,
         bool subtract = false)
     {
         var frame = target.Frame;
         if (frame is not null && _rng is not null &&
             _rng.Chance(Math.Max(0, frame.EvasionPercent() - AccuracyBonus)))
-            return; // dodged
+            return false; // dodged
+
+        var wasBroken = part is not null && frame is not null && frame.Contribution(part) == 0;
+        var shielded = frame is not null && frame.ShieldPoints > 0;
 
         // §6b shields are the ONLY damage mitigation now (alongside a full evade above): points absorb
         // the hit before it lands. A SHIELD-PIERCING hit (Charge-fuelled) skips the pool entirely.
@@ -406,7 +418,7 @@ public sealed class Caster
         if (frame is not null && !pierce)
         {
             power = subtract ? Math.Max(0, power - frame.ShieldPoints) : frame.AbsorbShields(power);
-            if (power <= 0) return;
+            if (power <= 0) return false;
         }
 
         // §8 [LOCKED]: every hit deals BOTH — the targeted PART's stat AND HP — simultaneously, the same
@@ -414,6 +426,7 @@ public sealed class Caster
         // plate blunt (shields + full evade are the ONLY mitigations).
         if (part is not null) frame?.Damage(part, power);
         target.Damage(power);
+        return part is not null && !wasBroken && !shielded;
     }
 
     private void PruneSilenced()

@@ -8,7 +8,7 @@ public class SessionTests
     public void PauseFreezesTheTick()
     {
         var s = Sessions.Demo();
-        s.Toggle(Techniques.Drain);
+        s.Toggle(Techniques.Siphon);
         s.TogglePause();
 
         var before = s.Battle.Outcome;

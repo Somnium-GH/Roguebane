@@ -76,12 +76,12 @@ public class BuildSessionTests
     public void ToggleBuildsTheLoadoutInPaletteOrder()
     {
         var build = New(); // Grunt kit pre-seeds jab + brace
-        build.Toggle(Techniques.Drain);
+        build.Toggle(Techniques.Siphon);
         build.Toggle(Techniques.Lunge);
 
         Assert.True(build.IsSelected(Techniques.Jab)); // kit
-        // palette order (jab, cleave, lunge, ember, drain, brace, bandage); the Grunt kit adds bandage
-        Assert.Equal(new[] { "jab", "lunge", "drain", "brace", "bandage" }, build.Equipment.Select(t => t.Id));
+        // palette order (jab, cleave, lunge, ember, siphon, brace, bandage); the Grunt kit adds bandage
+        Assert.Equal(new[] { "jab", "lunge", "siphon", "brace", "bandage" }, build.Equipment.Select(t => t.Id));
 
         build.Toggle(Techniques.Jab); // a kit item can still be dropped
         Assert.False(build.IsSelected(Techniques.Jab));

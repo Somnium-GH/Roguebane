@@ -81,7 +81,7 @@ public class ChargeTests
         defBody.Add(new BodyPart("head", Stat.Int, 4));
         defBody.Add(new BodyPart("chest", Stat.Con, 6));
         var defender = new Fighter(defBody, maxHp: 20);
-        new Caster(defBody).Activate(Content.Techniques.Stoneskin); // raise a 3-layer shield
+        new Caster(defBody).Activate(Content.Techniques.Barkskin); // raise a 3-layer shield
         Assert.Equal(3, defBody.ShieldPoints);
 
         var atk = new Caster(IntBody(9), defender, maxCharge: 5);

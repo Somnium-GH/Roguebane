@@ -12,6 +12,7 @@ public class TechStatusTests
         b.Add(new BodyPart("arm", Stat.Str, 6));
         b.Add(new BodyPart("head", Stat.Int, 6));
         b.Add(new BodyPart("chest", Stat.Con, 6));
+        b.Wield(Armory.Sword); // Jab consults it (timer 1.0 -- haste-neutral)
         return b; // no DEX -> no haste, so cooldowns read at their base
     }
 
@@ -31,9 +32,9 @@ public class TechStatusTests
         var c = new Caster(Body(), foe);
         c.Activate(Techniques.Jab);
 
-        Assert.Equal(50, c.StatusOf(Techniques.Jab).Countdown); // fresh = full cooldown
+        Assert.Equal(40, c.StatusOf(Techniques.Jab).Countdown); // fresh = full cooldown
         c.Step();
-        Assert.Equal(49, c.StatusOf(Techniques.Jab).Countdown);
+        Assert.Equal(39, c.StatusOf(Techniques.Jab).Countdown);
     }
 
     [Fact]

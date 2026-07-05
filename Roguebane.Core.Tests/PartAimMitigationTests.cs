@@ -46,7 +46,7 @@ public class PartAimMitigationTests
     [Fact]
     public void AShieldSourceAbsorbsThePartStrip()
     {
-        var shielded = RunUnder(Techniques.Stoneskin, seed: 5);
+        var shielded = RunUnder(Techniques.Barkskin, seed: 5);
         var bare = RunUnder(null, seed: 5);
         Assert.True(TotalCapacity(shielded) > TotalCapacity(bare),
             $"shield should leave more stat standing ({TotalCapacity(shielded)} vs {TotalCapacity(bare)})");

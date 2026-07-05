@@ -56,7 +56,7 @@ public class FoeSymmetryTests
     public void AFoeRaisesItsOwnShieldViaAShieldTechnique()
     {
         var frame = FoeFrame();
-        var foe = new Foe("warded", 40, frame, new[] { Strike, Techniques.Stoneskin });
+        var foe = new Foe("warded", 40, frame, new[] { Strike, Techniques.Barkskin });
 
         var battle = FightWith(foe);
         battle.Step();

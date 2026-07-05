@@ -29,6 +29,9 @@ public sealed record Technique(
     WeaponUse Consults = WeaponUse.None,
     bool Heals = false, // a REPAIR technique: on discharge it mends the caster's own most-damaged part
                         // (by Power) instead of striking a target (the §10 part-heal). No target needed.
+    bool Lifesteal = false, // Siphon (TECHNIQUES.md): on a CLEAN landed part-hit (never a shield-absorbed
+                            // hit, never an already-broken part -- the shared on-hit-boon gate), repairs
+                            // the caster's own most-damaged part by the damage just dealt.
     int ShieldLayers = 0, // >0 marks a SHIELD SOURCE (§6b): a passive that maintains this many 1-dmg
     int ShieldRegen = 0,  // layers on the body, one regenerating every ShieldRegen ticks (CON-scaled).
     bool ShieldPiercing = false, // ignores the shield pool; costs Charge per use (§6b Charge = pierce).

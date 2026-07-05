@@ -4,6 +4,8 @@ public static class Sessions
 {
     // A ready-to-fight demo body: generous stats so all six techniques fit at once, with a live
     // head (INT) for spells, dropped into the standard run. Balance is loose — see "play to feel it".
+    // Wields a sword + dagger so the weapon-consulting verbs (Jab/Cleave, Lunge) have something to
+    // swing — TECHNIQUES.md's weapon-verbs never fire unarmed.
     public static Body DemoBody()
     {
         var body = new Body();
@@ -13,6 +15,8 @@ public static class Sessions
         body.Add(new BodyPart("leg-r", Stat.Dex, 4));
         body.Add(new BodyPart("head", Stat.Int, 12));
         body.Add(new BodyPart("chest", Stat.Con, 8));
+        body.Wield(Armory.Sword);
+        body.Wield(Armory.Dagger);
         return body;
     }
 

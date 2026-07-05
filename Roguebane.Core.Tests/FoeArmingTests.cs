@@ -70,6 +70,7 @@ public class FoeArmingTests
 
         var body = new Body();
         body.Add(new BodyPart("arm", Stat.Str, 6));
+        body.Wield(Armory.Sword); // Jab consults it: power 4 * .5x = 2
         var c = new Caster(body, null, requireAim: true);
         c.Activate(Techniques.Jab, auto: true);
         c.Aim(Techniques.Jab, foe, head); // PART aim
