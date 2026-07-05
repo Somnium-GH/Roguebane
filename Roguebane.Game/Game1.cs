@@ -53,12 +53,14 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     // moved far enough to count as a drag rather than a plain click.
     private Roguebane.Core.Technique? _dragTech;
     private Point _dragAnchor;
+    private Rectangle _dragOrigin;
     private bool _dragging;
 
     // Same model, mirrored for the minion bay strip (a separate payload type, so a separate small
     // state machine beats forcing UpdateBarDrag generic over two unrelated record types).
     private Roguebane.Core.Minion? _dragMinion;
     private Point _dragAnchorM;
+    private Rectangle _dragOriginM;
     private bool _draggingM;
 
     // The leg under way is the campaign's current Expedition — most of the run screen reads it.
@@ -331,15 +333,16 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         for (var i = 0; i < tabs.Count; i++)
             if (Click(RectOf(tabs[i]))) _invTab = i;
 
-        // TECHNIQUES tab: click an inventory card to slot/unslot. §12: in-run the pool is the build
-        // palette PLUS whatever the merchant sold into the stash — same list the renderer stamps
-        // (Game1.ManifestRenderer.cs "inventory.activeTab.items" case 1), so cards line up with clicks.
+        // TECHNIQUES tab: the pool feeds UpdateBarDrag below as the drag SOURCE — a plain click
+        // slots/unslots (toggle), a drag onto the action bar equips at the drop's insertion point.
+        // §12: in-run the pool is the build palette PLUS whatever the merchant sold into the stash —
+        // same list the renderer stamps (Game1.ManifestRenderer.cs "inventory.activeTab.items" case 1).
+        System.Collections.Generic.IReadOnlyList<Roguebane.Core.Technique> techPalette = Array.Empty<Roguebane.Core.Technique>();
+        System.Collections.Generic.IReadOnlyList<LayoutRect> techPaletteSlots = Array.Empty<LayoutRect>();
         if (_invTab == 1)
         {
-            var items = InRun ? _build.Palette.Concat(Exp.Stash.Techniques).ToList() : _build.Palette;
-            var cards = ManifestListCells("equipment", "inventory.activeTab.items", items.Count);
-            for (var i = 0; i < cards.Count && i < items.Count; i++)
-                if (Click(RectOf(cards[i]))) ToggleTech(items[i]);
+            techPalette = InRun ? _build.Palette.Concat(Exp.Stash.Techniques).ToList() : _build.Palette;
+            techPaletteSlots = ManifestListCells("equipment", "inventory.activeTab.items", techPalette.Count);
         }
         // GEAR tab clicks (§6e, out-of-combat by Expedition's own gate): equipped → unequip;
         // equippable → equip, AUTO-DISPLACING on conflict — hands-full melee benches the OFF-hand
@@ -368,32 +371,34 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                 }
             }
         }
-        // MINIONS tab clicks (§6e, same instant-toggle model as GEAR): equipped (bayed) → dismiss;
-        // equippable (owned, free bay) → summon. Pool = chassis kit + rune grants + whatever the
-        // merchant sold into the stash — same list the renderer stamps (ManifestRenderer
-        // "inventory.activeTab.items" case 2). No pre-run toggle: the kit is auto-fielded wholesale
-        // at embark and BuildSession has no minion-picker concept to toggle against.
-        else if (_invTab == 2 && InRun)
+        // MINIONS tab: pool feeds UpdateBayDrag below as the drag SOURCE, same model as TECHNIQUES —
+        // plain click toggles (summon/dismiss), drag onto the bay strip summons at the drop's
+        // insertion point. Pool = chassis kit + rune grants + whatever the merchant sold into the
+        // stash — same list the renderer stamps (ManifestRenderer "inventory.activeTab.items" case 2).
+        // No pre-run pool: the kit is auto-fielded wholesale at embark and BuildSession has no
+        // minion-picker concept to toggle against.
+        System.Collections.Generic.IReadOnlyList<Roguebane.Core.Minion> minionPalette = Array.Empty<Roguebane.Core.Minion>();
+        System.Collections.Generic.IReadOnlyList<LayoutRect> minionPaletteSlots = Array.Empty<LayoutRect>();
+        if (_invTab == 2 && InRun)
         {
-            var minions = _build.CoreRune.MinionKit.Concat(_build.Runes.GrantedMinions)
+            minionPalette = _build.CoreRune.MinionKit.Concat(_build.Runes.GrantedMinions)
                 .Concat(Exp.Stash.Minions).ToList();
-            var cards = ManifestListCells("equipment", "inventory.activeTab.items", minions.Count);
-            for (var i = 0; i < cards.Count && i < minions.Count; i++)
-            {
-                if (!Click(RectOf(cards[i]))) continue;
-                if (Exp.Minions.Contains(minions[i])) Exp.DismissMinion(minions[i]);
-                else Exp.SummonMinion(minions[i]);
-            }
+            minionPaletteSlots = ManifestListCells("equipment", "inventory.activeTab.items", minionPalette.Count);
         }
+        void ToggleMinion(Roguebane.Core.Minion m)
+        {
+            if (Exp.Minions.Contains(m)) Exp.DismissMinion(m); else Exp.SummonMinion(m);
+        }
+
         var slottedData = InRun ? Exp.Equipment : _build.Equipment;
         var slotted = ManifestListCells("equipment", "loadout", slottedData.Count);
-        UpdateBarDrag(slotted, slottedData, ToggleTech);
+        UpdateBarDrag(slotted, slottedData, techPaletteSlots, techPalette, ToggleTech);
 
         // Minion bay strip: in-run only (no pre-run bay to reorder — the kit fields wholesale at embark).
         if (InRun)
         {
             var bays = ManifestListCells("equipment", "minions", Exp.Minions.Count);
-            UpdateBayDrag(bays, Exp.Minions);
+            UpdateBayDrag(bays, Exp.Minions, minionPaletteSlots, minionPalette, ToggleMinion);
         }
 
         if (!InRun)
@@ -597,23 +602,32 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
 
     private const int DragThresholdPx = 6; // §6e: a small press-move is still a click, not a drag
 
-    // §6e reorder: press a slotted card, drag past the threshold, release to drop at the nearest
-    // slot to the cursor. A press that never crosses the threshold is a plain click (toggle). Only
-    // wired in-run (Campaign.ReorderTechnique) — pre-run has no persisted bar order to reorder yet.
+    // §6e reorder: press a slotted OR palette card, drag past the threshold, release to drop at the
+    // nearest bar slot to the cursor. A press that never crosses the threshold (or a drag that lands
+    // outside the bar and off its own origin) is a plain click (toggle). Dragging a PALETTE card
+    // (not yet in `data`) onto the bar EQUIPS it at the drop's insertion point — the other §6e
+    // ASSUMED default, alongside "drop outside the bar cancels". Only wired in-run
+    // (Campaign.ReorderTechnique/EquipTechnique) — pre-run has no persisted bar order to reorder yet.
     private void UpdateBarDrag(
         System.Collections.Generic.IReadOnlyList<LayoutRect> slots,
         System.Collections.Generic.IReadOnlyList<Roguebane.Core.Technique> data,
+        System.Collections.Generic.IReadOnlyList<LayoutRect> paletteSlots,
+        System.Collections.Generic.IReadOnlyList<Roguebane.Core.Technique> paletteData,
         Action<Roguebane.Core.Technique> toggle)
     {
         if (_clicked)
-            for (var i = 0; i < slots.Count && i < data.Count; i++)
-                if (RectOf(slots[i]).Contains(_cursor)) { _dragTech = data[i]; _dragAnchor = _cursor; _dragging = false; break; }
+        {
+            for (var i = 0; i < slots.Count && i < data.Count && _dragTech is null; i++)
+                if (RectOf(slots[i]).Contains(_cursor)) { _dragTech = data[i]; _dragAnchor = _cursor; _dragOrigin = RectOf(slots[i]); _dragging = false; }
+            for (var i = 0; i < paletteSlots.Count && i < paletteData.Count && _dragTech is null; i++)
+                if (RectOf(paletteSlots[i]).Contains(_cursor)) { _dragTech = paletteData[i]; _dragAnchor = _cursor; _dragOrigin = RectOf(paletteSlots[i]); _dragging = false; }
+        }
 
         if (_dragTech is { } t && _mouseDown)
         {
             if (!_dragging && (Math.Abs(_cursor.X - _dragAnchor.X) > DragThresholdPx
                                 || Math.Abs(_cursor.Y - _dragAnchor.Y) > DragThresholdPx))
-                _dragging = InRun && data.Contains(t); // pre-run: fall through to plain click on release
+                _dragging = InRun; // pre-run: fall through to plain click on release
         }
 
         if (_released)
@@ -621,14 +635,12 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             if (_dragTech is { } dropped)
             {
                 if (_dragging && WithinBar(slots))
-                    _campaign.ReorderTechnique(dropped, DragInsertionIndex(slots));
-                else
                 {
-                    var origin = -1;
-                    for (var i = 0; i < data.Count; i++) if (data[i] == dropped) { origin = i; break; }
-                    if (origin >= 0 && origin < slots.Count && RectOf(slots[origin]).Contains(_cursor))
-                        toggle(dropped);
+                    if (!data.Contains(dropped)) _campaign.EquipTechnique(dropped); // promote from palette
+                    _campaign.ReorderTechnique(dropped, DragInsertionIndex(slots));
                 }
+                else if (_dragOrigin.Contains(_cursor))
+                    toggle(dropped);
             }
             _dragTech = null;
             _dragging = false;
@@ -637,22 +649,28 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
 
     // §6e reorder, mirrored for the minion bay strip (`buildMinions`, binds:"minions" — currently
     // rendered ZERO cells by the B14 layout.json sizing bug logged to CD; this wiring is correct and
-    // ready the moment that container is widened). Every card here is already-bayed (equip happens
-    // from the MINIONS tab grid instead, same as clicking an equipped technique card there), so a
-    // plain click (no drag) always means dismiss — there's no "equip" case on this strip.
+    // ready the moment that container is widened). Dragging a palette card onto the strip summons it
+    // at the drop's insertion point, same ASSUMED default as the technique bar above.
     private void UpdateBayDrag(
         System.Collections.Generic.IReadOnlyList<LayoutRect> slots,
-        System.Collections.Generic.IReadOnlyList<Roguebane.Core.Minion> data)
+        System.Collections.Generic.IReadOnlyList<Roguebane.Core.Minion> data,
+        System.Collections.Generic.IReadOnlyList<LayoutRect> paletteSlots,
+        System.Collections.Generic.IReadOnlyList<Roguebane.Core.Minion> paletteData,
+        Action<Roguebane.Core.Minion> toggle)
     {
         if (_clicked)
-            for (var i = 0; i < slots.Count && i < data.Count; i++)
-                if (RectOf(slots[i]).Contains(_cursor)) { _dragMinion = data[i]; _dragAnchorM = _cursor; _draggingM = false; break; }
+        {
+            for (var i = 0; i < slots.Count && i < data.Count && _dragMinion is null; i++)
+                if (RectOf(slots[i]).Contains(_cursor)) { _dragMinion = data[i]; _dragAnchorM = _cursor; _dragOriginM = RectOf(slots[i]); _draggingM = false; }
+            for (var i = 0; i < paletteSlots.Count && i < paletteData.Count && _dragMinion is null; i++)
+                if (RectOf(paletteSlots[i]).Contains(_cursor)) { _dragMinion = paletteData[i]; _dragAnchorM = _cursor; _dragOriginM = RectOf(paletteSlots[i]); _draggingM = false; }
+        }
 
         if (_dragMinion is { } m && _mouseDown)
         {
             if (!_draggingM && (Math.Abs(_cursor.X - _dragAnchorM.X) > DragThresholdPx
                                  || Math.Abs(_cursor.Y - _dragAnchorM.Y) > DragThresholdPx))
-                _draggingM = InRun && data.Contains(m);
+                _draggingM = InRun;
         }
 
         if (_released)
@@ -660,14 +678,12 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             if (_dragMinion is { } dropped)
             {
                 if (_draggingM && WithinBar(slots))
-                    Exp.ReorderMinion(dropped, DragInsertionIndex(slots));
-                else
                 {
-                    var origin = -1;
-                    for (var i = 0; i < data.Count; i++) if (data[i] == dropped) { origin = i; break; }
-                    if (origin >= 0 && origin < slots.Count && RectOf(slots[origin]).Contains(_cursor))
-                        Exp.DismissMinion(dropped);
+                    if (!data.Contains(dropped)) Exp.SummonMinion(dropped); // promote from palette
+                    Exp.ReorderMinion(dropped, DragInsertionIndex(slots));
                 }
+                else if (_dragOriginM.Contains(_cursor))
+                    toggle(dropped);
             }
             _dragMinion = null;
             _draggingM = false;
