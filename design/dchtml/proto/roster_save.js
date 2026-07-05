@@ -3,7 +3,8 @@
 //   parts   -> Content/sprites/body/<figure>/<name>_<state>.png   (base | all)
 //   flats   -> proto/roster/<figure>.png
 //   gear    -> Content/sprites/gear/<id>.png                      ('new' = only ids missing on disk)
-//   worn    -> Content/sprites/gear/worn/… (the B12 corrected worn-armor part set, 744 files)
+//   minions -> Content/sprites/minions/<name>.png                 (per-type deploy art, B18)
+//   worn    -> Content/sprites/gear/worn/… (B12 worn-armor part set; regex chunks by race path)
 //   layout  -> Content/layout.json  — replaces the generator-owned `figures`/`gear`/`worn` sections,
 //              PRESERVES the extraction-owned screens/templates/style (LAYOUT_CONTRACT §9), and
 //              refuses the merge if the generator LOST a previously-present figure/gear key
@@ -13,7 +14,7 @@
 // Run via run_script (chunk with opts to stay inside the time budget):
 //   var module={exports:{}}; (0,eval)(await readFile('proto/roster_save.js'));
 //   await RB_saveRoster({readFile,saveFile,createCanvas,ls,log},
-//     { figures:/^human_/, parts:'base', gear:'new', worn:true, layout:true, catalog:true });
+//     { figures:/^human_/, parts:'base', gear:'new', worn:/^sprites\/gear\/worn\/human\//, minions:true, layout:true, catalog:true });
 async function RB_saveRoster(env, opts) {
   const { readFile, saveFile, createCanvas, ls, log } = env;
   opts = opts || {};
@@ -39,7 +40,11 @@ async function RB_saveRoster(env, opts) {
       await saveFile('Content/sprites/gear/' + g.name + '.png', g.canvas); saved++;
     }
   }
-  if (opts.worn) for (const w of out.worn) { await saveFile('Content/' + w.path, w.canvas); saved++; }
+  if (opts.worn) for (const w of out.worn) {
+    if (opts.worn instanceof RegExp && !opts.worn.test(w.path)) continue;
+    await saveFile('Content/' + w.path, w.canvas); saved++;
+  }
+  if (opts.minions) for (const m of out.minions) { await saveFile('Content/sprites/minions/' + m.name + '.png', m.canvas); saved++; }
   if (opts.layout) {
     const cur = JSON.parse(await readFile('Content/layout.json'));
     const lost = Object.keys(cur.figures || {}).filter(k => !out.layout.figures[k]).map(k => 'figures.' + k)

@@ -121,7 +121,7 @@
       
     </div>
     <!-- jump to the Equipment screen (payload B4: every non-Equipment screen offers this entry) -->
-    <div data-el="equipmentBtn" data-binds="nav.equipment" data-bind-gate="" data-states="button" title="Open the equipment screen" style="position:relative;width:200px;height:40px;background:url('Content/ui/button/button_normal.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+    <div data-el="equipmentBtn" data-anchor="Right" data-binds="nav.equipment" data-bind-gate="" data-states="button" title="Open the equipment screen" style="position:relative;width:200px;height:40px;background:url('Content/ui/button/button_normal.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;">
       <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:1.5px;color:#cdb497;">⚒ EQUIPMENT</span>
     </div>
   </div>
@@ -166,7 +166,7 @@ class Component extends DCLogic {
     const stStyle = (st, capital) => {
       if (st === 'cleared') return { op: '.7', dot: '#7fa05a', nameColor: '#cdb497', subColor: '#7fa05a', cleared: true, glow: '' };
       if (st === 'skipped') return { op: '.4', dot: '#5a4636', nameColor: '#8d775c', subColor: '#6f5c46', cleared: false, glow: '' };
-      if (st === 'current') return { op: '1', dot: '#d9a441', nameColor: '#f0dcb4', subColor: '#d9a441', cleared: false, glow: 'animation:rb-cglow 1.8s infinite;' };
+      if (st === 'current') return { op: '1', dot: '#d9a441', nameColor: '#f0dcb4', subColor: '#d9a441', cleared: false, glow: 'animation:rb-cglow 1.8s ease-in-out infinite;' };
       if (capital) return { op: '.62', dot: '#c08a3a', nameColor: '#c08a3a', subColor: '#c08a3a', cleared: false, glow: '' };
       return { op: '.5', dot: '#5a4636', nameColor: '#9a8468', subColor: '#6f5c46', cleared: false, glow: '' };
     };

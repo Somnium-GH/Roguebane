@@ -14,7 +14,9 @@
 <style>
   *{box-sizing:border-box;}
   html,body{margin:0;background:#0c0810;}
-  @keyframes rb-glow{0%,100%{box-shadow:0 0 0 3px #cf9a4477,0 0 18px #cf9a4444}50%{box-shadow:0 0 0 3px #cf9a44bb,0 0 26px #cf9a4477}}
+  /* `pulse` mock — the ONE fixed-tick pulse primitive (style_tokens.js `pulse`, LOCKED 2026-07-04):
+     breathe the state BORDER colour's alpha .45→1 at 1.8s ease-in-out (actionCard.targeting). */
+  @keyframes rb-pulse{0%,100%{border-color:#c2553f73}50%{border-color:#c2553f}}
   @keyframes rb-torch{0%,100%{opacity:.5}50%{opacity:.72}}
   @keyframes rb-stream{0%{background-position:0 0}100%{background-position:30px 0}}
   @keyframes rb-target{0%,100%{box-shadow:0 0 0 2px #c2553f44,0 0 14px #c2553f33}50%{box-shadow:0 0 0 2px #c2553fcc,0 0 26px #c2553f88}}
@@ -38,8 +40,8 @@
       <!-- node TYPE only (2026-07-03 review: flavor place names dropped — no naming model needed) -->
       <span data-el="sceneLabel" data-binds="encounter.label" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#9a8468;letter-spacing:1px;">SKIRMISH</span>
     </div>
-    <span data-el="heldBadge" data-binds="combat.paused" data-bind-gate="" style="display:flex;align-items:center;gap:9px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:2px;color:#d9a441;padding:5px 14px;border:2px solid #6e5026;background:#2a1d10;">❚❚ HELD</span>
-    <div data-el="topControls" style="display:flex;align-items:center;gap:10px;">
+    <span data-el="heldBadge" data-anchor="Top" data-binds="combat.paused" data-bind-gate="" style="display:flex;align-items:center;gap:9px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:2px;color:#d9a441;padding:5px 14px;border:2px solid #6e5026;background:#2a1d10;">❚❚ HELD</span>
+    <div data-el="topControls" data-anchor="Right" style="display:flex;align-items:center;gap:10px;">
       <!-- RESOURCE READOUT (payload v5 §G: top-right on every IN-RUN screen) — supplies / gold / charge / summons -->
       <div data-el="resourceStrip" data-anchor="TopRight" data-z="6" data-binds="run.resources" data-container="1" data-template="resourceItem" data-flow="horizontal" style="display:flex;align-items:center;flex:none;gap:10px;margin-right:14px;">
         <sc-for list="{{ resources }}" as="res" hint-placeholder-count="4">
@@ -73,24 +75,25 @@
     <!-- zone labels -->
     <span data-el="youLabel" data-shadow="title" style="position:absolute;left:26px;top:12px;font-size:20px;letter-spacing:1px;color:#e9d6b0;text-shadow:0 2px 6px #000;">You</span>
     <span style="position:absolute;left:50%;top:14px;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:#8d775c;">— BATTLEFIELD —</span>
-    <span data-el="foeLabel" data-shadow="title" style="position:absolute;right:26px;top:12px;font-size:20px;letter-spacing:1px;color:#e9c7bd;text-shadow:0 2px 6px #000;">Foe</span>
+    <span data-el="foeLabel" data-anchor="TopRight" data-shadow="title" style="position:absolute;right:26px;top:12px;font-size:20px;letter-spacing:1px;color:#e9c7bd;text-shadow:0 2px 6px #000;">Foe</span>
 
     <!-- ===== YOU — paper-doll ===== -->
     <div data-el="heroFigure" data-anchor="BottomLeft" data-z="2" data-binds="Body" data-type="figure" style="position:absolute;left:120px;top:150px;width:360px;height:430px;">
       <div style="position:absolute;left:60px;top:402px;width:200px;height:22px;background:radial-gradient(50% 50% at 50% 50%,#0a0710cc,transparent 70%);"></div>
-      <dc-import name="Figure" figure="human_grunt" scale="0.8" states="{&quot;armL&quot;:&quot;baredamaged&quot;,&quot;armR&quot;:&quot;baredamaged&quot;,&quot;legL&quot;:&quot;barebroken&quot;,&quot;legR&quot;:&quot;barebroken&quot;,&quot;boots&quot;:&quot;hidden&quot;}" hint-size="262px,288px" style="position:absolute;left:34px;top:142px;"></dc-import>
+      <dc-import name="Figure" figure="{{ heroFig }}" scale="0.8" states="{{ heroStates }}" hidemounts="{{ heroHide }}" hint-size="262px,288px" style="position:absolute;left:34px;top:142px;"></dc-import>
     </div>
     <!-- your HP -->
     <!-- under-figure name + SEGMENTED HP (payload #3: pips are PARTS now — a template the engine
          instances from live HP, not a flat sample) -->
-    <div data-el="heroHp" data-binds="Body.hp" style="position:absolute;left:150px;top:586px;width:240px;text-align:center;">
-      <div data-el="heroHpLabel" data-binds="Body.hpLabel" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#b09a82;letter-spacing:1px;">GRUNT · HP</div>
-      <div data-el="heroHpPips" data-container="1" data-template="heroHpPip" data-flow="horizontal" data-binds="Body.hp.points" style="display:flex;gap:3px;justify-content:center;margin-top:4px;">
-        <sc-for list="{{ youHp }}" as="h" hint-placeholder-count="12">
-          <span data-tpl="heroHpPip" data-binds="point.live" data-states="{&quot;live&quot;:{&quot;fill&quot;:&quot;blood&quot;,&quot;border&quot;:&quot;outline&quot;},&quot;spent&quot;:{&quot;fill&quot;:&quot;slot&quot;,&quot;border&quot;:&quot;outline&quot;}}" style="width:14px;height:12px;background:{{ h.bg }};border:1px solid #0a0807;"></span>
+    <div data-el="heroHp" data-anchor="BottomLeft" data-binds="Body.hp" style="position:absolute;left:138px;top:586px;width:264px;text-align:center;">
+      <div data-el="heroHpLabel" data-binds="Body.hpLabel" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#b09a82;letter-spacing:1px;">{{ hpLabel }}</div>
+      <!-- pip row sized for the race HP formula (10 + 2×CON: 18–22 pips) — wraps if a rune pushes it past the row -->
+      <div data-el="heroHpPips" data-container="1" data-template="heroHpPip" data-flow="horizontal" data-binds="Body.hp.points" style="display:flex;flex-wrap:wrap;gap:2px;justify-content:center;margin-top:4px;">
+        <sc-for list="{{ youHp }}" as="h" hint-placeholder-count="20">
+          <span data-tpl="heroHpPip" data-binds="point.live" data-states="{&quot;live&quot;:{&quot;fill&quot;:&quot;blood&quot;,&quot;border&quot;:&quot;outline&quot;},&quot;spent&quot;:{&quot;fill&quot;:&quot;slot&quot;,&quot;border&quot;:&quot;outline&quot;}}" style="width:10px;height:12px;background:{{ h.bg }};border:1px solid #0a0807;"></span>
         </sc-for>
       </div>
-      <div data-el="heroHpValue" data-binds="Body.hp" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#cdb497;margin-top:3px;">9 / 12</div>
+      <div data-el="heroHpValue" data-binds="Body.hp" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#cdb497;margin-top:3px;">{{ youHpText }}</div>
     </div>
     <!-- SHIELD POOL (payload v5 §G, DESIGN_SPEC §6b): pips = live/spent shield points (variable N —
          designed for 8+; fixed-width pips that wrap) + a CON-scaled regen bar that fills toward the
@@ -109,14 +112,17 @@
       <div data-el="heroShieldRegen" data-binds="ShieldPool.regen" style="height:5px;margin-top:5px;background:#241b14;border:1px solid #0a0807;overflow:hidden;"><div data-el="heroShieldRegenFill" data-binds="ShieldPool.regenPct" style="height:100%;width:62%;background:#4f9a8a;"></div></div>
     </div>
 
-    <!-- ===== MINION on field ===== -->
+    <!-- ===== MINION on field (deployed; shown only when a bay is ACTIVE — per-TYPE deploy art from
+         Content/sprites/minions/<type>.png, closing the old skeleton stand-in) ===== -->
+    <sc-if value="{{ hasFieldMinion }}" hint-placeholder-val="{{ true }}">
     <div data-el="minionField" data-anchor="Bottom" data-z="2" data-binds="encounter.minions" data-type="figure" style="position:absolute;left:455px;top:344px;width:150px;">
       <div style="width:150px;height:151px;position:relative;display:flex;align-items:flex-end;justify-content:center;">
         <div style="position:absolute;left:38px;bottom:0;width:74px;height:11px;background:radial-gradient(50% 50% at 50% 50%,#0a0710cc,transparent 70%);"></div>
-        <dc-import name="Figure" figure="skeleton" scale="0.46" gear="false" hint-size="144px,151px" style="position:relative;bottom:3px;"></dc-import>
+        <img data-binds="encounter.minions.sprite" data-image-bind="sprites/minions/{minion.type}" src="{{ fieldArt }}" style="position:relative;bottom:3px;max-height:130px;max-width:144px;image-rendering:pixelated;" />
       </div>
-      <div style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:9px;color:#9fc0e8;margin-top:5px;">SKELETON</div>
+      <div data-el="minionFieldLabel" data-binds="encounter.minions.label" style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:9px;color:#9fc0e8;margin-top:5px;">{{ fieldLabel }}</div>
     </div>
+    </sc-if>
 
     <!-- foe incoming -->
     <div style="position:absolute;left:640px;top:430px;width:680px;height:14px;background-image:repeating-linear-gradient(90deg,transparent 0 12px,#b23b3255 12px 18px,transparent 18px 30px);background-size:30px 100%;animation:rb-stream .7s linear infinite reverse;opacity:.6;"></div>
@@ -128,7 +134,7 @@
       <!-- TARGETING PRESENTATION (DESIGN_SPEC §8, locked 2026-07-03): the locked FOCUS reticle PULSES
            by cycling authored frames focus_p0→p1→p2 on the fixed tick (data-frames carries the cycle;
            p0 == focus.png is the canonical/frozen frame). NO box affordances in-game. -->
-      <div data-el="foeReticle" data-binds="targeting.focus" data-type="icon" data-frames="ui/reticle/focus_p0,ui/reticle/focus_p1,ui/reticle/focus_p2" style="position:absolute;left:122px;top:80px;width:128px;height:128px;background:url('Content/ui/reticle/focus_p0.png') center/100% 100% no-repeat;image-rendering:pixelated;animation:rb-retpulse 1.2s infinite;filter:drop-shadow(0 0 7px #c2553f99);"></div>
+      <div data-el="foeReticle" data-binds="targeting.focus" data-type="icon" data-frames="ui/reticle/focus_p0,ui/reticle/focus_p1,ui/reticle/focus_p2" style="position:absolute;left:122px;top:80px;width:128px;height:128px;background:url('Content/ui/reticle/focus_p0.png') center/100% 100% no-repeat;image-rendering:pixelated;animation:{{ retAnim }};filter:drop-shadow(0 0 7px #c2553f99);"></div>
       <!-- AIM TAGS: the technique's HOTKEY NUMBER (not its name — names overflow + collide when
            several actives aim one part); several actives on a shared part STACK their numbers. -->
       <div data-el="foeAimTags" data-container="1" data-template="aimTag" data-flow="horizontal" data-binds="targeting.tags" style="position:absolute;left:130px;top:50px;display:flex;gap:4px;">
@@ -138,7 +144,7 @@
       </div>
     </div>
     <!-- foe HP -->
-    <div data-el="foeHp" data-binds="encounter.foe.hp" style="position:absolute;left:1500px;top:586px;width:300px;text-align:center;">
+    <div data-el="foeHp" data-anchor="BottomRight" data-binds="encounter.foe.hp" style="position:absolute;left:1500px;top:586px;width:300px;text-align:center;">
       <div data-el="foeHpLabel" data-binds="encounter.foe.hpLabel" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#a07a6e;letter-spacing:1px;">DIRE OGRE · HP 14 / 20</div>
       <div data-el="foeHpPips" data-container="1" data-template="foeHpPip" data-flow="horizontal" data-binds="encounter.foe.hp.points" style="display:flex;gap:2px;justify-content:center;margin-top:4px;">
         <sc-for list="{{ foeHp }}" as="h" hint-placeholder-count="20">
@@ -152,7 +158,7 @@
        PNG — box-shadow below is this PREVIEW's rendering of the same data-shadow token the extractor
        reads. Single accent-edge border, not a boxed 9-slice frame: this bar is full-bleed and touches
        the screen edge, so a frame box would read wrong — see DEV_LOOP_MEMORY.) ===== -->
-  <div data-el="hudFooter" data-shadow="panel" style="position:absolute;left:0;top:716px;width:1920px;height:364px;display:flex;border-top:3px solid #4a3729;background:linear-gradient(#1d1510,#15100b);box-shadow:0 -6px 16px rgba(10,8,7,.55);z-index:6;">
+  <div data-el="hudFooter" data-anchor="Bottom" data-shadow="panel" style="position:absolute;left:0;top:716px;width:1920px;height:364px;display:flex;border-top:3px solid #4a3729;background:linear-gradient(#1d1510,#15100b);box-shadow:0 -6px 16px rgba(10,8,7,.55);z-index:6;">
 
     <!-- ATTRIBUTE POOL (hero, detailed) -->
     <div data-el="attrPool" data-anchor="BottomLeft" data-z="6" data-binds="Body.pool" style="width:660px;border-right:2px solid #382a1d;padding:14px 20px;position:relative;">
@@ -185,7 +191,7 @@
         </sc-for>
       </div>
 
-      <div data-el="poolLegend" data-binds="pool.legend" style="position:absolute;left:20px;bottom:12px;right:20px;display:flex;gap:14px;font-family:'JetBrains Mono',monospace;font-size:9px;color:#b09a82;flex-wrap:wrap;">
+      <div data-el="poolLegend" data-anchor="BottomLeft" data-binds="pool.legend" style="position:absolute;left:20px;bottom:12px;right:20px;display:flex;gap:14px;font-family:'JetBrains Mono',monospace;font-size:9px;color:#b09a82;flex-wrap:wrap;">
         <span style="display:flex;align-items:center;gap:4px;"><b style="width:9px;height:9px;background:repeating-linear-gradient(-45deg,#0a0807aa 0 2px,transparent 2px 4px),#b9985f;border:1px solid #0a0807;display:inline-block;"></b>equipment reserved</span>
         <span style="display:flex;align-items:center;gap:4px;"><b style="width:9px;height:9px;background:#b9985f;border:1px solid #0a0807;display:inline-block;"></b>active skill</span>
         <span style="display:flex;align-items:center;gap:4px;"><b style="width:9px;height:9px;border:1px dashed #4a3a2c;display:inline-block;"></b>free</span>
@@ -221,7 +227,12 @@
                   </div>
                   <div style="display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-top:7px;">
                     <span data-binds="technique.name" style="font-size:17px;color:#ece0cb;">{{ t.name }}</span>
-                    <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:{{ t.costColor }};white-space:nowrap;"><span data-binds="technique.attr" data-color-bind="technique.attrColor">{{ t.attr }}</span> <span data-binds="technique.cost" data-color-bind="technique.attrColor">{{ t.cost }}</span></span>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;white-space:nowrap;">
+                      <sc-if value="{{ t.single }}" hint-placeholder-val="{{ true }}"><span data-binds="technique.attr" data-color-bind="technique.attrColor" style="color:{{ t.costColor }};">{{ t.attr }}</span> <span data-binds="technique.cost" data-color-bind="technique.attrColor" style="color:{{ t.costColor }};">{{ t.cost }}</span></sc-if>
+                      <!-- DUAL-ATTR cost (Frenzy/Flurry): "pay in either" shown as a STR-red row over a
+                           DEX-green row, echoing the split glyph chip. -->
+                      <sc-if value="{{ t.either }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;flex-direction:column;align-items:flex-end;line-height:1.12;gap:1px;font-size:10.5px;letter-spacing:.5px;vertical-align:bottom;"><span data-binds="technique.attr" style="color:{{ t.costTop.color }};">{{ t.costTop.attr }} {{ t.costTop.cost }}</span><span data-binds="technique.cost" style="color:{{ t.costBot.color }};">{{ t.costBot.attr }} {{ t.costBot.cost }}</span></span></sc-if>
+                    </span>
                   </div>
                 </div>
                 <div data-binds="technique.description" style="padding:9px;flex:1;font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:16.5px;line-height:1.5;color:#cdbfa8;">{{ t.descNode }}</div>
@@ -233,25 +244,24 @@
             </sc-for>
           </div>
         </div>
-        <!-- divider -->
-        <div style="width:2px;background:#2e2218;"></div>
-        <!-- bays group -->
-        <div style="width:200px;display:flex;flex-direction:column;">
+        <!-- bays group (action-bar reflow): whole group + divider hidden when bayCap 0 (Reaver); width scales with bay count -->
+        <sc-if value="{{ hasBays }}" hint-placeholder-val="{{ true }}">
+        <div data-el="minionGroup" data-anchor="Right" style="width:{{ bayWidth }};flex:none;display:flex;flex-direction:column;border-left:2px solid #2e2218;padding-left:14px;">
           <div data-el="bayGroupLabel" style="font-family: 'JetBrains Mono',monospace; font-size: 10px; letter-spacing: 2px; color: #cdb497; margin-bottom: 7px">MINIONS<br></div>
           <div data-el="bayList" data-container="1" data-template="minionBay" data-flow="horizontal" data-binds="loadout.bays" style="display:flex;gap:12px;flex:1;">
             <sc-for list="{{ bays }}" as="b" hint-placeholder-count="1">
-              <div data-tpl="minionBay" data-states="{&quot;active&quot;:{&quot;border&quot;:&quot;teal&quot;,&quot;fill&quot;:&quot;panelDeep&quot;},&quot;idle&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;fill&quot;:&quot;panelCard&quot;,&quot;opacity&quot;:0.7},&quot;starved&quot;:{&quot;border&quot;:&quot;lockRed&quot;,&quot;fill&quot;:&quot;panelDeep&quot;,&quot;opacity&quot;:0.82}}" style="flex:1;border:2px solid {{ b.border }};background:{{ b.bg }};display:flex;flex-direction:column;">
+              <div data-tpl="minionBay" data-states="{&quot;active&quot;:{&quot;border&quot;:&quot;teal&quot;,&quot;fill&quot;:&quot;panelDeep&quot;},&quot;idle&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;fill&quot;:&quot;panelCard&quot;,&quot;opacity&quot;:0.7},&quot;starved&quot;:{&quot;border&quot;:&quot;lockRed&quot;,&quot;fill&quot;:&quot;panelDeep&quot;,&quot;opacity&quot;:0.82}}" style="flex:1;border:2px {{ b.cardBorderStyle }} {{ b.border }};background:{{ b.bg }};opacity:{{ b.op }};display:flex;flex-direction:column;">
                 <div data-part="" style="padding:8px 9px 7px;border-bottom:1px solid #233028;">
                   <div style="display:flex;align-items:center;justify-content:space-between;">
                     <span style="display:flex;align-items:center;gap:6px;">
-                      <span style="width:30px;height:30px;border:2px solid #0a0807;background-image:repeating-conic-gradient(#9aa6ae 0% 25%,#76828a 0% 50%);background-size:5px 5px;"></span>
+                      <span data-binds="bay.icon" data-image-bind="sprites/minions/{minion.type}" style="width:30px;height:30px;border:2px {{ b.iconBorderStyle }} #0a0807;background:{{ b.iconBg }};image-rendering:pixelated;"></span>
                       <span data-binds="bay.hotkey" style="min-width:20px;height:20px;padding:0 5px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#e9d6b0;background:#241a12;border:1px solid #6e5026;">{{ b.hotkey }}</span>
                     </span>
                     <span data-binds="bay.state" style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;padding:2px 5px;color:{{ b.stateColor }};border:1px solid {{ b.stateColor }};">{{ b.state }}</span>
                   </div>
                   <div style="display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-top:7px;">
                     <span data-binds="bay.name" style="font-size:17px;color:#ece0cb;">{{ b.name }}</span>
-                    <span data-binds="bay.cost" data-color-bind="bay.gateColor" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#6f8fc4;white-space:nowrap;">INT {{ b.cost }}</span>
+                    <span data-binds="bay.cost" data-color-bind="bay.gateColor" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:{{ b.gateColor }};white-space:nowrap;">{{ b.attrLabel }} {{ b.cost }}</span>
                   </div>
                 </div>
                 <div data-binds="bay.description" style="padding:9px;flex:1;font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:16.5px;line-height:1.5;color:#cdbfa8;">{{ b.descNode }}</div>
@@ -259,16 +269,21 @@
             </sc-for>
           </div>
         </div>
+        </sc-if>
       </div>
     </div>
   </div>
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1080}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1080},&quot;core&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;grunt&quot;,&quot;warden&quot;,&quot;adept&quot;,&quot;summoner&quot;,&quot;reaver&quot;,&quot;ranger&quot;,&quot;barbarian&quot;],&quot;default&quot;:&quot;grunt&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vessel&quot;},&quot;race&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;human&quot;,&quot;elf&quot;,&quot;dwarf&quot;,&quot;halfling&quot;,&quot;half_giant&quot;],&quot;default&quot;:&quot;human&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vessel&quot;}}">
 class Component extends DCLogic {
-  state = { M: null };
-  componentDidMount() { import('./attribute-model.js').then(M => this.setState({ M })); }
+  /* Encounter (combat). The `core` prop sets which of the six PROTOTYPE cores is lit; the `race`
+   * prop sets the vessel race (pools = race base + core stat bonus, HP = 10 + 2×CON — v6 sheet), so
+   * the action bar + pool can be exercised across every race × core permutation (see core-kits.js).
+   * Effects DIVERGE from §11 canon by design (prototype relay). */
+  state = { K: null };
+  componentDidMount() { import('./core-kits.js').then(K => this.setState({ K })); }
   hpRow(cur, max, color) {
     const a = [];
     for (let i = 0; i < cur; i++) a.push({ bg: color });
@@ -284,20 +299,23 @@ class Component extends DCLogic {
     return a;
   }
   renderVals() {
-    const M = this.state.M;
-    if (!M) return { youHp: [], foeHp: [], pool: [], techniques: [], bays: [], resources: [], shieldPips: [], aimTags: [] };
-    const { KEYS, PART, COLOR, CAP, DMG, DEBUFF, HASH, compute, availColor } = M;
-    const r = compute();
+    const K = this.state.K;
+    const coreId = this.props.core || 'grunt';
+    const fallback = { youHp: [], foeHp: [], pool: [], techniques: [], bays: [], resources: [], shieldPips: [], aimTags: [],
+      hasBays: true, bayWidth: '172px', heroFig: 'human_grunt', heroStates: null, heroHide: [], hpLabel: 'GRUNT · HP',
+      youHpText: '', hasFieldMinion: false, fieldLabel: '', fieldArt: '', retAnim: 'none' };
+    if (!K) return fallback;
+    const core = K.get(coreId);
+    const race = K.RACES[this.props.race] ? this.props.race : 'human';
+    const R = K.resolve(core, race);
 
-    const youHp = this.hpRow(9, 12, '#b5503e');
+    // hero HP: max = the race formula (10 + 2×CON); current is a combat sample (live bind)
+    const hpMax = K.raceHp(race), hpCur = hpMax - 6;
+    const youHp = this.hpRow(hpCur, hpMax, '#b5503e');
     const foeHp = this.hpRow(14, 20, '#c8643c');
-
-    // SHIELD POOL (§6b): 6 live of 9 — sample sized ABOVE the old ~4-cap on purpose (variable-N pips).
     const shieldPips = [];
     for (let i = 0; i < 6; i++) shieldPips.push({ bg: '#7fc4b0', bd: '#0a0807', style: 'solid' });
     for (let i = 0; i < 3; i++) shieldPips.push({ bg: '#241b14', bd: '#4f9a8a', style: 'dashed' });
-
-    // run resources (top-right readout — same order on every in-run screen)
     const resources = [
       { id: 'supplies', label: 'SUPPLIES', value: '6' },
       { id: 'spoils',   label: 'GOLD',     value: '128' },
@@ -305,75 +323,73 @@ class Component extends DCLogic {
       { id: 'summons',  label: 'SUMMONS',  value: '2' },
     ].map(r => ({ ...r, iconCss: "url('Content/icons/resource/" + r.id + ".png')" }));
 
-    // Same pools, same damage + debuff as the equipment screen — but combat shows the FULL
-    // reservation: equipped gear PLUS every active technique & minion.
-    // gear reserves first (black L-to-R hatch over the stat colour, opposite of damage),
-    // then active skills (solid stat colour), then free, then debuff, then damage.
-    const EQH = '#0a0807aa';
-    const atomSeen = {};
-    const tagOnce = (s, id) => { if (atomSeen[s]) return undefined; atomSeen[s] = 1; return id; };
-    const pipCells = (k) => {
-      const cells = [], gear = r.allocGear[k], full = r.allocFull[k], av = r.available[k];
-      const eqBg = 'repeating-linear-gradient(-45deg,' + EQH + ' 0 3px,transparent 3px 6px),' + COLOR[k];
-      const kl = k.toLowerCase();
-      for (let i = 0; i < gear; i++)        cells.push({ bg: eqBg, bd: '#0a0807', style: 'solid', atomId: tagOnce('reserved', 'ui/pip/pip_reserved') });
-      for (let i = 0; i < full - gear; i++) cells.push({ bg: COLOR[k], bd: '#0a0807', style: 'solid', atomId: tagOnce('full', 'ui/pip/pip_full') });
-      for (let i = 0; i < av - full; i++)   cells.push({ bg: '#241b14', bd: '#0a0807', style: 'solid', atomId: tagOnce('empty', 'ui/pip/pip_empty') });
-      for (let i = 0; i < DEBUFF[k]; i++)   cells.push({ bg: HASH.deb, bd: '#0a0807', style: 'solid', atomId: tagOnce('debuff', 'ui/pip/pip_debuff') });
-      for (let i = 0; i < DMG[k]; i++)      cells.push({ bg: HASH.dmg, bd: '#0a0807', style: 'solid', atomId: tagOnce('damage', 'ui/pip/pip_damage') });
-      // engine-side pip identity (payload #3): cell.state + the ui/pip asset the imageBind resolves.
-      // Attr-specific assets exist for reserved/full (pip_reserved_str, pip_full_int, …).
-      return cells.map((c, i) => {
-        let state, asset;
-        if (i < gear) { state = 'reserved'; asset = 'pip_reserved_' + kl; }
-        else if (i < full) { state = 'full'; asset = 'pip_full_' + kl; }
-        else if (i < av) { state = 'empty'; asset = 'pip_empty'; }
-        else if (i < av + DEBUFF[k]) { state = 'debuff'; asset = 'pip_debuff'; }
-        else { state = 'damage'; asset = 'pip_damage'; }
-        return { ...c, state, asset };
-      });
+    // live attribute pool — gear standing reservation (−45° hatch) + ACTIVE technique/minion reservation (solid)
+    const pool = K.poolRows(core, 'combat', race);
+
+    // ACTION BAR — techniques: filled cards, then dashed empties up to techCap
+    const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+    const techCard = (t, i) => {
+      const S = K.STATE_STYLE[t.state] || K.STATE_STYLE.READY;
+      const cc = K.costColor(t);
+      let aLabel, cLabel;
+      if (t.costLabel) { aLabel = t.costLabel; cLabel = ''; }
+      else if (t.attr === '—') { aLabel = '—'; cLabel = ''; }
+      else { aLabel = t.attr; cLabel = String(t.cost); }
+      const split = K.costSplit(t);   // dual-attr → [{attr,cost,color} STR-top, DEX-bottom], else null
+      return {
+        glyph: t.glyph, glyphBg: K.glyphFill(t),
+        border: S.border, bg: S.bg, op: S.op, borderStyle: S.borderStyle,
+        anim: S.pulse ? 'rb-target 1.6s infinite' : 'none',
+        atomId: 'icons/technique/' + slug(t.name),
+        hotkey: String(i + 1), state: t.state, stateColor: S.stateColor,
+        name: t.name, attr: aLabel, cost: cLabel, costColor: cc, attrColor: cc,
+        either: !!split, single: !split,
+        costTop: split ? split[0] : { attr: '', cost: '', color: '' },
+        costBot: split ? split[1] : { attr: '', cost: '', color: '' },
+        descNode: t.desc, pct: S.pct, barColor: S.barColor,
+        timeLabel: t.state === 'LOCKED' ? ('needs ' + (t.lockNote || '')) : S.time,
+      };
     };
-    const pool = KEYS.map(k => ({
-      key: k, part: PART[k], color: COLOR[k],
-      alloc: r.allocFull[k], available: r.available[k], availColor: availColor(k),
-      pips: pipCells(k),
-    }));
-    const cost = (n) => r.item[n].cost;
-    const frenzy = r.item['Frenzy'];
+    const emptyTech = () => ({
+      glyph: '+', glyphBg: '#1a140d', border: '#3a3328', bg: '#14100b', op: '.5', borderStyle: 'dashed',
+      anim: 'none', atomId: '', hotkey: '', state: '', stateColor: 'transparent',
+      name: '', attr: '', cost: '', costColor: 'transparent', attrColor: 'transparent',
+      either: false, single: true, costTop: { attr: '', cost: '', color: '' }, costBot: { attr: '', cost: '', color: '' },
+      descNode: 'open slot', pct: '0%', barColor: 'transparent', timeLabel: '',
+    });
+    const techniques = R.techniques.map(techCard);
+    while (techniques.length < core.techCap) techniques.push(emptyTech());
 
-    const R = React.createElement;
-    // damage/amount digits inside a description carry their own bind (payload v5 §C: the digit was
-    // sample-only) — data-binds on the created span forces it into the template as technique.amount.
-    const num = (n, c, bind) => R('span', { 'data-binds': bind || 'technique.amount', style: { color: c, fontWeight: 700, fontStyle: 'normal', fontFamily: "'JetBrains Mono',monospace", fontSize: '0.95em' } }, n);
-    const FIRE = '#e8913a', HIT = '#e0654b';
-    const line = (...kids) => R('span', null, ...kids);
+    // bays: filled ACTIVE cards + dashed empties up to bayCap (Reaver bayCap 0 → group hidden)
+    const bayCard = (b) => {
+      const S = K.BAY_STYLE[b.state] || K.BAY_STYLE.IDLE;
+      return { name: b.name, border: S.border, bg: S.bg, op: S.op, cardBorderStyle: 'solid',
+        iconBg: "#12100c url('Content/sprites/minions/" + (K.MINION_SPRITE[b.name] || 'skeleton') + ".png') center/contain no-repeat", iconBorderStyle: 'solid',
+        state: b.state, stateColor: S.stateColor, cost: String(b.cost), attrLabel: b.attr,
+        gateColor: K.ATTR[b.attr] || '#8d9aa0', descNode: b.desc, hotkey: '' };
+    };
+    const emptyBay = () => ({ name: '', border: '#3a2c1d', bg: '#14100b', op: '.5', cardBorderStyle: 'dashed',
+      iconBg: '#14100b', iconBorderStyle: 'dashed', state: '', stateColor: 'transparent', cost: '', attrLabel: '',
+      gateColor: 'transparent', descNode: 'open bay', hotkey: '' });
+    const bays = (R.bays || []).map(bayCard);
+    while (bays.length < core.bayCap) bays.push(emptyBay());
+    bays.forEach((b, i) => { b.hotkey = String(core.techCap + i + 1); });
+    const hasBays = core.bayCap > 0;
+    const bayWidth = hasBays ? (core.bayCap * 156 + (core.bayCap - 1) * 12 + 16) + 'px' : '0px';
 
-    const techniques = [
-      { name: 'Swing', glyph: '⚔', glyphBg: '#c2553f', border: '#7fa05a', bg: '#1c140d', op: '1', attr: 'STR', cost: cost('Swing'), costColor: '#c2553f', state: 'READY', stateColor: '#7fa05a', barColor: '#7fa05a', pct: '100%', timeLabel: 'ready',
-        descNode: line('A committed swing of your blade for ', num('1', HIT), ' damage.') },
-      // LOCKED — not enough STR. Desaturated slate + dashed grey border + diagonal hatch; deliberately NOT red so it never reads as an active target.
-      { name: 'Frenzy', glyph: '⇶', glyphBg: '#46434e', border: '#56535f', borderStyle: 'dashed', bg: 'repeating-linear-gradient(45deg,#1a140d 0 7px,#15100b 7px 14px)', op: '.82', attr: 'STR', cost: cost('Frenzy'), costColor: '#9a8468', state: 'LOCKED', stateColor: '#8a8694', barColor: '#46434e', pct: '0%', timeLabel: 'needs +' + frenzy.short + ' STR',
-        descNode: line('Both blades, three wild arcs that each inflict ', num('3', HIT), ' damage.') },
-      // TARGETING — actively aiming. Red border + pulsing glow, matched to the red focus reticle on the foe.
-      { name: 'Firebolt', glyph: '✦', glyphBg: '#6f8fc4', border: '#c2553f', bg: '#20140f', op: '1', attr: 'INT', cost: cost('Firebolt'), costColor: '#6f8fc4', state: 'TARGETING', stateColor: '#e0654b', barColor: '#c2553f', pct: '65%', timeLabel: 'charging · 0.5s', anim: 'rb-target 1.6s infinite',
-        descNode: line('A mote of fire hurled from afar for ', num('4', FIRE, 'technique.amount'), ' damage.') },
-      { name: 'Disarm', glyph: '✂', glyphBg: '#c2553f', border: '#3a3328', bg: '#1c140d', op: '1', attr: 'STR', cost: cost('Disarm'), costColor: '#c2553f', state: 'COOLDOWN', stateColor: '#a07a6e', barColor: '#7a5a52', pct: '35%', timeLabel: '1.8s',
-        descNode: line('A precise cut that knocks the foe\u2019s weapon loose.') },
-      { name: 'Brace', glyph: '◈', glyphBg: '#cf9a44', border: '#cf9a44', bg: '#221a0e', op: '1', attr: 'CON', cost: cost('Brace'), costColor: '#cf9a44', state: 'HELD', stateColor: '#cf9a44', barColor: '#cf9a44', pct: '100%', timeLabel: 'blocking',
-        descNode: line('Raise your shield and turn aside ', num('2', '#e6b56a'), ' damage each blow.') },
-    ].map((t, i) => ({ borderStyle: 'solid', anim: 'none', atomId: 'icons/technique/' + t.name.toLowerCase(),
-                  hotkey: String(i + 1), ...t }));
+    // targeting → the focus reticle PULSES and the aim-tag stack echoes each targeting hotkey (§8d)
+    const aimTags = [];
+    R.techniques.forEach((t, i) => { if (t.state === 'TARGETING') aimTags.push({ hotkey: String(i + 1) }); });
+    const retAnim = aimTags.length ? 'rb-retpulse 1.2s infinite' : 'none';
 
-    // §8d: the foe-side AIM TAG stack — one chip per active technique aiming this part, reading the
-    // technique's HOTKEY NUMBER (Firebolt = card 3). Several actives on one part stack left→right.
-    const aimTags = [{ hotkey: '3' }];
-
-    const bays = [
-      { name: 'Skeleton', hotkey: '6', border: '#4f9a8a', bg: '#142019', state: 'ACTIVE', stateColor: '#7fc4b0', cost: cost('Skeleton'),
-        descNode: line('A raised thrall that strikes for ', num('1', HIT, 'bay.amount'), ' damage each turn.') },
-    ];
-
-    return { youHp, foeHp, pool, techniques, bays, resources, shieldPips, aimTags };
+    // deployed minion — per-TYPE deploy art (sprites/minions/<type>.png); shown only when a bay is ACTIVE
+    const active = (R.bays || []).find(b => b.state === 'ACTIVE');
+    return { youHp, foeHp, pool, techniques, bays, resources, shieldPips, aimTags,
+      hasBays, bayWidth, heroFig: K.figureId(core.id, race), heroStates: core.scenario.figStates || null, heroHide: R.hiddenSockets,
+      hpLabel: K.RACES[race].name.toUpperCase() + ' ' + core.cls.toUpperCase() + ' · HP',
+      youHpText: hpCur + ' / ' + hpMax,
+      hasFieldMinion: !!active, fieldLabel: active ? active.name.toUpperCase() : '',
+      fieldArt: active ? "Content/sprites/minions/" + (K.MINION_SPRITE[active.name] || 'skeleton') + ".png" : '', retAnim };
   }
 }
 </script>

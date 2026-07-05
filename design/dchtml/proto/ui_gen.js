@@ -77,4 +77,31 @@ function buildButtons(createCanvas) {
 
   return Object.entries(FRAMES).map(([name, spec]) => [name, frame(spec)]);
 }
-if (typeof module !== 'undefined') module.exports = { buildButtons };
+
+/* Small SQUARE pager button (44×34 design → 88×68 native) — the dedicated ui/button/button_pager.png
+ * used by the Merchant + Equipment inventory pagers. Same idle carved-metal skin as button_normal,
+ * just a compact square footprint so the ◀/▶ glyphs (drawn at runtime over it) seat cleanly. */
+function buildPager(createCanvas) {
+  const K = 2, w = 44 * K, h = 34 * K, OB = 2 * K, INK = [10, 8, 7];
+  const spec = { inner: [90, 70, 54], fill: [42, 32, 24] };
+  const cv = createCanvas(w, h), ctx = cv.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  const rgb = a => `rgb(${a[0]},${a[1]},${a[2]})`;
+  const [fr, fg, fb] = spec.fill;
+  ctx.fillStyle = rgb(INK); ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = rgb(spec.inner); ctx.fillRect(OB, OB, w - OB * 2, h - OB * 2);
+  const g = OB + K; ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.fillRect(g, g, w - g * 2, h - g * 2);
+  const i = g + K, iw = w - i * 2, ih = h - i * 2;
+  ctx.fillStyle = rgb(spec.fill); ctx.fillRect(i, i, iw, ih);
+  const sheen = ctx.createLinearGradient(0, i, 0, i + ih * 0.55);
+  sheen.addColorStop(0, 'rgba(255,255,255,.14)'); sheen.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = sheen; ctx.fillRect(i, i, iw, Math.round(ih * 0.55));
+  const lite = `rgb(${fr + 30},${fg + 27},${fb + 21})`, dark = `rgb(${Math.max(0, fr - 34)},${Math.max(0, fg - 30)},${Math.max(0, fb - 22)})`;
+  ctx.fillStyle = lite; ctx.fillRect(i, i, iw, K);
+  ctx.fillStyle = dark; ctx.fillRect(i, h - i - K, iw, K);
+  const rr = Math.max(1, Math.round(OB * 0.9)), pad = OB + 3 * K;
+  ctx.fillStyle = rgb(spec.inner);
+  [[pad, pad], [w - pad, pad], [pad, h - pad], [w - pad, h - pad]].forEach(([cx, cy]) => { ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI * 2); ctx.fill(); });
+  return cv;
+}
+if (typeof module !== 'undefined') module.exports = { buildButtons, buildPager };

@@ -12,9 +12,10 @@
  */
 globalThis.RB_buildRosterMockup = async function (H) {
   const { readImage, createCanvas, saveFile, log } = H;
-  // display order: the 6 human cores, then the standalone foes (matches the locked reference strip)
-  const FIGS = ['human_grunt','human_warden','human_adept','human_summoner','human_reaver','human_ranger',
-                'skeleton','bandit','wraith','ogre','troll','gargoyle'];
+  // display order: all 4 races × 6 cores (race×core morph regression grid), then the standalone foes
+  const RACES = ['human', 'elf', 'dwarf', 'halfling', 'half_giant'], CORES = ['grunt','warden','adept','summoner','reaver','ranger','barbarian'];
+  const FIGS = [].concat(...RACES.map(r => CORES.map(c => r + '_' + c)))
+                 .concat(['skeleton','bandit','wraith','ogre','troll','gargoyle']);
   const C = { bg:'#2b2540', label:'#7a6f92' };
   const TARGET_H = 440;   // px the TALLEST figure maps to
   const GAP = 26, PADX = 34, PADTOP = 34, LABEL_H = 26, BASELINE_PAD = 30;

@@ -14,7 +14,14 @@
 <style>
   *{box-sizing:border-box;}
   html,body{margin:0;background:#100b07;}
-  @keyframes rb-glow{0%,100%{box-shadow:0 0 0 3px #7fa05a99,0 0 22px #7fa05a55}50%{box-shadow:0 0 0 3px #7fa05add,0 0 30px #7fa05a88}}
+  /* `glow` mock — the ONE fixed-tick pulse primitive (style_tokens.js `pulse`, LOCKED 2026-07-04):
+     amber ring+halo breathing at 1.8s ease-in-out, same numbers as CampaignMap's rb-cglow reference.
+     The bevel insets ride INSIDE the keyframes (animated box-shadow replaces the whole list) so the
+     node token keeps its depth while glowing. */
+  @keyframes rb-glow{0%,100%{box-shadow:inset 3px 3px 0 rgba(255,246,222,.16),inset -4px -5px 0 rgba(0,0,0,.46),0 0 0 3px #d9a44166}50%{box-shadow:inset 3px 3px 0 rgba(255,246,222,.16),inset -4px -5px 0 rgba(0,0,0,.46),0 0 0 3px #d9a441bb,0 0 22px #d9a44155}}
+  /* `pulse:"self"` mock — same primitive, whole-element alpha (campaign-spine current chip: no marker
+     box, the icon itself breathes — Doug 2026-07-04). */
+  @keyframes rb-spulse{0%,100%{opacity:.45}50%{opacity:1}}
   @keyframes rb-ping{0%,100%{opacity:.55}50%{opacity:.95}}
 </style>
 </helmet>
@@ -177,7 +184,7 @@
       <span data-el="campaignStripLabel" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:#8d775c;">CAMPAIGN</span>
       <div data-el="campaignStrip" data-container="1" data-template="spineCity" data-flow="horizontal" data-binds="campaign.cities" style="display:flex;align-items:center;gap:8px;">
         <sc-for list="{{ spineCities }}" as="sc" hint-placeholder-count="6">
-          <div data-tpl="spineCity" data-binds="city.status" data-states="{&quot;taken&quot;:{&quot;border&quot;:&quot;good&quot;},&quot;current&quot;:{&quot;border&quot;:&quot;amber&quot;},&quot;future&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;opacity&quot;:0.45}}" style="width:30px;height:30px;box-sizing:border-box;border:2px solid {{ sc.border }};background:#160f09;display:flex;align-items:center;justify-content:center;opacity:{{ sc.op }};">
+          <div data-tpl="spineCity" data-binds="city.status" data-states="{&quot;taken&quot;:{&quot;border&quot;:&quot;good&quot;},&quot;current&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;pulse&quot;:&quot;self&quot;},&quot;future&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;opacity&quot;:0.45}}" style="width:30px;height:30px;box-sizing:border-box;border:2px solid {{ sc.border }};background:#160f09;display:flex;align-items:center;justify-content:center;opacity:{{ sc.op }};animation:{{ sc.anim }};">
             <span data-binds="city.castle" data-image-bind="icons/node/castle" style="width:20px;height:20px;background:url('Content/icons/node/castle.png') center/100% 100% no-repeat;image-rendering:pixelated;"></span>
           </div>
         </sc-for>
@@ -185,7 +192,7 @@
       <span data-el="campaignTaken" data-binds="campaign.taken" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#b09a82;">2 / 6 TAKEN</span>
     </div>
     <!-- PACK — quick view of what the body carries -->
-    <div style="display:flex;align-items:center;gap:12px;">
+    <div data-el="packGroup" data-anchor="Top" style="display:flex;align-items:center;gap:12px;">
       <span data-el="packLabel" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:#8d775c;">PACK</span>
       <div data-el="packChips" data-container="1" data-template="packChip" data-flow="horizontal" data-binds="Body.gear" style="display:flex;align-items:center;gap:8px;">
         <sc-for list="{{ packChips }}" as="pc" hint-placeholder-count="3">
@@ -197,7 +204,7 @@
       </div>
     </div>
     <!-- jump to the Equipment screen -->
-    <div data-el="equipmentBtn" data-binds="nav.equipment" data-bind-gate="" data-states="button" title="Open the equipment screen" style="position:relative;width:200px;height:40px;background:url('Content/ui/button/button_normal.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+    <div data-el="equipmentBtn" data-anchor="Right" data-binds="nav.equipment" data-bind-gate="" data-states="button" title="Open the equipment screen" style="position:relative;width:200px;height:40px;background:url('Content/ui/button/button_normal.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;">
       <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:1.5px;color:#cdb497;">⚒ EQUIPMENT</span>
     </div>
   </div>
@@ -275,8 +282,9 @@ class Component extends DCLogic {
       const landmark = shown === 'resource' || shown === 'castle';
       let op = landmark ? Math.max(opByDist(d), 0.74) : opByDist(d);
       const BEV = 'box-shadow:inset 3px 3px 0 rgba(255,246,222,.16),inset -4px -5px 0 rgba(0,0,0,.46)';
-      let extra = BEV + ';', labelColor = '#9a8468';
-      if (d === 0) { extra = 'animation:rb-glow 1.6s infinite;'; labelColor = '#7fa05a'; }
+      let extra = BEV + ';', labelColor = '#9a8468', bcolor = t.bcolor;
+      // CURRENT node — states.beaconNode.current: border amber + `glow` on the shared pulse primitive
+      if (d === 0) { extra = BEV + ';animation:rb-glow 1.8s ease-in-out infinite;'; labelColor = '#7fa05a'; bcolor = '#d9a441'; }
       else if (d === 1) { extra = BEV + ',0 0 0 2px #d9a44188;'; labelColor = '#e9d6b0'; }
       if (shown === 'unknown') extra += 'animation:rb-ping 2.6s infinite;';
       const atom = atomDone[shown] ? '' : (atomDone[shown] = 'icons/node/' + shown);
@@ -285,7 +293,7 @@ class Component extends DCLogic {
         top: (n.y - size / 2) + 'px',
         size: size + 'px',
         atom,
-        bg: 'radial-gradient(58% 58% at 35% 30%,rgba(255,246,222,.24),rgba(255,246,222,0) 60%),' + t.bg, bcolor: t.bcolor, bstyle: shown === 'unknown' ? 'dashed' : 'solid',
+        bg: 'radial-gradient(58% 58% at 35% 30%,rgba(255,246,222,.24),rgba(255,246,222,0) 60%),' + t.bg, bcolor, bstyle: shown === 'unknown' ? 'dashed' : 'solid',
         radius: isCastle ? '0' : '50%',
         glyph: t.glyph, glyphColor: t.g,
         glyphSize: (isCastle ? 52 : 22) + 'px',
@@ -325,8 +333,10 @@ class Component extends DCLogic {
       { name: 'Catapult', state: 'DAMAGED', color: '#d9a441' },
       { name: 'Ballista', state: 'INTACT',  color: '#7fa05a' },
     ];
-    const ST = { taken: { border: '#7fa05a', op: '1' }, current: { border: '#d9a441', op: '1' }, future: { border: '#382a1d', op: '.45' } };
-    const spineCities = ['taken', 'taken', 'current', 'future', 'future', 'future'].map(s => ({ ...ST[s] }));
+    // current spine chip: NO marker box (Doug 2026-07-04) — neutral chrome border, the chip itself
+    // breathes on the shared pulse primitive (`pulse:"self"`)
+    const ST = { taken: { border: '#7fa05a', op: '1' }, current: { border: '#382a1d', op: '1', anim: 'rb-spulse 1.8s ease-in-out infinite' }, future: { border: '#382a1d', op: '.45' } };
+    const spineCities = ['taken', 'taken', 'current', 'future', 'future', 'future'].map(s => ({ anim: 'none', ...ST[s] }));
     const ATTR = { STR: '#c2553f', INT: '#6f8fc4', DEX: '#82a85e', CON: '#cf9a44' };
     const packChips = [
       { name: 'Sword',        color: ATTR.STR },

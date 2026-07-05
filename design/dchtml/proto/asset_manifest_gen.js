@@ -8,15 +8,19 @@
 
 async function RB_buildAssetManifest(env) {
   const { ls, saveFile, log } = env;
-  async function walk(dir, acc) {
-    for (const f of await ls(dir)) {
+  // PARALLEL walk (2026-07-05): the worn tree (4 races × slots × core dirs) pushed a serial
+  // per-directory walk past the 30s script budget — fetch every subdirectory level concurrently.
+  async function walk(dir) {
+    let names; try { names = await ls(dir); } catch (e) { return []; }
+    const here = [], subs = [];
+    for (const f of names) {
       const p = dir + '/' + f;
-      if (/\.png$/i.test(f)) acc.push(p);
-      else if (!/\.[a-z0-9]+$/i.test(f)) { try { await walk(p, acc); } catch (e) {} }
+      if (/\.png$/i.test(f)) here.push(p);
+      else if (!/\.[a-z0-9]+$/i.test(f)) subs.push(walk(p));
     }
-    return acc;
+    return here.concat(...(await Promise.all(subs)));
   }
-  const pngs = (await walk('Content', [])).sort();
+  const pngs = (await walk('Content')).sort();
   await saveFile('asset-manifest.js', 'window.ROGUEBANE_ASSETS = ' + JSON.stringify(pngs) + ';\n');
   log('asset-manifest.js: ' + pngs.length + ' PNGs');
   return pngs.length;

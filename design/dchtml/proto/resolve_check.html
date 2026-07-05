@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<!-- Roguebane — MANIFEST RESOLVER SELF-CHECK (persistent tooling, LAYOUT_CONTRACT §3/§4 verify,
+     2026-07-05). Reads Content/layout.json and RE-COMPOSES a screen purely from (anchor, offset,
+     parent box, screen size) — the §4 determinism promise — at an ARBITRARY resolution, to prove a
+     screen isn't secretly pinned to its 1920x1080 authoring pixels. Model (the engine's expected
+     interpreter): UI scale S = screenH / designH (scale-by-height), so vertical geometry is
+     resolution-stable and off-16:9 reflows HORIZONTALLY; edge-anchored full-bleed bars/panels stretch
+     to fill their box's cross-axis; every element resolves against its PARENT's resolved box, else the
+     screen box. Renders all four target sizes side by side; a right/bottom element that DRIFTS off its
+     edge or a child that detaches from its parent is immediately visible. ?screen=encounter -->
+<head><meta charset="utf-8"><title>RB resolve check</title>
+<style>
+  body{margin:0;background:#0c0810;color:#cdb497;font:12px 'JetBrains Mono',monospace;padding:14px;}
+  h2{color:#e9d6b0;font-weight:700;letter-spacing:1px;margin:18px 0 6px;font-size:14px;}
+  .row{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-start;}
+  .stage-wrap{margin-bottom:6px;}
+  .cap{color:#8d775c;margin-bottom:4px;}
+  .stage{position:relative;background:#161009;border:1px solid #4a3729;box-shadow:inset 0 0 0 9999px transparent;}
+  .el{position:absolute;box-sizing:border-box;border:1px solid #7fa05a88;background:#7fa05a10;font-size:8px;color:#cdb497;overflow:hidden;white-space:nowrap;padding:1px 2px;}
+  .el.parented{border-color:#6f8fc4aa;background:#6f8fc412;}
+  .el.rightish{border-color:#d9a441cc;background:#d9a44118;}
+  .el.bottomish{border-color:#c2553fcc;background:#c2553f18;}
+  .edge{position:absolute;background:#e0654b;opacity:.5;}
+</style></head>
+<body>
+<div id="out">loading…</div>
+<script>
+const QS = new URLSearchParams(location.search);
+const SCREEN = QS.get('screen') || 'encounter';
+const SIZES = [[1920,1080,'1920×1080 (authoring / 16:9)'],[2560,1440,'2560×1440 (16:9 up)'],[2560,1080,'2560×1080 (21:9 ultrawide)'],[1440,1080,'1440×1080 (4:3)']];
+const PREVW = 560; // px width each mini-stage is drawn at
+
+function resolveScreen(screen, SW, SH) {
+  const dh = screen.designSize[1];
+  const S = SH / dh;                       // scale-by-height
+  const scrW = SW / S, scrH = SH / S;      // screen box in design space
+  const byId = {}; screen.elements.forEach(e => byId[e.id] = e);
+  const cache = {};
+  function box(e) {
+    if (cache[e.id]) return cache[e.id];
+    const pbox = (e.parent && byId[e.parent]) ? box(byId[e.parent]) : { x:0, y:0, w:scrW, h:scrH };
+    const a = e.anchor || 'TopLeft';
+    let w = e.size[0], h = e.size[1];
+    // full-bleed stretch: a bar/panel authored to (near-)fill its box's cross axis fills it at any size
+    if (w >= pbox.w * 0.98) w = pbox.w;
+    if (h >= pbox.h * 0.98) h = pbox.h;
+    const ox = e.offset[0], oy = e.offset[1];
+    let x, y;
+    if (/Left/.test(a)) x = pbox.x + ox;
+    else if (/Right/.test(a)) x = pbox.x + pbox.w + ox - w;
+    else x = pbox.x + pbox.w / 2 + ox - w / 2;
+    if (/Top/.test(a)) y = pbox.y + oy;
+    else if (/Bottom/.test(a)) y = pbox.y + pbox.h + oy - h;
+    else y = pbox.y + pbox.h / 2 + oy - h / 2;
+    return cache[e.id] = { x, y, w, h };
+  }
+  return { S, scrW, scrH, rects: screen.elements.map(e => ({ e, r: box(e) })) };
+}
+
+(async () => {
+  const L = JSON.parse(await (await fetch('../Content/layout.json')).text());
+  const screen = L.screens[SCREEN];
+  const out = document.getElementById('out');
+  out.innerHTML = '<h2>' + SCREEN + ' — ' + screen.elements.length + ' elements — resolved from manifest at 4 sizes</h2>';
+  const row = document.createElement('div'); row.className = 'row'; out.appendChild(row);
+  SIZES.forEach(([SW, SH, label]) => {
+    const { scrW, scrH, rects } = resolveScreen(screen, SW, SH);
+    const k = PREVW / scrW;                       // px per design unit for this mini-stage
+    const wrap = document.createElement('div'); wrap.className = 'stage-wrap';
+    const cap = document.createElement('div'); cap.className = 'cap'; cap.textContent = label; wrap.appendChild(cap);
+    const stage = document.createElement('div'); stage.className = 'stage';
+    stage.style.width = (scrW * k) + 'px'; stage.style.height = (scrH * k) + 'px';
+    rects.forEach(({ e, r }) => {
+      const d = document.createElement('div'); d.className = 'el';
+      if (e.parent) d.className += ' parented';
+      if (/Right/.test(e.anchor)) d.className += ' rightish';
+      if (/Bottom/.test(e.anchor) && !/Right/.test(e.anchor)) d.className += ' bottomish';
+      d.style.left = (r.x * k) + 'px'; d.style.top = (r.y * k) + 'px';
+      d.style.width = Math.max(2, r.w * k) + 'px'; d.style.height = Math.max(2, r.h * k) + 'px';
+      d.textContent = e.id;
+      d.title = e.id + ' ' + e.anchor + ' off=' + JSON.stringify(e.offset) + (e.parent ? ' ←' + e.parent : '');
+      stage.appendChild(d);
+    });
+    // right-edge + center probes
+    const cl = document.createElement('div'); cl.className = 'edge'; cl.style.left = (scrW / 2 * k) + 'px'; cl.style.top = 0; cl.style.width = '1px'; cl.style.height = (scrH * k) + 'px'; stage.appendChild(cl);
+    wrap.appendChild(stage); row.appendChild(wrap);
+  });
+  window.__resolveReady = true;
+})();
+</script>
+</body>
+</html>

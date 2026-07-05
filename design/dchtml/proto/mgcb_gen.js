@@ -10,15 +10,18 @@
 async function RB_buildMgcb(env) {
   const { ls, saveFile, log } = env;
 
-  async function walk(dir, acc) {
-    for (const f of await ls(dir)) {
+  // PARALLEL walk (2026-07-05): serial traversal outgrew the 30s budget at ~2600 assets.
+  async function walk(dir) {
+    let names; try { names = await ls(dir); } catch (e) { return []; }
+    const here = [], subs = [];
+    for (const f of names) {
       const p = dir + '/' + f;
-      if (/\.[a-z0-9]+$/i.test(f)) acc.push(p);
-      else { try { await walk(p, acc); } catch (e) {} }
+      if (/\.[a-z0-9]+$/i.test(f)) here.push(p);
+      else subs.push(walk(p));
     }
-    return acc;
+    return here.concat(...(await Promise.all(subs)));
   }
-  const all = (await walk('Content', [])).map(p => p.replace('Content/', ''));
+  const all = (await walk('Content')).map(p => p.replace('Content/', ''));
   const pngs = all.filter(p => /\.png$/i.test(p)).sort();
   const copies = all.filter(p => /\.json$/i.test(p)).sort();   // plain data -> /copy
 

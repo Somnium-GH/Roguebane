@@ -43,7 +43,7 @@
           </div>
         </sc-for>
       </div>
-      <div data-el="leaveBtn" data-binds="merchant.leave" data-bind-gate="" data-states="button" title="Leave the stall" style="position:relative;width:120px;height:40px;background:url('Content/ui/button/button_normal.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+      <div data-el="leaveBtn" data-anchor="TopRight" data-binds="merchant.leave" data-bind-gate="" data-states="button" title="Leave the stall" style="position:relative;width:120px;height:40px;background:url('Content/ui/button/button_normal.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;">
         <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;letter-spacing:1px;color:#cdb497;">⮐ LEAVE</span>
       </div>
     </div>
@@ -119,7 +119,7 @@
     <!-- CATEGORY SECTIONS — one dedicated section per category in stock this visit
          (Armor / Weapons / Techniques / Minions / Runes). Three sections to a page;
          the footer pager flips to the rest. -->
-    <div data-el="waresShelves" data-container="1" data-template="shopSection" data-flow="vertical" data-binds="merchant.stock.sections" style="display:flex;flex-direction:column;gap:24px;margin-top:18px;">
+    <div data-el="waresShelves" data-container="1" data-template="shopSection" data-flow="vertical" data-binds="merchant.stock.sections" style="display:flex;flex-direction:column;gap:24px;margin-top:18px;min-height:768px;">
       <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="3">
         <div data-tpl="shopSection">
           <div style="display:flex;align-items:baseline;gap:10px;border-bottom:1px solid #382a1d;padding-bottom:7px;margin-bottom:12px;">
@@ -156,12 +156,12 @@
   <div data-el="footer" data-anchor="Bottom" data-z="6" data-shadow="panel" style="position:absolute;left:0;bottom:0;width:1920px;height:72px;border-top:3px solid #4a3729;background:linear-gradient(#201710,#17110b);display:flex;align-items:center;justify-content:space-between;padding:0 28px;box-shadow:0 -6px 16px rgba(10,8,7,.55);z-index:6;">
     <span data-el="footerFlavor" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:17px;color:#9a8468;">Fair dealing by lantern light.</span>
     <div style="display:flex;align-items:center;gap:26px;">
-      <div data-el="pager" data-binds="merchant.stock.page" style="display:flex;align-items:center;gap:10px;">
+      <div data-el="pager" data-anchor="Right" data-binds="merchant.stock.page" style="display:flex;align-items:center;gap:10px;">
         <div data-el="pagePrev" data-binds="merchant.stock.pagePrev" data-bind-gate="" data-states="button" onClick="{{ prevPage }}" style="width:44px;height:34px;background:url('Content/ui/button/button_normal.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:{{ prevOp }};"><span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#cdb497;">◀</span></div>
         <span data-el="pageLabel" data-binds="merchant.stock.pageLabel" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2px;color:#cdb497;min-width:110px;text-align:center;">{{ pageLabel }}</span>
         <div data-el="pageNext" data-binds="merchant.stock.pageNext" data-bind-gate="" data-states="button" onClick="{{ nextPage }}" style="width:44px;height:34px;background:url('Content/ui/button/button_normal.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:{{ nextOp }};"><span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#cdb497;">▶</span></div>
       </div>
-      <span data-el="purseNote" data-binds="run.gold" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#b09a82;">PURSE <b style="color:#d9a441;">128g</b></span>
+      <span data-el="purseNote" data-anchor="Right" data-binds="run.gold" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#b09a82;">PURSE <b style="color:#d9a441;">128g</b></span>
     </div>
   </div>
 

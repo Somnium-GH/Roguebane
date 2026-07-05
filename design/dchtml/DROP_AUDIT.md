@@ -1,88 +1,212 @@
-# DROP AUDIT — 2026-07-04 (pass 3: B12 CORRECTED worn-armor convention; supersedes pass 2 same day)
+# DROP AUDIT — 2026-07-05 (pass 9: dual-attr Frenzy/Flurry + split glyph capture)
 
-Per CLAUDE.md "Ship the design SOURCES in every drop": rides with this drop to `Somnium-GH/Roguebane`
-and is regenerated per drop. Drop contents = `Roguebane.Content/` (from local `Content/`) +
-`design/` (1920×1080 renders + `design/00-assets-*` sheets; `design/dchtml/` = all `*.dc.html` +
-`support.js` + `style_tokens.js` + `attribute-model.js` + `asset-manifest.js` + `gear_catalog.json`
-+ the full `proto/` + this audit).
+**Pass 9 delta (dual-attribute techniques, Doug — SOURCE ONLY, no asset churn):**
+- **Frenzy + Flurry are now payable in STR *or* DEX.** `core-kits.js` technique defs gain
+  `either: ['STR','DEX']` (order = STR-top / DEX-bottom). The `resolve()` technique pass picks the pool
+  that can afford it (else the one with the most free room, for the lock shortfall), reserves there, and
+  returns `payAttr` per technique. New shared helpers: `glyphFill(t)` (solid stat colour, OR a hard 50/50
+  top/bottom split for `either` — NO black seam, Doug: it interfered with the glyph), `costSplit(t)`
+  (two `{attr,cost,color}` rows), `costLabel` → `"STR/DEX N"`. Rendered on THREE surfaces: the technique
+  glyph chip (split fill) + a two-row STR-red/DEX-green cost readout on the **Encounter** action-bar card,
+  the **Equipment** loadout card, and the **Equipment** inventory badge (split box). Verified on the
+  Reaver core (Finesse −1 → effective 2/2 Frenzy, 1/1 Flurry).
+- **Split glyph PNGs re-captured** — `Content/icons/technique/{frenzy,flurry}.png` (+ drop copies)
+  re-shot with the 50/50 STR-red/DEX-green split fill via the established capture pipeline
+  (`proto/atom_capture.js` `RB_buildChipOverlay` gradient chips → `proto/atom_slice.js`
+  `RB_buildTechChips` with new `RB_TECHS_SPLIT` + array-`glyphBg` split support; glyph SHAPE still lifted
+  from the live-font capture, keyed against the darker half so both bg halves zero out). Same 120×120
+  dims + same paths → **`asset-manifest.js`, `Content.mgcb`, `layout.json` UNCHANGED** (overwrite only, no
+  new/removed entries). Now visible in `Asset Review.dc.html`.
+- **NO screen-render churn.** Technique glyph PNGs are ENGINE-BLIT ONLY — the screens draw the design-font
+  glyph — so no `design/0N-*.png` was re-shot for the glyph capture (ASSET_GEN_METHOD "engine-only asset
+  needs no re-render"). The Reaver `design/01-encounter-reaver.png` / `02-equipment-reaver.png` are still
+  behind the SOURCE by the live split treatment (glyph chip + two-row cost the SCREENS draw) — refresh
+  those two when a screen-render pass runs; the glyph-PNG capture does not gate it.
+- **Changed files:** `design/dchtml/{core-kits.js, Encounter.dc.html, Equipment.dc.html}` +
+  `design/dchtml/proto/atom_slice.js` (split-chip generator) in the drop; `Content/icons/technique/
+  {frenzy,flurry}.png` (+ drop copies) re-captured. ⚠ **`core-kits.js` was MISSING from the drop
+  entirely** (both dchtml mirrors) despite the screens importing it — ADDED this pass so the drop is
+  reproducible. No removals, no manifest/mgcb changes.
+- **Engine follow-ups:** see **CD_STATUS #36** — dual-attr `either` cost still owes the `layout.json`
+  manifest field + the runtime which-pool reserve decision + the two-row split-cost draw. The split glyph
+  PNGs shipped this pass, so only the field + cost-draw remain. (Not restated here — CD_STATUS is canon.)
+- **Drop reconciliation (surgical parity sweep, this pass):** the drop had drifted well beyond the
+  session's own edits — brought fully back in sync WITHOUT a full re-stage: added the entirely-missing
+  **`ui/` group** (32 assets: pips/buttons/frames) to `drop/Roguebane.Content/`; synced stale
+  `layout.json` (root re-extraction, +5.5KB — the `parent`/anchor work never dropped); synced the whole
+  **`proto/`** (26 files were missing incl. `asset_incremental.js`, `resolve_check.html`, `screen_perms.js`;
+  9 stale generators); synced 6 stale dchtml sources (`CityMap, CampaignMap, NewGame, Merchant, Figure,
+  style_tokens.js`) + added `Core Loadouts.dc.html` + `Inventory Tabs.dc.html`. Verified parity: Content
+  3141/3141 (bg5+icons49+sprites3055+ui32), `Content.mgcb` + `ASSET_MANIFEST.md` + all 24 `design/*.png`
+  IDENTICAL, all 17 dchtml sources in sync. (Empty `Canvas.dc.html` scaffold intentionally excluded.)
+- **Artifact rename (going forward):** `CD_STATUS_MEMORY.md` → **`CD_STATUS.md`**; it now ships in every
+  drop (`drop/design/dchtml/`) alongside this audit, and the two are deduplicated — CD_STATUS holds the
+  canonical open-gap prose, the audit references `CD_STATUS #N`.
+- **Manual design edits (Doug/user) since pass 8:** the dual-attr direction itself (STR-top/DEX-bottom,
+  "let the colours meet — drop the black seam, it interferes with glyphs").
 
-**Confirm-to-close (engine verified LANDED per the 2026-07-04 payload): B0, B0b, B1a, B3, B5, B6.**
-Still-open payload items covered by this drop: B1b (guards live in `extract_merge.js` +
-`roster_save.js` + this audit's key-set diff) · B2-GO (weapons/families/CON ladder/armor icons/figure
-regen incl. elf_ranger neckline — pass 1; worn armor now per corrected B12) · B4 · B7 · B8 (states
-authored; glow design now LOCKED, see FYI) · B10 · B11 · **B12 corrected (this pass)**.
+---
+
+# DROP AUDIT — 2026-07-05 (pass 8: v6 technique glyphs captured — incremental)
+
+**Pass 8 delta (technique-glyph capture, incremental fast path):**
+- **6 v6 technique glyphs captured** — `icons/technique/{siphon, sacrifice, barkskin, flurry, aimed_shot,
+  bind}` (120×120 chips, glyph shape from the design-font render, glyphBg = core-kits `T` attr colour;
+  siphon/barkskin INT, flurry/aimed_shot DEX, bind STR, sacrifice minion-cost grey). Closes CD_STATUS
+  #34.4 / pass-7 "B18 glyph capture (incl. Bind)" for the full v6 roster. Reproducible: added to
+  `proto/atom_slice.js` `RB_TECHS_V6`; captured via one overlay/screenshot batch + one `run_script`.
+- **Incremental, no waste (the point of this pass):** technique glyphs are ENGINE-BLIT ONLY — the
+  screens draw the design-font glyph — so **no `design/0N-*.png` render changed and none was re-shot.**
+  The manifest+mgcb were APPENDED (`proto/asset_incremental.js` `RB_addAssets`, not the ~3000-file disk
+  walk): **3135 → 3141 PNGs.** Chips + both manifest files were written straight into `drop/` in the
+  same pass — no drop re-stage. New tooling this pass: `proto/asset_incremental.js`, `atom_slice.js`
+  `RB_TECHS_V6` + `outDirs` arg; instructions in ASSET_GEN_METHOD.md "Incremental adds" + CLAUDE.md.
+- **Changed files (adds only):** `Content/icons/technique/{siphon,sacrifice,barkskin,flurry,aimed_shot,
+  bind}.png` (+ drop copies); `asset-manifest.js` + `Content/Content.mgcb` (+ drop copies) — 6 new
+  entries. Binds unchanged (the screens already `data-image-bind` `icons/technique/{id}`; the 404s those
+  6 ids threw now resolve). No removals. No manual design edits this pass.
+
+---
+
+# DROP AUDIT — 2026-07-05 (pass 7: Barbarian core + Half-Giant race, on top of pass 6)
+
+**Pass 7 delta (Barbarian core + Half-Giant race, Doug 2026-07-05):**
+- **Barbarian — new 7th core (B15/B16/B18).** Rune `core_barbarian` (glyph ⚒). Core Effect **Warlord's
+  Might** — "Two-handed swords cost 2 less strength to equip" (resolver applies −2 to claymore equip).
+  Stat bonus **+4 STR · +1 CON**. v6 kit: Iron Claymore (2H) + Iron plate ×4 · Cleave, **Bind** (new STR
+  shield source — B18 icon PENDING capture, renders design-font glyph meanwhile), Bandage · **3 actions
+  / 1 minion / 14 budget** (Doug). Favored worn line = STR → new **Barbarian STR worn theme** authored
+  across all 5 races (savage hide-strap + tusk/fur accents). Figure = light-medium-brown hide with a
+  gold-buckled lace + pale fur collar (Doug: "not the green"). Added to Encounter/Equipment `core` enum
+  + NewGame grid (now 7 cores → 3 pages of 3 with the pager).
+- **Half-Giant — new 5th race (B17).** STR affinity **6/4/4/4**, HP 18. First TALL body-morph: +3 torso
+  rows, longer legs/arms, slightly wider + bigger head — reads clearly taller than the other races while
+  **tuned to fit the fixed paper-doll frames** (native 408 vs human 360, ~13%; Doug tuned down twice so
+  it doesn't overflow). Full figure/part/worn set for all 7 cores; worn race set now
+  {human, elf, dwarf, halfling, half_giant}. Added to the `race` selectors.
+- **"BAYS" → "MINIONS"** everywhere user-facing (NewGame core-card + Loadout labels, Equipment identity
+  stat) per Doug; element ids/binds unchanged.
+- **NewGame core cards** enlarged + given a **STARTING KIT** panel (weapons · armor line · skills ·
+  minion from the v6 kit) so the taller card fills down to the pager; Effect + kit fonts enlarged.
+- **Counts:** roster now **41 figures** (5 races × 7 cores + 6 foes); **3135 PNGs** (asset-manifest +
+  Content.mgcb rebuilt from disk). layout.json re-extracted; 00-assets-1 figures sheet + roster_mockup
+  (full 35 race×core grid) rebuilt.
+- **Renders refreshed this pass:** `design/05-newgame.png`; `design/01-encounter-{barbarian,summoner,
+  ranger}.png`; `design/02-equipment-{barbarian,summoner,ranger}.png` (the new core + the two cores whose
+  minion now blits its real per-type deploy sprite). The grunt/warden/adept/reaver enc+eq renders from
+  pass 6 remain accurate (no minion, core-only stat chips unchanged) — not re-shot.
+- **Still OUR side:** B18 technique GLYPH capture (now also **Bind**); half-giant worn↔figure morph
+  composition (§7/§17 #15). Everything else below is the pass-6 record.
+
+---
+
+# DROP AUDIT — 2026-07-05 (pass 6: two new races + v6 balance + race selectors + body-morph)
+
+Rides with this drop to `Somnium-GH/Roguebane` (regenerated per drop). Drop contents =
+`Roguebane.Content/` (from local `Content/`, repo-name mapping applied) + `design/` (1920×1080 renders
++ `design/00-assets-*` sheets; `design/dchtml/` = all `*.dc.html` + `support.js` + `style_tokens.js` +
+`attribute-model.js` + **`core-kits.js`** + `asset-manifest.js` + `gear_catalog.json` + the full
+`proto/` + this audit).
+
+**Headline:** the race roster grew **2 → 4** (Dwarf + Halfling, B17) with the first real **body-morph**
+(dwarf stout+short, halfling small+swift, both with wider/shorter or shorter heads); Encounter +
+Equipment gained a **race selector** alongside the core selector; and every attribute / loadout /
+technique / minion across NewGame, Equipment and Encounter was **resynced to the v6 balance sheet**
+(the number gospel), driven by a rewritten `core-kits.js`.
+
+## ‼ STATUS — PROTOTYPE, tuned to v6 (not silent drift)
+Core Effects are the payload-B15 PROTOTYPE roster (Jack of All Trades / Fortified / Resonance /
+Conscription / Finesse / Fletcher's Luck), superseding §11 canon. All numbers are the **v6 balance
+sheet** (2026-07-05 session): race bases, per-core stat bonuses, reserve costs, default loadouts.
 
 ## ‼ REMOVED this pass (the delete script — a file drop can't express deletions)
-The 2026-07-04-morning worn-armor build was MIS-BUILT (type×core×race cross-product + a "plain"
-type) and is fully retracted. It never reached the repo — if any earlier same-day staging WAS
-applied, delete:
-1. **Every file matching `Roguebane.Content/sprites/body/<fig>/<part>_(str|dex|int)_*.png`** across
-   the 12 player figure dirs (human_/elf_ × grunt/warden/adept/summoner/reaver/ranger) — 1344 files
-   (112 per standard figure, 48 per robe figure). Base parts are untouched; correct post-delete dir
-   counts: grunt 33 · warden/reaver/ranger 21 · adept/summoner 12 (per race).
-2. **`figures.*.armor` blocks in `layout.json`** (replaced by the top-level `worn` block).
-`Content.mgcb` + `asset-manifest.js` in THIS drop are rebuilt from disk and reference none of the
-removed files (1308 textures — see (c)); applying this drop's mgcb + the deletes together is safe.
+1. **No assets removed.** Only ADDS (2 new races' figures/parts/worn, minion deploy sprites) + edits.
+   The repo's existing `human_*`/`elf_*` figure + worn trees are unchanged in shape; the `dwarf_*` /
+   `halfling_*` trees are new.
+2. If the repo still carries a `Content/sprites/minion/` (singular) directory, note the deploy sprites
+   ship under `sprites/minions/` (plural) — the game-side mirror should use the plural path.
 
-## a) What changed THIS pass — B12 corrected worn-armor part set (744 files)
-Built from the single consolidated spec (supersedes pass-2's per-figure themed layers AND B2-GO item
-3's generic layers):
-- **FULL PART SPRITES**, race-first: `sprites/gear/worn/<race>/<slot>/bare_<condition>.png` ·
-  `…/<slot>/<type>_<tier>_<condition>.png` (generic, core-agnostic) ·
-  `…/<slot>/<core>/<type>_<tier>_<condition>.png` (themed — ONLY the core's favored line).
-- `race` ∈ human/elf, every slot per race (no shared arms/legs); `slot` ∈ head/chest/arms/legs (ONE
-  sprite per slot — engine reuses for both arms/legs); `type` ∈ str/dex/int — **no "plain" type, the
-  unarmored terminal is `bare`**; `tier` ∈ 1..4 numeric (palettes: str Iron→Steel→Mithral→Dwarven ·
-  dex leather ladder · int cloth ladder); `condition` ∈ healthy/damaged/broken, no disabled variants
-  (§6e). int = chest+head only (§6c); CON shields = hand items, no worn parts.
-- **Themes (favored line only, never a cross-product):** Grunt→str practical kit · Warden→str
-  reinforced edges/rivet rows/gold shield-boss/full-face visor helm · Adept→int teal runic hem +
-  restrained sigil · Summoner→int bone/chain trim + dark band + deeper hood · Reaver→dex twin-blade
-  X etch + studs · Ranger→dex fur(tusk) trim + quiver strap. Non-favored lines render GENERIC art.
-- **Counts (complete near-term set, both races):** bare 24 + generic 240 (str 96 / dex 96 / int 48)
-  + themed 480 (96/96/48/48/96/96) = **744** — matches the payload's completeness target exactly.
-- **Inventory for your asset-exists probes:** `layout.json` top-level **`worn`** block
-  (root/races/slots-per-type/tiers/conditions/bare/themes/sprite-template/fallback) — expanding it
-  enumerates all 744 paths. Fallback chain (engine): themed → generic → generic healthy → bare →
-  bare healthy, so partial coverage in future drops is always safe.
-- **Geometry:** race BASE body plan (human baseline ± race build: elf slim/ears/skin), deliberately
-  core-agnostic; composition with per-core figure geometry stays the engine's §7/§17 #15 morph
-  question (proceeding on the art convention as instructed — no new body-shape variation authored).
-- elf_ranger neckline: the figure-part fix landed pass 1; the themed ranger chest parts carry the
-  strap at mid-chest (never the neckline).
-- Generator: `proto/roster_gen.js` worn module rewritten to this spec (`buildWornSet`,
-  `wornGeom`/`wornSlotGrid`/`bareSlotGrid`, `WORN_TYPES`/`WORN_SLOTS`/`FAVORED_LINE`);
-  `proto/roster_save.js` gained the `worn` output + `layout.worn` merge; player figure base parts
-  re-emitted byte-identical after the purge (240 files).
-
-Pass-1/pass-2 items ride along unchanged: weapons ×4 metals, new families, CON shield ladder, armor
-card icons, B10 canon catalog names, B11 bows, back-mount art (`bow_<tier>_back`/`sling_<tier>_back`
-→ `sockets.back`), B4 Equipment buttons, B7 raceCard bind, B8a beaconNode states, B1b guards.
+## a) What changed THIS pass
+- **`core-kits.js` — REWRITTEN to the v6 sheet + made race-aware.** Now the ONE source for NewGame too
+  (not just Encounter/Equipment). Adds: `RACES` (Human 5/5/5/5 · Elf 4/6/4/4 · Dwarf 4/4/4/6 ·
+  Halfling 4/4/6/4, v6 §B) + `raceHp` (10 + 2×CON); `CORE_BONUS` + `pools(core,race)` +
+  `statBonus`/`statBonusFull` (payload B16 per-core stat bonuses); v6 **effect discounts** in the
+  resolver (`gearGate`/`techCost`/`bayCost`: Grunt −1 all, Warden plate→CON −1/tier, Reaver two-weapon
+  −1, Ranger bow −1/tier); the v6 default kits + demonstration scenarios; and `resolve(core, race)` /
+  `poolRows(…, race)` / `inventory(…, race)` all threaded with race. **ARMOR NOW RESERVES POOL PIPS**
+  (v6 §C "Requirement = armor + weapons + skills + minions") — this closes the pass-5 DROP_AUDIT Doug
+  call in favor of the summed-pool reading.
+- **Two new races (B17) — full figure/part/worn batch**, generated by `proto/roster_gen.js` (the
+  persistent generator; golden rule). New morph axes on the `RACE` table: `short` (leg/robe-collar),
+  `armD` (arm length), `headW`/`headH` (head box) — the first true body morph. Dwarf: stout (wider
+  torso), short legs, head +2 wider / −1 shorter, ruddy skin + ginger hair. Halfling: elf-slim build,
+  small ear points, head −1/−2, WARM skin (explicitly not elf pallor) + chestnut hair. Emitted for all
+  6 cores each → `sprites/body/{dwarf,halfling}_<core>/` (parts + damage states) and the full B12
+  worn-armor set → `sprites/gear/worn/{dwarf,halfling}/…` (**worn set now 1488 files across 4 races**).
+- **Race selector on Encounter + Equipment** — new `race` enum prop (human/elf/dwarf/halfling) beside
+  the existing `core` prop; pools, HP, figure, identity label all reflect it. NewGame's race column now
+  reads its 4 races + all data from `core-kits.js` (no more local duplicated tables) and every race can
+  bear every core (v6 clearance; the old Elf↛Warden hard-disallow retired).
+- **HELD indicator on the Equipment demo** (Doug) — same `heldBadge` idiom as Encounter, gated on
+  `combat.paused`: Equipment can be opened during combat (combat holds; loadout read-only in combat).
+- **Per-core STAT-BONUS boxes (B16)** — NewGame core cards show the core's additive bonus in the EXACT
+  race-card attr-box idiom (colored square / big value / little label), one box per non-zero stat
+  (Grunt shows all four +1s, singles centered). Equipment identity block shows the same via compact
+  chips. Loadout preview folds the bonus into the effective attr tiles (no separate badges — Doug).
+- **NewGame core grid → 3-per-page pager** (Doug) — bigger single-row cards (152×324 design-space) with
+  a Merchant/Equipment-style `corePager` (`button_pager.png`), 6 cores across 2 pages.
+- **Per-type minion DEPLOY sprites** — `sprites/minions/{skeleton,golem,hound,imp,wisp}.png`; the
+  Encounter field minion + the Encounter/Equipment bay icons now blit the real per-type sprite
+  (closes the old skeleton stand-in). (B18 technique GLYPH icons are still an ASSET_GEN capture pass —
+  see FYI below; the action bar renders the design-font glyph meanwhile, unchanged.)
+- **`Figure.dc.html`** — figure enum extended with the new race grunts (no logic change; it already
+  reads `layout.json` generically).
+- **Merchant `waresShelves`** bumped to fit its 3rd row (`min-height:768px` → extractor size[1]=384,
+  closing payload B13); **Equipment `buildMinions`** now sizes to the bay count (B14 closed —
+  layout.json size [162,89], item [78,89]).
 
 ## b) Binds added/removed
-None. `worn` is data/inventory, not a bind; screens/templates/style byte-identical since pass 1.
+- New engine display data the manifest now carries: `core.statBonus` (list template `statBonusChip`
+  on Equipment, `statBonusBox` on NewGame), `cores.page*` (NewGame `corePager` cluster mirroring the
+  Merchant/Equipment pagers), `combat.paused` on the Equipment `heldBadge`, and the `race` selector is
+  a screen prop (no new bind — the engine supplies the chosen race like it does core). Encounter/
+  Equipment figure + minion image binds now resolve per race/type.
+- `Content/layout.json` **re-extracted** (`proto/extract_all.html` → `extract_merge.js`) so
+  `screens.encounter` / `.equipment` / `.newgame` + all templates reflect every edit above — NOT a
+  hand-patch. Key-set diff guard passed (no screen/template lost). Figures/gear/worn sections
+  regenerated by `roster_save.js` (4 races, mounts reconciled into `roster_gen.js` so a regenerate no
+  longer reverts them — closes CD_STATUS #34.3).
 
-## c) Rebuilt from disk + reference renders
-- `Content.mgcb` ✅ **1308 textures** (= pre-worn 552 + 12 bows/back-mounts + 744 corrected worn;
-  pass-2's mis-built 1344 are gone) + 2 copies (`layout.json`,
-  `gear_catalog.json`). `asset-manifest.js` ✅ 1308 PNGs. Both reference zero removed files.
-- Key-set diff (B1b guard): figures 18/18 kept (armor sub-keys dropped by design — listed in
-  Removed), gear 119/119 kept, screens/templates untouched, `worn` added.
-- Screen renders `design/01..08` UNCHANGED (no screen source touched). Sheets:
-  `00-assets-4-armor.png` regenerated to the corrected set (bare/generic/themed/elf/conditions);
-  1-figures + 2-parts unchanged from pass 1 (2-parts lists base parts only — base sprites are
-  byte-identical).
+## c) Rebuilt from disk
+- `asset-manifest.js` + `Content.mgcb` rebuilt from disk — **2298 PNGs** (was ~1309; +~989 from the two
+  new races' body parts + worn set + minion sprites). Both walkers were parallelized (the serial walk
+  outgrew the 30s script budget at this asset count).
+- **Screen renders refreshed (13 total, all verified 1920×1080):** `design/01-encounter-<core>.png` ×6,
+  `design/02-equipment-<core>.png` ×6, `design/05-newgame.png`. `design/00-assets-1-figures.png` +
+  `proto/roster_mockup.png` rebuilt with a race-morph comparison row + the full 24 race×core grid.
+  (03-citymap / 04-campaignmap / 06-style / 07-merchant / 08-reticle unchanged this pass.)
 
-## d) Manual design edits (Doug/user) — intentional, not generator output
-- (carried) 2026-07-03: removed the "1" / "2" step markers from NewGame's **Race** and **Core Rune**
-  headings. No new manual edits since.
+## d) Manual design edits / user-accepted decisions (Doug/user) — intentional, not generator output
+- **Doug: race art calls** — Dwarf shorter + wider/shorter head "to rip the bandaid off on body morph";
+  Halfling elf-like with a shorter head "but not awkwardly and without the pale color."
+- **Doug: HELD on Equipment** — "it's actually read-only technically" during combat; badge only.
+- **Doug: stat-bonus display** — boxes consistent with the race attr boxes; Grunt shows all 4 (not
+  summarized); center the ones with fewer; Loadout just adds it up (no separate badges); the race+core
+  aggregated "+2 ALL" chip row was tried and REVERTED (identity block shows core-only; pools add it up).
+- **Doug: core cards** — bigger, 3 per page, paged like the other pagers.
+- **v6 loadout accuracy (Doug's balance session is gospel):** Ranger's melee is now an **Iron Dagger**
+  (v6), not the short sword; Summoner's Barkskin (T1 INT shield) + Sacrifice; Adept's Siphon +
+  Stoneskin; Bandage/Frenzy/Flurry/Aimed Shot costs are the v6 sheet numbers.
 
 ## FYI / open on our side
-- **B8 glow LOCKED (Doug 2026-07-04, "yes it's that glow"):** build ONE fixed-tick pulse primitive;
-  `glow` = that pulse on an outer amber ring/shadow (not the border colour), reference feel =
-  CampaignMap's `rb-cglow` ~1.8s ease-in-out breathing. Wire `cityNode` + `beaconNode` `current` to
-  it; `actionCard.targeting`'s `pulse` keys off the same primitive. DEV_LOOP_MEMORY #30 tracks the
-  engine build.
-- Worn-part + back-mount DRAW code is engine-side new work (DEV_LOOP_MEMORY #32): part-sprite
-  selection by (race, slot, wear-state) + fallback chain, back-mount behind `legL`.
-- Name-length overflow ("Dwarven Steel Short Sword") unchanged — accepted per Doug, treatment parked.
+- **B18 technique/minion GLYPH icons** — the minion DEPLOY sprites shipped; the technique glyph PNGs
+  (frenzy/flurry/aimed_shot/siphon/barkskin/sacrifice) are still an ASSET_GEN capture pass (CD_STATUS
+  #34.4), not in this drop. Action bar renders the design-font glyph meanwhile — no 404 regression, the
+  imageBind just falls through until the capture lands.
+- **Body-MORPH composition (§7/§17 #15)** — the worn-armor parts are per (race, slot), core-agnostic
+  (except themed); how they compose with per-core figure geometry + the new race build deltas is still
+  the engine/morph question. The art convention proceeds; flagged, not blocking.
+- **Ranger DEX utilization (v6 §E):** Human Ranger's full kit needs DEX 10 but even a healthy Human
+  pool is 9 — so the heavy Aimed Shot lapses at full activation (shown as utilization in the Encounter
+  render). Halfling Ranger fits it exactly. This is the v6 mono-attribute-scaling flag surfacing in UI,
+  not a bug.

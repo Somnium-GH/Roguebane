@@ -23,7 +23,10 @@ globalThis.RB_generateSheets = async function (H, only) {
   const W = 1120, M = 30, FONT_MONO = 'monospace';
 
   // ---- the three sheets ----
-  const BODY = ['human_grunt', 'human_warden', 'human_reaver', 'human_adept', 'human_summoner', 'wraith', 'skeleton', 'bandit', 'ogre', 'troll', 'gargoyle'];
+  const BODY = ['human_grunt', 'human_warden', 'human_barbarian', 'human_reaver', 'human_adept', 'human_summoner', 'wraith', 'skeleton', 'bandit', 'ogre', 'troll', 'gargoyle'];
+  // race-morph comparison row (B17: Human/Elf/Dwarf/Halfling/Half-Giant — dwarf stout+short, halfling
+  // small+swift, half-giant tall; barbarian shown across the morphs)
+  const RACE_ROW = ['human_grunt', 'elf_grunt', 'dwarf_grunt', 'halfling_grunt', 'half_giant_grunt', 'human_barbarian', 'dwarf_barbarian', 'half_giant_barbarian'];
   const partOrder = (a, b) => key(a) - key(b);
   function key(fn) {
     const m = fn.replace('.png', '');
@@ -68,9 +71,11 @@ globalThis.RB_generateSheets = async function (H, only) {
       sub: 'ASSEMBLED COMPOSITES (proto/roster) · MINIONS · GEAR — flat 8-bit sprite tier',
       cw: 196, imgH: 200, gap: 14, pixel: true,
       sections: [
+        { head: 'RACE MORPH — Human · Elf · Dwarf · Halfling · Half-Giant + Barbarian (B17: dwarf stout+short, halfling small+swift, half-giant tall)', root: 'proto/roster/',
+          files: RACE_ROW.map(f => f + '.png') },
         { head: 'ASSEMBLED FIGURES — players + foes (proto/roster)', root: 'proto/roster/',
           files: BODY.map(f => f + '.png') },
-        { head: 'MINIONS (Content/sprites/minion)', root: 'Content/sprites/minion/',
+        { head: 'MINIONS (Content/sprites/minions)', root: 'Content/sprites/minions/',
           files: ['skeleton.png', 'golem.png', 'hound.png', 'imp.png', 'wisp.png'] },
         { head: 'GEAR — WEAPONS & SHIELDS (Content/sprites/gear)', root: 'Content/sprites/gear/',
           files: ['sword.png', 'club.png', 'dagger.png', 'staff.png', 'round_shield.png', 'tower_shield.png'] },

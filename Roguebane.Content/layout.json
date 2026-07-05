@@ -5125,9 +5125,9 @@
         {
           "id": "foeLabel",
           "type": "text",
-          "anchor": "TopLeft",
+          "anchor": "TopRight",
           "offset": [
-            929,
+            -13,
             34
           ],
           "size": [
@@ -5169,10 +5169,10 @@
         {
           "id": "heroHp",
           "type": "panel",
-          "anchor": "TopLeft",
+          "anchor": "BottomLeft",
           "offset": [
             69,
-            321
+            -195
           ],
           "size": [
             132,
@@ -5190,14 +5190,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            69,
-            321
+            0,
+            0
           ],
           "size": [
             132,
             7
           ],
           "z": 5,
+          "parent": "heroHp",
           "binds": "Body.hpLabel",
           "color": "mutedWarm",
           "font": "mono",
@@ -5210,14 +5211,15 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            69,
-            330
+            0,
+            9
           ],
           "size": [
             132,
             6
           ],
           "z": 6,
+          "parent": "heroHp",
           "binds": "Body.hp.points",
           "color": "ink",
           "font": "display",
@@ -5238,14 +5240,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            69,
-            337
+            0,
+            16
           ],
           "size": [
             132,
             7
           ],
           "z": 7,
+          "parent": "heroHp",
           "binds": "Body.hp",
           "color": "parch",
           "font": "mono",
@@ -5276,14 +5279,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            38,
-            54
+            25,
+            0
           ],
           "size": [
             15,
             7
           ],
           "z": 9,
+          "parent": "heroShield",
           "binds": "ShieldPool.count",
           "color": "mintActive",
           "font": "mono",
@@ -5295,14 +5299,15 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            13,
-            63
+            0,
+            9
           ],
           "size": [
             112,
             5
           ],
           "z": 10,
+          "parent": "heroShield",
           "binds": "ShieldPool.points",
           "color": "ink",
           "font": "display",
@@ -5322,14 +5327,15 @@
           "type": "panel",
           "anchor": "TopLeft",
           "offset": [
-            13,
-            71
+            0,
+            17
           ],
           "size": [
             112,
             3
           ],
           "z": 11,
+          "parent": "heroShield",
           "binds": "ShieldPool.regen",
           "color": "ink",
           "fill": "slot",
@@ -5346,14 +5352,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            13,
-            71
+            0,
+            0
           ],
           "size": [
             69,
             2
           ],
           "z": 12,
+          "parent": "heroShieldRegen",
           "binds": "ShieldPool.regenPct",
           "color": "ink",
           "fill": "teal",
@@ -5383,19 +5390,20 @@
           "type": "icon",
           "anchor": "TopLeft",
           "offset": [
-            796,
-            143
+            61,
+            40
           ],
           "size": [
             64,
             64
           ],
           "z": 14,
+          "parent": "foeFigure",
           "binds": "targeting.focus",
           "color": "ink",
           "font": "display",
           "fontPx": 8,
-          "image": "Content/ui/reticle/focus_p1.png",
+          "image": "Content/ui/reticle/focus_p2.png",
           "frames": [
             "ui/reticle/focus_p0",
             "ui/reticle/focus_p1",
@@ -5407,14 +5415,15 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            800,
-            128
+            65,
+            25
           ],
           "size": [
             11,
             11
           ],
           "z": 15,
+          "parent": "foeFigure",
           "binds": "targeting.tags",
           "color": "ink",
           "font": "display",
@@ -5432,10 +5441,10 @@
         {
           "id": "foeHp",
           "type": "panel",
-          "anchor": "TopLeft",
+          "anchor": "BottomRight",
           "offset": [
-            750,
-            321
+            -60,
+            -205
           ],
           "size": [
             150,
@@ -5453,14 +5462,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            750,
-            321
+            0,
+            0
           ],
           "size": [
             150,
             7
           ],
           "z": 17,
+          "parent": "foeHp",
           "binds": "encounter.foe.hpLabel",
           "color": "muted",
           "font": "mono",
@@ -5473,14 +5483,15 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            750,
-            330
+            0,
+            9
           ],
           "size": [
             150,
             6
           ],
           "z": 18,
+          "parent": "foeHp",
           "binds": "encounter.foe.hp.points",
           "color": "ink",
           "font": "display",
@@ -5540,6 +5551,7 @@
             15
           ],
           "z": 20,
+          "parent": "statusStrip",
           "color": "inkWarm",
           "font": "display",
           "fontPx": 11.5,
@@ -5558,6 +5570,7 @@
             8
           ],
           "z": 21,
+          "parent": "statusStrip",
           "binds": "encounter.label",
           "color": "muted",
           "font": "mono",
@@ -5567,9 +5580,9 @@
         {
           "id": "heldBadge",
           "type": "text",
-          "anchor": "TopLeft",
+          "anchor": "Top",
           "offset": [
-            274,
+            -182,
             6
           ],
           "size": [
@@ -5577,6 +5590,7 @@
             16
           ],
           "z": 22,
+          "parent": "statusStrip",
           "binds": "combat.paused",
           "color": "amber",
           "fill": "slot",
@@ -5592,16 +5606,17 @@
         {
           "id": "topControls",
           "type": "panel",
-          "anchor": "TopLeft",
+          "anchor": "Right",
           "offset": [
-            484,
-            4
+            -13,
+            0
           ],
           "size": [
             463,
             20
           ],
           "z": 23,
+          "parent": "statusStrip",
           "color": "ink",
           "font": "display",
           "fontPx": 8
@@ -5611,14 +5626,15 @@
           "type": "list",
           "anchor": "TopRight",
           "offset": [
-            -273,
-            8
+            -260,
+            4
           ],
           "size": [
             203,
             11
           ],
           "z": 24,
+          "parent": "topControls",
           "binds": "run.resources",
           "color": "ink",
           "font": "display",
@@ -5638,14 +5654,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            699,
-            4
+            215,
+            0
           ],
           "size": [
             98,
             20
           ],
           "z": 25,
+          "parent": "topControls",
           "binds": "combat.autoAttack",
           "color": "panelCard",
           "font": "mono",
@@ -5666,14 +5683,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            802,
-            4
+            318,
+            0
           ],
           "size": [
             60,
             20
           ],
           "z": 26,
+          "parent": "topControls",
           "binds": "combat.retreat",
           "color": "parch",
           "font": "mono",
@@ -5694,14 +5712,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            867,
-            4
+            383,
+            0
           ],
           "size": [
             80,
             20
           ],
           "z": 27,
+          "parent": "topControls",
           "binds": "nav.equipment",
           "color": "border",
           "font": "mono",
@@ -5720,10 +5739,10 @@
         {
           "id": "hudFooter",
           "type": "panel",
-          "anchor": "TopLeft",
+          "anchor": "Bottom",
           "offset": [
             0,
-            358
+            0
           ],
           "size": [
             960,
@@ -5769,6 +5788,7 @@
             181
           ],
           "z": 29,
+          "parent": "hudFooter",
           "binds": "Body.pool",
           "color": "ink",
           "border": {
@@ -5788,13 +5808,14 @@
           "anchor": "TopLeft",
           "offset": [
             10,
-            366
+            7
           ],
           "size": [
             79,
             15
           ],
           "z": 30,
+          "parent": "attrPool",
           "color": "inkBright",
           "font": "display",
           "fontPx": 12,
@@ -5806,13 +5827,14 @@
           "anchor": "TopLeft",
           "offset": [
             10,
-            389
+            30
           ],
           "size": [
             309,
             77
           ],
           "z": 31,
+          "parent": "attrPool",
           "binds": "pool",
           "color": "ink",
           "font": "display",
@@ -5830,16 +5852,17 @@
         {
           "id": "poolLegend",
           "type": "text",
-          "anchor": "TopLeft",
+          "anchor": "BottomLeft",
           "offset": [
             10,
-            528
+            -6
           ],
           "size": [
             309,
             6
           ],
           "z": 32,
+          "parent": "attrPool",
           "binds": "pool.legend",
           "color": "mutedWarm",
           "font": "mono",
@@ -5859,6 +5882,7 @@
             181
           ],
           "z": 33,
+          "parent": "hudFooter",
           "binds": "loadout",
           "color": "ink",
           "font": "display",
@@ -5869,14 +5893,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            340,
-            366
+            10,
+            7
           ],
           "size": [
             59,
             15
           ],
           "z": 34,
+          "parent": "actionBar",
           "color": "inkBright",
           "font": "display",
           "fontPx": 12,
@@ -5887,14 +5912,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            340,
-            387
+            10,
+            28
           ],
           "size": [
             433,
             7
           ],
           "z": 35,
+          "parent": "actionBar",
           "color": "parch",
           "font": "mono",
           "fontPx": 5,
@@ -5905,14 +5931,15 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            340,
-            397
+            10,
+            38
           ],
           "size": [
             433,
             136
           ],
           "z": 36,
+          "parent": "actionBar",
           "binds": "loadout.techniques",
           "color": "ink",
           "font": "display",
@@ -5930,16 +5957,17 @@
         {
           "id": "minionGroup",
           "type": "panel",
-          "anchor": "TopLeft",
+          "anchor": "Right",
           "offset": [
-            780,
-            387
+            -10,
+            11
           ],
           "size": [
             170,
             146
           ],
           "z": 37,
+          "parent": "actionBar",
           "color": "ink",
           "border": {
             "color": "borderFaint",
@@ -5957,14 +5985,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            788,
-            387
+            8,
+            0
           ],
           "size": [
             162,
             7
           ],
           "z": 38,
+          "parent": "minionGroup",
           "color": "parch",
           "font": "mono",
           "fontPx": 5,
@@ -5975,14 +6004,15 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            788,
-            397
+            8,
+            10
           ],
           "size": [
             162,
             136
           ],
           "z": 39,
+          "parent": "minionGroup",
           "binds": "loadout.bays",
           "color": "ink",
           "font": "display",
@@ -6037,13 +6067,14 @@
           "anchor": "TopLeft",
           "offset": [
             0,
-            28
+            0
           ],
           "size": [
             249,
             380
           ],
           "z": 1,
+          "parent": "equipPanel",
           "binds": "equipment.scene",
           "color": "ink",
           "font": "display",
@@ -6056,13 +6087,14 @@
           "anchor": "TopLeft",
           "offset": [
             10,
-            34
+            6
           ],
           "size": [
             55,
             14
           ],
           "z": 2,
+          "parent": "equipPanel",
           "color": "inkWarm",
           "font": "display",
           "fontPx": 11,
@@ -6082,13 +6114,14 @@
           "anchor": "Left",
           "offset": [
             75,
-            -59
+            -7
           ],
           "size": [
             120,
             215
           ],
           "z": 3,
+          "parent": "equipPanel",
           "binds": "Body",
           "color": "ink",
           "font": "display",
@@ -6100,13 +6133,14 @@
           "anchor": "TopLeft",
           "offset": [
             196,
-            200
+            172
           ],
           "size": [
             35,
             7
           ],
           "z": 4,
+          "parent": "equipPanel",
           "color": "int",
           "font": "mono",
           "fontPx": 5,
@@ -6118,13 +6152,14 @@
           "anchor": "TopLeft",
           "offset": [
             153,
-            204
+            176
           ],
           "size": [
             41,
             1
           ],
           "z": 5,
+          "parent": "equipPanel",
           "color": "ink",
           "fill": "int",
           "font": "display",
@@ -6136,13 +6171,14 @@
           "anchor": "TopLeft",
           "offset": [
             196,
-            229
+            201
           ],
           "size": [
             35,
             7
           ],
           "z": 6,
+          "parent": "equipPanel",
           "color": "str",
           "font": "mono",
           "fontPx": 5,
@@ -6154,13 +6190,14 @@
           "anchor": "TopLeft",
           "offset": [
             176,
-            233
+            205
           ],
           "size": [
             18,
             1
           ],
           "z": 7,
+          "parent": "equipPanel",
           "color": "ink",
           "fill": "str",
           "font": "display",
@@ -6172,13 +6209,14 @@
           "anchor": "TopLeft",
           "offset": [
             196,
-            257
+            229
           ],
           "size": [
             39,
             7
           ],
           "z": 8,
+          "parent": "equipPanel",
           "color": "gold",
           "font": "mono",
           "fontPx": 5,
@@ -6190,13 +6228,14 @@
           "anchor": "TopLeft",
           "offset": [
             159,
-            261
+            233
           ],
           "size": [
             35,
             1
           ],
           "z": 9,
+          "parent": "equipPanel",
           "color": "ink",
           "fill": "gold",
           "font": "display",
@@ -6208,13 +6247,14 @@
           "anchor": "TopLeft",
           "offset": [
             196,
-            287
+            259
           ],
           "size": [
             35,
             7
           ],
           "z": 10,
+          "parent": "equipPanel",
           "color": "dex",
           "font": "mono",
           "fontPx": 5,
@@ -6226,13 +6266,14 @@
           "anchor": "TopLeft",
           "offset": [
             148,
-            291
+            263
           ],
           "size": [
             46,
             1
           ],
           "z": 11,
+          "parent": "equipPanel",
           "color": "ink",
           "fill": "dex",
           "font": "display",
@@ -6335,14 +6376,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            275,
-            143
+            14,
+            12
           ],
           "size": [
             48,
             13
           ],
           "z": 15,
+          "parent": "inventory",
           "color": "inkBright",
           "font": "display",
           "fontPx": 10.5,
@@ -6353,14 +6395,15 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            267,
-            156
+            6,
+            25
           ],
           "size": [
             419,
             29
           ],
           "z": 16,
+          "parent": "inventory",
           "binds": "inventory.tabs",
           "color": "ink",
           "font": "display",
@@ -6386,14 +6429,15 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            275,
-            185
+            14,
+            54
           ],
           "size": [
             403,
             183
           ],
           "z": 17,
+          "parent": "inventory",
           "binds": "inventory.activeTab.items",
           "color": "ink",
           "font": "display",
@@ -6414,14 +6458,15 @@
           "type": "panel",
           "anchor": "TopLeft",
           "offset": [
-            275,
-            373
+            14,
+            242
           ],
           "size": [
             403,
             15
           ],
           "z": 18,
+          "parent": "inventory",
           "binds": "inventory.activeTab.page",
           "color": "ink",
           "font": "display",
@@ -6432,14 +6477,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            427,
-            373
+            152,
+            0
           ],
           "size": [
             20,
             15
           ],
           "z": 19,
+          "parent": "invPager",
           "binds": "inventory.activeTab.pagePrev",
           "color": "parch",
           "font": "mono",
@@ -6460,14 +6506,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            453,
-            377
+            178,
+            4
           ],
           "size": [
             48,
             7
           ],
           "z": 20,
+          "parent": "invPager",
           "binds": "inventory.activeTab.pageLabel",
           "color": "parch",
           "font": "mono",
@@ -6480,14 +6527,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            507,
-            373
+            232,
+            0
           ],
           "size": [
             20,
             15
           ],
           "z": 21,
+          "parent": "invPager",
           "binds": "inventory.activeTab.pageNext",
           "color": "parch",
           "font": "mono",
@@ -6532,14 +6580,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            714,
-            36
+            10,
+            8
           ],
           "size": [
             51,
             15
           ],
           "z": 23,
+          "parent": "runeBag",
           "color": "ink",
           "font": "display",
           "fontPx": 11.5,
@@ -6558,14 +6607,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            714,
-            56
+            10,
+            28
           ],
           "size": [
             236,
             17
           ],
           "z": 24,
+          "parent": "runeBag",
           "binds": "runes.budget",
           "color": "muted",
           "font": "mono",
@@ -6577,14 +6627,15 @@
           "type": "panel",
           "anchor": "TopLeft",
           "offset": [
-            714,
-            76
+            10,
+            48
           ],
           "size": [
             236,
             8
           ],
           "z": 25,
+          "parent": "runeBag",
           "binds": "runes.budgetPct",
           "color": "ink",
           "fill": "slot",
@@ -6601,14 +6652,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            715,
-            77
+            1,
+            1
           ],
           "size": [
             117,
             6
           ],
           "z": 26,
+          "parent": "runeBudgetBar",
           "binds": "runes.budgetPct",
           "color": "ink",
           "fill": "int",
@@ -6620,14 +6672,15 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            714,
-            91
+            10,
+            63
           ],
           "size": [
             236,
             309
           ],
           "z": 27,
+          "parent": "runeBag",
           "binds": "runeGroups",
           "color": "ink",
           "font": "display",
@@ -6686,6 +6739,7 @@
             15
           ],
           "z": 29,
+          "parent": "statusStrip",
           "color": "inkWarm",
           "font": "display",
           "fontPx": 11.5,
@@ -6704,6 +6758,7 @@
             8
           ],
           "z": 30,
+          "parent": "statusStrip",
           "binds": "core.label",
           "color": "mutedWarm",
           "font": "mono",
@@ -6723,6 +6778,7 @@
             8
           ],
           "z": 31,
+          "parent": "statusStrip",
           "binds": "run.state",
           "color": "good",
           "font": "mono",
@@ -6732,9 +6788,9 @@
         {
           "id": "heldBadge",
           "type": "text",
-          "anchor": "TopLeft",
+          "anchor": "Top",
           "offset": [
-            406,
+            -50,
             6
           ],
           "size": [
@@ -6742,6 +6798,7 @@
             16
           ],
           "z": 32,
+          "parent": "statusStrip",
           "binds": "combat.paused",
           "color": "amber",
           "fill": "slot",
@@ -6767,6 +6824,7 @@
             11
           ],
           "z": 33,
+          "parent": "statusStrip",
           "binds": "run.resources",
           "color": "mutedWarm",
           "font": "mono",
@@ -6784,9 +6842,9 @@
         {
           "id": "closeBtn",
           "type": "text",
-          "anchor": "TopLeft",
+          "anchor": "TopRight",
           "offset": [
-            887,
+            -13,
             4
           ],
           "size": [
@@ -6794,6 +6852,7 @@
             20
           ],
           "z": 34,
+          "parent": "statusStrip",
           "binds": "nav.close",
           "color": "parch",
           "font": "mono",
@@ -6854,13 +6913,14 @@
           "anchor": "TopLeft",
           "offset": [
             0,
-            409
+            1
           ],
           "size": [
             150,
             131
           ],
           "z": 36,
+          "parent": "bottomBand",
           "binds": "core",
           "color": "ink",
           "border": {
@@ -6880,13 +6940,14 @@
           "anchor": "TopLeft",
           "offset": [
             9,
-            417
+            8
           ],
           "size": [
             131,
             14
           ],
           "z": 37,
+          "parent": "currentCore",
           "binds": "core.name",
           "color": "inkBright",
           "font": "display",
@@ -6899,13 +6960,14 @@
           "anchor": "TopLeft",
           "offset": [
             9,
-            434
+            25
           ],
           "size": [
             131,
             7
           ],
           "z": 38,
+          "parent": "currentCore",
           "binds": "core.role",
           "color": "muted",
           "font": "mono",
@@ -6918,13 +6980,14 @@
           "anchor": "TopLeft",
           "offset": [
             9,
-            446
+            37
           ],
           "size": [
             131,
             10
           ],
           "z": 39,
+          "parent": "currentCore",
           "binds": "core.statBonus",
           "color": "ink",
           "font": "display",
@@ -6945,13 +7008,14 @@
           "anchor": "TopLeft",
           "offset": [
             9,
-            461
+            52
           ],
           "size": [
             132,
             17
           ],
           "z": 40,
+          "parent": "currentCore",
           "binds": "core.stats",
           "color": "ink",
           "font": "mono",
@@ -6973,13 +7037,14 @@
           "anchor": "TopLeft",
           "offset": [
             9,
-            483
+            74
           ],
           "size": [
             131,
             40
           ],
           "z": 41,
+          "parent": "currentCore",
           "binds": "core.coreEffect",
           "color": "ink",
           "border": {
@@ -6998,14 +7063,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            16,
-            485
+            7,
+            2
           ],
           "size": [
             124,
             6
           ],
           "z": 42,
+          "parent": "coreEffectBlock",
           "color": "mutedDim",
           "font": "mono",
           "fontPx": 4.5,
@@ -7016,14 +7082,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            16,
-            492
+            7,
+            9
           ],
           "size": [
             124,
             11
           ],
           "z": 43,
+          "parent": "coreEffectBlock",
           "binds": "core.coreEffectName",
           "color": "inkBright",
           "font": "display",
@@ -7035,14 +7102,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            16,
-            506
+            7,
+            23
           ],
           "size": [
             124,
             16
           ],
           "z": 44,
+          "parent": "coreEffectBlock",
           "binds": "core.coreEffectDesc",
           "color": "muted",
           "font": "mono",
@@ -7055,13 +7123,14 @@
           "anchor": "TopLeft",
           "offset": [
             150,
-            409
+            1
           ],
           "size": [
             810,
             131
           ],
           "z": 45,
+          "parent": "bottomBand",
           "binds": "loadout",
           "color": "ink",
           "font": "display",
@@ -7072,14 +7141,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            160,
-            416
+            10,
+            7
           ],
           "size": [
             50,
             13
           ],
           "z": 46,
+          "parent": "actionBar",
           "color": "inkBright",
           "font": "display",
           "fontPx": 10,
@@ -7098,14 +7168,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            160,
-            434
+            10,
+            25
           ],
           "size": [
             613,
             7
           ],
           "z": 47,
+          "parent": "actionBar",
           "binds": "loadout.slotLabel",
           "color": "parch",
           "font": "mono",
@@ -7117,14 +7188,15 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            160,
-            444
+            10,
+            35
           ],
           "size": [
             613,
             89
           ],
           "z": 48,
+          "parent": "actionBar",
           "binds": "loadout",
           "color": "ink",
           "font": "display",
@@ -7142,16 +7214,17 @@
         {
           "id": "minionColumn",
           "type": "panel",
-          "anchor": "TopLeft",
+          "anchor": "Right",
           "offset": [
-            780,
-            434
+            -10,
+            9
           ],
           "size": [
             170,
             99
           ],
           "z": 49,
+          "parent": "actionBar",
           "color": "ink",
           "border": {
             "color": "borderFaint",
@@ -7169,14 +7242,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            788,
-            434
+            8,
+            0
           ],
           "size": [
             162,
             7
           ],
           "z": 50,
+          "parent": "minionColumn",
           "binds": "minions.slotLabel",
           "color": "parch",
           "font": "mono",
@@ -7188,14 +7262,15 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            788,
-            444
+            8,
+            10
           ],
           "size": [
             162,
             89
           ],
           "z": 51,
+          "parent": "minionColumn",
           "binds": "minions",
           "color": "ink",
           "font": "display",
@@ -7281,6 +7356,7 @@
             15
           ],
           "z": 2,
+          "parent": "topStrip",
           "color": "inkWarm",
           "font": "display",
           "fontPx": 11.5,
@@ -7299,6 +7375,7 @@
             8
           ],
           "z": 3,
+          "parent": "topStrip",
           "color": "muted",
           "font": "mono",
           "fontPx": 6,
@@ -7317,6 +7394,7 @@
             11
           ],
           "z": 4,
+          "parent": "topStrip",
           "binds": "run.resources",
           "color": "ink",
           "font": "display",
@@ -7344,6 +7422,7 @@
             8
           ],
           "z": 5,
+          "parent": "topStrip",
           "color": "mutedWarm",
           "font": "mono",
           "fontPx": 6,
@@ -7401,13 +7480,14 @@
           "anchor": "TopLeft",
           "offset": [
             862,
-            248
+            150
           ],
           "size": [
             24,
             7
           ],
           "z": 7,
+          "parent": "chart",
           "color": "parch",
           "font": "mono",
           "fontPx": 5,
@@ -7419,13 +7499,14 @@
           "anchor": "TopLeft",
           "offset": [
             30,
-            282
+            184
           ],
           "size": [
             60,
             7
           ],
           "z": 8,
+          "parent": "chart",
           "binds": "map.current",
           "color": "good",
           "font": "mono",
@@ -7476,14 +7557,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            22,
-            44
+            9,
+            7
           ],
           "size": [
             33,
             11
           ],
           "z": 10,
+          "parent": "supplies",
           "color": "inkBright",
           "font": "display",
           "fontPx": 8.5,
@@ -7494,14 +7576,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            124,
-            46
+            111,
+            9
           ],
           "size": [
             17,
             7
           ],
           "z": 11,
+          "parent": "supplies",
           "binds": "supplies.count",
           "color": "good",
           "font": "mono",
@@ -7513,14 +7596,15 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            22,
-            59
+            9,
+            22
           ],
           "size": [
             119,
             8
           ],
           "z": 12,
+          "parent": "supplies",
           "binds": "supplies.points",
           "color": "ink",
           "font": "display",
@@ -7540,14 +7624,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            22,
-            70
+            9,
+            33
           ],
           "size": [
             119,
             7
           ],
           "z": 13,
+          "parent": "supplies",
           "color": "muted",
           "font": "mono",
           "fontPx": 5,
@@ -7597,14 +7682,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            166,
-            44
+            9,
+            7
           ],
           "size": [
             72,
             11
           ],
           "z": 15,
+          "parent": "musteredSupport",
           "color": "inkBright",
           "font": "display",
           "fontPx": 8.5,
@@ -7615,14 +7701,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            268,
-            46
+            111,
+            9
           ],
           "size": [
             17,
             7
           ],
           "z": 16,
+          "parent": "musteredSupport",
           "binds": "support.count",
           "color": "amber",
           "font": "mono",
@@ -7634,14 +7721,15 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            166,
-            59
+            9,
+            22
           ],
           "size": [
             119,
             8
           ],
           "z": 17,
+          "parent": "musteredSupport",
           "binds": "support.points",
           "color": "ink",
           "font": "display",
@@ -7661,14 +7749,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            166,
-            70
+            9,
+            33
           ],
           "size": [
             119,
             13
           ],
           "z": 18,
+          "parent": "musteredSupport",
           "color": "muted",
           "font": "mono",
           "fontPx": 5,
@@ -7773,14 +7862,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            807,
-            111
+            10,
+            8
           ],
           "size": [
             130,
             11
           ],
           "z": 21,
+          "parent": "castlePanel",
           "color": "inkBright",
           "font": "display",
           "fontPx": 9,
@@ -7791,14 +7881,15 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            807,
-            126
+            10,
+            23
           ],
           "size": [
             130,
             61
           ],
           "z": 22,
+          "parent": "castlePanel",
           "binds": "city.castle.parts",
           "color": "ink",
           "font": "display",
@@ -7846,14 +7937,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            313,
-            44
+            10,
+            7
           ],
           "size": [
             144,
             11
           ],
           "z": 24,
+          "parent": "doomBar",
           "color": "parch",
           "font": "display",
           "fontPx": 9,
@@ -7864,14 +7956,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            545,
-            46
+            242,
+            9
           ],
           "size": [
             103,
             8
           ],
           "z": 25,
+          "parent": "doomBar",
           "binds": "enemy.advance",
           "color": "hit",
           "font": "mono",
@@ -7883,14 +7976,15 @@
           "type": "icon",
           "anchor": "TopLeft",
           "offset": [
-            313,
-            60
+            10,
+            23
           ],
           "size": [
             22,
             22
           ],
           "z": 26,
+          "parent": "doomBar",
           "color": "ink",
           "font": "display",
           "fontPx": 8,
@@ -7909,14 +8003,15 @@
           "type": "panel",
           "anchor": "TopLeft",
           "offset": [
-            341,
-            60
+            38,
+            23
           ],
           "size": [
             277,
             21
           ],
           "z": 27,
+          "parent": "doomBar",
           "color": "ink",
           "fill": "panel",
           "border": {
@@ -7932,14 +8027,15 @@
           "type": "panel",
           "anchor": "TopLeft",
           "offset": [
-            359,
-            61
+            18,
+            1
           ],
           "size": [
             259,
             19
           ],
           "z": 28,
+          "parent": "doomTrack",
           "binds": "enemy.advancePct",
           "color": "ink",
           "border": {
@@ -7958,14 +8054,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            360,
-            61
+            1,
+            0
           ],
           "size": [
             257,
             19
           ],
           "z": 29,
+          "parent": "doomFill",
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -7982,14 +8079,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            338,
-            39
+            -3,
+            -21
           ],
           "size": [
             41,
             41
           ],
           "z": 30,
+          "parent": "doomTrack",
           "color": "ink",
           "font": "display",
           "fontPx": 8,
@@ -8008,14 +8106,15 @@
           "type": "icon",
           "anchor": "TopLeft",
           "offset": [
-            624,
-            59
+            321,
+            22
           ],
           "size": [
             23,
             23
           ],
           "z": 31,
+          "parent": "doomBar",
           "color": "ink",
           "font": "display",
           "fontPx": 8,
@@ -8074,13 +8173,14 @@
           "anchor": "TopLeft",
           "offset": [
             13,
-            519
+            15
           ],
           "size": [
             32,
             7
           ],
           "z": 33,
+          "parent": "footer",
           "color": "mutedDim",
           "font": "mono",
           "fontPx": 5,
@@ -8092,13 +8192,14 @@
           "anchor": "TopLeft",
           "offset": [
             52,
-            515
+            11
           ],
           "size": [
             110,
             15
           ],
           "z": 34,
+          "parent": "footer",
           "binds": "campaign.cities",
           "color": "ink",
           "font": "display",
@@ -8119,13 +8220,14 @@
           "anchor": "TopLeft",
           "offset": [
             169,
-            519
+            15
           ],
           "size": [
             36,
             7
           ],
           "z": 35,
+          "parent": "footer",
           "binds": "campaign.taken",
           "color": "mutedWarm",
           "font": "mono",
@@ -8133,18 +8235,37 @@
           "sample": "2 / 6 TAKEN"
         },
         {
+          "id": "packGroup",
+          "type": "panel",
+          "anchor": "Top",
+          "offset": [
+            46,
+            12
+          ],
+          "size": [
+            186,
+            13
+          ],
+          "z": 36,
+          "parent": "footer",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
           "id": "packLabel",
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            433,
-            519
+            0,
+            3
           ],
           "size": [
             16,
             7
           ],
-          "z": 36,
+          "z": 37,
+          "parent": "packGroup",
           "color": "mutedDim",
           "font": "mono",
           "fontPx": 5,
@@ -8155,14 +8276,15 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            455,
-            516
+            22,
+            0
           ],
           "size": [
             164,
             13
           ],
-          "z": 37,
+          "z": 38,
+          "parent": "packGroup",
           "binds": "Body.gear",
           "color": "ink",
           "font": "display",
@@ -8180,16 +8302,17 @@
         {
           "id": "equipmentBtn",
           "type": "text",
-          "anchor": "TopLeft",
+          "anchor": "Right",
           "offset": [
-            847,
-            513
+            -13,
+            1
           ],
           "size": [
             100,
             20
           ],
-          "z": 38,
+          "z": 39,
+          "parent": "footer",
           "binds": "nav.equipment",
           "color": "parch",
           "font": "mono",
@@ -8266,6 +8389,7 @@
             15
           ],
           "z": 1,
+          "parent": "topBar",
           "color": "inkWarm",
           "font": "display",
           "fontPx": 12,
@@ -8274,9 +8398,9 @@
         {
           "id": "topBarSubtitle",
           "type": "text",
-          "anchor": "Top",
+          "anchor": "TopLeft",
           "offset": [
-            -348,
+            83,
             13
           ],
           "size": [
@@ -8284,6 +8408,7 @@
             8
           ],
           "z": 2,
+          "parent": "topBar",
           "color": "muted",
           "font": "mono",
           "fontPx": 6,
@@ -8321,13 +8446,14 @@
           "anchor": "Left",
           "offset": [
             10,
-            -221
+            -215
           ],
           "size": [
             209,
             15
           ],
           "z": 4,
+          "parent": "racePanel",
           "color": "inkBright",
           "font": "display",
           "fontPx": 12,
@@ -8339,13 +8465,14 @@
           "anchor": "Left",
           "offset": [
             10,
-            5
+            11
           ],
           "size": [
             209,
             423
           ],
           "z": 5,
+          "parent": "racePanel",
           "binds": "races",
           "color": "ink",
           "font": "display",
@@ -8383,13 +8510,14 @@
           "anchor": "Center",
           "offset": [
             0,
-            -221
+            -215
           ],
           "size": [
             476,
             15
           ],
           "z": 7,
+          "parent": "corePanel",
           "color": "inkBright",
           "font": "display",
           "fontPx": 12,
@@ -8401,13 +8529,14 @@
           "anchor": "Center",
           "offset": [
             0,
-            -5
+            1
           ],
           "size": [
             476,
             404
           ],
           "z": 8,
+          "parent": "corePanel",
           "binds": "cores",
           "color": "ink",
           "font": "display",
@@ -8426,16 +8555,17 @@
         {
           "id": "corePager",
           "type": "panel",
-          "anchor": "TopLeft",
+          "anchor": "Bottom",
           "offset": [
-            242,
-            467
+            0,
+            0
           ],
           "size": [
             476,
             29
           ],
           "z": 9,
+          "parent": "corePanel",
           "binds": "cores.page",
           "color": "ink",
           "font": "display",
@@ -8446,14 +8576,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            425,
-            475
+            183,
+            8
           ],
           "size": [
             22,
             17
           ],
           "z": 10,
+          "parent": "corePager",
           "binds": "cores.pagePrev",
           "color": "parch",
           "font": "mono",
@@ -8474,14 +8605,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            454,
-            480
+            212,
+            13
           ],
           "size": [
             52,
             7
           ],
           "z": 11,
+          "parent": "corePager",
           "binds": "cores.pageLabel",
           "color": "parch",
           "font": "mono",
@@ -8494,14 +8626,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            513,
-            475
+            271,
+            8
           ],
           "size": [
             22,
             17
           ],
           "z": 12,
+          "parent": "corePager",
           "binds": "cores.pageNext",
           "color": "parch",
           "font": "mono",
@@ -8555,13 +8688,14 @@
           "anchor": "Right",
           "offset": [
             -11,
-            -221
+            -215
           ],
           "size": [
             207,
             15
           ],
           "z": 14,
+          "parent": "preview",
           "color": "inkBright",
           "font": "display",
           "fontPx": 12,
@@ -8573,13 +8707,14 @@
           "anchor": "Right",
           "offset": [
             -11,
-            -130
+            -124
           ],
           "size": [
             207,
             160
           ],
           "z": 15,
+          "parent": "preview",
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -8600,14 +8735,15 @@
           "type": "figure",
           "anchor": "TopLeft",
           "offset": [
-            743,
-            82
+            1,
+            22
           ],
           "size": [
             205,
             122
           ],
           "z": 16,
+          "parent": "previewStage",
           "binds": "preview.fig",
           "color": "ink",
           "font": "display",
@@ -8618,14 +8754,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            749,
-            67
+            7,
+            7
           ],
           "size": [
             76,
             16
           ],
           "z": 17,
+          "parent": "previewStage",
           "binds": "preview.name",
           "color": "inkBright",
           "font": "display",
@@ -8645,14 +8782,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            749,
-            83
+            7,
+            23
           ],
           "size": [
             56,
             7
           ],
           "z": 18,
+          "parent": "previewStage",
           "binds": "preview.role",
           "color": "parch",
           "font": "mono",
@@ -8673,13 +8811,14 @@
           "anchor": "Right",
           "offset": [
             -11,
-            -25
+            -19
           ],
           "size": [
             207,
             35
           ],
           "z": 19,
+          "parent": "preview",
           "binds": "preview.attrs",
           "color": "ink",
           "font": "display",
@@ -8699,14 +8838,15 @@
           "type": "text",
           "anchor": "Right",
           "offset": [
-            -11,
-            -25
+            0,
+            0
           ],
           "size": [
             41,
             35
           ],
           "z": 20,
+          "parent": "previewAttrRow",
           "binds": "preview.hp",
           "color": "mutedDim",
           "fill": "panel",
@@ -8756,13 +8896,14 @@
           "anchor": "Right",
           "offset": [
             -11,
-            12
+            18
           ],
           "size": [
             207,
             27
           ],
           "z": 21,
+          "parent": "preview",
           "color": "ink",
           "font": "display",
           "fontPx": 8
@@ -8772,14 +8913,15 @@
           "type": "text",
           "anchor": "Right",
           "offset": [
-            -152,
-            12
+            -141,
+            0
           ],
           "size": [
             66,
             27
           ],
           "z": 22,
+          "parent": "previewLayoutRow",
           "binds": "preview.budget",
           "color": "mutedDim",
           "fill": "panelDeep",
@@ -8828,14 +8970,15 @@
           "type": "text",
           "anchor": "Right",
           "offset": [
-            -82,
-            12
+            -71,
+            0
           ],
           "size": [
             66,
             27
           ],
           "z": 23,
+          "parent": "previewLayoutRow",
           "binds": "preview.techniques",
           "color": "mutedDim",
           "fill": "panelDeep",
@@ -8884,14 +9027,15 @@
           "type": "text",
           "anchor": "Right",
           "offset": [
-            -11,
-            12
+            0,
+            0
           ],
           "size": [
             66,
             27
           ],
           "z": 24,
+          "parent": "previewLayoutRow",
           "binds": "preview.bays",
           "color": "mutedDim",
           "fill": "panelDeep",
@@ -8941,13 +9085,14 @@
           "anchor": "Right",
           "offset": [
             -11,
-            53
+            59
           ],
           "size": [
             207,
             39
           ],
           "z": 25,
+          "parent": "preview",
           "binds": "preview.coreEffect",
           "color": "ink",
           "border": {
@@ -8967,14 +9112,15 @@
           "type": "text",
           "anchor": "Right",
           "offset": [
-            -10,
-            38
+            1,
+            -15
           ],
           "size": [
             198,
             7
           ],
           "z": 26,
+          "parent": "previewCoreEffect",
           "color": "mutedDim",
           "font": "mono",
           "fontPx": 5,
@@ -8985,14 +9131,15 @@
           "type": "text",
           "anchor": "Right",
           "offset": [
-            -10,
-            50
+            1,
+            -2
           ],
           "size": [
             198,
             14
           ],
           "z": 27,
+          "parent": "previewCoreEffect",
           "binds": "preview.coreEffectName",
           "color": "inkBright",
           "font": "display",
@@ -9004,14 +9151,15 @@
           "type": "text",
           "anchor": "Right",
           "offset": [
-            -10,
-            66
+            1,
+            14
           ],
           "size": [
             198,
             10
           ],
           "z": 28,
+          "parent": "previewCoreEffect",
           "binds": "preview.coreEffectDesc",
           "color": "mutedWarm",
           "font": "mono",
@@ -9061,16 +9209,17 @@
         {
           "id": "beginBtn",
           "type": "button",
-          "anchor": "TopLeft",
+          "anchor": "Right",
           "offset": [
-            824,
-            506
+            -20,
+            1
           ],
           "size": [
             116,
             25
           ],
           "z": 30,
+          "parent": "confirmBar",
           "binds": "begin",
           "color": "panelDeep",
           "fill": "good",
@@ -9152,6 +9301,7 @@
             8
           ],
           "z": 2,
+          "parent": "header",
           "color": "muted",
           "font": "mono",
           "fontPx": 6,
@@ -9178,6 +9328,7 @@
             24
           ],
           "z": 3,
+          "parent": "header",
           "color": "inkBright",
           "font": "display",
           "fontPx": 19,
@@ -9204,6 +9355,7 @@
             11
           ],
           "z": 4,
+          "parent": "header",
           "binds": "run.resources",
           "color": "ink",
           "font": "display",
@@ -9231,6 +9383,7 @@
             11
           ],
           "z": 5,
+          "parent": "header",
           "binds": "campaign.taken",
           "color": "mutedWarm",
           "font": "mono",
@@ -9291,13 +9444,14 @@
           "anchor": "TopLeft",
           "offset": [
             710,
-            230
+            150
           ],
           "size": [
             120,
             0
           ],
           "z": 7,
+          "parent": "cityGraph",
           "color": "ink",
           "font": "display",
           "fontPx": 8,
@@ -9353,16 +9507,17 @@
         {
           "id": "equipmentBtn",
           "type": "text",
-          "anchor": "TopLeft",
+          "anchor": "Right",
           "offset": [
-            840,
-            508
+            -20,
+            1
           ],
           "size": [
             100,
             20
           ],
           "z": 9,
+          "parent": "footer",
           "binds": "nav.equipment",
           "color": "parch",
           "font": "mono",
@@ -9437,13 +9592,14 @@
           "anchor": "TopLeft",
           "offset": [
             12,
-            37
+            9
           ],
           "size": [
             22,
             22
           ],
           "z": 2,
+          "parent": "factorPanel",
           "color": "ink",
           "font": "display",
           "fontPx": 8,
@@ -9463,13 +9619,14 @@
           "anchor": "TopLeft",
           "offset": [
             40,
-            40
+            12
           ],
           "size": [
             52,
             15
           ],
           "z": 3,
+          "parent": "factorPanel",
           "color": "inkBright",
           "font": "display",
           "fontPx": 12,
@@ -9489,13 +9646,14 @@
           "anchor": "Left",
           "offset": [
             12,
-            -145
+            -141
           ],
           "size": [
             215,
             113
           ],
           "z": 4,
+          "parent": "factorPanel",
           "binds": "merchant.healing",
           "color": "ink",
           "fill": "panel",
@@ -9527,14 +9685,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            23,
-            78
+            11,
+            10
           ],
           "size": [
             37,
             13
           ],
           "z": 5,
+          "parent": "healPanel",
           "color": "inkBright",
           "font": "display",
           "fontPx": 10,
@@ -9545,14 +9704,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            184,
-            81
+            172,
+            13
           ],
           "size": [
             32,
             8
           ],
           "z": 6,
+          "parent": "healPanel",
           "binds": "Body.hp",
           "color": "lockRed",
           "font": "mono",
@@ -9564,14 +9724,15 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            23,
-            96
+            11,
+            28
           ],
           "size": [
             193,
             6
           ],
           "z": 7,
+          "parent": "healPanel",
           "binds": "Body.hp.points",
           "color": "ink",
           "font": "display",
@@ -9591,14 +9752,15 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            23,
-            107
+            11,
+            39
           ],
           "size": [
             193,
             64
           ],
           "z": 8,
+          "parent": "healPanel",
           "binds": "merchant.healing.offers",
           "color": "ink",
           "font": "display",
@@ -9619,13 +9781,14 @@
           "anchor": "Left",
           "offset": [
             12,
-            -12
+            -8
           ],
           "size": [
             215,
             137
           ],
           "z": 9,
+          "parent": "factorPanel",
           "binds": "merchant.provisions",
           "color": "ink",
           "fill": "panel",
@@ -9657,14 +9820,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            23,
-            199
+            11,
+            10
           ],
           "size": [
             47,
             13
           ],
           "z": 10,
+          "parent": "provisionPanel",
           "color": "inkBright",
           "font": "display",
           "fontPx": 10,
@@ -9675,14 +9839,15 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            23,
-            217
+            11,
+            28
           ],
           "size": [
             193,
             98
           ],
           "z": 11,
+          "parent": "provisionPanel",
           "binds": "merchant.provisions.stock",
           "color": "ink",
           "font": "display",
@@ -9720,14 +9885,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            254,
-            37
+            14,
+            9
           ],
           "size": [
             33,
             15
           ],
           "z": 13,
+          "parent": "waresPanel",
           "color": "inkBright",
           "font": "display",
           "fontPx": 12,
@@ -9746,14 +9912,15 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            254,
-            61
+            14,
+            33
           ],
           "size": [
             692,
             384
           ],
           "z": 14,
+          "parent": "waresPanel",
           "binds": "merchant.stock.sections",
           "color": "ink",
           "font": "display",
@@ -9812,6 +9979,7 @@
             15
           ],
           "z": 16,
+          "parent": "statusStrip",
           "color": "inkWarm",
           "font": "display",
           "fontPx": 11.5,
@@ -9830,6 +9998,7 @@
             8
           ],
           "z": 17,
+          "parent": "statusStrip",
           "binds": "merchant.label",
           "color": "muted",
           "font": "mono",
@@ -9849,6 +10018,7 @@
             11
           ],
           "z": 18,
+          "parent": "statusStrip",
           "binds": "run.resources",
           "color": "ink",
           "font": "display",
@@ -9866,9 +10036,9 @@
         {
           "id": "leaveBtn",
           "type": "text",
-          "anchor": "TopLeft",
+          "anchor": "TopRight",
           "offset": [
-            887,
+            -13,
             4
           ],
           "size": [
@@ -9876,6 +10046,7 @@
             20
           ],
           "z": 19,
+          "parent": "statusStrip",
           "binds": "merchant.leave",
           "color": "parch",
           "font": "mono",
@@ -9936,13 +10107,14 @@
           "anchor": "TopLeft",
           "offset": [
             14,
-            517
+            13
           ],
           "size": [
             88,
             11
           ],
           "z": 21,
+          "parent": "footer",
           "color": "muted",
           "font": "display",
           "fontPx": 8.5,
@@ -9951,16 +10123,17 @@
         {
           "id": "pager",
           "type": "panel",
-          "anchor": "TopLeft",
+          "anchor": "Right",
           "offset": [
-            785,
-            514
+            -66,
+            1
           ],
           "size": [
             109,
             17
           ],
           "z": 22,
+          "parent": "footer",
           "binds": "merchant.stock.page",
           "color": "ink",
           "font": "display",
@@ -9971,14 +10144,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            785,
-            514
+            0,
+            0
           ],
           "size": [
             22,
             17
           ],
           "z": 23,
+          "parent": "pager",
           "binds": "merchant.stock.pagePrev",
           "color": "parch",
           "font": "mono",
@@ -9999,14 +10173,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            812,
-            519
+            27,
+            5
           ],
           "size": [
             55,
             8
           ],
           "z": 24,
+          "parent": "pager",
           "binds": "merchant.stock.pageLabel",
           "color": "parch",
           "font": "mono",
@@ -10019,14 +10194,15 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            872,
-            514
+            87,
+            0
           ],
           "size": [
             22,
             17
           ],
           "z": 25,
+          "parent": "pager",
           "binds": "merchant.stock.pageNext",
           "color": "parch",
           "font": "mono",
@@ -10045,16 +10221,17 @@
         {
           "id": "purseNote",
           "type": "text",
-          "anchor": "TopLeft",
+          "anchor": "Right",
           "offset": [
-            907,
-            518
+            -14,
+            1
           ],
           "size": [
             39,
             9
           ],
           "z": 26,
+          "parent": "footer",
           "binds": "run.gold",
           "color": "mutedWarm",
           "font": "mono",

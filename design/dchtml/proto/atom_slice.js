@@ -55,6 +55,29 @@ const RB_TECHS_SYNTH = [ // techniques with NO card on the locked Encounter layo
   ['lunge',     '#82a85e', 266, '➤'], // DEX — darting extension
   ['stoneskin', '#6f8fc4', 396, '⬢'], // INT — living-stone hex plate
 ];
+// v6 kit glyphs with no card on any locked screen (DROP_AUDIT pass 7 FYI / DEV_LOOP #34.4). Same synth
+// pipeline; glyph chars + glyphBg mirror core-kits.js `T` (the design font's render is the source of
+// SHAPE). Two batches of ≤5 at x=6+i*130 — capture each batch to its own screenshot, slice with y:6.
+//   batch A: RB_buildTechChips({ techs: RB_TECHS_V6.slice(0,5), y:6, outDirs, … })
+//   batch B: RB_buildTechChips({ techs: RB_TECHS_V6.slice(5),  y:6, outDirs, … })
+const RB_TECHS_V6 = [
+  ['siphon',     '#6f8fc4', 6,   '◉'], // INT — draining bolt (Adept)
+  ['sacrifice',  '#6a5a48', 136, '❖'], // — (minion cost) — consume a minion to mend (Summoner)
+  ['barkskin',   '#6f8fc4', 266, '❦'], // INT — lesser ward (Summoner/Adept find)
+  ['flurry',     '#82a85e', 396, '⇉'], // DEX — cheap dual-wield flurry (Reaver)
+  ['aimed_shot', '#82a85e', 526, '➶'], // DEX — heavy piercing bow shot (Ranger)  [slug of "Aimed Shot"]
+  ['bind',       '#c2553f', 6,   '⛓'], // STR — raw-sinew ward (Barbarian, B18)   [batch B row start]
+];
+// DUAL-ATTR ("pay in either pool") glyph chips — glyphBg is a 2-colour ARRAY [top, bottom] and the chip
+// gets a hard 50/50 split (STR-red top / DEX-green bottom, NO seam — matches core-kits `glyphFill`). The
+// glyph SHAPE is still lifted from the live-font capture; keying is done against the DARKER half so both
+// bg halves zero out cleanly. Overlay renders these with a matching gradient bg (RB_buildChipOverlay).
+// Batch of 2 at x = 6 + i*130, y:6:
+//   RB_buildTechChips({ techs: RB_TECHS_SPLIT, y:6, outDirs, capture, vw })
+const RB_TECHS_SPLIT = [
+  ['frenzy', ['#c2553f', '#82a85e'], 6,   '⇶'], // STR|DEX — three-arc dual-wield (Reaver)
+  ['flurry', ['#c2553f', '#82a85e'], 136, '⇉'], // STR|DEX — fast dual-wield flurry (Reaver)
+];
 const RB_TECH_Y = 96, RB_TECH_W = 120; // overlay chip row geometry (k=4 of 30px)
 
 async function RB_renderPips(env) {
@@ -88,16 +111,23 @@ async function RB_buildTechChips(env) {
   const { readImage, createCanvas, saveFile, capture, vw } = env;
   const techs = env.techs || RB_TECHS;               // pass RB_TECHS_SYNTH for the reconstructed chips
   const rowY = (env.y == null) ? RB_TECH_Y : env.y;  // synthetic overlay rows start at y=6
+  // outDirs: base dirs each chip is written under as <dir>/icons/technique/<nm>.png. Default is just
+  // the Content source of truth; pass ['Content','drop/Roguebane.Content'] to land straight in the drop.
+  const outDirs = env.outDirs || ['Content'];
   const img = await readImage(capture); const scale = img.width / vw;
   const hexrgb = h => [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)];
   const lum = (r,g,b) => 0.3*r + 0.59*g + 0.11*b;
   const S = 120, CB = 8, INK = '#0a0807', link = 8.5;
   for (const [nm, glyphBg, cx0] of techs) {
+    const split = Array.isArray(glyphBg);                 // dual-attr → [topHex, bottomHex] 50/50 fill
+    const bgColors = split ? glyphBg : [glyphBg];
+    // key the glyph mask against the DARKER half so BOTH bg halves fall to alpha 0 while the dark ink → 1
+    const keyHex = split ? bgColors.slice().sort((a, b) => lum(...hexrgb(a)) - lum(...hexrgb(b)))[0] : glyphBg;
     const sx = Math.round(cx0*scale), sy = Math.round(rowY*scale);
     const cw = Math.round((cx0+RB_TECH_W)*scale) - sx, ch = Math.round((rowY+RB_TECH_W)*scale) - sy;
     const cap = createCanvas(cw, ch); cap.getContext('2d').drawImage(img, sx, sy, cw, ch, 0, 0, cw, ch);
     const data = cap.getContext('2d').getImageData(0,0,cw,ch).data;
-    const bg = hexrgb(glyphBg), lbg = lum(bg[0],bg[1],bg[2]);
+    const bg = hexrgb(keyHex), lbg = lum(bg[0],bg[1],bg[2]);
     const alpha = new Float32Array(cw*ch), dark = new Uint8Array(cw*ch);
     for (let p=0;p<cw*ch;p++){ const i=p*4; let a=(lbg-lum(data[i],data[i+1],data[i+2]))/(lbg-link); a=a<0?0:a>1?1:a; alpha[p]=a; dark[p]=a>0.4?1:0; }
     // flood-fill: remove the chip's own black border (dark pixels connected to an edge)
@@ -113,10 +143,11 @@ async function RB_buildTechChips(env) {
     for (let Y=0;Y<gh;Y++) for (let X=0;X<gw;X++){ const sp=(Y+minY)*cw+(X+minX); const a=border[sp]?0:alpha[sp]; const j=(Y*gw+X)*4; gid.data[j]=10; gid.data[j+1]=8; gid.data[j+2]=7; gid.data[j+3]=Math.round(a*255); }
     gctx.putImageData(gid,0,0);
     const d=createCanvas(S,S); const dx=d.getContext('2d'); dx.imageSmoothingEnabled=false;
-    dx.fillStyle=glyphBg; dx.fillRect(0,0,S,S);
+    if (split) { dx.fillStyle=bgColors[0]; dx.fillRect(0,0,S,S/2); dx.fillStyle=bgColors[1]; dx.fillRect(0,S/2,S,S/2); }
+    else { dx.fillStyle=glyphBg; dx.fillRect(0,0,S,S); }
     dx.drawImage(gC, Math.round((S-gw)/2), Math.round((S-gh)/2));
     dx.fillStyle=INK; dx.fillRect(0,0,S,CB); dx.fillRect(0,S-CB,S,CB); dx.fillRect(0,0,CB,S); dx.fillRect(S-CB,0,CB,S);
-    await saveFile('Content/icons/technique/' + nm + '.png', d);
+    for (const dir of outDirs) await saveFile(dir + '/icons/technique/' + nm + '.png', d);
   }
   return techs.length;
 }
@@ -153,4 +184,4 @@ async function RB_buildNodes(env) {
   }
   return rects.length;
 }
-if (typeof module !== 'undefined' && module.exports) module.exports = { RB_renderPips, RB_buildTechChips, RB_buildNodes, RB_TECHS_SYNTH };
+if (typeof module !== 'undefined' && module.exports) module.exports = { RB_renderPips, RB_buildTechChips, RB_buildNodes, RB_TECHS_SYNTH, RB_TECHS_V6, RB_TECHS_SPLIT };

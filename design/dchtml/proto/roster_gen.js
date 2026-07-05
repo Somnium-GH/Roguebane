@@ -47,16 +47,33 @@ function generateAll(createCanvas) {
     mail: [150,156,168], mailSh: [108,114,126],
     royal: [66,98,160], royalSh: [44,68,118],
     leather: [107,122,74], leatherSh: [74,86,48],
+    hide: [158,118,74], hideSh: [116,84,50],   // barbarian light-medium brown
   };
 
   // ---- RACE: base-body axis (skin/hair ramp + ears + BUILD). A figure = race base × core-rune kit.
-  // Human is the locked baseline; Elf is a permutation (cooler/paler ramp + pointed ears + leaner build).
-  // `ears` = how many px each ear point protrudes past the head edge (0 = none, round human ear).
-  // `slim` = px shaved off torso/shoulder WIDTH, symmetric about mid; arms follow the torso edge so the
-  //          whole upper silhouette narrows. legs/head stay centred on mid. 0 = locked human build.
+  // Human is the locked baseline; every other race is a permutation. Morph axes (all px deltas vs the
+  // locked human build — this is the BODY-MORPH layer, B17 'rip the bandaid off'):
+  // `ears`  = px each ear point protrudes past the head edge (0 human, 1 small point, 2 elf).
+  // `slim`  = px shaved off torso/shoulder WIDTH, symmetric about mid (NEGATIVE = stouter/wider).
+  // `short` = px removed from LEG height (human figs) / added to robe rTop (robe figs) — whole figure
+  //           stands shorter, feet stay planted on the ground line.
+  // `armD`  = px removed from ARM length (keeps knuckles off the ground on short-leg builds).
+  // `headW`/`headH` = px added to head width/height (dwarf +2/−1 wider+shorter; halfling −1/−2 —
+  //           subtle, per the 'not awkwardly' rule). Applies to helmeted heads too (helms fit heads).
   const RACE = {
-    human: { id:'human', skin: C.skin,        skinSh: C.skinSh,       hair: C.hair,      hairSh: C.hairSh,      ears: 0, slim: 0 },
-    elf:   { id:'elf',   skin: [206,200,190],  skinSh: [162,156,146],  hair: [150,128,74], hairSh: [104,84,44],  ears: 2, slim: 2 },
+    human:    { id:'human',    skin: C.skin,        skinSh: C.skinSh,       hair: C.hair,      hairSh: C.hairSh,      ears: 0, slim: 0,  short: 0, armD: 0, headW: 0,  headH: 0 },
+    elf:      { id:'elf',      skin: [206,200,190],  skinSh: [162,156,146],  hair: [150,128,74], hairSh: [104,84,44],  ears: 2, slim: 2,  short: 0, armD: 0, headW: 0,  headH: 0 },
+    // B17 Dwarf — CON affinity: stout heavy build (wider torso), the first true body morph (short
+    // legs), head slightly wider + slightly shorter than human; ruddy skin, ginger hair.
+    dwarf:    { id:'dwarf',    skin: [214,158,112],  skinSh: [168,118,76],   hair: [158,84,40],  hairSh: [110,58,26],  ears: 0, slim: -2, short: 3, armD: 1, headW: 2,  headH: -1 },
+    // B17 Halfling — DEX affinity: small + nimble, elf-like slim build with small ear points and a
+    // shorter head — but WARM skin (explicitly not the elf pallor), chestnut hair.
+    halfling: { id:'halfling', skin: [226,178,122],  skinSh: [182,136,86],   hair: [118,78,42],  hairSh: [82,54,28],   ears: 1, slim: 2,  short: 2, armD: 1, headW: -1, headH: -2 },
+    // B17 Half-Giant — STR affinity: a TALL silhouette (not a re-skinned human) — mainly HEIGHT via the
+    // grow axes: much taller torso (torsoH +10) + longer legs (short −8) and arms (armD −6); only
+    // SLIGHTLY wider (slim −2) with a slightly wider + taller head (headW/headH +1). Weathered olive-tan
+    // giant skin, dark hair.
+    half_giant: { id:'half_giant', skin: [198,176,140], skinSh: [156,136,104], hair: [92,66,40], hairSh: [64,44,26], ears: 0, slim: -1, short: -2, armD: -2, headW: 1, headH: 1, torsoH: 3 },
   };
 
   // ---- low-level grid + painter ----
@@ -311,16 +328,16 @@ function generateAll(createCanvas) {
     const race = o.race || RACE.human;
     const parts = [];
     const layer = (name) => { const g = grid(W, H); parts.push({ name, g }); return g; };
-    const t = o.torso, tw = Math.max(6, t.w - (race.slim || 0)), tL = mid - Math.floor(tw/2), tR = tL + tw - 1, tTop = t.top, tBot = tTop + t.h - 1;
+    const t = o.torso, tw = Math.max(6, t.w - (race.slim || 0)), tL = mid - Math.floor(tw/2), tR = tL + tw - 1, tTop = t.top, tBot = tTop + (t.h + (race.torsoH || 0)) - 1;
     // back (e.g. wings) — behind everything
     if (o.back) { const g = layer('back'); o.back(g, { mid, tL, tR, tTop, tBot, paint, rect, disc, setPx, C }); }
-    // legs + boots
-    const a = o.arm, aTop = tTop + (a.drop || 0), aBot = aTop + a.h - 1;
+    // legs + boots — race morph: `short` shortens legs, `armD` shortens arms (B17 body morph)
+    const a = o.arm, aTop = tTop + (a.drop || 0), aBot = aTop + (a.h - (race.armD || 0)) - 1;
     if (o.legs) {
       const lg = o.legs, half = Math.floor(lg.gap/2);
       const lLx1 = mid - half - 1, lLx0 = lLx1 - lg.w + 1;
       const rRx0 = mid + (lg.gap - half), rRx1 = rRx0 + lg.w - 1;
-      const lTop = tBot + 1, lBot = lTop + lg.h - 1;
+      const lTop = tBot + 1, lBot = lTop + (lg.h - (race.short || 0)) - 1;
       paint(layer('legL'), rect(lLx0, lTop, lLx1, lBot), lg.base, lg.sh);
       paint(layer('legR'), rect(rRx0, lTop, rRx1, lBot), lg.base, lg.sh);
       if (o.boots) {
@@ -337,14 +354,16 @@ function generateAll(createCanvas) {
     paint(layer('armL'), rect(tL - a.w - 1, aTop, tL, aBot), a.base, a.sh);
     paint(layer('armR'), rect(tR, aTop, tR + a.w + 1, aBot), a.base, a.sh);
     const handLx = tL - Math.round((a.w+1)/2), handRx = tR + Math.round((a.w+1)/2), handY = aBot - 1;
-    // head (sunk into torso top by `sink`) + head gear + eyes
-    const h = o.head, hL = mid - Math.floor(h.w/2), hR = hL + h.w - 1;
-    const hBot = tTop + (h.sink != null ? h.sink : 1), hTop = hBot - h.h + 1;
+    // head (sunk into torso top by `sink`) + head gear + eyes — race morph: headW/headH resize the
+    // head box (helmeted heads too — helms fit heads); eyes/ears re-derive from the morphed box
+    const h = o.head, hw = h.w + (race.headW || 0), hh = h.h + (race.headH || 0);
+    const hL = mid - Math.floor(hw/2), hR = hL + hw - 1;
+    const hBot = tTop + (h.sink != null ? h.sink : 1), hTop = hBot - hh + 1;
     const gh = layer('head');
     // race recolours flesh heads (base===C.skin) and adds pointed ears
     const skinHead = (h.base === C.skin);
     const hBase = skinHead ? race.skin : h.base, hSh = skinHead ? race.skinSh : h.sh;
-    const ears = skinHead ? (race.ears || 0) : 0, earY = hTop + Math.floor(h.h * 0.45);
+    const ears = skinHead ? (race.ears || 0) : 0, earY = hTop + Math.floor(hh * 0.45);
     const headMask = (px,py) => {
       if (px>=hL && px<=hR && py>=hTop && py<=hBot) return true;
       if (ears) for (const s of [-1,1]) { const ex = s<0 ? hL : hR;
@@ -356,7 +375,7 @@ function generateAll(createCanvas) {
     paint(gh, headMask, hBase, hSh);
     if (h.gear) h.gear(gh, { mid, hL, hR, hTop, hBot, paint, rect, disc, setPx, C });
     if (h.eye !== false) {
-      const eY = h.eyeY != null ? h.eyeY : hTop + Math.floor(h.h*0.5);
+      const eY = h.eyeY != null ? h.eyeY : hTop + Math.floor(hh*0.5);
       const eC = h.eye || OUT;
       setPx(gh, mid - 3, eY, eC); setPx(gh, mid + 3, eY, eC);
     }
@@ -375,12 +394,12 @@ function generateAll(createCanvas) {
     const legsGeom = o.legs ? (() => { const lg = o.legs, half = Math.floor(lg.gap/2);
       const lLx1 = mid - half - 1, lLx0 = lLx1 - lg.w + 1;
       const rRx0 = mid + (lg.gap - half), rRx1 = rRx0 + lg.w - 1;
-      return { lLx0, lLx1, rRx0, rRx1, top: tBot + 1, bot: tBot + lg.h }; })() : null;
+      return { lLx0, lLx1, rRx0, rRx1, top: tBot + 1, bot: tBot + (lg.h - (race.short || 0)) }; })() : null;
     const geom = { kind: 'human', mid, tL, tR, tTop, tBot,
       arm: { w: a.w, top: aTop, bot: aBot },
       legs: legsGeom,
       head: { hL, hR, hTop, hBot, mask: headMask, eye: h.eye,
-              eyeY: (h.eyeY != null ? h.eyeY : hTop + Math.floor(h.h*0.5)) } };
+              eyeY: (h.eyeY != null ? h.eyeY : hTop + Math.floor(hh*0.5)) } };
     return { W, H, mid, parts, sockets, geom };
   }
 
@@ -390,7 +409,10 @@ function generateAll(createCanvas) {
     const race = o.race || RACE.human;
     const parts = [];
     const layer = (name) => { const g = grid(W, H); parts.push({ name, g }); return g; };
-    const rTop = o.rTop, rHem = o.rHem, topHalf = Math.floor((o.shoulderW - (race.slim||0))/2), botHalf = Math.floor((o.hemW - (race.slim||0))/2);
+    // race morph: `short` raises the robe collar (hem stays planted) so the whole figure stands shorter.
+    // Only POSITIVE short raises it (small races); negative short (giants) would push the head off the
+    // top of the fixed robe canvas, so it's clamped — half-giant casters grow via width + arm length.
+    const rTop = o.rTop + Math.max(0, race.short || 0), rHem = o.rHem, topHalf = Math.floor((o.shoulderW - (race.slim||0))/2), botHalf = Math.floor((o.hemW - (race.slim||0))/2);
     const lX = y => Math.round((mid-topHalf) + ((mid-botHalf)-(mid-topHalf)) * (y-rTop)/(rHem-rTop));
     const rX = y => Math.round((mid+topHalf) + ((mid+botHalf)-(mid+topHalf)) * (y-rTop)/(rHem-rTop));
     // hemTatter: N -> jagged torn hem (deterministic broad tears, depth 0..N px cut up from rHem)
@@ -399,15 +421,16 @@ function generateAll(createCanvas) {
     paint(layer('torso'), (x,y) => y>=rTop && y<=rHem - notch(x) && x>=lX(y) && x<=rX(y), o.base, o.sh);
     const sL = mid - topHalf, sR = mid + topHalf;
     // arms IN FRONT, natural height, inner border touches the robe shoulder
-    const aw = o.armW, aTop = rTop, aBot = rTop + o.armH - 1;
+    const aw = o.armW, aTop = rTop, aBot = rTop + (o.armH - (race.armD || 0)) - 1;
     paint(layer('armL'), rect(sL - aw - 1, aTop, sL, aBot), o.base, o.sh);
     paint(layer('armR'), rect(sR, aTop, sR + aw + 1, aBot), o.base, o.sh);
-    // head/hood
-    const h = o.head, hL = mid - Math.floor(h.w/2), hR = hL + h.w - 1;
-    const hBot = rTop + 2, hTop = hBot - h.h + 1, gh = layer('head');
+    // head/hood — same race headW/headH morph as human()
+    const h = o.head, hw = h.w + (race.headW || 0), hh = h.h + (race.headH || 0);
+    const hL = mid - Math.floor(hw/2), hR = hL + hw - 1;
+    const hBot = rTop + 2, hTop = hBot - hh + 1, gh = layer('head');
     const skinHead = (h.base === C.skin);
     const hBase = skinHead ? race.skin : h.base, hSh = skinHead ? race.skinSh : h.sh;
-    const ears = skinHead ? (race.ears || 0) : 0, earY = hTop + Math.floor(h.h * 0.45);
+    const ears = skinHead ? (race.ears || 0) : 0, earY = hTop + Math.floor(hh * 0.45);
     const headMask = (px,py) => {
       if (px>=hL && px<=hR && py>=hTop && py<=hBot) return true;
       if (ears) for (const s of [-1,1]) { const ex = s<0 ? hL : hR;
@@ -418,7 +441,7 @@ function generateAll(createCanvas) {
     };
     paint(gh, headMask, hBase, hSh);
     if (h.gear) h.gear(gh, { mid, hL, hR, hTop, hBot, paint, rect, disc, setPx, C });
-    const eY = hTop + Math.floor(h.h*0.5);
+    const eY = hTop + Math.floor(hh*0.5);
     setPx(gh, mid-3, eY, h.eye||OUT); setPx(gh, mid+3, eY, h.eye||OUT);
     // front gear (staff)
     if (o.front) { const gf = layer('frontGear'); o.front(gf, { mid, sL, sR, rTop, paint, rect, disc, staff, C }); }
@@ -529,6 +552,21 @@ function generateAll(createCanvas) {
     legs:  { w: 5, h: 10, gap: 3, base: C.dark, sh: C.darkSh },
     boots: { w: 6, h: 3, base: C.darkSh, sh: C.darkSh },
     front: (g, x) => { x.daggerDown(g, x.handLx, x.handY-1, 9); x.daggerDown(g, x.handRx-1, x.handY-1, 9); },
+  });
+  // B15/B18 Barbarian — THE WARLORD: a two-handed-claymore STR core. Bare-headed (hair, no helm) so
+  // the race morph reads strongly (great for the half-giant); hide torso + fur collar, bracered arms.
+  F.barbarian = (race) => human({
+    race,
+    W: 60, H: 84,
+    torso: { w: 21, h: 20, top: 30, base: C.hide, sh: C.hideSh },
+    head:  { w: 13, h: 13, base: C.skin, sh: C.skinSh },
+    arm:   { w: 4, h: 14, base: C.hide, sh: C.hideSh },
+    legs:  { w: 5, h: 9, gap: 3, base: C.hideSh, sh: C.hideSh },
+    boots: { w: 6, h: 3, base: C.dark, sh: C.darkSh },
+    chest: (g, x) => { paint(g, rect(x.tL, x.tTop, x.tR, x.tTop+1), C.tusk, C.tuskSh);   // pale fur collar
+                       paint(g, rect(x.mid-1, x.tTop+3, x.mid+1, x.tBot-2), C.gold, C.goldSh);   // gold-buckled hide lacing
+                       paint(g, rect(x.tL+1, x.tBot-2, x.tR-1, x.tBot-1), C.tuskSh, C.tuskSh); },   // belt
+    front: (g, x) => x.sword(g, x.handLx, x.handY-24, 22),
   });
   F.ranger = (race) => human({
     race,
@@ -747,7 +785,7 @@ function generateAll(createCanvas) {
   // bare → bare healthy — partial coverage is always safe.
   const WORN_TYPES = { str: [METAL, METAL_ORDER], dex: [LEATHER, LEATHER_ORDER], int: [ROBE, ROBE_ORDER] };
   const WORN_SLOTS = { str: ['head','chest','arms','legs'], dex: ['head','chest','arms','legs'], int: ['head','chest'] };
-  const FAVORED_LINE = { grunt:'str', warden:'str', adept:'int', summoner:'int', reaver:'dex', ranger:'dex' };
+  const FAVORED_LINE = { grunt:'str', warden:'str', adept:'int', summoner:'int', reaver:'dex', ranger:'dex', barbarian:'str' };
   // stamp a detail INSIDE an already-painted part (never touches the outline ring or empty px)
   function detail(g, mask, col) {
     for (let y=0;y<g.H;y++) for (let x=0;x<g.W;x++)
@@ -788,6 +826,15 @@ function generateAll(createCanvas) {
       arms:  (g,G,pal,side,r) => { const cy = r.top + Math.floor((r.bot-r.top)/2);
         detail(g, (x,y) => y === r.top+1 || y === cy || y === cy+1, pal.sh); dot(g, Math.floor((r.x0+r.x1)/2), r.top+1, C.dark); },
       legs:  (g,G,pal,side,r) => detail(g, (x,y) => y === r.top+1 || y === r.top+3, pal.sh),
+    },
+    barbarian: {   // B15 Barbarian (str) — savage warlord kit: hide straps + tusk/fur accents over the plate, minimal helm
+      head:  (g,G,pal) => { paint(g, capMask(G, 2), pal.base, pal.sh);
+        for (const x of [G.head.hL+1, G.head.hR-1]) dot(g, x, G.head.hTop+1, C.tusk); },   // tusk crest studs
+      chest: (g,G,pal) => { detail(g, (x,y) => x === G.mid && y >= G.tTop+2 && y <= G.tBot-2, C.wood);   // hide lacing down the center
+        detail(g, (x,y) => (y === G.tTop+1) && x >= G.tL+1 && x <= G.tR-1, C.tusk);                      // fur collar band
+        for (let y = G.tTop+4; y <= G.tBot-2; y += 3) { dot(g, G.tL+2, y, C.tusk); dot(g, G.tR-2, y, C.tusk); } },   // strap rivets
+      arms:  (g,G,pal,side,r) => { detail(g, (x,y) => y === r.top+1, C.tusk); dot(g, Math.floor((r.x0+r.x1)/2), r.bot-1, C.wood); },   // fur shoulder + strap
+      legs:  (g,G,pal,side,r) => { for (let x = r.x0; x <= r.x1; x += 2) dot(g, x, r.top, C.tusk); },   // fur tops
     },
     generic_dex: {   // plain leathers (the cross-equip look on non-dex cores; display "Plain leather" is a NAME — the type token is dex)
       head:  (g,G,pal) => paint(g, capMask(G, 2), pal.base, pal.sh),
@@ -839,10 +886,14 @@ function generateAll(createCanvas) {
   // arm 4×14 (6-wide mask incl. border cols, matching the figure arm masks), leg 5×9; race build
   // permutes width/ears/skin). One grid per sprite; bbox-trimmed on export like every other part.
   function wornGeom(race) {
-    const W = 30, H = 28, mid = 15;
-    const tw = 20 - (race.slim || 0), tL = mid - Math.floor(tw/2), tR = tL + tw - 1, tTop = 4, tBot = tTop + 19;
-    const hL = mid - 6, hR = mid + 6, hTop = 4, hBot = hTop + 12;
-    const ears = race.ears || 0, earY = hTop + Math.floor(13 * 0.45);
+    // spacious canvas (bbox-trimmed on export, so oversize is free) so the tall/wide half-giant deltas
+    // never clip. All positions derive from `mid` + the race grow deltas (torsoH/slim/armD/short/head*).
+    const th = race.torsoH || 0;
+    const W = 40, H = 46, mid = 20;
+    const tw = 20 - (race.slim || 0), tL = mid - Math.floor(tw/2), tR = tL + tw - 1, tTop = 6, tBot = tTop + 19 + th;
+    const hw = 13 + (race.headW || 0), hh = 13 + (race.headH || 0);
+    const hL = mid - Math.floor(hw/2), hR = hL + hw - 1, hTop = 6, hBot = hTop + hh - 1;
+    const ears = race.ears || 0, earY = hTop + Math.floor(hh * 0.45);
     const headMask = (px,py) => {
       if (px>=hL && px<=hR && py>=hTop && py<=hBot) return true;
       if (ears) for (const s of [-1,1]) { const ex = s<0 ? hL : hR;
@@ -852,9 +903,9 @@ function generateAll(createCanvas) {
       return false;
     };
     return { W, H, mid, tL, tR, tTop, tBot,
-      head: { hL, hR, hTop, hBot, mask: headMask, eyeY: hTop + 6 },
-      arm: { x0: 12, x1: 17, top: 4, bot: 17 },
-      leg: { x0: 13, x1: 17, top: 4, bot: 12 } };
+      head: { hL, hR, hTop, hBot, mask: headMask, eyeY: hTop + Math.floor(hh * 0.5) },
+      arm: { x0: mid - 8, x1: mid - 3, top: 6, bot: 6 + 12 + Math.floor(th / 2) - (race.armD || 0) },
+      leg: { x0: mid - 7, x1: mid - 3, top: 6, bot: 6 + 7 - (race.short || 0) } };
   }
   // One armored slot sprite (base coat in the tier palette + theme detailing).
   function wornSlotGrid(race, G, slot, pal, T) {
@@ -930,17 +981,24 @@ function generateAll(createCanvas) {
     grunt: { armL: [C.mail, C.mailSh], armR: [C.mail, C.mailSh], legL: [C.mail, C.mailSh], legR: [C.mail, C.mailSh] },
   };
 
-  // which gear each figure carries, and on which hand socket
+  // which gear each figure carries, and on which hand socket.
+  // PLAYER CORES carry their v6 STARTER KIT (DESIGN_SPEC §7a + the balance-sheet v6 defaults) —
+  // reconciled from the 2026-07-04 layout.json hand-patch (DEV_LOOP #34.3) so a regenerate no longer
+  // reverts them: Grunt longsword+wooden shield · Warden longsword+buckler · Adept staff · Summoner
+  // wand+charm · Reaver twin daggers · Ranger short bow + iron DAGGER (v6: dagger, not short sword).
+  // Monsters keep the old generic gear ids.
   const MOUNTS = {
-    grunt:   [['sword','handL'], ['round_shield','handR']],
-    warden:  [['tower_shield','handR']],
+    grunt:   [['longsword_iron','handL'], ['shield_wooden','handR']],
+    warden:  [['longsword_iron','handL'], ['shield_buckler','handR']],
+    adept:   [['staff_wooden','handR']],
+    summoner:[['wand_adept','handL'], ['charm_wooden','handR']],
+    reaver:  [['dagger_iron','handL'], ['dagger_iron','handR']],
+    ranger:  [['bow_short','handL'], ['dagger_iron','handR']],
+    // B15 Barbarian: a two-handed claymore held at one hand socket (2H render, like the bow) + no shield
+    barbarian:[['claymore_iron','handL']],
     skeleton:[['sword','handL'], ['round_shield','handR']],
-    reaver:  [['dagger','handL'], ['dagger','handR']],
     bandit:  [['dagger','handL'], ['dagger','handR']],
     ogre:    [['club','handR']],
-    adept:   [['staff','handR']],
-    summoner:[['staff','handR']],
-    ranger:  [['bow','handL']],
   };
 
   // ============ MINIONS (summon creatures — single flat-bevel sprites) ============
@@ -1010,7 +1068,7 @@ function generateAll(createCanvas) {
   // SCREENS stub (pre-rename combat/build/runmap/campaign/newrun ids) was a clobber footgun — removed.
 
   // ============ BUILD EVERYTHING ============
-  const RACE_CORES = ['grunt','warden','adept','summoner','reaver','ranger'];   // the 6 player core runes (race × core)
+  const RACE_CORES = ['grunt','warden','adept','summoner','reaver','ranger','barbarian'];   // the 7 player core runes (race × core)
   const MONSTERS   = ['skeleton','bandit','wraith','ogre','troll','gargoyle'];  // standalone foes (no race axis)
   const figuresOut = [];
   const layout = { figures: {}, gear: {} };

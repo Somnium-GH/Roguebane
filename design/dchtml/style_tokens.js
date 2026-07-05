@@ -114,6 +114,26 @@
       card:  { asset: 'ui/frame/card',  slice: [12, 12, 12, 12], repeat: 'tile', centerFill: true },
     },
 
+    // ---- ONE fixed-tick PULSE primitive (LOCKED Doug 2026-07-04 — DEV_LOOP_MEMORY "glow" entry).
+    // Two flags, ONE clock — never build a second pulsing effect:
+    //   `pulse: true` (interactionStates.actionCard.targeting) — breathe the element's state BORDER
+    //     colour between alphaLo→alphaHi (Encounter mock: rb-pulse keyframes).
+    //   `pulse: "self"` (spineCity `current`) — breathe the WHOLE element's alpha; used where a marker
+    //     box would be noise and the icon itself pulses instead (CityMap mock: rb-spulse).
+    //   `glow: true`  (cityNode / beaconNode `current`)       — breathe an OUTER ring + halo BEHIND
+    //     the element; colour = the state's border token (amber on both current states today).
+    // Reference FEEL = CampaignMap's rb-cglow mock: slow ease-in-out breathing, never a blink.
+    // Units: design-space px (dc.html px ÷ 2); alphas 0–1; lo = rest keyframe (0%/100%), hi = peak (50%).
+    pulse: {
+      periodMs: 1800, easing: 'easeInOut', clock: 'fixedTick',
+      border: { alphaLo: 0.45, alphaHi: 1 },
+      glow: {
+        ring: { w: 1.5, alphaLo: 0.4,  alphaHi: 0.73 },
+        halo: { blur: 11, alphaLo: 0,  alphaHi: 0.33 },
+      },
+      self: { alphaLo: 0.45, alphaHi: 1 },
+    },
+
     // ---- INTERACTION STATES (hover/pressed/selected/disabled etc, DESIGN payload v3 "spec them across
     // all interactive elements"). Consolidates patterns the screens ALREADY use ad-hoc into one table so
     // new screens/elements reuse the same grammar instead of re-inventing per-element colour logic.
@@ -176,7 +196,7 @@
       },
       // CityMap beacon-graph nodes (payload B8) — same current/hover language as CampaignMap's
       // cityNode, so both screens share one grammar. `glow` reuses the SAME fixed-tick pulse primitive
-      // as actionCard.targeting's `pulse` flag (see the glow note in DEV_LOOP_MEMORY) — not a separate
+      // as actionCard.targeting's `pulse` flag — spec'd in the `pulse` block above, not a separate
       // effect to build.
       beaconNode: {
         hover:   { border: 'parch' },

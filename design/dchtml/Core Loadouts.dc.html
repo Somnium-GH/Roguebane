@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:#0c0810;}
+</style>
+</helmet>
+<div style="width:1756px;padding:26px 28px 44px;font-family:'IM Fell English',Georgia,serif;background:#0c0810;color:#ece0cb;">
+  <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:4px;">
+    <span style="font-size:27px;letter-spacing:.5px;color:#e9d6b0;">Roguebane</span>
+    <span style="font-size:20px;color:#cdb497;">Core Loadouts</span>
+  </div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:#7f6a52;margin-bottom:22px;">PROTOTYPE · ACTION-BAR REFLOW ACROSS SIX CORES · EQUIPMENT (BUILD) / ENCOUNTER (COMBAT)</div>
+  <div style="display:flex;flex-direction:column;gap:22px;">
+    <sc-for list="{{ cores }}" as="c" hint-placeholder-count="6">
+      <div style="display:flex;gap:20px;align-items:flex-start;">
+        <div style="width:840px;height:472px;overflow:hidden;flex:none;border:1px solid #2a2018;background:#0c0810;">
+          <div style="width:1920px;height:1080px;transform:scale(0.4375);transform-origin:top left;">
+            <dc-import name="Equipment" core="{{ c }}" hint-size="1920px,1080px" style="display:block;width:1920px;height:1080px;"></dc-import>
+          </div>
+        </div>
+        <div style="width:840px;height:472px;overflow:hidden;flex:none;border:1px solid #2a2018;background:#0c0810;">
+          <div style="width:1920px;height:1080px;transform:scale(0.4375);transform-origin:top left;">
+            <dc-import name="Encounter" core="{{ c }}" hint-size="1920px,1080px" style="display:block;width:1920px;height:1080px;"></dc-import>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  /* Comparison gallery — imports the REAL Encounter + Equipment screens once per core so the
+   * action-bar reflow (technique-slot + minion-bay counts) is visible across all six at a glance.
+   * No per-core annotation labels: each screen self-identifies via its own core name / figure —
+   * these panels are the direct correctness reference (CD rule, 2026-07-04). */
+  renderVals() {
+    return { cores: ['grunt', 'warden', 'adept', 'summoner', 'reaver', 'ranger'] };
+  }
+}
+</script>
+</body>
+</html>

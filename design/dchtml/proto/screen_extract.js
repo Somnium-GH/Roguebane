@@ -146,16 +146,24 @@
         h: Math.round(r.height * px2native / DS),
       };
     }
-    function anchorOffset(anchor, rc) {
+    // anchor offset relative to a CONTAINER box (design-space rect). For a top-level element the box
+    // is the whole screen {x:0,y:0,w:designW,h:designH}; for a nested element it is the parent
+    // [data-el]'s design rect — so a grouped child's offset is PARENT-RELATIVE and the whole group
+    // reflows as ONE unit. This is the LAYOUT_CONTRACT §3 NO-ABSOLUTE-POSITIONING invariant
+    // (2026-07-05): an element's position is a pure function of (anchor, offset, parent box, screen
+    // size) and NEVER its raw 1920×1080 pixel coordinate. Negative offset = inset from the box's
+    // right/bottom edge.
+    function anchorOffsetBox(anchor, rc, box) {
       var a = anchor || 'TopLeft', ox, oy;
-      if (/Left/.test(a)) ox = rc.x;
-      else if (/Right/.test(a)) ox = (rc.x + rc.w) - designW;
-      else ox = Math.round(rc.x + rc.w / 2 - designW / 2);     // Top/Bottom/Center
-      if (/Top/.test(a)) oy = rc.y;
-      else if (/Bottom/.test(a)) oy = (rc.y + rc.h) - designH;
-      else oy = Math.round(rc.y + rc.h / 2 - designH / 2);     // Left/Right/Center
+      if (/Left/.test(a)) ox = rc.x - box.x;
+      else if (/Right/.test(a)) ox = (rc.x + rc.w) - (box.x + box.w);
+      else ox = Math.round((rc.x + rc.w / 2) - (box.x + box.w / 2));   // Top/Bottom/Center
+      if (/Top/.test(a)) oy = rc.y - box.y;
+      else if (/Bottom/.test(a)) oy = (rc.y + rc.h) - (box.y + box.h);
+      else oy = Math.round((rc.y + rc.h / 2) - (box.y + box.h / 2));   // Left/Right/Center
       return [ox, oy];
     }
+    var SCREEN_BOX = { x: 0, y: 0, w: designW, h: designH };
     // does el contain a deeper [data-el]? (then it's a panel, not a leaf text node)
     function hasElDescendant(el) { return !!el.querySelector('[data-el]'); }
 
@@ -380,14 +388,20 @@
     rootEl.querySelectorAll('[data-el]').forEach(function (el) {
       var rc = dRect(el);
       var anchor = el.getAttribute('data-anchor') || 'TopLeft';
+      // PARENT-RELATIVE offsets (§3 no-absolute-positioning, 2026-07-05): if this element nests inside
+      // another [data-el], its offset is measured against that PARENT's design box (so the whole group
+      // reflows as one unit) and it emits a `parent` reference. Otherwise it anchors to the screen.
+      var parentEl = el.parentElement ? el.parentElement.closest('[data-el]') : null;
+      var box = parentEl ? dRect(parentEl) : SCREEN_BOX;
       var e = {
         id: el.getAttribute('data-el'),
         type: el.getAttribute('data-type') || (el.hasAttribute('data-container') ? 'list' : (hasElDescendant(el) ? 'panel' : 'text')),
         anchor: anchor,
-        offset: anchorOffset(anchor, rc),
+        offset: anchorOffsetBox(anchor, rc, box),
         size: [rc.w, rc.h],
         z: zRank.get(el),
       };
+      if (parentEl) e.parent = parentEl.getAttribute('data-el');
       var binds = el.getAttribute('data-binds');
       if (binds) e.binds = binds;
       Object.assign(e, visual(el));   // visual() also applies data-shadow/data-frame (applyShadowFrame)
@@ -487,7 +501,8 @@
   // mirror style_tokens.js into the layout.json `style` block (§8)
   function RB_styleBlock(STYLE) {
     return { palette: STYLE.palette, fonts: STYLE.fonts, partStates: STYLE.partStates, pip: STYLE.pip,
-             shadows: STYLE.shadows, frames: STYLE.frames, interactionStates: STYLE.interactionStates };
+             shadows: STYLE.shadows, frames: STYLE.frames, pulse: STYLE.pulse,
+             interactionStates: STYLE.interactionStates };
   }
 
   root.RB_extractScreen = RB_extractScreen;
