@@ -1,5 +1,29 @@
 # Status
 
+## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-04, Doug — Equipment's minion bay renders completely
+## blank; can't enable/disable a minion)
+Doug's screenshot: "MINIONS - 1 / 1 slotted" header is correct, but the card area below is entirely
+empty. **ROOT CAUSE FOUND, same class as the earlier coreStats/waresShelves sizing bugs:** the
+Equipment `buildMinions` list element (`binds:"minions"`) is authored `size:[94,89]` and does NOT
+override `item.size`, so it falls back to `templates.loadoutCard`'s own size **`[131,89]`** — wider
+than the container itself. `ListLayout.Cells`'s horizontal-flow overflow check
+(`Roguebane.Core/Layout/ListLayout.cs`: "cells past the region edge drop") fails on the very FIRST
+cell (`131 > 94`), so it returns ZERO cells — no minion card can ever render here, regardless of how
+many are slotted. Compare `loadoutList` (the TECHNIQUES action bar, same `loadoutCard` template):
+its container is `[681,89]` with `item.size` explicitly re-stated as `[131,89]` — plenty of room for
+~5 cards. `buildMinions` just never got sized for even one. **Fix: widen `buildMinions.size[0]` to
+fit `Bays × (131+gap)`** (matching how `loadoutList` sizes for its technique-bar width) — logged to
+CD (`CLAUDE_DESIGN_issues.md`) since layout.json regenerates externally.
+**Separately, "can't enable or disable minion" is NOT new — it's the same gap already on this file's
+P2/other-bugs list** ("Minions cannot be deactivated and start enabled"). Confirmed by grep: there is
+ZERO click/toggle handling for minion cards anywhere in `Roguebane.Game` — unlike technique cards
+(`_ctrl.CardPress`/`CardRightPress` on the action bar), minions have no interaction wiring at all in
+the shell, and `Minion` (`Roguebane.Core/Minion.cs`) is pure data with no active/enabled state field
+of its own — whatever tracks "is this minion currently summoned" needs identifying/building (check
+`Caster`'s active-tracking, the same place technique `Active`/`Reserve` accounting lives) before a
+click can toggle anything. Don't treat this as a quick wiring fix — the activation MODEL for minions
+needs to exist first, same scope as the P3 default-activation-state work already queued.
+
 ## ⇒ NEW DIRECTIVE — HiFi, HIGH PRIORITY (2026-07-04, Doug): gate must test NON-16:9 resolutions ✅ DONE (2026-07-04 loop)
 `tools/ui_gate.py` now runs every driven pass TWICE: the existing 1920x1080 reference size, plus a
 second pass at 1600x1000 (non-16:9, exercises §13 aspect-fill's DesignW/DesignH extension that the

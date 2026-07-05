@@ -114,6 +114,15 @@ B13. **Merchant `waresShelves` list is ONE PIXEL short of fitting its own author
     3rd wares section (e.g. Minions) vanishes even though the page-count math says it should show
     (Doug: "buy out one category and another appears that was invisible" — that's this). Ask: bump
     `waresShelves.size[1]` to at least 378, ideally 382+ for margin.
+B14. **Equipment `buildMinions` list is sized for ZERO cards, not one.** Element size `[94,89]` with
+    no `item.size` override, so it falls back to `templates.loadoutCard`'s own size `[131,89]` —
+    wider than the container. Our list layout drops any cell that doesn't fully fit, so with a
+    131-wide card and a 94-wide container, NOTHING renders regardless of how many minions are
+    slotted (live screenshot: "MINIONS - 1/1 slotted" header correct, card area totally blank).
+    Compare `loadoutList` (technique action bar, same `loadoutCard` template): container `[681,89]`
+    with `item.size` explicitly `[131,89]` — sized to fit ~5 cards. `buildMinions` needs the same
+    treatment: widen to fit `Bays × (131 + gap)`, matching how the technique bar is sized for its
+    own bay count.
 
 B12. **CLOSED 2026-07-04 — delivered + verified clean (744 files, no cross-product, no "plain",
     0 missing / 0 extra); see Confirm-to-close above. Convention is now canon in LAYOUT_CONTRACT §12a /
