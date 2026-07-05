@@ -69,4 +69,22 @@ public class CoreCampaignTests
             foreach (var core in CoreRunes.Roster)
                 Assert.Equal(CampaignState.Won, RunCampaign(race, core));
     }
+
+    // P3 balance pass [LOCKED 2026-07-04]: the other half of "everyone can activate their default kit"
+    // -- every default-assigned technique must be able to hold ACTIVE at the same time, right off
+    // assembly, with the cumulative SUSTAIN MODEL pool actually accounting for all of them together
+    // (Caster.Activate/Body.Activate silently returns false on a starved pool -- Toggle discards that
+    // bool, so a naive "campaign still wins" check can hide one technique quietly never lighting up).
+    [Fact]
+    public void EveryRaceAndCoreActivatesEveryDefaultTechniqueSimultaneously()
+    {
+        foreach (var race in Races.Roster)
+            foreach (var core in CoreRunes.Roster)
+            {
+                var c = Embark(race, core);
+                foreach (var t in c.Current.Equipment) c.Toggle(t);
+                foreach (var t in c.Current.Equipment)
+                    Assert.True(c.IsActive(t), $"{race.Id}/{core.Id}: {t.Id} failed to activate");
+            }
+    }
 }

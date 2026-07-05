@@ -78,4 +78,22 @@ public class StartingKitTests
                 Assert.Equal(piece, body.ArmorOn(piece.Slot));
         }
     }
+
+    // P3 balance pass [LOCKED 2026-07-04]: every race+core combo must equip its FULL default kit —
+    // Equip/Wield/EquipRanged gate on raw Capacity (§17 SUSTAIN MODEL note), so this is the frailest
+    // race (Elf, Con 7) crossed with every core, not just Human.
+    [Fact]
+    public void EveryRaceAndCoreEquipsItsWholeDefaultKit()
+    {
+        foreach (var race in Races.Roster)
+            foreach (var core in CoreRunes.Roster)
+            {
+                var body = core.NewBody(race, core.NewLoadout());
+                foreach (var piece in core.ArmorKit)
+                    Assert.Equal(piece, body.ArmorOn(piece.Slot));
+                foreach (var weapon in core.WeaponKit)
+                    Assert.True(body.Hands.Contains(weapon) || body.Ranged == weapon,
+                        $"{race.Id}/{core.Id}: {weapon.Id} failed to equip");
+            }
+    }
 }
