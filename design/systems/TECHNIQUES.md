@@ -69,10 +69,9 @@ Shape = (damage × weapon, speed × 8s·timer). Example numbers on Iron Longswor
 
 | Minion | Stat | Reserve | Power / cadence | Rules text |
 |---|---|:--:|:--:|---|
-| Skeleton | INT | 2 | 1 / 2.5s | A raised thrall; fast / weak. |
-| Golem | INT | 3 | 3 / 7.5s | A bound golem; slow / strong. |
-| Hound | DEX | 1 | 1 / 4.0s | A DEX pet; utility effect (evasion/accuracy) pending §17 #5. |
-| T2 minion | — | **OPEN** | stronger tier | Summoner's stronger starter; needs the minion tier ladder (Golem stands in for now). |
+| Skeleton (T1)| INT | 1 | 1 / 3s | A raised thrall; fast / weak. |
+| Iron Golem (T2) | INT | 2 | 3 / 5s | A bound iron golem; slow / strong. |
+| Hound | DEX | 1 | 1 / 4.0s | A DEX pet; Hound will provide an accuracy bonus when active, 5% as a Tier 1 (+5% per Tier for descendants) |
 
 ## Open / TBD
 - **Sacrifice** (consume-a-minion heal) = new mechanic. **Bow damage** OPEN (§17 #9). Technique / minion tier
