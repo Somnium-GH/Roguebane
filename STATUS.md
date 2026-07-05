@@ -162,12 +162,27 @@ already in this file).
   gap. 383/383 green. **P3 fully closed.**
 
 **Other bugs from this same pass, normal priority (not ahead of P1-P3, but don't lose them):**
-- **Techniques start fully charged at encounter start — should need to WARM UP** (start uncharged, on
-  their normal charge timer) rather than being instantly ready.
-- **Minions start ENABLED — should start DISABLED** (they consume a resource; an always-on default is
-  wasteful and wrong). Both of these are instances of the new "default activation state" LOCK in
-  DESIGN_SPEC (nothing charging/active by default, FTL parity) — build them as one consistent pass,
-  don't special-case techniques vs minions differently.
+- ~~Techniques start fully charged at encounter start — should need to WARM UP~~ **HALF DONE (2026-07-04
+  loop):** `Caster.RearmForEncounter()` rewinds every active Timered technique's cooldown and every
+  bayed minion's timer to full at the moment a node resolves into a fight (`Expedition.Enter`), so
+  leftover mid-charge/ready state from the PREVIOUS encounter can no longer buy an instant free
+  discharge in the next one. 385/385 green (2 new Caster tests pin the rewind for both a technique and
+  a minion). **This is the charge-clock half only — see Needs human below for the other half.**
+- **Needs human — the on/off half of this LOCK is genuinely blocked, not just unbuilt:** DESIGN_SPEC
+  says every technique/minion should start NEUTRAL ("off") each encounter, not just uncharged, which
+  reads as "deactivate everything, player re-arms every fight." For TECHNIQUES that's cheap and safe
+  (Deactivate/re-Toggle costs nothing beyond the stat reservation, which already frees on Deactivate) —
+  but it's a real UX change from today's campaign-wide toggle-once model (`CoreCampaignTests`), so
+  it's a judgment call, not just an engine fix. For MINIONS it's worse: `Caster.Summon` spends 1
+  `SummonsLeft` on EVERY successful call, with no "free reactivation" path distinct from a fresh
+  summon — so literally Dismissing a minion at encounter end and re-Summoning it next encounter would
+  silently burn the finite Summons resource every single fight, which can't be the intended design.
+  Making minions truly start "disabled" without that resource bug needs a NEW primitive (an enable/
+  disable bit orthogonal to bay membership, free to flip) that isn't specified yet. Don't guess-build
+  this (CLAUDE.md: no undesigned mechanics) — Doug's call on: (a) do techniques really re-arm EVERY
+  encounter, or does "beginning of an encounter" mean the start of a fresh RUN only (FTL's actual
+  parity — systems stay powered between fights once set); (b) if per-encounter, what's the free
+  minion re-enable primitive.
 
 **Then: all other bugs/debt in this file, business as usual for the loop.**
 
