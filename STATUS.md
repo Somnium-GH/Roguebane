@@ -464,9 +464,9 @@ engine resolution + the armor model. Armor-RED per §6/§6c stands, folded into 
   leaving a ghost in its slot, snaps insertion-style between neighbors, release locks the order; same
   model for minion bays. Supersedes the "mouse is click+hover only" Debt line WHEN BUILT. Assumed
   defaults flagged in §6e (drop-outside cancels; palette-drag equips at insertion point).
-- **Disable cascade [§17 #16 RESOLVED — buildable now]:** highest-requirement-first, ties last-
-  equipped-first; a pure ranking over the live attr level (recovery re-enables cheapest-first
-  automatically). Core-test the ranking exhaustively — thesis-adjacent economy math.
+- ~~Disable cascade [§17 #16 RESOLVED — buildable now]~~ DONE: highest-requirement-first, ties
+  last-equipped-first, cheapest-first recovery all built (`Body.cs`'s `DisabledGear`) and Core-tested
+  exhaustively in `BodyTests.cs`'s three `DisableCascade*` tests.
 - **Paper-doll = capability truth:** DISABLED gear is REMOVED from the render (no dimmed-armor art
   needed — scope savings flagged to CD in B6); a broken arm never draws its weapon; ranged mount
   while melee hands are full = §17 #22 (assumed NOT drawn — don't invent art).
