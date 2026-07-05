@@ -1,27 +1,61 @@
 # Status
 
+## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-05, Doug — the backdrop fix didn't cover everything;
+## header/footer bars stay fixed-width on a wider window, same bug class, different elements)
+Doug's maximize screenshots (NewGame + CityMap) show the header/footer bars NOT stretching to the
+new width at all — blank canvas appears around them — while he confirms "the interface stays locked"
+(cards/panels correctly keep their authored size, that part's fine; it's specifically the full-bleed
+bars that don't extend). **Root cause confirmed by reading `Roguebane.Core/Layout/ScreenLayout.cs`
+directly: `Resolve()` NEVER stretches an element's size — anchors only reposition (which corner pins
+where), the size is always the raw authored `e.Size`, unconditionally, for every element.** The
+backdrop fix (`.scene`-bound elements → `FullCanvasRect`) only special-cased THAT one element type;
+it never touched this general fact, so any OTHER element meant to span an edge has the identical
+problem. Confirmed concretely: `statusStrip` (every screen — grep hit it 3+ times identically:
+`anchor:"Top", offset:[0,0], size:[960,28]`) and `footer` (`anchor:"Bottom", size:[960,36]`) are both
+hardcoded to the BASE design width (960) — on a wider-than-960 canvas they stay exactly 960px wide,
+re-centered (since `Top`/`Bottom` anchors pin the element's horizontal CENTER), leaving blank canvas
+on both sides instead of spanning edge-to-edge. **Fix: extend the same special-case convention used
+for `.scene` elements to also cover `statusStrip`/`footer` — resolve their WIDTH to the current
+`DesignW` (keeping their authored HEIGHT), the same shape of fix, different element set.** Don't
+generalize this to "all Top/Bottom-anchored elements stretch" blindly — there may be other Top/Bottom
+elements that are deliberately narrower than full-bleed; scope the fix to the known full-bar
+elements (statusStrip, footer) by id, matching how `.scene` is keyed by its own bind convention today.
+
 ## ‼ HUMAN DIRECTIVES — 2026-07-05 (Doug — explicit priority order, WINS over everything below,
 ## including the 2026-07-04 block further down; work this list TOP-DOWN)
 
-**P1. Foe part hit-test still resolves overlapping arm/chest hits to the chest — REOPEN, not new.**
-Doug confirms the reticle-follows-cursor fix is excellent, but arm clicks in an encounter still
-register as chest. This is bug #2 of the "three targeting bugs" report (`2a3e864`), which STATUS.md
-marked DONE with the claim that the fix "resolves an overlapping hit to the frontmost part (chest over
-arms)." **That claim is backwards, and the closure was premature.** Checked against the actual data:
-every figure in `Roguebane.Content/layout.json` orders its `z` list `[..., torso, armL, armR, head,
-...]` — torso comes BEFORE the arms. `StageComposer.ComposeFigure` (`Roguebane.Core/Layout/
-StageComposer.cs:36`) draws in ascending `fig.Z` index order, so armL/armR paint AFTER (on top of,
-i.e. in front of) torso, not behind it. `FoePartAt`'s own tie-break (`Game1.cs:770`, "last Z match
-wins = frontmost") should therefore already favor the ARMS over the chest on any rect overlap — the
-exact opposite of what the fix's closing note and commit message assert ("arms sit behind the
-chest"). Whoever closed this had the Z-direction inverted, and nobody could re-verify live (no dotnet
-in this sandbox). Since Doug is now observing the chest winning live, either (a) the Z-tiebreak
-inversion above is real and the fix needs the direction corrected, or (b) the tiebreak is fine but the
-armL/armR rects themselves don't actually cover the clickable arm silhouette (rect-vs-sprite mismatch,
-not a Z bug) — **needs a live click-test with an actual build to tell which**, then fix accordingly.
-Start at `Game1.cs` `FoePartAt` (~line 760-780) and `Roguebane.Core/Layout/StageComposer.cs` (~line
-36); cross-check against `Roguebane.Content/layout.json`'s per-figure `z`/`parts.*.rect` data. See the
-matching reopened bullet in the "three targeting bugs" report below.
+**P1. Foe part hit-test still resolves overlapping arm/chest hits to the chest — investigated
+(2026-07-05 loop), option (a) ruled out headlessly, option (b) narrowed, live click-test still needed.**
+Traced the full path: `FoePartAt` → `CombatTargeting.FoePress` → `Caster.Aim/Discharge/Hit` →
+`frame.Damage(part,...)`. The aim-to-damage pipeline correctly threads whichever part is resolved —
+no bug downstream of the hit-test itself.
+
+On the Z-tiebreak question: **(a) is not the bug.** The comment on the fix this reopened ("arms sit
+behind the chest") was indeed backwards, as this entry originally suspected — `armL`/`armR` paint
+AFTER `torso` in every current figure's `z` list, so `FoePartAt`'s frontmost-wins tie-break already
+favors the arm on any rect overlap, today, in the code as it stands. Rather than trust another static
+read, this was pulled out of the MonoGame shell into a pure, headless-testable function
+(`Roguebane.Core/Layout/FigureHitTest.cs`; `Game1.FoePartAt` now just adapts screen `Rectangle`/`Point`
+into it) and pinned with two new tests in `FigureHitTestTests.cs` that quantify over every figure in
+the real `layout.json` (not named figures — survives CD re-drops per the schema-only test rule):
+every arm/torso rect overlap resolves to `Str` (the arm), and every point in an arm's rect that's
+outside torso's rect also resolves to `Str`. Both pass against current content (391/391 Core.Tests
+green). The stale "arms behind chest" comment in `Game1.cs` was also corrected.
+
+Geometry check across all foe figures: torso/arm rect overlap is a thin ~8px anatomical sliver at
+each shoulder for every figure except `wraith` (56px, ~7x the rest — an outlier, not yet explained;
+could be a genuine `layout.json` authoring inconsistency for CD, or intentional for a robed silhouette
+— not investigated further this pass). Sprite art for `human_grunt`'s arm doesn't bleed past its
+declared rect (checked via PIL alpha bbox), weakening hypothesis (b) for standard humanoids, but this
+was not checked for `wraith` or other large-figure sprites.
+
+**Net: the code's tiebreak logic is now proven correct headlessly for all current figures. If Doug is
+still seeing chest-wins live, the two live suspects left are (1) a stale build — `dotnet build -o
+scratch` can leave old binaries in place if not clean-rebuilt (bit us before, see repo memory) — rebuild
+clean and re-test before assuming a code bug remains; or (2) something only visible in a live click
+(actual `FoeRect()`/box dimensions at runtime, or a foe with unusually large overlap like `wraith`).**
+Needs a live click-test on a freshly clean-built exe to close out; if it reproduces, capture which foe
+and approximate click position so the large-overlap-figure lead can be followed up.
 
 **P2. Merchant screen — presentational + layout, bundled (Doug, 2026-07-05 live look):**
 - **Card borders still not rendering live.** The 2026-07-04 loop marked this FIXED (`DrawTemplateRootChrome`
@@ -111,9 +145,12 @@ blind. Don't rebaseline this without looking first.
    frame for the click-to-aim hit-test, it just never repositions the sprite. DESIGN_SPEC's corrected
    wording stands. **Doug confirmed live (2026-07-05): excellent.**
 2. ~~Hit-test uses a crude 4-band approximation, not real part geometry or Z-order~~ marked DONE here, but
-   **REOPENED (2026-07-05) — see the P1 CORRECTION at the top of this file.** The band-approximation half
-   of the fix is real (removed `PartBand`/`FoePartRect`); the Z-order tie-break half was closed on an
-   inverted premise and Doug is still seeing arm clicks resolve to the chest live.
+   **REOPENED (2026-07-05), investigated further (2026-07-05 loop) — see P1 at the top of this file.**
+   The band-approximation half of the fix is real (removed `PartBand`/`FoePartRect`). The Z-order
+   tie-break half's closing note was indeed backwards as suspected, but the tie-break logic itself is
+   now proven correct headlessly (extracted to `Roguebane.Core/Layout/FigureHitTest.cs`, pinned by
+   `FigureHitTestTests.cs`) for every current figure — so if arm clicks are still resolving to chest,
+   it's not this. See P1 for the live-test suspects left (stale build / wraith-class large overlap).
 3. ~~Targeting/aim state isn't cleared at fight end~~ DONE: `Expedition.Redeploy()`/`Retreat()` now call a
    new `ClearAllAims()` clearing every equipped technique's `Aim` before returning to Choosing. Covered by
    two new headless tests (`RedeployClearsStaleAim`, `RetreatClearsStaleAim`).
