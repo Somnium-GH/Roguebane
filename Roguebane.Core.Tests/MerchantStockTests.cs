@@ -81,4 +81,18 @@ public class MerchantStockTests
         Assert.InRange(techniquesHits, 70, 130);   // ~25% of 400
         Assert.InRange(runesHits, 15, 50);         // ~8% of 400
     }
+
+    // STATUS.md investigation (2026-07-05, "pager doesn't indicate a second page"): rules out the
+    // Core-side stock roll as the cause. A 4-section roll (SectionCount > SectionsPerPage=3, the
+    // Game-side pager threshold) DOES occur across a normal seed sweep -- so a live merchant visit
+    // can and does land a stock that should trigger page 2. If Doug isn't seeing the page-2
+    // indication, the bug is downstream in Game1.ManifestRenderer (pager bind/chrome), not here.
+    [Fact]
+    public void AFourSectionRollOccursAcrossASeedSweepSoThePagerCanBeExercised()
+    {
+        var sawFourSections = false;
+        for (ulong seed = 1; seed <= 400; seed++)
+            if (Roll(seed).SectionCount > 3) { sawFourSections = true; break; }
+        Assert.True(sawFourSections);
+    }
 }
