@@ -153,20 +153,20 @@ public class MinionTests
     public void MinionsListInSummonOrderNotIdOrder()
     {
         var caster = new Caster(IntBody(10), null);
-        Assert.True(caster.Summon(Minions.Golem, minionCap: 3));    // "golem" summoned first...
+        Assert.True(caster.Summon(Minions.IronGolem, minionCap: 3));    // "iron_golem" summoned first...
         Assert.True(caster.Summon(Minions.Skeleton, minionCap: 3)); // ...then "skeleton" (alphabetically earlier)
-        Assert.Equal(new[] { "golem", "skeleton" }, caster.Minions.Select(m => m.Id));
+        Assert.Equal(new[] { "iron_golem", "skeleton" }, caster.Minions.Select(m => m.Id));
     }
 
     [Fact]
     public void DismissCompactsTheMinionOrderLeft()
     {
-        var caster = new Caster(IntBody(10), null); // Golem(3) + Skeleton(2) + Shade(3) = 8 INT
-        caster.Summon(Minions.Golem, minionCap: 3);
+        var caster = new Caster(IntBody(10), null); // IronGolem(2) + Skeleton(1) + Shade(3) = 6 INT
+        caster.Summon(Minions.IronGolem, minionCap: 3);
         caster.Summon(Minions.Skeleton, minionCap: 3);
         caster.Summon(Minions.Shade, minionCap: 3);
 
-        caster.Dismiss(Minions.Golem); // remove the FIRST slot
+        caster.Dismiss(Minions.IronGolem); // remove the FIRST slot
         Assert.Equal(new[] { "skeleton", "shade" }, caster.Minions.Select(m => m.Id));
     }
 
@@ -174,11 +174,11 @@ public class MinionTests
     public void ReorderMinionMovesItWithinTheMinionStrip()
     {
         var caster = new Caster(IntBody(10), null);
-        caster.Summon(Minions.Golem, minionCap: 3);
+        caster.Summon(Minions.IronGolem, minionCap: 3);
         caster.Summon(Minions.Skeleton, minionCap: 3);
 
-        Assert.True(caster.ReorderMinion(Minions.Golem, 1)); // move golem behind skeleton
-        Assert.Equal(new[] { "skeleton", "golem" }, caster.Minions.Select(m => m.Id));
+        Assert.True(caster.ReorderMinion(Minions.IronGolem, 1)); // move golem behind skeleton
+        Assert.Equal(new[] { "skeleton", "iron_golem" }, caster.Minions.Select(m => m.Id));
     }
 
     [Fact]
@@ -186,7 +186,7 @@ public class MinionTests
     {
         var caster = new Caster(IntBody(10), null);
         caster.Summon(Minions.Skeleton, minionCap: 3);
-        Assert.False(caster.ReorderMinion(Minions.Golem, 0)); // never summoned -> no minion slot to move
+        Assert.False(caster.ReorderMinion(Minions.IronGolem, 0)); // never summoned -> no minion slot to move
     }
 
     // §6e minion-membership toggle: the MINIONS tab's equip/unequip. The Summoner fields Skeleton+Golem
@@ -223,11 +223,11 @@ public class MinionTests
     public void DismissMinionFreesTheSlotAndLeavesItResummonable()
     {
         var exp = SummonerExpedition();
-        Assert.True(exp.DismissMinion(Minions.Golem)); // leaves a slot, not removed from any pool
+        Assert.True(exp.DismissMinion(Minions.IronGolem)); // leaves a slot, not removed from any pool
         Assert.Equal(1, exp.MinionCount);
-        Assert.DoesNotContain(Minions.Golem, exp.Minions);
+        Assert.DoesNotContain(Minions.IronGolem, exp.Minions);
 
-        Assert.True(exp.SummonMinion(Minions.Golem)); // kit membership persists -> re-summon works
+        Assert.True(exp.SummonMinion(Minions.IronGolem)); // kit membership persists -> re-summon works
         Assert.Equal(2, exp.MinionCount);
     }
 

@@ -6,19 +6,18 @@ namespace Roguebane.Core.Content;
 // DPS, different lever.
 public static class Minions
 {
-    // Fast/weak: frequent small hits. Timer 25 ticks (2.5s), Power 1 -> ~0.4 dmg/s.
-    public static readonly Minion Skeleton = new("skeleton", Stat.Int, Reserve: 2, Power: 1, Timer: 25,
+    // T1 INT, r1: fast/weak, frequent small hits. Timer 30 ticks (3.0s), Power 1 (v6 sync).
+    public static readonly Minion Skeleton = new("skeleton", Stat.Int, Reserve: 1, Power: 1, Timer: 30,
         Desc: "A raised thrall that strikes for {power} damage every {timer} ticks.");
 
-    // Slow/strong, replaces Shade's role: Timer 100 ticks (10s), Power 4 -> ~0.4 dmg/s.
-    public static readonly Minion Golem = new("golem", Stat.Int, Reserve: 3, Power: 4, Timer: 100,
-        Desc: "A bound golem that hits hard for {power} every {timer} ticks while its reserve holds.");
+    // T2 INT, r2: slow/strong, replaces Shade's role. Timer 50 ticks (5.0s), Power 3 (v6 sync).
+    public static readonly Minion IronGolem = new("iron_golem", Stat.Int, Reserve: 2, Power: 3, Timer: 50,
+        Desc: "A bound iron golem that hits hard for {power} every {timer} ticks while its reserve holds.");
 
-    // DEX-gated pet (§9: DEX = utility/evasion, not raw DPS) — deliberately the weakest per-reserve-
-    // point placeholder; its real distinguishing EFFECT (evasion/accuracy grant, not damage) rides the
-    // minion stat->role pass (§17 #5) as its own slice. Timer 40 ticks (4s), Power 1 -> ~0.25 dmg/s.
+    // T1 DEX pet, r1: Timer 40 ticks (4s), Power 1, +5% accuracy while fielded (TECHNIQUES.md).
     public static readonly Minion Hound = new("hound", Stat.Dex, Reserve: 1, Power: 1, Timer: 40,
-        Desc: "A hound that nips for {power} every {timer} ticks.");
+        AccuracyBonus: 5,
+        Desc: "A hound that nips for {power} every {timer} ticks and sharpens your aim while fielded.");
 
     // Duplicated Skeleton's role with no distinct playstyle now that Golem fills the slow/strong slot
     // (DESIGN_SPEC §9) -- likely retired, NOT yet deleted (Needs human: confirm with Doug first).
@@ -26,5 +25,5 @@ public static class Minions
     public static readonly Minion Shade = new("shade", Stat.Int, Reserve: 3, Power: 2, Timer: 50,
         Desc: "A bound shade that hits hard for {power} every {timer} ticks while its reserve holds.");
 
-    public static readonly IReadOnlyList<Minion> All = new[] { Skeleton, Golem, Hound };
+    public static readonly IReadOnlyList<Minion> All = new[] { Skeleton, IronGolem, Hound };
 }
