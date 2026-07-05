@@ -556,17 +556,12 @@ truth for render + combat). ~~weapons disable-not-drop~~ DONE (2026-07-04 loop, 
 the Body.Damage fall-off is DELETED — a hand item below its reserve stays ASSIGNED, reads
 DISABLED red on the card [HandItemUsable feeds InvCardState], stops answering Consulted, leaves
 the paper-doll render, and re-activates by itself when the stat heals; asserted end to end incl.
-the self-re-activation). REMAINING: cascade ranking
-(BLOCKED on the sustain-model question below); drag-reorder; vestigial pre-run branch retire._
-**‼ NEEDS HUMAN — cascade SUSTAIN MODEL ambiguous, blocking the ranking build:** §6e reads
-"an attribute can't sustain EVERY equipped item" + a ranking with TIE-BREAKS + cheapest-first
-recovery — all load-bearing only under a SUMMED shared-pool demand (level 5 vs two req-3 swords:
-one disables). But §6d locks equip gating "purely by EACH weapon's OWN per-tier STR requirement"
-(individual thresholds) — and under individual thresholds the disable set is trivially
-{req > level}: ranking order never changes membership and ties are cosmetic. Doug: is gear
-sustain (a) SUMMED against the attr pool alongside technique reservations (FTL-power-budget
-style), or (b) individual thresholds (each item vs the post-reservation level)? The ranking's
-Core tests assert economy math — not building it on a guess.
+the self-re-activation). ~~cascade ranking~~ DONE (resolved by P3's SUMMED-shared-pool lock below,
+plus exhaustive ranking coverage in `BodyTests.cs`: `DisableCascadeShedsHighestRequirementFirstAnd
+RecoversCheapestFirst`, `DisableCascadeTiesBreakLastEquippedFirst`,
+`DisableCascadeRanksAcrossHandRangedAndArmorTogether` — highest-requirement-first shedding,
+last-equipped-first ties, and cheapest-first recovery all asserted, 389/389 green). REMAINING:
+drag-reorder (DONE, see P2 above); vestigial pre-run branch retire.
 
 ## ✅ BUILD-BREAKING BUG FIXED (2026-07-03, post-commit 57cc8a6): mgcb crashed on launch
 `dotnet run` failed content build (MGCB exited -532462766 / 0xE0434352 — unhandled CLR exception,
