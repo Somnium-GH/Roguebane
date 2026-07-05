@@ -1,5 +1,53 @@
 # Status
 
+## ‼ HUMAN DIRECTIVES — 2026-07-05 (Doug — explicit priority order, WINS over everything below,
+## including the 2026-07-04 block further down; work this list TOP-DOWN)
+
+**P1. Foe part hit-test still resolves overlapping arm/chest hits to the chest — REOPEN, not new.**
+Doug confirms the reticle-follows-cursor fix is excellent, but arm clicks in an encounter still
+register as chest. This is bug #2 of the "three targeting bugs" report (`2a3e864`), which STATUS.md
+marked DONE with the claim that the fix "resolves an overlapping hit to the frontmost part (chest over
+arms)." **That claim is backwards, and the closure was premature.** Checked against the actual data:
+every figure in `Roguebane.Content/layout.json` orders its `z` list `[..., torso, armL, armR, head,
+...]` — torso comes BEFORE the arms. `StageComposer.ComposeFigure` (`Roguebane.Core/Layout/
+StageComposer.cs:36`) draws in ascending `fig.Z` index order, so armL/armR paint AFTER (on top of,
+i.e. in front of) torso, not behind it. `FoePartAt`'s own tie-break (`Game1.cs:770`, "last Z match
+wins = frontmost") should therefore already favor the ARMS over the chest on any rect overlap — the
+exact opposite of what the fix's closing note and commit message assert ("arms sit behind the
+chest"). Whoever closed this had the Z-direction inverted, and nobody could re-verify live (no dotnet
+in this sandbox). Since Doug is now observing the chest winning live, either (a) the Z-tiebreak
+inversion above is real and the fix needs the direction corrected, or (b) the tiebreak is fine but the
+armL/armR rects themselves don't actually cover the clickable arm silhouette (rect-vs-sprite mismatch,
+not a Z bug) — **needs a live click-test with an actual build to tell which**, then fix accordingly.
+Start at `Game1.cs` `FoePartAt` (~line 760-780) and `Roguebane.Core/Layout/StageComposer.cs` (~line
+36); cross-check against `Roguebane.Content/layout.json`'s per-figure `z`/`parts.*.rect` data. See the
+matching reopened bullet in the "three targeting bugs" report below.
+
+**P2. Merchant screen — presentational + layout, bundled (Doug, 2026-07-05 live look):**
+- **Card borders still not rendering live.** The 2026-07-04 loop marked this FIXED (`DrawTemplateRootChrome`
+  call added to the wareCard stamping path in `Game1.ManifestRenderer.cs`, see the "✅ FIXED (2026-07-04
+  loop) — Merchant wareCards render with no border/chrome" entry further down) and RB_SMOKE ran clean —
+  but smoke only checks text geometry/collision, it never asserts chrome/border pixels are actually
+  drawn, so a clean smoke run proves nothing here. Doug's live look says the borders are still missing.
+  REOPEN: re-check `DrawWarePart`/`DrawTemplateRootChrome` call ordering and z-paint order in the
+  merchant card-stamping path against an actual running build.
+- **Missing a whole row on page 1 of the wares list.** Already root-caused below (see "BUG REPORT — HiFi,
+  HIGH PRIORITY (2026-07-03, Doug — Merchant only shows 2 of 3 wares sections)"): `layout.json`'s
+  `waresShelves` container is sized `[692,377]` but 3 stacked `shopSection` rows need 378px — ONE PIXEL
+  short, so `ListLayout.Cells`'s overflow rule silently drops the whole 3rd row rather than partial-
+  rendering it. Fix already logged to CD (`CLAUDE_DESIGN_issues.md`, ask B13: bump `waresShelves.size[1]`
+  to 378+, margin recommended). Still not landed — this is the same bug Doug is re-confirming, not a new
+  one; don't re-diagnose it, just chase the CD landing.
+- **NEW — the pager doesn't indicate a second page is available.** Not yet root-caused. `MerchantPageCount()`
+  (`Game1.ManifestRenderer.cs:1195`, `Math.Max(1, ceil(MerchantSections().Count / SectionsPerPage))`) and
+  the `>` next-page arrow (`Game1.ManifestRenderer.cs:594`, gated on `_merchantPage < MerchantPageCount()
+  - 1`) look correct on paper for a stock with more than 3 sections (stock can roll up to 4 of 5 sections
+  per `MerchantStock.Roll`) — but Doug is seeing no page-2 indication live. Needs investigation: check
+  whether `MerchantSections()` is actually returning >3 sections when the pager fails to show, whether the
+  `>` arrow's manifest bind/label element renders at all (possible chrome gap, same family as the border
+  bug above), or whether the 1px `waresShelves` row-drop bug above is masking page 2's existence somehow.
+  Flagging fresh, not guessing at a fix — needs a live repro with a >3-section stock.
+
 ## ⇒ CONTENT DRIFT FLAGGED (2026-07-05 loop) — Techniques/minion numbers vs `design/systems/TECHNIQUES.md`
 Doug edited that doc directly this pass (two External commits, no LOCKED marker, no STATUS work-item
 attached) — not chasing a code sync without one, per usual, but noting the drift so whoever picks this
@@ -73,10 +121,9 @@ blind. Don't rebaseline this without looking first.
 ## ‼ HUMAN DIRECTIVES — 2026-07-04 (Doug — explicit priority order, WINS over everything below;
 ## work this block TOP-DOWN before returning to normal-priority bugs/debt)
 
-**P1. Fix the merchant screen** — already logged above/below as two precise bugs, nothing new to add:
-the `waresShelves` 1-pixel-short container dropping the 3rd wares section (CD ask B13), and the
-missing wareCard root border/chrome in the merchant's card-stamping path (pure engine fix, both
-already in this file).
+**P1. Fix the merchant screen** — **superseded by the 2026-07-05 P2 block at the top of this file**
+(same two bugs plus a newly-reported third: the pager not indicating page 2). Work from that entry,
+not this one.
 
 **P2. Fix Equipment/Technique inventory "button" states:**
 - ~~All inventory cards render as if EQUIPPED regardless of real state~~ RESOLVED — see the
