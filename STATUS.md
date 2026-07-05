@@ -494,8 +494,22 @@ engine resolution + the armor model. Armor-RED per §6/§6c stands, folded into 
 - **Paper-doll = capability truth:** DISABLED gear is REMOVED from the render (no dimmed-armor art
   needed — scope savings flagged to CD in B6); a broken arm never draws its weapon; ranged mount
   while melee hands are full = §17 #22 (assumed NOT drawn — don't invent art).
-- **Equipment renders LIVE run state only; the legacy pre-run build branch is vestigial — retire when
-  next touched.** (BEGIN → CityMap; the screen is unreachable pre-run.)
+- **CORRECTION (2026-07-04 loop) — "vestigial pre-run branch" claim above was WRONG, don't retire it:**
+  went to retire `UpdateEquipment`'s `!InRun` branches (`Game1.cs` ~308-410: the Rune Bag climb block,
+  `ToggleTech`'s `_build.Toggle` fallback) since BEGIN → CityMap does mean Equipment is unreachable
+  pre-run in real play (confirmed — only entries are `UpdateChoosing`'s E-key/nav.equipment, both
+  already in-run; the `!InRun` code only fires via the `RB_SMOKESCREEN=equipment` dev shortcut). BUT
+  DESIGN_SPEC §12 (line 706) is explicit: a merchant-bought rune "lands in... rune bag (Climb rules
+  unchanged); slotting stays Equipment's job" — i.e. Climb is SPECED to work in-run, not just pre-run.
+  `Expedition.BuyMark` already stashes bought Marks in-run (`Exp.Stash.Marks`) — but there is NO live
+  `RuneLoadout` on `Campaign`/`Expedition` to climb into: `RuneLoadout` lives only on `BuildSession`,
+  consumed once at `Forge` time when the `Body` is minted, and nothing re-applies a later Climb to an
+  already-minted `Body`. So the REAL gap isn't dead code to delete — it's a genuinely unbuilt Core
+  primitive (a live in-run rune bag + climb-and-reapply-to-Body path). **NEEDS HUMAN**: how should a
+  mid-run Climb affect the already-minted Body — recompute stats/HP live (risk: interacts with current
+  damage/disable state), or bank the climbed rune to apply only on the next leg/embark? Not a guess-build
+  (CLAUDE.md: no undesigned mechanics) — until answered, `!InRun` gating on the Rune Bag UI stays as-is
+  (correctly inert in-run, not "vestigial"), and the dev shortcut that reaches it pre-run stays too.
 - ENGINE ORDER (extends the §6d queue, normal priority, no queue-jump): armor items as data (§6c
   ladders) + gear/armor requirement checks → cascade ranking → state-family render wiring → click
   matrix + auto-displace → drag-reorder → paper-doll gear-state compose. Each slice Core-tested.
@@ -585,7 +599,8 @@ plus exhaustive ranking coverage in `BodyTests.cs`: `DisableCascadeShedsHighestR
 RecoversCheapestFirst`, `DisableCascadeTiesBreakLastEquippedFirst`,
 `DisableCascadeRanksAcrossHandRangedAndArmorTogether` — highest-requirement-first shedding,
 last-equipped-first ties, and cheapest-first recovery all asserted, 389/389 green). REMAINING:
-drag-reorder (DONE, see P2 above); vestigial pre-run branch retire.
+drag-reorder (DONE, see P2 above); in-run rune-bag Climb primitive (Needs Human, see the corrected
+note in the §6e block above — not a "retire dead code" item after all).
 
 ## ✅ BUILD-BREAKING BUG FIXED (2026-07-03, post-commit 57cc8a6): mgcb crashed on launch
 `dotnet run` failed content build (MGCB exited -532462766 / 0xE0434352 — unhandled CLR exception,
