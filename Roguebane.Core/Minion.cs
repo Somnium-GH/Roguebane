@@ -17,6 +17,8 @@ public enum MinionGate { Stat, None, AltCost }
 public sealed record Minion(
     string Id, Stat Stat, int Reserve, int Power, int Timer,
     MinionGate Gate = MinionGate.Stat, int AltCost = 0,
+    int AccuracyBonus = 0, // flat evasion-percent reduction on the caster's hits while fielded
+                           // (Hound: +5, TECHNIQUES.md) — inert (0) for every other minion.
     string Desc = "") // DISPLAY-ONLY card copy (design/01); {power}/{timer} resolve from data at render.
 {
     public string DescText => Desc.Replace("{power}", Power.ToString()).Replace("{timer}", Timer.ToString());

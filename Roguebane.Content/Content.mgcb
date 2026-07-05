@@ -386,6 +386,17 @@
 /processorParam:TextureFormat=Color
 /build:icons/rune/path_minor.png
 
+#begin icons/technique/aimed_shot.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/technique/aimed_shot.png
+
 #begin icons/technique/bandage.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -396,6 +407,28 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:icons/technique/bandage.png
+
+#begin icons/technique/barkskin.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/technique/barkskin.png
+
+#begin icons/technique/bind.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/technique/bind.png
 
 #begin icons/technique/block.png
 /importer:TextureImporter
@@ -474,6 +507,17 @@
 /processorParam:TextureFormat=Color
 /build:icons/technique/firebolt.png
 
+#begin icons/technique/flurry.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/technique/flurry.png
+
 #begin icons/technique/frenzy.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -507,6 +551,17 @@
 /processorParam:TextureFormat=Color
 /build:icons/technique/lunge.png
 
+#begin icons/technique/sacrifice.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/technique/sacrifice.png
+
 #begin icons/technique/shot.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -517,6 +572,17 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:icons/technique/shot.png
+
+#begin icons/technique/siphon.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/technique/siphon.png
 
 #begin icons/technique/stoneskin.png
 /importer:TextureImporter

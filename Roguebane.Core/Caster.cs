@@ -39,7 +39,7 @@ public sealed class Caster
     // (untargeted holds, never falling back to a default front). Engine casters (foe offense, sims)
     // leave it false and keep the default-front auto-fire. Minions and Sustained reserves track the
     // front in BOTH modes — only the per-technique offensive FSM is gated.
-    public Caster(Body self, ICombatTarget? target = null, int maxCharge = 0, bool requireAim = false, int minionCap = 0, int maxSummons = -1)
+    public Caster(Body self, ICombatTarget? target = null, int maxCharge = 0, bool requireAim = false, int minionCap = 0, int maxSummons = -1, bool freeSummons = false)
     {
         _self = self;
         _default = target;
@@ -52,7 +52,12 @@ public sealed class Caster
         // bare unit-test casters stay resource-free.
         MaxSummons = maxSummons < 0 ? int.MaxValue : maxSummons;
         SummonsLeft = MaxSummons;
+        _freeSummons = freeSummons;
     }
+
+    // The Summoner's Core Effect (Conscription, CORE_RUNES.md): fielding a minion never spends the
+    // Summons resource at all — a different mechanic from the old refund-on-Redeploy Legion effect.
+    private readonly bool _freeSummons;
 
     public int MinionCap { get; } // how many minion slots this caster's chassis has (for the render lane)
 
@@ -186,7 +191,8 @@ public sealed class Caster
 
     private int EffectivePower(Technique t) => t.Consults == WeaponUse.None
         ? t.Power
-        : t.Power + _self.Consulted(t).Sum(w => w.Power);
+        : t.Power + (int)Math.Round(
+            _self.Consulted(t).Sum(w => w.Power) * t.DamageMult, MidpointRounding.AwayFromZero);
 
     // DEX haste shortens a technique's cooldown a modest % per point, capped (non-OP). Quoted in
     // ticks at the 10/sec combat clock. Read live so a smashed leg (DEX drop) slows you back down.
@@ -240,6 +246,13 @@ public sealed class Caster
 
     private static Active Reservation(Minion m) => new(m.Id, m.Stat, m.Reserve);
 
+    // A fielded minion's flat evasion-reduction bonus (Hound: +5%, TECHNIQUES.md) — summed across
+    // every minion that is actually firing (idle stat-gated minions contribute nothing), applied
+    // against the DEFENDER'S evasion roll in Hit() below.
+    private int AccuracyBonus => _minions
+        .Where(m => m.Gate != MinionGate.Stat || _self.IsActive(Reservation(m)))
+        .Sum(m => m.AccuracyBonus);
+
     // Summon a minion into a free slot: capped by the chassis's minion capacity, paid per its GATE — a stat
     // reservation (default), nothing (chassis-granted), or a one-off charge cost (alt-cost caster).
     // §9: a FRESH summon costs BOTH — 1 SUMMONS (the finite deploy resource, uniform across gates) and
@@ -258,7 +271,7 @@ public sealed class Caster
             case MinionGate.AltCost: break;
             default: if (!_self.Activate(Reservation(minion))) return false; break;
         }
-        SummonsLeft--;
+        if (!_freeSummons) SummonsLeft--; // Conscription: Summoner's minions never spend Summons
         _minions.Add(minion); // §6e ORDERING: click slots into the first free slot -> append
         _minionCountdown[minion.Id] = minion.Timer; // fresh summon starts charging, same as a technique
         return true;
@@ -382,7 +395,8 @@ public sealed class Caster
         bool subtract = false)
     {
         var frame = target.Frame;
-        if (frame is not null && _rng is not null && _rng.Chance(frame.EvasionPercent()))
+        if (frame is not null && _rng is not null &&
+            _rng.Chance(Math.Max(0, frame.EvasionPercent() - AccuracyBonus)))
             return; // dodged
 
         // §6b shields are the ONLY damage mitigation now (alongside a full evade above): points absorb

@@ -105,7 +105,7 @@ public class WandTests
         var c = new Caster(body, foe, maxCharge: 3);
         var charge0 = c.Charge;
         Assert.True(c.Activate(Armory.Shot));
-        for (var i = 0; i < 3; i++) c.Step(); // Shot: timered cd 3
+        for (var i = 0; i < 70; i++) c.Step(); // Shot: cd 80, 12% haste (6 DEX) -> 70
 
         Assert.Equal(99, foe.Hp);                 // 1 landed THROUGH 5 shield points
         Assert.Equal(5, foe.Frame!.ShieldPoints); // full bypass, pool untouched

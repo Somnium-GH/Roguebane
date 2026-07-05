@@ -23,6 +23,8 @@ public sealed record Technique(
     TechniqueKind Kind,
     int Cooldown,
     int Power,
+    double DamageMult = 1.0, // weapon-consulting only: multiplies the SUM of consulted weapon power
+                              // (the "verb" scaling — Jab .5x, Cleave 1.5x...). Inert when Consults is None.
     int ChargeCost = 0,
     WeaponUse Consults = WeaponUse.None,
     bool Heals = false, // a REPAIR technique: on discharge it mends the caster's own most-damaged part

@@ -40,7 +40,11 @@ Per run:
    next target. Any NEW Needs-CD finding goes BOTH places in the same pass: the STATUS line AND a
    relay-ready item appended to `outputs/CLAUDE_DESIGN_issues.md` (the standing CD outbox — one entry
    per item, cold-start context, concrete ask). Items clear from that file only when verified LANDED
-   in the repo, never on "sent". Keeping the outbox current is part of DONE. Keep STATUS LEAN (prune resolved/stale lines). If the slice changed LOCKED design, also
+   in the repo, never on "sent". Keeping the outbox current is part of DONE. CONVERSELY, when this slice
+   implements the engine consumer for something CD's dev-memory (`DEV_LOOP_MEMORY`) opened as
+   ENGINE-PENDING, record the closure in `CD_CLOSED_ITEMS.md` (repo-root — the REVERSE of the outbox; CD
+   reads it in the repo to confirm-to-close + clear its own dev-memory): CD item # · what shipped ·
+   `file:symbol` evidence · date. That file is a DURABLE confirmation log, not a work queue. Keep STATUS LEAN (prune resolved/stale lines). If the slice changed LOCKED design, also
    reconcile `design/DESIGN_SPEC.md` (the canon). PUSH the commit when you can (remote reachable); never
    force-push. If the step-1 pull or the push hits a CONFLICT you can't resolve cleanly, park it in
    "Needs human" rather than forcing. Then STOP — one task done.

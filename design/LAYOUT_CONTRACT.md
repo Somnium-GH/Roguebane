@@ -70,6 +70,24 @@ For each screen, emit `screens.<id>`:
   **spreads to fill any aspect** — no bars.
 - `binds` = the Core state the element reads (advisory; the game wires it).
 
+**NO ABSOLUTE POSITIONING [required invariant — resolution-independence].** An element's on-screen
+position must be a pure function of (its `anchor`, its design-px `offset`, its parent box, screen size) —
+NEVER its raw pixel coordinate on the fixed 1920×1080 authoring stage. Concretely: (1) every positioned
+element carries an EXPLICIT `anchor` (one of the 9 above) OR is nested in a parent container and positioned
+RELATIVE to that parent (the parent anchors; children ride it) — no element defaults its anchor or depends
+on where it "lands" at 1920×1080; a right/bottom/center element emits `Right`/`Bottom`/`Center` (etc.) + a
+small edge-relative offset, NOT a ~900px top-left absolute. (2) Grouped elements (a panel + its contents, a
+readout + its pips, a card's innards) are authored as true parent→child containment (§7 container/template,
+or §12 element `parts[]` with element-local rects) so the group reflows as ONE unit — never as sibling
+stage-absolutes. (3) Fixed design-px `size` is fine (it scales with the uniform design→screen factor);
+absolute stage-px POSITION is not. The failure mode this bans: a layout that lines up only at exactly
+1920×1080 and then drifts / gaps / overlaps at larger or off-aspect resolutions (2300px+ especially) — e.g.
+a foe's HP bar + targeting reticle emitted `TopLeft`-absolute while its figure is `BottomRight`, so the
+reticle detaches from the foe as the window grows. SELF-VERIFY before shipping any screen by re-rendering at
+a non-1920×1080 size (≥1 larger + ≥1 off-aspect) and confirming zero drift — same discipline as the NO-DRIFT
+re-diff (§9). (Engine's half: the anchor/scale interpreter that consumes this — an OUR-side concern; this
+invariant governs what the manifest must EMIT.)
+
 ## 4. Determinism
 Every on-screen position is a pure function of (manifest, figure→slot scale, screen size). Same
 manifest ⇒ identical layout on any monitor. A screenshot matches the mockup BY CONSTRUCTION — the

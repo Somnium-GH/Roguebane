@@ -178,6 +178,73 @@ B19. **CANON RENAME (2026-07-05, Doug) — "bay(s)" is retired as the minion-slo
     class of ask as the earlier B6 vocabulary rename. Our renderer's bind-key literals wait for this
     drop to land before renaming in lockstep (avoids breaking the live binding mid-flight).
 
+**2026-07-05 — STRUCTURAL directive (Doug): eradicate absolute positioning. This applies to EVERY
+screen, not a single asset — please treat it as a standing correctness rule, not a one-off fix.**
+
+B21. **ABSOLUTE POSITIONING IN THE MANIFEST — the resolution-scaling bug. Eradicate it everywhere.**
+    **[STATUS 2026-07-05 — CD dev-memory #35 reports this ADDRESSED: `proto/screen_extract.js` now emits a
+    `parent` field, all 6 screens re-anchored, re-extract shows 0 baked-absolute suspects, self-checked via
+    `proto/resolve_check.html` at 4 sizes. NOT yet landed in our repo (current `layout.json` still shows the
+    baked absolutes below) → VERIFY-to-close on the next drop. The residual — recursive parent-box
+    resolution in the interpreter — is engine/OURS, and must land before/with that drop or every parented
+    child mis-places. Original ask kept below for the audit trail.]**
+    Symptom Doug is hitting: screens line up at exactly 1920×1080 but DRIFT, GAP, and OVERLAP as the
+    window grows past 1080 — badly at 2300px+ and at any off-16:9 aspect. Root cause is baked into the
+    emitted manifest: **elements that visually belong to the RIGHT / BOTTOM / CENTER are anchored
+    `TopLeft` and given a large ABSOLUTE offset**, so their on-screen position is only correct at the
+    2×-design size they were authored at. The offset should be relative to the zone the element lives in;
+    instead it's a raw top-left pixel coordinate that the engine can't reflow.
+
+    Evidence (`encounter`, current `layout.json`, design space 960×540):
+    - `foeLabel` — anchor `TopLeft`, offset `[929,34]`. It's the "Foe" title on the RIGHT edge (the
+      dc.html authored it `right:26px`). Correct is `TopRight`, offset ≈ `[-31,34]`.
+    - The whole foe cluster — `foeHp [750,321]`, `foeHpPips [750,330]`, `foeReticle [796,143]`,
+      `foeAimTags [800,128]` — is all `TopLeft`-absolute, while `foeFigure` (the SAME foe) is correctly
+      `BottomRight [-45,-217]`. So above 1080 the foe's figure sticks to the right edge but its HP bar and
+      the TARGETING RETICLE slide toward center-left and detach from the foe. That reticle-off-the-enemy
+      drift is baked into the data, not an engine glitch.
+    - Top-right combat controls `autoAttackBtn [699,4]` / `retreatBtn [802,4]` / `equipmentBtn [867,4]`,
+      and the action bar's minion column `minionGroup` / `bayGroupLabel` / `bayList [~785,387]` — same
+      class: `TopLeft`-absolute where they belong to the right. `poolLegend [10,528]` belongs to the bottom.
+    - Containment is also lost: `heroHp` / `heroHpLabel` / `heroHpPips` / `heroHpValue` are four separate
+      `TopLeft` siblings all at ~`[69,32x]` instead of ONE anchored `heroHp` container with its labels
+      positioned RELATIVE to it. Children don't ride their parent, so the stack shears apart as the frame
+      grows. Same shape on `foeHp*` and `heroShield*`.
+
+    **The fix (apply to every screen — `encounter` is worst, but they all carry it):**
+    1. **Anchor every positioned element to the zone it belongs to.** Author an explicit `data-anchor`
+       (one of the 9: TopLeft/Top/TopRight/Left/Center/Right/BottomLeft/Bottom/BottomRight) on EVERY
+       element — never let the extractor default to TopLeft. The dc.html already encodes the intent via
+       `right:` / `bottom:` / `translateX(-50%)` / nesting; make the extraction honor it (or annotate it)
+       so a right-edge element emits `Right`/`TopRight`/`BottomRight` + a small EDGE-RELATIVE offset, not
+       a ~900px top-left absolute.
+    2. **Emit grouped children RELATIVE to their parent, not as stage-absolute siblings.** A panel + its
+       labels, an HP readout + its pips, a card + its innards → author as real parent→child containment
+       (§7 container/template, or §12 element `parts[]` with element-local rects). The parent anchors once;
+       the children live inside it and reflow as ONE unit.
+    3. **No element may depend on its incidental 1920×1080 pixel position.** After re-extraction, every
+       element's position must be a pure function of (anchor, offset, parent box, screen size) — the §4
+       determinism promise, actually honored.
+    4. **Self-verify before shipping:** re-render each screen at a size OTHER than 1920×1080 — at minimum
+       one larger (e.g. 2560×1440) and one off-aspect (e.g. 2560×1080) — and confirm zero drift / gaps /
+       overlap. A screen that only lines up at 1920×1080 is not done.
+
+    **Add this to your CLAUDE.md / dev-loop guide as a permanent invariant so it can't recur:**
+    > **No absolute positioning (resolution-independence).** A screen element's position must be a pure
+    > function of its anchor, its design-px offset, its parent box, and the screen size — NEVER its raw
+    > pixel coordinate on the fixed 1920×1080 authoring stage. Every positioned element gets an explicit
+    > `data-anchor` (one of the 9 anchors) OR is nested in a parent and positioned relative to it; no
+    > element defaults its anchor or relies on where it "lands" at 1920×1080. Grouped elements (panel +
+    > contents, readout + pips, card innards) are authored as true parent→child containment so the group
+    > reflows as one unit — never as sibling stage-absolutes. Before shipping a screen, re-render it at a
+    > non-1920×1080 size (≥1 larger + ≥1 off-aspect) and confirm zero drift/gaps/overlap. A layout that
+    > only lines up at exactly 1920×1080 is a bug.
+
+    We've also written this invariant into `design/LAYOUT_CONTRACT.md` §3 (the shared contract), so it's
+    binding regardless. Engine note (OURS, not a CD ask): once the manifest anchors correctly, any drift
+    that remains is our anchor/scale interpreter — we own that half; this item is the authoring/extraction
+    half, which is where the baked-in TopLeft absolutes come from.
+
 B12. **CLOSED 2026-07-04 — delivered + verified clean (744 files, no cross-product, no "plain",
     0 missing / 0 extra); see Confirm-to-close above. Convention is now canon in LAYOUT_CONTRACT §12a /
     DESIGN_SPEC §7a. Kept below for reference.** WORN-ARMOR PART SET — CONSOLIDATED CONVENTION (Doug).

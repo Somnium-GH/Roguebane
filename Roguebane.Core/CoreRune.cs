@@ -1,8 +1,9 @@
 namespace Roguebane.Core;
 
-// A CoreRune is data: the LAYOUT you socket a Race's body into. It carries NO attrs (those are the
-// Race's, §7) — only a rune budget, a per-rung discount, minion capacity, and the fixed starting
-// equipment/minions.
+// A CoreRune is data: the LAYOUT you socket a Race's body into. It carries an additive STAT BONUS
+// (StrBonus/IntBonus/DexBonus/ConBonus, folded into the Race's body at NewBody below, CORE_RUNES.md) on
+// top of the Race's own attrs (§7), plus a rune budget, a per-rung discount, minion capacity, and the
+// fixed starting equipment/minions.
 // The thesis lives in the tension between budget and discount: a fat-budget, cheap-rune core can climb
 // to a keystone it was never built for. DefaultEquipment is the FIXED starting kit (the action bar is
 // never empty, no build-time "pick a technique" gate; finds grow the kit mid-run).
@@ -11,6 +12,10 @@ public sealed record CoreRune(
     int RuneBudget,
     int RuneDiscount = 0,
     int MinionCap = 1,
+    int StrBonus = 0, // additive stat bonus on top of the Race's own attrs (CORE_RUNES.md's table)
+    int IntBonus = 0,
+    int DexBonus = 0,
+    int ConBonus = 0,
     IReadOnlyList<Technique>? DefaultEquipment = null,
     IReadOnlyList<Minion>? DefaultMinions = null,
     IReadOnlyList<Weapon>? DefaultWeapons = null, // wielded at assembly so a consulting verb has a stick
@@ -19,8 +24,11 @@ public sealed record CoreRune(
     string Flavor = "",     // the card's short pitch (design/05)
     string CoreEffectName = "",   // Core Effect label (the core's signature effect) shown on the cards
     string CoreEffectDesc = "",   // Core Effect blurb; most effects are display-only for now (§11)...
-    bool CoreEffectRefundsSummons = false, // ...EXCEPT this one [LOCKED §11]: on Redeploy, surviving
-                                           // minions refund their Summons (the Summoner's real effect)
+    bool CoreEffectRefundsSummons = false, // one legacy mechanized effect: on Redeploy, surviving
+                                           // minions refund their Summons. No v6 core uses this anymore.
+    bool CoreEffectFreeSummons = false, // Summoner's Conscription [LOCKED, CORE_RUNES.md]: fielding a
+                                        // minion never spends the Summons resource at all (replaces the
+                                        // old refund-on-Redeploy Legion effect above — genuinely different).
     string Accent = "",     // colorBind accent (a palette token) for core.accent/preview.accent;
                             // empty keeps the manifest's static chrome — per-core VALUES await design
     string Badge = "")      // the role chip (STARTER/BULWARK/CASTER/SPECIALIST), design/05 v2 `core.badge`
@@ -50,7 +58,7 @@ public sealed record CoreRune(
     // extension parts on top, and the core's starting weapons/armor are equipped.
     public Body NewBody(Race race, RuneLoadout runes)
     {
-        var body = race.NewBody();
+        var body = race.NewBody(StrBonus, IntBonus, DexBonus, ConBonus);
         foreach (var mark in runes.HeldMarks)
             foreach (var part in mark.Granted)
                 body.Add(part);

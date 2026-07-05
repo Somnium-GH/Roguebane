@@ -33,7 +33,8 @@ public class BowTests
         var atk = new Caster(body, defender, maxCharge: 2);
         atk.Activate(Armory.Shot);
         atk.Aim(Armory.Shot, defender);
-        for (var i = 0; i < 30; i++) atk.Step();             // looses until the charge is dry, then holds
+        for (var i = 0; i < 160; i++) atk.Step();            // cd 80, 8% haste (4 DEX) -> 74/loose,
+                                                              // fires twice then the charge runs dry
 
         Assert.Equal(3, defBody.ShieldPoints);               // shields IGNORED (piercing)
         Assert.Equal(0, atk.Charge);                         // both charges spent (1 per loose)

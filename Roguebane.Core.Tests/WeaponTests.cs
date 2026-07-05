@@ -45,7 +45,7 @@ public class WeaponTests
         Assert.True(caster.Activate(Armory.Swing));
         Assert.Equal(2, body.Reserved(Stat.Str)); // sword's reserve, not the technique's 0
 
-        caster.Step(); caster.Step(); // timered cd 2: fires on the 2nd tick
+        for (var i = 0; i < 80; i++) caster.Step(); // timered cd 80 (0 DEX haste, sword timer 1.0)
         Assert.Equal(96, foe.Hp);      // sword power 4
     }
 
@@ -67,9 +67,9 @@ public class WeaponTests
         var caster = new Caster(body, foe);
 
         Assert.True(caster.Activate(Armory.Frenzy));
-        Assert.Equal(3, body.Reserved(Stat.Str)); // 2 + 1
+        Assert.Equal(3, body.Reserved(Stat.Str)); // 2 + 1 (weapon reserves; Frenzy's own reserve is inert)
 
-        for (var i = 0; i < 3; i++) caster.Step(); // cd 3
+        for (var i = 0; i < 76; i++) caster.Step(); // cd 80, 0 haste (no DEX), Sword/Axe avg timer 0.95 -> 76
         Assert.Equal(93, foe.Hp);                  // 4 + 3 = 7
     }
 

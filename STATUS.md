@@ -154,6 +154,19 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
    combos; **everything in FOES.md's IDEAS section stays unbuilt** (it's marked, believe it).
 
 ### Then: the standing bug queue (loop-actionable, in order)
+- **Engine: recursive `parent`-box resolution — DROP PRE-REQ (2026-07-05, verified ABSENT).** CD's next
+  drop re-anchors every screen and adds a `parent` field (CD dev-memory #35, = the no-absolute-positioning
+  payoff, outbox B21): a child's `offset` becomes RELATIVE to its named parent element's box instead of the
+  screen, so grouped clusters (HP readout+pips, panel+contents, top-right controls, action-bar minion
+  column) reflow as ONE unit. Today `ScreenLayout.Resolve(designW,designH,Element e)`
+  (`Roguebane.Core/Layout/ScreenLayout.cs:16`) resolves anchor+offset+size against the SCREEN only and
+  `Element` has no `parent`. Add: parse `parent`; resolve an element's rect RECURSIVELY (resolve the
+  parent's box first, then place the child by anchor+offset INSIDE it) — single forward pass, id→box cache,
+  children rank after parents in z. MUST land BEFORE/WITH that drop or every parented child mis-places
+  (offsets are now small parent-relative, not screen-px). SEPARATE: off-16:9 aspect-fill (grow the middle
+  panel) is §13 WIP, not part of this. (Verified 2026-07-05: the OTHER dev-memory "engine-pending" items —
+  merchant/states/border.sides/shield-pips/core.label/pagination — already SHIPPED; logged in
+  `CD_CLOSED_ITEMS.md`. Only #35, #30 glow/pulse, and #32 worn-draw remain, #32 already in Debt below.)
 - **Merchant pager doesn't indicate page 2** (Doug 2026-07-05, not root-caused): needs a live repro
   with a >3-section stock — check `MerchantSections()` count vs the `>` arrow's render/bind, and
   whether B13's 1px row-drop masks page 2. Don't re-diagnose B13/B14 (both root-caused, CD-side,

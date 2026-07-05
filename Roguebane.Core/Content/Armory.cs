@@ -90,17 +90,35 @@ public static class Armory
     public static readonly Weapon Dagger = Daggers[0];
     public static readonly Weapon Bow = Bows[0];
 
-    // Swing consults the primary STR weapon; Frenzy consults BOTH (cost = sum of their reserves).
+    // Cooldowns are in COMBAT TICKS at the fixed 10 ticks/sec clock; 80 = the canon's base-speed
+    // anchor (8.0s, CORE_RUNES.md/TECHNIQUES.md) for every speed x1.0 verb below.
+    // Swing/Frenzy/Flurry all consult by STR (Consulted() matches technique.Stat against the wielded
+    // weapon's own Stat, and melee weapons are STR) — TECHNIQUES.md's Open/TBD flags a possible DEX
+    // dual-wield gate as unresolved, not locked, so this stays STR pending that design decision.
+    // Reserve on a Consults!=None technique is inert (Caster.Reservation zeroes it) — the WEAPON's own
+    // reserve is what's tracked; kept at the TECHNIQUES.md-quoted value for future §11 Finesse display.
     public static readonly Technique Swing =
-        new("swing", Stat.Str, Reserve: 0, TechniqueKind.Timered, Cooldown: 2, Power: 0, Consults: WeaponUse.Primary);
+        new("swing", Stat.Str, Reserve: 0, TechniqueKind.Timered, Cooldown: 80, Power: 0, Consults: WeaponUse.Primary);
 
     public static readonly Technique Frenzy =
-        new("frenzy", Stat.Str, Reserve: 0, TechniqueKind.Timered, Cooldown: 3, Power: 0, Consults: WeaponUse.Both);
+        new("frenzy", Stat.Str, Reserve: 2, TechniqueKind.Timered, Cooldown: 80, Power: 0, DamageMult: 1.0,
+            Consults: WeaponUse.Both);
+
+    public static readonly Technique Flurry =
+        new("flurry", Stat.Str, Reserve: 1, TechniqueKind.Timered, Cooldown: 40, Power: 0, DamageMult: 0.5,
+            Consults: WeaponUse.Both);
 
     // Shot looses the primary DEX weapon (the BOW): it BYPASSES the shield pool and spends 1 Charge per
     // loose (§6b Charge = the shield-pierce resource); dry => it holds. Power/cost come from the bow.
+    // Kept as legacy content (superseded by AimedShot below in every v6 kit) — inert but harmless.
     public static readonly Technique Shot =
-        new("shot", Stat.Dex, Reserve: 0, TechniqueKind.Timered, Cooldown: 3, Power: 0,
+        new("shot", Stat.Dex, Reserve: 0, TechniqueKind.Timered, Cooldown: 80, Power: 0,
+            Consults: WeaponUse.Primary, ChargeCost: 1, ShieldPiercing: true);
+
+    // The Marksman's real bow verb (CORE_RUNES.md/TECHNIQUES.md): 2.0x the bow's power, slow (160
+    // ticks = 16s), 1 Reserve, DEX-gated, spends+bypasses on Charge same as Shot.
+    public static readonly Technique AimedShot =
+        new("aimed_shot", Stat.Dex, Reserve: 1, TechniqueKind.Timered, Cooldown: 160, Power: 0, DamageMult: 2.0,
             Consults: WeaponUse.Primary, ChargeCost: 1, ShieldPiercing: true);
 
     public static readonly IReadOnlyList<Weapon> All = new[] { Sword, Axe, Dagger, Bow };
