@@ -437,6 +437,19 @@ reference) and found two real defects.
      unreliable below some fontPx threshold and need their own fix before being trusted again. Not a
      stop-the-loop interrupt — HiFi bugs stay top-of-queue by standing rule, but this one needs a human's
      eyes before the next code change, not another guess.
+   - **CORROBORATED cross-screen (2026-07-05 loop):** re-ran `RB_SMOKE=1 RB_MF=all` on the current build —
+     Equipment shows the IDENTICAL collision shape on its own name/role and coreEffect triad:
+     `collide=8 hits=[...,currentCoreNamexcurrentCoreRole,...,coreEffectLabelxcoreEffectName,
+     coreEffectNamexcoreEffectDesc,...]` — same three-member pattern (name×role, label×name, name×desc) as
+     NewGame's, on a DIFFERENT manifest structure (Equipment's is the flattened `core.coreEffect` block, not
+     NewGame's 3 separate elements) and different element ids entirely. Two unrelated layouts hitting the
+     exact same collision shape rules out a NewGame-authoring quirk — this is a shared measurement/render
+     mechanism, strengthening the P0-if-real read above. Equipment ALSO shows a second, broader collision
+     family not yet seen on NewGame: header-directly-over-body (`attrTitlexattrReadout`,
+     `runeBagTitlexruneBudget`, `actionBarTitlextechSlotCount`) — every one is a title/eyebrow-style label
+     colliding with the content row immediately below it, consistent with the same ink-height
+     underestimate (header measures taller than its allotted band, next row starts before it's clear).
+     Still NEEDS HUMAN per the eyeball check above before any fix — this only sharpens which bug it is.
 
 ## ✅ FIXED (2026-07-04 loop) — Selected-card highlight (amber ring) NOT RENDERING
 Root cause: `DrawTemplateRootChrome` (`Game1.ManifestRenderer.cs`) bailed out early whenever the
