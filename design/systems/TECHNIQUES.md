@@ -53,25 +53,27 @@ Shape = (damage × weapon, speed × 8s·timer). Example numbers on Iron Longswor
 
 | Source | Stat | Reserve | Rules text |
 |---|---|:--:|---|
-| Brace (T1 CON) | CON | 2 | Hold a pool of 4 CON shield points, each absorbing one hit, +1 pip / 2.0s. Requires a shield OBJECT equipped. |
-| T2 CON Shield | CON | 3 | Stronger held guard: pool 8, +1 pip / 1.5s. (Warden signature.) |
-| barkskin (INT) | INT | 1 | A held spell keeping 3 shield points, +1 pip / 3.0s. Ladder: barkskin → stoneskin → steelskin → diamondskin. |
+| Brace | T1 CON | 2 | Hold a pool of 4 CON shield points, each absorbing one hit, +1 pip / 2.0s. Requires a shield OBJECT equipped. |
+| Steel | T2 CON | 3 | Stronger held guard: pool 8, +1 pip / 1.5s. |
+| Barkskin | T1 INT | 1 | A held spell keeping 3 shield points, +1 pip / 3.0s. Ladder: barkskin → stoneskin → steelskin → diamondskin. |
+| Bind | T1 STR | 2 | A held guard keeping 2 shield points, +1 pip / 2.5s |
+| Parry | T1 DEX | 2 | A held guard keep 1 shield point, +1 pip / 2s |
 
 ### Heals (self)
 
 | Heal | Stat | Reserve | Rules text |
 |---|---|:--:|---|
-| Bandage (T1) | CON | 1 | Mends your most-damaged part 1 / 8.0s. The flat baseline. |
-| T2 CON Heal | CON | 2 | Mends your most-damaged part 2 / 8.0s. (Warden signature.) |
+| Bandage | T1 CON | 2 | Mends your most-damaged part 1 / 8.0s. The flat baseline. |
+| Suture | T2 CON | 3 | Mends your most-damaged part 2 / 8.0s. (Warden signature.) |
 | Sacrifice | — | consumes 1 minion | Consume one of your own minions to mend your body. **New mechanic — needs-design.** |
 
 ### Minions (field cost = Summons + reserve gate stat)
 
 | Minion | Stat | Reserve | Power / cadence | Rules text |
 |---|---|:--:|:--:|---|
-| Skeleton (T1)| INT | 1 | 1 / 3s | A raised thrall; fast / weak. |
-| Iron Golem (T2) | INT | 2 | 3 / 5s | A bound iron golem; slow / strong. |
-| Hound | DEX | 1 | 1 / 4.0s | A DEX pet; Hound will provide an accuracy bonus when active, 5% as a Tier 1 (+5% per Tier for descendants) |
+| Skeleton | T1 INT | 1 | 1 / 3s | A raised thrall; fast / weak. |
+| Iron Golem | T2 INT | 2 | 3 / 5s | A bound iron golem; slow / strong. |
+| Hound | T1 DEX | 1 | 1 / 4.0s | A DEX pet; Hound will provide an accuracy bonus when active, 5% as a Tier 1 (+5% per Tier for descendants) |
 
 ## Open / TBD
 - **Sacrifice** (consume-a-minion heal) = new mechanic. **Bow damage** OPEN (§17 #9). Technique / minion tier
