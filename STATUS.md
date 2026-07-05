@@ -1,25 +1,27 @@
 # Status
 
-## ⇒ NEW DIRECTIVE — HiFi, HIGH PRIORITY (2026-07-04, Doug): gate must test NON-16:9 resolutions,
-## closes the "Needs Doug: confirm live" gap on the backdrop-drift fix below
-Doug: the gate is "obviously not realizing what's going on with fullscreen/maximized modes" because
-it only ever tests ONE size. **Confirmed exactly right, and it's precisely why the backdrop-drift fix
-below (✅ FIXED 2026-07-04) had to ask Doug to eyeball it live instead of verifying itself:**
-`tools/ui_gate.py` hardcodes every smoke pass to `"RB_SIZE": "1920x1080"` (line ~101) — EXACTLY a
-16:9, 960K-multiple size. At that exact aspect, `_ui.DesignW/DesignH` never extends past the base
-`[960,540]` (§13 aspect-fill only extends on a non-16:9 window), so the whole backdrop-vs-foreground
-drift class **cannot occur in the current gate no matter what** — it structurally only manifests on a
-maximized/resized window whose aspect isn't 16:9, which the gate never renders. **Directive: add at
-least one additional smoke pass at a NON-16:9 `RB_SIZE`** (e.g. 1920x1200, or 1600x1000 — anything off
-the 960K×540K contract) alongside the existing 1920x1080 pass, and check two things automatically at
-that size: (1) every `*.scene`-bound backdrop element's rendered rect covers the FULL current canvas
-(`ManifestUi.FullCanvasRect`), not just the base 960x540 extent — this is the exact assertion that
-would have caught the bug Doug reported and now verifies the fix without a human maximizing the
-window; (2) collision/overflow counts (already gated at the reference size) don't regress at the
-off-aspect size either. Fidelity-diff itself can't run at a non-960K×540K size (no matching design
-PNG to compare against) — this new check is geometry/coverage-based, not pixel-comparison, and sits
-alongside fidelity as its own gate step. This closes the "Needs Doug: confirm live" line on the fix
-below permanently, for this bug class and any future one like it.
+## ⇒ NEW DIRECTIVE — HiFi, HIGH PRIORITY (2026-07-04, Doug): gate must test NON-16:9 resolutions ✅ DONE (2026-07-04 loop)
+`tools/ui_gate.py` now runs every driven pass TWICE: the existing 1920x1080 reference size, plus a
+second pass at 1600x1000 (non-16:9, exercises §13 aspect-fill's DesignW/DesignH extension that the
+16:9 reference size structurally never reaches). New checks, both pinned zero (no baseline ride):
+(1) `SMOKE SCENECOVER` (`Game1.cs`) samples 8 points (corners + edge-midpoints) of every screen with a
+`*.scene`-bound backdrop against the raw clear colour right after the backdrop-only render — any
+sample still showing clear means the backdrop didn't reach that part of the current canvas. Ran at
+both sizes on every screen: **0 gaps everywhere** — the earlier backdrop-drift fix holds under an
+actual non-16:9 render, not just by code inspection. (2) TEXTGEOM (overflow/collide/truncated) is
+captured at the off-aspect size too, in its own `ui_baseline.json` lane (`textgeom_offaspect`) so a
+legitimate aspect-driven reflow difference never gets conflated with the 16:9 numbers.
+**Needs human — found in the same pass, not fixed here (out of scope for a gate-instrumentation
+task):** `tools/ui_baseline.json` hasn't been rebaselined since commit `2249948` ("Equipment gate pass
+rides a ref-aligned grunt drive"), and ~15 functional commits have landed since (drag-and-drop §6e,
+the three targeting bugs, the gear-sustain cascade, the Equipment-screen reservation fix). Running
+`python tools/ui_gate.py` right now (both at 1920x1080 and 1600x1000) reports real baseline drift:
+fidelity drops on `encounter` (78.0→75.6) and `equipment` (74.7→71.6), and text overflow/collision
+COUNTS ROSE on every single screen (e.g. equipment 11→28 overflow, 3→8 collide). Some of this is
+probably legitimate reflow from the real UI changes above (new coreEffect/attrReadout content, the
+drag-chrome placeholder, etc.) — but a fidelity DROP can also hide a genuine visual regression, so
+this needs a human (or CD) eyeball on the worst-offender ELEM lines before anyone runs `--update`
+blind. Don't rebaseline this without looking first.
 
 ## ⇒ BUG REPORT — HiFi (2026-07-04, Doug — three targeting bugs) — ALL RESOLVED (2026-07-04 loop, 370 tests)
 1. ~~Reticle SNAPS to a part's center instead of following the raw cursor~~ DONE: `Game1.ManifestRenderer.cs`
