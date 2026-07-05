@@ -60,12 +60,14 @@ public static class Armory
         t, 1.0, Hands: 1, WeaponKind.Sling)).ToArray();
 
     // INT implements (§6d): wand = 1H shield-SUBTRACTION hand item (resolution is its own slice);
-    // staff = 2H plain blockable melee, deliberately cheap (1 INT/t); charm/tome = pure-bonus
+    // staff = 2H plain blockable melee, 2 INT/t per WEAPONS.md's table; charm/tome = pure-bonus
     // offhands (+0.1x minion/spell damage per tier — consumers are their own slice), Power 0.
+    // Wand/staff Timer (1.0 here) is WEAPONS.md's own Open/TBD ("wand / staff timer multipliers") —
+    // placeholder, not a locked number.
     public static readonly IReadOnlyList<Weapon> Wands = Named("wand", Stat.Int, WeaponKind.Wand,
         1.0, 2, 2, 1, "Adept Wand", "Twisted Wand", "Gemstone Wand", "Glowing Wand");
     public static readonly IReadOnlyList<Weapon> Staffs = Named("staff", Stat.Int, WeaponKind.Staff,
-        1.0, 2, 1, 2, "Wooden Staff", "Twisted Staff", "Ornate Staff", "Humming Staff");
+        1.0, 2, 2, 2, "Wooden Staff", "Twisted Staff", "Ornate Staff", "Humming Staff");
     public static readonly IReadOnlyList<Weapon> Charms = Named("charm", Stat.Int, WeaponKind.Charm,
         1.0, 0, 1, 1, "Wooden Charm", "Bone Charm", "Ornate Charm", "Humming Charm");
     public static readonly IReadOnlyList<Weapon> Tomes = Named("tome", Stat.Int, WeaponKind.Tome,
