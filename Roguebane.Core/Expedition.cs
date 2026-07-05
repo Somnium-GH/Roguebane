@@ -348,6 +348,7 @@ public sealed class Expedition
 
         Battle = new Battle(_caster, Maps.EncounterFor(node, Map.SupportBank), _player, Seed(node.Id));
         State = ExpeditionState.Fighting;
+        _caster.RearmForEncounter(); // §17 default-activation-state LOCK: no free carry-over charge
         return true;
     }
 

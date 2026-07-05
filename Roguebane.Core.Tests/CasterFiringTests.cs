@@ -88,4 +88,41 @@ public class CasterFiringTests
         Assert.Equal(100, front.Hp);   // default front untouched
         Assert.True(flank.Hp < 100);   // the aimed flank took the hit
     }
+
+    // §17 default-activation-state LOCK: a technique that stayed active across a fight ends up
+    // charged/ready (leftover from the last encounter) — RearmForEncounter must rewind that so the
+    // NEXT encounter can't get an instant free discharge off carry-over charge.
+    [Fact]
+    public void RearmForEncounterRewindsAReadyTechniqueBackToItsFullCooldown()
+    {
+        var foe = new Foe("dummy", 1000);
+        var c = new Caster(Body(), foe);
+        c.Activate(Techniques.Jab, auto: false);
+
+        for (var i = 0; i < 200; i++) c.Step(); // charge well past ready
+        Assert.True(c.IsReady(Techniques.Jab));
+
+        c.RearmForEncounter();
+        Assert.False(c.IsReady(Techniques.Jab)); // back to uncharged, must warm up again
+        Assert.True(c.IsActive(Techniques.Jab)); // on/off state untouched -- still toggled on
+    }
+
+    [Fact]
+    public void RearmForEncounterRewindsAChargedMinionBackToItsFullTimer()
+    {
+        var body = new Body();
+        body.Add(new BodyPart("head", Stat.Int, 5)); // Skeleton reserves 2 Int
+        var foe = new Foe("dummy", 100);
+        var c = new Caster(body, foe);
+        Assert.True(c.Summon(Minions.Skeleton, bayCap: 1)); // Timer 25, Power 1
+
+        for (var i = 0; i < Minions.Skeleton.Timer - 1; i++) c.Step(); // charged to 1 tick from firing
+        c.RearmForEncounter();
+
+        for (var i = 0; i < Minions.Skeleton.Timer - 1; i++) c.Step();
+        Assert.Equal(100, foe.Hp); // still warming up -- the carry-over charge didn't survive
+
+        c.Step();
+        Assert.Equal(99, foe.Hp); // fires once the full timer has run again
+    }
 }

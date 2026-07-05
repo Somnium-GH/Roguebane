@@ -115,6 +115,20 @@ public sealed class Caster
 
     public bool IsActive(Technique technique) => _active.ContainsKey(technique.Id);
 
+    // Default-activation-state LOCK (DESIGN_SPEC "nothing starts charging... at the beginning of an
+    // encounter"): rewind every active technique's cooldown and every bayed minion's timer to a full
+    // warm-up when a NEW encounter starts, so leftover charge from the last fight can't let something
+    // discharge instantly. On/off state (which techniques are toggled, which minions are bayed) is
+    // untouched here — only the charge clock resets. Sustained techniques have no cooldown to rewind.
+    public void RearmForEncounter()
+    {
+        foreach (var run in _active.Values)
+            if (run.Tech.Kind == TechniqueKind.Timered)
+                run.Countdown = EffectiveCooldown(run.Tech);
+        foreach (var minion in _bays)
+            _minionCountdown[minion.Id] = minion.Timer;
+    }
+
     // The ONE AUTO toggle (global, player-facing): ON => no module clears its target after firing (every
     // powered + targeted module keeps charging and firing at the SAME target); OFF (default) => one-shot,
     // each module clears its target after the shot and then holds. One switch governs the whole bar —
