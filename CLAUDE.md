@@ -47,3 +47,6 @@ and does it feel good.
 - Design canon = `design/DESIGN_SPEC.md`; keep it CURRENT — fold a decision in WHEN IT LOCKS. `STATUS.md`
   is build-STATE (target / debt / needs-human / progress) and POINTS to the spec, it doesn't re-specify
   design. A change that alters locked design reconciles DESIGN_SPEC in the same pass.
+
+### Claude Cowork Agents **ONLY**
+Please read the orientation memory in the Roguebane project to ensure you follow all processes properly.
