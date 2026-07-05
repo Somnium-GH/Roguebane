@@ -2,10 +2,10 @@ namespace Roguebane.Core;
 
 // The §12 merchant GEAR stock, rolled once per merchant node from a seed so the run stays
 // reproducible: random but SCARCE across five categories — Armor / Weapons / Techniques / Minions /
-// Runes. The spec locks the shape (always 3 picks per non-technique section, techniques always 5
-// when present and 2nd-rarest, runes extremely rare with keystones NEVER stocked, at most 4 of the
-// 5 sections per visit); the exact weighted-shuffle distribution is OPEN (§17), so the section
-// weights below are placeholder-sane numbers the tuning pass owns.
+// Runes. Both the shape (always 3 picks per non-technique section, techniques always 5 when present
+// and 2nd-rarest, runes extremely rare with keystones NEVER stocked, at most 4 of the 5 sections per
+// visit) and the section-presence weights below are LOCKED [2026-07-03, Doug] — these ARE the
+// shipped "advanced prototype" numbers, not a placeholder for a later tuning pass.
 public sealed class MerchantStock
 {
     public IReadOnlyList<Weapon> Weapons { get; }
@@ -27,8 +27,8 @@ public sealed class MerchantStock
     private const int SectionPicks = 3;   // non-technique sections stock exactly 3 (pool-capped)
     private const int TechniquePicks = 5; // techniques stock exactly 5 when the section shows
 
-    // Placeholder section-presence weights out of 100 (OPEN §17 — most visits read Armor/Weapons/
-    // Minions, techniques 2nd-rarest, runes extremely rare).
+    // Section-presence weights out of 100 [LOCKED 2026-07-03, Doug, DESIGN_SPEC §12] — most visits
+    // read Armor/Weapons/Minions, techniques 2nd-rarest, runes extremely rare.
     private const int CommonWeight = 80, TechniqueWeight = 25, RuneWeight = 8;
 
     public static MerchantStock Roll(ulong seed,
