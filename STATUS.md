@@ -112,6 +112,13 @@ heal; (c) Adept's canon kit wants Stoneskin T2, which doesn't exist in Technique
 or substitute Barkskin, undecided; (d) Barbarian needs the item 8 CoreCampaignTests exemption wired
 before its kit can land.
 
+**Progress (2026-07-05, loop, cont.):** item 7 done — Minions.cs synced to v6 (Skeleton r1/Timer30,
+IronGolem r2/Power3/Timer50 incl. clean `Golem`->`IronGolem` rename id `golem`->`iron_golem`, Hound
+AccuracyBonus 5 — the Caster.cs wiring for it already existed from an earlier pass, only the content
+value was missing). 392/392 green. Remaining CHUNK A items: 1 (Races.cs), 3 (CoreRunes.cs full rewrite,
+blocked on the 4 Needs-Human calls above), 6 (Armory.cs Frenzy/Flurry/Aimed Shot — also touches the
+Reaver STR/DEX question), 8 (new focused tests + Barbarian test-exemption).
+
 ### CHUNK B — ASSET WIRING (mechanical; do right after A or interleave freely)
 1. Mirror every new CD-source mgcb entry into `Roguebane.Game/Content/Content.mgcb` (the copy builds
    read) with the established path/output transform — new body dirs (all `dwarf_*`, `halfling_*`,
