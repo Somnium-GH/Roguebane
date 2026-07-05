@@ -57,15 +57,15 @@ drag-chrome placeholder, etc.) — but a fidelity DROP can also hide a genuine v
 this needs a human (or CD) eyeball on the worst-offender ELEM lines before anyone runs `--update`
 blind. Don't rebaseline this without looking first.
 
-## ⇒ BUG REPORT — HiFi (2026-07-04, Doug — three targeting bugs) — ALL RESOLVED (2026-07-04 loop, 370 tests)
+## ⇒ BUG REPORT — HiFi (2026-07-04, Doug — three targeting bugs) — 2 of 3 RESOLVED, #2 REOPENED (see P1 above)
 1. ~~Reticle SNAPS to a part's center instead of following the raw cursor~~ DONE: `Game1.ManifestRenderer.cs`
    now always draws the aiming reticle at the raw cursor; part detection (`FoePartAt`) still runs every
    frame for the click-to-aim hit-test, it just never repositions the sprite. DESIGN_SPEC's corrected
-   wording stands.
-2. ~~Hit-test uses a crude 4-band approximation, not real part geometry or Z-order~~ DONE: `Game1.cs`
-   `FoePartAt` now walks the figure's real per-part rects (same transform `FoePartScreenRect` uses for
-   drawing) in `Figure.Z` paint order back-to-front, so an overlapping hit resolves to the frontmost part
-   (chest over arms). `PartBand`/old `FoePartRect` band approximation removed.
+   wording stands. **Doug confirmed live (2026-07-05): excellent.**
+2. ~~Hit-test uses a crude 4-band approximation, not real part geometry or Z-order~~ marked DONE here, but
+   **REOPENED (2026-07-05) — see the P1 CORRECTION at the top of this file.** The band-approximation half
+   of the fix is real (removed `PartBand`/`FoePartRect`); the Z-order tie-break half was closed on an
+   inverted premise and Doug is still seeing arm clicks resolve to the chest live.
 3. ~~Targeting/aim state isn't cleared at fight end~~ DONE: `Expedition.Redeploy()`/`Retreat()` now call a
    new `ClearAllAims()` clearing every equipped technique's `Aim` before returning to Choosing. Covered by
    two new headless tests (`RedeployClearsStaleAim`, `RetreatClearsStaleAim`).

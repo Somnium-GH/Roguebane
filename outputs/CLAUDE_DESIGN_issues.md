@@ -124,6 +124,35 @@ B14. **Equipment `buildMinions` list is sized for ZERO cards, not one.** Element
     treatment: widen to fit `Bays × (131 + gap)`, matching how the technique bar is sized for its
     own bay count.
 
+**NEW 2026-07-05 (core-effect + race/balance design session — not yet relayed; Doug to send):**
+
+B15. **Core Effect roster REPLACED — new names + rules text.** The prototype set is now canon and SUPERSEDES
+    the old §11 roster (Hollow Vessel / Unbroken Aegis / Overchannel / Legion / Bloodrush / Called Shot).
+    Engine binds the text (`core.coreEffect`), so no data work — but two card-layout notes: (a) the effect
+    NAMES changed — Grunt "Jack of All Trades", Warden "Fortified", Adept "Resonance", Summoner "Conscription",
+    Reaver "Finesse", Ranger "Fletcher's Luck"; (b) some rules text is LONGER now (Ranger's is a compound
+    sentence) — re-check the `coreEffect` text rect wraps/fits. Full text: `design/systems/CORE_RUNES.md`.
+
+B16. **NEW element — per-core STAT-BONUS chips on the core card (Doug's explicit ask).** Each Core Rune now
+    grants an additive stat bonus; show it as a concise row of colored attribute chips (attr color + number +
+    short label), like the resource strip. Bonuses: Grunt +1 STR/INT/DEX/CON · Warden +5 CON · Adept +5 INT ·
+    Summoner +3 INT / +2 CON · Reaver +5 DEX · Ranger +4 DEX / +1 CON. Author a `core.statBonus` list element
+    on the NewGame coreCard (and the Equipment identity block), one chip per non-zero stat; engine supplies
+    the datum.
+
+B17. **TWO NEW RACES — Dwarf + Halfling — full figure/portrait/card batch.** The race roster grew 2 → 4:
+    Dwarf (CON affinity — stout, heavy build) and Halfling (DEX affinity — small, nimble). Both need the same
+    treatment Human/Elf have: race × core figures for all six cores (part/z-list contract, B2-GO), head
+    portraits, race-card art, AND worn-armor part sets per the B12 convention — this EXTENDS B12's
+    `race ∈ {human, elf}` to `{human, elf, dwarf, halfling}` (every slot/tier/condition per new race, same
+    completeness math + fallback chain). Final blurbs/tags: Doug to supply. Multi-night — ship by race/slot/tier.
+
+B18. **New technique + minion ICONS for the current default kits.** Beyond the existing 8 icons
+    (bandage/block/cleave/drain/ember/jab/lunge/stoneskin), the kits now use **Frenzy, Flurry, Aimed Shot,
+    Siphon** (renamed from Drain — reuse `drain` or new), **Barkskin** (INT shield), **Sacrifice**
+    (consume-minion heal); plus minion icons **Skeleton, Iron Golem, Hound**. Add icons + mgcb source (we
+    mirror game-side). (Rapier / Staff / Charm / Tome weapon sprites are already in B2-GO.)
+
 B12. **CLOSED 2026-07-04 — delivered + verified clean (744 files, no cross-product, no "plain",
     0 missing / 0 extra); see Confirm-to-close above. Convention is now canon in LAYOUT_CONTRACT §12a /
     DESIGN_SPEC §7a. Kept below for reference.** WORN-ARMOR PART SET — CONSOLIDATED CONVENTION (Doug).
@@ -205,8 +234,10 @@ B12. **CLOSED 2026-07-04 — delivered + verified clean (744 files, no cross-pro
 - **Name lengths:** the "Dwarven Steel Short Sword" (24ch) class overflows current card name rects —
   Doug ACCEPTS overflow for now; final treatment is a parked Doug+Cowork decision. Don't
   unilaterally re-rect, but flag preferred options if you have them.
-- design/05 v2 STAT BLOCKS are not adopted; Doug will run a live tuning session — if a future 05
-  re-render can sample stats from a handed set, ask him for the tuned numbers then.
-- Core Effect roster (incl. Called Shot) is canon; effect MECHANICS come later engine-side.
+- design/05 v2 STAT BLOCKS are not adopted. **Tuned numbers now exist** (race bases Human 5/5/5/5 · Elf
+  4/6/4/4 · Dwarf 4/4/4/6 · Halfling 4/4/6/4, + the per-core stat bonuses in B16; `design/systems/RACES.md`) —
+  a 05 re-render can sample from these.
+- Core Effect roster was **REPLACED this pass** (see B15) — the old §11 names (incl. Called Shot) are retired;
+  effect MECHANICS still come later engine-side.
 - Drops are applied via a stop/apply/re-arm handshake now — stage in `.drop/`, Cowork applies with
   the loop halted, guards run before the tree resumes.
