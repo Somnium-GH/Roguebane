@@ -18,25 +18,34 @@ Baseline is **4/4/4/4**. **Human** gets **+1 straight across** — breadth, a li
 | **Elf** | 4 | 6 | 4 | 4 | INT |
 | **Dwarf** | 4 | 4 | 4 | 6 | CON |
 | **Halfling** | 4 | 4 | 6 | 4 | DEX |
+| **Half-Giant** | 6 | 4 | 4 | 4 | STR |
+
+Half-Giant locked 2026-07-05 (Doug via Cowork): the missing STR lane, straight from the specialist
+formula — numbers flagged placeholder-blessed like the rest; art already shipped in the 07-05 drop.
 
 ## Demand & clearance
 Effective stat in a core = race base + the core's stat bonus (`CORE_RUNES.md`). A core's **demand** is its
 fully-active reserve per stat. ● = runs the whole kit at once; number = short by (deactivate or rune to fit).
 
-Demands: Grunt STR 5 · CON 2 · Warden CON 10 · Adept INT 10 · Summoner INT 8 · Reaver DEX 9 · Ranger DEX 10 · CON 2.
+Demands: Grunt STR 5 · CON 2 · Warden CON 10 · Adept INT 10 · Summoner INT 8 · Reaver DEX 9 · Ranger DEX 10 · CON 2 ·
+Barbarian STR 15 · CON 2 (**over-demand by design** — see CORE_RUNES.md's Barbarian note).
 
-| Core | Human 5/5/5/5 | Elf 4/6/4/4 | Dwarf 4/4/4/6 | Halfling 4/4/6/4 |
-|---|:--:|:--:|:--:|:--:|
-| Grunt | ● +1 | ● +0 | ● +0 | ● +0 |
-| Warden | ● +0 | −1 | ● +1 | −1 |
-| Adept | ● +0 | ● +1 | −1 | −1 |
-| Summoner | ● +0 | ● +1 | −1 | −1 |
-| Reaver | ● +1 | ● +0 | ● +0 | ● +2 |
-| Ranger | −1 | −2 | −2 | ● +0 |
+| Core | Human 5/5/5/5 | Elf 4/6/4/4 | Dwarf 4/4/4/6 | Halfling 4/4/6/4 | Half-Giant 6/4/4/4 |
+|---|:--:|:--:|:--:|:--:|:--:|
+| Grunt | ● +1 | ● +0 | ● +0 | ● +0 | ● +2 |
+| Warden | ● +0 | −1 | ● +1 | −1 | −1 |
+| Adept | ● +0 | ● +1 | −1 | −1 | −1 |
+| Summoner | ● +0 | ● +1 | −1 | −1 | −1 |
+| Reaver | ● +1 | ● +0 | ● +0 | ● +2 | ● +0 |
+| Ranger | −1 | −2 | −2 | ● +0 | −2 |
+| Barbarian | −6 | −7 | −7 | −7 | −5 |
 
-**Read:** Human runs 5 of 6 full but tight (breadth, no headroom to grow). Each specialist owns its lane with
-room — Elf the INT cores, Dwarf the Warden, Halfling the Ranger. Every core has at least one full home.
+**Read:** Human runs 5 of 6 classic cores full but tight (breadth, no headroom). Each specialist owns its
+lane with room — Elf the INT cores, Dwarf the Warden, Halfling the Ranger, Half-Giant the muscle cores.
+Every classic core has at least one full home; **Barbarian alone clears nowhere** — the Warlord's
+over-packed kit triages via the §6e cascade (identity, not a bug; tune at the balance session).
 
 ## Open / TBD
-- Current in-code values (Human 3/3/3/3, Elf 2/3/4/2) need updating; **Dwarf + Halfling are new races** to add.
+- Current in-code values (Human 3/3/3/3-era placeholders) need updating; **Dwarf, Halfling + Half-Giant are
+  the new races** to add (Half-Giant locked 2026-07-05, flagged placeholder-blessed).
 - HP per race; the **mono-attribute scaling** concern (mains scale high, little pulls secondary stats) — playtest.

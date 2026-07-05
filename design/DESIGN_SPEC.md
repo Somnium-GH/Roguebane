@@ -293,13 +293,13 @@ evasion/haste/accuracy/+0.25×) — DEX **techniques** are the expensive lever.
 
 ### 6e. Equipment screen — card states, clicks, ordering, paper-doll [LOCKED 2026-07-03, states session]
 **ONE state family for every inventory card** (GEAR / TECHNIQUES / MINIONS tabs):
-- **EQUIPPED** (green border) — active: wielded/worn · slotted on the bar · assigned to a bay.
+- **EQUIPPED** (green border) — active: wielded/worn · slotted on the bar · fielded as a minion.
 - **DISABLED** (red) — still ASSIGNED but currently unsustainable: attribute below requirement, arm
   broken, or a §6d gear-gate lost (a slotted technique whose required weapon left). Re-activates when
   the requirement is met again (§6).
 - **EQUIPPABLE** (plain) — unequipped, requirements MET.
-- **LOCKED** (dim) — unequipped, requirements NOT met; also technique/minion cards when the bar/bays
-  are FULL (capacity reads as locked, it is never a displacement conflict).
+- **LOCKED** (dim) — unequipped, requirements NOT met; also technique/minion cards when the bar/minion
+  capacity is FULL (capacity reads as locked, it is never a displacement conflict).
 *(Manifest today authors these as `equipped`/`dropped`/`ready`/`neutral` on `invCard` — rename +
 `states.family` keys + hover variants are CD payload items; hover treatment is CD-authored, engine may
 ship a FLAGGED generic brighten stopgap meanwhile.)*
@@ -311,11 +311,11 @@ the conflicting piece is unequipped back to inventory — equipping a bow/wand b
 (§6d incompatibility); a new melee weapon with both hands full displaces the OFF-HAND (main-hand is
 never displaced, §6d promotion); armor over an occupied slot displaces the old piece.
 
-**ORDERING [slot index IS the hotkey — techniques 1..T, then bays]:** click slots into the first free
+**ORDERING [slot index IS the hotkey — techniques 1..T, then minions]:** click slots into the first free
 slot; unslot compacts left (no holes); hotkeys renumber positionally. **Reorder = DRAG-AND-DROP:**
 dragging a slotted card pulls it off leaving a matching ghost background in its slot; it snaps
 INSERTION-style between neighbors (sticky but easy); release locks the new order. Same model for
-minion bays. *[ASSUMED defaults, flag if wrong: drop outside the bar snaps back (cancel); dragging a
+minions. *[ASSUMED defaults, flag if wrong: drop outside the bar snaps back (cancel); dragging a
 palette card onto the bar equips at the insertion point.]*
 
 **DISABLE CASCADE [resolves §17 #16]:** when an attribute can't sustain every equipped item (after
@@ -347,26 +347,28 @@ when next touched.
 
 ## 7. Race + Core rune, and the three-layer architecture [LOCKED]
 Identity is **two axes** (FTL ship + layout):
-- **RACE** — sets **starting attributes + base HP** (the ONLY source of base attrs; Core runes add none).
-  Start with **Human + Elf**. Placeholder blocks from design/05 (tune later): **Human** STR3/INT3/DEX3/
-  CON3, HP20 (balanced, no edge); **Elf** STR2/INT3/DEX4/CON2, HP14 (keen + fleet, frail). Verified
-  winnable for EVERY core at these low-scale stats with the intended PART-AIM play (disable the boss's
-  arm), CoreCampaignTests. **All race×core combos allowed for the POC** (restriction matrix deferred, §17 #4).
+- **RACE** — sets **starting attributes + base HP**. **SUPERSEDED numbers [v6, LOCKED 2026-07-05]:
+  canon = `design/systems/RACES.md`** — FIVE races (Human 5/5/5/5 · Elf 4/6/4/4 · Dwarf 4/4/4/6 ·
+  Halfling 4/4/6/4 · Half-Giant 6/4/4/4; baseline 4s, Human +1 across, specialists +2 in one lane).
+  v6 also changes the layering: a Core Rune now ADDS an additive stat bonus on top of race base
+  (CORE_RUNES.md) — the old "core runes add none" rule is retired (§18). **All race×core combos
+  allowed for the POC** (restriction matrix deferred, §17 #4).
 - **CORE RUNE** (the Shadowbane "Core rune") — sets **LAYOUT**: rune budget, action-bar size (#
-  techniques), # minion bays, and a **Core Effect** (its signature effect, stronger than a keystone —
+  techniques), # minions, and a **Core Effect** (its signature effect, stronger than a keystone —
 renamed from "apex"). **Races GATE which
   core runes they may take** (an SB-style restriction matrix). New Run = pick Race → pick Core rune
   (race-allowed). *(This replaces the old single "Chassis" concept — §18. The archetypes
-  Grunt/Warden/Adept/Summoner/Reaver/**Ranger** are CORE RUNES; Race is the new orthogonal axis. (Ranger =
-  the DEX marksman, the reference build for the bow / shield-pierce economy, §10 — added to stress-test
-  the data-only core-rune path.)*
+  Grunt/Warden/Adept/Summoner/Reaver/Ranger/**Barbarian** [added 2026-07-05, LOCKED — budget 14 ·
+  actions 3 · minions 1, *Warlord's Might*] are CORE RUNES; Race is the new orthogonal axis. Layout
+  numbers + kits for all seven: `design/systems/CORE_RUNES.md` [v6 canon, supersedes the §7a kit
+  table where they differ].)*
 
 Three layers over the shared attribute pool:
-1. **Race + Core rune = the LOADOUT.** Race sets base attrs+HP; the Core rune sets layout (budget / bays /
-   action-bar size / apex). Together they are your **Loadout** — the assembled identity you take into a
+1. **Race + Core rune = the LOADOUT.** Race sets base attrs+HP; the Core rune sets layout (budget /
+   minions / action-bar size / apex). Together they are your **Loadout** — the assembled identity you take into a
    run (above the rune economy; not bought). *(This is the freed-up "Loadout" term; the old "Core" label
    retires.)*
-2. **Equipment (installed things).** Weapons (in hands), armor (per-group slots), minion-bay contents,
+2. **Equipment (installed things).** Weapons (in hands), armor (per-group slots), fielded minions,
    shield sources, runes — configured **between fights** on the **Equipment screen**, sealed in combat.
    A Core rune only ships a **STARTING** Equipment set — it does NOT lock equipment; gear is swappable
    (grown by finds; no build-time "pick a technique" gate). A piece may be **single-slot OR MULTI-SLOT**:
@@ -464,11 +466,12 @@ art is favored-line-only (never the cross-product). Revised completeness target 
 generic 240 + themed 480, 2 races) — multi-night, ship incrementally behind the §12a fallback chain. The
 per-core body-silhouette vs worn-part composition is an OPEN our-side engine question (§17 #15), deferred;
 no new body-shape art in this batch.
-**NOT locked, floated only (Doug, devil's-advocate mode, 2026-07-04):** an idea to make Warden's identity
-"all armor that requires STR requires CON instead" — this would either replace or stack with the
-ALREADY-LOCKED Warden Core Effect (*Unbroken Aegis* = 2× CON-scaled shield regen, §11). Don't build
-either interpretation until Doug picks one explicitly; Warden's STARTING KIT above doesn't depend on
-this and can ship regardless.
+**RESOLVED (2026-07-05, v6):** the floated "Warden's STR armor paid in CON" idea IS the design now —
+Core Effect *Fortified* ("plate armor is paid in CON at 1 less per tier", CORE_RUNES.md), REPLACING
+*Unbroken Aegis*. Note the v6 kits in CORE_RUNES.md supersede this §7a table where they differ
+(Warden's Cleave→Jab; Adept Ember/Siphon/Stoneskin + no minion; Summoner Ember/Sacrifice/Barkskin +
+Skeleton only; Reaver Frenzy/Flurry, no heal; Ranger Aimed Shot/Lunge/Bandage + Iron Dagger; new
+Barbarian Cleave/Bind/Bandage + Iron Claymore + plate) — the THEME column above stays canon.
 **Technique-weapon consult gap (observation, not a decision):** Jab/Cleave/Lunge/Ember/Drain are
 self-contained (no `Consults`) — equipping a themed weapon per the table above changes the paperdoll +
 equip-gate/cascade behavior (§6/§6d) but NOT those techniques' flat Power today (only `Shot`/`Swing`/
@@ -478,7 +481,9 @@ bigger balance-pass question Doug hasn't called yet — flagged, not invented.
 ## 8. Combat: single enemy, parts, targeting/firing [LOCKED]
 **Combat is always against ONE enemy** (a human foe, an atypical creature, the castle, or a special
 resource fight) — which may be **multi-PART**. The only targeting is **part aim within that one enemy**;
-there is no multi-foe list and no default/front target.
+there is no multi-foe list and no default/front target. **Foe roster canon + the foe/player SYMMETRY
+model (frames, gear, arsenals, Foe Effects, T1–T2 numbers): `design/systems/FOES.md`** (2026-07-05;
+built-foe specs are flagged prototypes, its IDEAS section is explicitly not-to-build).
 
 - **Every hit deals BOTH [LOCKED]:** part damage (subtracts from the targeted part's stat, graded §6,
   persistent) **and** HP damage — simultaneously, from the same hit. There is NO part-vs-HP split and no
@@ -549,8 +554,8 @@ stacked entities). Direction locked; specific creatures illustrative.
 
 ## 9. Minions [LOCKED; some OPEN]
 Minions yes; **party no** — one main character.
-- Minions live in **dedicated bays** (Core-rune-set count), **instant toggle**, not an action-bar cast.
-- A bay **requires its gate in real time**; below it the minion goes **idle (not destroyed)** and
+- Minions live in a **dedicated roster** (Core-rune-set capacity), **instant toggle**, not an action-bar cast.
+- A minion **requires its gate in real time**; below it the minion goes **idle (not destroyed)** and
   reactivates free once met. The gate scales minion quality.
 - **Gating is data-driven [LOCKED]:** default **INT-gated** (reserve INT). A Core rune / minion may
   OVERRIDE: a different gate stat; **ungated** (core-rune-granted loyal allies — e.g. a knight's retinue);
@@ -572,7 +577,7 @@ Minions yes; **party no** — one main character.
   pressing. **Archetype split, same total DPS at T1, different lever:** a FAST/WEAK minion (frequent,
   small hits) vs a SLOW/STRONG minion (rare, big hits) — both tuned to roughly **T1 1H-weapon-technique
   parity, not above it** (a minion is bonus pressure alongside the player's own kit, at the cost of a
-  bay + a reservation + Summons — it should not out-damage what the player's own action bar can do).
+  reservation + Summons — it should not out-damage what the player's own action bar can do).
   **T1 blessed-initial numbers** (10 ticks/sec clock, matching Jab/Lunge's ~0.4 dmg/s benchmark):
   **Skeleton** (fast/weak, INT-gated, Reserve 2) — Timer 25 ticks (2.5s), Power 1 → ~0.4 dmg/s.
   **Golem** (slow/strong, INT-gated, Reserve 3 — NEW, replaces Shade's role) — Timer 100 ticks (10s),
@@ -636,16 +641,15 @@ rune** (grown by progression). The *shape* of the rune loadout is itself a build
   OPEN: the old "aether" target is retired; redefine (vs Charge or a regenerating attribute) before it's
   real. Code currently grants a placeholder +CON — sample content, not the designed effect.]**
   Each CoreRune carries a **Core Effect** (renamed from "apex"; card label + blurb = `CoreEffectName`/
-  `CoreEffectDesc`, e.g. Grunt = *Hollow Vessel*) the build cards render (§13).
-  **Core Effect roster CANON [ADOPTED 2026-07-03 from design/05 v2 — CD's pass accepted as the design]:**
-  Grunt *Hollow Vessel* — healed for unspent budget points after each encounter · Warden *Unbroken
-  Aegis* — shield points regenerate at twice their CON-scaled rate · Adept *Overchannel* — spells
-  reserve no INT while the head stays above three-quarters · Summoner *Legion* — surviving minions'
-  Summons are refunded on Redeploy · Reaver *Bloodrush* — every part you break refunds a charging
-  technique · Ranger *Called Shot* (renamed from *Piercing Focus*) — ranged techniques ignore the foe's
-  shield and cover bonuses. Names+copy are LOCKED; the MECHANICS get built in a dedicated effect-model
-  pass — until then card copy may describe unbuilt behavior (flagged, acceptable). **EXCEPTION — the
-  Summoner's is REAL + LOCKED (2026-07-02)** and already built (§9/§14).
+  `CoreEffectDesc`, e.g. Grunt = *Jack of All Trades*) the build cards render (§13).
+  **Core Effect roster — REPLACED by the v6 pass [LOCKED 2026-07-05; canon = `design/systems/
+  CORE_RUNES.md`]:** the 2026-07-03 roster (*Hollow Vessel* / *Unbroken Aegis* / *Overchannel* /
+  *Legion* / *Bloodrush* / *Called Shot*) is RETIRED (§18). The seven current effects (Grunt *Jack of
+  All Trades* · Warden *Fortified* · Adept *Resonance* · Summoner *Conscription* · Reaver *Finesse* ·
+  Ranger *Fletcher's Luck* · Barbarian *Warlord's Might*) have rules text designed for BUILDING — the
+  mechanics are engine work now (STATUS Chunk A), not display-only placeholders. Warden's *Fortified*
+  ("plate paid in CON at 1 less per tier") RESOLVES the floated CON-substitution idea (§7a note): it
+  replaces *Unbroken Aegis*, decided.
 - **Prerequisite ladder [LOCKED]:** big runes need a minimum in an attribute, met by RACE base
   (efficient) **or** by spending budget on Marks to climb (mostly-refunded-but-leaks tax). Native
   qualification beats climbing.
@@ -744,7 +748,7 @@ Nested layers, macro → micro:
   `design/LAYOUT_CONTRACT.md` + `design/SCREENS.md`. **Aspect-independent fill:** background
   scale-to-cover; HUD anchored to real edges; the pixel stage integer-scaled + centered (no bars).
 - **Screens & canonical names [LOCKED]** (design/ PNGs 01-05): **NewGame** (design/05 — ONE screen,
-  three columns: **Race** (head sprites + attr/HP card) | **Core Rune** (rune icon + budget/actions/bays +
+  three columns: **Race** (head sprites + attr/HP card) | **Core Rune** (rune icon + budget/actions/minions +
   APEX card) | **Loadout** (the assembled Race+CoreRune: composed figure + combined stats + apex); BEGIN
   THE RUN), **Equipment** (design/02 — the Equipment cutaway:
   race+core anatomy, rune budget + ladder, equipped gear, action bar; a **between-fights** screen
@@ -770,14 +774,15 @@ Nested layers, macro → micro:
   - *Foe* = the ONE structured enemy with targetable PARTS + the targeting reticle; it carries its
     creature figure (ogre/troll/bandit/skeleton wired; wraith/gargoyle art pending).
   - Corrections from old wireframes: parallel action bar (not one-hand); **no poise/stagger bar**;
-    minions in **bays**; **no TEMPO/PERIL header**.
+    minions fielded as their own roster (no separate slot term); **no TEMPO/PERIL header**.
 
 ## 14. Economy / resources summary [LOCKED, modulo §10]
 - **Attributes (STR/INT/DEX/CON):** live pool; from RACE base + carrying parts + Marks; no gold buy.
 - **Charge:** finite, refillable (loot/gold, out of combat); spent by SHIELD-IGNORING techniques (incl.
   all bows) to bypass the shield pool (§6b/§10). NOT a generic magic cost.
 - **Summons:** finite, refillable (merchant/loot); SPENT to field a minion, on top of reserving its gate
-  stat (§9). The Summoner's Core Effect refunds it for surviving minions on Redeploy (§11).
+  stat (§9). The Summoner's Core Effect (*Conscription*, v6 2026-07-05) makes fielding spend NO
+  Summons at all — replacing the old Legion surviving-minion refund (§11/§18).
 - **HP:** small life total; restored only out of combat.
 - **Parts:** localized; damage subtracts the part's stat; heals repair parts.
 - **Shield points:** consumed 1:1 by damage; regen on a CON-scaled timer (§6b).
@@ -805,8 +810,10 @@ points there so the canon stays design-focused.
 2. Charge (§10) — RESOLVED: name = Charge, consume-per-use, IN the POC (the shield-pierce economy).
    Still open: whether shield-piercing needs an extra damaging-resolution beyond the bypass.
 3. Keystone taxonomy; budget math (≈55%/≈120%); gold buying low-tier runes (§11).
-4. Race roster beyond Human/Elf; full Core-rune roster; the **race↔core-rune restriction matrix** (§7)
-   — POC: ALL combos allowed; the matrix is a later content pass.
+4. ~~Race roster beyond Human/Elf; full Core-rune roster~~ MOSTLY RESOLVED 2026-07-05 (v6): FIVE races
+   (RACES.md, Half-Giant locked via Cowork) × SEVEN cores (CORE_RUNES.md, Barbarian added). Still open:
+   the **race↔core-rune restriction matrix** (§7) — POC: ALL combos allowed; a later content pass —
+   and further roster growth.
 5. Minion-type acquisition; **CON-as-minion-resource** (§9) — DROPPED, resource is Summons.
    PARTIAL 2026-07-04: Skeleton/Golem (INT, damage-lean) + Hound (DEX, utility-lean placeholder) are
    content now (§9). Still OPEN: the full stat→role table (STR minion undecided; DEX's real
@@ -817,7 +824,10 @@ points there so the canon stays design-focused.
 8. Shield numbers — per-source point caps + regen rates; the shield-wall troops→points formula (§6b).
 9. Balance/feel tuning overall (stat bases, budgets, spoils/prices, supplies vs march length, foe HP,
    damage, DEX-haste rate/cap, CON→HP ratio, evasion %, castle cadences) — the "play it and tune" pass.
-10. The Core-rune stat blocks (design/05 + the new Ranger) are placeholder — tune later.
+10. ~~The Core-rune stat blocks are placeholder~~ SUPERSEDED 2026-07-05: v6 gives cores ADDITIVE stat
+    bonuses + layout numbers (CORE_RUNES.md) and races their v6 blocks (RACES.md) — blessed-initial,
+    tuned at the balance-playtest pass like everything else (#9). Known deliberate outlier: Barbarian's
+    kit over-demand (CORE_RUNES.md note).
 11. Part→stat friction (legs = accuracy, arms = STR) — low-pri revisit only if it nags.
 12. Action speed beyond DEX haste — none planned; revisit only if needed.
 13. Redeploy lockout tuning (the DEX→lockout curve) and the FTL-style commit-to-destination on
@@ -852,6 +862,12 @@ points there so the canon stays design-focused.
 
 ## 18. DROPPED — must not resurface
 - **"Chassis" as the identity model** → split into **Race + Core rune** (§7).
+- **"A Core rune carries NO attributes"** → v6 (2026-07-05): cores grant ADDITIVE stat bonuses on top
+  of race base (CORE_RUNES.md); race remains the only source of BASE attrs + HP.
+- **The 2026-07-03 Core Effect roster** (*Hollow Vessel* / *Unbroken Aegis* / *Overchannel* / *Legion* /
+  *Bloodrush* / *Called Shot*) → the v6 seven-effect roster with buildable rules text (CORE_RUNES.md);
+  Summoner's old Legion refund mechanic retires in favor of *Conscription*.
+- **"Bay(s)" as the minion-slot term** → "Minions"/minion capacity only (2026-07-05 canon rename).
 - **Multi-foe combat / multiple targets / a "front" fallback target** → **single enemy**, part-aim only (§8).
 - **A fire button; a focus/selected-technique cursor; techniques starting powered/targeted; AUTO on by
   default** → the targeting FSM (§8): start inactive+untargeted, charged+targeted fires, AUTO off.
@@ -873,12 +889,12 @@ points there so the canon stays design-focused.
   **Summons**: a minion is gated by a reserved stat AND costs Summons to field/re-summon (§9/§14).
 - **Weapon durability / maintenance** → covered by the disable layer, §8.
 - **Party members / companions** → minions only, §9.
-- **Summoning as an action-bar technique** → bays with instant toggle, §9.
+- **Summoning as an action-bar technique** → minions with instant toggle, §9.
 - **Armor on the action bar; armor that gates/grants attributes** → per-group slots; light effect layer
   keyed to type (STR = part-damage mitigation, DEX = evasion, INT = spell dmg, shield = block recharge —
   full ladders §6c), §6/§13.
 - **Verbs bound to weapons** → weapons grant zero verbs; techniques consult gear, §7.
-- **Multiple consumable stockpiles** → one **Charge** resource + gated bays, §10.
+- **Multiple consumable stockpiles** → one **Charge** resource + gated minions, §10.
 - **Charge as a generic "magic-tier" cost (any spell/magic verb draws it)** → Charge is spent ONLY by
   SHIELD-IGNORING techniques (all bows + designated pierce verbs) — the shield-pierce economy, §10.
 - **Integer-only / letterbox-only scaling that bars out** → aspect-independent fill (cover bg + anchored

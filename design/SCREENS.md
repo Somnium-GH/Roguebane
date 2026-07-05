@@ -22,11 +22,11 @@ Three columns: YOU (left) | BATTLEFIELD (center) | FOE (right); header top; acti
 - [x] YOU: HP bar bound to Fighter Hp/MaxHp; figure labelled with its chassis.
 - [x] ATTRIBUTE-POOL PIP WIDGET: per-stat coloured pips (free/reserved/damaged), mono anchor.
       (In the YOU box, not yet the prominent bottom panel — that waits on the combat manifest rebuild.)
-- [x] BATTLEFIELD: minion sprites in the bay lane; rallied-support lane (banked / RALLIED +N).
+- [x] BATTLEFIELD: minion sprites in the minion lane; rallied-support lane (banked / RALLIED +N).
 - [x] FOE: structured creature figure(s) with targetable PART bands + HP bar + reticle + name tag.
 - [x] ACTION BAR: card per technique — icon, stat cost, cooldown fill, state (RDY/charging/held/dry),
       per-card target tag; global AUTO toggle, no fire button.
-- [x] Minion-bay lane (filled occupant sprite / empty outline).
+- [x] Minion lane (filled occupant sprite / empty outline).
 - [x] Run resources: supplies X/max, support banked/holds, war-party distance, gold, potions.
 - [ ] design/01 EXACT layout (prominent bottom attribute-pool + action-bar panels, figures in the open
       battlefield) — deferred to the coherent combat manifest rebuild (see STATUS).
@@ -43,9 +43,9 @@ Action Bar loadout (bottom). **This is the worst current gap — most of the bel
 - [ ] INVENTORY with TABS (GEAR / TECHNIQUES / MINIONS) + click/drag equip — input-coupled, deferred
       (equip works on the run-map gear bar today).
 - [ ] RUNE BAG (MARKS / PATHS / KEYSTONES cards + socket/sell) — current screen shows rune LADDERS instead.
-- [x] CURRENT CORE stat block: str/int/dex/con / bays / budget / actions.
-- [x] ACTION BAR loadout: the FIXED starting kit pre-slotted (no pick gate); MINION BAYS preview strip
-      shows the chassis retinue (sprite + power per bay) alongside.
+- [x] CURRENT CORE stat block: str/int/dex/con / minion capacity / budget / actions.
+- [x] ACTION BAR loadout: the FIXED starting kit pre-slotted (no pick gate); MINIONS preview strip
+      shows the chassis retinue (sprite + power per minion) alongside.
 
 ## 03 Run Map — `design/03-runmap.png`
 - [x] Supplies meter (X/max); Mastered Support (banked/holds).
@@ -64,7 +64,7 @@ Action Bar loadout (bottom). **This is the worst current gap — most of the bel
 Two-axis pick (DESIGN_SPEC §7), ideally a COMBINED experience rather than two hard steps:
 - [ ] Pick a RACE: a card per race (start: Human, Elf) — figure + base attributes + base HP + flavor.
 - [ ] Pick a CORE RUNE: cards for the core runes the chosen race ALLOWS (others greyed/hidden) —
-      figure/identity + layout block (budget / #techniques / #bays / apex effect) + flavor.
+      figure/identity + layout block (budget / #techniques / #minions / apex effect) + flavor.
 - [ ] COMBINED ideal: a race selector + a core-rune grid that filters/updates to the race's allowed
       set, previewing the resulting race-base × core-rune-layout combo. (Old single "Chassis" pick is
       retired — design/05 PNG predates this.)

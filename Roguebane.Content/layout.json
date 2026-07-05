@@ -106,11 +106,11 @@
       },
       "mounts": [
         {
-          "gear": "sword",
+          "gear": "longsword_iron",
           "socket": "handL"
         },
         {
-          "gear": "round_shield",
+          "gear": "shield_wooden",
           "socket": "handR"
         }
       ]
@@ -221,7 +221,11 @@
       },
       "mounts": [
         {
-          "gear": "tower_shield",
+          "gear": "longsword_iron",
+          "socket": "handL"
+        },
+        {
+          "gear": "shield_buckler",
           "socket": "handR"
         }
       ]
@@ -305,7 +309,7 @@
       },
       "mounts": [
         {
-          "gear": "staff",
+          "gear": "staff_wooden",
           "socket": "handR"
         }
       ]
@@ -389,7 +393,11 @@
       },
       "mounts": [
         {
-          "gear": "staff",
+          "gear": "wand_adept",
+          "socket": "handL"
+        },
+        {
+          "gear": "charm_wooden",
           "socket": "handR"
         }
       ]
@@ -500,11 +508,11 @@
       },
       "mounts": [
         {
-          "gear": "dagger",
+          "gear": "dagger_iron",
           "socket": "handL"
         },
         {
-          "gear": "dagger",
+          "gear": "dagger_iron",
           "socket": "handR"
         }
       ]
@@ -615,7 +623,122 @@
       },
       "mounts": [
         {
-          "gear": "bow",
+          "gear": "bow_short",
+          "socket": "handL"
+        },
+        {
+          "gear": "dagger_iron",
+          "socket": "handR"
+        }
+      ]
+    },
+    "human_barbarian": {
+      "size": [
+        272,
+        368
+      ],
+      "race": "human",
+      "pivot": [
+        140,
+        360
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            88,
+            264,
+            40,
+            72
+          ]
+        },
+        "legR": {
+          "rect": [
+            152,
+            264,
+            40,
+            72
+          ]
+        },
+        "boots": {
+          "rect": [
+            80,
+            336,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            56,
+            104,
+            168,
+            160
+          ]
+        },
+        "armL": {
+          "rect": [
+            16,
+            104,
+            48,
+            112
+          ]
+        },
+        "armR": {
+          "rect": [
+            216,
+            104,
+            48,
+            112
+          ]
+        },
+        "head": {
+          "rect": [
+            88,
+            16,
+            104,
+            104
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          36,
+          204
+        ],
+        "handR": [
+          244,
+          204
+        ],
+        "neck": [
+          140,
+          116
+        ],
+        "shoulderL": [
+          44,
+          108
+        ],
+        "shoulderR": [
+          236,
+          108
+        ],
+        "back": [
+          140,
+          124
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "claymore_iron",
           "socket": "handL"
         }
       ]
@@ -726,11 +849,11 @@
       },
       "mounts": [
         {
-          "gear": "sword",
+          "gear": "longsword_iron",
           "socket": "handL"
         },
         {
-          "gear": "round_shield",
+          "gear": "shield_wooden",
           "socket": "handR"
         }
       ]
@@ -841,7 +964,11 @@
       },
       "mounts": [
         {
-          "gear": "tower_shield",
+          "gear": "longsword_iron",
+          "socket": "handL"
+        },
+        {
+          "gear": "shield_buckler",
           "socket": "handR"
         }
       ]
@@ -925,7 +1052,7 @@
       },
       "mounts": [
         {
-          "gear": "staff",
+          "gear": "staff_wooden",
           "socket": "handR"
         }
       ]
@@ -1009,7 +1136,11 @@
       },
       "mounts": [
         {
-          "gear": "staff",
+          "gear": "wand_adept",
+          "socket": "handL"
+        },
+        {
+          "gear": "charm_wooden",
           "socket": "handR"
         }
       ]
@@ -1120,11 +1251,11 @@
       },
       "mounts": [
         {
-          "gear": "dagger",
+          "gear": "dagger_iron",
           "socket": "handL"
         },
         {
-          "gear": "dagger",
+          "gear": "dagger_iron",
           "socket": "handR"
         }
       ]
@@ -1235,7 +1366,2351 @@
       },
       "mounts": [
         {
-          "gear": "bow",
+          "gear": "bow_short",
+          "socket": "handL"
+        },
+        {
+          "gear": "dagger_iron",
+          "socket": "handR"
+        }
+      ]
+    },
+    "elf_barbarian": {
+      "size": [
+        256,
+        368
+      ],
+      "race": "elf",
+      "pivot": [
+        132,
+        360
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            80,
+            264,
+            40,
+            72
+          ]
+        },
+        "legR": {
+          "rect": [
+            144,
+            264,
+            40,
+            72
+          ]
+        },
+        "boots": {
+          "rect": [
+            72,
+            336,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            56,
+            104,
+            152,
+            160
+          ]
+        },
+        "armL": {
+          "rect": [
+            16,
+            104,
+            48,
+            112
+          ]
+        },
+        "armR": {
+          "rect": [
+            200,
+            104,
+            48,
+            112
+          ]
+        },
+        "head": {
+          "rect": [
+            56,
+            16,
+            152,
+            104
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          36,
+          204
+        ],
+        "handR": [
+          228,
+          204
+        ],
+        "neck": [
+          132,
+          116
+        ],
+        "shoulderL": [
+          44,
+          108
+        ],
+        "shoulderR": [
+          220,
+          108
+        ],
+        "back": [
+          132,
+          124
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "claymore_iron",
+          "socket": "handL"
+        }
+      ]
+    },
+    "dwarf_grunt": {
+      "size": [
+        344,
+        328
+      ],
+      "race": "dwarf",
+      "pivot": [
+        148,
+        320
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            96,
+            248,
+            40,
+            48
+          ]
+        },
+        "legR": {
+          "rect": [
+            160,
+            248,
+            40,
+            48
+          ]
+        },
+        "boots": {
+          "rect": [
+            88,
+            296,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            56,
+            88,
+            176,
+            160
+          ]
+        },
+        "armL": {
+          "rect": [
+            16,
+            88,
+            48,
+            104
+          ]
+        },
+        "armR": {
+          "rect": [
+            224,
+            88,
+            48,
+            104
+          ]
+        },
+        "head": {
+          "rect": [
+            88,
+            8,
+            120,
+            96
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          36,
+          180
+        ],
+        "handR": [
+          252,
+          180
+        ],
+        "neck": [
+          148,
+          100
+        ],
+        "shoulderL": [
+          44,
+          92
+        ],
+        "shoulderR": [
+          244,
+          92
+        ],
+        "back": [
+          148,
+          108
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "longsword_iron",
+          "socket": "handL"
+        },
+        {
+          "gear": "shield_wooden",
+          "socket": "handR"
+        }
+      ]
+    },
+    "dwarf_warden": {
+      "size": [
+        352,
+        344
+      ],
+      "race": "dwarf",
+      "pivot": [
+        156,
+        336
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            96,
+            264,
+            48,
+            48
+          ]
+        },
+        "legR": {
+          "rect": [
+            168,
+            264,
+            48,
+            48
+          ]
+        },
+        "boots": {
+          "rect": [
+            88,
+            312,
+            136,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            56,
+            96,
+            192,
+            168
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            96,
+            56,
+            112
+          ]
+        },
+        "armR": {
+          "rect": [
+            240,
+            96,
+            56,
+            112
+          ]
+        },
+        "head": {
+          "rect": [
+            88,
+            8,
+            128,
+            104
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          36,
+          196
+        ],
+        "handR": [
+          268,
+          196
+        ],
+        "neck": [
+          156,
+          108
+        ],
+        "shoulderL": [
+          36,
+          100
+        ],
+        "shoulderR": [
+          268,
+          100
+        ],
+        "back": [
+          156,
+          116
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "longsword_iron",
+          "socket": "handL"
+        },
+        {
+          "gear": "shield_buckler",
+          "socket": "handR"
+        }
+      ]
+    },
+    "dwarf_adept": {
+      "size": [
+        296,
+        384
+      ],
+      "race": "dwarf",
+      "pivot": [
+        148,
+        376
+      ],
+      "z": [
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "torso": {
+          "rect": [
+            16,
+            112,
+            264,
+            264
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            112,
+            64,
+            120
+          ]
+        },
+        "armR": {
+          "rect": [
+            224,
+            112,
+            64,
+            120
+          ]
+        },
+        "head": {
+          "rect": [
+            88,
+            32,
+            120,
+            104
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          44,
+          220
+        ],
+        "handR": [
+          252,
+          220
+        ],
+        "neck": [
+          148,
+          132
+        ],
+        "shoulderL": [
+          44,
+          116
+        ],
+        "shoulderR": [
+          252,
+          116
+        ],
+        "back": [
+          148,
+          124
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "staff_wooden",
+          "socket": "handR"
+        }
+      ]
+    },
+    "dwarf_summoner": {
+      "size": [
+        296,
+        384
+      ],
+      "race": "dwarf",
+      "pivot": [
+        148,
+        376
+      ],
+      "z": [
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "torso": {
+          "rect": [
+            16,
+            112,
+            264,
+            264
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            112,
+            64,
+            120
+          ]
+        },
+        "armR": {
+          "rect": [
+            224,
+            112,
+            64,
+            120
+          ]
+        },
+        "head": {
+          "rect": [
+            88,
+            32,
+            120,
+            104
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          44,
+          220
+        ],
+        "handR": [
+          252,
+          220
+        ],
+        "neck": [
+          148,
+          132
+        ],
+        "shoulderL": [
+          44,
+          116
+        ],
+        "shoulderR": [
+          252,
+          116
+        ],
+        "back": [
+          148,
+          124
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "wand_adept",
+          "socket": "handL"
+        },
+        {
+          "gear": "charm_wooden",
+          "socket": "handR"
+        }
+      ]
+    },
+    "dwarf_reaver": {
+      "size": [
+        264,
+        328
+      ],
+      "race": "dwarf",
+      "pivot": [
+        132,
+        320
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            80,
+            240,
+            40,
+            56
+          ]
+        },
+        "legR": {
+          "rect": [
+            144,
+            240,
+            40,
+            56
+          ]
+        },
+        "boots": {
+          "rect": [
+            72,
+            296,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            48,
+            88,
+            168,
+            152
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            88,
+            48,
+            96
+          ]
+        },
+        "armR": {
+          "rect": [
+            208,
+            88,
+            48,
+            96
+          ]
+        },
+        "head": {
+          "rect": [
+            72,
+            8,
+            120,
+            96
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          28,
+          172
+        ],
+        "handR": [
+          236,
+          172
+        ],
+        "neck": [
+          132,
+          100
+        ],
+        "shoulderL": [
+          36,
+          92
+        ],
+        "shoulderR": [
+          228,
+          92
+        ],
+        "back": [
+          132,
+          108
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "dagger_iron",
+          "socket": "handL"
+        },
+        {
+          "gear": "dagger_iron",
+          "socket": "handR"
+        }
+      ]
+    },
+    "dwarf_ranger": {
+      "size": [
+        280,
+        320
+      ],
+      "race": "dwarf",
+      "pivot": [
+        148,
+        312
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            96,
+            240,
+            40,
+            48
+          ]
+        },
+        "legR": {
+          "rect": [
+            160,
+            240,
+            40,
+            48
+          ]
+        },
+        "boots": {
+          "rect": [
+            88,
+            288,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            64,
+            88,
+            168,
+            152
+          ]
+        },
+        "armL": {
+          "rect": [
+            24,
+            88,
+            48,
+            104
+          ]
+        },
+        "armR": {
+          "rect": [
+            224,
+            88,
+            48,
+            104
+          ]
+        },
+        "head": {
+          "rect": [
+            88,
+            8,
+            120,
+            96
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          44,
+          180
+        ],
+        "handR": [
+          252,
+          180
+        ],
+        "neck": [
+          148,
+          100
+        ],
+        "shoulderL": [
+          52,
+          92
+        ],
+        "shoulderR": [
+          244,
+          92
+        ],
+        "back": [
+          148,
+          108
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "bow_short",
+          "socket": "handL"
+        },
+        {
+          "gear": "dagger_iron",
+          "socket": "handR"
+        }
+      ]
+    },
+    "dwarf_barbarian": {
+      "size": [
+        288,
+        352
+      ],
+      "race": "dwarf",
+      "pivot": [
+        148,
+        344
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            96,
+            272,
+            40,
+            48
+          ]
+        },
+        "legR": {
+          "rect": [
+            160,
+            272,
+            40,
+            48
+          ]
+        },
+        "boots": {
+          "rect": [
+            88,
+            320,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            56,
+            112,
+            184,
+            160
+          ]
+        },
+        "armL": {
+          "rect": [
+            16,
+            112,
+            48,
+            104
+          ]
+        },
+        "armR": {
+          "rect": [
+            232,
+            112,
+            48,
+            104
+          ]
+        },
+        "head": {
+          "rect": [
+            88,
+            32,
+            120,
+            96
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          36,
+          204
+        ],
+        "handR": [
+          260,
+          204
+        ],
+        "neck": [
+          148,
+          124
+        ],
+        "shoulderL": [
+          44,
+          116
+        ],
+        "shoulderR": [
+          252,
+          116
+        ],
+        "back": [
+          148,
+          132
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "claymore_iron",
+          "socket": "handL"
+        }
+      ]
+    },
+    "halfling_grunt": {
+      "size": [
+        312,
+        328
+      ],
+      "race": "halfling",
+      "pivot": [
+        132,
+        320
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            80,
+            240,
+            40,
+            56
+          ]
+        },
+        "legR": {
+          "rect": [
+            144,
+            240,
+            40,
+            56
+          ]
+        },
+        "boots": {
+          "rect": [
+            72,
+            296,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            56,
+            80,
+            144,
+            160
+          ]
+        },
+        "armL": {
+          "rect": [
+            16,
+            80,
+            48,
+            104
+          ]
+        },
+        "armR": {
+          "rect": [
+            192,
+            80,
+            48,
+            104
+          ]
+        },
+        "head": {
+          "rect": [
+            64,
+            8,
+            128,
+            88
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          36,
+          172
+        ],
+        "handR": [
+          220,
+          172
+        ],
+        "neck": [
+          132,
+          92
+        ],
+        "shoulderL": [
+          44,
+          84
+        ],
+        "shoulderR": [
+          212,
+          84
+        ],
+        "back": [
+          132,
+          100
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "longsword_iron",
+          "socket": "handL"
+        },
+        {
+          "gear": "shield_wooden",
+          "socket": "handR"
+        }
+      ]
+    },
+    "halfling_warden": {
+      "size": [
+        320,
+        344
+      ],
+      "race": "halfling",
+      "pivot": [
+        140,
+        336
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            80,
+            256,
+            48,
+            56
+          ]
+        },
+        "legR": {
+          "rect": [
+            152,
+            256,
+            48,
+            56
+          ]
+        },
+        "boots": {
+          "rect": [
+            72,
+            312,
+            136,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            56,
+            88,
+            160,
+            168
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            88,
+            56,
+            112
+          ]
+        },
+        "armR": {
+          "rect": [
+            208,
+            88,
+            56,
+            112
+          ]
+        },
+        "head": {
+          "rect": [
+            88,
+            8,
+            104,
+            96
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          36,
+          188
+        ],
+        "handR": [
+          236,
+          188
+        ],
+        "neck": [
+          140,
+          100
+        ],
+        "shoulderL": [
+          36,
+          92
+        ],
+        "shoulderR": [
+          236,
+          92
+        ],
+        "back": [
+          140,
+          108
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "longsword_iron",
+          "socket": "handL"
+        },
+        {
+          "gear": "shield_buckler",
+          "socket": "handR"
+        }
+      ]
+    },
+    "halfling_adept": {
+      "size": [
+        264,
+        384
+      ],
+      "race": "halfling",
+      "pivot": [
+        132,
+        376
+      ],
+      "z": [
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "torso": {
+          "rect": [
+            16,
+            104,
+            232,
+            272
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            104,
+            64,
+            120
+          ]
+        },
+        "armR": {
+          "rect": [
+            192,
+            104,
+            64,
+            120
+          ]
+        },
+        "head": {
+          "rect": [
+            64,
+            32,
+            128,
+            96
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          44,
+          212
+        ],
+        "handR": [
+          220,
+          212
+        ],
+        "neck": [
+          132,
+          124
+        ],
+        "shoulderL": [
+          44,
+          108
+        ],
+        "shoulderR": [
+          220,
+          108
+        ],
+        "back": [
+          132,
+          116
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "staff_wooden",
+          "socket": "handR"
+        }
+      ]
+    },
+    "halfling_summoner": {
+      "size": [
+        264,
+        384
+      ],
+      "race": "halfling",
+      "pivot": [
+        132,
+        376
+      ],
+      "z": [
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "torso": {
+          "rect": [
+            16,
+            104,
+            232,
+            272
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            104,
+            64,
+            120
+          ]
+        },
+        "armR": {
+          "rect": [
+            192,
+            104,
+            64,
+            120
+          ]
+        },
+        "head": {
+          "rect": [
+            64,
+            32,
+            128,
+            96
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          44,
+          212
+        ],
+        "handR": [
+          220,
+          212
+        ],
+        "neck": [
+          132,
+          124
+        ],
+        "shoulderL": [
+          44,
+          108
+        ],
+        "shoulderR": [
+          220,
+          108
+        ],
+        "back": [
+          132,
+          116
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "wand_adept",
+          "socket": "handL"
+        },
+        {
+          "gear": "charm_wooden",
+          "socket": "handR"
+        }
+      ]
+    },
+    "halfling_reaver": {
+      "size": [
+        232,
+        328
+      ],
+      "race": "halfling",
+      "pivot": [
+        116,
+        320
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            64,
+            232,
+            40,
+            64
+          ]
+        },
+        "legR": {
+          "rect": [
+            128,
+            232,
+            40,
+            64
+          ]
+        },
+        "boots": {
+          "rect": [
+            56,
+            296,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            48,
+            80,
+            136,
+            152
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            80,
+            48,
+            96
+          ]
+        },
+        "armR": {
+          "rect": [
+            176,
+            80,
+            48,
+            96
+          ]
+        },
+        "head": {
+          "rect": [
+            48,
+            8,
+            128,
+            88
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          28,
+          164
+        ],
+        "handR": [
+          204,
+          164
+        ],
+        "neck": [
+          116,
+          92
+        ],
+        "shoulderL": [
+          36,
+          84
+        ],
+        "shoulderR": [
+          196,
+          84
+        ],
+        "back": [
+          116,
+          100
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "dagger_iron",
+          "socket": "handL"
+        },
+        {
+          "gear": "dagger_iron",
+          "socket": "handR"
+        }
+      ]
+    },
+    "halfling_ranger": {
+      "size": [
+        248,
+        320
+      ],
+      "race": "halfling",
+      "pivot": [
+        132,
+        312
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            80,
+            232,
+            40,
+            56
+          ]
+        },
+        "legR": {
+          "rect": [
+            144,
+            232,
+            40,
+            56
+          ]
+        },
+        "boots": {
+          "rect": [
+            72,
+            288,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            64,
+            80,
+            136,
+            152
+          ]
+        },
+        "armL": {
+          "rect": [
+            24,
+            80,
+            48,
+            104
+          ]
+        },
+        "armR": {
+          "rect": [
+            192,
+            80,
+            48,
+            104
+          ]
+        },
+        "head": {
+          "rect": [
+            64,
+            8,
+            128,
+            88
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          44,
+          172
+        ],
+        "handR": [
+          220,
+          172
+        ],
+        "neck": [
+          132,
+          92
+        ],
+        "shoulderL": [
+          52,
+          84
+        ],
+        "shoulderR": [
+          212,
+          84
+        ],
+        "back": [
+          132,
+          100
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "bow_short",
+          "socket": "handL"
+        },
+        {
+          "gear": "dagger_iron",
+          "socket": "handR"
+        }
+      ]
+    },
+    "halfling_barbarian": {
+      "size": [
+        256,
+        360
+      ],
+      "race": "halfling",
+      "pivot": [
+        132,
+        352
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            80,
+            272,
+            40,
+            56
+          ]
+        },
+        "legR": {
+          "rect": [
+            144,
+            272,
+            40,
+            56
+          ]
+        },
+        "boots": {
+          "rect": [
+            72,
+            328,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            56,
+            112,
+            152,
+            160
+          ]
+        },
+        "armL": {
+          "rect": [
+            16,
+            112,
+            48,
+            104
+          ]
+        },
+        "armR": {
+          "rect": [
+            200,
+            112,
+            48,
+            104
+          ]
+        },
+        "head": {
+          "rect": [
+            64,
+            40,
+            128,
+            88
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          36,
+          204
+        ],
+        "handR": [
+          228,
+          204
+        ],
+        "neck": [
+          132,
+          124
+        ],
+        "shoulderL": [
+          44,
+          116
+        ],
+        "shoulderR": [
+          220,
+          116
+        ],
+        "back": [
+          132,
+          132
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "claymore_iron",
+          "socket": "handL"
+        }
+      ]
+    },
+    "half_giant_grunt": {
+      "size": [
+        336,
+        408
+      ],
+      "race": "half_giant",
+      "pivot": [
+        140,
+        400
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            88,
+            288,
+            40,
+            88
+          ]
+        },
+        "legR": {
+          "rect": [
+            152,
+            288,
+            40,
+            88
+          ]
+        },
+        "boots": {
+          "rect": [
+            80,
+            376,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            56,
+            104,
+            168,
+            184
+          ]
+        },
+        "armL": {
+          "rect": [
+            16,
+            104,
+            48,
+            128
+          ]
+        },
+        "armR": {
+          "rect": [
+            216,
+            104,
+            48,
+            128
+          ]
+        },
+        "head": {
+          "rect": [
+            80,
+            8,
+            112,
+            112
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          36,
+          220
+        ],
+        "handR": [
+          244,
+          220
+        ],
+        "neck": [
+          140,
+          116
+        ],
+        "shoulderL": [
+          44,
+          108
+        ],
+        "shoulderR": [
+          236,
+          108
+        ],
+        "back": [
+          140,
+          124
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "longsword_iron",
+          "socket": "handL"
+        },
+        {
+          "gear": "shield_wooden",
+          "socket": "handR"
+        }
+      ]
+    },
+    "half_giant_warden": {
+      "size": [
+        344,
+        424
+      ],
+      "race": "half_giant",
+      "pivot": [
+        148,
+        416
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            88,
+            304,
+            48,
+            88
+          ]
+        },
+        "legR": {
+          "rect": [
+            160,
+            304,
+            48,
+            88
+          ]
+        },
+        "boots": {
+          "rect": [
+            80,
+            392,
+            136,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            56,
+            112,
+            184,
+            192
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            112,
+            56,
+            136
+          ]
+        },
+        "armR": {
+          "rect": [
+            232,
+            112,
+            56,
+            136
+          ]
+        },
+        "head": {
+          "rect": [
+            88,
+            8,
+            120,
+            120
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          36,
+          236
+        ],
+        "handR": [
+          260,
+          236
+        ],
+        "neck": [
+          148,
+          124
+        ],
+        "shoulderL": [
+          36,
+          116
+        ],
+        "shoulderR": [
+          260,
+          116
+        ],
+        "back": [
+          148,
+          132
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "longsword_iron",
+          "socket": "handL"
+        },
+        {
+          "gear": "shield_buckler",
+          "socket": "handR"
+        }
+      ]
+    },
+    "half_giant_adept": {
+      "size": [
+        280,
+        400
+      ],
+      "race": "half_giant",
+      "pivot": [
+        140,
+        392
+      ],
+      "z": [
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "torso": {
+          "rect": [
+            16,
+            104,
+            248,
+            288
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            104,
+            64,
+            144
+          ]
+        },
+        "armR": {
+          "rect": [
+            208,
+            104,
+            64,
+            144
+          ]
+        },
+        "head": {
+          "rect": [
+            80,
+            8,
+            112,
+            120
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          44,
+          236
+        ],
+        "handR": [
+          236,
+          236
+        ],
+        "neck": [
+          140,
+          124
+        ],
+        "shoulderL": [
+          44,
+          108
+        ],
+        "shoulderR": [
+          236,
+          108
+        ],
+        "back": [
+          140,
+          116
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "staff_wooden",
+          "socket": "handR"
+        }
+      ]
+    },
+    "half_giant_summoner": {
+      "size": [
+        280,
+        400
+      ],
+      "race": "half_giant",
+      "pivot": [
+        140,
+        392
+      ],
+      "z": [
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "torso": {
+          "rect": [
+            16,
+            104,
+            248,
+            288
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            104,
+            64,
+            144
+          ]
+        },
+        "armR": {
+          "rect": [
+            208,
+            104,
+            64,
+            144
+          ]
+        },
+        "head": {
+          "rect": [
+            80,
+            8,
+            112,
+            120
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          44,
+          236
+        ],
+        "handR": [
+          236,
+          236
+        ],
+        "neck": [
+          140,
+          124
+        ],
+        "shoulderL": [
+          44,
+          108
+        ],
+        "shoulderR": [
+          236,
+          108
+        ],
+        "back": [
+          140,
+          116
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "wand_adept",
+          "socket": "handL"
+        },
+        {
+          "gear": "charm_wooden",
+          "socket": "handR"
+        }
+      ]
+    },
+    "half_giant_reaver": {
+      "size": [
+        256,
+        408
+      ],
+      "race": "half_giant",
+      "pivot": [
+        132,
+        400
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            80,
+            280,
+            40,
+            96
+          ]
+        },
+        "legR": {
+          "rect": [
+            144,
+            280,
+            40,
+            96
+          ]
+        },
+        "boots": {
+          "rect": [
+            72,
+            376,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            48,
+            104,
+            160,
+            176
+          ]
+        },
+        "armL": {
+          "rect": [
+            8,
+            104,
+            48,
+            120
+          ]
+        },
+        "armR": {
+          "rect": [
+            200,
+            104,
+            48,
+            120
+          ]
+        },
+        "head": {
+          "rect": [
+            72,
+            8,
+            112,
+            112
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          28,
+          212
+        ],
+        "handR": [
+          228,
+          212
+        ],
+        "neck": [
+          132,
+          116
+        ],
+        "shoulderL": [
+          36,
+          108
+        ],
+        "shoulderR": [
+          220,
+          108
+        ],
+        "back": [
+          132,
+          124
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "dagger_iron",
+          "socket": "handL"
+        },
+        {
+          "gear": "dagger_iron",
+          "socket": "handR"
+        }
+      ]
+    },
+    "half_giant_ranger": {
+      "size": [
+        272,
+        400
+      ],
+      "race": "half_giant",
+      "pivot": [
+        148,
+        392
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            96,
+            280,
+            40,
+            88
+          ]
+        },
+        "legR": {
+          "rect": [
+            160,
+            280,
+            40,
+            88
+          ]
+        },
+        "boots": {
+          "rect": [
+            88,
+            368,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            64,
+            104,
+            160,
+            176
+          ]
+        },
+        "armL": {
+          "rect": [
+            24,
+            104,
+            48,
+            128
+          ]
+        },
+        "armR": {
+          "rect": [
+            216,
+            104,
+            48,
+            128
+          ]
+        },
+        "head": {
+          "rect": [
+            88,
+            8,
+            112,
+            112
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          44,
+          220
+        ],
+        "handR": [
+          244,
+          220
+        ],
+        "neck": [
+          148,
+          116
+        ],
+        "shoulderL": [
+          52,
+          108
+        ],
+        "shoulderR": [
+          236,
+          108
+        ],
+        "back": [
+          148,
+          124
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "bow_short",
+          "socket": "handL"
+        },
+        {
+          "gear": "dagger_iron",
+          "socket": "handR"
+        }
+      ]
+    },
+    "half_giant_barbarian": {
+      "size": [
+        280,
+        408
+      ],
+      "race": "half_giant",
+      "pivot": [
+        148,
+        400
+      ],
+      "z": [
+        "legL",
+        "legR",
+        "boots",
+        "torso",
+        "armL",
+        "armR",
+        "head",
+        "frontGear"
+      ],
+      "parts": {
+        "legL": {
+          "rect": [
+            96,
+            288,
+            40,
+            88
+          ]
+        },
+        "legR": {
+          "rect": [
+            160,
+            288,
+            40,
+            88
+          ]
+        },
+        "boots": {
+          "rect": [
+            88,
+            376,
+            120,
+            24
+          ]
+        },
+        "torso": {
+          "rect": [
+            56,
+            104,
+            176,
+            184
+          ]
+        },
+        "armL": {
+          "rect": [
+            16,
+            104,
+            48,
+            128
+          ]
+        },
+        "armR": {
+          "rect": [
+            224,
+            104,
+            48,
+            128
+          ]
+        },
+        "head": {
+          "rect": [
+            88,
+            8,
+            112,
+            112
+          ]
+        }
+      },
+      "sockets": {
+        "handL": [
+          36,
+          220
+        ],
+        "handR": [
+          252,
+          220
+        ],
+        "neck": [
+          148,
+          116
+        ],
+        "shoulderL": [
+          44,
+          108
+        ],
+        "shoulderR": [
+          244,
+          108
+        ],
+        "back": [
+          148,
+          124
+        ]
+      },
+      "mounts": [
+        {
+          "gear": "claymore_iron",
           "socket": "handL"
         }
       ]
@@ -2696,11 +5171,11 @@
           "type": "panel",
           "anchor": "TopLeft",
           "offset": [
-            75,
+            69,
             321
           ],
           "size": [
-            120,
+            132,
             24
           ],
           "z": 4,
@@ -2715,11 +5190,11 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            75,
+            69,
             321
           ],
           "size": [
-            120,
+            132,
             7
           ],
           "z": 5,
@@ -2728,18 +5203,18 @@
           "font": "mono",
           "fontPx": 5,
           "align": "center",
-          "sample": "GRUNT · HP"
+          "sample": "HUMAN GRUNT · HP"
         },
         {
           "id": "heroHpPips",
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            75,
+            69,
             330
           ],
           "size": [
-            120,
+            132,
             6
           ],
           "z": 6,
@@ -2751,9 +5226,9 @@
           "item": {
             "template": "heroHpPip",
             "flow": "horizontal",
-            "gap": 2,
+            "gap": 1,
             "size": [
-              7,
+              5,
               6
             ]
           }
@@ -2763,11 +5238,11 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            75,
+            69,
             337
           ],
           "size": [
-            120,
+            132,
             7
           ],
           "z": 7,
@@ -2776,7 +5251,7 @@
           "font": "mono",
           "fontPx": 5.5,
           "align": "center",
-          "sample": "9 / 12"
+          "sample": "14 / 20"
         },
         {
           "id": "heroShield",
@@ -2886,24 +5361,6 @@
           "fontPx": 8
         },
         {
-          "id": "minionField",
-          "type": "figure",
-          "anchor": "Bottom",
-          "offset": [
-            -214,
-            -256
-          ],
-          "size": [
-            75,
-            84
-          ],
-          "z": 13,
-          "binds": "encounter.minions",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8
-        },
-        {
           "id": "foeFigure",
           "type": "figure",
           "anchor": "BottomRight",
@@ -2915,7 +5372,7 @@
             180,
             220
           ],
-          "z": 14,
+          "z": 13,
           "binds": "encounter.foe",
           "color": "ink",
           "font": "display",
@@ -2933,12 +5390,12 @@
             64,
             64
           ],
-          "z": 15,
+          "z": 14,
           "binds": "targeting.focus",
           "color": "ink",
           "font": "display",
           "fontPx": 8,
-          "image": "Content/ui/reticle/focus_p0.png",
+          "image": "Content/ui/reticle/focus_p1.png",
           "frames": [
             "ui/reticle/focus_p0",
             "ui/reticle/focus_p1",
@@ -2957,7 +5414,7 @@
             11,
             11
           ],
-          "z": 16,
+          "z": 15,
           "binds": "targeting.tags",
           "color": "ink",
           "font": "display",
@@ -2984,7 +5441,7 @@
             150,
             14
           ],
-          "z": 17,
+          "z": 16,
           "binds": "encounter.foe.hp",
           "color": "ink",
           "font": "display",
@@ -3003,7 +5460,7 @@
             150,
             7
           ],
-          "z": 18,
+          "z": 17,
           "binds": "encounter.foe.hpLabel",
           "color": "muted",
           "font": "mono",
@@ -3023,7 +5480,7 @@
             150,
             6
           ],
-          "z": 19,
+          "z": 18,
           "binds": "encounter.foe.hp.points",
           "color": "ink",
           "font": "display",
@@ -3051,7 +5508,7 @@
             960,
             28
           ],
-          "z": 20,
+          "z": 19,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -3082,7 +5539,7 @@
             57,
             15
           ],
-          "z": 21,
+          "z": 20,
           "color": "inkWarm",
           "font": "display",
           "fontPx": 11.5,
@@ -3100,7 +5557,7 @@
             33,
             8
           ],
-          "z": 22,
+          "z": 21,
           "binds": "encounter.label",
           "color": "muted",
           "font": "mono",
@@ -3112,14 +5569,14 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            316,
+            274,
             6
           ],
           "size": [
             48,
             16
           ],
-          "z": 23,
+          "z": 22,
           "binds": "combat.paused",
           "color": "amber",
           "fill": "slot",
@@ -3137,14 +5594,14 @@
           "type": "panel",
           "anchor": "TopLeft",
           "offset": [
-            569,
+            484,
             4
           ],
           "size": [
-            378,
+            463,
             20
           ],
-          "z": 24,
+          "z": 23,
           "color": "ink",
           "font": "display",
           "fontPx": 8
@@ -3154,14 +5611,14 @@
           "type": "list",
           "anchor": "TopRight",
           "offset": [
-            -188,
+            -273,
             8
           ],
           "size": [
             203,
             11
           ],
-          "z": 25,
+          "z": 24,
           "binds": "run.resources",
           "color": "ink",
           "font": "display",
@@ -3181,14 +5638,14 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            784,
+            699,
             4
           ],
           "size": [
             98,
             20
           ],
-          "z": 26,
+          "z": 25,
           "binds": "combat.autoAttack",
           "color": "panelCard",
           "font": "mono",
@@ -3209,14 +5666,14 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            887,
+            802,
             4
           ],
           "size": [
             60,
             20
           ],
-          "z": 27,
+          "z": 26,
           "binds": "combat.retreat",
           "color": "parch",
           "font": "mono",
@@ -3231,6 +5688,34 @@
             "on": "ui/button/button_on"
           },
           "content": "⮐ RETREAT"
+        },
+        {
+          "id": "equipmentBtn",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            867,
+            4
+          ],
+          "size": [
+            80,
+            20
+          ],
+          "z": 27,
+          "binds": "nav.equipment",
+          "color": "border",
+          "font": "mono",
+          "fontPx": 6.5,
+          "image": "Content/ui/button/button_disabled.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "content": "⚒ EQUIPMENT"
         },
         {
           "id": "hudFooter",
@@ -3406,7 +5891,7 @@
             387
           ],
           "size": [
-            495,
+            433,
             7
           ],
           "z": 35,
@@ -3424,7 +5909,7 @@
             397
           ],
           "size": [
-            495,
+            433,
             136
           ],
           "z": 36,
@@ -3437,24 +5922,49 @@
             "flow": "horizontal",
             "gap": 6,
             "size": [
-              94,
+              104,
               136
             ]
           }
+        },
+        {
+          "id": "minionGroup",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            780,
+            387
+          ],
+          "size": [
+            170,
+            146
+          ],
+          "z": 37,
+          "color": "ink",
+          "border": {
+            "color": "borderFaint",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "left"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8
         },
         {
           "id": "bayGroupLabel",
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            850,
+            788,
             387
           ],
           "size": [
-            100,
+            162,
             7
           ],
-          "z": 37,
+          "z": 38,
           "color": "parch",
           "font": "mono",
           "fontPx": 5,
@@ -3465,14 +5975,14 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            850,
+            788,
             397
           ],
           "size": [
-            100,
+            162,
             136
           ],
-          "z": 38,
+          "z": 39,
           "binds": "loadout.bays",
           "color": "ink",
           "font": "display",
@@ -3482,7 +5992,7 @@
             "flow": "horizontal",
             "gap": 6,
             "size": [
-              100,
+              78,
               136
             ]
           }
@@ -3881,7 +6391,7 @@
           ],
           "size": [
             403,
-            105
+            183
           ],
           "z": 17,
           "binds": "inventory.activeTab.items",
@@ -3895,9 +6405,103 @@
             "cols": 2,
             "size": [
               199,
-              31
+              44
             ]
           }
+        },
+        {
+          "id": "invPager",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            275,
+            373
+          ],
+          "size": [
+            403,
+            15
+          ],
+          "z": 18,
+          "binds": "inventory.activeTab.page",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "invPagePrev",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            427,
+            373
+          ],
+          "size": [
+            20,
+            15
+          ],
+          "z": 19,
+          "binds": "inventory.activeTab.pagePrev",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 6,
+          "image": "Content/ui/button/button_pager.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "content": "◀"
+        },
+        {
+          "id": "invPageLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            453,
+            377
+          ],
+          "size": [
+            48,
+            7
+          ],
+          "z": 20,
+          "binds": "inventory.activeTab.pageLabel",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 5.5,
+          "align": "center",
+          "sample": "PAGE 1 / 2"
+        },
+        {
+          "id": "invPageNext",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            507,
+            373
+          ],
+          "size": [
+            20,
+            15
+          ],
+          "z": 21,
+          "binds": "inventory.activeTab.pageNext",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 6,
+          "image": "Content/ui/button/button_pager.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "content": "▶"
         },
         {
           "id": "runeBag",
@@ -3911,7 +6515,7 @@
             256,
             380
           ],
-          "z": 18,
+          "z": 22,
           "binds": "runes",
           "color": "ink",
           "fill": {
@@ -3935,7 +6539,7 @@
             51,
             15
           ],
-          "z": 19,
+          "z": 23,
           "color": "ink",
           "font": "display",
           "fontPx": 11.5,
@@ -3961,7 +6565,7 @@
             236,
             17
           ],
-          "z": 20,
+          "z": 24,
           "binds": "runes.budget",
           "color": "muted",
           "font": "mono",
@@ -3980,7 +6584,7 @@
             236,
             8
           ],
-          "z": 21,
+          "z": 25,
           "binds": "runes.budgetPct",
           "color": "ink",
           "fill": "slot",
@@ -4004,7 +6608,7 @@
             117,
             6
           ],
-          "z": 22,
+          "z": 26,
           "binds": "runes.budgetPct",
           "color": "ink",
           "fill": "int",
@@ -4023,7 +6627,7 @@
             236,
             309
           ],
-          "z": 23,
+          "z": 27,
           "binds": "runeGroups",
           "color": "ink",
           "font": "display",
@@ -4050,7 +6654,7 @@
             960,
             28
           ],
-          "z": 24,
+          "z": 28,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -4081,7 +6685,7 @@
             57,
             15
           ],
-          "z": 25,
+          "z": 29,
           "color": "inkWarm",
           "font": "display",
           "fontPx": 11.5,
@@ -4099,7 +6703,7 @@
             36,
             8
           ],
-          "z": 26,
+          "z": 30,
           "binds": "core.label",
           "color": "mutedWarm",
           "font": "mono",
@@ -4118,12 +6722,37 @@
             59,
             8
           ],
-          "z": 27,
+          "z": 31,
           "binds": "run.state",
           "color": "good",
           "font": "mono",
           "fontPx": 6,
           "sample": "▶ READY TO MARCH"
+        },
+        {
+          "id": "heldBadge",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            406,
+            6
+          ],
+          "size": [
+            48,
+            16
+          ],
+          "z": 32,
+          "binds": "combat.paused",
+          "color": "amber",
+          "fill": "slot",
+          "border": {
+            "color": "border",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 6.5,
+          "content": "❚❚ HELD"
         },
         {
           "id": "resourceStrip",
@@ -4137,7 +6766,7 @@
             203,
             11
           ],
-          "z": 28,
+          "z": 33,
           "binds": "run.resources",
           "color": "mutedWarm",
           "font": "mono",
@@ -4164,7 +6793,7 @@
             60,
             20
           ],
-          "z": 29,
+          "z": 34,
           "binds": "nav.close",
           "color": "parch",
           "font": "mono",
@@ -4192,7 +6821,7 @@
             960,
             132
           ],
-          "z": 30,
+          "z": 35,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -4231,7 +6860,7 @@
             150,
             131
           ],
-          "z": 31,
+          "z": 36,
           "binds": "core",
           "color": "ink",
           "border": {
@@ -4257,7 +6886,7 @@
             131,
             14
           ],
-          "z": 32,
+          "z": 37,
           "binds": "core.name",
           "color": "inkBright",
           "font": "display",
@@ -4276,7 +6905,7 @@
             131,
             7
           ],
-          "z": 33,
+          "z": 38,
           "binds": "core.role",
           "color": "muted",
           "font": "mono",
@@ -4284,28 +6913,56 @@
           "sample": "THE GENERALIST"
         },
         {
+          "id": "coreStatBonus",
+          "type": "list",
+          "anchor": "TopLeft",
+          "offset": [
+            9,
+            446
+          ],
+          "size": [
+            131,
+            10
+          ],
+          "z": 39,
+          "binds": "core.statBonus",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8,
+          "item": {
+            "template": "statBonusChip",
+            "flow": "horizontal",
+            "gap": 3,
+            "size": [
+              30,
+              10
+            ]
+          }
+        },
+        {
           "id": "coreStats",
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
             9,
-            447
+            461
           ],
           "size": [
-            66,
-            34
+            132,
+            17
           ],
-          "z": 34,
+          "z": 40,
           "binds": "core.stats",
           "color": "ink",
           "font": "mono",
           "fontPx": 5.5,
           "item": {
             "template": "coreStatRow",
-            "flow": "vertical",
+            "flow": "grid",
             "gap": 2,
+            "cols": 2,
             "size": [
-              66,
+              63,
               7
             ]
           }
@@ -4316,13 +6973,13 @@
           "anchor": "TopLeft",
           "offset": [
             9,
-            493
+            483
           ],
           "size": [
             131,
             40
           ],
-          "z": 35,
+          "z": 41,
           "binds": "core.coreEffect",
           "color": "ink",
           "border": {
@@ -4342,13 +6999,13 @@
           "anchor": "TopLeft",
           "offset": [
             16,
-            495
+            485
           ],
           "size": [
             124,
             6
           ],
-          "z": 36,
+          "z": 42,
           "color": "mutedDim",
           "font": "mono",
           "fontPx": 4.5,
@@ -4360,18 +7017,18 @@
           "anchor": "TopLeft",
           "offset": [
             16,
-            502
+            492
           ],
           "size": [
             124,
             11
           ],
-          "z": 37,
+          "z": 43,
           "binds": "core.coreEffectName",
           "color": "inkBright",
           "font": "display",
           "fontPx": 10,
-          "sample": "Hollow Vessel"
+          "sample": "Jack of All Trades"
         },
         {
           "id": "coreEffectDesc",
@@ -4379,18 +7036,18 @@
           "anchor": "TopLeft",
           "offset": [
             16,
-            516
+            506
           ],
           "size": [
             124,
             16
           ],
-          "z": 38,
+          "z": 44,
           "binds": "core.coreEffectDesc",
           "color": "muted",
           "font": "mono",
           "fontPx": 5,
-          "sample": "You are healed for your unspent budget points after each encounter."
+          "sample": "Every attribute cost you pay is reduced by 1."
         },
         {
           "id": "actionBar",
@@ -4404,7 +7061,7 @@
             810,
             131
           ],
-          "z": 39,
+          "z": 45,
           "binds": "loadout",
           "color": "ink",
           "font": "display",
@@ -4422,7 +7079,7 @@
             50,
             13
           ],
-          "z": 40,
+          "z": 46,
           "color": "inkBright",
           "font": "display",
           "fontPx": 10,
@@ -4445,15 +7102,15 @@
             434
           ],
           "size": [
-            681,
+            613,
             7
           ],
-          "z": 41,
+          "z": 47,
           "binds": "loadout.slotLabel",
           "color": "parch",
           "font": "mono",
           "fontPx": 5,
-          "sample": "TECHNIQUES · 4 / 5 slotted"
+          "sample": "TECHNIQUES · 3 / 4 slotted"
         },
         {
           "id": "loadoutList",
@@ -4464,10 +7121,10 @@
             444
           ],
           "size": [
-            681,
+            613,
             89
           ],
-          "z": 42,
+          "z": 48,
           "binds": "loadout",
           "color": "ink",
           "font": "display",
@@ -4477,51 +7134,80 @@
             "flow": "horizontal",
             "gap": 6,
             "size": [
-              131,
+              149,
               89
             ]
           }
+        },
+        {
+          "id": "minionColumn",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            780,
+            434
+          ],
+          "size": [
+            170,
+            99
+          ],
+          "z": 49,
+          "color": "ink",
+          "border": {
+            "color": "borderFaint",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "left"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8
         },
         {
           "id": "minionSlotCount",
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            856,
+            788,
             434
           ],
           "size": [
-            94,
+            162,
             7
           ],
-          "z": 43,
+          "z": 50,
           "binds": "minions.slotLabel",
           "color": "parch",
           "font": "mono",
           "fontPx": 5,
-          "sample": "MINIONS · 0 / 1 slotted"
+          "sample": "MINIONS · 0 / 2 slotted"
         },
         {
           "id": "buildMinions",
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            856,
+            788,
             444
           ],
           "size": [
-            94,
+            162,
             89
           ],
-          "z": 44,
+          "z": 51,
           "binds": "minions",
           "color": "ink",
           "font": "display",
           "fontPx": 8,
           "item": {
-            "template": "loadoutCard",
+            "template": "minionCard",
             "flow": "horizontal",
-            "gap": 6
+            "gap": 6,
+            "size": [
+              78,
+              89
+            ]
           }
         }
       ]
@@ -5653,11 +8339,11 @@
           "anchor": "Left",
           "offset": [
             10,
-            -124
+            5
           ],
           "size": [
             209,
-            165
+            423
           ],
           "z": 5,
           "binds": "races",
@@ -5715,11 +8401,11 @@
           "anchor": "Center",
           "offset": [
             0,
-            1
+            -5
           ],
           "size": [
             476,
-            416
+            404
           ],
           "z": 8,
           "binds": "cores",
@@ -5733,9 +8419,103 @@
             "cols": 3,
             "size": [
               152,
-              203
+              395
             ]
           }
+        },
+        {
+          "id": "corePager",
+          "type": "panel",
+          "anchor": "TopLeft",
+          "offset": [
+            242,
+            467
+          ],
+          "size": [
+            476,
+            29
+          ],
+          "z": 9,
+          "binds": "cores.page",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "corePagePrev",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            425,
+            475
+          ],
+          "size": [
+            22,
+            17
+          ],
+          "z": 10,
+          "binds": "cores.pagePrev",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 6.5,
+          "image": "Content/ui/button/button_pager.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "content": "◀"
+        },
+        {
+          "id": "corePageLabel",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            454,
+            480
+          ],
+          "size": [
+            52,
+            7
+          ],
+          "z": 11,
+          "binds": "cores.pageLabel",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 5.5,
+          "align": "center",
+          "sample": "PAGE 1 / 3"
+        },
+        {
+          "id": "corePageNext",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            513,
+            475
+          ],
+          "size": [
+            22,
+            17
+          ],
+          "z": 12,
+          "binds": "cores.pageNext",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 6.5,
+          "image": "Content/ui/button/button_pager.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "content": "▶"
         },
         {
           "id": "preview",
@@ -5749,7 +8529,7 @@
             230,
             464
           ],
-          "z": 9,
+          "z": 13,
           "binds": "preview",
           "color": "ink",
           "fill": {
@@ -5781,7 +8561,7 @@
             207,
             15
           ],
-          "z": 10,
+          "z": 14,
           "color": "inkBright",
           "font": "display",
           "fontPx": 12,
@@ -5799,7 +8579,7 @@
             207,
             160
           ],
-          "z": 11,
+          "z": 15,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -5827,7 +8607,7 @@
             205,
             122
           ],
-          "z": 12,
+          "z": 16,
           "binds": "preview.fig",
           "color": "ink",
           "font": "display",
@@ -5845,7 +8625,7 @@
             76,
             16
           ],
-          "z": 13,
+          "z": 17,
           "binds": "preview.name",
           "color": "inkBright",
           "font": "display",
@@ -5872,7 +8652,7 @@
             56,
             7
           ],
-          "z": 14,
+          "z": 18,
           "binds": "preview.role",
           "color": "parch",
           "font": "mono",
@@ -5899,7 +8679,7 @@
             207,
             35
           ],
-          "z": 15,
+          "z": 19,
           "binds": "preview.attrs",
           "color": "ink",
           "font": "display",
@@ -5926,7 +8706,7 @@
             41,
             35
           ],
-          "z": 16,
+          "z": 20,
           "binds": "preview.hp",
           "color": "mutedDim",
           "fill": "panel",
@@ -5982,7 +8762,7 @@
             207,
             27
           ],
-          "z": 17,
+          "z": 21,
           "color": "ink",
           "font": "display",
           "fontPx": 8
@@ -5999,7 +8779,7 @@
             66,
             27
           ],
-          "z": 18,
+          "z": 22,
           "binds": "preview.budget",
           "color": "mutedDim",
           "fill": "panelDeep",
@@ -6055,7 +8835,7 @@
             66,
             27
           ],
-          "z": 19,
+          "z": 23,
           "binds": "preview.techniques",
           "color": "mutedDim",
           "fill": "panelDeep",
@@ -6111,7 +8891,7 @@
             66,
             27
           ],
-          "z": 20,
+          "z": 24,
           "binds": "preview.bays",
           "color": "mutedDim",
           "fill": "panelDeep",
@@ -6136,7 +8916,7 @@
               "font": "mono",
               "fontPx": 10,
               "align": "center",
-              "sample": "1",
+              "sample": "2",
               "binds": "preview.bays"
             },
             {
@@ -6151,7 +8931,7 @@
               "font": "mono",
               "fontPx": 4.25,
               "align": "center",
-              "content": "MINION BAYS"
+              "content": "MINIONS"
             }
           ]
         },
@@ -6161,13 +8941,13 @@
           "anchor": "Right",
           "offset": [
             -11,
-            58
+            53
           ],
           "size": [
             207,
-            49
+            39
           ],
-          "z": 21,
+          "z": 25,
           "binds": "preview.coreEffect",
           "color": "ink",
           "border": {
@@ -6194,7 +8974,7 @@
             198,
             7
           ],
-          "z": 22,
+          "z": 26,
           "color": "mutedDim",
           "font": "mono",
           "fontPx": 5,
@@ -6212,12 +8992,12 @@
             198,
             14
           ],
-          "z": 23,
+          "z": 27,
           "binds": "preview.coreEffectName",
           "color": "inkBright",
           "font": "display",
           "fontPx": 13,
-          "sample": "Hollow Vessel"
+          "sample": "Jack of All Trades"
         },
         {
           "id": "previewCoreEffectDesc",
@@ -6225,18 +9005,18 @@
           "anchor": "Right",
           "offset": [
             -10,
-            71
+            66
           ],
           "size": [
             198,
-            19
+            10
           ],
-          "z": 24,
+          "z": 28,
           "binds": "preview.coreEffectDesc",
           "color": "mutedWarm",
           "font": "mono",
           "fontPx": 6,
-          "sample": "You are healed for your unspent budget points after each encounter."
+          "sample": "Every attribute cost you pay is reduced by 1."
         },
         {
           "id": "confirmBar",
@@ -6250,7 +9030,7 @@
             960,
             44
           ],
-          "z": 25,
+          "z": 29,
           "binds": "selection",
           "color": "ink",
           "fill": {
@@ -6290,7 +9070,7 @@
             116,
             25
           ],
-          "z": 26,
+          "z": 30,
           "binds": "begin",
           "color": "panelDeep",
           "fill": "good",
@@ -6533,7 +9313,7 @@
         },
         {
           "id": "footer",
-          "type": "text",
+          "type": "panel",
           "anchor": "Bottom",
           "offset": [
             0,
@@ -6569,6 +9349,34 @@
             "color": "outline",
             "opacity": 0.5
           }
+        },
+        {
+          "id": "equipmentBtn",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            840,
+            508
+          ],
+          "size": [
+            100,
+            20
+          ],
+          "z": 9,
+          "binds": "nav.equipment",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 6.5,
+          "image": "Content/ui/button/button_normal.png",
+          "states": {
+            "family": "button",
+            "normal": "ui/button/button_normal",
+            "hover": "ui/button/button_hover",
+            "down": "ui/button/button_down",
+            "disabled": "ui/button/button_disabled",
+            "on": "ui/button/button_on"
+          },
+          "content": "⚒ EQUIPMENT"
         }
       ]
     },
@@ -6943,7 +9751,7 @@
           ],
           "size": [
             692,
-            377
+            384
           ],
           "z": 14,
           "binds": "merchant.stock.sections",
@@ -7310,7 +10118,7 @@
     },
     "heroHpPip": {
       "size": [
-        7,
+        5,
         6
       ],
       "parts": [],
@@ -7381,7 +10189,7 @@
           "font": "mono",
           "fontPx": 6.5,
           "align": "center",
-          "sample": "3"
+          "sample": "1"
         }
       ],
       "binds": "tag.hotkey",
@@ -7426,7 +10234,7 @@
     },
     "poolPip": {
       "size": [
-        16,
+        33,
         10
       ],
       "parts": [],
@@ -7478,18 +10286,18 @@
           "rect": [
             54,
             0,
-            13,
+            7,
             15
           ],
           "color": "ink",
           "font": "mono",
           "fontPx": 11,
           "binds": "pool.attr.alloc",
-          "sample": "10"
+          "sample": "3"
         },
         {
           "rect": [
-            69,
+            63,
             4,
             5,
             10
@@ -7501,16 +10309,16 @@
         },
         {
           "rect": [
-            76,
+            69,
             0,
-            13,
+            7,
             15
           ],
           "color": "lockText",
           "font": "mono",
           "fontPx": 11,
           "binds": "pool.attr.available",
-          "sample": "10"
+          "sample": "3"
         },
         {
           "rect": [
@@ -7524,7 +10332,7 @@
             "flow": "horizontal",
             "gap": 2,
             "size": [
-              16,
+              33,
               10
             ]
           },
@@ -7537,7 +10345,7 @@
     },
     "techCard": {
       "size": [
-        94,
+        104,
         136
       ],
       "parts": [
@@ -7545,7 +10353,7 @@
           "rect": [
             1,
             1,
-            92,
+            102,
             37
           ],
           "color": "ink",
@@ -7602,38 +10410,38 @@
         },
         {
           "rect": [
-            69,
+            66,
             9,
-            20,
+            32,
             8
           ],
-          "color": "good",
+          "color": "hit",
           "border": {
-            "color": "good",
+            "color": "hit",
             "w": 1,
             "style": "solid"
           },
           "font": "mono",
           "fontPx": 4,
           "binds": "technique.state",
-          "sample": "READY"
+          "sample": "TARGETING"
         },
         {
           "rect": [
             6,
             24,
-            21,
+            11,
             11
           ],
           "color": "ink",
           "font": "display",
           "fontPx": 8.5,
           "binds": "technique.name",
-          "sample": "Swing"
+          "sample": "Jab"
         },
         {
           "rect": [
-            69,
+            79,
             25,
             12,
             9
@@ -7647,7 +10455,7 @@
         },
         {
           "rect": [
-            85,
+            94,
             25,
             4,
             9
@@ -7657,39 +10465,26 @@
           "fontPx": 6.5,
           "colorBind": "technique.attrColor",
           "binds": "technique.cost",
-          "sample": "1"
+          "sample": "0"
         },
         {
           "rect": [
             1,
             38,
-            92,
+            102,
             80
           ],
           "color": "parch",
           "font": "display",
           "fontPx": 8.25,
           "binds": "technique.description",
-          "sample": "A committed swing of your blade for  damage."
-        },
-        {
-          "rect": [
-            33,
-            56,
-            5,
-            10
-          ],
-          "color": "hit",
-          "font": "mono",
-          "fontPx": 7.84,
-          "sample": "1",
-          "binds": "technique.amount"
+          "sample": "A quick, light strike."
         },
         {
           "rect": [
             6,
             118,
-            83,
+            93,
             5
           ],
           "color": "ink",
@@ -7706,11 +10501,11 @@
           "rect": [
             6,
             118,
-            83,
+            60,
             4
           ],
           "color": "ink",
-          "fill": "good",
+          "fill": "str",
           "font": "display",
           "fontPx": 8,
           "binds": "technique.chargePct"
@@ -7719,20 +10514,20 @@
           "rect": [
             6,
             125,
-            83,
+            93,
             6
           ],
           "color": "muted",
           "font": "mono",
           "fontPx": 4.5,
           "binds": "technique.cooldownLabel",
-          "sample": "ready"
+          "sample": "charging · 0.5s"
         }
       ],
       "color": "ink",
-      "fill": "panelCard",
+      "fill": "panel",
       "border": {
-        "color": "good",
+        "color": "str",
         "w": 1,
         "style": "solid"
       },
@@ -7772,7 +10567,7 @@
     },
     "minionBay": {
       "size": [
-        100,
+        78,
         136
       ],
       "parts": [
@@ -7780,8 +10575,8 @@
           "rect": [
             1,
             1,
-            98,
-            37
+            76,
+            26
           ],
           "color": "ink",
           "border": {
@@ -7794,6 +10589,25 @@
           },
           "font": "display",
           "fontPx": 8
+        },
+        {
+          "rect": [
+            6,
+            5,
+            15,
+            15
+          ],
+          "color": "ink",
+          "fill": "panelDeep",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "dashed"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "imageBind": "sprites/minions/{minion.type}",
+          "binds": "bay.icon"
         },
         {
           "rect": [
@@ -7812,98 +10626,63 @@
           "font": "mono",
           "fontPx": 6,
           "binds": "bay.hotkey",
-          "sample": "6"
+          "sample": "5"
         },
         {
           "rect": [
-            71,
-            9,
-            23,
-            8
+            67,
+            11,
+            6,
+            3
           ],
-          "color": "mintActive",
-          "border": {
-            "color": "mintActive",
-            "w": 1,
-            "style": "solid"
-          },
           "font": "mono",
           "fontPx": 4,
-          "binds": "bay.state",
-          "sample": "ACTIVE"
+          "binds": "bay.state"
         },
         {
           "rect": [
             6,
             24,
-            31,
-            11
+            0,
+            0
           ],
           "color": "ink",
           "font": "display",
           "fontPx": 8.5,
-          "binds": "bay.name",
-          "sample": "Skeleton"
+          "binds": "bay.name"
         },
         {
           "rect": [
-            75,
-            25,
-            20,
-            9
+            73,
+            24,
+            0,
+            0
           ],
-          "color": "int",
           "font": "mono",
           "fontPx": 6.5,
           "colorBind": "bay.gateColor",
-          "sample": "INT",
           "binds": "bay.cost"
         },
         {
           "rect": [
-            91,
-            25,
-            4,
-            9
-          ],
-          "color": "int",
-          "font": "mono",
-          "fontPx": 6.5,
-          "sample": "2"
-        },
-        {
-          "rect": [
             1,
-            38,
-            98,
-            97
+            27,
+            76,
+            108
           ],
           "color": "parch",
           "font": "display",
           "fontPx": 8.25,
           "binds": "bay.description",
-          "sample": "A raised thrall that strikes for  damage each turn."
-        },
-        {
-          "rect": [
-            6,
-            56,
-            5,
-            10
-          ],
-          "color": "hit",
-          "font": "mono",
-          "fontPx": 7.84,
-          "sample": "1",
-          "binds": "bay.amount"
+          "sample": "open bay"
         }
       ],
       "color": "ink",
-      "fill": "slot",
+      "fill": "panelDeep",
       "border": {
-        "color": "teal",
+        "color": "borderDim",
         "w": 1,
-        "style": "solid"
+        "style": "dashed"
       },
       "font": "display",
       "fontPx": 8,
@@ -7926,7 +10705,7 @@
     },
     "attrPip": {
       "size": [
-        26,
+        53,
         9
       ],
       "parts": [],
@@ -7976,7 +10755,7 @@
         },
         {
           "rect": [
-            404,
+            410,
             0,
             6,
             13
@@ -7985,11 +10764,11 @@
           "font": "mono",
           "fontPx": 10,
           "binds": "attrs.alloc",
-          "sample": "8"
+          "sample": "3"
         },
         {
           "rect": [
-            412,
+            418,
             3,
             4,
             9
@@ -8001,16 +10780,16 @@
         },
         {
           "rect": [
-            419,
+            425,
             0,
-            12,
+            6,
             13
           ],
           "color": "lockText",
           "font": "mono",
           "fontPx": 10,
           "binds": "attrs.available",
-          "sample": "10"
+          "sample": "3"
         },
         {
           "rect": [
@@ -8024,7 +10803,7 @@
             "flow": "horizontal",
             "gap": 2,
             "size": [
-              26,
+              53,
               9
             ]
           },
@@ -8066,11 +10845,6 @@
       "fontPx": 6,
       "states": {
         "family": "invTab",
-        "active": {
-          "border": "amber",
-          "fill": "panel",
-          "color": "inkBright"
-        },
         "idle": {
           "border": "borderDim",
           "fill": "panelDeep",
@@ -8080,19 +10854,24 @@
           "border": "border",
           "fill": "panelTab",
           "color": "ink"
+        },
+        "active": {
+          "border": "amber",
+          "fill": "panel",
+          "color": "inkBright"
         }
       }
     },
     "invCard": {
       "size": [
         199,
-        31
+        44
       ],
       "parts": [
         {
           "rect": [
             8,
-            7,
+            8,
             26,
             18
           ],
@@ -8111,7 +10890,7 @@
         {
           "rect": [
             16,
-            10,
+            11,
             9,
             4
           ],
@@ -8124,7 +10903,7 @@
         {
           "rect": [
             18,
-            14,
+            15,
             4,
             7
           ],
@@ -8132,39 +10911,89 @@
           "font": "mono",
           "fontPx": 7,
           "binds": "invItems.badgeNum",
-          "sample": "3"
+          "sample": "1"
         },
         {
           "rect": [
             40,
-            10,
-            120,
+            7,
+            55,
             10
           ],
           "color": "ink",
           "font": "display",
           "fontPx": 8,
           "binds": "invItems.name",
-          "sample": "Sword"
+          "sample": "Iron Longsword"
         },
         {
           "rect": [
-            167,
-            10,
-            24,
-            12
+            165,
+            8,
+            26,
+            10
           ],
-          "color": "rareEpic",
-          "fill": "rareEpic",
+          "color": "rareMagic",
+          "fill": "rareMagic",
           "border": {
-            "color": "rareEpic",
+            "color": "rareMagic",
             "w": 1,
             "style": "solid"
           },
           "font": "mono",
-          "fontPx": 5,
+          "fontPx": 4.5,
           "binds": "invItems.rarity",
-          "sample": "EPIC"
+          "sample": "MAGIC"
+        },
+        {
+          "rect": [
+            40,
+            19,
+            152,
+            6
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 4.25,
+          "sample": "·",
+          "binds": "invItems.stateLabel"
+        },
+        {
+          "rect": [
+            40,
+            20,
+            18,
+            6
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 4.25,
+          "sample": "WEAPON"
+        },
+        {
+          "rect": [
+            67,
+            20,
+            31,
+            6
+          ],
+          "color": "good",
+          "font": "mono",
+          "fontPx": 4.25,
+          "sample": "✓ EQUIPPED"
+        },
+        {
+          "rect": [
+            40,
+            28,
+            152,
+            9
+          ],
+          "color": "mutedWarm",
+          "font": "display",
+          "fontPx": 6.25,
+          "binds": "invItems.effect",
+          "sample": "4 dmg · 1.0× timer · 0.50 DPS."
         }
       ],
       "color": "ink",
@@ -8397,9 +11226,64 @@
       "font": "display",
       "fontPx": 8
     },
+    "statBonusChip": {
+      "size": [
+        30,
+        10
+      ],
+      "parts": [
+        {
+          "rect": [
+            9,
+            2,
+            17,
+            6
+          ],
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 4.75,
+          "sample": "+"
+        },
+        {
+          "rect": [
+            12,
+            2,
+            3,
+            6
+          ],
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 4.75,
+          "sample": "1"
+        },
+        {
+          "rect": [
+            18,
+            2,
+            9,
+            6
+          ],
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 4.75,
+          "sample": "ALL"
+        }
+      ],
+      "binds": "bonus.label",
+      "color": "ink",
+      "fill": "panelDeep",
+      "border": {
+        "color": "borderDim",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "mono",
+      "fontPx": 4.75,
+      "colorBind": "bonus.attrColor"
+    },
     "coreStatRow": {
       "size": [
-        66,
+        63,
         7
       ],
       "parts": [
@@ -8413,12 +11297,12 @@
           "color": "mutedDim",
           "font": "mono",
           "fontPx": 5.5,
-          "sample": "budget",
-          "binds": "stat.label"
+          "binds": "stat.label",
+          "sample": "budget"
         },
         {
           "rect": [
-            59,
+            56,
             0,
             7,
             7
@@ -8426,8 +11310,8 @@
           "color": "amber",
           "font": "mono",
           "fontPx": 5.5,
-          "sample": "20",
-          "binds": "stat.value"
+          "binds": "stat.value",
+          "sample": "20"
         }
       ],
       "color": "ink",
@@ -8436,16 +11320,35 @@
     },
     "loadoutCard": {
       "size": [
-        131,
+        149,
         89
       ],
       "parts": [
         {
           "rect": [
-            54,
-            22,
-            24,
-            24
+            1,
+            1,
+            147,
+            37
+          ],
+          "color": "ink",
+          "border": {
+            "color": "borderFaint",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "bottom"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "rect": [
+            6,
+            5,
+            15,
+            15
           ],
           "color": "panelDeep",
           "fill": "str",
@@ -8455,8 +11358,7 @@
             "style": "solid"
           },
           "font": "mono",
-          "fontPx": 13,
-          "align": "center",
+          "fontPx": 7.5,
           "imageBind": "icons/technique/{loadout.id}",
           "colorBind": "loadout.attrColor",
           "binds": "loadout.glyph",
@@ -8464,44 +11366,182 @@
         },
         {
           "rect": [
-            57,
-            49,
-            17,
-            9
+            24,
+            8,
+            10,
+            10
           ],
-          "color": "ink",
-          "font": "display",
-          "fontPx": 7,
-          "align": "center",
-          "binds": "loadout.name",
-          "sample": "Swing"
+          "color": "inkWarm",
+          "fill": "slot",
+          "border": {
+            "color": "border",
+            "w": 1,
+            "style": "solid"
+          },
+          "font": "mono",
+          "fontPx": 6,
+          "binds": "loadout.hotkey",
+          "sample": "1"
         },
         {
           "rect": [
-            59,
-            60,
-            14,
-            6
+            6,
+            24,
+            11,
+            11
+          ],
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8.5,
+          "binds": "loadout.name",
+          "sample": "Jab"
+        },
+        {
+          "rect": [
+            124,
+            25,
+            20,
+            9
           ],
           "color": "str",
           "font": "mono",
-          "fontPx": 4.5,
-          "align": "center",
+          "fontPx": 6.5,
           "colorBind": "loadout.attrColor",
           "binds": "loadout.attr",
-          "sample": "STR 1"
+          "sample": "STR 0"
+        },
+        {
+          "rect": [
+            1,
+            38,
+            147,
+            50
+          ],
+          "color": "parch",
+          "font": "display",
+          "fontPx": 7.25,
+          "binds": "loadout.desc",
+          "sample": "A quick, light strike."
         }
       ],
       "color": "ink",
-      "fill": "panelCard",
+      "fill": "panelTab",
       "border": {
-        "color": "border",
+        "color": "borderMid",
         "w": 1,
         "style": "solid"
       },
       "font": "display",
       "fontPx": 8,
-      "align": "center",
+      "states": {
+        "family": "loadoutCard",
+        "slotted": {
+          "border": "border",
+          "fill": "panelCard"
+        },
+        "empty": {
+          "border": "border",
+          "borderStyle": "dashed",
+          "fill": "panelDeep",
+          "opacity": 0.8
+        },
+        "hover": {
+          "overlay": "rgba(255,255,255,.06)"
+        }
+      }
+    },
+    "minionCard": {
+      "size": [
+        78,
+        89
+      ],
+      "parts": [
+        {
+          "rect": [
+            1,
+            1,
+            76,
+            37
+          ],
+          "color": "ink",
+          "border": {
+            "color": "borderFaint",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "bottom"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "rect": [
+            6,
+            5,
+            15,
+            15
+          ],
+          "color": "ink",
+          "fill": "panelDeep",
+          "border": {
+            "color": "outline",
+            "w": 1,
+            "style": "dashed"
+          },
+          "font": "display",
+          "fontPx": 8,
+          "imageBind": "sprites/minions/{minion.type}",
+          "binds": "minions.icon"
+        },
+        {
+          "rect": [
+            6,
+            24,
+            45,
+            11
+          ],
+          "color": "border",
+          "font": "display",
+          "fontPx": 8.5,
+          "binds": "minions.name",
+          "sample": "slot a minion"
+        },
+        {
+          "rect": [
+            73,
+            31,
+            0,
+            0
+          ],
+          "color": "border",
+          "font": "mono",
+          "fontPx": 6.5,
+          "colorBind": "minions.attrColor",
+          "binds": "minions.attr"
+        },
+        {
+          "rect": [
+            1,
+            38,
+            76,
+            50
+          ],
+          "color": "border",
+          "font": "display",
+          "fontPx": 7.25,
+          "binds": "minions.desc"
+        }
+      ],
+      "color": "ink",
+      "fill": "panelDeep",
+      "border": {
+        "color": "borderDim",
+        "w": 1,
+        "style": "dashed"
+      },
+      "font": "display",
+      "fontPx": 8,
       "states": {
         "family": "loadoutCard",
         "slotted": {
@@ -8615,7 +11655,7 @@
           "color": "ink",
           "fill": "slot",
           "border": {
-            "color": "good",
+            "color": "amber",
             "w": 1,
             "style": "solid"
           },
@@ -8777,7 +11817,8 @@
           "border": "good"
         },
         "current": {
-          "border": "amber"
+          "border": "borderDim",
+          "pulse": "self"
         },
         "future": {
           "border": "borderDim",
@@ -8843,31 +11884,6 @@
       "parts": [
         {
           "rect": [
-            1,
-            1,
-            53,
-            77
-          ],
-          "color": "ink",
-          "fill": {
-            "type": "gradient",
-            "from": "slot",
-            "to": "ground",
-            "dir": "vertical"
-          },
-          "border": {
-            "color": "borderFaint",
-            "w": 1,
-            "style": "solid",
-            "sides": [
-              "right"
-            ]
-          },
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "rect": [
             10,
             22,
             35,
@@ -8877,8 +11893,6 @@
           "font": "display",
           "fontPx": 8,
           "image": "Content/sprites/body/human_grunt/head_healthy.png",
-          "imageBind": "sprites/body/{race.id}_grunt/head_healthy",
-          "binds": "race.headImage",
           "shadow": {
             "token": "soft",
             "dx": 0,
@@ -8886,7 +11900,9 @@
             "blur": 4,
             "color": "outline",
             "opacity": 0.45
-          }
+          },
+          "imageBind": "sprites/body/{race.id}_grunt/head_healthy",
+          "binds": "race.headImage"
         },
         {
           "rect": [
@@ -8977,7 +11993,7 @@
           "fontPx": 7.5,
           "align": "center",
           "binds": "race.attrs.value",
-          "sample": "3"
+          "sample": "5"
         },
         {
           "rect": [
@@ -9024,7 +12040,7 @@
           "fontPx": 7.5,
           "align": "center",
           "binds": "race.attrs.value",
-          "sample": "3"
+          "sample": "5"
         },
         {
           "rect": [
@@ -9071,7 +12087,7 @@
           "fontPx": 7.5,
           "align": "center",
           "binds": "race.attrs.value",
-          "sample": "3"
+          "sample": "5"
         },
         {
           "rect": [
@@ -9118,7 +12134,7 @@
           "fontPx": 7.5,
           "align": "center",
           "binds": "race.attrs.value",
-          "sample": "3"
+          "sample": "5"
         },
         {
           "rect": [
@@ -9191,7 +12207,7 @@
           "font": "mono",
           "fontPx": 4.75,
           "binds": "race.blurb",
-          "sample": "No innate edge or lack — fits any core it can afford."
+          "sample": "No innate edge or lack — runs almost any core it can afford, but always tight."
         }
       ],
       "color": "ink",
@@ -9226,18 +12242,64 @@
         }
       }
     },
-    "coreCard": {
+    "statBonusBox": {
       "size": [
-        152,
-        203
+        28,
+        24
       ],
       "parts": [
         {
           "rect": [
-            50,
             12,
-            52,
-            52
+            7,
+            5,
+            10
+          ],
+          "color": "ink",
+          "font": "mono",
+          "fontPx": 7.5,
+          "align": "center",
+          "sample": "1"
+        },
+        {
+          "rect": [
+            11,
+            17,
+            7,
+            5
+          ],
+          "color": "mutedDim",
+          "font": "mono",
+          "fontPx": 3.75,
+          "align": "center",
+          "sample": "STR"
+        }
+      ],
+      "binds": "bonus.label",
+      "color": "ink",
+      "fill": "panelDeep",
+      "border": {
+        "color": "borderDim",
+        "w": 1,
+        "style": "solid"
+      },
+      "font": "display",
+      "fontPx": 8,
+      "align": "center",
+      "colorBind": "bonus.attrColor"
+    },
+    "coreCard": {
+      "size": [
+        152,
+        395
+      ],
+      "parts": [
+        {
+          "rect": [
+            53,
+            21,
+            46,
+            46
           ],
           "color": "ink",
           "font": "display",
@@ -9276,7 +12338,7 @@
         {
           "rect": [
             8,
-            82,
+            93,
             136,
             13
           ],
@@ -9289,7 +12351,7 @@
         {
           "rect": [
             8,
-            97,
+            108,
             136,
             6
           ],
@@ -9302,7 +12364,7 @@
         {
           "rect": [
             8,
-            108,
+            118,
             43,
             23
           ],
@@ -9321,7 +12383,7 @@
         {
           "rect": [
             10,
-            112,
+            122,
             38,
             9
           ],
@@ -9335,7 +12397,7 @@
         {
           "rect": [
             10,
-            122,
+            132,
             38,
             5
           ],
@@ -9348,7 +12410,7 @@
         {
           "rect": [
             55,
-            108,
+            118,
             43,
             23
           ],
@@ -9367,7 +12429,7 @@
         {
           "rect": [
             57,
-            112,
+            122,
             38,
             9
           ],
@@ -9381,7 +12443,7 @@
         {
           "rect": [
             57,
-            122,
+            132,
             38,
             5
           ],
@@ -9394,7 +12456,7 @@
         {
           "rect": [
             101,
-            108,
+            118,
             43,
             23
           ],
@@ -9413,7 +12475,7 @@
         {
           "rect": [
             103,
-            112,
+            122,
             38,
             9
           ],
@@ -9422,12 +12484,12 @@
           "fontPx": 9,
           "align": "center",
           "binds": "core.bays",
-          "sample": "1"
+          "sample": "2"
         },
         {
           "rect": [
             103,
-            122,
+            132,
             38,
             5
           ],
@@ -9435,14 +12497,14 @@
           "font": "mono",
           "fontPx": 4,
           "align": "center",
-          "sample": "BAYS"
+          "sample": "MINIONS"
         },
         {
           "rect": [
             8,
+            174,
             136,
-            136,
-            33
+            41
           ],
           "color": "ink",
           "border": {
@@ -9461,34 +12523,156 @@
         },
         {
           "rect": [
-            14,
-            144,
-            131,
-            8
+            15,
+            183,
+            129,
+            11
           ],
           "color": "inkBright",
           "font": "display",
-          "fontPx": 7.5,
+          "fontPx": 9.5,
           "binds": "core.coreEffectName",
-          "sample": "Hollow Vessel"
+          "sample": "Jack of All Trades"
         },
         {
           "rect": [
-            14,
-            154,
-            131,
-            14
+            15,
+            196,
+            129,
+            18
           ],
           "color": "muted",
           "font": "mono",
-          "fontPx": 4.75,
+          "fontPx": 5.75,
           "binds": "core.coreEffectDesc",
-          "sample": "You are healed for your unspent budget points after each encounter."
+          "sample": "Every attribute cost you pay is reduced by 1."
         },
         {
           "rect": [
             8,
-            179,
+            224,
+            136,
+            81
+          ],
+          "color": "ink",
+          "border": {
+            "color": "borderFaint",
+            "w": 1,
+            "style": "solid",
+            "sides": [
+              "top"
+            ]
+          },
+          "font": "display",
+          "fontPx": 8,
+          "binds": "core.startKit",
+          "sample": "STARTING KIT"
+        },
+        {
+          "rect": [
+            8,
+            241,
+            33,
+            21
+          ],
+          "color": "border",
+          "font": "mono",
+          "fontPx": 5,
+          "sample": "WEAPON",
+          "binds": "core.kitWeaponLabel"
+        },
+        {
+          "rect": [
+            46,
+            241,
+            99,
+            21
+          ],
+          "color": "parch",
+          "font": "display",
+          "fontPx": 8,
+          "binds": "core.kitWeapon",
+          "sample": "Iron Longsword + Wooden Shield"
+        },
+        {
+          "rect": [
+            8,
+            265,
+            33,
+            10
+          ],
+          "color": "border",
+          "font": "mono",
+          "fontPx": 5,
+          "sample": "ARMOR"
+        },
+        {
+          "rect": [
+            46,
+            265,
+            43,
+            10
+          ],
+          "color": "parch",
+          "font": "display",
+          "fontPx": 8,
+          "binds": "core.kitArmor",
+          "sample": "Iron plate ×4"
+        },
+        {
+          "rect": [
+            8,
+            280,
+            33,
+            10
+          ],
+          "color": "border",
+          "font": "mono",
+          "fontPx": 5,
+          "sample": "SKILLS"
+        },
+        {
+          "rect": [
+            46,
+            280,
+            66,
+            10
+          ],
+          "color": "parch",
+          "font": "display",
+          "fontPx": 8,
+          "binds": "core.kitTech",
+          "sample": "Jab, Brace, Bandage"
+        },
+        {
+          "rect": [
+            8,
+            294,
+            33,
+            10
+          ],
+          "color": "border",
+          "font": "mono",
+          "fontPx": 5,
+          "sample": "MINION"
+        },
+        {
+          "rect": [
+            46,
+            294,
+            5,
+            10
+          ],
+          "color": "parch",
+          "font": "display",
+          "fontPx": 8,
+          "binds": "core.kitMinion",
+          "sample": "—"
+        },
+        {
+          "rect": [
+            8,
+            371,
             136,
             17
           ],
@@ -9524,6 +12708,24 @@
           },
           "binds": "core.selection",
           "sample": "✓ CORE SET"
+        },
+        {
+          "rect": [
+            8,
+            144,
+            136,
+            24
+          ],
+          "list": {
+            "template": "statBonusBox",
+            "flow": "horizontal",
+            "gap": 3,
+            "size": [
+              28,
+              24
+            ]
+          },
+          "binds": "core.statBonus"
         }
       ],
       "color": "ink",
@@ -9596,7 +12798,7 @@
           "fontPx": 10,
           "align": "center",
           "binds": "attr.value",
-          "sample": "3"
+          "sample": "6"
         },
         {
           "rect": [
@@ -10298,6 +13500,31 @@
         "centerFill": true
       }
     },
+    "pulse": {
+      "periodMs": 1800,
+      "easing": "easeInOut",
+      "clock": "fixedTick",
+      "border": {
+        "alphaLo": 0.45,
+        "alphaHi": 1
+      },
+      "glow": {
+        "ring": {
+          "w": 1.5,
+          "alphaLo": 0.4,
+          "alphaHi": 0.73
+        },
+        "halo": {
+          "blur": 11,
+          "alphaLo": 0,
+          "alphaHi": 0.33
+        }
+      },
+      "self": {
+        "alphaLo": 0.45,
+        "alphaHi": 1
+      }
+    },
     "interactionStates": {
       "button": {
         "normal": "ui/button/button_normal",
@@ -10367,6 +13594,69 @@
         "disabled": {
           "opacity": 0.5
         }
+      },
+      "invCard": {
+        "equipped": {
+          "border": "good",
+          "fill": "panelDeep"
+        },
+        "disabled": {
+          "border": "lockRed",
+          "fill": "panelDeep"
+        },
+        "equippable": {
+          "border": "border",
+          "fill": "panelCard"
+        },
+        "locked": {
+          "border": "borderDim",
+          "fill": "panelCard",
+          "opacity": 0.6
+        },
+        "hover": {
+          "overlay": "rgba(255,255,255,.06)"
+        }
+      },
+      "loadoutCard": {
+        "slotted": {
+          "border": "border",
+          "fill": "panelCard"
+        },
+        "empty": {
+          "border": "border",
+          "borderStyle": "dashed",
+          "fill": "panelDeep",
+          "opacity": 0.8
+        },
+        "hover": {
+          "overlay": "rgba(255,255,255,.06)"
+        }
+      },
+      "invTab": {
+        "idle": {
+          "border": "borderDim",
+          "fill": "panelDeep",
+          "color": "mutedDim"
+        },
+        "hover": {
+          "border": "border",
+          "fill": "panelTab",
+          "color": "ink"
+        },
+        "active": {
+          "border": "amber",
+          "fill": "panel",
+          "color": "inkBright"
+        }
+      },
+      "beaconNode": {
+        "hover": {
+          "border": "parch"
+        },
+        "current": {
+          "border": "amber",
+          "glow": true
+        }
       }
     }
   },
@@ -10374,7 +13664,10 @@
     "root": "sprites/gear/worn",
     "races": [
       "human",
-      "elf"
+      "elf",
+      "dwarf",
+      "halfling",
+      "half_giant"
     ],
     "slots": {
       "str": [
@@ -10424,7 +13717,8 @@
       "adept": "int",
       "summoner": "int",
       "reaver": "dex",
-      "ranger": "dex"
+      "ranger": "dex",
+      "barbarian": "str"
     },
     "sprite": "<race>/<slot>/[<core>/]<type>_<tier>_<condition>",
     "fallback": [

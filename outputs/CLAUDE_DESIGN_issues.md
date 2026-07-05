@@ -1,4 +1,13 @@
-# Claude Design payload — CURRENT only (2026-07-04)
+# Claude Design payload — CURRENT only (2026-07-05)
+
+**‼ RECONCILED against the 2026-07-05 v6/roster drop (Cowork):** figures for **5 races × 7 cores**
+(dwarf + halfling as asked, PLUS half_giant + barbarian unasked — both adopted: Half-Giant is now a
+locked race, Barbarian a locked core, see `design/systems/RACES.md`/`CORE_RUNES.md`), worn sets for
+all 5 races incl. barbarian(str) themes, regenerated figures/gear/worn manifest sections, and the 14
+per-core 01/02 reference PNGs (all exactly 1920×1080 — thank you, contract held). Item states swept
+below: **B17 ✅ closed (exceeded)**, B15/B16 folded into the new **B20** (the copy/chips exist in your
+refs now; what's missing is the EXTRACTION so the engine can render them), B18 updated (frenzy +
+skeleton icons arrived; the rest still needed), B12 stays closed.
 **‼ CORRECTION 2026-07-04 (Doug) — the worn-armor batch relayed earlier today was MIS-BUILT.** CD
 generated themed art for EVERY armor type × core × race (a full cross-product) plus an armor type
 literally named "plain". Neither is the design. The corrected, CONSOLIDATED worn-armor convention now
@@ -26,6 +35,9 @@ drop:** B0 (strips 203/gap 5), B0b (`core.label` split), B1a (campaignmap ships 
 memory. B9 is FOLDED into B2-GO (it was scoping for a batch that was on hold; the hold is lifted).
 
 ## Confirm-to-close (no action — just clear your memory)
+**B17 ✅ (2026-07-05) — Dwarf + Halfling figure batch landed AND exceeded** (half_giant + barbarian
+came too, now both canon; worn sets + manifest sections regenerated cleanly, merge guard held). The
+race-card art/portrait + final blurbs/tags residue moves into B20. Thank you — clear from dev memory.
 B0 ✅ · B0b ✅ · B1a ✅ · B3 ✅ landed in the evening drop. B9 → merged into B2-GO below.
 **B12 ✅ (2026-07-04) — the CORRECTED worn-armor set landed clean:** 744 files on the race-first
 full-part convention, cross-product leak check EMPTY, no "plain" type, complete (0 missing / 0 extra),
@@ -124,34 +136,47 @@ B14. **Equipment `buildMinions` list is sized for ZERO cards, not one.** Element
     treatment: widen to fit `Bays × (131 + gap)`, matching how the technique bar is sized for its
     own bay count.
 
-**NEW 2026-07-05 (core-effect + race/balance design session — not yet relayed; Doug to send):**
+**2026-07-05 batch (v6 design session + the roster drop's follow-ups):**
 
-B15. **Core Effect roster REPLACED — new names + rules text.** The prototype set is now canon and SUPERSEDES
-    the old §11 roster (Hollow Vessel / Unbroken Aegis / Overchannel / Legion / Bloodrush / Called Shot).
-    Engine binds the text (`core.coreEffect`), so no data work — but two card-layout notes: (a) the effect
-    NAMES changed — Grunt "Jack of All Trades", Warden "Fortified", Adept "Resonance", Summoner "Conscription",
-    Reaver "Finesse", Ranger "Fletcher's Luck"; (b) some rules text is LONGER now (Ranger's is a compound
-    sentence) — re-check the `coreEffect` text rect wraps/fits. Full text: `design/systems/CORE_RUNES.md`.
+B20. **RE-EXTRACTION to the per-core refs + the v6 roster (the big one — the engine renders only what
+    the manifest authors, so everything here is render-blocked until it lands):**
+    1. The 01/02-`<core>` refs show elements the manifest doesn't author yet: **per-core STAT-BONUS
+       chips** (ex-B16 — `core.statBonus` list on the NewGame coreCard + Equipment identity block; one
+       colored chip per non-zero stat: Grunt +1 all · Warden +5 CON · Adept +5 INT · Summoner +3 INT/
+       +2 CON · Reaver +5 DEX · Ranger +4 DEX/+1 CON · **Barbarian +4 STR/+1 CON**), **action-bar cards
+       with rules text** (name + cost + italic description + footer state line), and the **"minions"
+       label vocabulary** (fold B19 into the same regen). New Core-Effect copy (ex-B15) is in
+       `design/systems/CORE_RUNES.md` — some rules text runs long (Ranger's compound sentence), size
+       the coreEffect rects for it.
+    2. **NewGame re-author for the grown roster: 5 races × 7 cores** (raceCards/coreCards currently
+       seat 2×6 — cells past the container silently drop, so the screen literally can't show the new
+       picks). Include Doug's tile treatment: **each core tile carries its core's BG color + Core-Effect
+       trim color** — please publish the per-core accent TOKENS in the style block so the engine reads
+       them instead of our flagged stopgap palette (STATUS Chunk C.2).
+    3. Refresh the stale refs to v6 data: 05-newgame (new roster + tile colors), 03/07 if their strips
+       show core identity; a `01/02-*-<core>` set for any future core additions. Race-card art/portraits
+       + final race blurbs/tags for Dwarf/Halfling/Half-Giant (Doug supplies copy) ride here too.
+    4. FYI so it doesn't surprise you: mock numbers in the refs that disagree with the systems docs
+       (e.g. Claymore "6 dmg · 1.4×" vs WEAPONS.md's 7 dmg · 1.3×; Stoneskin/Barkskin pool text) are
+       treated as NON-canon — docs win; no action needed unless you'd rather regenerate the copy.
 
-B16. **NEW element — per-core STAT-BONUS chips on the core card (Doug's explicit ask).** Each Core Rune now
-    grants an additive stat bonus; show it as a concise row of colored attribute chips (attr color + number +
-    short label), like the resource strip. Bonuses: Grunt +1 STR/INT/DEX/CON · Warden +5 CON · Adept +5 INT ·
-    Summoner +3 INT / +2 CON · Reaver +5 DEX · Ranger +4 DEX / +1 CON. Author a `core.statBonus` list element
-    on the NewGame coreCard (and the Equipment identity block), one chip per non-zero stat; engine supplies
-    the datum.
+B18. **Technique + minion ICONS — updated after the 07-05 drop (frenzy ✅ + skeleton ✅ arrived, thank
+    you).** Still needed for the v6 kits: **Flurry, Aimed Shot, Siphon** (renamed from Drain — reuse
+    `drain` or new), **Barkskin**, **Stoneskin** (existing icon can stay for the T2), **Sacrifice**,
+    **Bind, Parry, Steel, Suture**; minion icons **Iron Golem, Hound**. Icons + mgcb source (we mirror
+    game-side). (Rapier / Staff / Charm / Tome weapon sprites are already in B2-GO.)
 
-B17. **TWO NEW RACES — Dwarf + Halfling — full figure/portrait/card batch.** The race roster grew 2 → 4:
-    Dwarf (CON affinity — stout, heavy build) and Halfling (DEX affinity — small, nimble). Both need the same
-    treatment Human/Elf have: race × core figures for all six cores (part/z-list contract, B2-GO), head
-    portraits, race-card art, AND worn-armor part sets per the B12 convention — this EXTENDS B12's
-    `race ∈ {human, elf}` to `{human, elf, dwarf, halfling}` (every slot/tier/condition per new race, same
-    completeness math + fallback chain). Final blurbs/tags: Doug to supply. Multi-night — ship by race/slot/tier.
-
-B18. **New technique + minion ICONS for the current default kits.** Beyond the existing 8 icons
-    (bandage/block/cleave/drain/ember/jab/lunge/stoneskin), the kits now use **Frenzy, Flurry, Aimed Shot,
-    Siphon** (renamed from Drain — reuse `drain` or new), **Barkskin** (INT shield), **Sacrifice**
-    (consume-minion heal); plus minion icons **Skeleton, Iron Golem, Hound**. Add icons + mgcb source (we
-    mirror game-side). (Rapier / Staff / Charm / Tome weapon sprites are already in B2-GO.)
+B19. **CANON RENAME (2026-07-05, Doug) — "bay(s)" is retired as the minion-slot term; vocabulary is
+    "Minions" only, no separate slot noun.** DESIGN_SPEC/CORE_RUNES/SCREENS canon already updated our
+    side. Your manifest still spells the retired term into ids/binds: template `minionBay`; element ids
+    `bayGroupLabel`/`bayList` (note: `bayGroupLabel`'s rendered TEXT already correctly says "MINIONS" —
+    only the id is stale); binds `bay.hotkey`, `bay.state`, `bay.name`, `bay.gateColor`, `bay.cost`,
+    `bay.description`, `bay.amount`, `loadout.bays`, `core.bays`, `preview.bays`; part `baysBox`. Ask:
+    next regen, rename these to the "minion" equivalent (e.g. `minionCard` template, `minion.hotkey`,
+    `minion.state`, `minion.name`, `minion.gateColor`, `minion.cost`, `minion.description`,
+    `minion.amount`, `loadout.minions`, `core.minionCap`, `preview.minionCap`, `minionsBox`) — same
+    class of ask as the earlier B6 vocabulary rename. Our renderer's bind-key literals wait for this
+    drop to land before renaming in lockstep (avoids breaking the live binding mid-flight).
 
 B12. **CLOSED 2026-07-04 — delivered + verified clean (744 files, no cross-product, no "plain",
     0 missing / 0 extra); see Confirm-to-close above. Convention is now canon in LAYOUT_CONTRACT §12a /
@@ -234,10 +259,10 @@ B12. **CLOSED 2026-07-04 — delivered + verified clean (744 files, no cross-pro
 - **Name lengths:** the "Dwarven Steel Short Sword" (24ch) class overflows current card name rects —
   Doug ACCEPTS overflow for now; final treatment is a parked Doug+Cowork decision. Don't
   unilaterally re-rect, but flag preferred options if you have them.
-- design/05 v2 STAT BLOCKS are not adopted. **Tuned numbers now exist** (race bases Human 5/5/5/5 · Elf
-  4/6/4/4 · Dwarf 4/4/4/6 · Halfling 4/4/6/4, + the per-core stat bonuses in B16; `design/systems/RACES.md`) —
-  a 05 re-render can sample from these.
-- Core Effect roster was **REPLACED this pass** (see B15) — the old §11 names (incl. Called Shot) are retired;
-  effect MECHANICS still come later engine-side.
+- The v6 stat blocks are ADOPTED canon (race bases Human 5/5/5/5 · Elf 4/6/4/4 · Dwarf 4/4/4/6 ·
+  Halfling 4/4/6/4 · **Half-Giant 6/4/4/4**, + the per-core bonuses/layout numbers in B20.1 /
+  `design/systems/{RACES,CORE_RUNES}.md`) — the 05 re-render (B20.3) samples from these.
+- Core Effect roster was **REPLACED** (v6; folded into B20.1) — the old §11 names (incl. Called Shot)
+  are retired; the engine is building the new effects' MECHANICS now (they're no longer display-only).
 - Drops are applied via a stop/apply/re-arm handshake now — stage in `.drop/`, Cowork applies with
   the loop halted, guards run before the tree resumes.
