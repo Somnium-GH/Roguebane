@@ -94,10 +94,14 @@ and approximate click position so the large-overlap-figure lead can be followed 
   bug above), or whether the 1px `waresShelves` row-drop bug above is masking page 2's existence somehow.
   Flagging fresh, not guessing at a fix — needs a live repro with a >3-section stock.
 
-## ⇒ CONTENT DRIFT FLAGGED (2026-07-05 loop) — Techniques/minion numbers vs `design/systems/TECHNIQUES.md`
-Doug edited that doc directly this pass (two External commits, no LOCKED marker, no STATUS work-item
-attached) — not chasing a code sync without one, per usual, but noting the drift so whoever picks this
-up doesn't have to re-discover it: `Minions.cs` still has Skeleton (Reserve 2/Timer 25), Golem
+## ⇒ CONTENT DRIFT FLAGGED (2026-07-05 loop, updated after external commit `9711f3a` "technique tweaks")
+## — Techniques/minion numbers vs `design/systems/TECHNIQUES.md`
+Doug edited that doc directly again this pass (three External commits now, no LOCKED marker, no
+STATUS work-item attached) — not chasing a code sync without one, per usual, but noting the drift so
+whoever picks this up doesn't have to re-discover it. Latest edit (`9711f3a`) renames `T2 CON Shield`
+→ `Steel` and `T2 CON Heal` → `Suture`, adds two new held guards (`Bind`, T1 STR, Reserve 2; `Parry`,
+T1 DEX, Reserve 2) with no Core counterpart at all yet, and bumps `Bandage`'s reserve 1→2. Prior drift
+still stands: `Minions.cs` still has Skeleton (Reserve 2/Timer 25), Golem
 (Reserve 3/Timer 100, no T2 label) against the doc's new Skeleton T1 (1/3s) and Iron Golem T2 (2/5s);
 Hound has no accuracy-bonus effect at all against the doc's new "+5%/tier" spec. `Techniques.cs`'s
 `Stoneskin` (id `stoneskin`, Reserve 2) also predates the doc's tier-1 rename to `barkskin`
