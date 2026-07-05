@@ -103,28 +103,33 @@ public static class Armory
     // Reserve on a Consults!=None technique is inert (Caster.Reservation zeroes it) — the WEAPON's own
     // reserve is what's tracked; kept at the TECHNIQUES.md-quoted value for future §11 Finesse display.
     public static readonly Technique Swing =
-        new("swing", Stat.Str, Reserve: 0, TechniqueKind.Timered, Cooldown: 80, Power: 0, Consults: WeaponUse.Primary);
+        new("swing", Stat.Str, Reserve: 0, TechniqueKind.Timered, Cooldown: 80, Power: 0, Consults: WeaponUse.Primary,
+            Desc: "A basic strike with your main-hand weapon.");
 
     public static readonly Technique Frenzy =
         new("frenzy", Stat.Str, Reserve: 3, TechniqueKind.Timered, Cooldown: 80, Power: 0, DamageMult: 1.0,
-            Consults: WeaponUse.Both, AltStat: Stat.Dex);
+            Consults: WeaponUse.Both, AltStat: Stat.Dex,
+            Desc: "A dual-wield assault with both blades at once. Needs two weapons; paid in STR or DEX by what you wield.");
 
     public static readonly Technique Flurry =
         new("flurry", Stat.Str, Reserve: 2, TechniqueKind.Timered, Cooldown: 40, Power: 0, DamageMult: 0.5,
-            Consults: WeaponUse.Both, AltStat: Stat.Dex);
+            Consults: WeaponUse.Both, AltStat: Stat.Dex,
+            Desc: "A fast dual-wield flurry, both blades at half power. Needs two weapons; paid in STR or DEX.");
 
     // Shot looses the primary DEX weapon (the BOW): it BYPASSES the shield pool and spends 1 Charge per
     // loose (§6b Charge = the shield-pierce resource); dry => it holds. Power/cost come from the bow.
     // Kept as legacy content (superseded by AimedShot below in every v6 kit) — inert but harmless.
     public static readonly Technique Shot =
         new("shot", Stat.Dex, Reserve: 0, TechniqueKind.Timered, Cooldown: 80, Power: 0,
-            Consults: WeaponUse.Primary, ChargeCost: 1, ShieldPiercing: true);
+            Consults: WeaponUse.Primary, ChargeCost: 1, ShieldPiercing: true,
+            Desc: "Loose your bow: bypasses the foe's shield and spends 1 charge. Dry, it holds.");
 
     // The Marksman's real bow verb (CORE_RUNES.md/TECHNIQUES.md): 2.0x the bow's power, slow (160
     // ticks = 16s), 1 Reserve, DEX-gated, spends+bypasses on Charge same as Shot.
     public static readonly Technique AimedShot =
         new("aimed_shot", Stat.Dex, Reserve: 2, TechniqueKind.Timered, Cooldown: 160, Power: 0, DamageMult: 2.0,
-            Consults: WeaponUse.Primary, ChargeCost: 1, ShieldPiercing: true);
+            Consults: WeaponUse.Primary, ChargeCost: 1, ShieldPiercing: true,
+            Desc: "A slow, heavy bow shot for double power; bypasses shields and spends 1 charge.");
 
     public static readonly IReadOnlyList<Weapon> All = new[] { Sword, Axe, Dagger, Bow };
 }

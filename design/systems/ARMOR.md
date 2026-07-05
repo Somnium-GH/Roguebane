@@ -33,6 +33,12 @@ evade does; STR plate reduces the covered part's own stat loss, not HP.
   **hard-zeroed if a leg breaks** (§6). Robe caps at two pieces so its spell bonus tops out fast. The shield
   object is the gateway to the strongest block source.
 - **Disable cascade** — highest-requirement-first, ties last-equipped-first; recovery re-enables cheapest-first.
+- **CON-plate override (Warden only, granted by the Core Effect).** STR plate's governing/payment stat can be
+  reassigned to **CON** — but ONLY when granted by the **Warden Core Effect (Fortified)**, which also discounts it
+  −1 STR-equiv per tier (CORE_RUNES.md). This is a per-core EFFECT grant, not a new armor line: the four lines above
+  are unchanged, plate is STR-governed by default, and no other core pays plate in CON. (Sanctioned 2026-07-05, Doug —
+  this is the engine-legal home for Fortified the loop was waiting on: a Core-Effect governing-stat override, not an
+  invented CON-plate line.)
 
 ## Open / TBD
 - All numbers are §6c blessed-initial — tune in a balance pass.

@@ -79,9 +79,10 @@ scales with the sacrificed minion's tier, minion destroyed permanently (no refun
 the (still-flagged) exact per-tier numbers. Barkskin here is T1 — Adept gets the stronger Stoneskin T2
 (below); the two are intentionally different tiers, not a mix-up.
 
-### Reaver — *THE DUELIST* · badge SPECIALIST — req **DEX 9**
-Bonus +5 DEX. Weapons: 2× Iron Dagger · Armor: leather ×4 · Techniques: Frenzy, Flurry · Minions: none (capacity 0) ·
-**no heal** (glass cannon). **Locked 2026-07-05 (Doug):** Frenzy/Flurry are single **stat-flexible** techniques (STR OR DEX, same
+### Reaver — *THE DUELIST* · badge SPECIALIST — req **DEX 9 · CON 2**
+Bonus +5 DEX. Weapons: 2× Iron Dagger · Armor: leather ×4 · Techniques: Frenzy, Flurry, Bandage · Minions: none (capacity 0).
+**Bandage added 2026-07-05 (Doug + balance spreadsheet Kits/Demand tabs, CON 2):** Reaver carries the flat CON part-heal like
+every core bar Adept/Summoner — the earlier "no heal glass cannon" framing is retired. **Locked 2026-07-05 (Doug):** Frenzy/Flurry are single **stat-flexible** techniques (STR OR DEX, same
 reserve — see TECHNIQUES.md); Reaver pays them in DEX, and Finesse (−1) brings them to 2/1 — leather 4 +
 daggers 2 + Frenzy 2 + Flurry 1 = the DEX 9 above. (The earlier `frenzy_dex`/`flurry_dex` clone framing is retired.)
 
@@ -114,8 +115,10 @@ test exemption were both artifacts of that hand-math error, not real design inte
 them.
 
 ## Shared rules
-- **Healing map:** Grunt, Warden, Ranger, Barbarian → Bandage (T1 CON heal); Adept → Siphon (lifesteal spell);
-  Summoner → Sacrifice (consume a minion); Reaver → none. Flat baselines pull players toward acquiring better heals.
+- **Healing map:** Grunt, Warden, Ranger, Barbarian, **Reaver** → Bandage (T1 CON heal); Adept → Siphon (lifesteal spell);
+  Summoner → Sacrifice (consume a minion). Only Adept/Summoner heal off-Bandage; every other core carries the flat CON
+  baseline (Reaver's Bandage added 2026-07-05 — it was briefly dropped to "no heal," now restored). Flat baselines pull
+  players toward acquiring better heals.
 - **Discount perks live in the effects** — Grunt (−1 all), Warden (plate-in-CON −1/tier), Reaver (dual-wield −1),
   Ranger (bow −1/tier) all fold their affordability discount into their Core Effect text above.
 - A Core Effect outranks a keystone rune.

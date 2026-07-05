@@ -1,5 +1,44 @@
 # Status
 
+## 📐 RULES REFERENCE (2026-07-05, Cowork — STANDING; consult on ANY design conflict/ambiguity)
+The core/race/effect/kit/number design changed a lot this week. On any conflict or ambiguity about races,
+cores, Core Effects, stat bonuses, default kits, technique/gear reserves, or the reservation model,
+**`design/systems/RULES_SNAPSHOT.md` is the current source of truth** — a clean consolidated snapshot that
+SUPERSEDES DESIGN_SPEC §11 (old Core-Effect roster) and §7 (old 2-race set) and any in-code placeholder
+stats. The per-system `design/systems/*.md` docs hold the detail but carry historical reconciliation notes;
+when they and the snapshot seem to disagree, trust the snapshot's clean current state. Numbers are
+prototype/placeholder-blessed; snapshot items marked **OPEN** are NOT settled — don't hardcode them as final.
+(Temporary — remove when this design folds into DESIGN_SPEC.)
+
+## ✅ COWORK PASS LANDED (2026-07-05) — display strings + Reaver heal + Fortified unblock (verify tests, then absorb)
+A Cowork/Doug hand-edit pass is COMPLETE on the working tree. All DISPLAY/data + one kit heal — it does NOT
+touch the coupled CHUNK A stat/kit/effect economy (that stays yours). Absorb it into your next commit; the
+one thing I can't do in the sandbox is BUILD — run Core.Tests and confirm green before committing.
+- **`Content/Techniques.cs` + `Content/Armory.cs`:** technique `Desc` strings reconciled to TECHNIQUES.md
+  canon rules text (they were loop-invented and drifting from the rules — Doug's complaint); Frenzy/Flurry/
+  Swing/Shot/AimedShot given real card copy (were empty). `{power}` tokens preserved; shield/heal Descs bake
+  the canon numbers (pool/regen) that match today's data — when a tuning pass changes those, update the Desc
+  (or route through a token). Frenzy/Flurry MECHANICS were already correct (Reserve 3/2, `Consults.Both`,
+  `AltStat.Dex`) — this pass only added their missing text.
+- **`Content/CoreRunes.cs`:** **Reaver kit += `Techniques.Bandage`** (Doug + balance spreadsheet Kits/Demand
+  tabs; CON 2 demand). Reaver was never meant heal-less — the "no heal glass cannon" interim was a loop
+  artifact of the pre-Bandage healing map. Test-checked safe: `StartingKitTests.ReaverWieldsTwinDaggers…`
+  asserts weapons/armor only; no test pins Reaver's kit list or "no heal"; Bandage is CON r2, every race has
+  the CON headroom.
+- **Canon:** `CORE_RUNES.md` healing map Reaver→Bandage (+ req `DEX 9 · CON 2`); `ARMOR.md` sanctions the
+  **Fortified CON-plate override (Warden Core Effect)** — the item-3/4 blocker is cleared (see Needs-Human
+  RESOLVED below). `outputs/CLAUDE_DESIGN_issues.md` reconciled vs CD_STATUS (B18 glyphs + B21 authoring
+  closed). (Rules-text-from-canon PROCESS fix is a SEPARATE agent's `design/systems/RULES_SNAPSHOT.md` — see
+  the RULES REFERENCE block above; I did not touch CLAUDE.md.)
+- **For CHUNK A item 3 (your slice):** the spreadsheet confirms `CORE_RUNES.md` §Default-loadouts ALREADY
+  matches Doug's model for every core (only Reaver's heal had drifted, now fixed) — so item 3's kit target is
+  CORE_RUNES.md **verbatim**, no re-derivation. Confirmed engine-vs-canon drift still to reconcile in your
+  tested slice: Warden Cleave→**Jab** (Doug: nothing too strong to start), Adept →Stoneskin + drop the
+  Skeleton kit-minion, Summoner →Sacrifice/Barkskin + Skeleton-only (drop IronGolem/Brace/Bandage), Ranger
+  Shot→**Aimed Shot** + ShortSword→**Dagger** (drop Brace), **Barbarian** core add, Core-Effect roster rename+
+  mechanics (still pins `CoreRuneRosterTests` line ~32 Grunt "Hollow Vessel" + the Summoner RefundsSummons
+  test — update those), budgets + v6 race stats. All now UNBLOCKED.
+
 ## ‼ HIFI, HIGH PRIORITY (2026-07-05, Doug screenshot) — `"parent"` in layout.json is DEAD DATA; every
 ## nested/parent-relative element renders in the wrong place, screen-wide
 Doug's NewGame screenshot shows the title garbled ("Human Grunt"/"THE GENERALIST" bleeding into the
@@ -64,9 +103,10 @@ What landed (all verified on the real tree):
   locks: **Barbarian** (budget 14 · actions 3 · minions 1) and **Half-Giant** (6/4/4/4 STR).
 - **CD-side `Roguebane.Content/Content.mgcb` updated; the GAME-side `Roguebane.Game/Content/Content.mgcb`
   (the one builds READ) has ZERO of the new entries — CHUNK B mirrors it.**
-- Icons: only `frenzy.png` + `skeleton.png` arrived beyond the old 8 — B18 still open (flurry, aimed
-  shot, siphon, barkskin, sacrifice, bind, parry, suture, steel, golem, hound); tinted-tile fallback
-  covers meanwhile.
+- Icons (RECONCILED 2026-07-05 vs CD_STATUS #34/#36, verified on the tree): the pass-8/9 glyphs LANDED —
+  `flurry` `aimed_shot` `siphon` `barkskin` `sacrifice` `bind` present + `frenzy`/`flurry` re-captured as
+  the STR/DEX split two-badge. B18 now open for ONLY `parry` `steel` `suture` + minion `iron_golem` `hound`;
+  tinted-tile fallback covers those meanwhile.
 What this drop RESOLVES (swept everywhere below): B17 (dwarf+halfling figures — EXCEEDED: half_giant +
 barbarian came too); the race/core roster gap (§17 #4 mostly); the "Techniques/minion numbers drift"
 flag (now a sanctioned sync, CHUNK A); core-effect design (v6 effects have rules text = build them);
@@ -223,18 +263,15 @@ gap by accident (Lunge/Brace/Bandage in its kit ARE in `Techniques.All`, so Armo
 the palette went unnoticed). Fix: palette now also carries Armory.Swing/Frenzy/Flurry/Shot/AimedShot.
 392/392 green.
 
-**Needs human — NEW blocker found this pass, item 3/1 stay deferred:** Warden's Core Effect *Fortified*
-("Plate armor is paid in CON at 1 less per tier", CORE_RUNES.md) has no basis in ARMOR.md's canon: the
-ONLY four armor lines are STR-plate / DEX-leather / INT-robe / CON-shield-object — no CON-governed BODY
-armor line exists, and `Armor.Governing` (`Armor.cs`) is a hardcoded DERIVED property (`Plate => Stat.Str`
-always), not something a `with` expression or a per-core override can touch without inventing a new
-mechanism (a per-core armor-governing override, or a distinct CON-plate line) that ARMOR.md doesn't
-sanction. Per CLAUDE.md's no-undesigned-mechanics rule, NOT inventing this speculatively. Doug: please
-reconcile ARMOR.md with CORE_RUNES.md's Fortified text (either ARMOR.md grows a CON-plate override
-mechanism, or Fortified's wording changes) before item 1 (Races.cs rescale) and the rest of item 3 resume
-— the full rescale's demand/clearance proofs (esp. Half-Giant+Barbarian's zero-headroom fit) depend on
-every core's discount actually being mechanized, and Fortified is the one that has no legal engine home
-yet. Everything else in item 3/1 is unblocked and ready once this lands.
+**Needs human — RESOLVED (Doug, 2026-07-05), item 3/1 UNBLOCKED:** the *Fortified* CON-plate question is
+answered. **Fortified is the WARDEN CORE EFFECT's grant:** it reassigns Warden's STR plate to be paid in
+**CON** (−1 STR-equiv/tier) — a per-core CORE-EFFECT governing-stat override, NOT a new armor line and NOT
+plate becoming CON for anyone else. Sanctioned in `design/systems/ARMOR.md` (Mechanics → "CON-plate override
+(Warden only, granted by the Core Effect)") so it's no longer an undesigned mechanic. Engine home: give the
+Core-Effect interpreter a per-core armor-governing override that `Body`/`Armor.Governing` consult for the
+Warden+Fortified case (the four armor lines in `Armor.cs` stay as-is; the override is effect-driven, gated to
+Warden). This is exactly item 4's *Fortified* mechanic + the item-3 kit swap — land them together with items
+1+2 in one tested slice per the coupling proof above. Nothing else in item 3/1 was ever blocked.
 
 **Note on the new HIGH-PRIORITY `parent` bug at the top of this file:** landed after this pass's engine
 work was already in flight; next loop pass picks it up first (it outranks CHUNK A per Doug's own

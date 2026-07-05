@@ -26,14 +26,14 @@ public static class Techniques
 
     public static readonly Technique Ember =
         new("ember", Stat.Int, Reserve: 1, TechniqueKind.Timered, Cooldown: 30, Power: 1,  // ~3s bolt
-            Desc: "A mote of fire hurled from afar for {power} damage.");
+            Desc: "A fast fire bolt for {power} damage; a targeted hit feeds Resonance.");
 
     // The lifesteal spell (TECHNIQUES.md): on a CLEAN landed part-hit (never shield-absorbed, never an
     // already-broken part -- Caster.Hit's shared on-hit-boon gate) it mends the caster's own
     // most-damaged part by the damage just dealt.
     public static readonly Technique Siphon =
         new("siphon", Stat.Int, Reserve: 2, TechniqueKind.Timered, Cooldown: 60, Power: 2, Lifesteal: true,
-            Desc: "A draining bolt that saps {power} from the struck part and mends your own wounds by the same.");
+            Desc: "A draining bolt for {power} that heals you by the same, replenishing your own attribute damage. No lifesteal on a shield-absorbed hit or a broken part; a targeted hit feeds Resonance.");
 
     // The CON shield source: a held passive that reserves CON and maintains a regenerating pool of
     // shield layers -- the §6b mitigation that stands between a hit and the body (§8: shields + full
@@ -41,52 +41,52 @@ public static class Techniques
     public static readonly Technique Brace =
         new("brace", Stat.Con, Reserve: 2, TechniqueKind.Sustained, Cooldown: 0, Power: 0,
             ShieldLayers: 4, ShieldRegen: 20, // +1 pip / 2.0s
-            Desc: "Raise your guard and hold a wall of regenerating shield layers.");
+            Desc: "Hold a pool of 4 CON shield points, each absorbing one hit, +1 pip / 2.0s. Requires a shield equipped.");
 
     // T2 rung of the CON guard ladder (Warden signature). Tier ladders are parked elsewhere
     // (TECHNIQUES.md Open/TBD) but Steel is itself a distinct T2 entry, not a scaled Brace.
     public static readonly Technique Steel =
         new("steel", Stat.Con, Reserve: 3, TechniqueKind.Sustained, Cooldown: 0, Power: 0,
             ShieldLayers: 8, ShieldRegen: 15, // +1 pip / 1.5s
-            Desc: "A stronger held guard: a deeper wall of regenerating shield layers.");
+            Desc: "A stronger held guard: pool 8, +1 pip / 1.5s.");
 
     // T1 rung of the INT ward ladder (barkskin -> stoneskin -> steelskin -> diamondskin,
     // TECHNIQUES.md; higher rungs are parked, T1 only).
     public static readonly Technique Barkskin =
         new("barkskin", Stat.Int, Reserve: 1, TechniqueKind.Sustained, Cooldown: 0, Power: 0,
             ShieldLayers: 3, ShieldRegen: 30, // +1 pip / 3.0s
-            Desc: "A held spell that keeps stone layers between you and harm.");
+            Desc: "A held spell keeping 3 shield points, +1 pip / 3.0s.");
 
     // T2 rung of the INT ward ladder (barkskin -> stoneskin -> steelskin -> diamondskin,
     // TECHNIQUES.md), numbers locked by Doug 2026-07-05 (CHUNK A item 5): pool 6, +2 pips/3.0s.
     public static readonly Technique Stoneskin =
         new("stoneskin", Stat.Int, Reserve: 2, TechniqueKind.Sustained, Cooldown: 0, Power: 0,
             ShieldLayers: 6, ShieldRegen: 15, // +2 pips / 3.0s
-            Desc: "A stronger held ward: a deeper wall of regenerating stone layers.");
+            Desc: "A stronger held ward: pool 6, +2 pips / 3.0s.");
 
     // T1 STR guard (TECHNIQUES.md).
     public static readonly Technique Bind =
         new("bind", Stat.Str, Reserve: 2, TechniqueKind.Sustained, Cooldown: 0, Power: 0,
             ShieldLayers: 2, ShieldRegen: 25, // +1 pip / 2.5s
-            Desc: "A held guard that keeps a shield point between you and harm.");
+            Desc: "A held guard keeping 2 shield points, +1 pip / 2.5s.");
 
     // T1 DEX guard (TECHNIQUES.md).
     public static readonly Technique Parry =
         new("parry", Stat.Dex, Reserve: 2, TechniqueKind.Sustained, Cooldown: 0, Power: 0,
             ShieldLayers: 1, ShieldRegen: 20, // +1 pip / 2.0s
-            Desc: "A held guard that keeps a shield point between you and harm.");
+            Desc: "A held guard keeping 1 shield point, +1 pip / 2.0s.");
 
     // The §10 in-combat part-heal (CON): mends the most-damaged part ~1 every 8s, reserving CON while
     // held. Kept OUT of `All` for now so it stays opt-in content (no balance shift to the default
     // palette); it is the reconcile trigger for live foe part-aim (G1, staged off until heals exist).
     public static readonly Technique Bandage =
         new("bandage", Stat.Con, Reserve: 2, TechniqueKind.Timered, Cooldown: 80, Power: 1, Heals: true,
-            Desc: "Binds your most-damaged part, mending {power} each pass.", Side: TargetSide.Self);
+            Desc: "Mends your most-damaged part {power} / 8.0s. The flat baseline.", Side: TargetSide.Self);
 
     // T2 rung of the CON heal ladder (Warden signature, TECHNIQUES.md).
     public static readonly Technique Suture =
         new("suture", Stat.Con, Reserve: 3, TechniqueKind.Timered, Cooldown: 80, Power: 2, Heals: true,
-            Desc: "Binds your most-damaged part, mending {power} each pass.", Side: TargetSide.Self);
+            Desc: "Mends your most-damaged part {power} / 8.0s. (Warden signature.)", Side: TargetSide.Self);
 
     // PLACEHOLDER -- needs-design (TECHNIQUES.md Open/TBD): "consume one of your own minions to mend
     // your body" is a brand-new mechanic (a minion-consuming heal) with no engine support yet. This
@@ -94,7 +94,7 @@ public static class Techniques
     // inert CON reservation. Kept OUT of `All` and every kit until the mechanic is designed and built.
     public static readonly Technique Sacrifice =
         new("sacrifice", Stat.Con, Reserve: 0, TechniqueKind.Timered, Cooldown: 80, Power: 0,
-            Desc: "Consume one of your minions to mend your body. (placeholder -- needs design)",
+            Desc: "Consume one of your fielded minions to mend your most-damaged part; the heal scales with the minion's tier. (placeholder -- needs design)",
             Side: TargetSide.Self);
 
     // Bandage is in the palette + the starting kits: every build fights with a part-heal so it can

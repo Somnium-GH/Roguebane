@@ -75,16 +75,18 @@ public static class CoreRunes
         CoreEffectDesc: "Surviving minions' Summons are refunded on Redeploy.",
         CoreEffectRefundsSummons: true); // the first REAL Core Effect [LOCKED §11]; CD reconciles the card copy
 
-    // The Duelist: glass-cannon, no minion capacity, no heal — ends parts before they answer.
+    // The Duelist: glass-cannon, no minion capacity — twin blades end parts before they answer.
     // Frenzy/Flurry are the real Task #3 kit (TECHNIQUES.md/CORE_RUNES.md LOCKED 2026-07-05): both
-    // are stat-flexible (AltStat: Stat.Dex), so Reaver's twin DEX daggers consult them directly — the
-    // Lunge/Bandage interim placeholder is retired.
+    // are stat-flexible (AltStat: Stat.Dex), so Reaver's twin DEX daggers consult them directly.
+    // Bandage restored 2026-07-05 (Doug + balance spreadsheet Kits/Demand tabs — CON 2 demand): Reaver
+    // carries the flat CON part-heal like every core bar Adept (Siphon) / Summoner (Sacrifice); the
+    // earlier "no heal glass cannon" interim was a loop artifact of the pre-Bandage healing map.
     public static readonly CoreRune Reaver = new(
         "reaver",
         RuneBudget: 19,
         RuneDiscount: 0,
         MinionCap: 0,
-        DefaultEquipment: new[] { Armory.Frenzy, Armory.Flurry },
+        DefaultEquipment: new[] { Armory.Frenzy, Armory.Flurry, Techniques.Bandage },
         DefaultWeapons: new[] { Armory.Daggers[0], Armory.Daggers[0] }, // twin Iron Daggers
         DefaultArmor: LeatherKitT1,
         Archetype: "THE DUELIST",

@@ -48,7 +48,10 @@ and does it feel good.
   is build-STATE (target / debt / needs-human / progress) and POINTS to the spec, it doesn't re-specify
   design. A change that alters locked design reconciles DESIGN_SPEC in the same pass.
 - Content/economy canon = `design/systems/*.md` (RACES/CORE_RUNES/TECHNIQUES/WEAPONS/ARMOR/FOES) — these
-  ARE the source of truth for code; don't re-derive their numbers by hand. Doug maintains a balance
+  ARE the source of truth for code; don't re-derive their numbers by hand, and COPY rules text / card copy
+  from them (or CD's manifest), never invent it. On ANY race/core/effect/kit/number conflict or ambiguity,
+  read `design/systems/RULES_SNAPSHOT.md` FIRST — the consolidated current-design snapshot that supersedes
+  DESIGN_SPEC §11/§7 and in-code placeholders. Doug maintains a balance
   spreadsheet outside the repo (cost/demand model, not tracked here) that these tables must stay
   reconciled against whenever he shares an update — that's how the 2026-07-05 Barbarian STR mismatch was
   caught: hand arithmetic written into CORE_RUNES.md had drifted from Doug's actual model. When he drops

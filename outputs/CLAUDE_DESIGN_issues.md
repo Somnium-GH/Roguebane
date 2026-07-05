@@ -1,5 +1,13 @@
 # Claude Design payload — CURRENT only (2026-07-05)
 
+**‼ RECONCILED against CD_STATUS.md (pass 8/9, 2026-07-05 — CD's new living open-gap file replaces
+DEV_LOOP_MEMORY, ships in every drop under `design/dchtml/`):** verified CD's landed claims against the
+real tree, not the memo. CLOSED here: **B18 glyphs** (Flurry/Aimed Shot/Siphon/Barkskin/Sacrifice/Bind +
+the Frenzy/Flurry two-badge split) all present in `icons/technique/`; **B21 authoring** (the `parent`
+re-anchor — 160 `parent` keys now in `layout.json`). Both now have only ENGINE/OUR residual (dual-pool
+draw; recursive parent-box resolve), tracked in STATUS, no longer CD asks. Still OPEN for CD: B18's
+Parry/Steel/Suture + Iron Golem/Hound icons, B20 re-extraction, and the B-series below.
+
 **‼ RECONCILED against the 2026-07-05 v6/roster drop (Cowork):** figures for **5 races × 7 cores**
 (dwarf + halfling as asked, PLUS half_giant + barbarian unasked — both adopted: Half-Giant is now a
 locked race, Barbarian a locked core, see `design/systems/RACES.md`/`CORE_RUNES.md`), worn sets for
@@ -160,18 +168,18 @@ B20. **RE-EXTRACTION to the per-core refs + the v6 roster (the big one — the e
        (e.g. Claymore "6 dmg · 1.4×" vs WEAPONS.md's 7 dmg · 1.3×; Stoneskin/Barkskin pool text) are
        treated as NON-canon — docs win; no action needed unless you'd rather regenerate the copy.
 
-B18. **Technique + minion ICONS — updated after the 07-05 drop (frenzy ✅ + skeleton ✅ arrived, thank
-    you).** Still needed for the v6 kits: **Flurry, Aimed Shot, Siphon** (renamed from Drain — reuse
-    `drain` or new), **Barkskin**, **Stoneskin** (existing icon can stay for the T2), **Sacrifice**,
-    **Bind, Parry, Steel, Suture**; minion icons **Iron Golem, Hound**. Icons + mgcb source (we mirror
-    game-side). (Rapier / Staff / Charm / Tome weapon sprites are already in B2-GO.)
-    **NEW (Doug, 2026-07-05, prototypal canon): Frenzy AND Flurry are each ONE shared dual-wield
-    technique that gates on either STR or DEX depending on the wielded weapons (not a clone pair) — both
-    need a two-cost icon treatment: the STR reserve cost as a red badge in the top-left corner, the DEX
-    reserve cost as a green badge in the bottom-right corner, same icon either way.** Flurry's icon is
-    still outstanding (build it with the two-badge treatment from the start). Frenzy's icon already
-    shipped (✅ above) as a single-cost icon before this dual-stat call landed — flagging for a revision
-    pass so it gets the same red/green two-badge treatment, not closing this as done until that lands.
+B18. **Technique + minion ICONS — RECONCILED against CD_STATUS #34/#36 (pass 8/9), verified on the real
+    tree.** LANDED since last relay (present in `Roguebane.Content/icons/technique/`, confirm-to-close —
+    clear from your dev memory): **Flurry ✅ · Aimed Shot ✅ · Siphon ✅ · Barkskin ✅ · Sacrifice ✅ · Bind ✅**
+    (pass 8). And the **Frenzy/Flurry two-badge split-fill treatment ✅** — CD_STATUS #36 re-captured both
+    `frenzy.png`/`flurry.png` as the split STR/DEX glyph (pass 9); verified both modified on the tree. That
+    closes the "Frenzy needs a two-badge revision + Flurry's icon" ask outright. Stoneskin's existing icon
+    stays for the T2.
+    **STILL NEEDED for the v6 kits (the only open icons):** **Parry, Steel, Suture** (technique glyphs —
+    absent from the tree); minion icons **Iron Golem, Hound** (only `skeleton.png` is in `icons/minion/`).
+    Icons + mgcb source (we mirror game-side). (Rapier / Staff / Charm / Tome weapon sprites are in B2-GO.)
+    Engine-side FYI (OURS, not a CD ask): the `either`/`payAttr` dual-pool manifest field + split-cost
+    two-row draw (CD_STATUS #36 consequences) is engine work, tracked in STATUS — the glyph art is done.
 
 B19. **CANON RENAME (2026-07-05, Doug) — "bay(s)" is retired as the minion-slot term; vocabulary is
     "Minions" only, no separate slot noun.** DESIGN_SPEC/CORE_RUNES/SCREENS canon already updated our
@@ -189,12 +197,13 @@ B19. **CANON RENAME (2026-07-05, Doug) — "bay(s)" is retired as the minion-slo
 screen, not a single asset — please treat it as a standing correctness rule, not a one-off fix.**
 
 B21. **ABSOLUTE POSITIONING IN THE MANIFEST — the resolution-scaling bug. Eradicate it everywhere.**
-    **[STATUS 2026-07-05 — CD dev-memory #35 reports this ADDRESSED: `proto/screen_extract.js` now emits a
-    `parent` field, all 6 screens re-anchored, re-extract shows 0 baked-absolute suspects, self-checked via
-    `proto/resolve_check.html` at 4 sizes. NOT yet landed in our repo (current `layout.json` still shows the
-    baked absolutes below) → VERIFY-to-close on the next drop. The residual — recursive parent-box
-    resolution in the interpreter — is engine/OURS, and must land before/with that drop or every parented
-    child mis-places. Original ask kept below for the audit trail.]**
+    **[STATUS 2026-07-05 — LANDED (verified): the `parent`-field re-extraction (CD dev-memory #35) is now
+    in our `layout.json` — 160 `parent` keys across the 6 screens, confirmed on the real tree. The CD
+    AUTHORING half of B21 is DONE — confirm-to-close, clear from your dev memory. The remaining half is
+    ENGINE/OURS — recursive parent-box resolution in the interpreter — and it's already the #1 HIFI
+    priority at the top of STATUS.md (today nothing reads `parent`, so every parented child mis-places;
+    that's the NewGame screenshot Doug hit). NOT a CD ask anymore. Original ask kept below for the audit
+    trail; delete this item once the engine resolver lands and the screens verify.]**
     Symptom Doug is hitting: screens line up at exactly 1920×1080 but DRIFT, GAP, and OVERLAP as the
     window grows past 1080 — badly at 2300px+ and at any off-16:9 aspect. Root cause is baked into the
     emitted manifest: **elements that visually belong to the RIGHT / BOTTOM / CENTER are anchored
