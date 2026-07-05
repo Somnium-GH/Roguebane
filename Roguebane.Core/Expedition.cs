@@ -211,6 +211,12 @@ public sealed class Expedition
         return true;
     }
 
+    // §6e reorder gate: same model as ReorderTechnique, against the Caster's bay list instead of
+    // the equipped-technique list. No Campaign-side mirror needed — Campaign hands every leg the
+    // SAME Caster instance (see Campaign.NewLeg), so bay order already survives a leg advance.
+    public bool ReorderMinion(Minion minion, int newIndex) =>
+        State == ExpeditionState.Choosing && _caster.ReorderMinion(minion, newIndex);
+
     // The merchant's HP service price (§10): gold per 1 HP, randomized within a loot-bounded range and
     // STABLE per merchant node (same node id => same price, so the run stays reproducible).
     public int HealPricePerHp => 1 + new Rng(Seed(Map.Current.Id) ^ HealSalt).Next(2); // 1..2 gold / HP

@@ -146,4 +146,46 @@ public class MinionTests
         Assert.True(caster.Summon(imp, bayCap: 3)); // succeeds without a stat reservation
         Assert.Equal(3, caster.Charge);             // Charge untouched
     }
+
+    // §6e ORDERING ("slot index IS the hotkey"): bays are a SLOT-ordered list, not id-sorted — a
+    // fresh Summon appends to the first free slot.
+    [Fact]
+    public void MinionsListsBaysInSummonOrderNotIdOrder()
+    {
+        var caster = new Caster(IntBody(10), null);
+        Assert.True(caster.Summon(Minions.Golem, bayCap: 3));    // "golem" summoned first...
+        Assert.True(caster.Summon(Minions.Skeleton, bayCap: 3)); // ...then "skeleton" (alphabetically earlier)
+        Assert.Equal(new[] { "golem", "skeleton" }, caster.Minions.Select(m => m.Id));
+    }
+
+    [Fact]
+    public void DismissCompactsTheBayOrderLeft()
+    {
+        var caster = new Caster(IntBody(10), null); // Golem(3) + Skeleton(2) + Shade(3) = 8 INT
+        caster.Summon(Minions.Golem, bayCap: 3);
+        caster.Summon(Minions.Skeleton, bayCap: 3);
+        caster.Summon(Minions.Shade, bayCap: 3);
+
+        caster.Dismiss(Minions.Golem); // remove the FIRST slot
+        Assert.Equal(new[] { "skeleton", "shade" }, caster.Minions.Select(m => m.Id));
+    }
+
+    [Fact]
+    public void ReorderMinionMovesItWithinTheBayStrip()
+    {
+        var caster = new Caster(IntBody(10), null);
+        caster.Summon(Minions.Golem, bayCap: 3);
+        caster.Summon(Minions.Skeleton, bayCap: 3);
+
+        Assert.True(caster.ReorderMinion(Minions.Golem, 1)); // move golem behind skeleton
+        Assert.Equal(new[] { "skeleton", "golem" }, caster.Minions.Select(m => m.Id));
+    }
+
+    [Fact]
+    public void ReorderMinionFailsForAnUnsummonedMinion()
+    {
+        var caster = new Caster(IntBody(10), null);
+        caster.Summon(Minions.Skeleton, bayCap: 3);
+        Assert.False(caster.ReorderMinion(Minions.Golem, 0)); // never summoned -> no bay slot to move
+    }
 }

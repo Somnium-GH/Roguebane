@@ -24,7 +24,9 @@ public sealed class Caster
     private bool _keepTargets;         // global player AUTO: ON => no module clears its target after firing
     private ICombatTarget? _default;
     private readonly SortedDictionary<string, Run> _active = new(StringComparer.Ordinal);
-    private readonly SortedDictionary<string, Minion> _bays = new(StringComparer.Ordinal);
+    // Ordered by BAY SLOT (§6e: "slot index IS the hotkey"), not by id — a fresh Summon appends to
+    // the first free slot, a Dismiss compacts left, and ReorderMinion below repositions in place.
+    private readonly List<Minion> _bays = new();
     private readonly Dictionary<string, int> _minionCountdown = new();
 
     public int Tick { get; private set; }
@@ -219,8 +221,8 @@ public sealed class Caster
     }
 
     public int MinionCount => _bays.Count;
-    public bool HasMinion(Minion minion) => _bays.ContainsKey(minion.Id);
-    public IReadOnlyList<Minion> Minions => _bays.Values.ToList(); // bay occupants, for the render lane
+    public bool HasMinion(Minion minion) => _bays.Any(m => m.Id == minion.Id);
+    public IReadOnlyList<Minion> Minions => _bays.ToList(); // bay occupants in slot order, for the render lane
 
     private static Active Reservation(Minion m) => new(m.Id, m.Stat, m.Reserve);
 
@@ -230,7 +232,7 @@ public sealed class Caster
     // its GATE — a stat reservation (default), nothing (chassis-granted), or the alt-cost placeholder.
     public bool Summon(Minion minion, int bayCap)
     {
-        if (_bays.ContainsKey(minion.Id)) return true;
+        if (HasMinion(minion)) return true;
         if (_bays.Count >= bayCap) return false;
         if (SummonsLeft <= 0) return false;
         switch (minion.Gate)
@@ -243,16 +245,32 @@ public sealed class Caster
             default: if (!_self.Activate(Reservation(minion))) return false; break;
         }
         SummonsLeft--;
-        _bays[minion.Id] = minion;
+        _bays.Add(minion); // §6e ORDERING: click slots into the first free slot -> append
         _minionCountdown[minion.Id] = minion.Timer; // fresh summon starts charging, same as a technique
         return true;
     }
 
     public void Dismiss(Minion minion)
     {
-        if (!_bays.Remove(minion.Id)) return;
+        var i = _bays.FindIndex(m => m.Id == minion.Id);
+        if (i < 0) return;
+        _bays.RemoveAt(i); // §6e ORDERING: unslot compacts left (no holes)
         _minionCountdown.Remove(minion.Id);
         if (minion.Gate == MinionGate.Stat) _self.Deactivate(Reservation(minion)); // free the stat
+    }
+
+    // §6e reorder: drag-and-drop insertion in the bay strip — same model as ReorderTechnique
+    // (Expedition.cs), just against the bay list instead of the equipped-technique list. Pure
+    // position mutation: no Summon/Dismiss, no reservation change.
+    public bool ReorderMinion(Minion minion, int newIndex)
+    {
+        var i = _bays.FindIndex(m => m.Id == minion.Id);
+        if (i < 0) return false;
+        newIndex = Math.Clamp(newIndex, 0, _bays.Count - 1);
+        if (i == newIndex) return true;
+        _bays.RemoveAt(i);
+        _bays.Insert(newIndex, minion);
+        return true;
     }
 
     public void Step()
@@ -284,7 +302,7 @@ public sealed class Caster
         // on the caster's front-target check. The countdown ticks unconditionally each Step (same as a
         // Timered technique's Run.Countdown) so an idle minion (gate stat drained) keeps charging in the
         // background; only the actual discharge is gated on being active + a live front.
-        foreach (var minion in _bays.Values)
+        foreach (var minion in _bays)
         {
             var countdown = _minionCountdown.GetValueOrDefault(minion.Id, minion.Timer);
             if (countdown > 0) countdown--;
@@ -381,7 +399,7 @@ public sealed class Caster
         // §9 [LOCKED 2026-07-02]: a drained stat only IDLES a stat-gated minion — it stays SUMMONED
         // (paid once) and re-raises FREE the moment its stat recovers. Idle minions hold their bay but
         // do not fire (the auto-fire loop skips them).
-        foreach (var minion in _bays.Values)
+        foreach (var minion in _bays)
             if (minion.Gate == MinionGate.Stat && !_self.IsActive(Reservation(minion)))
                 _self.Activate(Reservation(minion)); // free re-raise; fails harmlessly while short
     }
