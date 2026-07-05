@@ -150,6 +150,18 @@ comment accordingly, test intent (Grunt's edge is budget, not a cheaper rune pri
 green, committed standalone (this crumb has none of item 1-3's kit-coupling — it only changes a flat
 rune-cost number, not stat capacity vs. demand).
 
+**Progress (2026-07-05, loop, cont. #4):** two more independent crumbs, both pure content, neither
+touches kit assignment or race/core stat capacity. (a) item 6: `Armory.cs`'s Staff ladder had
+`reqPerTier=1`, WEAPONS.md locks Staff at 2 INT/tier (same as Wand) — fixed to 2. Flagged the shared
+wand/staff `Timer=1.0` constant as WEAPONS.md's own Open/TBD, not a locked number, in the same comment.
+No test hardcoded the old value. (b) item 5's Needs-Human blocker (c) partially resolved: built
+**Stoneskin** (T2 INT ward, pool 6, +2 pips/3.0s, r2 INT — numbers were already locked in item 5's own
+line above, just not yet coded) as pure content in `Techniques.cs`, following Steel/Suture/Bind/Parry's
+existing pattern — NOT wired into Adept's kit (that assignment is still item-3-coupled: Adept's
+DefaultEquipment is Ember/Siphon/Bandage, unchanged). This only removes "doesn't exist yet" from
+blocker (c); the actual kit-swap decision (Stoneskin vs Barkskin for Adept) still waits on item 3
+landing with items 1+2. 392/392 green, committed standalone.
+
 ### CHUNK B — ASSET WIRING (mechanical; do right after A or interleave freely)
 1. Mirror every new CD-source mgcb entry into `Roguebane.Game/Content/Content.mgcb` (the copy builds
    read) with the established path/output transform — new body dirs (all `dwarf_*`, `halfling_*`,

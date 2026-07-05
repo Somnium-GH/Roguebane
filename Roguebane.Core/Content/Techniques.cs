@@ -57,6 +57,13 @@ public static class Techniques
             ShieldLayers: 3, ShieldRegen: 30, // +1 pip / 3.0s
             Desc: "A held spell that keeps stone layers between you and harm.");
 
+    // T2 rung of the INT ward ladder (barkskin -> stoneskin -> steelskin -> diamondskin,
+    // TECHNIQUES.md), numbers locked by Doug 2026-07-05 (CHUNK A item 5): pool 6, +2 pips/3.0s.
+    public static readonly Technique Stoneskin =
+        new("stoneskin", Stat.Int, Reserve: 2, TechniqueKind.Sustained, Cooldown: 0, Power: 0,
+            ShieldLayers: 6, ShieldRegen: 15, // +2 pips / 3.0s
+            Desc: "A stronger held ward: a deeper wall of regenerating stone layers.");
+
     // T1 STR guard (TECHNIQUES.md).
     public static readonly Technique Bind =
         new("bind", Stat.Str, Reserve: 2, TechniqueKind.Sustained, Cooldown: 0, Power: 0,
