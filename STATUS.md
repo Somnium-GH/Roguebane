@@ -151,14 +151,15 @@ already in this file).
   TechReserved-inclusive checks (`RangedUsable`/`HandItemUsable`/`ArmorSustained`) are untouched, so
   in-combat resolution and the paper-doll draw keep reading true capability. New tests in
   `BodyTests.cs` prove a lingering active technique disables the real check but not the gear-only one.
-- **Balance pass:** scale race base attributes UP (keep each race's current RELATIVE STR/DEX/INT/CON
-  proportions — an Elf stays Elf-shaped, just bigger numbers) so every race×core combo can both equip
-  its full default kit AND activate every default-assigned technique simultaneously, with the
-  reservation fix above actually accounting cumulatively. This is explicitly a PROVISIONAL uniform-
-  playability baseline (Doug's words) — not a claim that every race/core should end up equally
-  capable long-term; it's so the team can actually play every combo far enough to judge whether racial
-  handicapping vs. baseline-equality is the right direction. Don't over-tune past "everything clears
-  the bar" for this pass.
+- ~~**Balance pass:** scale race base attributes UP...~~ DONE (2026-07-04 loop): turned out to already
+  hold in substance from the earlier "Human bump" (Races.cs) — that pass raised attributes generally
+  for the cumulative SUSTAIN MODEL, but nothing directly asserted the specific property P3 asks for.
+  Added two headless tests closing that coverage gap: `StartingKitTests.
+  EveryRaceAndCoreEquipsItsWholeDefaultKit` (armor + weapon kit, whole race roster incl. frail Elf,
+  Con 7) and `CoreCampaignTests.EveryRaceAndCoreActivatesEveryDefaultTechniqueSimultaneously` (embarks
+  every race×core, toggles every default technique, asserts all stay active). Both pass on the
+  CURRENT numbers — no attribute retune was needed, this was a missing-test gap, not a missing-tune
+  gap. 383/383 green. **P3 fully closed.**
 
 **Other bugs from this same pass, normal priority (not ahead of P1-P3, but don't lose them):**
 - **Techniques start fully charged at encounter start — should need to WARM UP** (start uncharged, on
