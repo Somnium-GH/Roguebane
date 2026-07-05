@@ -14,15 +14,15 @@ its container is `[681,89]` with `item.size` explicitly re-stated as `[131,89]` 
 ~5 cards. `buildMinions` just never got sized for even one. **Fix: widen `buildMinions.size[0]` to
 fit `Bays × (131+gap)`** (matching how `loadoutList` sizes for its technique-bar width) — logged to
 CD (`CLAUDE_DESIGN_issues.md`) since layout.json regenerates externally.
-**Separately, "can't enable or disable minion" is NOT new — it's the same gap already on this file's
-P2/other-bugs list** ("Minions cannot be deactivated and start enabled"). Confirmed by grep: there is
-ZERO click/toggle handling for minion cards anywhere in `Roguebane.Game` — unlike technique cards
-(`_ctrl.CardPress`/`CardRightPress` on the action bar), minions have no interaction wiring at all in
-the shell, and `Minion` (`Roguebane.Core/Minion.cs`) is pure data with no active/enabled state field
-of its own — whatever tracks "is this minion currently summoned" needs identifying/building (check
-`Caster`'s active-tracking, the same place technique `Active`/`Reserve` accounting lives) before a
-click can toggle anything. Don't treat this as a quick wiring fix — the activation MODEL for minions
-needs to exist first, same scope as the P3 default-activation-state work already queued.
+**Separately, "can't enable or disable minion" — activation MODEL + click wiring DONE (2026-07-04
+loop):** the model piece was real (Doug's caution not to treat this as a quick wiring fix held) —
+`Caster.Summon`/`Dismiss` already tracked "is this minion currently summoned" via the bay list, but
+nothing at the `Expedition` level bridged that to the owned-minion pool the way `EquipTechnique`/
+`UnequipTechnique` do for techniques. Added `Expedition.SummonMinion`/`DismissMinion` plus Game1
+MINIONS-tab click handling (see P2 ORDERING entry below for the full writeup). **The blank-render
+half of this bug is UNCHANGED** — `buildMinions`'s `layout.json` sizing bug (returns zero cells
+regardless of click wiring) still needs the CD-side fix logged to `CLAUDE_DESIGN_issues.md`; a card
+still won't be visible to click until that lands.
 
 ## ⇒ NEW DIRECTIVE — HiFi, HIGH PRIORITY (2026-07-04, Doug): gate must test NON-16:9 resolutions ✅ DONE (2026-07-04 loop)
 `tools/ui_gate.py` now runs every driven pass TWICE: the existing 1920x1080 reference size, plus a
@@ -104,10 +104,21 @@ already in this file).
   mirrors `Expedition.ReorderTechnique`'s clamp/remove/insert exactly, plus a thin
   `Expedition.ReorderMinion` wrapper gated on `Choosing`. No `Campaign`-level mirror needed (Campaign
   already hands every leg the same `Caster` instance, so bay order persists across leg advances for
-  free). 4 new headless tests, 377/377 green. **STILL OPEN:** the Game1 drag-and-drop interaction
-  wiring for the minion-bay strip (mirroring PART 2 of the technique-bar work above) hasn't been
-  built yet — today `ReorderMinion` exists but nothing in the shell calls it; dragging a palette card
-  onto the bar to equip-at-insertion-point (the other ASSUMED default) also isn't built.
+  free). 4 new headless tests, 377/377 green.
+  **Minion activation MODEL + click wiring — DONE (2026-07-04 loop):** the missing primitive Doug's
+  B14 flagged (below) — `Expedition.SummonMinion`/`DismissMinion`, thin `Choosing`-gated wrappers over
+  `Caster.Summon`/`Dismiss` (`Caster.Dismiss` now returns `bool`), mirroring `EquipTechnique`/
+  `UnequipTechnique` exactly: ownership (chassis kit + rune grants + bought stash) is untouched by
+  summon/dismiss, same as equipping a technique never removes it from the palette. Game1's MINIONS
+  tab (`_invTab == 2`) now has click handling (`InRun`-gated, same pattern as GEAR): click an
+  equippable card to summon into a free bay, click an equipped card to dismiss it back out. 4 new
+  headless tests, 381/381 green. **STILL OPEN:** the Game1 drag-and-drop interaction wiring for the
+  minion-bay strip (mirroring PART 2 of the technique-bar work above) — reordering already-summoned
+  minions by drag — hasn't been built yet; today's work only covers click-to-toggle. Also unbuilt:
+  dragging a palette card onto the bar to equip-at-insertion-point (the other ASSUMED default, same
+  as the technique side's open item). **Separately, B14's actual blank-render bug (`buildMinions`
+  cell-overflow sizing) is UNCHANGED by this — that's a `layout.json` fix logged to CD, not a code
+  gap; see the bug report above.**
 
 **P3. Fix equipment reservation + the "everyone can activate their default kit" balance pass:**
 - ~~**Equipment currently reserves nothing cumulatively.**~~ DONE (2026-07-04 loop): the SUSTAIN MODEL
