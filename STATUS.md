@@ -1499,11 +1499,18 @@ ENGINE TODOs reconciled from CD's gap list (2026-07-01) — NOT already covered 
   found beyond (1) — element rects come straight from manifest design px through the scene transform.
 
 ## Debt (active — with reconcile trigger)
-- Equipment: no inventory tabs (GEAR/TECH/MINIONS) + drag-to-equip + equipped-gear-on-anatomy + real
-  rune-bag cards yet — blocked on gear/minion equip + mid-run gear/rune mutation (design-open). MODEL now
-  refined (DESIGN_SPEC §7): a Core rune gives STARTING gear (does NOT lock it), gear is swappable;
-  MULTI-SLOT pieces (robe = all slots); figures MORPH (human base + race + core + equipped-gear parts) —
-  author morph layers, not per-combo art. Exact morph/slot mechanics OPEN (§17); feeds this when built.
+- **CORRECTION (2026-07-05 loop) — three of this line's four claims are STALE, don't re-add them:**
+  this bullet predates the tabs/drag/rune-bag work and was never updated after it landed. Confirmed
+  live in `Game1.cs`: inventory tabs (GEAR/TECHNIQUES/MINIONS, `_invTab`) exist and work; drag-to-equip
+  exists for both bars (`UpdateBarDrag`/`UpdateBayDrag`, press-move-release state machine); GEAR tab
+  clicks perform REAL equip/unequip mutation (`Exp.EquipWeapon`/`UnequipWeapon`/`EquipArmor`/
+  `UnequipArmor`, with auto-displace on conflict); the pre-run Rune Bag's climb-by-click is real too
+  (`_build.Climb`, budget-gated in Core). The one genuinely open piece is **equipped-gear-on-anatomy**
+  (worn armor doesn't draw on the figure yet) — already tracked below under "Worn-armor DRAW wiring",
+  blocked on Doug's composition-approach call, not on this line. MODEL refined (DESIGN_SPEC §7): a Core
+  rune gives STARTING gear (does NOT lock it), gear is swappable; MULTI-SLOT pieces (robe = all slots);
+  figures MORPH (human base + race + core + equipped-gear parts) — author morph layers, not per-combo
+  art. Exact morph/slot mechanics OPEN (§17); feeds the worn-armor wiring item when built.
 - Bow.png not mounted on the figure. (~~`shot` icon~~ RESOLVED by the 07-03 late drop —
   `icons/technique/shot.png` ships + is mirrored; drop the swing fallback when touching that code.)
 - The FLAT thumbnail dir `sprites/char/chassis/*` + its `Content.mgcb` entries still use the old name.
