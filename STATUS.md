@@ -1,5 +1,33 @@
 # Status
 
+## ⇒ CANON RENAME (2026-07-05, Doug) — "Bay(s)" retired as the minion-slot term; use "Minions" only
+Doug's directive, verbatim: **"'Bays' should be 'Minions' — no need for another slot term."** DESIGN_SPEC.md,
+`design/systems/CORE_RUNES.md`, and `design/SCREENS.md` are already updated (canon-side done, this pass) —
+"bay(s)" replaced with "minion(s)" / "minion capacity" throughout (e.g. "2 bays" → "capacity 2"; "minion-bay
+lane" → "minion lane"; "assigned to a bay" → "fielded as a minion"). **Remaining is engine-side — this is a
+CLEAN RENAME per CLAUDE.md (no aliases/back-compat):**
+- **C# internal names (safe to rename now, no manifest dependency):** `Caster.BayCap` → e.g. `MinionCap`,
+  `Caster._bays` → `_minions`, `Caster.Summon(Minion, int bayCap)` param name, `CoreRune.Bays` record field →
+  `MinionCap` (or similar — pick one, apply everywhere), `Forge.cs` `chassis.Bays` call sites, comments in
+  `Expedition.cs`/`Race.cs`/`Content/CoreRunes.cs` that say "bay"/"bayed". `Expedition.Bays` property (line
+  ~300, `public int Bays => _caster.BayCap;`) → rename too. Grep `[Bb]ay` across `Roguebane.Core` +
+  `Roguebane.Core.Tests` (CasterFiringTests.cs, MinionTests.cs, CoreRuneRosterTests.cs, RunStartTests.cs) and
+  rename every hit — comments included, per the hygiene rule (WHY comments shouldn't preserve retired
+  vocabulary either).
+- **`Game1.ManifestRenderer.cs` / `Game1.cs` bind-key STRING LITERALS (`"bay.hotkey"`, `"bay.state"`,
+  `"bay.name"`, `"bay.gateColor"`, `"bay.cost"`, `"bay.description"`, `"bay.amount"`, `"loadout.bays"`,
+  `"core.bays"`, `"preview.bays"`) — these must match whatever `layout.json` actually contains, and that
+  file is CD-authored/regenerated (per this file's own DoD note). **Do NOT rename these literals until the
+  CD payload below lands** — renaming the switch/match string without the manifest changing breaks the live
+  binding. Track it as a paired follow-up, not a blocker on the C#-internal renames above (those are
+  independent and can land now).
+- **`outputs/CLAUDE_DESIGN_issues.md` gets a new CD ask (next entry, add the B-id in sequence — B15-B18 are
+  already queued per memory, so this is B19+):** manifest ids/binds/template spelling "bay" (`minionBay`
+  template, `bayGroupLabel`/`bayList` element ids — note `bayGroupLabel`'s rendered text already correctly
+  says "MINIONS", it's just the id/bind vocabulary that's stale — `bay.*` binds listed above, `baysBox` part,
+  `loadout.bays`/`core.bays`/`preview.bays`) should regenerate using "minion" vocabulary, same class of ask as
+  the earlier B6 vocabulary rename (invCard/loadoutCard states).
+
 ## ✅ FIXED (2026-07-05 loop) — statusStrip/footer bars now stretch to full design width
 Implemented the fix this entry itself scoped: added `ManifestUi.FullWidthRect(screen, e)` (stretches
 just the WIDTH to the current `DesignW`, keeps the element's authored HEIGHT and anchor position —
@@ -9,8 +37,10 @@ same reasoning as `FullCanvasRect` for `.scene` elements, narrower application) 
 `layout.json`, no other Top/Bottom element shares them). `dotnet build` confirms no compile errors
 (copy-stage error only, from Doug's own running Roguebane.Game.exe holding the DLL lock — left it
 alone). Core.Tests still 391/391 green (this is shell-only, no Core change, per CLAUDE.md's Core-tests
-rule). **Not yet visually confirmed live** — needs Doug to maximize/resize a non-16:9 window and check
-the bars now span edge-to-edge with no blank canvas on the sides.
+rule). Game.exe's DLL lock cleared this cycle (the running process from prior loop firings exited) —
+`dotnet build Roguebane.Game/Roguebane.Game.csproj` now completes fully: 0 errors, 0 warnings. **Still
+not visually confirmed live** — needs Doug to launch, maximize/resize a non-16:9 window, and check the
+bars now span edge-to-edge with no blank canvas on the sides.
 
 ## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-05, Doug — the backdrop fix didn't cover everything;
 ## header/footer bars stay fixed-width on a wider window, same bug class, different elements) — FIXED, see ✅ above
@@ -75,8 +105,17 @@ and approximate click position so the large-overlap-figure lead can be followed 
   loop) — Merchant wareCards render with no border/chrome" entry further down) and RB_SMOKE ran clean —
   but smoke only checks text geometry/collision, it never asserts chrome/border pixels are actually
   drawn, so a clean smoke run proves nothing here. Doug's live look says the borders are still missing.
-  REOPEN: re-check `DrawWarePart`/`DrawTemplateRootChrome` call ordering and z-paint order in the
-  merchant card-stamping path against an actual running build.
+  **Re-checked the code this loop (2026-07-05):** the wareCard call site (`Game1.ManifestRenderer.cs:829`)
+  calls `DrawTemplateRootChrome` before the parts loop, correct order; the template itself has BOTH
+  `fill: panelCard` and `border: {color: border, w:1, style:solid}` defined at the template ROOT (not
+  just inside `states`, unlike pickerCard's original bug) — so this path doesn't depend on state-key
+  resolution at all, and `border` (`#5a4636`) contrasts clearly against `panelCard` (`#1c140d`). Nothing
+  in the code reads as broken by static inspection. **New lead: the DLL-lock-holding `Roguebane.Game.exe`
+  process that had been running since before this loop started (blocking every build this session) has
+  now exited — meaning Doug's live look may have been against an EXE built before the 2026-07-04 border
+  fix landed**, same stale-process class as the P1 caution above. Recommend Doug re-launch fresh off a
+  clean build before re-reporting; if still missing on a confirmed-fresh launch, the code-level lead
+  above is exhausted and this needs a live screenshot to find what's actually different.
 - **Missing a whole row on page 1 of the wares list.** Already root-caused below (see "BUG REPORT — HiFi,
   HIGH PRIORITY (2026-07-03, Doug — Merchant only shows 2 of 3 wares sections)"): `layout.json`'s
   `waresShelves` container is sized `[692,377]` but 3 stacked `shopSection` rows need 378px — ONE PIXEL
