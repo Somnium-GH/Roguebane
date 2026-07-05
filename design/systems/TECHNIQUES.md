@@ -55,7 +55,7 @@ Shape = (damage × weapon, speed × 8s·timer). Example numbers on Iron Longswor
 |---|---|:--:|---|
 | Brace (T1 CON) | CON | 2 | Hold a pool of 4 CON shield points, each absorbing one hit, +1 pip / 2.0s. Requires a shield OBJECT equipped. |
 | T2 CON Shield | CON | 3 | Stronger held guard: pool 8, +1 pip / 1.5s. (Warden signature.) |
-| Stoneskin (INT) | INT | 2 | A held spell keeping 3 stone shield points, +1 pip / 3.0s. Ladder: stoneskin → barkskin → steelskin → diamondskin. |
+| barkskin (INT) | INT | 1 | A held spell keeping 3 shield points, +1 pip / 3.0s. Ladder: barkskin → stoneskin → steelskin → diamondskin. |
 
 ### Heals (self)
 
