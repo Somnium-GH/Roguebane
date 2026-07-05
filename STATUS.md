@@ -98,10 +98,16 @@ already in this file).
   under threshold still plain-clicks (toggle); drop outside the bar cancels (the ASSUMED default).
   Draw side has a PLACEHOLDER ghost-dim + insertion-ring visual (flagged Needs Claude Design for real
   chrome — no authored drag chrome exists yet). Only wired in-run; pre-run has no persisted bar order.
-  **STILL OPEN:** minion-bay reorder (no Core primitive yet; same shape as the technique one once
-  bay-index semantics are confirmed against `Caster`'s bay model); dragging a palette card onto the bar
-  to equip-at-insertion-point (the other ASSUMED default) isn't built — today the bar only reorders
-  what's already slotted.
+  **Minion-bay reorder — Core primitive DONE (2026-07-04 loop):** `Caster._bays` switched from an
+  id-sorted `SortedDictionary` to a slot-ordered `List<Minion>` (§6e "slot index IS the hotkey" — a
+  fresh Summon appends to the first free slot, Dismiss compacts left); new `Caster.ReorderMinion`
+  mirrors `Expedition.ReorderTechnique`'s clamp/remove/insert exactly, plus a thin
+  `Expedition.ReorderMinion` wrapper gated on `Choosing`. No `Campaign`-level mirror needed (Campaign
+  already hands every leg the same `Caster` instance, so bay order persists across leg advances for
+  free). 4 new headless tests, 377/377 green. **STILL OPEN:** the Game1 drag-and-drop interaction
+  wiring for the minion-bay strip (mirroring PART 2 of the technique-bar work above) hasn't been
+  built yet — today `ReorderMinion` exists but nothing in the shell calls it; dragging a palette card
+  onto the bar to equip-at-insertion-point (the other ASSUMED default) also isn't built.
 
 **P3. Fix equipment reservation + the "everyone can activate their default kit" balance pass:**
 - ~~**Equipment currently reserves nothing cumulatively.**~~ DONE (2026-07-04 loop): the SUSTAIN MODEL
