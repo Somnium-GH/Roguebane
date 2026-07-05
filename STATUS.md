@@ -99,6 +99,19 @@ NON-canon where it disagrees — e.g. mock Claymore "6 dmg/1.4×" vs WEAPONS.md 
 (Bay→minion C# rename: DONE last pass, 391/391 — only the bind-key literal half remains, paired to
 CD's B19 landing; the literals list lives in git history + B19 itself. Don't rename literals early.)
 
+**Progress (2026-07-05, loop):** item 5's Jab/Cleave/Lunge weapon-consult DamageMult rewire is fully
+test-reconciled — every fixture body that activates a weapon-verb now wields a matching weapon (else
+`Caster.Activate`'s consult gate silently no-ops it); 392/392 green. Item 3's FULL CoreRunes.cs rewrite
+is still NOT started — applied only a minimal interim fix (dropped Jab from Reaver's kit; its twin
+daggers are DEX, Jab is STR, same silent-activate-failure). **Needs human before item 3 can be done for
+real (don't guess these):** (a) Reaver's canon kit is Frenzy/Flurry, but those are themselves STR
+pending Armory.cs's own flagged DEX-dual-wield Open/TBD — same bug, different verb, until that's
+decided; (b) Summoner's canon kit includes Sacrifice, which is still an inert placeholder (§ above) —
+assigning it live either breaks CLAUDE.md's placeholder-flagging rule or leaves Summoner with no real
+heal; (c) Adept's canon kit wants Stoneskin T2, which doesn't exist in Techniques.cs yet — build fresh
+or substitute Barkskin, undecided; (d) Barbarian needs the item 8 CoreCampaignTests exemption wired
+before its kit can land.
+
 ### CHUNK B — ASSET WIRING (mechanical; do right after A or interleave freely)
 1. Mirror every new CD-source mgcb entry into `Roguebane.Game/Content/Content.mgcb` (the copy builds
    read) with the established path/output transform — new body dirs (all `dwarf_*`, `halfling_*`,
