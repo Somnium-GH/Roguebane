@@ -112,13 +112,18 @@ already in this file).
   summon/dismiss, same as equipping a technique never removes it from the palette. Game1's MINIONS
   tab (`_invTab == 2`) now has click handling (`InRun`-gated, same pattern as GEAR): click an
   equippable card to summon into a free bay, click an equipped card to dismiss it back out. 4 new
-  headless tests, 381/381 green. **STILL OPEN:** the Game1 drag-and-drop interaction wiring for the
-  minion-bay strip (mirroring PART 2 of the technique-bar work above) — reordering already-summoned
-  minions by drag — hasn't been built yet; today's work only covers click-to-toggle. Also unbuilt:
-  dragging a palette card onto the bar to equip-at-insertion-point (the other ASSUMED default, same
-  as the technique side's open item). **Separately, B14's actual blank-render bug (`buildMinions`
-  cell-overflow sizing) is UNCHANGED by this — that's a `layout.json` fix logged to CD, not a code
-  gap; see the bug report above.**
+  headless tests, 381/381 green.
+  **Minion-bay drag-reorder — DONE (2026-07-04 loop):** `Game1.UpdateBayDrag` mirrors
+  `UpdateBarDrag`/`WithinBar`/`DragInsertionIndex` for the `buildMinions` strip (`binds: "minions"`),
+  calling `ReorderMinion` on drop and `DismissMinion` on a plain click (every card in this strip is
+  already bayed, so there's no "equip" case here — that's the MINIONS tab grid's job). Kept as its
+  own method rather than genericizing `UpdateBarDrag`, since `Technique`/`Minion` are different
+  payload types and the duplication is small. In-run only, same as the click wiring above.
+  **NOTE: inert until CD lands the fix** — `buildMinions` still renders zero cells (the B14
+  cell-overflow sizing bug, container `[94,89]` vs `loadoutCard` item `[131,89]`, logged to CD in
+  `CLAUDE_DESIGN_issues.md`); this wiring is the correct, tested code-side completion, just waiting
+  on that container to widen. Still unbuilt (lower priority, ASSUMED-default parity with the
+  technique side's own open item): dragging a palette card onto either bar to equip-at-insertion-point.
 
 **P3. Fix equipment reservation + the "everyone can activate their default kit" balance pass:**
 - ~~**Equipment currently reserves nothing cumulatively.**~~ DONE (2026-07-04 loop): the SUSTAIN MODEL
