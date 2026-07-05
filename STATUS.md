@@ -122,8 +122,20 @@ already in this file).
   **NOTE: inert until CD lands the fix** — `buildMinions` still renders zero cells (the B14
   cell-overflow sizing bug, container `[94,89]` vs `loadoutCard` item `[131,89]`, logged to CD in
   `CLAUDE_DESIGN_issues.md`); this wiring is the correct, tested code-side completion, just waiting
-  on that container to widen. Still unbuilt (lower priority, ASSUMED-default parity with the
-  technique side's own open item): dragging a palette card onto either bar to equip-at-insertion-point.
+  on that container to widen.
+  **Palette-drag-to-equip — DONE (2026-07-04 loop), closes the P2 drag-and-drop item entirely:**
+  the second ASSUMED default ("dragging a palette card onto the bar equips at the insertion point")
+  is now built for BOTH bars. `UpdateBarDrag`/`UpdateBayDrag` take a palette slot/data source
+  alongside the bar's own; a press can now start on an unequipped tab-grid card, and dropping it
+  onto the bar calls `EquipTechnique`/`SummonMinion` then `ReorderTechnique`/`ReorderMinion` to place
+  it at the drop point (no new Core primitives — pure composition of already-tested calls). This
+  required folding the TECHNIQUES/MINIONS tab grids' old immediate press-toggle into the same
+  press/drag/release state machine the bars use (otherwise a plain click would've toggled twice —
+  once on press via the old inline `Click()`, once on release via the new drag logic); a release
+  without a qualifying drag still behaves as a plain click. GEAR tab untouched (single-slot, no bar).
+  381/381 (Core unchanged this pass), `dotnet build` clean. **Both ASSUMED defaults from the DESIGN_SPEC
+  §6e drag-and-drop item are now built; nothing left open here except the already-flagged Needs-CD
+  visual chrome (ghost-dim/insertion-ring placeholder) and the B14 `buildMinions` sizing gap above.**
 
 **P3. Fix equipment reservation + the "everyone can activate their default kit" balance pass:**
 - ~~**Equipment currently reserves nothing cumulatively.**~~ DONE (2026-07-04 loop): the SUSTAIN MODEL
