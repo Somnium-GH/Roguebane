@@ -66,9 +66,16 @@ public static class Sessions
         return new Campaign(Forge.PlayerFighter(body), caster, Techniques.All, legs);
     }
 
+    // The palette must carry every weapon-verb a starting kit can ship (Armory's Swing/Frenzy/Flurry/
+    // Shot/AimedShot), not just Techniques.All's spell/heal/passive set — else BuildSession.SeedKit
+    // can't slot a kit built entirely from Armory verbs (e.g. Reaver's Frenzy+Flurry).
+    private static readonly IReadOnlyList<Technique> BuildPalette = Techniques.All
+        .Concat(new[] { Armory.Swing, Armory.Frenzy, Armory.Flurry, Armory.Shot, Armory.AimedShot })
+        .ToList();
+
     public static BuildSession NewBuild() => new(
         Races.Roster,
         CoreRunes.Roster,
         new[] { Paths.VesselLadder, Paths.ResonanceLadder },
-        Techniques.All);
+        BuildPalette);
 }

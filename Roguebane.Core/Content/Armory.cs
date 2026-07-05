@@ -64,8 +64,10 @@ public static class Armory
     // offhands (+0.1x minion/spell damage per tier — consumers are their own slice), Power 0.
     // Wand/staff Timer (1.0 here) is WEAPONS.md's own Open/TBD ("wand / staff timer multipliers") —
     // placeholder, not a locked number.
+    // Req corrected 2026-07-05 (WEAPONS.md): 2->1 INT/tier — the old value put Summoner's kit one
+    // INT over the model's demand (8).
     public static readonly IReadOnlyList<Weapon> Wands = Named("wand", Stat.Int, WeaponKind.Wand,
-        1.0, 2, 2, 1, "Adept Wand", "Twisted Wand", "Gemstone Wand", "Glowing Wand");
+        1.0, 2, 1, 1, "Adept Wand", "Twisted Wand", "Gemstone Wand", "Glowing Wand");
     public static readonly IReadOnlyList<Weapon> Staffs = Named("staff", Stat.Int, WeaponKind.Staff,
         1.0, 2, 2, 2, "Wooden Staff", "Twisted Staff", "Ornate Staff", "Humming Staff");
     public static readonly IReadOnlyList<Weapon> Charms = Named("charm", Stat.Int, WeaponKind.Charm,
@@ -94,21 +96,22 @@ public static class Armory
 
     // Cooldowns are in COMBAT TICKS at the fixed 10 ticks/sec clock; 80 = the canon's base-speed
     // anchor (8.0s, CORE_RUNES.md/TECHNIQUES.md) for every speed x1.0 verb below.
-    // Swing/Frenzy/Flurry all consult by STR (Consulted() matches technique.Stat against the wielded
-    // weapon's own Stat, and melee weapons are STR) — TECHNIQUES.md's Open/TBD flags a possible DEX
-    // dual-wield gate as unresolved, not locked, so this stays STR pending that design decision.
+    // Swing consults STR only (its own weapon ladders are all melee STR bar the Reaver's daggers,
+    // which use Frenzy/Flurry instead). Frenzy/Flurry are stat-flexible (LOCKED 2026-07-05,
+    // TECHNIQUES.md/CORE_RUNES.md): AltStat: Stat.Dex lets Reaver's twin daggers consult them too —
+    // the earlier frenzy_dex/flurry_dex clone-pair plan is RETIRED in favor of this single verb.
     // Reserve on a Consults!=None technique is inert (Caster.Reservation zeroes it) — the WEAPON's own
     // reserve is what's tracked; kept at the TECHNIQUES.md-quoted value for future §11 Finesse display.
     public static readonly Technique Swing =
         new("swing", Stat.Str, Reserve: 0, TechniqueKind.Timered, Cooldown: 80, Power: 0, Consults: WeaponUse.Primary);
 
     public static readonly Technique Frenzy =
-        new("frenzy", Stat.Str, Reserve: 2, TechniqueKind.Timered, Cooldown: 80, Power: 0, DamageMult: 1.0,
-            Consults: WeaponUse.Both);
+        new("frenzy", Stat.Str, Reserve: 3, TechniqueKind.Timered, Cooldown: 80, Power: 0, DamageMult: 1.0,
+            Consults: WeaponUse.Both, AltStat: Stat.Dex);
 
     public static readonly Technique Flurry =
-        new("flurry", Stat.Str, Reserve: 1, TechniqueKind.Timered, Cooldown: 40, Power: 0, DamageMult: 0.5,
-            Consults: WeaponUse.Both);
+        new("flurry", Stat.Str, Reserve: 2, TechniqueKind.Timered, Cooldown: 40, Power: 0, DamageMult: 0.5,
+            Consults: WeaponUse.Both, AltStat: Stat.Dex);
 
     // Shot looses the primary DEX weapon (the BOW): it BYPASSES the shield pool and spends 1 Charge per
     // loose (§6b Charge = the shield-pierce resource); dry => it holds. Power/cost come from the bow.
@@ -120,7 +123,7 @@ public static class Armory
     // The Marksman's real bow verb (CORE_RUNES.md/TECHNIQUES.md): 2.0x the bow's power, slow (160
     // ticks = 16s), 1 Reserve, DEX-gated, spends+bypasses on Charge same as Shot.
     public static readonly Technique AimedShot =
-        new("aimed_shot", Stat.Dex, Reserve: 1, TechniqueKind.Timered, Cooldown: 160, Power: 0, DamageMult: 2.0,
+        new("aimed_shot", Stat.Dex, Reserve: 2, TechniqueKind.Timered, Cooldown: 160, Power: 0, DamageMult: 2.0,
             Consults: WeaponUse.Primary, ChargeCost: 1, ShieldPiercing: true);
 
     public static readonly IReadOnlyList<Weapon> All = new[] { Sword, Axe, Dagger, Bow };

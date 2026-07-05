@@ -200,8 +200,10 @@ public sealed class Body
                 ? new[] { r } : Array.Empty<Weapon>();
         return technique.Consults switch
         {
-            WeaponUse.Primary => UsableHands().Where(w => w.Stat == technique.Stat).Take(1).ToList(),
-            WeaponUse.Both => UsableHands().Where(w => w.Stat == technique.Stat).ToList(),
+            WeaponUse.Primary => UsableHands()
+                .Where(w => w.Stat == technique.Stat || w.Stat == technique.AltStat).Take(1).ToList(),
+            WeaponUse.Both => UsableHands()
+                .Where(w => w.Stat == technique.Stat || w.Stat == technique.AltStat).ToList(),
             _ => Array.Empty<Weapon>(),
         };
     }

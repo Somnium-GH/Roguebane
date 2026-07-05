@@ -27,6 +27,8 @@ public sealed record Technique(
                               // (the "verb" scaling — Jab .5x, Cleave 1.5x...). Inert when Consults is None.
     int ChargeCost = 0,
     WeaponUse Consults = WeaponUse.None,
+    Stat? AltStat = null, // stat-flexible verbs (Frenzy/Flurry): consults EITHER Stat or AltStat's
+                          // wielded weapon (TECHNIQUES.md/CORE_RUNES.md LOCKED 2026-07-05).
     bool Heals = false, // a REPAIR technique: on discharge it mends the caster's own most-damaged part
                         // (by Power) instead of striking a target (the §10 part-heal). No target needed.
     bool Lifesteal = false, // Siphon (TECHNIQUES.md): on a CLEAN landed part-hit (never a shield-absorbed

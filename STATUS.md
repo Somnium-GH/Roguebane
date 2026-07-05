@@ -1,5 +1,45 @@
 # Status
 
+## ‼ HIFI, HIGH PRIORITY (2026-07-05, Doug screenshot) — `"parent"` in layout.json is DEAD DATA; every
+## nested/parent-relative element renders in the wrong place, screen-wide
+Doug's NewGame screenshot shows the title garbled ("Human Grunt"/"THE GENERALIST" bleeding into the
+"Roguebane"/"Choose your Loadout" header) and the whole right-side Loadout panel collapsed into one
+overlapping cluster (stat tiles, CORE EFFECT box, and the "BEGIN THE RUN" button all stacked on top of
+each other mid-screen instead of stacked down the panel with BEGIN at the true bottom bar).
+
+**Root cause, confirmed by reading the full chain, not assumed:** `layout.json` elements carry a
+`"parent": "<id>"` key (160 occurrences across the file) meaning "resolve my anchor+offset against
+THIS element's rect, not the screen." **Nothing in the engine reads it.** `Element`
+(`Roguebane.Core/Layout/LayoutManifest.cs:80-106`) has no `Parent` property at all — grepped `parent`
+case-insensitively across `LayoutManifest.cs`, `ScreenLayout.cs`, and `Game1.ManifestRenderer.cs`: zero
+hits in all three. `ScreenLayout.Resolve(int designW, int designH, Element e)` always anchors against
+the passed-in viewport size; `ManifestUi.Rect(Screen screen, Element e)` (`ManifestUi.cs:35-39`), the
+ONE chokepoint the whole renderer calls to place any element, always passes the SCREEN's (extended)
+design size — never a parent's rect. So every `parent`-carrying element silently resolves against the
+full screen instead of its container.
+
+This exactly explains the screenshot: `previewName`/`previewRole` (`parent: previewStage`, small
+TopLeft offsets like `[7,7]`) resolve against the raw viewport TopLeft instead of `previewStage`'s
+rect (which sits on the far right) — landing right on top of `logo`/`topBarSubtitle` at the screen's
+real top-left corner. `previewBudgetTile`/`previewActionsTile`/`previewBaysTile` (`parent:
+previewLayoutRow`), `previewCoreEffect*` (`parent: preview`/`previewCoreEffect`), and `beginBtn`
+(`parent: confirmBar`, anchor `Right`) are all anchored `Right`, so they all resolve against the same
+"viewport-Right-anchor, vertically centered" point, offset only by their own small deltas — which is
+why they all pile into one overlapping cluster instead of spreading from the Loadout header down to
+the real bottom confirm bar. **160 elements share this bug** — this is not scoped to NewGame; grep
+`"parent":` in `layout.json` for the full blast radius before assuming any other screen is clean.
+
+**Fix:** add `public string? Parent { get; init; }` to `Element`; give `ScreenLayout` (or `ManifestUi`,
+since it already holds the screen's element list via `Screen`) a parent-aware resolve: if `e.Parent` is
+set, look up that element by id in `screen.Elements`, resolve ITS rect first (recurse — parent chains
+nest, e.g. `previewCoreEffectLabel` → `previewCoreEffect` → `preview`; guard against cycles/missing ids
+by falling back to the screen viewport, matching today's tolerant-degrade convention noted in
+`ManifestUi.cs`'s file header), then resolve the child's anchor+offset+size against the PARENT's
+resolved rect (same anchor math as `ScreenLayout.Point`, just using the parent's W/H for the anchor
+point and adding the parent's X/Y as origin) instead of the screen's design size. Needs a headless
+`Roguebane.Core.Tests` case (`ScreenLayoutTests` or new) since `ScreenLayout` has zero MonoGame deps —
+assert a child with `parent` set resolves relative to a non-origin parent rect, not the viewport.
+
 **How to work this file (every pass):** read CLAUDE.md + `.claude/loop.md` first. Top of this file =
 priority; human revisions WIN. One task/run, tests green before commit, update this file, stop. History
 lives in `git log` + old STATUS revisions (`git show <rev>:STATUS.md`) — it is NOT re-listed here.
@@ -167,6 +207,38 @@ built, so the old rune-PRICE discount has no design reason to survive). Fixed th
 comment accordingly, test intent (Grunt's edge is budget, not a cheaper rune price) unchanged. 392/392
 green, committed standalone (this crumb has none of item 1-3's kit-coupling — it only changes a flat
 rune-cost number, not stat capacity vs. demand).
+
+**Progress (2026-07-05, loop, cont. #5):** landed the real Task #3 slice for Reaver (deferred rest of
+item 3 — see blocker below). Wand req fixed 2→1 INT/tier (WEAPONS.md). Frenzy/Flurry/Aimed Shot reserves
+corrected to the TECHNIQUES.md-locked 3/2/2; Frenzy/Flurry made genuinely **stat-flexible** (new
+`Technique.AltStat`, `Body.Consulted` OR-matches `Stat`/`AltStat` against the wielded weapon) per the
+2026-07-05 lock — retires the old frenzy_dex/flurry_dex clone-pair plan, one technique either stat.
+Reaver's kit/budget/CoreEffect rewired to CORE_RUNES.md's real spec: budget 19, kit = Frenzy+Flurry only
+(no heal), CoreEffectName corrected "Bloodrush"(stale)→"Finesse". Fixed a real latent bug this exposed:
+`BuildSession`'s technique palette (`Content/Sessions.cs`) only carried `Techniques.All` (7 spell/heal/
+passive entries) — any kit built entirely from Armory's weapon-verb techniques (Reaver's new Frenzy+
+Flurry) couldn't be seeded at all (`SeedKit`'s palette-id intersection came up empty → `Equipment` empty
+→ `BuildSessionTests.EveryCoreRuneShipsANonEmptyKitThatLandsInTheLoadout` failed). Ranger masked this same
+gap by accident (Lunge/Brace/Bandage in its kit ARE in `Techniques.All`, so Armory.Shot's own absence from
+the palette went unnoticed). Fix: palette now also carries Armory.Swing/Frenzy/Flurry/Shot/AimedShot.
+392/392 green.
+
+**Needs human — NEW blocker found this pass, item 3/1 stay deferred:** Warden's Core Effect *Fortified*
+("Plate armor is paid in CON at 1 less per tier", CORE_RUNES.md) has no basis in ARMOR.md's canon: the
+ONLY four armor lines are STR-plate / DEX-leather / INT-robe / CON-shield-object — no CON-governed BODY
+armor line exists, and `Armor.Governing` (`Armor.cs`) is a hardcoded DERIVED property (`Plate => Stat.Str`
+always), not something a `with` expression or a per-core override can touch without inventing a new
+mechanism (a per-core armor-governing override, or a distinct CON-plate line) that ARMOR.md doesn't
+sanction. Per CLAUDE.md's no-undesigned-mechanics rule, NOT inventing this speculatively. Doug: please
+reconcile ARMOR.md with CORE_RUNES.md's Fortified text (either ARMOR.md grows a CON-plate override
+mechanism, or Fortified's wording changes) before item 1 (Races.cs rescale) and the rest of item 3 resume
+— the full rescale's demand/clearance proofs (esp. Half-Giant+Barbarian's zero-headroom fit) depend on
+every core's discount actually being mechanized, and Fortified is the one that has no legal engine home
+yet. Everything else in item 3/1 is unblocked and ready once this lands.
+
+**Note on the new HIGH-PRIORITY `parent` bug at the top of this file:** landed after this pass's engine
+work was already in flight; next loop pass picks it up first (it outranks CHUNK A per Doug's own
+priority marker) rather than continuing item 1/3.
 
 **Progress (2026-07-05, loop, cont. #4):** two more independent crumbs, both pure content, neither
 touches kit assignment or race/core stat capacity. (a) item 6: `Armory.cs`'s Staff ladder had

@@ -75,25 +75,23 @@ public static class CoreRunes
         CoreEffectDesc: "Surviving minions' Summons are refunded on Redeploy.",
         CoreEffectRefundsSummons: true); // the first REAL Core Effect [LOCKED §11]; CD reconciles the card copy
 
-    // The Duelist: glass-cannon, no minion capacity — ends parts before they answer.
-    // Interim kit fix: dropped Jab (Stat.Str) — twin daggers are Stat.Dex, so Jab could never consult
-    // them and silently failed to activate. CORE_RUNES.md's real Reaver kit is Frenzy/Flurry, but those
-    // verbs are themselves Stat.Str pending Armory.cs's own flagged Open/TBD (a possible DEX dual-wield
-    // gate, not yet locked) — swapping to them now would trade one silent-activation-failure for another.
-    // Needs human: resolve the dual-wield stat question, then give Reaver its real Task #3 kit.
+    // The Duelist: glass-cannon, no minion capacity, no heal — ends parts before they answer.
+    // Frenzy/Flurry are the real Task #3 kit (TECHNIQUES.md/CORE_RUNES.md LOCKED 2026-07-05): both
+    // are stat-flexible (AltStat: Stat.Dex), so Reaver's twin DEX daggers consult them directly — the
+    // Lunge/Bandage interim placeholder is retired.
     public static readonly CoreRune Reaver = new(
         "reaver",
-        RuneBudget: 12,
+        RuneBudget: 19,
         RuneDiscount: 0,
         MinionCap: 0,
-        DefaultEquipment: new[] { Techniques.Lunge, Techniques.Bandage },
+        DefaultEquipment: new[] { Armory.Frenzy, Armory.Flurry },
         DefaultWeapons: new[] { Armory.Daggers[0], Armory.Daggers[0] }, // twin Iron Daggers
         DefaultArmor: LeatherKitT1,
         Archetype: "THE DUELIST",
         Flavor: "No shield, twin blades. Glass-cannon STR-DEX - ends parts before they answer.",
         Badge: "SPECIALIST",
-        CoreEffectName: "Bloodrush",
-        CoreEffectDesc: "Every part you break refunds a charging technique.");
+        CoreEffectName: "Finesse",
+        CoreEffectDesc: "Techniques requiring two weapons cost 1 less to activate.");
 
     // The Marksman: ranged core. Its signature is the shield-piercing BOW (charge #4) — Shot bypasses
     // shields for Charge. But Charge is scarce (INT-pooled, no mid-fight refill), so a pure-bow build
