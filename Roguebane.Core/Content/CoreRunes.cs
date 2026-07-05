@@ -18,7 +18,7 @@ public static class CoreRunes
     public static readonly CoreRune Grunt = new(
         "grunt",
         RuneBudget: 24,
-        RuneDiscount: 1,
+        RuneDiscount: 0, // CORE_RUNES.md v6: JoAT is attribute costs now, not rune price — discount retires to 0 all cores
         DefaultEquipment: new[] { Techniques.Jab, Techniques.Brace, Techniques.Bandage },
         DefaultWeapons: new[] { Armory.Longswords[0], Armory.Shields[0] }, // Iron Longsword + Wooden Shield
         DefaultArmor: PlateKitT1,

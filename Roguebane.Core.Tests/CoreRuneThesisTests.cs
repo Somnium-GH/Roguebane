@@ -26,8 +26,9 @@ public class CoreRuneThesisTests
         Assert.True(ClimbResonance(runes));
         Assert.True(runes.Has(Paths.ResonantCore));
 
-        // cheap runes (discount 1): effective 4 + (5-2) + (3-3) = 7 — real, not free
-        Assert.Equal(7, runes.Spent);
+        // CORE_RUNES.md v6: RuneDiscount retired to 0 (JoAT is now an attribute-cost effect, item 4,
+        // not yet built) — full-price climb: 5 + (6-2) + (4-3) = 10, real, not free.
+        Assert.Equal(10, runes.Spent);
         Assert.True(runes.Spent > 0);
 
         // "never built for it" is now a BUDGET gap, not a stat gap — attrs are race-only (§7). The

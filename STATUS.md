@@ -119,6 +119,37 @@ value was missing). 392/392 green. Remaining CHUNK A items: 1 (Races.cs), 3 (Cor
 blocked on the 4 Needs-Human calls above), 6 (Armory.cs Frenzy/Flurry/Aimed Shot — also touches the
 Reaver STR/DEX question), 8 (new focused tests + Barbarian test-exemption).
 
+**Progress (2026-07-05, loop, cont. #2) — item 1 attempted TWICE this pass, reverted both times; new
+finding, re-scopes items 1-3:** applying items 1+2 alone (v6 Races.cs + the CoreRune stat-bonus values
+verbatim from item 2's own list above) against the CURRENT/interim item-3 kits pushes 383/392 (was
+392/392) — WORSE than a first incomplete attempt (387/392), not better, once the bonus values were
+corrected to match item 2's full list. Root cause (traced through `Body.cs`'s `DisabledGear`/`Reserved`):
+the interim Summoner kit's TOTAL same-stat demand — Ember(1 INT) + Skeleton(1 INT) + IronGolem(2 INT)
++ RobeChest/RobeHead armor (INT-governed even though RobeChest's SLOT is CON — `Armor.Governing` is
+Robe-line-wide INT, req 2+1) + Wand/Charm weapons (also INT-governed, req 2+1) = **10 INT demand**,
+which exceeds even Elf's max under item 2's bonus (base 6 + IntBonus 3 = 9). This isn't a math slip on
+my part — the interim kit's per-item numbers were tuned against the OLD 12-14-range race stats (git
+history), and item 2's v6 bonuses are sized for item 3's FUTURE slimmer kit (Ember/Sacrifice/Barkskin,
+Skeleton only, no IronGolem — the kit swap item 3 itself calls for). **Conclusion: items 1, 2 and 3
+cannot land as separable commits — CoreCampaignTests exercises the FULL kit simultaneously, so v6 race
+stats only pass once item 3's kit swap lands alongside them.** This matches item 8's own framing ("Tests
+(DoD for A)" — one DoD for the whole chunk) and its explicit Barbarian over-demand exemption; the same
+category of exemption/timing applies to Summoner's transition, not just Barbarian. **Re-scope: don't
+reattempt item 1 standalone — next real progress on this thread means moving item 3's Needs-Human
+blockers (Reaver dual-wield stat, Summoner Sacrifice-placeholder conflict, Adept Stoneskin T2, Barbarian
+exemption wiring) to Doug, since item 3's kit swap has to land in the SAME slice as items 1+2.** Both
+files reverted to committed HEAD, tree clean, re-verified 392/392 before touching anything else.
+
+**Progress (2026-07-05, loop, cont. #3):** pulled one genuinely independent, non-blocked crumb out of
+item 3 instead — `RuneDiscount` retired to 0 on Grunt (was 1; every other core already 0), per
+CORE_RUNES.md's locked working assumption (JoAT moves to an attribute-cost effect under item 4, not yet
+built, so the old rune-PRICE discount has no design reason to survive). Fixed the one test this broke,
+`CoreRuneThesisTests.GruntCanClimbToTheSpecialistKeystoneAtARealCost` — its hardcoded `Spent` figure
+(7) was the discount-1 economy; recomputed for discount-0 (5 + (6-2) + (4-3) = 10) and updated the
+comment accordingly, test intent (Grunt's edge is budget, not a cheaper rune price) unchanged. 392/392
+green, committed standalone (this crumb has none of item 1-3's kit-coupling — it only changes a flat
+rune-cost number, not stat capacity vs. demand).
+
 ### CHUNK B — ASSET WIRING (mechanical; do right after A or interleave freely)
 1. Mirror every new CD-source mgcb entry into `Roguebane.Game/Content/Content.mgcb` (the copy builds
    read) with the established path/output transform — new body dirs (all `dwarf_*`, `halfling_*`,
