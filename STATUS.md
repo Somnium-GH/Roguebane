@@ -1,7 +1,19 @@
 # Status
 
+## ✅ FIXED (2026-07-05 loop) — statusStrip/footer bars now stretch to full design width
+Implemented the fix this entry itself scoped: added `ManifestUi.FullWidthRect(screen, e)` (stretches
+just the WIDTH to the current `DesignW`, keeps the element's authored HEIGHT and anchor position —
+same reasoning as `FullCanvasRect` for `.scene` elements, narrower application) and wired it into
+`DrawManifestScreen` (`Game1.ManifestRenderer.cs`) gated on a new `IsFullBarElement` check scoped by id
+(`statusStrip`, `footer` only — confirmed those are the exact literal ids used across every screen via
+`layout.json`, no other Top/Bottom element shares them). `dotnet build` confirms no compile errors
+(copy-stage error only, from Doug's own running Roguebane.Game.exe holding the DLL lock — left it
+alone). Core.Tests still 391/391 green (this is shell-only, no Core change, per CLAUDE.md's Core-tests
+rule). **Not yet visually confirmed live** — needs Doug to maximize/resize a non-16:9 window and check
+the bars now span edge-to-edge with no blank canvas on the sides.
+
 ## ⇒ BUG REPORT — HiFi, HIGH PRIORITY (2026-07-05, Doug — the backdrop fix didn't cover everything;
-## header/footer bars stay fixed-width on a wider window, same bug class, different elements)
+## header/footer bars stay fixed-width on a wider window, same bug class, different elements) — FIXED, see ✅ above
 Doug's maximize screenshots (NewGame + CityMap) show the header/footer bars NOT stretching to the
 new width at all — blank canvas appears around them — while he confirms "the interface stays locked"
 (cards/panels correctly keep their authored size, that part's fine; it's specifically the full-bleed

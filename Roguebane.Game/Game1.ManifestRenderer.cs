@@ -35,7 +35,9 @@ public partial class Game1
             _curScreen = s;    // panel headers confine to the band above their contained children
             // Scene/backdrop art stretches to the FULL design canvas — never its authored anchor/size
             // — so it can't diverge from edge-anchored chrome when the canvas extends past 16:9 (§13).
-            DrawManifestElement(e, IsSceneElement(e) ? _ui.FullCanvasRect(s) : _ui.Rect(s, e));
+            DrawManifestElement(e, IsSceneElement(e) ? _ui.FullCanvasRect(s)
+                : IsFullBarElement(e) ? _ui.FullWidthRect(s, e)
+                : _ui.Rect(s, e));
         }
         _textOwner = null;
     }
@@ -43,6 +45,12 @@ public partial class Game1
     // The scene layer alone — the baseline the smoke paint-coverage diff measures against. A scene
     // element is identified by its *.scene bind (paint-ordinal z carries no layer semantics).
     private static bool IsSceneElement(Element e) => e.Binds is { } b && b.EndsWith(".scene");
+
+    // Full-bleed chrome bars: authored at the base 960 design width, but meant to span the real
+    // viewport edge-to-edge past 16:9 (§13) — same bug class as the scene backdrop, different
+    // element set. Scoped by id, not "every Top/Bottom element", since some are deliberately narrower.
+    private static readonly HashSet<string> FullBarIds = ["statusStrip", "footer"];
+    private static bool IsFullBarElement(Element e) => FullBarIds.Contains(e.Id);
 
     private void DrawManifestBackdrop(string screenId)
     {

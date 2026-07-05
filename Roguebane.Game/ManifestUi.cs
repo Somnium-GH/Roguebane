@@ -47,6 +47,17 @@ public sealed class ManifestUi
         DesignW > 0 ? DesignW : screen.DesignSize[0],
         DesignH > 0 ? DesignH : screen.DesignSize[1]);
 
+    // Full-bleed bars (statusStrip/footer): same "never leave gaps past 16:9" reasoning as
+    // FullCanvasRect, but these keep their authored HEIGHT and anchor position (Top/Bottom) —
+    // only the WIDTH stretches to the current design width, spanning edge-to-edge.
+    public Rectangle FullWidthRect(Screen screen, Element e)
+    {
+        var w = DesignW > 0 ? DesignW : screen.DesignSize[0];
+        var stretched = new Element { Anchor = e.Anchor, Offset = e.Offset, Size = [w, e.Size[1]] };
+        var r = Resolve(screen, stretched);
+        return new Rectangle(r.X, r.Y, r.W, r.H);
+    }
+
     public Rectangle? ElementRect(string screen, string id)
     {
         var m = _layout.Manifest;
