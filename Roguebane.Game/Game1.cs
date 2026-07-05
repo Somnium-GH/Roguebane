@@ -55,6 +55,12 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     private Point _dragAnchor;
     private bool _dragging;
 
+    // Same model, mirrored for the minion bay strip (a separate payload type, so a separate small
+    // state machine beats forcing UpdateBarDrag generic over two unrelated record types).
+    private Roguebane.Core.Minion? _dragMinion;
+    private Point _dragAnchorM;
+    private bool _draggingM;
+
     // The leg under way is the campaign's current Expedition — most of the run screen reads it.
     private Expedition Exp => _campaign.Current;
 
@@ -383,6 +389,13 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         var slotted = ManifestListCells("equipment", "loadout", slottedData.Count);
         UpdateBarDrag(slotted, slottedData, ToggleTech);
 
+        // Minion bay strip: in-run only (no pre-run bay to reorder — the kit fields wholesale at embark).
+        if (InRun)
+        {
+            var bays = ManifestListCells("equipment", "minions", Exp.Minions.Count);
+            UpdateBayDrag(bays, Exp.Minions);
+        }
+
         if (!InRun)
         {
             // Rune Bag: climb a ladder's next rung (spends budget; Core gates it). Pre-run only.
@@ -619,6 +632,45 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             }
             _dragTech = null;
             _dragging = false;
+        }
+    }
+
+    // §6e reorder, mirrored for the minion bay strip (`buildMinions`, binds:"minions" — currently
+    // rendered ZERO cells by the B14 layout.json sizing bug logged to CD; this wiring is correct and
+    // ready the moment that container is widened). Every card here is already-bayed (equip happens
+    // from the MINIONS tab grid instead, same as clicking an equipped technique card there), so a
+    // plain click (no drag) always means dismiss — there's no "equip" case on this strip.
+    private void UpdateBayDrag(
+        System.Collections.Generic.IReadOnlyList<LayoutRect> slots,
+        System.Collections.Generic.IReadOnlyList<Roguebane.Core.Minion> data)
+    {
+        if (_clicked)
+            for (var i = 0; i < slots.Count && i < data.Count; i++)
+                if (RectOf(slots[i]).Contains(_cursor)) { _dragMinion = data[i]; _dragAnchorM = _cursor; _draggingM = false; break; }
+
+        if (_dragMinion is { } m && _mouseDown)
+        {
+            if (!_draggingM && (Math.Abs(_cursor.X - _dragAnchorM.X) > DragThresholdPx
+                                 || Math.Abs(_cursor.Y - _dragAnchorM.Y) > DragThresholdPx))
+                _draggingM = InRun && data.Contains(m);
+        }
+
+        if (_released)
+        {
+            if (_dragMinion is { } dropped)
+            {
+                if (_draggingM && WithinBar(slots))
+                    Exp.ReorderMinion(dropped, DragInsertionIndex(slots));
+                else
+                {
+                    var origin = -1;
+                    for (var i = 0; i < data.Count; i++) if (data[i] == dropped) { origin = i; break; }
+                    if (origin >= 0 && origin < slots.Count && RectOf(slots[origin]).Contains(_cursor))
+                        Exp.DismissMinion(dropped);
+                }
+            }
+            _dragMinion = null;
+            _draggingM = false;
         }
     }
 
