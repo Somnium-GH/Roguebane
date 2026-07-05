@@ -314,11 +314,12 @@ Doug: keep the RANDOMIZED per-category stocking (don't flatten to "always show a
 now instead of flagged placeholder/OPEN. **No new engine behavior needed — this is a doc/test-status
 change, not a code change:** Armor/Weapons/Minions = 80% independent presence roll each, Techniques =
 25%, Runes = 8% (+ a 33% survival roll for rank-2+ Marks), capped at 4-of-5 sections, keystones never.
-Folded into DESIGN_SPEC §12 as LOCKED. **Loop follow-up (small):** `MerchantStockTests.cs`'s header
-comment still says "the exact section weights are OPEN (§17) — these tests pin the locked SHAPE, not
-the odds" — update that comment (now stale) and consider adding a statistical presence-rate assertion
-across the existing 400-seed sweep (e.g. Techniques appearing in roughly 20-30% of seeds) now that
-the numbers themselves are locked, not just the shape. Not urgent, no P0 jump.
+Folded into DESIGN_SPEC §12 as LOCKED. **Loop follow-up DONE (2026-07-04 loop, 389 tests):**
+de-flagged the stale "OPEN (§17)"/placeholder wording in `MerchantStock.cs` and
+`MerchantStockTests.cs` to say LOCKED, and added
+`MerchantStockTests.SectionPresenceRateMatchesTheLockedWeights` — sweeps the same 400-seed range and
+asserts each section's hit count falls in a wide band around its locked weight (80/80/80/25/8), so a
+future silent drift in the odds (not just the shape) gets caught.
 
 ## ⇒ CORRECTION to the "ghost head — FIXED" answer above (2026-07-03, Doug caught it live)
 The fix picked the WRONG part to keep. Recap: `raceCard` had two overlapping head parts — (1)
