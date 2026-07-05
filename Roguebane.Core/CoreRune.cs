@@ -1,7 +1,8 @@
 namespace Roguebane.Core;
 
 // A CoreRune is data: the LAYOUT you socket a Race's body into. It carries NO attrs (those are the
-// Race's, §7) — only a rune budget, a per-rung discount, bays, and the fixed starting equipment/minions.
+// Race's, §7) — only a rune budget, a per-rung discount, minion capacity, and the fixed starting
+// equipment/minions.
 // The thesis lives in the tension between budget and discount: a fat-budget, cheap-rune core can climb
 // to a keystone it was never built for. DefaultEquipment is the FIXED starting kit (the action bar is
 // never empty, no build-time "pick a technique" gate; finds grow the kit mid-run).
@@ -9,7 +10,7 @@ public sealed record CoreRune(
     string Id,
     int RuneBudget,
     int RuneDiscount = 0,
-    int Bays = 1,
+    int MinionCap = 1,
     IReadOnlyList<Technique>? DefaultEquipment = null,
     IReadOnlyList<Minion>? DefaultMinions = null,
     IReadOnlyList<Weapon>? DefaultWeapons = null, // wielded at assembly so a consulting verb has a stick
@@ -32,8 +33,8 @@ public sealed record CoreRune(
 
     public IReadOnlyList<Technique> Kit => DefaultEquipment ?? Array.Empty<Technique>();
 
-    // The minions the core fields from the start (summoned into its bays at assembly), the minion
-    // analogue of the fixed technique Kit. Rune grants add more on top, capped by Bays.
+    // The minions the core fields from the start (summoned into its minion capacity at assembly), the
+    // minion analogue of the fixed technique Kit. Rune grants add more on top, capped by MinionCap.
     public IReadOnlyList<Minion> MinionKit => DefaultMinions ?? Array.Empty<Minion>();
 
     // The weapons the core wields from the start (a bow for the Marksman) — a consulting verb (Shot)

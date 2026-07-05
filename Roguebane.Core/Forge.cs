@@ -28,8 +28,8 @@ public static class Forge
         CityMap map)
     {
         var body = chassis.NewBody(race, runes);
-        var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, bayCap: chassis.Bays,
-            maxSummons: chassis.Bays + 2); // §9 deploy budget — placeholder size, economy tune owns it
+        var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, minionCap: chassis.MinionCap,
+            maxSummons: chassis.MinionCap + 2); // §9 deploy budget — placeholder size, economy tune owns it
         SummonKit(caster, chassis, runes);
         return new Expedition(PlayerFighter(body, race), caster, WithRuneGrants(equipment, runes), map,
             figureId: chassis.FigureKey(race), refundSummonsOnRedeploy: chassis.CoreEffectRefundsSummons,
@@ -45,21 +45,22 @@ public static class Forge
         IReadOnlyList<Func<CityMap>> legs)
     {
         var body = chassis.NewBody(race, runes);
-        var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, bayCap: chassis.Bays,
-            maxSummons: chassis.Bays + 2); // §9 deploy budget — placeholder size, economy tune owns it
+        var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, minionCap: chassis.MinionCap,
+            maxSummons: chassis.MinionCap + 2); // §9 deploy budget — placeholder size, economy tune owns it
         SummonKit(caster, chassis, runes);
         return new Campaign(PlayerFighter(body, race), caster, WithRuneGrants(equipment, runes), legs,
             figureId: chassis.FigureKey(race), refundSummonsOnRedeploy: chassis.CoreEffectRefundsSummons,
             techniqueSlots: chassis.Kit.Count);
     }
 
-    // Field the chassis's minion kit plus any rune-granted minions into its bays at assembly, so the
-    // summoner archetype actually fights through its summons in a real run (capped by Bays; each pays
-    // its own gate — INT reservation, charge, or free). Summon is idempotent, so a duplicate id no-ops.
+    // Field the chassis's minion kit plus any rune-granted minions into its capacity at assembly, so
+    // the summoner archetype actually fights through its summons in a real run (capped by MinionCap;
+    // each pays its own gate — INT reservation, charge, or free). Summon is idempotent, so a
+    // duplicate id no-ops.
     private static void SummonKit(Caster caster, CoreRune chassis, RuneLoadout runes)
     {
         foreach (var minion in chassis.MinionKit.Concat(runes.GrantedMinions))
-            caster.Summon(minion, chassis.Bays);
+            caster.Summon(minion, chassis.MinionCap);
     }
 
     // Rune-granted techniques join the equipment (deduped) — a held keystone hands you a verb your

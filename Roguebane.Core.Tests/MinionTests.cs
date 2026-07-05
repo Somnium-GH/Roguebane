@@ -2,7 +2,7 @@ using Roguebane.Core.Content;
 
 namespace Roguebane.Core.Tests;
 
-// G7 (minions): bay-bound, stat-reserving allied units that auto-fire and cascade off when their
+// G7 (minions): capacity-bound, stat-reserving allied units that auto-fire and cascade off when their
 // stat drains — the same body rule as techniques.
 public class MinionTests
 {
@@ -20,7 +20,7 @@ public class MinionTests
         // same as a Timered technique — never on every combat tick.
         var foe = new Foe("front", 100);
         var caster = new Caster(IntBody(9), foe);
-        Assert.True(caster.Summon(Minions.Skeleton, bayCap: 3)); // power 1, Timer 25
+        Assert.True(caster.Summon(Minions.Skeleton, minionCap: 3)); // power 1, Timer 25
 
         for (var i = 0; i < Minions.Skeleton.Timer - 1; i++) caster.Step();
         Assert.Equal(100, foe.Hp); // still charging
@@ -30,11 +30,11 @@ public class MinionTests
     }
 
     [Fact]
-    public void BaysCapTheNumberOfMinions()
+    public void MinionCapCapsTheNumberOfMinions()
     {
         var caster = new Caster(IntBody(20), null);
-        Assert.True(caster.Summon(Minions.Skeleton, bayCap: 1));
-        Assert.False(caster.Summon(Minions.Shade, bayCap: 1)); // no free bay
+        Assert.True(caster.Summon(Minions.Skeleton, minionCap: 1));
+        Assert.False(caster.Summon(Minions.Shade, minionCap: 1)); // no free slot
         Assert.Equal(1, caster.MinionCount);
     }
 
@@ -42,8 +42,8 @@ public class MinionTests
     public void SummoningGatesOnFreeStat()
     {
         var caster = new Caster(IntBody(2), null); // only 2 INT
-        Assert.True(caster.Summon(Minions.Skeleton, bayCap: 3)); // reserves 2 -> ok
-        Assert.False(caster.Summon(Minions.Shade, bayCap: 3));   // needs 3 more INT, none free
+        Assert.True(caster.Summon(Minions.Skeleton, minionCap: 3)); // reserves 2 -> ok
+        Assert.False(caster.Summon(Minions.Shade, minionCap: 3));   // needs 3 more INT, none free
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public class MinionTests
         var body = IntBody(2);
         var foe = new Foe("front", 100);
         var caster = new Caster(body, foe, maxSummons: 1);
-        Assert.True(caster.Summon(Minions.Skeleton, bayCap: 3)); // spends the only summon
+        Assert.True(caster.Summon(Minions.Skeleton, minionCap: 3)); // spends the only summon
         Assert.Equal(0, caster.SummonsLeft);
 
         var head = body.Parts.Single();
@@ -77,7 +77,7 @@ public class MinionTests
     {
         var body = IntBody(5);
         var caster = new Caster(body, null);
-        caster.Summon(Minions.Shade, bayCap: 3); // reserves 3
+        caster.Summon(Minions.Shade, minionCap: 3); // reserves 3
         Assert.Equal(2, body.Available(Stat.Int));
 
         caster.Dismiss(Minions.Shade);
@@ -86,11 +86,11 @@ public class MinionTests
     }
 
     [Fact]
-    public void SummonerHasThreeBaysTheWardenNone()
+    public void SummonerHasThreeMinionCapTheWardenNone()
     {
-        Assert.Equal(3, CoreRunes.Summoner.Bays);
-        Assert.Equal(0, CoreRunes.Warden.Bays);
-        Assert.Equal(1, CoreRunes.Grunt.Bays);
+        Assert.Equal(3, CoreRunes.Summoner.MinionCap);
+        Assert.Equal(0, CoreRunes.Warden.MinionCap);
+        Assert.Equal(1, CoreRunes.Grunt.MinionCap);
     }
 
     [Fact]
@@ -101,14 +101,14 @@ public class MinionTests
         var caster = new Caster(body, foe);
         var retinue = new Minion("retinue", Stat.Int, 0, 1, Timer: 1, Gate: MinionGate.None);
 
-        Assert.True(caster.Summon(retinue, bayCap: 3)); // ungated -> succeeds with zero INT
+        Assert.True(caster.Summon(retinue, minionCap: 3)); // ungated -> succeeds with zero INT
         body.Damage(body.Parts[0], 5);                  // drain does nothing it depends on
         caster.Step();
         Assert.Equal(1, caster.MinionCount);            // still standing
         Assert.Equal(99, foe.Hp);
     }
 
-    // G7 in play: the Summoner chassis fields its minion kit into its bays at assembly, and those
+    // G7 in play: the Summoner chassis fields its minion kit into its capacity at assembly, and those
     // minions auto-fire on the front foe — so the summoner archetype actually fights through summons
     // even when the player aims no techniques (requireAim holds the bar).
     [Fact]
@@ -116,7 +116,7 @@ public class MinionTests
     {
         var chassis = CoreRunes.Summoner;
         var exp = Forge.Embark(Races.Human, chassis, chassis.NewLoadout(), chassis.Kit, Maps.StandardLeg(autoResolveCastle: false));
-        Assert.True(exp.MinionCount > 0); // bays filled at assembly
+        Assert.True(exp.MinionCount > 0); // capacity filled at assembly
 
         exp.Enter("a2");
         var foe = exp.Enemy!;
@@ -127,11 +127,11 @@ public class MinionTests
     }
 
     [Fact]
-    public void TheMinionKitIsCappedByTheCoreRuneBays()
+    public void TheMinionKitIsCappedByTheCoreRuneMinionCap()
     {
-        var reaver = CoreRunes.Reaver; // zero bays
+        var reaver = CoreRunes.Reaver; // zero minion capacity
         var exp = Forge.Embark(Races.Human, reaver, reaver.NewLoadout(), reaver.Kit, Maps.StandardLeg(autoResolveCastle: false));
-        Assert.Equal(0, exp.MinionCount); // no bays -> nothing fielded
+        Assert.Equal(0, exp.MinionCount); // no capacity -> nothing fielded
     }
 
     [Fact]
@@ -143,39 +143,39 @@ public class MinionTests
         var caster = new Caster(body, null, maxCharge: 3);
         var imp = new Minion("imp", Stat.Int, 0, 1, Timer: 1, Gate: MinionGate.AltCost, AltCost: 2);
 
-        Assert.True(caster.Summon(imp, bayCap: 3)); // succeeds without a stat reservation
+        Assert.True(caster.Summon(imp, minionCap: 3)); // succeeds without a stat reservation
         Assert.Equal(3, caster.Charge);             // Charge untouched
     }
 
-    // §6e ORDERING ("slot index IS the hotkey"): bays are a SLOT-ordered list, not id-sorted — a
+    // §6e ORDERING ("slot index IS the hotkey"): minions are a SLOT-ordered list, not id-sorted — a
     // fresh Summon appends to the first free slot.
     [Fact]
-    public void MinionsListsBaysInSummonOrderNotIdOrder()
+    public void MinionsListInSummonOrderNotIdOrder()
     {
         var caster = new Caster(IntBody(10), null);
-        Assert.True(caster.Summon(Minions.Golem, bayCap: 3));    // "golem" summoned first...
-        Assert.True(caster.Summon(Minions.Skeleton, bayCap: 3)); // ...then "skeleton" (alphabetically earlier)
+        Assert.True(caster.Summon(Minions.Golem, minionCap: 3));    // "golem" summoned first...
+        Assert.True(caster.Summon(Minions.Skeleton, minionCap: 3)); // ...then "skeleton" (alphabetically earlier)
         Assert.Equal(new[] { "golem", "skeleton" }, caster.Minions.Select(m => m.Id));
     }
 
     [Fact]
-    public void DismissCompactsTheBayOrderLeft()
+    public void DismissCompactsTheMinionOrderLeft()
     {
         var caster = new Caster(IntBody(10), null); // Golem(3) + Skeleton(2) + Shade(3) = 8 INT
-        caster.Summon(Minions.Golem, bayCap: 3);
-        caster.Summon(Minions.Skeleton, bayCap: 3);
-        caster.Summon(Minions.Shade, bayCap: 3);
+        caster.Summon(Minions.Golem, minionCap: 3);
+        caster.Summon(Minions.Skeleton, minionCap: 3);
+        caster.Summon(Minions.Shade, minionCap: 3);
 
         caster.Dismiss(Minions.Golem); // remove the FIRST slot
         Assert.Equal(new[] { "skeleton", "shade" }, caster.Minions.Select(m => m.Id));
     }
 
     [Fact]
-    public void ReorderMinionMovesItWithinTheBayStrip()
+    public void ReorderMinionMovesItWithinTheMinionStrip()
     {
         var caster = new Caster(IntBody(10), null);
-        caster.Summon(Minions.Golem, bayCap: 3);
-        caster.Summon(Minions.Skeleton, bayCap: 3);
+        caster.Summon(Minions.Golem, minionCap: 3);
+        caster.Summon(Minions.Skeleton, minionCap: 3);
 
         Assert.True(caster.ReorderMinion(Minions.Golem, 1)); // move golem behind skeleton
         Assert.Equal(new[] { "skeleton", "golem" }, caster.Minions.Select(m => m.Id));
@@ -185,12 +185,12 @@ public class MinionTests
     public void ReorderMinionFailsForAnUnsummonedMinion()
     {
         var caster = new Caster(IntBody(10), null);
-        caster.Summon(Minions.Skeleton, bayCap: 3);
-        Assert.False(caster.ReorderMinion(Minions.Golem, 0)); // never summoned -> no bay slot to move
+        caster.Summon(Minions.Skeleton, minionCap: 3);
+        Assert.False(caster.ReorderMinion(Minions.Golem, 0)); // never summoned -> no minion slot to move
     }
 
-    // §6e bay-membership toggle: the MINIONS tab's equip/unequip. The Summoner fields Skeleton+Golem
-    // at embark (2 of its 3 bays), leaving one free for a bought minion to fill.
+    // §6e minion-membership toggle: the MINIONS tab's equip/unequip. The Summoner fields Skeleton+Golem
+    // at embark (2 of its 3 slots), leaving one free for a bought minion to fill.
     private static Expedition SummonerExpedition()
     {
         var chassis = CoreRunes.Summoner;
@@ -199,7 +199,7 @@ public class MinionTests
     }
 
     [Fact]
-    public void SummonMinionMovesAStashedMinionIntoAFreeBay()
+    public void SummonMinionMovesAStashedMinionIntoAFreeSlot()
     {
         var exp = SummonerExpedition();
         Assert.Equal(2, exp.MinionCount); // Skeleton + Golem from the kit
@@ -220,10 +220,10 @@ public class MinionTests
     }
 
     [Fact]
-    public void DismissMinionFreesTheBayAndLeavesItResummonable()
+    public void DismissMinionFreesTheSlotAndLeavesItResummonable()
     {
         var exp = SummonerExpedition();
-        Assert.True(exp.DismissMinion(Minions.Golem)); // leaves a bay, not removed from any pool
+        Assert.True(exp.DismissMinion(Minions.Golem)); // leaves a slot, not removed from any pool
         Assert.Equal(1, exp.MinionCount);
         Assert.DoesNotContain(Minions.Golem, exp.Minions);
 
@@ -232,7 +232,7 @@ public class MinionTests
     }
 
     [Fact]
-    public void DismissMinionFailsForAMinionNotInAnyBay()
+    public void DismissMinionFailsForAMinionNotInAnySlot()
     {
         var exp = SummonerExpedition();
         Assert.False(exp.DismissMinion(Minions.Shade)); // never summoned

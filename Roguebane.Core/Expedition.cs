@@ -23,7 +23,7 @@ public sealed class Expedition
     private readonly Stash _stash;
     // §12 gear stock: rolled ONCE per merchant node from its seed (reproducible), purchases consume
     // it. Techniques/minions/runes are OFFERED but not yet buyable — their receiving models (mid-run
-    // palette/bay/rune mutation) are the design-open gate.
+    // palette/minion/rune mutation) are the design-open gate.
     private sealed class GearStock
     {
         public required List<Weapon> Weapons;
@@ -211,9 +211,9 @@ public sealed class Expedition
         return true;
     }
 
-    // §6e reorder gate: same model as ReorderTechnique, against the Caster's bay list instead of
+    // §6e reorder gate: same model as ReorderTechnique, against the Caster's minion list instead of
     // the equipped-technique list. No Campaign-side mirror needed — Campaign hands every leg the
-    // SAME Caster instance (see Campaign.NewLeg), so bay order already survives a leg advance.
+    // SAME Caster instance (see Campaign.NewLeg), so minion order already survives a leg advance.
     public bool ReorderMinion(Minion minion, int newIndex) =>
         State == ExpeditionState.Choosing && _caster.ReorderMinion(minion, newIndex);
 
@@ -290,22 +290,23 @@ public sealed class Expedition
 
     public bool IsActive(Technique technique) => _caster.IsActive(technique);
 
-    // Bay occupants (the summoned minions) + total bays for the combat minion-bay lane.
+    // Summoned minions + total minion capacity for the combat minion lane.
     public int MinionCount => _caster.MinionCount;
     public int Charge => _caster.Charge;       // the shield-pierce resource (§6b) — readout + spend
     public int MaxCharge => _caster.MaxCharge;
     public int Summons => _caster.SummonsLeft; // §9 deploy resource — readout + merchant refill
     public int MaxSummons => _caster.MaxSummons;
     public IReadOnlyList<Minion> Minions => _caster.Minions;
-    public int Bays => _caster.BayCap;
+    public int MinionCap => _caster.MinionCap;
 
-    // §6e minion-bay membership toggle — the MINIONS tab's equivalent of EquipTechnique/
+    // §6e minion membership toggle — the MINIONS tab's equivalent of EquipTechnique/
     // UnequipTechnique above. A minion's "ownership" pool (chassis kit + rune grants + Stash) never
-    // changes here; this only moves it into/out of a bay, same as equipping never removes a
-    // technique from the Palette. Caster.Summon/Dismiss already do the gate-reservation + Summons-
-    // resource bookkeeping (§9), so these are thin out-of-combat gates over them.
+    // changes here; this only moves it into/out of the caster's minion capacity, same as equipping
+    // never removes a technique from the Palette. Caster.Summon/Dismiss already do the
+    // gate-reservation + Summons-resource bookkeeping (§9), so these are thin out-of-combat gates
+    // over them.
     public bool SummonMinion(Minion minion) =>
-        State == ExpeditionState.Choosing && _caster.Summon(minion, Bays);
+        State == ExpeditionState.Choosing && _caster.Summon(minion, MinionCap);
     public bool DismissMinion(Minion minion) =>
         State == ExpeditionState.Choosing && _caster.Dismiss(minion);
 

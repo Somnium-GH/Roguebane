@@ -3,7 +3,7 @@ using Roguebane.Core.Content;
 namespace Roguebane.Core.Tests;
 
 // G3: the cores exist as data with distinct ids + display identities, selectable at New Run. Their
-// identity is now budget/bays/equipment — attrs are the Race's (§7), so no stat-identity assertions.
+// identity is now budget/minion capacity/equipment — attrs are the Race's (§7), so no stat-identity assertions.
 public class CoreRuneRosterTests
 {
     [Fact]

@@ -41,8 +41,8 @@ public class RunStartTests
         Assert.True(exp.Map.SupportBank >= 0);
         Assert.True(exp.Gold >= 0);
 
-        // Bay lane + equipment/gear bar sources are readable (the crash was drawing the gear bar).
-        Assert.True(exp.Bays >= 0);
+        // Minion lane + equipment/gear bar sources are readable (the crash was drawing the gear bar).
+        Assert.True(exp.MinionCap >= 0);
         Assert.Equal(0, exp.MinionCount);
         Assert.NotNull(exp.Equipment);          // may be empty (the dash placeholder) -- just must be drawable
         Assert.NotNull(exp.Player.Body.Hands); // the wielded-weapon chips

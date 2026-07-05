@@ -10,7 +10,7 @@ public sealed class Stash
     private readonly List<Weapon> _weapons = new(); // carried but not wielded
     private readonly List<Armor> _armor = new();    // carried but not worn
     private readonly List<Technique> _techniques = new(); // bought, awaiting a palette slot (§12)
-    private readonly List<Minion> _minions = new();       // bought, awaiting a bay (§12)
+    private readonly List<Minion> _minions = new();       // bought, awaiting a minion slot (§12)
     private readonly List<Mark> _marks = new();           // bought runes in the bag (§12)
 
     public Stash(int gold = 0) => Gold = gold;

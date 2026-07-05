@@ -2,7 +2,7 @@ namespace Roguebane.Core;
 
 // Race is the ATTRIBUTE + HP source of a build (design/05, §7): a body's stat shares (STR/INT/DEX/CON,
 // laid into the standard Head/Chest/Arms x2/Legs x2 anatomy) and its HP come from the Race ALONE — a
-// CoreRune adds none. A Race paired with a CoreRune (which carries budget/actions/bays/Core Effect/equipment)
+// CoreRune adds none. A Race paired with a CoreRune (which carries budget/actions/minion capacity/Core Effect/equipment)
 // is the assembled identity the player begins a run as.
 public sealed record Race(
     string Id,

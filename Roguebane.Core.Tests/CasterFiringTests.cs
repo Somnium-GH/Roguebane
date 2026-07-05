@@ -114,7 +114,7 @@ public class CasterFiringTests
         body.Add(new BodyPart("head", Stat.Int, 5)); // Skeleton reserves 2 Int
         var foe = new Foe("dummy", 100);
         var c = new Caster(body, foe);
-        Assert.True(c.Summon(Minions.Skeleton, bayCap: 1)); // Timer 25, Power 1
+        Assert.True(c.Summon(Minions.Skeleton, minionCap: 1)); // Timer 25, Power 1
 
         for (var i = 0; i < Minions.Skeleton.Timer - 1; i++) c.Step(); // charged to 1 tick from firing
         c.RearmForEncounter();

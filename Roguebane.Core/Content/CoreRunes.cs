@@ -1,7 +1,7 @@
 ﻿namespace Roguebane.Core.Content;
 
 // The core LAYOUTS (design/05). A core carries NO attrs — STR/INT/DEX/CON + HP are the Race's (§7).
-// Cores differ by budget / discount / bays / starting equipment / Core Effect identity only. Values are
+// Cores differ by budget / discount / minion capacity / starting equipment / Core Effect identity only. Values are
 // placeholder (tuning is a "Needs human" touchpoint).
 public static class CoreRunes
 {
@@ -43,12 +43,12 @@ public static class CoreRunes
         CoreEffectName: "Overchannel",
         CoreEffectDesc: "Spells reserve no INT while the head stays above three-quarters.");
 
-    // The Wall: built to hold the line — modest budget, no bays.
+    // The Wall: built to hold the line — modest budget, no minion capacity.
     public static readonly CoreRune Warden = new(
         "warden",
         RuneBudget: 12,
         RuneDiscount: 0,
-        Bays: 0,
+        MinionCap: 0,
         DefaultEquipment: new[] { Techniques.Cleave, Techniques.Brace, Techniques.Bandage },
         DefaultWeapons: new[] { Armory.Longswords[0], Armory.Shields[1] }, // Iron Longsword + Iron Buckler
         DefaultArmor: PlateKitT1,
@@ -58,12 +58,12 @@ public static class CoreRunes
         CoreEffectName: "Unbroken Aegis",
         CoreEffectDesc: "Shield points regenerate at twice their CON-scaled rate.");
 
-    // The Binder: fights through summons — three bays, INT funds them all.
+    // The Binder: fights through summons — three minion slots, INT funds them all.
     public static readonly CoreRune Summoner = new(
         "summoner",
         RuneBudget: 12,
         RuneDiscount: 0,
-        Bays: 3,
+        MinionCap: 3,
         DefaultEquipment: new[] { Techniques.Ember, Techniques.Brace, Techniques.Bandage },
         DefaultWeapons: new[] { Armory.Wands[0], Armory.Charms[0] }, // Adept Wand + Wooden Charm
         DefaultArmor: RobeKitT1,
@@ -75,12 +75,12 @@ public static class CoreRunes
         CoreEffectDesc: "Surviving minions' Summons are refunded on Redeploy.",
         CoreEffectRefundsSummons: true); // the first REAL Core Effect [LOCKED §11]; CD reconciles the card copy
 
-    // The Duelist: glass-cannon, no bays — ends parts before they answer.
+    // The Duelist: glass-cannon, no minion capacity — ends parts before they answer.
     public static readonly CoreRune Reaver = new(
         "reaver",
         RuneBudget: 12,
         RuneDiscount: 0,
-        Bays: 0,
+        MinionCap: 0,
         DefaultEquipment: new[] { Techniques.Lunge, Techniques.Jab, Techniques.Bandage },
         DefaultWeapons: new[] { Armory.Daggers[0], Armory.Daggers[0] }, // twin Iron Daggers
         DefaultArmor: LeatherKitT1,
@@ -98,7 +98,7 @@ public static class CoreRunes
         "ranger",
         RuneBudget: 12,
         RuneDiscount: 0,
-        Bays: 1, // one bay for its DEX-gated Hound pet (§7a kit table)
+        MinionCap: 1, // one minion slot for its DEX-gated Hound pet (§7a kit table)
         DefaultEquipment: new[] { Armory.Shot, Techniques.Lunge, Techniques.Brace, Techniques.Bandage },
         DefaultWeapons: new[] { Armory.ShortSwords[0], Armory.Bow }, // Iron Short Sword + Short Bow
         DefaultArmor: LeatherKitT1,

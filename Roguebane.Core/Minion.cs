@@ -10,7 +10,7 @@ namespace Roguebane.Core;
 //             yet, so the summon is currently un-costed; wire the HP/stat spend when one ships.
 public enum MinionGate { Stat, None, AltCost }
 
-// A minion occupies a BAY (not an action-bar slot). Its GATE decides what summoning costs; while
+// A minion occupies a MINION SLOT (not an action-bar slot). Its GATE decides what summoning costs; while
 // powered it fires on its own TIMER (ticks between discharges, same unit as a Technique's Cooldown —
 // §9, 2026-07-04) instead of every combat tick. AltCost holds the (designed, non-Charge) alt cost
 // amount. Minion VARIETY (re-gating onto STR/DEX/CON) rides on the Gate field.

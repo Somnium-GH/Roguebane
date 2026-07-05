@@ -6,14 +6,21 @@ Doug's directive, verbatim: **"'Bays' should be 'Minions' — no need for anothe
 "bay(s)" replaced with "minion(s)" / "minion capacity" throughout (e.g. "2 bays" → "capacity 2"; "minion-bay
 lane" → "minion lane"; "assigned to a bay" → "fielded as a minion"). **Remaining is engine-side — this is a
 CLEAN RENAME per CLAUDE.md (no aliases/back-compat):**
-- **C# internal names (safe to rename now, no manifest dependency):** `Caster.BayCap` → e.g. `MinionCap`,
-  `Caster._bays` → `_minions`, `Caster.Summon(Minion, int bayCap)` param name, `CoreRune.Bays` record field →
-  `MinionCap` (or similar — pick one, apply everywhere), `Forge.cs` `chassis.Bays` call sites, comments in
-  `Expedition.cs`/`Race.cs`/`Content/CoreRunes.cs` that say "bay"/"bayed". `Expedition.Bays` property (line
-  ~300, `public int Bays => _caster.BayCap;`) → rename too. Grep `[Bb]ay` across `Roguebane.Core` +
-  `Roguebane.Core.Tests` (CasterFiringTests.cs, MinionTests.cs, CoreRuneRosterTests.cs, RunStartTests.cs) and
-  rename every hit — comments included, per the hygiene rule (WHY comments shouldn't preserve retired
-  vocabulary either).
+- **C# internal names — DONE (2026-07-05 loop):** `Caster.BayCap` → `MinionCap`, `Caster._bays` → `_minions`,
+  `Caster.Summon(Minion, int bayCap)` param → `minionCap`, `CoreRune.Bays` record field → `MinionCap`,
+  `Expedition.Bays` property → `MinionCap`, `Forge.cs`'s `chassis.Bays`/`bayCap:` call sites → `.MinionCap`/
+  `minionCap:`, plus every "bay"/"bayed"/"bay slot" comment across `Caster.cs`, `CoreRune.cs`, `Expedition.cs`,
+  `Forge.cs`, `Minion.cs`, `Race.cs`, `Stash.cs`, `Content/CoreRunes.cs` and the four Core.Tests files
+  (`CasterFiringTests.cs`, `MinionTests.cs` — test method names too, e.g. `BaysCapTheNumberOfMinions` →
+  `MinionCapCapsTheNumberOfMinions` —, `CoreRuneRosterTests.cs`, `RunStartTests.cs`). Also fixed the
+  mechanical fallout in `Game1.ManifestRenderer.cs`: 5 `.Bays` PROPERTY-ACCESS call sites (feeding the
+  `"preview.bays"`/`"minions.slotLabel"`/`"core.bays"`/tuple-`"bays"` binds) now read `.MinionCap` — this is
+  NOT the bind-key literal rename below, just the property read that had to follow the Core-side rename to
+  keep the Game project compiling. 391/391 Core.Tests green, both `Roguebane.Core.Tests` and
+  `Roguebane.Game` build clean. **Judgment call (flagging, not assumed-settled):** the two player-facing
+  `Flavor:` strings in `Content/CoreRunes.cs` (Warden "no bay, fewer actions...", Summoner "Three bays -
+  fights through...") were left UNCHANGED — read as authored content copy, not a C#-internal identifier/
+  comment, so out of this pass's stated scope; Doug's call whether that copy should sync too.
 - **`Game1.ManifestRenderer.cs` / `Game1.cs` bind-key STRING LITERALS (`"bay.hotkey"`, `"bay.state"`,
   `"bay.name"`, `"bay.gateColor"`, `"bay.cost"`, `"bay.description"`, `"bay.amount"`, `"loadout.bays"`,
   `"core.bays"`, `"preview.bays"`) — these must match whatever `layout.json` actually contains, and that

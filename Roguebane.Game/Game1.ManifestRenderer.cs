@@ -549,7 +549,7 @@ public partial class Game1
         "preview.hp" => _build.Race.Hp.ToString(),
         "preview.budget" => _build.CoreRune.RuneBudget.ToString(),
         "preview.techniques" => _build.CoreRune.Kit.Count.ToString(),
-        "preview.bays" => _build.CoreRune.Bays.ToString(),
+        "preview.bays" => _build.CoreRune.MinionCap.ToString(),
         "preview.coreEffectName" => _build.CoreRune.CoreEffectName,
         // *.coreEffect is the BLOCK container (border chrome; label/name/desc are their own
         // elements/parts) — resolving it to the desc painted the copy TWICE (the doubled-text P0).
@@ -570,7 +570,7 @@ public partial class Game1
         "loadout.slotLabel" => "TECHNIQUES - "
             + (InRun ? Exp.Equipment.Count : _build.Equipment.Count) + " / " + _build.CoreRune.Kit.Count + " slotted",
         "minions.slotLabel" => "MINIONS - "
-            + (InRun ? Exp.Minions.Count : _build.CoreRune.MinionKit.Count) + " / " + _build.CoreRune.Bays + " slotted",
+            + (InRun ? Exp.Minions.Count : _build.CoreRune.MinionKit.Count) + " / " + _build.CoreRune.MinionCap + " slotted",
         "core.coreEffectName" => _build.CoreRune.CoreEffectName,
         "core.coreEffectDesc" => _build.CoreRune.CoreEffectDesc,
         // The authored copy is "BUDGET n free / m" (design/02's rune bag readout).
@@ -980,7 +980,7 @@ public partial class Game1
         Roguebane.Core.Minion m when (InRun
             ? Exp.Minions.Contains(m) : _build.CoreRune.MinionKit.Contains(m)) => "equipped",
         Roguebane.Core.Minion => (InRun ? Exp.Minions.Count : _build.CoreRune.MinionKit.Count)
-            >= _build.CoreRune.Bays ? "locked" : "equippable",
+            >= _build.CoreRune.MinionCap ? "locked" : "equippable",
         _ => null,
     };
 
@@ -1043,7 +1043,7 @@ public partial class Game1
         // all live core/build data, no invented figures.
         "core.stats" => new List<object>
         {
-            ("bays", _build.CoreRune.Bays.ToString()),
+            ("bays", _build.CoreRune.MinionCap.ToString()),
             ("actions", _build.CoreRune.Kit.Count.ToString()),
             ("budget", _build.CoreRune.RuneBudget.ToString()),
         },
@@ -1436,7 +1436,7 @@ public partial class Game1
             "core.role" => c.Archetype,
             "core.badge" => c.Badge, // the role chip datum (07-03 drop A1)
             "core.budget" => c.RuneBudget.ToString(),
-            "core.bays" => c.Bays.ToString(),
+            "core.bays" => c.MinionCap.ToString(),
             "core.actionSlots" => c.Kit.Count.ToString(),
             "core.coreEffectName" => c.CoreEffectName,
             "core.coreEffectDesc" => c.CoreEffectDesc, // core.coreEffect = block chrome, resolves to nothing
