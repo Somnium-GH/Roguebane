@@ -250,13 +250,14 @@ public sealed class Caster
         return true;
     }
 
-    public void Dismiss(Minion minion)
+    public bool Dismiss(Minion minion)
     {
         var i = _bays.FindIndex(m => m.Id == minion.Id);
-        if (i < 0) return;
+        if (i < 0) return false;
         _bays.RemoveAt(i); // §6e ORDERING: unslot compacts left (no holes)
         _minionCountdown.Remove(minion.Id);
         if (minion.Gate == MinionGate.Stat) _self.Deactivate(Reservation(minion)); // free the stat
+        return true;
     }
 
     // §6e reorder: drag-and-drop insertion in the bay strip — same model as ReorderTechnique

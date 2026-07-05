@@ -362,6 +362,23 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                 }
             }
         }
+        // MINIONS tab clicks (§6e, same instant-toggle model as GEAR): equipped (bayed) → dismiss;
+        // equippable (owned, free bay) → summon. Pool = chassis kit + rune grants + whatever the
+        // merchant sold into the stash — same list the renderer stamps (ManifestRenderer
+        // "inventory.activeTab.items" case 2). No pre-run toggle: the kit is auto-fielded wholesale
+        // at embark and BuildSession has no minion-picker concept to toggle against.
+        else if (_invTab == 2 && InRun)
+        {
+            var minions = _build.CoreRune.MinionKit.Concat(_build.Runes.GrantedMinions)
+                .Concat(Exp.Stash.Minions).ToList();
+            var cards = ManifestListCells("equipment", "inventory.activeTab.items", minions.Count);
+            for (var i = 0; i < cards.Count && i < minions.Count; i++)
+            {
+                if (!Click(RectOf(cards[i]))) continue;
+                if (Exp.Minions.Contains(minions[i])) Exp.DismissMinion(minions[i]);
+                else Exp.SummonMinion(minions[i]);
+            }
+        }
         var slottedData = InRun ? Exp.Equipment : _build.Equipment;
         var slotted = ManifestListCells("equipment", "loadout", slottedData.Count);
         UpdateBarDrag(slotted, slottedData, ToggleTech);

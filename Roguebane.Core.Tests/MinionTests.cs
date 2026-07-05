@@ -188,4 +188,53 @@ public class MinionTests
         caster.Summon(Minions.Skeleton, bayCap: 3);
         Assert.False(caster.ReorderMinion(Minions.Golem, 0)); // never summoned -> no bay slot to move
     }
+
+    // §6e bay-membership toggle: the MINIONS tab's equip/unequip. The Summoner fields Skeleton+Golem
+    // at embark (2 of its 3 bays), leaving one free for a bought minion to fill.
+    private static Expedition SummonerExpedition()
+    {
+        var chassis = CoreRunes.Summoner;
+        return Forge.Embark(Races.Human, chassis, chassis.NewLoadout(), chassis.Kit,
+            Maps.StandardLeg(autoResolveCastle: false));
+    }
+
+    [Fact]
+    public void SummonMinionMovesAStashedMinionIntoAFreeBay()
+    {
+        var exp = SummonerExpedition();
+        Assert.Equal(2, exp.MinionCount); // Skeleton + Golem from the kit
+        exp.Stash.AddMinion(Minions.Shade); // as if bought from a merchant
+
+        Assert.True(exp.SummonMinion(Minions.Shade));
+        Assert.Contains(Minions.Shade, exp.Minions);
+        Assert.Equal(3, exp.MinionCount);
+    }
+
+    [Fact]
+    public void SummonMinionFailsMidCombat()
+    {
+        var exp = SummonerExpedition();
+        exp.Stash.AddMinion(Minions.Shade);
+        exp.Enter("a2"); // State -> Fighting
+        Assert.False(exp.SummonMinion(Minions.Shade));
+    }
+
+    [Fact]
+    public void DismissMinionFreesTheBayAndLeavesItResummonable()
+    {
+        var exp = SummonerExpedition();
+        Assert.True(exp.DismissMinion(Minions.Golem)); // leaves a bay, not removed from any pool
+        Assert.Equal(1, exp.MinionCount);
+        Assert.DoesNotContain(Minions.Golem, exp.Minions);
+
+        Assert.True(exp.SummonMinion(Minions.Golem)); // kit membership persists -> re-summon works
+        Assert.Equal(2, exp.MinionCount);
+    }
+
+    [Fact]
+    public void DismissMinionFailsForAMinionNotInAnyBay()
+    {
+        var exp = SummonerExpedition();
+        Assert.False(exp.DismissMinion(Minions.Shade)); // never summoned
+    }
 }

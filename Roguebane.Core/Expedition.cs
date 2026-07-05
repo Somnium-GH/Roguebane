@@ -299,6 +299,16 @@ public sealed class Expedition
     public IReadOnlyList<Minion> Minions => _caster.Minions;
     public int Bays => _caster.BayCap;
 
+    // §6e minion-bay membership toggle — the MINIONS tab's equivalent of EquipTechnique/
+    // UnequipTechnique above. A minion's "ownership" pool (chassis kit + rune grants + Stash) never
+    // changes here; this only moves it into/out of a bay, same as equipping never removes a
+    // technique from the Palette. Caster.Summon/Dismiss already do the gate-reservation + Summons-
+    // resource bookkeeping (§9), so these are thin out-of-combat gates over them.
+    public bool SummonMinion(Minion minion) =>
+        State == ExpeditionState.Choosing && _caster.Summon(minion, Bays);
+    public bool DismissMinion(Minion minion) =>
+        State == ExpeditionState.Choosing && _caster.Dismiss(minion);
+
     // Live per-technique state for the action-bar render (cooldown fill + card state).
     public Caster.TechStatus Status(Technique technique) => _caster.StatusOf(technique);
 
