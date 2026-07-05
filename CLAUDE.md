@@ -47,6 +47,12 @@ and does it feel good.
 - Design canon = `design/DESIGN_SPEC.md`; keep it CURRENT — fold a decision in WHEN IT LOCKS. `STATUS.md`
   is build-STATE (target / debt / needs-human / progress) and POINTS to the spec, it doesn't re-specify
   design. A change that alters locked design reconciles DESIGN_SPEC in the same pass.
+- Content/economy canon = `design/systems/*.md` (RACES/CORE_RUNES/TECHNIQUES/WEAPONS/ARMOR/FOES) — these
+  ARE the source of truth for code; don't re-derive their numbers by hand. Doug maintains a balance
+  spreadsheet outside the repo (cost/demand model, not tracked here) that these tables must stay
+  reconciled against whenever he shares an update — that's how the 2026-07-05 Barbarian STR mismatch was
+  caught: hand arithmetic written into CORE_RUNES.md had drifted from Doug's actual model. When he drops
+  a new spreadsheet, reconcile design/systems/*.md against it in the same pass, then it's canon again.
 
 ### Claude Cowork Agents **ONLY**
 Please read the orientation memory in the Roguebane project to ensure you follow all processes properly.

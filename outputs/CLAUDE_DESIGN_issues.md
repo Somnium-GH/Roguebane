@@ -165,6 +165,13 @@ B18. **Technique + minion ICONS — updated after the 07-05 drop (frenzy ✅ + s
     `drain` or new), **Barkskin**, **Stoneskin** (existing icon can stay for the T2), **Sacrifice**,
     **Bind, Parry, Steel, Suture**; minion icons **Iron Golem, Hound**. Icons + mgcb source (we mirror
     game-side). (Rapier / Staff / Charm / Tome weapon sprites are already in B2-GO.)
+    **NEW (Doug, 2026-07-05, prototypal canon): Frenzy AND Flurry are each ONE shared dual-wield
+    technique that gates on either STR or DEX depending on the wielded weapons (not a clone pair) — both
+    need a two-cost icon treatment: the STR reserve cost as a red badge in the top-left corner, the DEX
+    reserve cost as a green badge in the bottom-right corner, same icon either way.** Flurry's icon is
+    still outstanding (build it with the two-badge treatment from the start). Frenzy's icon already
+    shipped (✅ above) as a single-cost icon before this dual-stat call landed — flagging for a revision
+    pass so it gets the same red/green two-badge treatment, not closing this as done until that lands.
 
 B19. **CANON RENAME (2026-07-05, Doug) — "bay(s)" is retired as the minion-slot term; vocabulary is
     "Minions" only, no separate slot noun.** DESIGN_SPEC/CORE_RUNES/SCREENS canon already updated our

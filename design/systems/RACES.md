@@ -27,8 +27,10 @@ formula — numbers flagged placeholder-blessed like the rest; art already shipp
 Effective stat in a core = race base + the core's stat bonus (`CORE_RUNES.md`). A core's **demand** is its
 fully-active reserve per stat. ● = runs the whole kit at once; number = short by (deactivate or rune to fit).
 
-Demands: Grunt STR 5 · CON 2 · Warden CON 10 · Adept INT 10 · Summoner INT 8 · Reaver DEX 9 · Ranger DEX 10 · CON 2 ·
-Barbarian STR 15 · CON 2 (**over-demand by design** — see CORE_RUNES.md's Barbarian note).
+Demands (verified against Doug's balance spreadsheet): Grunt STR 5 · CON 2 · Warden CON 10 · Adept INT 10 ·
+Summoner INT 8 · Reaver DEX 9 · Ranger DEX 10 · CON 2 · Barbarian STR 10 · CON 2 (**Half-Giant is the
+exact fit, zero headroom** — see CORE_RUNES.md's Barbarian note; corrected 2026-07-05, was miscalculated
+as STR 15).
 
 | Core | Human 5/5/5/5 | Elf 4/6/4/4 | Dwarf 4/4/4/6 | Halfling 4/4/6/4 | Half-Giant 6/4/4/4 |
 |---|:--:|:--:|:--:|:--:|:--:|
@@ -38,12 +40,15 @@ Barbarian STR 15 · CON 2 (**over-demand by design** — see CORE_RUNES.md's Bar
 | Summoner | ● +0 | ● +1 | −1 | −1 | −1 |
 | Reaver | ● +1 | ● +0 | ● +0 | ● +2 | ● +0 |
 | Ranger | −1 | −2 | −2 | ● +0 | −2 |
-| Barbarian | −6 | −7 | −7 | −7 | −5 |
+| Barbarian | −1 | −2 | −2 | −2 | ● +0 |
 
 **Read:** Human runs 5 of 6 classic cores full but tight (breadth, no headroom). Each specialist owns its
-lane with room — Elf the INT cores, Dwarf the Warden, Halfling the Ranger, Half-Giant the muscle cores.
-Every classic core has at least one full home; **Barbarian alone clears nowhere** — the Warlord's
-over-packed kit triages via the §6e cascade (identity, not a bug; tune at the balance session).
+lane with room — Elf the INT cores, Dwarf the Warden, Halfling the Ranger. **Half-Giant is Barbarian's
+home** — the one race that clears its full kit, and clears it EXACTLY (zero headroom, the tightest fit in
+the game); every other race falls 1-2 STR short and triages one small item via the §6e cascade.
+(Corrected 2026-07-05 against Doug's balance spreadsheet — this row previously read −6/−7/−7/−7/−5 from a hand-
+math error that overstated Barbarian's STR demand as 15 instead of 10; see CORE_RUNES.md's Barbarian
+note for the full reconciliation.)
 
 ## Open / TBD
 - Current in-code values (Human 3/3/3/3-era placeholders) need updating; **Dwarf, Halfling + Half-Giant are

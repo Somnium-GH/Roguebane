@@ -67,8 +67,9 @@ NON-canon where it disagrees — e.g. mock Claymore "6 dmg/1.4×" vs WEAPONS.md 
    −2%, stacks ×5) · Summoner *Conscription* (fielding spends no Summons; replaces Legion/refund) ·
    Reaver *Finesse* (techniques requiring two weapons reserve −1) · Ranger *Fletcher's Luck* (bow fires
    20% no-Charge off the SEEDED sim RNG; bows equip −1/tier) · Barbarian *Warlord's Might* (2H swords
-   equip −2 STR). Shared rule: on-hit boons need a landed PART-hit — never shield-absorbed, never a
-   broken part. Names/desc strings from CORE_RUNES.md verbatim.
+   equip −3 STR; STR plate equip −1 STR/piece — corrected 2026-07-05 against Doug's balance spreadsheet, was
+   wrongly −2/no-plate-discount). Shared rule: on-hit boons need a landed PART-hit — never shield-absorbed,
+   never a broken part. Names/desc strings from CORE_RUNES.md verbatim.
 5. **Techniques** (`Content/Techniques.cs`): sync to TECHNIQUES.md — base 8.0s anchor model. Renames:
    Drain→**Siphon** (2 dmg/6.0s, r2 INT, lifesteal = heals YOUR attribute damage equal to dealt;
    part-hit rule applies) · old `stoneskin`→**Barkskin** (T1 INT ward, pool 3, +1/3.0s, r1). NEW:
@@ -92,10 +93,10 @@ NON-canon where it disagrees — e.g. mock Claymore "6 dmg/1.4×" vs WEAPONS.md 
 8. **Tests (DoD for A):** every table above asserted (economy math, not assumed); all 35 race×core
    combos embark and win per the established CoreCampaignTests pattern; effect mechanics each get a
    focused test (Resonance stack cap, Conscription zero-spend, Fletcher seeded-RNG band, Fortified
-   CON-payment + Warden clearance CON 10 on Dwarf, JoAT −1 sweep, Finesse reserve). **EXEMPT Barbarian
-   from "activates its whole default kit"** — its STR 15 over-demand is the design (CORE_RUNES.md
-   note); assert instead: barbarian fights and wins with its cascade-sustained subset. Keep the
-   no-CD-content-pinning rule (schema/fixtures only).
+   CON-payment + Warden clearance CON 10 on Dwarf, JoAT −1 sweep, Finesse reserve). **Barbarian needs NO
+   exemption** (corrected 2026-07-05 — real STR demand is 10, not 15): assert Half-Giant+Barbarian
+   activates its FULL default kit; other race+Barbarian pairs (short 1-2 STR) activate the sustainable
+   subset, same as any other tight combo. Keep the no-CD-content-pinning rule (schema/fixtures only).
 (Bay→minion C# rename: DONE last pass, 391/391 — only the bind-key literal half remains, paired to
 CD's B19 landing; the literals list lives in git history + B19 itself. Don't rename literals early.)
 
@@ -103,14 +104,31 @@ CD's B19 landing; the literals list lives in git history + B19 itself. Don't ren
 test-reconciled — every fixture body that activates a weapon-verb now wields a matching weapon (else
 `Caster.Activate`'s consult gate silently no-ops it); 392/392 green. Item 3's FULL CoreRunes.cs rewrite
 is still NOT started — applied only a minimal interim fix (dropped Jab from Reaver's kit; its twin
-daggers are DEX, Jab is STR, same silent-activate-failure). **Needs human before item 3 can be done for
-real (don't guess these):** (a) Reaver's canon kit is Frenzy/Flurry, but those are themselves STR
-pending Armory.cs's own flagged DEX-dual-wield Open/TBD — same bug, different verb, until that's
-decided; (b) Summoner's canon kit includes Sacrifice, which is still an inert placeholder (§ above) —
-assigning it live either breaks CLAUDE.md's placeholder-flagging rule or leaves Summoner with no real
-heal; (c) Adept's canon kit wants Stoneskin T2, which doesn't exist in Techniques.cs yet — build fresh
-or substitute Barkskin, undecided; (d) Barbarian needs the item 8 CoreCampaignTests exemption wired
-before its kit can land.
+daggers are DEX, Jab is STR, same silent-activate-failure). **Needs-human blockers RESOLVED (Doug, 2026-07-05) — item 3 is UNBLOCKED, do it next:**
+(a) **Reaver/dual-wield:** confirmed in code there's no hardcoded "dual-wield = STR" rule — a technique's
+stat gate is just whatever `Stat` it declares (`Body.Consulted` matches wielded-weapon stat against the
+technique's own field). Fix: add plain DEX clones `frenzy_dex`/`flurry_dex` (identical numbers, gated
+DEX) alongside the existing STR versions; Reaver's kit uses the clones. No rework of the STR originals.
+Locked in TECHNIQUES.md + CORE_RUNES.md.
+(b) **Summoner/Sacrifice:** locked as a real mechanic, not a substitute-heal punt. Consuming a fielded
+minion mends your most-damaged part (same targeting as Bandage/Suture) for an amount that SCALES with
+the sacrificed minion's tier; the minion is destroyed permanently (no refund/cooldown). Exact numbers
+are still FLAGGED placeholders (Skeleton/Hound T1 → 4, Iron Golem T2 → 8, unconfirmed) — build the
+mechanic + wire the T1 number now, flag the T2 number same as any placeholder. New engine piece needed:
+"consume a minion" as a technique cost (doesn't exist yet — nothing currently spends a minion).
+(c) **Adept vs Summoner shields:** no actual conflict — Adept uses Stoneskin T2 (already built in
+Techniques.cs, just needs kit-wiring), Summoner uses Barkskin T1. Both already correct in CORE_RUNES.md;
+this was a confirm, not a change.
+(d) **Barbarian STR gap — SUPERSEDED, real bug found 2026-07-05 (later same day):** the "15 vs 10" figure
+this section relied on was itself wrong — a hand-math error in CORE_RUNES.md (Warlord's Might costed as
+−2 STR on the claymore only, plate priced with no discount at all). Doug supplied the actual balance
+model (kept outside the repo, not tracked here; design/systems/*.md is the in-repo canon reconciled
+against it — see CLAUDE.md/DESIGN_SPEC.md
+pointers added this pass) and it computes Barbarian's real demand as **STR 10**: claymore 2 (5−3 Warlord's
+Might) + plate 4 (4×(2−1), Warlord's Might's plate discount) + Cleave 2 + Bind 2 = 10. Half-Giant's
+effective STR is 6+4=10 — an EXACT fit, zero headroom, not an over-demand. **No test exemption needed at
+all** — CORE_RUNES.md, RACES.md, TECHNIQUES.md all corrected; item 8 below updated to match. This replaces
+the earlier "keep the gap, add an exemption" decision outright, not in addition to it.
 
 **Progress (2026-07-05, loop, cont.):** item 7 done — Minions.cs synced to v6 (Skeleton r1/Timer30,
 IronGolem r2/Power3/Timer50 incl. clean `Golem`->`IronGolem` rename id `golem`->`iron_golem`, Hound

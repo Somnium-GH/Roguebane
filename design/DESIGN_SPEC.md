@@ -21,6 +21,13 @@ interface/trade dress. Same systems grammar, our own identity (the retrofantasy 
 emitted manifest — see `design/LAYOUT_CONTRACT.md` (figure part rects/sockets/z, gear pivots, screen
 elements as anchor+offset+size, the shared style block) and `design/SCREENS.md` (per-screen checklist).
 
+**Content/economy numbers are data, not guesswork, either.** `design/systems/*.md` (RACES/CORE_RUNES/
+TECHNIQUES/WEAPONS/ARMOR) hold the operative content tables and ARE canon — don't hand-recompute a kit's
+total demand in prose. Doug keeps a balance spreadsheet outside the repo (cost list + per-core kit sum +
+per-race clearance check) that these tables get reconciled against whenever he shares an update. The
+2026-07-05 pass found CORE_RUNES.md/RACES.md had drifted from that model on Barbarian's STR demand (hand
+math said 15, the real model says 10, Half-Giant fits exactly) — corrected, logged in STATUS.md.
+
 ---
 
 ## 1. Concept [LOCKED]

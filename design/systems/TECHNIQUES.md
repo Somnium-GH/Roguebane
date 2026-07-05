@@ -37,10 +37,26 @@ Shape = (damage × weapon, speed × 8s·timer). Example numbers on Iron Longswor
 | Jab | 0.5 | 0.5 | 1 | quick light strike | 2 / 4.0s = 0.50 | — |
 | Cleave | 1.5 | 1.5 | 2 | heavy arc; big single hit (break-through) | 6 / 12.0s = 0.50 | — |
 | Lunge | 0.75 | 0.6 | 1 | darting thrust; charge-free DEX damage | — | 1 / 2.9s = 0.35 (1 blade) |
-| Frenzy | both blades | 1.0 (avg) | 2 → 1 Finesse | dual-wield; needs two weapons | — | 2 / 4.8s = 0.42 |
-| Flurry | both ×0.5 | 0.5 | 1 → 0 Finesse | fast dual-wield flurry | — | 1 / 2.4s = 0.42 |
+| Frenzy | both blades | 1.0 (avg) | 3 STR OR DEX | dual-wield; needs two weapons | — | 18 / 8s = 0.44 |
+| Flurry | both ×0.5 | 0.5 | 2 STR OR DEX | fast dual-wield flurry | — | 8 / 4s = 0.5 |
 | Shot | bow ×1.0 | 1.0 | 0 · +1 Charge | bypasses shields; dry → holds | bow-gated | — |
-| Aimed Shot | bow ×2.0 | 2.0 | 1 · +1 Charge | slow heavy shot; bypasses shields | bow-gated | — |
+| Aimed Shot | bow ×2.0 | 2.0 | 2 · +1 Charge | slow heavy shot; bypasses shields | bow-gated | — |
+
+**LOCKED 2026-07-05 (Doug):** dual-wield gating was never a hard rule — a technique's stat gate is just
+whatever attribute it declares, resolved generically (`Body.Consulted` matches the wielded-weapon stat
+against the technique's `Stat` field; nothing special-cases "dual-wield"). So Frenzy/Flurry are each a
+single **stat-flexible** technique — same reserve whether paid in **STR or DEX** (split STR/DEX icon),
+resolved by the stat the wielded weapons gate on: heavy weapons → STR, fast weapons → DEX, so the weapon
+requirements self-enforce weapon-appropriate dual-wield. The earlier `frenzy_dex`/`flurry_dex` clone plan is
+RETIRED — one technique, either stat. Engine note: the reserve stat is picked from the consulted weapon (a
+small change vs. a fixed-`Stat` clone). Tier flavor: DEX dual-wield scales into SPEED, STR into DAMAGE.
+
+**Numbers corrected 2026-07-05 against Doug's balance spreadsheet:** Frenzy's raw reserve is 3 (was
+written as 2), Flurry's is 2 (was written as 1) — both net one lower under Reaver's Finesse discount,
+matching the model's Reaver DEX-demand total of 9 (Leather 4 + Daggers 2 + Frenzy 2 + Flurry 1 = 9).
+Aimed Shot's reserve is 2 (was written as 1) — matches the model's Ranger DEX-demand total of 10. These
+are the same totals CORE_RUNES.md's Reaver/Ranger "req" lines already stated correctly; only the
+per-technique breakdown here was stale.
 
 ### Spells (innate INT base + Tome; no weapon)
 
@@ -65,7 +81,7 @@ Shape = (damage × weapon, speed × 8s·timer). Example numbers on Iron Longswor
 |---|---|:--:|---|
 | Bandage | T1 CON | 2 | Mends your most-damaged part 1 / 8.0s. The flat baseline. |
 | Suture | T2 CON | 3 | Mends your most-damaged part 2 / 8.0s. (Warden signature.) |
-| Sacrifice | — | consumes 1 minion | Consume one of your own minions to mend your body. **New mechanic — needs-design.** |
+| Sacrifice | — | consumes 1 minion | Consume one of your own fielded minions to mend your most-damaged body part (same most-damaged-first targeting as Bandage/Suture). Heal amount SCALES with the sacrificed minion's tier. Minion is destroyed permanently — no refund, no cooldown-return. **LOCKED mechanic 2026-07-05 (Doug); exact per-tier numbers below are FLAGGED placeholders pending final confirm.** |
 
 ### Minions (field cost = Summons + reserve gate stat)
 
@@ -76,5 +92,7 @@ Shape = (damage × weapon, speed × 8s·timer). Example numbers on Iron Longswor
 | Hound | T1 DEX | 1 | 1 / 4.0s | A DEX pet; Hound will provide an accuracy bonus when active, 5% as a Tier 1 (+5% per Tier for descendants) |
 
 ## Open / TBD
-- **Sacrifice** (consume-a-minion heal) = new mechanic. **Bow damage** OPEN (§17 #9). Technique / minion tier
-  ladders parked (T1 only). Frenzy / Flurry should gate on DEX for the dagger Reaver (STR in current code).
+- **Sacrifice per-tier heal amounts** — mechanic + scaling rule LOCKED 2026-07-05 (see Heals table); exact
+  numbers still FLAGGED placeholders: Skeleton/Hound (T1) → 4 part-points, Iron Golem (T2) → 8 part-points
+  (2×, unconfirmed — Doug to review). Engine still needs "consume a minion" as a technique cost — doesn't
+  exist yet. **Bow damage** OPEN (§17 #9). Technique / minion tier ladders parked (T1 only).
