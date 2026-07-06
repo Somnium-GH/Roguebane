@@ -87,15 +87,17 @@ regressions on screens this fix never touches like campaignmap/citymap/merchant 
 restored) — confirmed the SAME pre-existing baseline-drift gate failure already logged under Task #2/
 #3 above, not caused by this change. Parked, not blocking.
 
-**2. Only 1 column renders instead of 2 (`invItems` grid).** Two things stacked: (a) the manifest
-authors `"cols": 2` on the `invItems` list item (`layout.json:6449`), but `ListLayout`'s grid flow
-(confirmed earlier this session) computes column count from `region.W / stepX` and never reads the
-authored `cols` hint at all — dead data, same class of bug as the merchant `waresShelves` miss. (b) Even
-if it did, the container is 1px too narrow to fit 2 columns: `invItems.size[0] = 403`, item size `[199,44]`
-gap `6` → 2 columns need `199×2+6 = 404`. Same shape of off-by-one as the earlier `waresShelves` fix.
-Fix both: widen `invItems` to ≥404 (410+ for margin), and make grid flow actually respect an authored
-`cols` when present instead of only back-computing from width (the width-based fallback should stay for
-manifests that don't author `cols`).
+**2. ⇒ RE-DIAGNOSED (2026-07-06, loop) — not an engine bug, re-routed to CD as B22.** Re-checked
+`ListLayout` against the original report: it does NOT ignore the authored `cols:2` hint out of
+neglect — `ListLayoutTests.GridCapacityHonestlyReportsAOnePixelColumnShortfall` (landed in Task #2,
+`99238ed`) is a DELIBERATE pin: `GridCapacity`/`Cells` compute column count from the region's real
+width rather than trusting `cols`, specifically so a card can never render 1px past its container
+edge. That decision is sound and stays. The only real defect is the container itself:
+`invItems.size[0] = 403` is exactly 1px short of the `199×2+6 = 404` two columns need — pure manifest
+geometry, same shape as the earlier `waresShelves` off-by-one, but this time in CD-owned
+`layout.json` (regenerated externally per CLAUDE.md — not ours to hand-patch). Logged as **B22** in
+`outputs/CLAUDE_DESIGN_issues.md` (widen `invItems.size[0]` to ≥404); no engine change needed once it
+lands. Parked on CD, not blocking.
 
 **3. GEAR/TECHNIQUES/MINIONS tab buttons mislabeled/mis-sized/mis-spaced.** The `invTab` template
 (`layout.json:10994`) is a fixed `40×18` box with its label text in a hardcoded `[12,5,16,8]` rect (16px

@@ -333,6 +333,18 @@ B12. **CLOSED 2026-07-04 — delivered + verified clean (744 files, no cross-pro
     mirror game-side), refreshed 00-assets sheets. Our SMOKE FIGURES + asset-exists probes verify
     completeness on landing — an inventory list in the drop notes helps us confirm fast.
 
+B22. **`inventory.invItems` (Equipment/GEAR tab) is 1px too narrow for its own authored `cols:2`.**
+    `layout.json`'s `invItems` list item authors `"flow":"grid","gap":6,"cols":2,"size":[199,44]` but
+    the container itself (`invItems.size = [403,183]`) is exactly 1px short of what 2 columns need
+    (`199*2+6 = 404`). Our `ListLayout.GridCapacity`/`.Cells` deliberately compute column count from
+    the region's actual width rather than trusting the authored `cols` hint (a prior pass chose this
+    on purpose, pinned in `ListLayoutTests.GridCapacityHonestlyReportsAOnePixelColumnShortfall` — we'd
+    rather under-seat by design than silently clip a card past the container edge), so today this
+    renders as a single column, 8 rows/page, which reads as "only 1 column renders" even though the
+    manifest clearly intends 2. Ask: widen `invItems.size[0]` to `≥404` (410+ for a visible margin) —
+    a pure geometry fix, no new binds/states needed. We'll pick up the extra column automatically
+    once the width actually fits (no engine change required on our side).
+
 ## Standing FYIs (for context — not action items)
 - **Tier ladders for the new families** (for card copy / labels): Sling Shepherd's → Braided →
   Sinew → Giantsbane · Staff Wooden → Twisted → Ornate → Humming · Charm Wooden → Bone → Ornate →
