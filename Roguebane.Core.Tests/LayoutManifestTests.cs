@@ -264,6 +264,20 @@ public class LayoutManifestTests
     }
 
     [Fact]
+    public void FullBarStretchElementsExistInEveryScreenThatDeclaresThem()
+    {
+        // Game1.ManifestRenderer's FullBarIds ("statusStrip","footer") hardcodes which element ids
+        // get full-width-stretch treatment on maximize/resize -- a real code dependency on these
+        // literal ids, not incidental CD content. A silent CD rename would drop the stretch behavior
+        // with no red test (the fragility this pins down). Intentionally named ids, unlike the rest
+        // of this file's contract-only assertions -- tripwire for that one dependency, not a general
+        // content pin.
+        var fullBarIds = new[] { "statusStrip", "footer" };
+        var allIds = Real().Screens.Values.SelectMany(s => s.Elements).Select(e => e.Id).ToHashSet();
+        Assert.All(fullBarIds, id => Assert.Contains(id, allIds));
+    }
+
+    [Fact]
     public void PaletteValuesAreHexColors()
     {
         Assert.NotEmpty(Real().Style.Palette);

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """UI regression gate: one command that proves the screens still render and still match.
 
-  python tools/ui_gate.py [--update] [--build-dir DIR]
+  python tools/ui_gate.py [--update] [--build-dir DIR] [--probes]
 
 Pipeline:
   1. dotnet build Roguebane.Game into a scratch dir (a running game locks the default output).
@@ -24,6 +24,10 @@ Pipeline:
 
 --update rewrites the baseline from this run (use after a slice that legitimately improves things).
 Exit 0 = no regression. Nonzero = the printed reasons.
+
+--probes additionally runs tools/probes.py and tools/geometry_diff.py against the same shots this
+run already produced (no extra build/smoke). Their output is REPORT ONLY: printed under a clearly
+labeled banner, never consulted for pass/fail — the exit code is driven by the checks above alone.
 """
 import argparse
 import json
@@ -37,6 +41,11 @@ BASELINE = ROOT / "tools" / "ui_baseline.json"
 DESIGNS = {
     "encounter": "01-encounter", "equipment": "02-equipment", "citymap": "03-citymap",
     "campaignmap": "04-campaignmap", "newgame": "05-newgame", "merchant": "07-merchant",
+}
+# screen id -> its dc.html SOURCE (design/dchtml, read-only) — used only by the --probes report pass.
+SCREEN_DCHTML = {
+    "encounter": "Encounter", "equipment": "Equipment", "citymap": "CityMap",
+    "campaignmap": "CampaignMap", "newgame": "NewGame", "merchant": "Merchant",
 }
 FIDELITY_TOLERANCE = 2.0  # points a score may dip before failing (antialias/scene jitter head-room)
 # Tolerated placeholder zones (Doug 2026-07-03): design/05 v2 stat blocks are NOT adopted — the build
@@ -60,6 +69,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--update", action="store_true", help="rewrite the baseline from this run")
     ap.add_argument("--build-dir", default=str(ROOT / ".ui-gate-build"))
+    ap.add_argument("--probes", action="store_true",
+                     help="also run probes.py/geometry_diff.py (report only, non-gating)")
     args = ap.parse_args()
 
     # P0-A.1 reference contract guard: every design ref must be EXACTLY 960K x 540K (integer K).
@@ -158,6 +169,19 @@ def main():
         fidelity[screen] = float(m.group(1))
         worst = [l.strip() for l in fr.stdout.splitlines() if l.strip().startswith("ELEM ")]
         print(f"  {screen}: {fidelity[screen]:.1f}%" + (f"  worst: {'; '.join(worst[:5])}" if worst else ""))
+
+        if args.probes and rects_json.exists():
+            print(f"-- REPORT ONLY (non-gating): probes.py {screen} --")
+            pr = run([sys.executable, str(ROOT / "tools" / "probes.py"),
+                      str(shot_png), str(rects_json), "--worst", "5"])
+            print(pr.stdout.strip() or pr.stderr.strip())
+            textgeom_json = shot_png.parent / (shot_png.stem + ".textgeom.json")
+            dchtml = ROOT / "design" / "dchtml" / f"{SCREEN_DCHTML[screen]}.dc.html"
+            if textgeom_json.exists() and dchtml.exists():
+                print(f"-- REPORT ONLY (non-gating): geometry_diff.py {screen} --")
+                gr = run([sys.executable, str(ROOT / "tools" / "geometry_diff.py"),
+                          str(dchtml), str(rects_json), str(textgeom_json)])
+                print(gr.stdout.strip() or gr.stderr.strip())
 
     # Scene-backdrop canvas coverage (any RB_SIZE, any drive): pinned ZERO, no baseline ride — a gap
     # means a `*.scene` backdrop stopped short of the current (possibly non-16:9-extended) canvas.

@@ -136,6 +136,74 @@ should sanity-check this signature before the baseline re-pin, in case it IS hid
   dedicated pass: audit all 4 sites, swap to `ActionSlots` where the check is gameplay-gating (not
   just display), headless-test the equip-cap per core.
 
+## ✅ TASK #3 COMPLETE (2026-07-06, loop) — pixel-perfection systemic-cause pass, 412/412
+Five-part directive off the approved plan's Task #3: harden a fragile constant, root-cause two
+FontPx-bypass literals feeding the "~4.4x ink-height mystery," sanity-check the recurring
+`shift=(-3,-3)px` gate signature, wire `probes.py`/`geometry_diff.py` into the gate as report-only, and
+write an aspect-fill design doc only if 2–3 actually surfaced a need for it (they didn't).
+
+1. **`FullBarIds` hardened** (`Game1.ManifestRenderer.cs:52-53`) — new
+   `LayoutManifestTests.FullBarStretchElementsExistInEveryScreenThatDeclaresThem` asserts `statusStrip`/
+   `footer` exist as real elements in every screen that declares them, parsed from the actual on-disk
+   `layout.json` (contract-level, no CD content pinned). 412/412 (411 + 1).
+
+2. **Both FontPx-bypass literals resolved — different verdicts, NOT the same bug:**
+   - `260,263-264` skinned-button-label hardcoded `7.0` → **FIXED**, now `e.FontPx ?? 7.0` (real
+     per-button authored size; `7.0` kept only as the no-data fallback). Before/after gate diff: byte-
+     identical everywhere except campaignmap's `equipmentBtn` fidelity 51.0%→52.2%. Does not clear the
+     pre-existing button-label overflow (a separate box-vs-string-length issue) — not this literal's fault.
+   - `955-959` `core.coreEffect`-binds eyebrow hardcoded `4.5` → **CONFIRMED correct, left as-is.** This
+     branch draws ONLY the flattened "CORE EFFECT" eyebrow label (one string); the template's
+     `coreCard.parts` entry for `binds:"core.coreEffect"` authors `fontPx:8, font:"display"` — CD
+     flattened the wrong style onto it during extraction, exactly what the existing WHY comment claims.
+     The real fix is a CD re-extraction, not an engine change; forcing `pp.FontPx` here would draw the
+     eyebrow at the WRONG (8px display) size instead of the current, correct 4.5px mono.
+   - **The actual collisions — `equipment: coreEffectLabelxcoreEffectName`, `coreEffectNamexcoreEffectDesc`
+     (and NewGame's `previewNamexpreviewRole`, `previewCoreEffectLabelxpreviewCoreEffectName`,
+     `previewCoreEffectNamexpreviewCoreEffectDesc`) — are a MANIFEST LAYOUT overlap, not a font-size bug.**
+     Confirmed unchanged before/after the button fix. Three stacked text elements (label/name/desc) in the
+     coreEffect identity block don't leave enough vertical room for each other at their authored
+     sizes/positions. **This answers the Needs-Doug eyeball call below: P0-manifest-reflow, not a global
+     font bug** — Needs-CD to re-space `coreEffectLabel`/`coreEffectName`/`coreEffectDesc` (and the
+     NewGame preview mirrors).
+   - Incidental, NOT part of either literal: the new `--probes` pass (item 4) flagged `coreEffectDesc`
+     (equipment) at 3.20x "oversized" ink-height (drawn 16.0px / authored 5.0px) and
+     `previewCoreEffectDesc` (newgame) at 1.50x (9.0px/6.0px). Checked `layout.json`: `coreEffectDesc` is
+     `size:[124,16]` at `fontPx:5` mono holding a full sentence ("Every attribute cost you pay is reduced
+     by 1.") — too wide for one line at that box width, wraps ~2 lines; 2 lines x ~8px design line-height
+     = 16px ink height / 5px single-line authored fontPx = 3.2x, an exact match. **Very likely
+     `probes.py` measuring a multi-line wrapped block's total ink height against a single-line-implied
+     fontPx expectation, not a rendering defect** — the tool has no concept of wrapping. Caveat only, NOT
+     logged as a bug; `previewCoreEffectDesc`'s smaller 1.5x (wider 198px box, little/no wrap) doesn't fit
+     the same math and is left as an open, non-blocking curiosity — not chased further, out of this
+     directive's scope.
+
+3. **`shift=(-3,-3)px` signature: a tooling tie-break artifact, not a renderer bug.** Traced 3 simple
+   screen-anchored elements (`suppliesTitle`, `castlePanelTitle`, `partLineChest`) by hand: anchor+offset
+   -> `ScreenLayout.Resolve` output -> gate measurement vs reference PNG — all exact per-pixel matches at
+   their resolved position. Root cause is `fidelity_diff.py`'s alignment search: it tries `dx=-3,dy=-3`
+   FIRST and only updates `best` on strict `>`, so any element that scores `0.0` at every one of the 49
+   candidate shifts (content mismatch, not offset) spuriously reports `shift=(-3,-3)` by tie-break — not
+   because anything is actually offset. Confirmed: every recurring `(-3,-3)` entry in the gate's
+   worst-lists (`autoAttackBtn`, `foeAimTags`, `heroShieldPips`, `heroShieldRegenFill`,
+   `partLineChest/Head/Legs`, `runeBagTitle`, `runeBudgetFill`, ...) sits at 0.0% fidelity — exactly the
+   class this artifact produces. Combined with stale v6-era reference PNGs (content changed under every
+   screen per the Task #2 note above), this fully explains the pattern. **No engine offset bug. Do not
+   chase this further; `tools/ui_baseline.json` was NOT touched.**
+
+4. **`--probes` wired into `tools/ui_gate.py` (report-only, non-gating).** New optional flag runs
+   `probes.py` + `geometry_diff.py` against the SAME shots/sidecars the gate run already produced (zero
+   extra builds/smokes) and prints them under `-- REPORT ONLY (non-gating): ... --` banners inline per
+   screen. Neither script's output touches `failures` or the exit code — verified by a live
+   `python tools/ui_gate.py --probes` run: exit code identical (1, the same pre-existing baseline-drift
+   failures logged under Task #2 above, unrelated to this wiring) with vs without `--probes`.
+
+5. **Aspect-fill/stretch design doc: explicitly SKIPPED.** Neither #2 nor #3 surfaced a concrete
+   aspect-fill gap — #2's issue is manifest spacing (Needs-CD), #3 is a diffing-tool artifact. Nothing to
+   design yet; not writing a speculative doc.
+
+Build/tests green at commit time: `dotnet build` clean, `dotnet test Roguebane.Core.Tests` 412/412.
+
 ## 📐 RULES REFERENCE (2026-07-05, Cowork — STANDING; consult on ANY design conflict/ambiguity)
 The core/race/effect/kit/number design changed a lot this week. On any conflict or ambiguity about races,
 cores, Core Effects, stat bonuses, default kits, technique/gear reserves, or the reservation model,
@@ -319,10 +387,11 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
 - **Review the flagged placeholders from tonight:** new-race HP (22/16/24) + tags/blurbs; per-core
   accent hexes; Sacrifice's heal amount (4 part-points); RuneDiscount retiring to 0; FOES.md T1/T2
   numbers + foe effects (prototypes for your review — they ARE being built per CHUNK D).
-- **Baseline re-pin eyeball** (after A+C): one approved `--update`; also triage the ink-box
-  overflow/collide lists then (the ~4.4x ink-height mystery on `previewCoreEffect*` rides it —
-  Equipment shows the same three-collision shape, so it's one shared mechanism; eyeball decides
-  P0-global-font-bug vs tooling-only).
+- **Baseline re-pin eyeball** (after A+C): one approved `--update`. The ink-box overflow/collide
+  triage this bullet used to defer is DONE (see the TASK #3 banner above) — verdict is
+  **P0-manifest-reflow, not a font bug**: `coreEffectLabel`/`coreEffectName`/`coreEffectDesc` (Equipment
+  + the NewGame preview mirror) physically don't fit their authored vertical space. Needs-CD to re-space
+  the coreEffect identity block; the `--update` eyeball itself still just waits on A+C.
 - Standing design calls parked earlier: per-encounter re-arm scope for techniques + the free minion
   re-enable primitive (§8/§9 FTL-parity lock's second half); mid-run rune-bag Climb → Body reapply
   path (§11/§12); worn-armor DRAW composition (§17 #15) — B2-GO themed-half draw waits on it; Shade

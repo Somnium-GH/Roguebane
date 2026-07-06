@@ -256,12 +256,16 @@ public partial class Game1
                 {
                     // Skinned-button labels are authored centered, mono-bold, ground-dark in the
                     // dc.html source (the extraction flattens the inner spans and mis-attributes
-                    // display/ink — logged Needs-CD). Draw per the source.
-                    var bsz = MeasureText(_assets.Mono, txt!) * (float)(7.0 / MonoDesignPx);
+                    // display/ink — logged Needs-CD). Draw per the source, but at THIS button's own
+                    // authored fontPx (was hardcoded to 7.0 — autoAttackBtn's value only; every other
+                    // skinned button's real fontPx differs (retreatBtn/closeBtn/leaveBtn 6, equipmentBtn
+                    // 6.5, beginBtn 7.5), which measurably overflowed the label past the button rect).
+                    var btnPx = e.FontPx ?? 7.0;
+                    var bsz = MeasureText(_assets.Mono, txt!) * (float)(btnPx / MonoDesignPx);
                     var slx = (int)(r.X + r.Width / 2 - bsz.X / 2);
                     var sly = (int)(r.Y + r.Height / 2 - bsz.Y / 2);
-                    RecordTextBox(InkBox(_assets.Mono, txt!, slx, sly, 7.0), r, txt!, _assets.Mono);
-                    TextPx(_assets.Mono, txt!, slx, sly, _ui.Color("ground", Color.Black), 7.0);
+                    RecordTextBox(InkBox(_assets.Mono, txt!, slx, sly, btnPx), r, txt!, _assets.Mono);
+                    TextPx(_assets.Mono, txt!, slx, sly, _ui.Color("ground", Color.Black), btnPx);
                     break;
                 }
                 if (!string.IsNullOrEmpty(txt))
