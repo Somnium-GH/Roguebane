@@ -13,3 +13,4 @@ date,task,minutes,lines_changed,estimate_minutes,method
 2026-07-06,bug6-weapon-badge-discounted-reserve,25,42,-,commit-delta
 2026-07-06,status-stale-parent-resolution-bullet-cleanup,10,22,-,commit-delta
 2026-07-06,bug7-kitcount-vs-actionslots-4-sites,40,36,-,commit-delta
+2026-07-06,equip-time-gate-cumulative-reservation,50,119,-,commit-delta
