@@ -1,5 +1,26 @@
 # Status
 
+## ✅ CHUNK B item 1 DONE (2026-07-06, loop) — game-side mgcb mirrored, 1846 new entries, build green
+`Roguebane.Game/Content/Content.mgcb` (the copy builds actually read) had ZERO of the new v6 race/core
+body-figure, worn-set, and icon entries that `Roguebane.Content/Content.mgcb` (CD source) already had —
+confirmed via grep: 0 vs 930 matches for `dwarf_|halfling_|half_giant_|human_barbarian|elf_barbarian`.
+**Fix:** wrote a one-off mirror script (diffed every CD-source `#begin` block against the game-side file
+by asset key, transformed each missing block's `/build:<path>` line to the established game-side
+convention — `/build:../../Roguebane.Content/<path>;<output-name-without-extension>`, `#begin` name
+stripped of its file extension to match game-side convention) and appended all 1846 missing blocks.
+**Caught before commit:** the naive diff also picked up `#begin gear_catalog.json`/`#begin layout.json`
+(CD-only `/copy:` directives, not `/build:` — my transform only rewrote `/build:` lines, so these two
+would've copied through with an unrewritten relative path that doesn't exist on the game side).
+`gear_catalog.json` is a CD-tooling-only artifact (grepped: zero references in `Roguebane.Game` code);
+`layout.json` already has its own working mechanism (`Roguebane.Game.csproj`'s `None Include="..\
+Roguebane.Content\layout.json" Link="Content\layout.json"` + `CopyToOutputDirectory`). Both blocks were
+out of CHUNK B's stated scope (body dirs/worn sets/icons only) and were stripped before commit.
+**Verification:** `dotnet build Roguebane.Game -o <scratch> --no-incremental` → 0 errors, 0 warnings —
+all 1846 new textures compile to xnbs. Directive slashes double-checked against the 57cc8a6 precedent
+(`/importer:`/`/processor:`/`/build:` — forward-slash, matches existing game-side entries exactly).
+Core.Tests untouched by this change (asset-only): still 424/424 green.
+CHUNK B items 2-4 (drop guards, `RB_SMOKE=1 RB_MF=all` figure/asset verification, final DoD) remain open.
+
 ## ✅ FIXED (2026-07-06, loop) — equip-time over-reservation gap: gear now refused cumulatively, not degraded after the fact
 Root cause was `Body.Wield`/`Body.EquipRanged`/`Body.Equip` each gating only on `Capacity(stat) <
 item's own Reserve` — raw capacity, never against what OTHER currently-equipped gear already
@@ -592,10 +613,8 @@ the Reaver/Sacrifice/Barbarian Needs-Human resolutions, and the RuneDiscount/Sto
 crumbs landed along the way.
 
 ### CHUNK B — ASSET WIRING (mechanical; do right after A or interleave freely)
-1. Mirror every new CD-source mgcb entry into `Roguebane.Game/Content/Content.mgcb` (the copy builds
-   read) with the established path/output transform — new body dirs (all `dwarf_*`, `halfling_*`,
-   `half_giant_*` + `human_barbarian`, `elf_barbarian`), all new worn sets/themed subdirs, new icons.
-   Verify `/directive:` slashes (the 57cc8a6 lesson). `dotnet build` must produce the xnbs.
+1. ✅ DONE (2026-07-06, loop) — mirrored every new CD-source mgcb entry into `Roguebane.Game/Content/
+   Content.mgcb` (the copy builds read); 1846 blocks, build green. See the FIXED banner at top of file.
 2. Run the drop guards this same pass: layout.json parse + `drop_audit.py` + the manifest→previous
    key-set diff (screens/templates lost = repair verbatim + flag CD).
 3. `RB_SMOKE=1 RB_MF=all` + `SMOKE FIGURES`/`SMOKE ASSETS`: every figure × z-part × state resolves for
