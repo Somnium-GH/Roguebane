@@ -46,4 +46,24 @@ public static class ListLayout
         }
         return cells;
     }
+
+    // How many grid cells actually FIT the region (cols * rows), for callers that need to page a grid
+    // list to what's visible (Cells itself never clips grid overflow — see GridWrapsLeftToRightThen-
+    // TopToBottom — so a pager derives its page size from this instead of a hand-picked constant).
+    public static int GridCapacity(LayoutRect region, Item item, int[]? fallbackSize = null)
+    {
+        if (item.Pad.Length == 4)
+            region = new LayoutRect(region.X + item.Pad[3], region.Y + item.Pad[0],
+                Math.Max(0, region.W - item.Pad[1] - item.Pad[3]),
+                Math.Max(0, region.H - item.Pad[0] - item.Pad[2]));
+        var size = item.Size.Length >= 2 ? item.Size : fallbackSize ?? item.Size;
+        var w = size.Length > 0 ? size[0] : 0;
+        var h = size.Length > 1 ? size[1] : 0;
+
+        var stepX = w + item.Gap;
+        var stepY = h + item.Gap;
+        var cols = Math.Max(1, stepX > 0 ? (region.W + item.Gap) / stepX : 1);
+        var rows = Math.Max(1, stepY > 0 ? (region.H + item.Gap) / stepY : 1);
+        return cols * rows;
+    }
 }

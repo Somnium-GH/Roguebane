@@ -93,4 +93,23 @@ public class ListLayoutTests
         Assert.Equal(4 + 108, cells[1].X);                     // 2 columns fit the 212px padded width
         Assert.Equal(new LayoutRect(4, 2 + 12, 104, 8), cells[2]); // wraps to row 2
     }
+
+    [Fact]
+    public void GridCapacityMultipliesColsByRowsForNewGamesCoreGrid()
+    {
+        // NewGame's coreCards region/item exactly (layout.json corePanel.coreCards): 3 cols x 1 row
+        // fit -> a pager sized off this seats 3 cores/page, matching CD's own NewGame.dc.html PER=3.
+        var item = new Item { Template = "coreCard", Flow = "grid", Gap = 10, Size = new[] { 152, 395 } };
+        Assert.Equal(3, ListLayout.GridCapacity(new LayoutRect(0, 0, 476, 404), item));
+    }
+
+    [Fact]
+    public void GridCapacityHonestlyReportsAOnePixelColumnShortfall()
+    {
+        // Equipment's invItems region/item exactly (layout.json inventory.invItems): the authored
+        // "cols":2 hint doesn't quite fit (2*199+6 = 404 > 403) -- GridCapacity derives what actually
+        // fits (1 col) rather than trusting the inert hint, so a pager sized off it never over-seats.
+        var item = new Item { Template = "invCard", Flow = "grid", Gap = 6, Size = new[] { 199, 44 } };
+        Assert.Equal(3, ListLayout.GridCapacity(new LayoutRect(0, 0, 403, 183), item)); // 1 col x 3 rows
+    }
 }

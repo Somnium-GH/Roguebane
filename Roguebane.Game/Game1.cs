@@ -115,6 +115,10 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         // (humanoid + robed) can be RB_SMOKE-verified, not just the default.
         if (_smoke && int.TryParse(Environment.GetEnvironmentVariable("RB_CHASSIS"), out var ci))
             _build.CycleCoreRune(ci - _build.CoreRuneIndex);
+        // Smoke: RB_ITAB=<0|1|2> pins the Equipment screen's inventory tab, so GEAR/TECHNIQUES/MINIONS
+        // pagination can each be shot without a real click (mirrors RB_CHASSIS's role for the core picker).
+        if (_smoke && int.TryParse(Environment.GetEnvironmentVariable("RB_ITAB"), out var it))
+            _invTab = it;
 
         _mfScreen = Environment.GetEnvironmentVariable("RB_MF"); // dev: render this screen from the manifest
 
@@ -259,9 +263,15 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     {
         if (Pressed(keys, Keys.Left)) _build.CycleCoreRune(-1);
         if (Pressed(keys, Keys.Right)) _build.CycleCoreRune(1);
-        var cores = ManifestListCells("newgame", "cores", _build.Roster.Count);
+        var coreSkip = CorePager.Skip(_build.Roster.Count);
+        var corePageCount = Math.Min(CorePageSize, _build.Roster.Count - coreSkip);
+        var cores = ManifestListCells("newgame", "cores", corePageCount);
         for (var i = 0; i < cores.Count; i++)
-            if (Click(RectOf(cores[i]))) _build.CycleCoreRune(i - _build.CoreRuneIndex);
+            if (Click(RectOf(cores[i]))) _build.CycleCoreRune(coreSkip + i - _build.CoreRuneIndex);
+        if (ManifestElementRect("newgame", "cores.pagePrev") is { } cpv && Click(cpv))
+            CorePager.Prev(_build.Roster.Count);
+        if (ManifestElementRect("newgame", "cores.pageNext") is { } cnx && Click(cnx))
+            CorePager.Next(_build.Roster.Count);
 
         // Race axis: Tab cycles, or click a card. Attrs/HP + the composed figure follow the choice.
         if (Pressed(keys, Keys.Tab)) _build.CycleRace(1);
@@ -302,6 +312,21 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         return s is null || e is null ? null : _ui.Rect(s, e);
     }
 
+    // How many grid cells the manifest's list region actually fits, for sizing a Pager to real
+    // geometry instead of a hand-picked constant (self-heals if a CD drop ever resizes the region).
+    // Falls back to "no real paging" (one page holds everything) if the bind/template can't resolve.
+    private const int NoPagingCap = 999;
+    private int ManifestGridCapacity(string screenId, string binds)
+    {
+        var s = _ui.ScreenDef(screenId);
+        var m = _ui.Manifest;
+        var e = s?.Elements.FirstOrDefault(x => x.Binds == binds && x.Item is not null);
+        if (s is null || m is null || e is null || !m.Templates.TryGetValue(e.Item!.Template, out var tmpl))
+            return NoPagingCap;
+        var r = _ui.Rect(s, e);
+        return ListLayout.GridCapacity(new LayoutRect(r.X, r.Y, r.Width, r.Height), e.Item, tmpl.Size);
+    }
+
     // Equipment is the BETWEEN-FIGHTS loadout for the CURRENT core (design/02) — no core switching
     // here; that choice lives on NewGame. Reached in-run (E / EQUIPMENT buttons); BACK/Esc returns to
     // the caller (2026-07-02: this full screen replaced the loadout popover). Geometry by binds.
@@ -333,6 +358,14 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         for (var i = 0; i < tabs.Count; i++)
             if (Click(RectOf(tabs[i]))) _invTab = i;
 
+        if (InventoryTabItems() is { } invFullForPager)
+        {
+            if (ManifestElementRect("equipment", "inventory.activeTab.pagePrev") is { } ipv && Click(ipv))
+                InvPager.Prev(invFullForPager.Count);
+            if (ManifestElementRect("equipment", "inventory.activeTab.pageNext") is { } inx && Click(inx))
+                InvPager.Next(invFullForPager.Count);
+        }
+
         // TECHNIQUES tab: the pool feeds UpdateBarDrag below as the drag SOURCE — a plain click
         // slots/unslots (toggle), a drag onto the action bar equips at the drop's insertion point.
         // §12: in-run the pool is the build palette PLUS whatever the merchant sold into the stash —
@@ -341,7 +374,8 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         System.Collections.Generic.IReadOnlyList<LayoutRect> techPaletteSlots = Array.Empty<LayoutRect>();
         if (_invTab == 1)
         {
-            techPalette = InRun ? _build.Palette.Concat(Exp.Stash.Techniques).ToList() : _build.Palette;
+            var techFull = InRun ? _build.Palette.Concat(Exp.Stash.Techniques).ToList() : _build.Palette;
+            techPalette = techFull.Skip(InvPager.Skip(techFull.Count)).Take(InvPageSize).ToList();
             techPaletteSlots = ManifestListCells("equipment", "inventory.activeTab.items", techPalette.Count);
         }
         // GEAR tab clicks (§6e, out-of-combat by Expedition's own gate): equipped → unequip;
@@ -350,7 +384,8 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         // LOCKED cards are inert because the Body's own wield gate rejects the equip.
         else if (_invTab == 0 && InRun)
         {
-            var gear = GearTabItems();
+            var gearFull = GearTabItems();
+            var gear = gearFull.Skip(InvPager.Skip(gearFull.Count)).Take(InvPageSize).ToList();
             var cards = ManifestListCells("equipment", "inventory.activeTab.items", gear.Count);
             for (var i = 0; i < cards.Count && i < gear.Count; i++)
             {
@@ -381,8 +416,9 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         System.Collections.Generic.IReadOnlyList<LayoutRect> minionPaletteSlots = Array.Empty<LayoutRect>();
         if (_invTab == 2 && InRun)
         {
-            minionPalette = _build.CoreRune.MinionKit.Concat(_build.Runes.GrantedMinions)
+            var minionFull = _build.CoreRune.MinionKit.Concat(_build.Runes.GrantedMinions)
                 .Concat(Exp.Stash.Minions).ToList();
+            minionPalette = minionFull.Skip(InvPager.Skip(minionFull.Count)).Take(InvPageSize).ToList();
             minionPaletteSlots = ManifestListCells("equipment", "inventory.activeTab.items", minionPalette.Count);
         }
         void ToggleMinion(Roguebane.Core.Minion m)
@@ -511,9 +547,9 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             // The wares shelves: page with the footer buttons, buy a card straight off a shelf
             // (weapons/armor land in the stash; the other categories aren't buyable yet).
             if (ManifestElementRect("merchant", "merchant.stock.pagePrev") is { } pv && Click(pv))
-                _merchantPage = Math.Max(0, _merchantPage - 1);
+                _merchantPager.Prev(MerchantSections().Count);
             if (ManifestElementRect("merchant", "merchant.stock.pageNext") is { } nx && Click(nx))
-                _merchantPage = Math.Min(MerchantPageCount() - 1, _merchantPage + 1);
+                _merchantPager.Next(MerchantSections().Count);
             foreach (var (item, rect) in WareRects())
                 if (Click(rect))
                 {
@@ -798,6 +834,15 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     protected override void Draw(GameTime gameTime)
     {
         EnsureSceneMatchesBackbuffer();
+        // Smoke: RB_PAGE=<n> advances the screen's pager n pages before the shot, so a short last
+        // page / exactly-full page can be verified without a real click (CorePager/InvPager pick
+        // whichever pager applies to the current tab/screen; advancing the other is a harmless no-op).
+        if (_smoke && _frames == 0 && int.TryParse(Environment.GetEnvironmentVariable("RB_PAGE"), out var pg))
+            for (var p = 0; p < pg; p++)
+            {
+                CorePager.Next(_build.Roster.Count);
+                InvPager.Next(InventoryTabItems()?.Count ?? 0);
+            }
         // 2026-07-02 P0 guard: RB_MF=all smokes EVERY manifest screen with a paint-coverage check.
         if (_smoke && _mfScreen == "all") { SmokeAllScreensAndExit(); return; }
         // The world always paints at the fixed design resolution into the scene target...

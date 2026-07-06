@@ -1,5 +1,75 @@
 # Status
 
+## ‼ HIGH PRIORITY (2026-07-05, Doug) — Equipment/Inventory screen: 4 distinct root-caused bugs + 1 known item
+Doug's live report bundled several symptoms under "Inventory." Read the actual code for each — these are
+FOUR separate, independently-confirmed bugs, not one:
+
+**1. GEAR tab clicks resolve to the wrong item after every equip/unequip (the "clicking the same spot
+keeps toggling something else" / "clicked first repeatedly unequipped everything, clicked last on the
+last page equipped everything" reports) — HIGH PRIORITY, this can strip a player's whole loadout by
+accident.** Root cause: `GearTabItems()` (`Game1.ManifestRenderer.cs:1005`) builds the GEAR tab's list by
+CONCATENATING the currently-equipped items pulled live off the body (`Body.Hands`, `.Ranged`,
+`.ArmorOn(stat)`) with the currently-unequipped pool (`Exp.Stash.Weapons`/`.Armor`). Equipping/unequipping
+doesn't just flip a state badge on a stable card — it physically MOVES the item between these two
+source collections, so the concatenated list's membership and ORDER change after every single click.
+Game1.cs's GEAR click loop (`UpdateEquipment`, ~line 386) maps click index `i` straight to `gear[i]`
+computed FRESH that frame — so a click on a fixed screen slot resolves to whatever item the reshuffled
+list put there THIS frame, not the item the player was looking at. Repeatedly clicking one screen
+position drains/fills the list front-to-back exactly as described. **Contrast: TECHNIQUES and MINIONS
+tabs do NOT have this bug** — their palettes (`_build.Palette`+`Stash.Techniques`;
+`MinionKit+GrantedMinions+Stash.Minions`) are STABLE lists separate from the equipped/fielded state
+(`Exp.Equipment`/`Exp.Minions`), so toggling never reorders them. **Fix: make GEAR's list the same
+shape — a single stable owned-item roster (all owned weapons+armor, equipped or not, in a fixed order
+keyed by identity/acquisition, not by which collection currently holds it), with EQUIPPED/EQUIPPABLE/
+DISABLED/LOCKED computed as a per-item property at render/click time.** This also happens to be what
+DESIGN_SPEC §6e already locks ("ONE state family... items don't move, the state badge changes") — GEAR
+is the one tab not following its own spec.
+
+**2. Only 1 column renders instead of 2 (`invItems` grid).** Two things stacked: (a) the manifest
+authors `"cols": 2` on the `invItems` list item (`layout.json:6449`), but `ListLayout`'s grid flow
+(confirmed earlier this session) computes column count from `region.W / stepX` and never reads the
+authored `cols` hint at all — dead data, same class of bug as the merchant `waresShelves` miss. (b) Even
+if it did, the container is 1px too narrow to fit 2 columns: `invItems.size[0] = 403`, item size `[199,44]`
+gap `6` → 2 columns need `199×2+6 = 404`. Same shape of off-by-one as the earlier `waresShelves` fix.
+Fix both: widen `invItems` to ≥404 (410+ for margin), and make grid flow actually respect an authored
+`cols` when present instead of only back-computing from width (the width-based fallback should stay for
+manifests that don't author `cols`).
+
+**3. GEAR/TECHNIQUES/MINIONS tab buttons mislabeled/mis-sized/mis-spaced.** The `invTab` template
+(`layout.json:10994`) is a fixed `40×18` box with its label text in a hardcoded `[12,5,16,8]` rect (16px
+wide) — sized and positioned around the 4-character word "GEAR" specifically (matches the template's own
+`sample: "GEAR"`), never adjusted for "TECHNIQUES" (10 chars) or "MINIONS" (7 chars), which will clip or
+run outside the 40px button at the same font size. Separately, the 3 tabs (3×40 + 2×4 gap = 128px) sit in
+a 419px-wide `invTabs` container (`layout.json:6394`) with no stretch/distribute rule, leaving ~290px of
+dead space — reads as "not properly spaced." Fix: either widen the template box (and re-check text-rect
+centering) or shrink the font per label length; distribute/stretch the 3 tabs across the container's real
+width instead of left-packing them.
+
+**4. Equipment reservation is visually present but easy to miss — not fully absent.** `attrBar`
+(`layout.json:10901`, bound to `"attrs"` on the Equipment screen, `layout.json:6321`) DOES read live
+`Body.Available`/`Body.Capacity` data and DOES render a pip strip (`attrs.cells`/`attrPip`) — but the pip
+fill logic (`Game1.ManifestRenderer.cs:901-905`) only encodes TWO states: pip index `< Available` renders
+colored/filled (free), everything else (both genuinely RESERVED capacity and any capacity lost to damage)
+renders as the same plain `"slot"` token. DESIGN_SPEC's own "ATTRIBUTE-POOL PIP WIDGET" calls for THREE
+distinguishable states (free/reserved/damaged) — today reserved and damaged are visually identical to
+each other and to generic "unfilled," so equipping something that eats STR doesn't visibly change
+anything distinct from how the bar already looked. Separate, smaller mislabel found alongside this:
+the numeric readout binds `attrs.alloc` → `Item3` (which is actually `Available`, the FREE count) and
+`attrs.available` → `Item4` (which is actually `Capacity`, the TOTAL) — the bind names are swapped from
+what they actually carry (`Game1.ManifestRenderer.cs:1505-1508`); harmless today only because the template
+doesn't literally print the word "alloc"/"available" next to them, but worth fixing before anyone reads
+those bind names as documentation. Fix: give `PoolCells`/the pip-fill switch a real 3-way state (add a
+`Reserved(stat)` tier between free and damaged — `Body.Reserved(stat)` already exists and is currently
+NEVER called anywhere in `Roguebane.Game`, confirmed by grep), and swap the `alloc`/`available` bind names
+to match what they actually hold.
+
+**5. Paper-doll missing sprites (NewGame heads + "almost every other paper doll") — ALREADY TRACKED, not
+a new bug.** This is CHUNK B item 1 below: the last CD drop updated `Roguebane.Content/Content.mgcb` but
+the GAME-side `Roguebane.Game/Content/Content.mgcb` (the one the build actually reads/compiles) still has
+ZERO of the new entries, so none of the new race/core figure art exists in the compiled content regardless
+of what's on disk. Doug's report is a live confirmation this is real and visible now, not new information —
+CHUNK B is already next in the work queue; no separate re-diagnosis needed.
+
 ## ✅ CHUNK A COMPLETE (2026-07-05, loop) — v6 race/core overhaul landed as ONE coupled slice, 405/405
 Items 1–8 all done together (proven coupled — see the cont.#2 finding below): `Content/Races.cs` v6
 (Human/Elf/Dwarf/Halfling/Half-Giant), `Content/CoreRunes.cs` full 7-core rewrite (budgets/actions/
@@ -20,6 +90,51 @@ baseline + 10 new).
 Reserve` → 4/tier1, 8/tier2) is implemented and tested but the numbers/formula shape are unconfirmed
 per RULES_SNAPSHOT.md's OPEN item — do not treat as final until Doug reviews.
 **Next target: CHUNK B/C (Task #2 — UI paging, NewGame roster + Inventory screen).**
+
+## ✅ TASK #2 COMPLETE (2026-07-06, loop) — UI paging (NewGame 7-core roster + Inventory), 3 bind-gap bugs fixed
+`Pager`/`ListLayout.GridCapacity` (Core, headless-tested: `PagerTests`, `ListLayoutTests`) wired to
+both the NewGame `corePager` and Equipment `invPager` manifest clusters — CHUNK C item 1 (roster
+paging) is satisfied by this same work. Verified live: NewGame 7 cores page correctly; Equipment
+GEAR tab pages 8 items / 3 pages (p2/p3 screenshotted, item data correct incl. seeded duplicate-
+armor edge case); TECHNIQUES tab pages correctly; MINIONS tab's 0-item empty state renders clean
+("PAGE 1/1", no crash) — both edge states (empty + full multi-page) driven per the plan.
+**3 real pre-existing bind bugs found+fixed while verifying** (same bug class each time: an
+unhandled key in `ResolveBind`'s per-type `switch`, `Game1.ManifestRenderer.cs`, silently fell back
+to the manifest's static SAMPLE text instead of the real datum):
+1. `CoreRune` kit display (`core.kitWeapon`/`core.kitArmor`) — overflow, needed a real formatter.
+2. `Weapon`/`Armor` `invItems.effect` — every gear card showed the same placeholder stat line.
+3. `Technique` `invItems.effect` — every technique card showed the same placeholder stat line
+   (`"technique.description" or "invItems.effect" => t.DescText,` — reuses the existing populated
+   field, no new derivation).
+All 3 fixes verified via rebuild + RB_SMOKE screenshots showing distinct, correct per-item text.
+Uncommitted in the working tree pending this STATUS write, landing as one commit next.
+
+**`python tools/ui_gate.py` is currently RED across every screen — confirmed PRE-EXISTING, NOT
+caused by this work.** Isolated via `git stash` (removes these 3 fixes) → rebuild → re-run gate →
+near-identical failure at HEAD (equipment 69.8% vs this branch's 70.7%, newgame 75.9% vs 76.2% —
+this work's real text is marginally BETTER than the placeholder baseline it's compared against,
+never worse) → `git stash pop` restored. This matches what CHUNK C item 4 (above) already predicted
+in writing: *"content changed under every screen, the old [gate] numbers are noise now... the
+long-pending baseline re-pin happens ONCE with Doug's eyeball... after A+C land."* Task #1 (v6
+races/cores) landed since the baseline was last pinned (`tools/ui_baseline.json` git history: last
+touched by 2249948/8512334/c3d2c1f/cf81242/01de711, all pre-v6) — this IS that predicted noise, not
+a new regression. Per the M0 rule, NOT bending the ruler: no `--update` without a STATUS-logged
+Doug approval, which per CHUNK C's own plan waits for the roster/pixel-lane work below to finish
+first. Numbers for the record (this branch, with the 3 fixes): encounter 77.5%, equipment 70.7%,
+citymap 86.6%, campaignmap 94.5%, newgame 76.2%, merchant 82.9%; recurring `shift=(-3,-3)px` on
+many unrelated elements across encounter/equipment/citymap/newgame is consistent with stale-ref
+noise (old design PNGs captured before v6 content), not yet root-caused as a renderer bug — Task #3
+should sanity-check this signature before the baseline re-pin, in case it IS hiding a real offset.
+**Flagged, not yet logged as Debt until now — 2 more open items surfaced this pass:**
+- Barbarian's CORE EFFECT card text visually cuts off (seen in an earlier screenshot pass) — not
+  yet root-caused (font/box-size mismatch vs Warlord's Might's string length, likely). Needs-human
+  triage or a quick measure-and-fix pass; not blocking, cosmetic on one card.
+- `Kit.Count`-vs-`ActionSlots` mismatch at 4 more sites in `Game1.ManifestRenderer.cs` (~lines 551,
+  577, 994, 1057) beyond the one Task #1 already fixed in `Forge.cs` — worst case is line ~994's
+  technique-equip gate, which may silently cap equip at `Kit.Count` (3) instead of the real
+  `ActionSlots` (4 for 5 of 7 cores), blocking players from using a rune-granted 4th slot. Needs a
+  dedicated pass: audit all 4 sites, swap to `ActionSlots` where the check is gameplay-gating (not
+  just display), headless-test the equip-cap per core.
 
 ## 📐 RULES REFERENCE (2026-07-05, Cowork — STANDING; consult on ANY design conflict/ambiguity)
 The core/race/effect/kit/number design changed a lot this week. On any conflict or ambiguity about races,
@@ -225,6 +340,12 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
 - Rarity chips (COMMON/MAGIC/RARE) + rune-bag MARKS/PATHS/KEYSTONES sample runes appear in the refs —
   NO rarity/taxonomy model is designed; engine keeps gating those binds silent. Design-open (§17 #3),
   don't build from mock copy.
+- `Kit.Count`-vs-`ActionSlots` mismatch, 4 sites in `Game1.ManifestRenderer.cs` (~551/577/994/1057) —
+  line ~994 may gameplay-cap technique-equip at 3 instead of the real `ActionSlots` (4 for 5/7 cores).
+  See the TASK #2 COMPLETE banner above for detail. Needs an audit pass + per-core headless equip-cap
+  test, not yet started.
+- Barbarian's CORE EFFECT card text visually cuts off (Warlord's Might string vs box size, likely) —
+  seen in a screenshot pass, not yet root-caused. Cosmetic, one card, not blocking.
 
 ## Asset gaps (Needs Claude Design) — see outputs/CLAUDE_DESIGN_issues.md for the payload versions
 - B20 (NEW): re-extraction for the per-core refs (stat-bonus chips, action-card rules text, minions

@@ -554,6 +554,12 @@ public partial class Game1
         // *.coreEffect is the BLOCK container (border chrome; label/name/desc are their own
         // elements/parts) — resolving it to the desc painted the copy TWICE (the doubled-text P0).
         "preview.coreEffectDesc" => _build.CoreRune.CoreEffectDesc,
+        // NewGame core-roster pager (design/NewGame, 7 cores/3 per page -- CD's own NewGame.dc.html
+        // reference JS uses the same PER=3, matching GridCapacity's read of the coreCards geometry).
+        "cores.pageLabel" => "PAGE " + (CorePager.Index(_build.Roster.Count) + 1)
+            + " / " + CorePager.PageCount(_build.Roster.Count),
+        "cores.pagePrev" => CorePager.HasPrev(_build.Roster.Count) ? "<" : null,
+        "cores.pageNext" => CorePager.HasNext(_build.Roster.Count) ? ">" : null,
         // "core" = the equipment identity BLOCK (chrome only) — currentCoreName/Role carry the text;
         // resolving it printed the identity a SECOND time as a panel header (the doubled-name bug).
         // Equipment identity block (design/02): the core is fixed for the run, so the build's core
@@ -571,6 +577,13 @@ public partial class Game1
             + (InRun ? Exp.Equipment.Count : _build.Equipment.Count) + " / " + _build.CoreRune.Kit.Count + " slotted",
         "minions.slotLabel" => "MINIONS - "
             + (InRun ? Exp.Minions.Count : _build.CoreRune.MinionKit.Count) + " / " + _build.CoreRune.MinionCap + " slotted",
+        // Equipment inventory pager (design/02): pages whichever tab is active, sized live off the
+        // invItems grid geometry (GridCapacity -- its authored "cols":2 hint is a 1px-short fit today).
+        "inventory.activeTab.pageLabel" => InventoryTabItems() is { } ipItems
+            ? "PAGE " + (InvPager.Index(ipItems.Count) + 1) + " / " + InvPager.PageCount(ipItems.Count)
+            : null,
+        "inventory.activeTab.pagePrev" => InventoryTabItems() is { } ipPrev && InvPager.HasPrev(ipPrev.Count) ? "<" : null,
+        "inventory.activeTab.pageNext" => InventoryTabItems() is { } ipNext && InvPager.HasNext(ipNext.Count) ? ">" : null,
         "core.coreEffectName" => _build.CoreRune.CoreEffectName,
         "core.coreEffectDesc" => _build.CoreRune.CoreEffectDesc,
         // The authored copy is "BUDGET n free / m" (design/02's rune bag readout).
@@ -596,10 +609,12 @@ public partial class Game1
         "merchant.leave" => InRun && Exp.AtMerchant ? "LEAVE" : null,
         "run.gold" => InRun ? "PURSE " + Exp.Gold + "g" : null,
         "merchant.stock.pageLabel" => InRun && Exp.AtMerchant
-            ? "PAGE " + (_merchantPage + 1) + " / " + MerchantPageCount() : null,
-        "merchant.stock.pagePrev" => InRun && Exp.AtMerchant && _merchantPage > 0 ? "<" : null,
+            ? "PAGE " + (_merchantPager.Index(MerchantSections().Count) + 1) + " / "
+                + _merchantPager.PageCount(MerchantSections().Count) : null,
+        "merchant.stock.pagePrev" => InRun && Exp.AtMerchant
+            && _merchantPager.HasPrev(MerchantSections().Count) ? "<" : null,
         "merchant.stock.pageNext" => InRun && Exp.AtMerchant
-            && _merchantPage < MerchantPageCount() - 1 ? ">" : null,
+            && _merchantPager.HasNext(MerchantSections().Count) ? ">" : null,
         "combat.paused" => _paused ? "HELD" : null, // badge shows only while the fight is held
         // Navigation gates (07-03 drop): the bound datum is "this affordance applies here" — the
         // literal labels live in the manifest content (bind-gate semantics, LAYOUT_CONTRACT §12).
@@ -666,7 +681,7 @@ public partial class Game1
         var selIx = e.Binds switch
         {
             "races" => _build.RaceIndex,
-            "cores" => _build.CoreRuneIndex,
+            "cores" => LocalCoreSelIx(), // page-local -- "cores" data is sliced to the current page
             _ => -1,
         };
         for (var i = 0; i < cells.Count; i++)
@@ -1016,7 +1031,8 @@ public partial class Game1
     private System.Collections.Generic.IReadOnlyList<object>? ListData(string? bind) => bind switch
     {
         "races" => Roguebane.Core.Content.Races.Roster.Cast<object>().ToList(),
-        "cores" => Roguebane.Core.Content.CoreRunes.Roster.Cast<object>().ToList(),
+        "cores" => _build.Roster.Skip(CorePager.Skip(_build.Roster.Count)).Take(CorePageSize)
+            .Cast<object>().ToList(),
         "preview.attrs" => PreviewAttrs(),
         "attrs" => AttrBars(),
         "loadout" => (InRun ? Exp.Equipment : _build.Equipment).Cast<object>().ToList(),
@@ -1026,16 +1042,10 @@ public partial class Game1
         // — gear only exists once marching), TECHNIQUES = the palette, MINIONS = the retinue.
         // (CD's 07-02 drop renamed the bind invItems -> inventory.activeTab.items; chased clean.)
         "inventory.tabs" => new List<object> { "GEAR", "TECHNIQUES", "MINIONS" },
-        "inventory.activeTab.items" => _invTab switch
-        {
-            0 => GearTabItems(),
-            // §12: bought techniques/minions join the pool the Equipment screen slots from.
-            1 => _build.Palette.Cast<object>()
-                .Concat(InRun ? Exp.Stash.Techniques : Enumerable.Empty<object>().Cast<Roguebane.Core.Technique>()).ToList(),
-            2 => _build.CoreRune.MinionKit.Concat(_build.Runes.GrantedMinions).Cast<object>()
-                .Concat(InRun ? Exp.Stash.Minions : Enumerable.Empty<Roguebane.Core.Minion>()).ToList(),
-            _ => null,
-        },
+        // §12: bought techniques/minions join the pool the Equipment screen slots from.
+        "inventory.activeTab.items" => InventoryTabItems() is { } tabItems
+            ? tabItems.Skip(InvPager.Skip(tabItems.Count)).Take(InvPageSize).ToList()
+            : null,
         // The Rune Bag (design/02): one group per PATH ladder — the MARKS/PATHS/KEYSTONES taxonomy
         // is OPEN (§17), so the model's actual grouping (ladders) is what renders.
         "runeGroups" => _build.Paths.Cast<object>().ToList(),
@@ -1097,7 +1107,7 @@ public partial class Game1
             }
             : new List<object>(),
         "merchant.stock.sections" => InRun && Exp.AtMerchant
-            ? MerchantSections().Skip(_merchantPage * SectionsPerPage).Take(SectionsPerPage)
+            ? MerchantSections().Skip(_merchantPager.Skip(MerchantSections().Count)).Take(SectionsPerPage)
                 .Cast<object>().ToList()
             : new List<object>(),
         "merchant.provisions.stock" => InRun && Exp.AtMerchant
@@ -1170,7 +1180,44 @@ public partial class Game1
     // Wares-shelf geometry shared by render + click hit-test: cards flow horizontally inside the
     // section's wares region; 3 sections fill a page of the shelf area.
     private const int WareGap = 11, SectionsPerPage = 3;
-    private int _merchantPage;
+    private readonly Pager _merchantPager = new(SectionsPerPage);
+
+    // NewGame's coreCards / Equipment's invItems are grid lists whose page size is real geometry
+    // (476x404 seats 3 coreCards; invItems' authored "cols":2 doesn't quite fit its 403px region --
+    // see ListLayoutTests.GridCapacityHonestlyReportsAOnePixelColumnShortfall), so their page size is
+    // derived live via GridCapacity rather than a hand-picked constant. Lazy: the manifest isn't
+    // loaded yet when these fields would otherwise initialize (LoadContent runs after field init).
+    private int? _corePageSize;
+    private int CorePageSize => _corePageSize ??= Math.Max(1, ManifestGridCapacity("newgame", "cores"));
+    private Pager? _corePagerBacking;
+    private Pager CorePager => _corePagerBacking ??= new Pager(CorePageSize);
+
+    private int? _invPageSize;
+    private int InvPageSize => _invPageSize ??= Math.Max(1, ManifestGridCapacity("equipment", "inventory.activeTab.items"));
+    private Pager? _invPagerBacking;
+    private Pager InvPager => _invPagerBacking ??= new Pager(InvPageSize);
+
+    // The active inventory tab's full (unpaginated) item list -- shared by ListData's slicing, the
+    // page-label text binds, and Game1.cs's three tab-branch click/drag handlers so all three agree
+    // on exactly what "item N of the current tab" means.
+    private List<object>? InventoryTabItems() => _invTab switch
+    {
+        0 => GearTabItems(),
+        1 => _build.Palette.Cast<object>()
+            .Concat(InRun ? Exp.Stash.Techniques : Enumerable.Empty<object>().Cast<Roguebane.Core.Technique>()).ToList(),
+        2 => _build.CoreRune.MinionKit.Concat(_build.Runes.GrantedMinions).Cast<object>()
+            .Concat(InRun ? Exp.Stash.Minions : Enumerable.Empty<Roguebane.Core.Minion>()).ToList(),
+        _ => null,
+    };
+
+    // Page-relative index of the currently-selected core, for the "pickerCard" selection ring --
+    // ListData("cores") is sliced to the current page, so the ring must compare against a page-local
+    // index, not the roster-global CoreRuneIndex (-1 hides the ring when the selection is off-page).
+    private int LocalCoreSelIx()
+    {
+        var local = _build.CoreRuneIndex - CorePager.Skip(_build.Roster.Count);
+        return local >= 0 && local < CorePageSize ? local : -1;
+    }
 
     // §12 (receiving LOCKED 2026-07-03): EVERY ware category is a click-to-buy tile. A purchase
     // lands in the run inventory — technique -> palette pool, minion -> minion inventory,
@@ -1200,9 +1247,6 @@ public partial class Game1
         return s;
     }
 
-    private int MerchantPageCount()
-        => Math.Max(1, (MerchantSections().Count + SectionsPerPage - 1) / SectionsPerPage);
-
     // Ware-card hit-test sharing the nested-stamping geometry: page sections in their manifest list
     // cells, cards flowing horizontally through each section's wares region. Template ids are needed
     // for GEOMETRY here (guarded — a CD rename degrades to no shelves, never a crash).
@@ -1212,7 +1256,8 @@ public partial class Game1
             || !m.Templates.TryGetValue("shopSection", out var sect)) yield break;
         var waresPart = sect.Parts.FirstOrDefault(p => p.Binds == "section.wares");
         if (waresPart is null) yield break;
-        var sections = MerchantSections().Skip(_merchantPage * SectionsPerPage)
+        var allSections = MerchantSections();
+        var sections = allSections.Skip(_merchantPager.Skip(allSections.Count))
             .Take(SectionsPerPage).ToList();
         var cells = ManifestListCells("merchant", "merchant.stock.sections", sections.Count);
         for (var si = 0; si < sections.Count && si < cells.Count; si++)
@@ -1437,9 +1482,20 @@ public partial class Game1
             "core.badge" => c.Badge, // the role chip datum (07-03 drop A1)
             "core.budget" => c.RuneBudget.ToString(),
             "core.bays" => c.MinionCap.ToString(),
-            "core.actionSlots" => c.Kit.Count.ToString(),
+            "core.actionSlots" => c.ActionSlots.ToString(), // the bar's real capacity (RULES_SNAPSHOT
+                                                             // "Actions") -- was Kit.Count, undersized
+                                                             // 5 of 7 cores (fixed 2026-07-06)
             "core.coreEffectName" => c.CoreEffectName,
             "core.coreEffectDesc" => c.CoreEffectDesc, // core.coreEffect = block chrome, resolves to nothing
+            // 2026-07-06: these four were unhandled -> every card fell back to the manifest's static
+            // SAMPLE kit text (every card showing the same "Iron Longsword + Wooden Shield" etc.),
+            // surfaced verifying Task #2's paging. Format from the roster's own live data instead.
+            "core.kitWeapon" => FormatKitWeapons(c.WeaponKit),
+            "core.kitArmor" => FormatKitArmor(c.ArmorKit),
+            "core.kitTech" => string.Join(", ", c.Kit.Select(tk => DisplayName(tk.Id))),
+            "core.kitMinion" => c.MinionKit.Count > 0
+                ? string.Join(", ", c.MinionKit.Select(mk => DisplayName(mk.Id)))
+                : "—",
             _ => null,
         },
         ValueTuple<string, string> kv => bind switch // (key, value): legend rows, core-stat rows
@@ -1508,7 +1564,9 @@ public partial class Game1
             "loadout.attr" => t.Stat.ToString().ToUpperInvariant() + " " + t.Reserve,
             "invItems.badgeLabel" or "technique.cost" => t.Stat.ToString().ToUpperInvariant(),
             "invItems.badgeNum" => t.Reserve.ToString(),
-            "technique.description" => t.DescText,
+            // same gap as Weapon/Armor's invItems.effect (2026-07-06): every technique card in the
+            // Inventory list fell back to the static gear SAMPLE ("...DPS.") instead of its own copy.
+            "technique.description" or "invItems.effect" => t.DescText,
             // The mock's separately-positioned damage highlight can't land on live wrap — the
             // description already carries the number ({power}); resolve EMPTY so the sample never stamps.
             "technique.amount" => "",
@@ -1521,6 +1579,10 @@ public partial class Game1
             "invItems.name" or "gear.name" => w.Name is { Length: > 0 } ? w.Name : DisplayName(w.Id),
             "invItems.badgeLabel" => w.Stat.ToString().ToUpperInvariant(),
             "invItems.badgeNum" => w.Reserve.ToString(),
+            // 2026-07-06: unhandled -> every gear card (weapon AND armor alike) fell back to the
+            // manifest's static SAMPLE "4 dmg . 1.0x timer . 0.50 DPS.", surfaced alongside the
+            // coreCard kit-bind gap. Power/Timer are the weapon's real §6d fields.
+            "invItems.effect" => $"{w.Power} power * {w.Timer:0.0}x timer",
             _ => null,
         },
         Roguebane.Core.Armor ar => bind switch
@@ -1528,6 +1590,13 @@ public partial class Game1
             "invItems.name" or "gear.name" => ar.Name,
             "invItems.badgeLabel" => ar.Governing.ToString().ToUpperInvariant(),
             "invItems.badgeNum" => ar.Tier.ToString(),
+            // Armor has no dmg/timer (that's weapon cadence) -- show the piece's real §6c line effect.
+            "invItems.effect" => ar.Line switch
+            {
+                ArmorLine.Plate => $"-{ar.PartMitigation} part dmg",
+                ArmorLine.Leather => $"+{ar.EvadePct}% evade",
+                _ => $"+{ar.SpellDamage} spell dmg",
+            },
             _ => null,
         },
         Roguebane.Core.Minion mn => bind switch
@@ -1546,6 +1615,19 @@ public partial class Game1
     // Content ids are lower-case ("swing", "skeleton"); cards show them capitalised, per design/02.
     private static string DisplayName(string id) =>
         id.Length == 0 ? id : char.ToUpperInvariant(id[0]) + id[1..];
+
+    // A core's starting weapons, joined "+" (matches the coreCard's one-line WEAPON row); a repeated
+    // weapon (Reaver's twin daggers) collapses to "2x Name" instead of listing it twice.
+    private static string FormatKitWeapons(IReadOnlyList<Weapon> weapons) => weapons.Count == 0 ? "—"
+        : string.Join(" + ", weapons
+            .Select(wk => wk.Name is { Length: > 0 } ? wk.Name : DisplayName(wk.Id))
+            .GroupBy(n => n)
+            .Select(g => g.Count() > 1 ? $"{g.Count()}× {g.Key}" : g.Key));
+
+    // A core's starting armor as family + count ("4x Plate"): every kit today is one uniform ladder/
+    // tier (§7a), and the coreCard's ARMOR row is sized for a short line, not 4 distinct piece names.
+    private static string FormatKitArmor(IReadOnlyList<Armor> armor) =>
+        armor.Count == 0 ? "—" : $"{armor.Count}× {armor[0].Line}";
 
     // A card's live FSM read (design/01 chips + cooldown label): null = idle, show nothing.
     // Countdown is in fixed ticks (10/s) -> seconds for the label.
