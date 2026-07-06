@@ -19,9 +19,13 @@
    .AMinionKeystoneExposesItsGrantedMinion` now exercises the GENERIC keystone-grant mechanism via a
    synthetic Mark, so the code path stays covered independent of Conclave's open decision. 425/425 green.
    Verified via clean `dotnet build Roguebane.Game --no-incremental` (0 errors) — Game1.cs changed.
-3. **Sacrifice's heal formula (4/8 part-points, T1/T2) is APPROVED as the standing placeholder** — stop
-   treating it as OPEN/unconfirmed (RULES_SNAPSHOT.md updated). No engine change needed, just unblocks
-   anything that was waiting on this confirm.
+3. ✅ DONE (2026-07-06, loop) — Sacrifice's heal formula (4/8 part-points, T1/T2) is APPROVED as the
+   standing placeholder (RULES_SNAPSHOT.md already reflected this from the earlier Doug drop). Engine
+   already matched (`4 * minion.Reserve` in `Caster.Discharge`) — the only stale thing was the
+   `Techniques.Sacrifice` comment, which still called the numbers unconfirmed; reworded to point at the
+   approval. Real gap found: **the formula had NO headless test** — added `SacrificeHealTests` (pins
+   4x-Reserve heal amount, highest-Reserve minion consumed first, hold-fire with no minion fielded).
+   428/428 green.
 4. **Minion re-arm scope — real behavior gap found while confirming this:** Doug's rule is "techniques
    persist across back-to-back encounters, minions do NOT — every fielded minion dismisses at encounter
    end and must be re-summoned (re-paying Summons) next fight." Checked `Caster.RearmForEncounter()`

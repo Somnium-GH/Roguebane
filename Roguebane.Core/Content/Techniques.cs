@@ -91,8 +91,8 @@ public static class Techniques
     // Sacrifice (TECHNIQUES.md, LOCKED 2026-07-05): consumes 1 fielded minion per discharge to mend the
     // most-damaged part -- Reserve 0/Consults None by design (it costs a MINION, not a stat). Heal =
     // 4 x the consumed minion's Reserve (its tier proxy: Skeleton/Hound T1 -> 4, Iron Golem T2 -> 8).
-    // FLAGGED placeholder: exact per-tier heal numbers are unconfirmed pending Doug's final review
-    // (RULES_SNAPSHOT.md Open/TBD) -- the 4x-Reserve formula, not just the numbers, may still change.
+    // Heal numbers APPROVED as the standing placeholder (Doug, 2026-07-05 - "placeholder for now",
+    // RULES_SNAPSHOT.md) -- not final-locked, but no longer blocking. Pinned by SacrificeHealTests.
     public static readonly Technique Sacrifice =
         new("sacrifice", Stat.Con, Reserve: 0, TechniqueKind.Timered, Cooldown: 80, Power: 0,
             Heals: true, ConsumesMinion: true,
