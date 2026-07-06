@@ -147,7 +147,7 @@ public class BuildSessionTests
         var build = New(); // Grunt: jab, brace, bandage
         Assert.Equal(new[] { "jab", "brace", "bandage" }, build.Equipment.Select(t => t.Id));
 
-        build.CycleCoreRune(1); // Warden: cleave, brace, bandage
-        Assert.Equal(new[] { "cleave", "brace", "bandage" }, build.Equipment.Select(t => t.Id));
+        build.CycleCoreRune(1); // Warden: jab, brace, bandage
+        Assert.Equal(new[] { "jab", "brace", "bandage" }, build.Equipment.Select(t => t.Id));
     }
 }

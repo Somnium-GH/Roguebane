@@ -88,19 +88,20 @@ public static class Techniques
         new("suture", Stat.Con, Reserve: 3, TechniqueKind.Timered, Cooldown: 80, Power: 2, Heals: true,
             Desc: "Mends your most-damaged part {power} / 8.0s. (Warden signature.)", Side: TargetSide.Self);
 
-    // PLACEHOLDER -- needs-design (TECHNIQUES.md Open/TBD): "consume one of your own minions to mend
-    // your body" is a brand-new mechanic (a minion-consuming heal) with no engine support yet. This
-    // entry exists so content/UI can reference the id/icon; Activate()-ing it does nothing but hold an
-    // inert CON reservation. Kept OUT of `All` and every kit until the mechanic is designed and built.
+    // Sacrifice (TECHNIQUES.md, LOCKED 2026-07-05): consumes 1 fielded minion per discharge to mend the
+    // most-damaged part -- Reserve 0/Consults None by design (it costs a MINION, not a stat). Heal =
+    // 4 x the consumed minion's Reserve (its tier proxy: Skeleton/Hound T1 -> 4, Iron Golem T2 -> 8).
+    // FLAGGED placeholder: exact per-tier heal numbers are unconfirmed pending Doug's final review
+    // (RULES_SNAPSHOT.md Open/TBD) -- the 4x-Reserve formula, not just the numbers, may still change.
     public static readonly Technique Sacrifice =
         new("sacrifice", Stat.Con, Reserve: 0, TechniqueKind.Timered, Cooldown: 80, Power: 0,
-            Desc: "Consume one of your fielded minions to mend your most-damaged part; the heal scales with the minion's tier. (placeholder -- needs design)",
+            Heals: true, ConsumesMinion: true,
+            Desc: "Consume one of your fielded minions to mend your most-damaged part; the heal scales with the minion's tier.",
             Side: TargetSide.Self);
 
     // Bandage is in the palette + the starting kits: every build fights with a part-heal so it can
     // survive live foe part-aim on skirmishes; a build that drops it pays the intended penalty. Steel/
-    // Barkskin/Bind/Parry/Suture/Sacrifice stay opt-in (higher-tier or placeholder content) until a
-    // kit picks them.
+    // Barkskin/Bind/Parry/Suture/Sacrifice stay opt-in (higher-tier content) until a kit picks them.
     public static readonly IReadOnlyList<Technique> All =
         new[] { Jab, Cleave, Lunge, Ember, Siphon, Brace, Bandage };
 }

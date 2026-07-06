@@ -13,12 +13,12 @@ public class ConHpTests
         // so a numbers tune doesn't redden the test.
         var human = Forge.Assemble(Races.Human, CoreRunes.Grunt, CoreRunes.Grunt.NewLoadout(),
             CoreRunes.Grunt.Kit, Sieges.StandardRun());
-        Assert.Equal(Races.Human.Hp + 2 * Races.Human.Con, human.Player.MaxHp);
+        Assert.Equal(Races.Human.Hp + 2 * (Races.Human.Con + CoreRunes.Grunt.ConBonus), human.Player.MaxHp);
 
         // The frailer Elf ends up lower.
         var elf = Forge.Assemble(Races.Elf, CoreRunes.Grunt, CoreRunes.Grunt.NewLoadout(),
             CoreRunes.Grunt.Kit, Sieges.StandardRun());
-        Assert.Equal(Races.Elf.Hp + 2 * Races.Elf.Con, elf.Player.MaxHp);
+        Assert.Equal(Races.Elf.Hp + 2 * (Races.Elf.Con + CoreRunes.Grunt.ConBonus), elf.Player.MaxHp);
         Assert.True(elf.Player.MaxHp < human.Player.MaxHp);
     }
 

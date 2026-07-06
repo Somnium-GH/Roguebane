@@ -10,9 +10,9 @@ public class CoreRuneRosterTests
     public void RosterCoresAreDistinct()
     {
         var ids = CoreRunes.Roster.Select(c => c.Id).ToList();
-        Assert.True(ids.Count >= 6);                            // grunt/warden/adept/summoner/reaver/ranger
+        Assert.True(ids.Count >= 7);                            // grunt/warden/adept/summoner/reaver/ranger/barbarian
         Assert.Equal(ids.Count, ids.Distinct().Count());       // no dupes
-        Assert.Contains("ranger", ids);                        // the data-only 6th core
+        Assert.Contains("barbarian", ids);                     // the v6 7th core
     }
 
     [Fact]
@@ -29,7 +29,7 @@ public class CoreRuneRosterTests
             Assert.Equal(char.ToUpperInvariant(c.Id[0]), c.Title[0]); // "grunt" -> "Grunt"
         }
         Assert.Equal("THE WALL", CoreRunes.Warden.Archetype);
-        Assert.Equal("Hollow Vessel", CoreRunes.Grunt.CoreEffectName); // the POC keystone (§11)
+        Assert.Equal("Jack of All Trades", CoreRunes.Grunt.CoreEffectName); // the POC keystone (§11)
     }
 
     [Fact]
@@ -58,15 +58,14 @@ public class CoreRuneRosterTests
     }
 
     [Fact]
-    public void SummonerCoreEffectRefundsSummonsForSurvivorsOnRedeploy()
+    public void SummonerConscriptionNeverSpendsSummonsFieldingMinions()
     {
-        // The first REAL Core Effect [LOCKED §11]: on Redeploy each SURVIVING minion refunds its
-        // Summons; other cores refund nothing. The kit's two summons spend at assembly.
+        // Conscription [LOCKED §11]: fielding a minion never spends the Summons resource at all —
+        // the kit's minions field for free, and stay free across a Redeploy.
         var summoner = Forge.Embark(Races.Human, CoreRunes.Summoner, CoreRunes.Summoner.NewLoadout(),
             CoreRunes.Summoner.Kit, Maps.StandardLeg());
-        var spentAtStart = summoner.MaxSummons - summoner.Summons;
-        Assert.Equal(summoner.MinionCount, spentAtStart); // each fielded kit minion spent one Summons
-        Assert.True(spentAtStart >= 1);                   // the Binder fields at least the Skeleton
+        Assert.True(summoner.MinionCount >= 1);            // the Binder fields at least the Skeleton
+        Assert.Equal(summoner.MaxSummons, summoner.Summons); // Conscription: fielding spent nothing
 
         foreach (var t in summoner.Equipment) summoner.Toggle(t);
         summoner.SetAuto(true);
@@ -78,12 +77,7 @@ public class CoreRuneRosterTests
             summoner.Tick();
         }
         Assert.Equal(ExpeditionState.Cleared, summoner.State);
-        var before = summoner.Summons;
-        var survivors = summoner.MinionCount;
         summoner.Redeploy();
-        Assert.Equal(Math.Min(summoner.MaxSummons, before + survivors), summoner.Summons); // refunded, capped
-
-        // A non-summoner core refunds nothing on the same path.
-        Assert.False(CoreRunes.Grunt.CoreEffectRefundsSummons);
+        Assert.Equal(summoner.MaxSummons, summoner.Summons); // still free after Redeploy
     }
 }

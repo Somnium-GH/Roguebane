@@ -67,7 +67,7 @@ public class WeaponTests
         var caster = new Caster(body, foe);
 
         Assert.True(caster.Activate(Armory.Frenzy));
-        Assert.Equal(3, body.Reserved(Stat.Str)); // 2 + 1 (weapon reserves; Frenzy's own reserve is inert)
+        Assert.Equal(6, body.Reserved(Stat.Str)); // 2 + 1 weapon reserves, + Frenzy's own reserve of 3
 
         for (var i = 0; i < 76; i++) caster.Step(); // cd 80, 0 haste (no DEX), Sword/Axe avg timer 0.95 -> 76
         Assert.Equal(93, foe.Hp);                  // 4 + 3 = 7

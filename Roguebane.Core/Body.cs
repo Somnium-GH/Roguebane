@@ -21,9 +21,44 @@ public sealed class Body
     private readonly List<int> _handSeq = new();
     private int? _rangedSeq;
     private readonly Dictionary<Stat, int> _armorSeq = new();
+    private CoreEffectKind _effect = CoreEffectKind.None;
 
     public IReadOnlyList<BodyPart> Parts => _parts;
     public IReadOnlyList<Active> Actives => _actives;
+
+    // Set once at assembly (CoreRune.NewBody) so every equip-time/sustain-time gate below can apply
+    // its core's discount without threading the enum through every call site.
+    public void SetCoreEffect(CoreEffectKind effect) => _effect = effect;
+
+    // WarlordMight/FletcherLuck/JackOfAllTrades: an equip-time discount on what a weapon costs to
+    // wield/ready. Shared by Wield/EquipRanged AND DisabledGear's ongoing sustain math — both must
+    // agree on the same discounted number or the equip gate and the post-damage cascade desync.
+    private int EffectiveWeaponReserve(Weapon w)
+    {
+        var r = w.Reserve;
+        if (_effect == CoreEffectKind.WarlordMight && w.Hands == 2 && w.Stat == Stat.Str) r -= 3;
+        if (_effect == CoreEffectKind.FletcherLuck && w.Kind == WeaponKind.Bow) r -= w.Tier;
+        if (_effect == CoreEffectKind.JackOfAllTrades) r -= 1;
+        return Math.Max(0, r);
+    }
+
+    // Fortified/WarlordMight/JackOfAllTrades: an equip-time discount on armor's governing attribute
+    // and requirement. Fortified reassigns Plate's governing STR to CON (paid in CON instead) at a
+    // per-tier rate; WarlordMight's STR-plate discount is a flat per-piece amount — two distinct
+    // formula shapes, not one shared abstraction (see plan).
+    private (Stat Governing, int Requirement) EffectiveArmor(Armor piece)
+    {
+        var governing = piece.Governing;
+        var req = piece.Requirement;
+        if (_effect == CoreEffectKind.Fortified && piece.Line == ArmorLine.Plate)
+        {
+            governing = Stat.Con;
+            req -= piece.Tier;
+        }
+        if (_effect == CoreEffectKind.WarlordMight && piece.Line == ArmorLine.Plate) req -= 1;
+        if (_effect == CoreEffectKind.JackOfAllTrades) req -= 1;
+        return (governing, Math.Max(0, req));
+    }
 
     public void Add(BodyPart part)
     {
@@ -57,12 +92,15 @@ public sealed class Body
     {
         var candidates = new List<GearCandidate>();
         for (var i = 0; i < _hands.Count; i++)
-            if (_hands[i].Stat == stat) candidates.Add(new GearCandidate("hand", _hands[i].Reserve, _handSeq[i], i, default));
+            if (_hands[i].Stat == stat) candidates.Add(new GearCandidate("hand", EffectiveWeaponReserve(_hands[i]), _handSeq[i], i, default));
         if (_ranged is { } r && r.Stat == stat)
-            candidates.Add(new GearCandidate("ranged", r.Reserve, _rangedSeq ?? 0, -1, default));
+            candidates.Add(new GearCandidate("ranged", EffectiveWeaponReserve(r), _rangedSeq ?? 0, -1, default));
         foreach (var (slot, piece) in _armor)
-            if (piece.Governing == stat)
-                candidates.Add(new GearCandidate("armor", piece.Requirement, _armorSeq[slot], -1, slot));
+        {
+            var eff = EffectiveArmor(piece);
+            if (eff.Governing == stat)
+                candidates.Add(new GearCandidate("armor", eff.Requirement, _armorSeq[slot], -1, slot));
+        }
 
         var pool = Math.Max(0, Capacity(stat) - (techReservedOverride ?? TechReserved(stat)));
         var remaining = candidates.Sum(c => c.Reserve);
@@ -89,7 +127,11 @@ public sealed class Body
     public bool Activate(Active active)
     {
         if (_actives.Contains(active)) return true;
-        if (Available(active.Stat) < active.Reserve) return false;
+        // Gate on raw Capacity-minus-TechReserved, NOT Available(): Available() nets out gear at
+        // its CURRENT (pre-activation) size, so a technique landing on an already-full pool would
+        // see zero room even though SUSTAIN MODEL gear is meant to yield to it (DisabledGear already
+        // recomputes gear's fit from TechReserved once this active is counted -- see Reserved()).
+        if (Capacity(active.Stat) - TechReserved(active.Stat) < active.Reserve) return false;
         _actives.Add(active);
         return true;
     }
@@ -119,7 +161,7 @@ public sealed class Body
         if (weapon.Kind is WeaponKind.Bow or WeaponKind.Sling) return false;
         if (weapon.Kind is WeaponKind.Wand or WeaponKind.Staff && _ranged is not null) return false;
         if (_hands.Count >= 2) return false;
-        if (Capacity(weapon.Stat) < weapon.Reserve) return false;
+        if (Capacity(weapon.Stat) < EffectiveWeaponReserve(weapon)) return false;
         _hands.Add(weapon);
         _handSeq.Add(++_equipSeq);
         return true;
@@ -141,7 +183,7 @@ public sealed class Body
     {
         if (w.Kind is not (WeaponKind.Bow or WeaponKind.Sling)) return false;
         if (_ranged is not null) return false;
-        if (Capacity(w.Stat) < w.Reserve) return false;
+        if (Capacity(w.Stat) < EffectiveWeaponReserve(w)) return false;
         // Mutual exclusion (§6d): a held wand excludes the ranged slot; a staff blocks it too.
         if (_hands.Any(h => h.Kind is WeaponKind.Wand or WeaponKind.Staff)) return false;
         _ranged = w;
@@ -215,7 +257,8 @@ public sealed class Body
     // shield OBJECT when that builds). Shields + full evade stay the only HP mitigations.
     public bool Equip(Armor piece)
     {
-        if (Capacity(piece.Governing) < piece.Requirement) return false;
+        var eff = EffectiveArmor(piece);
+        if (Capacity(eff.Governing) < eff.Requirement) return false;
         _armor[piece.Slot] = piece;
         _armorSeq[piece.Slot] = ++_equipSeq;
         return true;
@@ -232,7 +275,7 @@ public sealed class Body
     // §6e sustain: a worn piece works while the shared pool on its LINE's governing attribute can
     // still cover its Requirement, after techniques + higher-ranked gear take their share (SUSTAIN
     // MODEL, DISABLE CASCADE — see DisabledGear).
-    public bool ArmorSustained(Armor piece) => !DisabledGear(piece.Governing).Armor.Contains(piece.Slot);
+    public bool ArmorSustained(Armor piece) => !DisabledGear(EffectiveArmor(piece).Governing).Armor.Contains(piece.Slot);
 
     // Reservation timing [DESIGN_SPEC lock 2026-07-04]: techniques reserve attributes only on
     // in-combat ACTIVATION, never for sitting equipped — so the Equipment screen must read gear
@@ -247,7 +290,7 @@ public sealed class Body
         && HandUsable(i) && !DisabledGear(_hands[i].Stat, techReservedOverride: 0).Hands.Contains(i);
 
     public bool ArmorGearOnlySustained(Armor piece) =>
-        !DisabledGear(piece.Governing, techReservedOverride: 0).Armor.Contains(piece.Slot);
+        !DisabledGear(EffectiveArmor(piece).Governing, techReservedOverride: 0).Armor.Contains(piece.Slot);
 
     // §6c INT robe: +2 spell damage per worn sustained robe piece, capped at TWO pieces
     // (robe + hat — the line only authors those slots, the cap keeps that true under tuning).

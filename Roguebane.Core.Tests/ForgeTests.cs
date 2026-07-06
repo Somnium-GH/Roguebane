@@ -15,8 +15,8 @@ public class ForgeTests
         foreach (var rung in Paths.VesselLadder) Assert.True(runes.TryTake(rung));
 
         var minted = chassis.NewBody(race, runes);
-        // Hollow Vessel sockets +6 CON onto the race body.
-        Assert.Equal(baseCon + 6, minted.Capacity(Stat.Con));
+        // Grunt's own +1 CON bonus, plus Hollow Vessel's +6 CON from the rune ladder.
+        Assert.Equal(baseCon + chassis.ConBonus + 6, minted.Capacity(Stat.Con));
     }
 
     [Fact]
@@ -27,7 +27,8 @@ public class ForgeTests
         var runes = chassis.NewLoadout(); // nothing taken
 
         var minted = chassis.NewBody(race, runes);
-        Assert.Equal(race.NewBody().Capacity(Stat.Con), minted.Capacity(Stat.Con));
+        // No rune-granted CON, but the chassis's own stat bonus still applies.
+        Assert.Equal(race.NewBody().Capacity(Stat.Con) + chassis.ConBonus, minted.Capacity(Stat.Con));
     }
 
     [Fact]
@@ -42,7 +43,7 @@ public class ForgeTests
 
         Assert.Equal(SessionState.Fighting, session.State);
         Assert.Equal(Techniques.All.Count, session.Equipment.Count);
-        Assert.Equal(race.NewBody().Capacity(Stat.Con) + 6, session.Player.Body.Capacity(Stat.Con));
+        Assert.Equal(race.NewBody().Capacity(Stat.Con) + chassis.ConBonus + 6, session.Player.Body.Capacity(Stat.Con));
     }
 
     [Fact]

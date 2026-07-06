@@ -75,3 +75,4 @@ Base technique speed **8.0s**; melee/ranged verbs CONSULT the weapon for damage;
 - **RuneDiscount** (old per-core rune-price discount) assumed retired to 0 — needs Doug confirm.
 - **HP per race**; **mono-attribute scaling** (mains scale high, little pulls secondary stats) — playtest concern.
 - Reserve stat "picked from the wielded weapon" for the split dual-wield technique needs a small engine touch (vs today's fixed-`Stat` field).
+- **Crossover skills** (per-pair offense/defense — Confusion, Stun, Ward, etc.) are EXPERIMENTAL concepts only, parked in TECHNIQUES.md's *EXPERIMENTAL — IN DESIGN* section. Do NOT build. A future INT+CON Ward would rename Stoneskin → Mana Shield.

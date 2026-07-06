@@ -32,10 +32,8 @@ public sealed class Campaign
         IReadOnlyList<Func<CityMap>> legs,
         Stash? stash = null,
         string figureId = "human_grunt",
-        bool refundSummonsOnRedeploy = false,
         int techniqueSlots = int.MaxValue)
     {
-        _refundSummonsOnRedeploy = refundSummonsOnRedeploy;
         if (legs.Count == 0) throw new ArgumentException("a campaign needs at least one leg", nameof(legs));
         _player = player;
         _caster = caster;
@@ -52,11 +50,8 @@ public sealed class Campaign
     public Stash Stash => _stash;
     public bool OnFinalLeg => _legIndex == _legs.Count - 1;
 
-    private readonly bool _refundSummonsOnRedeploy;
-
     private Expedition NewLeg() =>
-        new(_player, _caster, _loadout, _legs[_legIndex](), _stash, _figureId, _refundSummonsOnRedeploy,
-            _techniqueSlots);
+        new(_player, _caster, _loadout, _legs[_legIndex](), _stash, _figureId, _techniqueSlots);
 
     // Top-level passthroughs so a driver talks to the campaign, not the swapping leg underneath.
     public bool Enter(string nodeId)

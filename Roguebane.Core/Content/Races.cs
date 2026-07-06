@@ -1,23 +1,27 @@
 namespace Roguebane.Core.Content;
 
 // The playable races. Copy is CANON per design/05 v2 (drop #17, 2026-07-03) — ASCII dashes, the
-// font lacks the em-dash. Attrs + HP are RACE-ONLY; a CoreRune adds none. Stats await the tuning
-// session; the race<->core matrix stays "Needs human" (§7/§17).
+// font lacks the em-dash. Attrs are RACE-ONLY; a CoreRune adds its own bonus on top (RULES_SNAPSHOT
+// v6 formula: baseline 4/4/4/4, Human +1 all, each specialist +2 into its one affinity). HP per race
+// stays a flagged placeholder (RULES_SNAPSHOT OPEN item) — spread kept CON-correlated like the prior
+// 2-race set, final numbers await Doug's tune.
 public static class Races
 {
-    // Balanced generalist, the sturdier body.
-    // Bumped 2026-07-04 (Debt, placeholder): the cumulative gear-sustain model (SUSTAIN MODEL) sums a
-    // core's whole kit against ONE shared pool per stat, not per-item. The old 3/3/3/3 was sized for
-    // per-item gating and left several cores (Warden's full plate + Brace, Ranger's blade+bow+leather,
-    // Summoner's minions) unable to sustain their OWN starting kit. Raised just enough for every
-    // race+core combo to fight and win (CoreCampaignTests) - final numbers still "Needs human" (§7/§17).
-    public static readonly Race Human = new("human", Str: 14, Int: 14, Dex: 12, Con: 8, Hp: 20, Title: "Human",
+    public static readonly Race Human = new("human", Str: 5, Int: 5, Dex: 5, Con: 5, Hp: 16, Title: "Human",
         Tag: "THE FOUNDER LINE", Blurb: "No innate edge or lack - fits any core it can afford.");
 
-    // Dex-leaning and frail (see Human bump note above for why these moved off 2/3/4/2).
-    public static readonly Race Elf = new("elf", Str: 14, Int: 12, Dex: 16, Con: 7, Hp: 14, Title: "Elf",
-        Tag: "THE KEEN & FLEET", Blurb: "Keen and fleet, but frail - punishes a dropped block.");
+    public static readonly Race Elf = new("elf", Str: 4, Int: 6, Dex: 4, Con: 4, Hp: 13, Title: "Elf",
+        Tag: "THE DEEP MINDED", Blurb: "A keen head for spellcraft, but frail - punishes a dropped block.");
+
+    public static readonly Race Dwarf = new("dwarf", Str: 4, Int: 4, Dex: 4, Con: 6, Hp: 20, Title: "Dwarf",
+        Tag: "THE UNYIELDING", Blurb: "Thick of chest and slow to fall - the line holds where a Dwarf stands.");
+
+    public static readonly Race Halfling = new("halfling", Str: 4, Int: 4, Dex: 6, Con: 4, Hp: 13, Title: "Halfling",
+        Tag: "THE QUICK STEP", Blurb: "Fast hands, faster feet - answers before the foe can.");
+
+    public static readonly Race HalfGiant = new("half_giant", Str: 6, Int: 4, Dex: 4, Con: 4, Hp: 17, Title: "Half-Giant",
+        Tag: "THE BROKEN GROUND", Blurb: "Strength enough to carry what breaks a smaller back.");
 
     // Roster order matches design/05's Race column.
-    public static readonly IReadOnlyList<Race> Roster = new[] { Human, Elf };
+    public static readonly IReadOnlyList<Race> Roster = new[] { Human, Elf, Dwarf, Halfling, HalfGiant };
 }

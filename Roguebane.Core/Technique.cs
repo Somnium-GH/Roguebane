@@ -34,6 +34,11 @@ public sealed record Technique(
     bool Lifesteal = false, // Siphon (TECHNIQUES.md): on a CLEAN landed part-hit (never a shield-absorbed
                             // hit, never an already-broken part -- the shared on-hit-boon gate), repairs
                             // the caster's own most-damaged part by the damage just dealt.
+    bool ConsumesMinion = false, // Sacrifice (TECHNIQUES.md, LOCKED 2026-07-05): a Heals technique that,
+                                 // on each discharge, consumes ONE fielded minion (freeing its reservation,
+                                 // no Summons refund) instead of spending Power -- heal scales with the
+                                 // consumed minion's Reserve (its tier proxy). Holds fire with no minion
+                                 // fielded, same as Heals holds fire with no wound. Inert without Heals.
     int ShieldLayers = 0, // >0 marks a SHIELD SOURCE (§6b): a passive that maintains this many 1-dmg
     int ShieldRegen = 0,  // layers on the body, one regenerating every ShieldRegen ticks (CON-scaled).
     bool ShieldPiercing = false, // ignores the shield pool; costs Charge per use (§6b Charge = pierce).

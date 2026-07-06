@@ -48,7 +48,7 @@ public class BowTests
             CoreRunes.Ranger.Kit, Maps.StandardLeg());
 
         Assert.Equal("bow", exp.Player.Body.Ranged?.Id); // bow mounts the RANGED slot at assembly
-        Assert.Contains(CoreRunes.Ranger.Kit, t => t.Id == "shot"); // the Shot verb is on the bar
-        Assert.True(Armory.Shot.ShieldPiercing);                    // and it pierces
+        Assert.Contains(CoreRunes.Ranger.Kit, t => t.Id == "aimed_shot"); // the Aimed Shot verb is on the bar
+        Assert.True(Armory.AimedShot.ShieldPiercing);                    // and it pierces
     }
 }

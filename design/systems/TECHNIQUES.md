@@ -91,6 +91,35 @@ per-technique breakdown here was stale.
 | Iron Golem | T2 INT | 2 | 3 / 5s | A bound iron golem; slow / strong. |
 | Hound | T1 DEX | 1 | 1 / 4.0s | A DEX pet; Hound will provide an accuracy bonus when active, 5% as a Tier 1 (+5% per Tier for descendants) |
 
+## EXPERIMENTAL — IN DESIGN (crossover skills — future pass, NOT built)
+Skills that span TWO attributes/parts, so a build wants BOTH those parts alive — the cross-stat pressure +
+"keep your other limbs alive" lever, and the acquire-mid-run "climb into something you weren't built for"
+content (not default kits). From the 2026-07-05 brainstorm (Doug). One per stat-pair, offense + defense.
+**All concepts only — no numbers, mechanics, or reserves locked. Do not build yet.**
+
+### Offense
+| Combo | Effect (concept) |
+|---|---|
+| STR + DEX | **Dual wield** (Frenzy / Flurry — already built). |
+| STR + INT | **Confusion** — the enemy has a chance to attack ITSELF, targeting a random part, instead of you. |
+| STR + CON | **Shield Break** — disarm the foe's shield. |
+| DEX + INT | **Poison** — double damage straight to HP, no limb damage. |
+| DEX + CON | **Stun** — reset the foe's technique timers; can't-reactivate ("stunned") for 1s per tier. |
+| INT + CON | **Disable limbs** — temporarily knock a foe's part offline. |
+
+### Defense
+| Combo | Effect (concept) |
+|---|---|
+| STR + DEX | **Counter** — chance to fully negate an incoming hit and strike back for weapon damage. |
+| STR + INT | **Imbue Weapon** — enchant the weapon. |
+| STR + CON | **Warcry** — passively increase shields. |
+| DEX + INT | **Evasion** — passively improve evasion. |
+| DEX + CON | **Alchemist** — potion techniques that heal limbs (sustain for the glass cannon). |
+| INT + CON | **Ward** — reduce damage by 1 per tier. |
+
+**Note (Doug):** the INT+CON **Ward** overlaps thematically with the current INT shield **Stoneskin** — if Ward
+gets built, first rename **Stoneskin → Mana Shield** to free up the warding space. (Future rename, not yet done.)
+
 ## Open / TBD
 - **Sacrifice per-tier heal amounts** — mechanic + scaling rule LOCKED 2026-07-05 (see Heals table); exact
   numbers still FLAGGED placeholders: Skeleton/Hound (T1) → 4 part-points, Iron Golem (T2) → 8 part-points

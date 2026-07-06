@@ -31,13 +31,13 @@ public class StartingKitTests
     }
 
     [Fact]
-    public void AdeptWieldsStaffWornInRobeAndFieldsASkeleton()
+    public void AdeptWieldsStaffWornInRobe()
     {
         var body = Assemble(CoreRunes.Adept);
         Assert.Contains(body.Hands, w => w.Id == "staff_wooden");
         Assert.Equal("armor_int_chest_cotton", body.ArmorOn(Stat.Con)?.Id);
         Assert.Equal("armor_int_head_cotton", body.ArmorOn(Stat.Int)?.Id);
-        Assert.Contains(Minions.Skeleton, CoreRunes.Adept.MinionKit);
+        Assert.Empty(CoreRunes.Adept.MinionKit); // v6: no minion cap, the Scholar fields nothing
     }
 
     [Fact]
@@ -59,10 +59,10 @@ public class StartingKitTests
     }
 
     [Fact]
-    public void RangerWieldsShortSwordAndBowWornInLeather()
+    public void RangerWieldsDaggerAndBowWornInLeather()
     {
         var body = Assemble(CoreRunes.Ranger);
-        Assert.Contains(body.Hands, w => w.Id == "shortsword_iron");
+        Assert.Contains(body.Hands, w => w.Id == "dagger_iron");
         Assert.Equal("bow", body.Ranged?.Id);
         Assert.Equal("armor_dex_legs_plain", body.ArmorOn(Stat.Dex)?.Id);
     }

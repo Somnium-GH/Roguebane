@@ -12,6 +12,8 @@ public sealed record CoreRune(
     int RuneBudget,
     int RuneDiscount = 0,
     int MinionCap = 1,
+    int ActionSlots = 3, // RULES_SNAPSHOT "Actions" column — the action bar's real capacity, independent
+                         // of Kit.Count (a rune-granted technique must have room to land)
     int StrBonus = 0, // additive stat bonus on top of the Race's own attrs (CORE_RUNES.md's table)
     int IntBonus = 0,
     int DexBonus = 0,
@@ -23,9 +25,8 @@ public sealed record CoreRune(
     string Archetype = "",  // the one-line identity ("THE GENERALIST") shown on the New Run / build cards
     string Flavor = "",     // the card's short pitch (design/05)
     string CoreEffectName = "",   // Core Effect label (the core's signature effect) shown on the cards
-    string CoreEffectDesc = "",   // Core Effect blurb; most effects are display-only for now (§11)...
-    bool CoreEffectRefundsSummons = false, // one legacy mechanized effect: on Redeploy, surviving
-                                           // minions refund their Summons. No v6 core uses this anymore.
+    string CoreEffectDesc = "",   // Core Effect blurb — display copy; the interpreter dispatches on Effect
+    CoreEffectKind Effect = CoreEffectKind.None, // the mechanical hook (Body/Caster wire on this, not on name strings)
     bool CoreEffectFreeSummons = false, // Summoner's Conscription [LOCKED, CORE_RUNES.md]: fielding a
                                         // minion never spends the Summons resource at all (replaces the
                                         // old refund-on-Redeploy Legion effect above — genuinely different).
@@ -59,6 +60,7 @@ public sealed record CoreRune(
     public Body NewBody(Race race, RuneLoadout runes)
     {
         var body = race.NewBody(StrBonus, IntBonus, DexBonus, ConBonus);
+        body.SetCoreEffect(Effect);
         foreach (var mark in runes.HeldMarks)
             foreach (var part in mark.Granted)
                 body.Add(part);

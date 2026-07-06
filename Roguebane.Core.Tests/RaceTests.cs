@@ -31,9 +31,9 @@ public class RaceTests
     }
 
     [Fact]
-    public void ElfIsDexLeaningAndFrailerThanHuman()
+    public void ElfIsIntLeaningAndFrailerThanHuman()
     {
-        Assert.True(Races.Elf.Dex > Races.Human.Dex);  // the keen archer
+        Assert.True(Races.Elf.Int > Races.Human.Int);  // the deep-minded caster
         Assert.True(Races.Elf.Con < Races.Human.Con);  // the frailer body
         Assert.True(Races.Elf.Hp < Races.Human.Hp);
     }

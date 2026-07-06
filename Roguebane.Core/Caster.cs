@@ -13,6 +13,7 @@ public sealed class Caster
         public ICombatTarget? Aimed; // per-technique target; null => no target (player) or default front (engine)
         public BodyPart? Part;       // per-technique PART aim within Aimed; null => whole-target HP
         public bool Auto = true;     // AUTO: discharge on cadence when ready. Off => hold for a Fire() command.
+        public int ResonanceStacks;  // Adept's Resonance: landed hits stack a −2%/stack charge discount (cap 5)
     }
 
     private const int HasteRate = 2; // % cooldown reduction per point of DEX (action speed)
@@ -39,7 +40,7 @@ public sealed class Caster
     // (untargeted holds, never falling back to a default front). Engine casters (foe offense, sims)
     // leave it false and keep the default-front auto-fire. Minions and Sustained reserves track the
     // front in BOTH modes — only the per-technique offensive FSM is gated.
-    public Caster(Body self, ICombatTarget? target = null, int maxCharge = 0, bool requireAim = false, int minionCap = 0, int maxSummons = -1, bool freeSummons = false)
+    public Caster(Body self, ICombatTarget? target = null, int maxCharge = 0, bool requireAim = false, int minionCap = 0, int maxSummons = -1, bool freeSummons = false, CoreEffectKind effect = CoreEffectKind.None)
     {
         _self = self;
         _default = target;
@@ -53,11 +54,13 @@ public sealed class Caster
         MaxSummons = maxSummons < 0 ? int.MaxValue : maxSummons;
         SummonsLeft = MaxSummons;
         _freeSummons = freeSummons;
+        _effect = effect;
     }
 
     // The Summoner's Core Effect (Conscription, CORE_RUNES.md): fielding a minion never spends the
     // Summons resource at all — a different mechanic from the old refund-on-Redeploy Legion effect.
     private readonly bool _freeSummons;
+    private readonly CoreEffectKind _effect;
 
     public int MinionCap { get; } // how many minion slots this caster's chassis has (for the render lane)
 
@@ -71,9 +74,6 @@ public sealed class Caster
         if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));
         SummonsLeft = Math.Min(MaxSummons, SummonsLeft + amount);
     }
-
-    // The Summoner's Core Effect hook (§11): refund one Summons per surviving minion on Redeploy.
-    public void RefundSummons(int amount) => AddSummons(amount);
 
     // Battle hands every caster the fight's shared PRNG so chance rolls are deterministic.
     public void UseRng(Rng rng) => _rng = rng;
@@ -129,7 +129,10 @@ public sealed class Caster
     {
         foreach (var run in _active.Values)
             if (run.Tech.Kind == TechniqueKind.Timered)
+            {
+                run.ResonanceStacks = 0; // Resonance decays fresh each encounter — no cross-fight snowball
                 run.Countdown = EffectiveCooldown(run.Tech);
+            }
         foreach (var minion in _minions)
             _minionCountdown[minion.Id] = minion.Timer;
     }
@@ -172,8 +175,9 @@ public sealed class Caster
 
     public TechStatus StatusOf(Technique t)
     {
-        var cooldown = EffectiveCooldown(t);
-        if (!_active.TryGetValue(t.Id, out var run))
+        _active.TryGetValue(t.Id, out var run);
+        var cooldown = EffectiveCooldown(t, run?.ResonanceStacks ?? 0);
+        if (run is null)
             return new TechStatus(false, cooldown, cooldown, t.Kind == TechniqueKind.Sustained, false, false, false);
         var dry = t.ShieldPiercing && _charge < Math.Max(1, t.ChargeCost); // only pierce draws charge
         var ready = run.Tech.Kind == TechniqueKind.Timered && run.Countdown <= 0;
@@ -183,11 +187,20 @@ public sealed class Caster
 
     public int ActiveCount => _active.Count;
 
-    // A self-contained technique reserves its own stat. A weapon-consulting one reserves NOTHING of
-    // its own — the consulted weapon(s) already stand a reservation as equipped gear (SUSTAIN MODEL,
-    // §17 #16); baking their reserve into the technique's Active too would double-count the same
+    // A self-contained technique reserves its own stat; so does a Both-consulting dual-wield technique
+    // (Frenzy/Flurry, RULES_SNAPSHOT) — its Reserve is the TECHNIQUE's own cost, distinct from the
+    // reservation its consulted weapons already stand as equipped gear (SUSTAIN MODEL, §17 #16). A
+    // Primary-consulting technique reserves NOTHING of its own: the one weapon it swings already
+    // reserves as gear, and baking that into the technique's Active too would double-count the same
     // stat. Activate() below gates weapon-consulting techniques on having something to swing instead.
-    private Active Reservation(Technique t) => new(t.Id, t.Stat, t.Consults == WeaponUse.None ? t.Reserve : 0);
+    private Active Reservation(Technique t)
+    {
+        if (t.Consults == WeaponUse.Primary) return new Active(t.Id, t.Stat, 0);
+        var reserve = t.Reserve;
+        if (t.Consults == WeaponUse.Both && _effect == CoreEffectKind.Finesse) reserve -= 1;
+        if (_effect == CoreEffectKind.JackOfAllTrades) reserve -= 1;
+        return new Active(t.Id, t.Stat, Math.Max(0, reserve));
+    }
 
     private int EffectivePower(Technique t) => t.Consults == WeaponUse.None
         ? t.Power
@@ -199,13 +212,14 @@ public sealed class Caster
     // §6d: the consulting weapon's TIMER multiplies the charge timer on top (<1.0x = faster;
     // dual-wield = the AVERAGE of both weapons') — self-contained techniques are untouched; the
     // haste x timer interaction is a balance-pass knob, both simply scale the same counter.
-    public int EffectiveCooldown(Technique t)
+    public int EffectiveCooldown(Technique t, int resonanceStacks = 0)
     {
         if (t.Cooldown <= 0) return t.Cooldown;
         var haste = Math.Min(HasteCap, _self.Capacity(Stat.Dex) * HasteRate);
         var ticks = t.Cooldown * (100 - haste) / 100.0;
         var consulted = _self.Consulted(t);
         if (consulted.Count > 0) ticks *= consulted.Average(w => w.Timer);
+        if (resonanceStacks > 0) ticks *= 1.0 - 0.02 * resonanceStacks; // Adept's Resonance, cap 5 stacks
         return Math.Max(1, (int)Math.Round(ticks, MidpointRounding.AwayFromZero));
     }
 
@@ -218,7 +232,9 @@ public sealed class Caster
         if (_active.ContainsKey(technique.Id)) return true;
         if (technique.Consults == WeaponUse.None)
         {
-            if (technique.Reserve <= 0) return false;
+            // Sacrifice (ConsumesMinion) is a legitimate standing Reserve-0 toggle -- it costs a
+            // MINION per discharge, not a stat -- so it skips the "Reserve<=0 is misconfigured" guard.
+            if (technique.Reserve <= 0 && !technique.ConsumesMinion) return false;
         }
         else if (_self.Consulted(technique).Count == 0) return false; // nothing to swing
         var reservation = Reservation(technique);
@@ -357,7 +373,20 @@ public sealed class Caster
         {
             var wound = _self.MostDamagedPart();
             if (wound is null) return false;
-            _self.Repair(wound, EffectivePower(run.Tech));
+            if (run.Tech.ConsumesMinion)
+            {
+                // Sacrifice: also holds fire with no minion fielded (same "wait for the condition"
+                // shape as holding fire with no wound). Dismiss frees the minion's own reservation --
+                // "no refund" (TECHNIQUES.md) means no Summons/re-summon grace, not a stuck stat.
+                var minion = _minions.OrderByDescending(m => m.Reserve).FirstOrDefault();
+                if (minion is null) return false;
+                Dismiss(minion);
+                _self.Repair(wound, 4 * minion.Reserve);
+            }
+            else
+            {
+                _self.Repair(wound, EffectivePower(run.Tech));
+            }
             if (run.Tech.Kind == TechniqueKind.Timered) run.Countdown = EffectiveCooldown(run.Tech);
             return true;
         }
@@ -369,7 +398,14 @@ public sealed class Caster
 
         var part = onAim ? run.Part : null;
         // CHARGE = shield-pierce fuel: only a shield-piercing technique spends it; dry => HOLD the pierce.
-        if (run.Tech.ShieldPiercing && !TrySpendCharge(Math.Max(1, run.Tech.ChargeCost))) return false;
+        // Ranger's Fletcher's Luck: a bow-consulting pierce has a 20% chance to cost no charge at all.
+        if (run.Tech.ShieldPiercing)
+        {
+            var luckyFree = _effect == CoreEffectKind.FletcherLuck
+                && _self.Consulted(run.Tech).Any(w => w.Kind == WeaponKind.Bow)
+                && _rng is not null && _rng.Chance(20);
+            if (!luckyFree && !TrySpendCharge(Math.Max(1, run.Tech.ChargeCost))) return false;
+        }
 
         // §6c INT robe: +2 SPELL DAMAGE per worn sustained piece (2-piece cap) — damage only,
         // never heals (the Repair branch above stays unbuffed) and only INT-stat casts.
@@ -392,7 +428,10 @@ public sealed class Caster
             var wound = _self.MostDamagedPart();
             if (wound is not null) _self.Repair(wound, power);
         }
-        if (run.Tech.Kind == TechniqueKind.Timered) run.Countdown = EffectiveCooldown(run.Tech);
+        // Adept's Resonance (shared on-hit-boon gate): a landed hit stacks −2%/stack off this
+        // technique's OWN next charge time, capped at 5 stacks.
+        if (_effect == CoreEffectKind.Resonance && landed) run.ResonanceStacks = Math.Min(5, run.ResonanceStacks + 1);
+        if (run.Tech.Kind == TechniqueKind.Timered) run.Countdown = EffectiveCooldown(run.Tech, run.ResonanceStacks);
         return true;
     }
 

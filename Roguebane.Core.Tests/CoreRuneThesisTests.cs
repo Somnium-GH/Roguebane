@@ -10,13 +10,13 @@ public class CoreRuneThesisTests
         && runes.TryTake(Paths.ResonantCore);
 
     [Fact]
-    public void SpecialistJustAffordsItsOwnKeystone()
+    public void SpecialistCoreClimbsItsKeystoneWithBudgetToSpare()
     {
         var runes = CoreRunes.Adept.NewLoadout();
         Assert.True(ClimbResonance(runes));
         Assert.True(runes.Has(Paths.ResonantCore));
-        Assert.Equal(10, runes.Spent);   // tight budget 10, spent to the rune
-        Assert.Equal(0, runes.Available);
+        Assert.Equal(10, runes.Spent);   // 5 + (6-2) + (4-3) = 10, the rune's own price
+        Assert.Equal(CoreRunes.Adept.RuneBudget - 10, runes.Available);
     }
 
     [Fact]

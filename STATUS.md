@@ -1,5 +1,26 @@
 # Status
 
+## ✅ CHUNK A COMPLETE (2026-07-05, loop) — v6 race/core overhaul landed as ONE coupled slice, 405/405
+Items 1–8 all done together (proven coupled — see the cont.#2 finding below): `Content/Races.cs` v6
+(Human/Elf/Dwarf/Halfling/Half-Giant), `Content/CoreRunes.cs` full 7-core rewrite (budgets/actions/
+minion-caps/stat-bonuses/kits/effects per CORE_RUNES.md, Barbarian added to `Roster`), the
+`CoreEffectKind` interpreter (`Body.cs` equip-time discounts shared with `DisabledGear`'s sustain
+cascade; `Caster.cs` reservation/discharge-time hooks) covering all 7 effects, `CoreRuneRosterTests`/
+`StartingKitTests` rewritten for the new kits/names, `CoreEffectRefundsSummons` retired end-to-end
+(dead mechanic, replaced by Conscription's `CoreEffectFreeSummons`), the SUSTAIN MODEL fix in
+`Body.Activate`, and the Sacrifice mechanic (consume-a-minion heal). NEW this pass:
+`CoreEffectTests.cs` — focused headless coverage for JackOfAllTrades (4 equip-time checkpoints incl.
+DisabledGear-consistency), Fortified (CON-plate governance reassignment + tier discount + sustain-
+cascade proof), Resonance (stack-and-decay-on-`RearmForEncounter`), Finesse (dual-wield technique
+reservation −1, isolated to `Caster.Reservation` — confirmed no Body-side branch), FletcherLuck (bow
+tier discount + a seeded maxCharge:0/luckyFree charge-skip proof), WarlordMight (2H STR-weapon −3 +
+flat STR-plate −1). Conscription already covered by `CoreRuneRosterTests`. Full suite 405/405 (395
+baseline + 10 new).
+**FLAGGED placeholder needing Doug's confirm:** Sacrifice's heal formula (`4 × consumed minion's
+Reserve` → 4/tier1, 8/tier2) is implemented and tested but the numbers/formula shape are unconfirmed
+per RULES_SNAPSHOT.md's OPEN item — do not treat as final until Doug reviews.
+**Next target: CHUNK B/C (Task #2 — UI paging, NewGame roster + Inventory screen).**
+
 ## 📐 RULES REFERENCE (2026-07-05, Cowork — STANDING; consult on ANY design conflict/ambiguity)
 The core/race/effect/kit/number design changed a lot this week. On any conflict or ambiguity about races,
 cores, Core Effects, stat bonuses, default kits, technique/gear reserves, or the reservation model,
@@ -91,175 +112,13 @@ B20 extraction ask (`outputs/CLAUDE_DESIGN_issues.md`); render only what the man
 Chunks are sized for real progress: finish a WHOLE chunk per pass where possible (M2 batching rule —
 same-class items share causes; one commit per coherent slice inside a chunk is fine, don't atomize).
 
-### CHUNK A — v6 DATA LAYER (pure Core + tests; no MonoGame; fully unblocked; do FIRST)
-Sync every content table to `design/systems/*.md` (they are canon; mock text in the ref PNGs is
-NON-canon where it disagrees — e.g. mock Claymore "6 dmg/1.4×" vs WEAPONS.md 7/1.3×; docs win).
-1. **Races** (`Content/Races.cs`, `Race.cs`): re-block to v6 — Human 5/5/5/5 hp20 · Elf 4/6/4/4 hp14 ·
-   NEW Dwarf 4/4/4/6 · Halfling 4/4/6/4 · Half-Giant 6/4/4/4 (id `half_giant` — must match the figure/
-   worn sprite keys). HP for the new three: FLAGGED placeholders — Dwarf 22, Halfling 16, Half-Giant 24
-   (Doug reviews; RACES.md leaves HP open). Tags/blurbs: FLAGGED placeholders in the same register as
-   Human/Elf (B17 notes Doug supplies finals).
-2. **Core stat bonuses — NEW MECHANIC** (`CoreRune.cs`, `Forge.cs`): a core now grants an ADDITIVE
-   per-stat bonus on top of race base (breaks the old "a core carries NO attrs" comment — update it):
-   Grunt +1 all · Warden +5 CON · Adept +5 INT · Summoner +3 INT/+2 CON · Reaver +5 DEX ·
-   Ranger +4 DEX/+1 CON · Barbarian +4 STR/+1 CON. Effective = race + core, everywhere bodies mint.
-3. **Core layouts + kits** (`Content/CoreRunes.cs`): budgets/actions/caps per CORE_RUNES.md's new
-   Layout-numbers table (Grunt 20/4/2 · Warden 18/4/1 · Adept 16/4/1 · Summoner 17/3/3 · Reaver 19/4/0 ·
-   Ranger 18/4/2 · **Barbarian 14/3/1**). Kits per CORE_RUNES.md §Default loadouts (Warden's Cleave→Jab;
-   Adept: Ember/Siphon/Stoneskin, staff, robe, NO minion; Summoner: Ember/Sacrifice/Barkskin, Skeleton
-   only in kit; Reaver: Frenzy/Flurry ONLY, no heal; Ranger: Aimed Shot/Lunge/Bandage, Iron DAGGER +
-   Short Bow; NEW Barbarian: Cleave/Bind/Bandage, Iron Claymore 2H, iron plate ×4). Archetypes/badges/
-   flavor from the docs+refs (Barbarian "THE WARLORD"/SPECIALIST) — this REPLACES the old Flavor
-   strings wholesale, which also settles the flagged "bay" copy in Warden/Summoner Flavor (last pass's
-   judgment call: superseded, no separate decision needed). `RuneDiscount`: set 0 all cores (flagged
-   working assumption in CORE_RUNES.md — JoAT is attribute costs, not rune prices).
-4. **Core Effects — REPLACE the roster, BUILD the mechanics** (data + ONE interpreter, no per-core
-   classes): Grunt *Jack of All Trades* (every attribute cost −1) · Warden *Fortified* (plate paid in
-   CON at tier−1) · Adept *Resonance* (each landed TARGETED spell part-hit → that spell's next charge
-   −2%, stacks ×5) · Summoner *Conscription* (fielding spends no Summons; replaces Legion/refund) ·
-   Reaver *Finesse* (techniques requiring two weapons reserve −1) · Ranger *Fletcher's Luck* (bow fires
-   20% no-Charge off the SEEDED sim RNG; bows equip −1/tier) · Barbarian *Warlord's Might* (2H swords
-   equip −3 STR; STR plate equip −1 STR/piece — corrected 2026-07-05 against Doug's balance spreadsheet, was
-   wrongly −2/no-plate-discount). Shared rule: on-hit boons need a landed PART-hit — never shield-absorbed,
-   never a broken part. Names/desc strings from CORE_RUNES.md verbatim.
-5. **Techniques** (`Content/Techniques.cs`): sync to TECHNIQUES.md — base 8.0s anchor model. Renames:
-   Drain→**Siphon** (2 dmg/6.0s, r2 INT, lifesteal = heals YOUR attribute damage equal to dealt;
-   part-hit rule applies) · old `stoneskin`→**Barkskin** (T1 INT ward, pool 3, +1/3.0s, r1). NEW:
-   **Stoneskin T2** (pool 6, **+2 pips/3.0s**, r2 INT — Doug 2026-07-05) · **Steel** (T2 CON, pool 8,
-   +1/1.5s, r3) · **Suture** (T2 CON heal 2/8.0s, r3) · **Bind** (T1 STR ward, pool 2, +1/2.5s, r2) ·
-   **Parry** (T1 DEX ward, pool 1, +1/2.0s, r2) · **Frenzy** (both blades, 1.0× avg speed, r2 DEX,
-   needs two weapons) · **Flurry** (both ×0.5, 0.5×, r1 DEX, needs two) · **Aimed Shot** (bow ×2.0,
-   2.0×, r1 DEX + 1 Charge, pierces) · **Sacrifice** (Summoner heal: consume 1 fielded minion → restore
-   4 part-points most-damaged-first — FLAGGED placeholder amount, TECHNIQUES.md marks it needs-design).
-   Bandage r1→**r2**. Frenzy/Flurry gate DEX (doc TBD says so; refs agree). Weapon-verb dmg/speed mults
-   per the doc table (Jab .5/.5 · Cleave 1.5/1.5 · Lunge .75/.6 · Shot 1.0/1.0 +1 CHG).
-6. **Weapons** (`Content/Armory.cs`): sync the T1 table — Dagger 0.6×/1dmg/1DEX · Rapier 0.7×/2/2 ·
-   Short Sword 0.8×/3/3 · Axe 0.9×/3/1STR · Longsword 1.0×/4/2 · Mace 1.1×/5/3 · Battleaxe 1.2×/6/4STR ·
-   Claymore 1.3×/7/5 · Warhammer 1.4×/8/5 · Staff 2dmg/2INT, +0.2× SPELL dmg/tier (2× a tome) · Wand
-   2/2INT shield-subtraction · Charm/Tome +0.1×/tier, 1 INT. Higher tiers scale as already established
-   (blessed-initial). Bow/sling dmg stay OPEN-flagged (§17 #9) — don't invent.
-7. **Minions** (`Content/Minions.cs`): Skeleton T1 INT r1, Timer 30 (3.0s), Power 1 · **Iron Golem**
-   (rename Golem) T2 INT r2, Timer 50, Power 3 · Hound T1 DEX r1, Timer 40, Power 1 + **+5% accuracy
-   while fielded** (new small hook; +5%/tier for descendants later). Shade stays out of `Minions.All`
-   (still the Conclave keystone reward; full deletion still needs Doug).
-8. **Tests (DoD for A):** every table above asserted (economy math, not assumed); all 35 race×core
-   combos embark and win per the established CoreCampaignTests pattern; effect mechanics each get a
-   focused test (Resonance stack cap, Conscription zero-spend, Fletcher seeded-RNG band, Fortified
-   CON-payment + Warden clearance CON 10 on Dwarf, JoAT −1 sweep, Finesse reserve). **Barbarian needs NO
-   exemption** (corrected 2026-07-05 — real STR demand is 10, not 15): assert Half-Giant+Barbarian
-   activates its FULL default kit; other race+Barbarian pairs (short 1-2 STR) activate the sustainable
-   subset, same as any other tight combo. Keep the no-CD-content-pinning rule (schema/fixtures only).
-(Bay→minion C# rename: DONE last pass, 391/391 — only the bind-key literal half remains, paired to
-CD's B19 landing; the literals list lives in git history + B19 itself. Don't rename literals early.)
-
-**Progress (2026-07-05, loop):** item 5's Jab/Cleave/Lunge weapon-consult DamageMult rewire is fully
-test-reconciled — every fixture body that activates a weapon-verb now wields a matching weapon (else
-`Caster.Activate`'s consult gate silently no-ops it); 392/392 green. Item 3's FULL CoreRunes.cs rewrite
-is still NOT started — applied only a minimal interim fix (dropped Jab from Reaver's kit; its twin
-daggers are DEX, Jab is STR, same silent-activate-failure). **Needs-human blockers RESOLVED (Doug, 2026-07-05) — item 3 is UNBLOCKED, do it next:**
-(a) **Reaver/dual-wield:** confirmed in code there's no hardcoded "dual-wield = STR" rule — a technique's
-stat gate is just whatever `Stat` it declares (`Body.Consulted` matches wielded-weapon stat against the
-technique's own field). Fix: add plain DEX clones `frenzy_dex`/`flurry_dex` (identical numbers, gated
-DEX) alongside the existing STR versions; Reaver's kit uses the clones. No rework of the STR originals.
-Locked in TECHNIQUES.md + CORE_RUNES.md.
-(b) **Summoner/Sacrifice:** locked as a real mechanic, not a substitute-heal punt. Consuming a fielded
-minion mends your most-damaged part (same targeting as Bandage/Suture) for an amount that SCALES with
-the sacrificed minion's tier; the minion is destroyed permanently (no refund/cooldown). Exact numbers
-are still FLAGGED placeholders (Skeleton/Hound T1 → 4, Iron Golem T2 → 8, unconfirmed) — build the
-mechanic + wire the T1 number now, flag the T2 number same as any placeholder. New engine piece needed:
-"consume a minion" as a technique cost (doesn't exist yet — nothing currently spends a minion).
-(c) **Adept vs Summoner shields:** no actual conflict — Adept uses Stoneskin T2 (already built in
-Techniques.cs, just needs kit-wiring), Summoner uses Barkskin T1. Both already correct in CORE_RUNES.md;
-this was a confirm, not a change.
-(d) **Barbarian STR gap — SUPERSEDED, real bug found 2026-07-05 (later same day):** the "15 vs 10" figure
-this section relied on was itself wrong — a hand-math error in CORE_RUNES.md (Warlord's Might costed as
-−2 STR on the claymore only, plate priced with no discount at all). Doug supplied the actual balance
-model (kept outside the repo, not tracked here; design/systems/*.md is the in-repo canon reconciled
-against it — see CLAUDE.md/DESIGN_SPEC.md
-pointers added this pass) and it computes Barbarian's real demand as **STR 10**: claymore 2 (5−3 Warlord's
-Might) + plate 4 (4×(2−1), Warlord's Might's plate discount) + Cleave 2 + Bind 2 = 10. Half-Giant's
-effective STR is 6+4=10 — an EXACT fit, zero headroom, not an over-demand. **No test exemption needed at
-all** — CORE_RUNES.md, RACES.md, TECHNIQUES.md all corrected; item 8 below updated to match. This replaces
-the earlier "keep the gap, add an exemption" decision outright, not in addition to it.
-
-**Progress (2026-07-05, loop, cont.):** item 7 done — Minions.cs synced to v6 (Skeleton r1/Timer30,
-IronGolem r2/Power3/Timer50 incl. clean `Golem`->`IronGolem` rename id `golem`->`iron_golem`, Hound
-AccuracyBonus 5 — the Caster.cs wiring for it already existed from an earlier pass, only the content
-value was missing). 392/392 green. Remaining CHUNK A items: 1 (Races.cs), 3 (CoreRunes.cs full rewrite,
-blocked on the 4 Needs-Human calls above), 6 (Armory.cs Frenzy/Flurry/Aimed Shot — also touches the
-Reaver STR/DEX question), 8 (new focused tests + Barbarian test-exemption).
-
-**Progress (2026-07-05, loop, cont. #2) — item 1 attempted TWICE this pass, reverted both times; new
-finding, re-scopes items 1-3:** applying items 1+2 alone (v6 Races.cs + the CoreRune stat-bonus values
-verbatim from item 2's own list above) against the CURRENT/interim item-3 kits pushes 383/392 (was
-392/392) — WORSE than a first incomplete attempt (387/392), not better, once the bonus values were
-corrected to match item 2's full list. Root cause (traced through `Body.cs`'s `DisabledGear`/`Reserved`):
-the interim Summoner kit's TOTAL same-stat demand — Ember(1 INT) + Skeleton(1 INT) + IronGolem(2 INT)
-+ RobeChest/RobeHead armor (INT-governed even though RobeChest's SLOT is CON — `Armor.Governing` is
-Robe-line-wide INT, req 2+1) + Wand/Charm weapons (also INT-governed, req 2+1) = **10 INT demand**,
-which exceeds even Elf's max under item 2's bonus (base 6 + IntBonus 3 = 9). This isn't a math slip on
-my part — the interim kit's per-item numbers were tuned against the OLD 12-14-range race stats (git
-history), and item 2's v6 bonuses are sized for item 3's FUTURE slimmer kit (Ember/Sacrifice/Barkskin,
-Skeleton only, no IronGolem — the kit swap item 3 itself calls for). **Conclusion: items 1, 2 and 3
-cannot land as separable commits — CoreCampaignTests exercises the FULL kit simultaneously, so v6 race
-stats only pass once item 3's kit swap lands alongside them.** This matches item 8's own framing ("Tests
-(DoD for A)" — one DoD for the whole chunk) and its explicit Barbarian over-demand exemption; the same
-category of exemption/timing applies to Summoner's transition, not just Barbarian. **Re-scope: don't
-reattempt item 1 standalone — next real progress on this thread means moving item 3's Needs-Human
-blockers (Reaver dual-wield stat, Summoner Sacrifice-placeholder conflict, Adept Stoneskin T2, Barbarian
-exemption wiring) to Doug, since item 3's kit swap has to land in the SAME slice as items 1+2.** Both
-files reverted to committed HEAD, tree clean, re-verified 392/392 before touching anything else.
-
-**Progress (2026-07-05, loop, cont. #3):** pulled one genuinely independent, non-blocked crumb out of
-item 3 instead — `RuneDiscount` retired to 0 on Grunt (was 1; every other core already 0), per
-CORE_RUNES.md's locked working assumption (JoAT moves to an attribute-cost effect under item 4, not yet
-built, so the old rune-PRICE discount has no design reason to survive). Fixed the one test this broke,
-`CoreRuneThesisTests.GruntCanClimbToTheSpecialistKeystoneAtARealCost` — its hardcoded `Spent` figure
-(7) was the discount-1 economy; recomputed for discount-0 (5 + (6-2) + (4-3) = 10) and updated the
-comment accordingly, test intent (Grunt's edge is budget, not a cheaper rune price) unchanged. 392/392
-green, committed standalone (this crumb has none of item 1-3's kit-coupling — it only changes a flat
-rune-cost number, not stat capacity vs. demand).
-
-**Progress (2026-07-05, loop, cont. #5):** landed the real Task #3 slice for Reaver (deferred rest of
-item 3 — see blocker below). Wand req fixed 2→1 INT/tier (WEAPONS.md). Frenzy/Flurry/Aimed Shot reserves
-corrected to the TECHNIQUES.md-locked 3/2/2; Frenzy/Flurry made genuinely **stat-flexible** (new
-`Technique.AltStat`, `Body.Consulted` OR-matches `Stat`/`AltStat` against the wielded weapon) per the
-2026-07-05 lock — retires the old frenzy_dex/flurry_dex clone-pair plan, one technique either stat.
-Reaver's kit/budget/CoreEffect rewired to CORE_RUNES.md's real spec: budget 19, kit = Frenzy+Flurry only
-(no heal), CoreEffectName corrected "Bloodrush"(stale)→"Finesse". Fixed a real latent bug this exposed:
-`BuildSession`'s technique palette (`Content/Sessions.cs`) only carried `Techniques.All` (7 spell/heal/
-passive entries) — any kit built entirely from Armory's weapon-verb techniques (Reaver's new Frenzy+
-Flurry) couldn't be seeded at all (`SeedKit`'s palette-id intersection came up empty → `Equipment` empty
-→ `BuildSessionTests.EveryCoreRuneShipsANonEmptyKitThatLandsInTheLoadout` failed). Ranger masked this same
-gap by accident (Lunge/Brace/Bandage in its kit ARE in `Techniques.All`, so Armory.Shot's own absence from
-the palette went unnoticed). Fix: palette now also carries Armory.Swing/Frenzy/Flurry/Shot/AimedShot.
-392/392 green.
-
-**Needs human — RESOLVED (Doug, 2026-07-05), item 3/1 UNBLOCKED:** the *Fortified* CON-plate question is
-answered. **Fortified is the WARDEN CORE EFFECT's grant:** it reassigns Warden's STR plate to be paid in
-**CON** (−1 STR-equiv/tier) — a per-core CORE-EFFECT governing-stat override, NOT a new armor line and NOT
-plate becoming CON for anyone else. Sanctioned in `design/systems/ARMOR.md` (Mechanics → "CON-plate override
-(Warden only, granted by the Core Effect)") so it's no longer an undesigned mechanic. Engine home: give the
-Core-Effect interpreter a per-core armor-governing override that `Body`/`Armor.Governing` consult for the
-Warden+Fortified case (the four armor lines in `Armor.cs` stay as-is; the override is effect-driven, gated to
-Warden). This is exactly item 4's *Fortified* mechanic + the item-3 kit swap — land them together with items
-1+2 in one tested slice per the coupling proof above. Nothing else in item 3/1 was ever blocked.
-
-**Note on the new HIGH-PRIORITY `parent` bug at the top of this file:** landed after this pass's engine
-work was already in flight; next loop pass picks it up first (it outranks CHUNK A per Doug's own
-priority marker) rather than continuing item 1/3.
-
-**Progress (2026-07-05, loop, cont. #4):** two more independent crumbs, both pure content, neither
-touches kit assignment or race/core stat capacity. (a) item 6: `Armory.cs`'s Staff ladder had
-`reqPerTier=1`, WEAPONS.md locks Staff at 2 INT/tier (same as Wand) — fixed to 2. Flagged the shared
-wand/staff `Timer=1.0` constant as WEAPONS.md's own Open/TBD, not a locked number, in the same comment.
-No test hardcoded the old value. (b) item 5's Needs-Human blocker (c) partially resolved: built
-**Stoneskin** (T2 INT ward, pool 6, +2 pips/3.0s, r2 INT — numbers were already locked in item 5's own
-line above, just not yet coded) as pure content in `Techniques.cs`, following Steel/Suture/Bind/Parry's
-existing pattern — NOT wired into Adept's kit (that assignment is still item-3-coupled: Adept's
-DefaultEquipment is Ember/Siphon/Bandage, unchanged). This only removes "doesn't exist yet" from
-blocker (c); the actual kit-swap decision (Stoneskin vs Barkskin for Adept) still waits on item 3
-landing with items 1+2. 392/392 green, committed standalone.
+### CHUNK A — v6 DATA LAYER — ✅ DONE 2026-07-05 (see the banner at the top of this file for the
+landed slice + the Sacrifice-heal placeholder flag). All 8 items + the new `CoreEffectTests.cs`
+coverage landed together in one coupled commit (races/cores/kits/effects cannot split — a full-kit
+CoreCampaignTests run is the chunk's own DoD). Blow-by-blow progress log moved to `git log`
+(STATUS.md whittling rule, line ~54) — see commits around 2026-07-05 for the coupling investigation,
+the Reaver/Sacrifice/Barbarian Needs-Human resolutions, and the RuneDiscount/Stoneskin/Wand-req
+crumbs landed along the way.
 
 ### CHUNK B — ASSET WIRING (mechanical; do right after A or interleave freely)
 1. Mirror every new CD-source mgcb entry into `Roguebane.Game/Content/Content.mgcb` (the copy builds

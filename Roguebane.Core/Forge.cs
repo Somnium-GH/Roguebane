@@ -15,7 +15,8 @@ public static class Forge
         var body = chassis.NewBody(race, runes);
         // Session is the legacy linear-run + balance-sim path (unattended): keep default-front auto-fire.
         // The interactive targeting FSM lives on the Expedition/Campaign mints below (requireAim).
-        var caster = new Caster(body, run.Current.Enemy, MagicCapacity(body));
+        var caster = new Caster(body, run.Current.Enemy, MagicCapacity(body),
+            freeSummons: chassis.CoreEffectFreeSummons, effect: chassis.Effect);
         return new Session(PlayerFighter(body, race), caster, WithRuneGrants(equipment, runes), run);
     }
 
@@ -29,11 +30,11 @@ public static class Forge
     {
         var body = chassis.NewBody(race, runes);
         var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, minionCap: chassis.MinionCap,
-            maxSummons: chassis.MinionCap + 2); // §9 deploy budget — placeholder size, economy tune owns it
+            maxSummons: chassis.MinionCap + 2, // §9 deploy budget — placeholder size, economy tune owns it
+            freeSummons: chassis.CoreEffectFreeSummons, effect: chassis.Effect);
         SummonKit(caster, chassis, runes);
         return new Expedition(PlayerFighter(body, race), caster, WithRuneGrants(equipment, runes), map,
-            figureId: chassis.FigureKey(race), refundSummonsOnRedeploy: chassis.CoreEffectRefundsSummons,
-            techniqueSlots: chassis.Kit.Count);
+            figureId: chassis.FigureKey(race), techniqueSlots: chassis.ActionSlots);
     }
 
     // The same mint, marching a multi-leg campaign to the Capital instead of one leg.
@@ -46,11 +47,11 @@ public static class Forge
     {
         var body = chassis.NewBody(race, runes);
         var caster = new Caster(body, maxCharge: MagicCapacity(body), requireAim: true, minionCap: chassis.MinionCap,
-            maxSummons: chassis.MinionCap + 2); // §9 deploy budget — placeholder size, economy tune owns it
+            maxSummons: chassis.MinionCap + 2, // §9 deploy budget — placeholder size, economy tune owns it
+            freeSummons: chassis.CoreEffectFreeSummons, effect: chassis.Effect);
         SummonKit(caster, chassis, runes);
         return new Campaign(PlayerFighter(body, race), caster, WithRuneGrants(equipment, runes), legs,
-            figureId: chassis.FigureKey(race), refundSummonsOnRedeploy: chassis.CoreEffectRefundsSummons,
-            techniqueSlots: chassis.Kit.Count);
+            figureId: chassis.FigureKey(race), techniqueSlots: chassis.ActionSlots);
     }
 
     // Field the chassis's minion kit plus any rune-granted minions into its capacity at assembly, so

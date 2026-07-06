@@ -58,13 +58,10 @@ public sealed class Expedition
     public Battle? Battle { get; private set; }
     public ExpeditionState State { get; private set; } = ExpeditionState.Choosing;
 
-    private readonly bool _refundSummonsOnRedeploy; // the Summoner's Core Effect [LOCKED §11]
-
     public Expedition(Fighter player, Caster caster, IReadOnlyList<Technique> equipment, CityMap map,
-        Stash? stash = null, string figureId = "human_grunt", bool refundSummonsOnRedeploy = false,
+        Stash? stash = null, string figureId = "human_grunt",
         int techniqueSlots = int.MaxValue)
     {
-        _refundSummonsOnRedeploy = refundSummonsOnRedeploy;
         _player = player;
         _caster = caster;
         _equipment = equipment.ToList();
@@ -388,9 +385,6 @@ public sealed class Expedition
     {
         if (State != ExpeditionState.Cleared) return;
         State = ExpeditionState.Choosing;
-        // The Summoner's Core Effect [LOCKED §11]: each SURVIVING minion (idle counts — it is still
-        // summoned) refunds its Summons on redeploy — its economy edge.
-        if (_refundSummonsOnRedeploy) _caster.RefundSummons(_caster.MinionCount);
         ClearAllAims(); // this fight's foe is gone; a stale lock must not bleed onto the next one
     }
 

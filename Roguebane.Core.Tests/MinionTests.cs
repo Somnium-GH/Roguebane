@@ -86,11 +86,11 @@ public class MinionTests
     }
 
     [Fact]
-    public void SummonerHasThreeMinionCapTheWardenNone()
+    public void SummonerHasThreeMinionCapTheWardenOne()
     {
         Assert.Equal(3, CoreRunes.Summoner.MinionCap);
-        Assert.Equal(0, CoreRunes.Warden.MinionCap);
-        Assert.Equal(1, CoreRunes.Grunt.MinionCap);
+        Assert.Equal(1, CoreRunes.Warden.MinionCap);
+        Assert.Equal(2, CoreRunes.Grunt.MinionCap);
     }
 
     [Fact]
@@ -201,12 +201,16 @@ public class MinionTests
     [Fact]
     public void SummonMinionMovesAStashedMinionIntoAFreeSlot()
     {
+        // v6: Wand+Charm+Ember+Barkskin leave the Summoner exactly 1 free INT after its kit's
+        // Skeleton+Golem -- Shade (3 INT, also retired from Minions.All) no longer fits. Hound
+        // gates on DEX instead, which the Summoner never touches, so it proves the free SLOT
+        // (MinionCap 3) fills independent of the INT pool being nearly spent.
         var exp = SummonerExpedition();
         Assert.Equal(2, exp.MinionCount); // Skeleton + Golem from the kit
-        exp.Stash.AddMinion(Minions.Shade); // as if bought from a merchant
+        exp.Stash.AddMinion(Minions.Hound); // as if bought from a merchant
 
-        Assert.True(exp.SummonMinion(Minions.Shade));
-        Assert.Contains(Minions.Shade, exp.Minions);
+        Assert.True(exp.SummonMinion(Minions.Hound));
+        Assert.Contains(Minions.Hound, exp.Minions);
         Assert.Equal(3, exp.MinionCount);
     }
 
