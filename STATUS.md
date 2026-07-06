@@ -69,11 +69,19 @@ session. **This is why:**
   really is free (see above); the pip bar just never shows the free unit that makes that legal. Once the
   container fits all 6 cells this will visually resolve itself — don't chase `Body.Activate` further, it
   was already checked and confirmed correct last pass.
-- Fix: widen `attrs.cells`'s rect (or the parent `attrReadout`/`attrBar`) by the same handful of px as
-  the other two off-by-ones, OR (better, fixes the whole class at once) make the pip-grid/list layout
-  actually respect an authored total-cell-count / min-fit the same way `cols` should already be respected
-  (flagged earlier this session) instead of silently dropping overflow. Given this is the THIRD instance
-  of the identical bug shape, consider it a standing pattern worth a general fix, not three separate ones.
+- ⇒ RE-DIAGNOSED (2026-07-06, loop) — not an engine bug, re-routed to CD as **B25**. Checked
+  `ListLayout.Cells`'s horizontal-flow path (used for `attrs.cells`, non-grid): its overflow-drop is a
+  second DELIBERATE pin, not an oversight — the "26 HP pips in a 12-pip region" comment at
+  `ListLayout.cs:42-44` documents the same "never spill past the container edge" contract the
+  `GridCapacity` pin covers for card grids, and it's shared by every horizontal pip strip (HP included) —
+  changing it here would silently change HP's rendering too, an undesigned side effect for a container-
+  geometry bug. The only real defect is `attrs.cells`'s authored width: `layout.json` rect is `326`, but
+  6 `attrPip` cells (`53` wide, `2` gap) need `6×53 + 5×2 = 328` — 2px short, same shape as `waresShelves`/
+  `invItems`. Logged as **B25** in `outputs/CLAUDE_DESIGN_issues.md` (widen `attrs.cells`'s rect to ≥328,
+  330+ for margin); no engine change needed once it lands. The "general min-fit engine fix" idea from the
+  first pass is NOT taken up here — it would touch the shared `Cells()` path (HP pips too) beyond what
+  this bug needs; if Doug wants that as a deliberate design change, it's a separate ask. Parked on CD, not
+  blocking.
 
 **Genuinely separate bug (confirmed, different code path): weapon inventory cards show the RAW cost, not
 the Core-Effect-discounted one.** "Grunt paying 2 STR for a sword instead of 1" — `Game1.ManifestRenderer
@@ -233,9 +241,10 @@ width rather than trusting `cols`, specifically so a card can never render 1px p
 edge. That decision is sound and stays. The only real defect is the container itself:
 `invItems.size[0] = 403` is exactly 1px short of the `199×2+6 = 404` two columns need — pure manifest
 geometry, same shape as the earlier `waresShelves` off-by-one, but this time in CD-owned
-`layout.json` (regenerated externally per CLAUDE.md — not ours to hand-patch). Logged as **B22** in
-`outputs/CLAUDE_DESIGN_issues.md` (widen `invItems.size[0]` to ≥404); no engine change needed once it
-lands. Parked on CD, not blocking.
+`layout.json` (regenerated externally per CLAUDE.md — not ours to hand-patch). Logged as **B24** in
+`outputs/CLAUDE_DESIGN_issues.md` (widen `invItems.size[0]` to ≥404; renumbered from a stale B22 —
+that slot collided with the unrelated merchant-sale-card-art ask already there); no engine change
+needed once it lands. Parked on CD, not blocking.
 
 **3. ⇒ RE-DIAGNOSED (2026-07-06, loop) — not an engine bug, re-routed to CD as B23.** Checked the
 "will clip or run outside the button" claim against `TextPxWrapped` (`Game1.Canvas.cs:138`) directly:

@@ -333,7 +333,7 @@ B12. **CLOSED 2026-07-04 — delivered + verified clean (744 files, no cross-pro
     mirror game-side), refreshed 00-assets sheets. Our SMOKE FIGURES + asset-exists probes verify
     completeness on landing — an inventory list in the drop notes helps us confirm fast.
 
-B22. **`inventory.invItems` (Equipment/GEAR tab) is 1px too narrow for its own authored `cols:2`.**
+B24. **`inventory.invItems` (Equipment/GEAR tab) is 1px too narrow for its own authored `cols:2`.**
     `layout.json`'s `invItems` list item authors `"flow":"grid","gap":6,"cols":2,"size":[199,44]` but
     the container itself (`invItems.size = [403,183]`) is exactly 1px short of what 2 columns need
     (`199*2+6 = 404`). Our `ListLayout.GridCapacity`/`.Cells` deliberately compute column count from
@@ -344,6 +344,18 @@ B22. **`inventory.invItems` (Equipment/GEAR tab) is 1px too narrow for its own a
     manifest clearly intends 2. Ask: widen `invItems.size[0]` to `≥404` (410+ for a visible margin) —
     a pure geometry fix, no new binds/states needed. We'll pick up the extra column automatically
     once the width actually fits (no engine change required on our side).
+
+B25. **`attrs.cells` (Equipment/Attributes panel pip strip) is 2px too narrow for a 6-capacity stat's
+    pips.** `layout.json`'s `attrs.cells` list item authors `attrPip` at `size:[53,9]`, `gap:2`, inside a
+    container `rect` of width `326`. A stat with capacity 6 (e.g. Human+Grunt STR: base 5 + Grunt's +1)
+    needs `6×53 + 5×2 = 328`px to render all 6 pips — 2px short. Our `ListLayout.Cells` (horizontal flow)
+    deliberately drops cells that would spill past the container edge rather than overlapping them (same
+    "never render past the region" contract as B24, pinned for the general case in
+    `ListLayoutTests` — a prior pass chose honest under-seating over silent clipping), so today the 6th
+    pip — which happens to be the one FREE (unreserved) pip — silently disappears, and the bar reads as
+    100% spent when 1 unit is actually still free. Ask: widen `attrs.cells`'s rect to `≥328` (330+ for a
+    visible margin) — pure geometry, no new binds/states/engine hooks needed. We'll render the 6th pip
+    automatically once the width fits.
 
 B23. **Equipment tab buttons (`invTab`) too narrow for two of their three labels, and the row leaves
     ~290px of dead space.** `invTab` template is `size:[40,18]` with its label text drawn into a
