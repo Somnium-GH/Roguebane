@@ -83,16 +83,24 @@ session. **This is why:**
   this bug needs; if Doug wants that as a deliberate design change, it's a separate ask. Parked on CD, not
   blocking.
 
-**Genuinely separate bug (confirmed, different code path): weapon inventory cards show the RAW cost, not
-the Core-Effect-discounted one.** "Grunt paying 2 STR for a sword instead of 1" — `Game1.ManifestRenderer
-.cs`'s `"invItems.badgeNum" => w.Reserve.ToString()` (weapon card badge) prints `Weapon.Reserve` directly
-— it never calls `Body`'s private `EffectiveWeaponReserve` (which folds in JoAT/WarlordMight/FletcherLuck
-discounts). The actual RESERVATION math is correct (see the STR back-computation above: discounted 4+1=5,
-matching what's rendered) — this is a DISPLAY-only bug: the card just shows the wrong number, the game
-isn't actually charging the undiscounted amount. Same pattern likely affects technique cards
-(`"invItems.badgeNum" => t.Reserve.ToString()`, line ~1605 — Reaver's Finesse discount wouldn't show
-either). Fix: badge display needs access to a Body (or the equipping build/expedition's effect) to run
-the same discount math the reservation itself already uses, for both weapon and technique cards.
+**⇒ WEAPON HALF FIXED (2026-07-06, loop):** `Game1.ManifestRenderer.cs`'s `"invItems.badgeNum"` for a
+`Weapon` now reads `Exp.Player.Body.EffectiveWeaponReserve(w)` (InRun) instead of `w.Reserve` raw.
+`Body.EffectiveWeaponReserve` went `private` -> `public` (pure function, no new state) so the renderer can
+call the SAME discount math the equip gate already used — no duplicated formula. `ResolveBind` dropped
+`static` to reach the instance's `InRun`/`Exp`. New test `CoreEffectTests.
+EffectiveWeaponReserveIsPubliclyReadableForCardDisplayAndMatchesTheEquipGate` pins the public contract
+directly (WarlordMight -3 on a 2H claymore). 421/421 green; `Roguebane.Game` full clean rebuild (`--no-
+incremental`, `scratch-build-stale-obj` memory) 0 errors.
+**Technique half NOT done — separate, harder slice, still open:** `"invItems.badgeNum" =>
+t.Reserve.ToString()` (technique card badge, same file ~line 1632) still prints raw. Reason it's not the
+same fix: technique reservation isn't a flat per-item discount like weapons/armor — `Caster.Reservation`
+(private, Caster.cs:196) branches on `Consults`: a `Primary`-consult technique (e.g. Jab) reserves **0** of
+its own (the ONE weapon it swings already reserves as gear — baking `t.Reserve` in too would double-count),
+while a `Both`-consult technique (Frenzy/Flurry) reserves its own `t.Reserve` minus Finesse/JoAT. Showing
+the *right* badge needs that same branch, but `Caster` is a combat-time object (needs a target to
+construct) — not something the pre-run Equipment/build screen has lying around the way `Exp.Player.Body`
+already did for weapons. Needs a display-only accessor (Body- or Technique-side, not a full `Caster`) before
+this half can land — a real design/API question, not a one-line wire-up. Left as-is, not touched this pass.
 
 **Not yet root-caused, needs a retest once the above two land:** "removing the shield and re-equipping it
 never reserves." Two live candidates, don't guess further without a fresh repro: (a) the still-open
@@ -233,7 +241,7 @@ regressions on screens this fix never touches like campaignmap/citymap/merchant 
 restored) — confirmed the SAME pre-existing baseline-drift gate failure already logged under Task #2/
 #3 above, not caused by this change. Parked, not blocking.
 
-**2. ⇒ RE-DIAGNOSED (2026-07-06, loop) — not an engine bug, re-routed to CD as B22.** Re-checked
+**2. ⇒ RE-DIAGNOSED (2026-07-06, loop) — not an engine bug, re-routed to CD as B24.** Re-checked
 `ListLayout` against the original report: it does NOT ignore the authored `cols:2` hint out of
 neglect — `ListLayoutTests.GridCapacityHonestlyReportsAOnePixelColumnShortfall` (landed in Task #2,
 `99238ed`) is a DELIBERATE pin: `GridCapacity`/`Cells` compute column count from the region's real

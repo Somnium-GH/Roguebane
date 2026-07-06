@@ -1494,7 +1494,9 @@ public partial class Game1
 
     // Resolve a template part's `binds` against a live datum -> display text, or null to use the sample.
     // Missing-data binds (race tag/blurb, per-attr tiles, Core Effect text) return null pending their data.
-    private static string? ResolveBind(object datum, string? bind) => datum switch
+    // Instance (not static): the Weapon case needs InRun/Exp to read the equipped Body's discounted
+    // reserve instead of the item's raw authored Reserve (2026-07-06 loop bug).
+    private string? ResolveBind(object datum, string? bind) => datum switch
     {
         System.Collections.Generic.IReadOnlyList<Roguebane.Core.Mark> lad => bind switch
         {
@@ -1644,7 +1646,9 @@ public partial class Game1
         {
             "invItems.name" or "gear.name" => w.Name is { Length: > 0 } ? w.Name : DisplayName(w.Id),
             "invItems.badgeLabel" => w.Stat.ToString().ToUpperInvariant(),
-            "invItems.badgeNum" => w.Reserve.ToString(),
+            // Discounted, not raw: a card must show what the equip gate actually charges (WarlordMight/
+            // FletcherLuck/JackOfAllTrades), or the badge lies about the cost (2026-07-06 loop bug).
+            "invItems.badgeNum" => (InRun ? Exp.Player.Body.EffectiveWeaponReserve(w) : w.Reserve).ToString(),
             // 2026-07-06: unhandled -> every gear card (weapon AND armor alike) fell back to the
             // manifest's static SAMPLE "4 dmg . 1.0x timer . 0.50 DPS.", surfaced alongside the
             // coreCard kit-bind gap. Power/Timer are the weapon's real §6d fields.

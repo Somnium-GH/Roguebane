@@ -33,7 +33,9 @@ public sealed class Body
     // WarlordMight/FletcherLuck/JackOfAllTrades: an equip-time discount on what a weapon costs to
     // wield/ready. Shared by Wield/EquipRanged AND DisabledGear's ongoing sustain math — both must
     // agree on the same discounted number or the equip gate and the post-damage cascade desync.
-    private int EffectiveWeaponReserve(Weapon w)
+    // Public: the invItems weapon-card badge reads this too, so its cost display agrees with the
+    // gate instead of showing Weapon.Reserve raw (2026-07-06 loop bug).
+    public int EffectiveWeaponReserve(Weapon w)
     {
         var r = w.Reserve;
         if (_effect == CoreEffectKind.WarlordMight && w.Hands == 2 && w.Stat == Stat.Str) r -= 3;

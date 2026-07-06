@@ -150,6 +150,20 @@ public class CoreEffectTests
         Assert.True(body.EquipRanged(bow)); // 4 - tier(2) = 2
     }
 
+    // --- Display-facing regression (2026-07-06 loop): the invItems weapon-card badge must read this
+    // SAME discounted number, not Weapon.Reserve raw, or the card lies about what the gate charges.
+    [Fact]
+    public void EffectiveWeaponReserveIsPubliclyReadableForCardDisplayAndMatchesTheEquipGate()
+    {
+        var claymore = Armory.Claymores[0]; // Reserve 5, Str, 2H
+        var plain = new Body();
+        Assert.Equal(claymore.Reserve, plain.EffectiveWeaponReserve(claymore)); // no effect -> raw
+
+        var warlord = new Body();
+        warlord.SetCoreEffect(CoreEffectKind.WarlordMight);
+        Assert.Equal(claymore.Reserve - 3, warlord.EffectiveWeaponReserve(claymore));
+    }
+
     [Fact]
     public void FletcherLuckSkipsChargeOnALuckyRollWhileABaselineCasterNeverFiresDry()
     {
