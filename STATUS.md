@@ -1,10 +1,53 @@
 # Status
 
+## ⇒ CLARIFIED (2026-07-05, Doug) — active-technique reservation IS correctly gated in code; the risk
+## was in the DOCS, not the mechanic. Plus one still-open, already-known mechanic gap.
+Doug's rule, verbatim: "Equipment permanently reserves attr. A skill must reserve attr to be active and
+charging or passively active. It cannot be active or passively active with insufficient attr. If
+deactivated attr is returned to pool." **Checked `Body.cs` directly against this, line by line:**
+- `Activate(Active active)` (line ~127): gates on `Capacity(stat) - TechReserved(stat) < active.Reserve`
+  → returns `false` (refuses activation outright) when insufficient — matches "cannot be active... with
+  insufficient attr" exactly. Confirmed correct, not reinterpreted.
+- `Deactivate(Active active)` (line ~139): just removes it from `_actives`, and `Reserved()`/`Available()`
+  sum over `_actives` live — so the freed reserve is immediate. Matches "deactivated attr returned to
+  pool" exactly.
+- `Reserved(stat) = TechReserved(stat) + DisabledGear(stat).EnabledTotal` (line ~78-82): gear's
+  contribution comes from whatever's CURRENTLY in `_hands`/`_ranged`/`_armor` — unconditional, no
+  separate "gear activation" gate exists — matches "Equipment permanently reserves attr" exactly.
+**So the ACTIVATION rule is implemented correctly and wasn't reinterpreted.** The real risk Doug sensed
+is real, just located in `design/systems/RULES_SNAPSHOT.md`, not the engine: its old "Reservation /
+combat model" section said *"every ACTIVE thing reserves... worn armor + equipped weapons + active
+techniques + active minions"* — one sentence that reads as if gear only reserves while some separate
+"active" state holds, same as techniques. That's not what the code does (gear reserves unconditionally
+at equip, no activation gate) and not what DESIGN_SPEC §7's fuller "Reservation timing" lock says either
+— RULES_SNAPSHOT's compression just lost the distinction. Since STATUS.md's own RULES REFERENCE banner
+tells the loop to trust RULES_SNAPSHOT over DESIGN_SPEC on any perceived conflict, that ambiguity was a
+real latent risk of a future pass "fixing" gear reservation into an activation-gated model that doesn't
+belong. **Fixed this pass:** RULES_SNAPSHOT.md's reservation section now spells out the two DIFFERENT
+triggers explicitly (equip-time unconditional reserve for gear vs. activation-only reserve for
+techniques/minions) and points back to DESIGN_SPEC §7 as the fuller lock.
+
+**One genuine, still-open mechanic gap (pre-existing, NOT touched by today's CHUNK A pass, not a new
+regression):** the EQUIP-TIME gates — `Body.Wield`, `Body.EquipRanged`, `Body.Equip` (armor) — each check
+only `Capacity(stat) < item's own Reserve`, i.e. against RAW capacity, never against what's already
+reserved by OTHER currently-equipped gear on that same stat. So a player CAN equip more gear than the
+shared pool actually holds; nothing blocks the equip action itself — only `DisabledGear`'s ongoing
+sustain cascade notices afterward and silently marks the lowest-priority piece(s) DISABLED. This matches
+DESIGN_SPEC §7's own "Reservation timing" paragraph, which already flags this exact gap by name ("today's
+engine gate only checks a single item's Reserve against raw Capacity... there IS currently no real
+cumulative equipment reservation") — confirmed still true today, not yet scheduled in CHUNK B/C. Fix:
+gate `Wield`/`EquipRanged`/`Equip` on `Available(stat) < effective reserve` (or equivalent) instead of
+raw `Capacity`, so over-equipping is refused at the equip click instead of silently degrading afterward —
+symmetric with how `Activate` already refuses instead of degrading.
+
 ## ‼ HIGH PRIORITY (2026-07-05, Doug) — Equipment/Inventory screen: 4 distinct root-caused bugs + 1 known item
 Doug's live report bundled several symptoms under "Inventory." Read the actual code for each — these are
 FOUR separate, independently-confirmed bugs, not one:
 
-**1. GEAR tab clicks resolve to the wrong item after every equip/unequip (the "clicking the same spot
+**1. ✅ FIXED (2026-07-06, loop).** Root-caused and closed — see below. Original report kept verbatim
+for the record.
+
+GEAR tab clicks resolve to the wrong item after every equip/unequip (the "clicking the same spot
 keeps toggling something else" / "clicked first repeatedly unequipped everything, clicked last on the
 last page equipped everything" reports) — HIGH PRIORITY, this can strip a player's whole loadout by
 accident.** Root cause: `GearTabItems()` (`Game1.ManifestRenderer.cs:1005`) builds the GEAR tab's list by
@@ -24,6 +67,25 @@ keyed by identity/acquisition, not by which collection currently holds it), with
 DISABLED/LOCKED computed as a per-item property at render/click time.** This also happens to be what
 DESIGN_SPEC §6e already locks ("ONE state family... items don't move, the state badge changes") — GEAR
 is the one tab not following its own spec.
+
+**Fix landed exactly as prescribed above.** `Stash` gained a stable identity roster
+(`WeaponRoster`/`ArmorRoster`, reference-identity keyed so structurally-equal `record` duplicates —
+the seeded duplicate-armor case — stay distinct entries) fed by `TrackOwned`, called from
+`Stash.AddWeapon`/`AddArmor` (catches merchant buys AND the RB_SMOKE dev-seed path, both of which
+call these) and once more from `Expedition`'s constructor (seeds kit items that `Forge` equips
+straight onto `Body`, which never touch `Stash`). `Game1.ManifestRenderer.GearTabItems()` now reads
+`Exp.Stash.WeaponRoster.Concat(ArmorRoster)` — fixed acquisition order, immune to equip/unequip
+churn — instead of concatenating live Body+Stash membership. `InvCardState`'s EQUIPPED/EQUIPPABLE/
+DISABLED/LOCKED computation was already correct (per-item, not position-based) and untouched.
+4 new headless tests (`StashTests`: roster order survives leaving the pack, equal-valued duplicates
+stay distinct, `TrackOwned` is idempotent by reference; `ExpeditionTests`: roster seeds from the
+starting kit and survives an equip/unequip round-trip) — 416/416 (412 + 4). Verified live via
+RB_SMOKE `loadout`/`equipment`: GEAR tab renders 3 correctly-labeled EQUIPPED rows, no crash.log.
+**`ui_gate.py` isolated per anti_block protocol** (`git stash` this fix → rebuild → re-run → near-
+identical failure, e.g. equipment 70.7%→70.8%, everything else byte-for-byte the same, including
+regressions on screens this fix never touches like campaignmap/citymap/merchant → `git stash pop`
+restored) — confirmed the SAME pre-existing baseline-drift gate failure already logged under Task #2/
+#3 above, not caused by this change. Parked, not blocking.
 
 **2. Only 1 column renders instead of 2 (`invItems` grid).** Two things stacked: (a) the manifest
 authors `"cols": 2` on the `invItems` list item (`layout.json:6449`), but `ListLayout`'s grid flow

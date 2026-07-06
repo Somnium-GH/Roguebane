@@ -335,6 +335,27 @@ public class ExpeditionTests
         Assert.DoesNotContain(Armory.Dagger, exp.Stash.Weapons); // left the pack
     }
 
+    // HIGH PRIORITY bug #1: the GEAR tab used to build its rows by concatenating Body + Stash live,
+    // so equipping/unequipping (which MOVES a piece between them) reshuffled every other piece's
+    // screen-slot index too, mis-routing clicks. Pins that the Expedition seeds a stable roster from
+    // the starting kit at construction, and that it survives an equip/unequip round-trip untouched.
+    [Fact]
+    public void GearRosterSeedsFromTheStartingKitAndSurvivesAnEquipUnequipCycle()
+    {
+        var exp = FullLoadout(); // DemoBody wields Sword then Dagger, no armor
+        var seeded = exp.Stash.WeaponRoster.ToList();
+        Assert.Equal(new[] { Armory.Sword, Armory.Dagger }, seeded);
+        Assert.Empty(exp.Stash.ArmorRoster);
+
+        exp.Enter("a1"); FightToEnd(exp);
+        exp.Enter("b");
+        exp.UnequipWeapon(Armory.Sword); // Sword: Body -> pack
+        Assert.Equal(seeded, exp.Stash.WeaponRoster); // roster order unchanged by the move
+
+        Assert.True(exp.EquipWeapon(Armory.Sword)); // Sword: pack -> Body again
+        Assert.Equal(seeded, exp.Stash.WeaponRoster); // still unchanged
+    }
+
     [Fact]
     public void GearCannotBeEquippedMidFight()
     {

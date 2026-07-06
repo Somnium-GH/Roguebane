@@ -1004,14 +1004,14 @@ public partial class Game1
     };
 
     // The GEAR tab's rows, ONE composition shared by the renderer's list bind and the click
-    // hit-test (a divergence would mis-route clicks): wielded, then worn armor (it lives on the
-    // BODY — Gearing moves it out of the pack, so listing only the stash hid it), then the pack.
+    // hit-test (a divergence would mis-route clicks). Fixed identity/acquisition order from
+    // Stash's roster (Stash.cs) — NOT built by concatenating wherever each piece currently lives
+    // (Body vs pack), because equipping/unequipping MOVES a piece between those, which reshuffled
+    // every other piece's screen-slot index too and mis-routed clicks (HIGH PRIORITY bug #1).
+    // EQUIPPED/EQUIPPABLE/DISABLED/LOCKED is a per-item property computed at render/click time
+    // (InvCardState above) — order here never needs to reflect current equip state.
     private List<object> GearTabItems() => InRun
-        ? Exp.Player.Body.Hands.Cast<object>()
-            .Concat(Exp.Player.Body.Ranged is { } rw ? new object[] { rw } : Array.Empty<object>())
-            .Concat(new[] { Stat.Str, Stat.Int, Stat.Dex, Stat.Con }
-                .Select(s => (object?)Exp.Player.Body.ArmorOn(s)).OfType<object>())
-            .Concat(Exp.Stash.Weapons).Concat(Exp.Stash.Armor).ToList()
+        ? Exp.Stash.WeaponRoster.Cast<object>().Concat(Exp.Stash.ArmorRoster).ToList()
         : new List<object>();
 
     // How many technique cards precede the bay lane on the action bar (hotkey numbering).

@@ -64,7 +64,16 @@ Base technique speed **8.0s**; melee/ranged verbs CONSULT the weapon for damage;
 - **Weapon families / numbers:** see `WEAPONS.md`. Staff is 2 INT + magic dmg = 2× a tome. Bows/sling damage OPEN.
 
 ## Reservation / combat model
-- Every ACTIVE thing reserves from a per-stat pool: **worn armor + equipped weapons + active techniques + active minions**. Toggle something off and its reserve frees.
+- One shared per-stat pool. **Two different triggers feed it — do not conflate them:**
+  **(1) EQUIPMENT reserves the moment it's equipped**, unconditionally, for as long as it stays
+  equipped — worn armor and wielded/ranged weapons are NOT separately "activated"; being equipped
+  IS the reservation event (Equipment screen / build time), and it's cumulative with everything else
+  equipped. **(2) TECHNIQUES AND MINIONS reserve ONLY on their own in-combat activation** (charging,
+  passively active, or fielded) — never merely for being slotted/owned — and free the instant they're
+  deactivated/dismissed. A technique or minion cannot become active/passive/fielded at all while the
+  pool lacks room for its reserve (the activation attempt itself is refused, not just later disabled).
+  (DESIGN_SPEC §7 "Reservation timing" is the fuller lock this compresses — read it if this summary
+  and the code ever seem to disagree.)
 - A part's damage drops its stat → active things that need that stat **deactivate** until it heals (§5/§6).
 - **Demand** = the full-kit reserve per stat with effect discounts applied (the "req" above).
 - **Tier scaling (PARKED — T1 only):** tier ↑ = bigger effect + longer charge (≈constant DPS) + more reserve — EXCEPT DEX attack skills, which tier into SPEED (charge down). Dual-wield flavor: DEX → speed, STR → damage.

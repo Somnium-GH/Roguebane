@@ -69,6 +69,14 @@ public sealed class Expedition
         _stash = stash ?? new Stash();
         FigureId = figureId;
         TechniqueSlots = techniqueSlots;
+
+        // Forge equips the chassis kit straight onto the Body before an Expedition exists, so those
+        // pieces never pass through Stash.AddWeapon/AddArmor -- seed the GEAR roster with them here so
+        // it's stable from turn 1 (see Stash's roster fields for why this exists).
+        foreach (var w in _player.Body.Hands) _stash.TrackOwned(w);
+        if (_player.Body.Ranged is { } ranged) _stash.TrackOwned(ranged);
+        foreach (var s in new[] { Stat.Str, Stat.Int, Stat.Dex, Stat.Con })
+            if (_player.Body.ArmorOn(s) is { } armor) _stash.TrackOwned(armor);
     }
 
     // The technique action bar's fixed slot count (the CoreRune's starting Kit size, §6e "techniques
