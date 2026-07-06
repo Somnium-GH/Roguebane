@@ -625,19 +625,15 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
    combos; **everything in FOES.md's IDEAS section stays unbuilt** (it's marked, believe it).
 
 ### Then: the standing bug queue (loop-actionable, in order)
-- **Engine: recursive `parent`-box resolution — DROP PRE-REQ (2026-07-05, verified ABSENT).** CD's next
-  drop re-anchors every screen and adds a `parent` field (CD dev-memory #35, = the no-absolute-positioning
-  payoff, outbox B21): a child's `offset` becomes RELATIVE to its named parent element's box instead of the
-  screen, so grouped clusters (HP readout+pips, panel+contents, top-right controls, action-bar minion
-  column) reflow as ONE unit. Today `ScreenLayout.Resolve(designW,designH,Element e)`
-  (`Roguebane.Core/Layout/ScreenLayout.cs:16`) resolves anchor+offset+size against the SCREEN only and
-  `Element` has no `parent`. Add: parse `parent`; resolve an element's rect RECURSIVELY (resolve the
-  parent's box first, then place the child by anchor+offset INSIDE it) — single forward pass, id→box cache,
-  children rank after parents in z. MUST land BEFORE/WITH that drop or every parented child mis-places
-  (offsets are now small parent-relative, not screen-px). SEPARATE: off-16:9 aspect-fill (grow the middle
-  panel) is §13 WIP, not part of this. (Verified 2026-07-05: the OTHER dev-memory "engine-pending" items —
-  merchant/states/border.sides/shield-pips/core.label/pagination — already SHIPPED; logged in
-  `CD_CLOSED_ITEMS.md`. Only #35, #30 glow/pulse, and #32 worn-draw remain, #32 already in Debt below.)
+- **Engine: recursive `parent`-box resolution — ✅ DONE, this bullet was stale (2026-07-06, loop).**
+  This was tracked here as a drop PRE-REQ, but it already SHIPPED — see the "✅ FIXED (2026-07-05, loop) —
+  `"parent"` in layout.json now resolves" banner earlier in this file (`b6812bf`): `Element.Parent` and
+  `ScreenLayout`'s recursive parent-chain resolve are both live (confirmed on disk: `LayoutManifest.cs:88`,
+  `ScreenLayout.cs:13,30,33`). Leaving the old wording in place risked a future pass re-implementing
+  already-shipped work. CD dev-memory #35/B21 (the drop that USES this) is otherwise unaffected.
+  Two items from this bullet's old parenthetical are still genuinely open, not tracked elsewhere — kept
+  here so they aren't silently dropped: **#30 glow/pulse** (no engine primitive yet, not started) and
+  **#32 worn-draw composition**, which IS tracked, see Debt below ("Worn-armor DRAW wiring").
 - **Merchant pager doesn't indicate page 2** (Doug 2026-07-05, not root-caused): needs a live repro
   with a >3-section stock — check `MerchantSections()` count vs the `>` arrow's render/bind, and
   whether B13's 1px row-drop masks page 2. Don't re-diagnose B13/B14 (both root-caused, CD-side,
