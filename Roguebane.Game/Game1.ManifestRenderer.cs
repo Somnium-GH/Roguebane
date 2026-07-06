@@ -1011,14 +1011,19 @@ public partial class Game1
     };
 
     // The GEAR tab's rows, ONE composition shared by the renderer's list bind and the click
-    // hit-test (a divergence would mis-route clicks). Fixed identity/acquisition order from
-    // Stash's roster (Stash.cs) — NOT built by concatenating wherever each piece currently lives
-    // (Body vs pack), because equipping/unequipping MOVES a piece between those, which reshuffled
-    // every other piece's screen-slot index too and mis-routed clicks (HIGH PRIORITY bug #1).
-    // EQUIPPED/EQUIPPABLE/DISABLED/LOCKED is a per-item property computed at render/click time
-    // (InvCardState above) — order here never needs to reflect current equip state.
+    // hit-test (a divergence would mis-route clicks). Base order is the fixed identity/acquisition
+    // order from Stash's roster (Stash.cs) — NOT built by concatenating wherever each piece currently
+    // lives (Body vs pack), because equipping/unequipping MOVES a piece between those, which
+    // reshuffled every other piece's screen-slot index too and mis-routed clicks (HIGH PRIORITY
+    // bug #1). On top of that stable base, equipped items sort to the front (Doug's ask) via a
+    // STABLE OrderByDescending on the same live EQUIPPED read `InvCardState` already uses for the
+    // card badge — so equip/unequip still visibly moves an item to/from the top cluster (the point
+    // of the ask), but within the equipped and unequipped halves the roster's acquisition order is
+    // preserved, keeping click routing exactly as stable as bug #1's fix made it.
     private List<object> GearTabItems() => InRun
-        ? Exp.Stash.WeaponRoster.Cast<object>().Concat(Exp.Stash.ArmorRoster).ToList()
+        ? Exp.Stash.WeaponRoster.Cast<object>().Concat(Exp.Stash.ArmorRoster)
+            .OrderByDescending(item => InvCardState(item) == "equipped")
+            .ToList()
         : new List<object>();
 
     // How many technique cards precede the bay lane on the action bar (hotkey numbering).

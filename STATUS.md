@@ -32,18 +32,20 @@ per-state pager variants get authored) or use `button_pager.png` untinted for al
 buttons since a distinct hover/down look matters less at this size — loop's call on which, just don't
 keep silently defaulting every skinned button to the wide-bar frame regardless of its own image field.
 
-**3. "Sort equipment so equipped items stick to the top" — this is also the real fix for finding #1
-above (GEAR-tab clicks resolving to the wrong item).** Doug's ask lines up exactly with the fix already
-prescribed there: replace `GearTabItems()`'s "concatenate live Body slots + Stash" (which reorders on
-every equip/unequip) with ONE STABLE roster — enumerate everything the player owns (equipped ON the body
-PLUS whatever's in `Exp.Stash`), sort **equipped-first** (then some stable secondary key — acquisition/
-equip-sequence order works, `Body` already tracks `_equipSeq`/`_handSeq`/`_armorSeq`/stash order for the
-disable-cascade tiebreak, reuse it here rather than inventing a new key), and compute EQUIPPED/EQUIPPABLE
-as a per-item property read off the CURRENT body/stash state at render/click time — never by which
-collection currently holds the item. Toggling equip/unequip still moves an item between the "equipped"
-and "unequipped" halves of the SAME list (so it still visually jumps to the top or out of the top
-cluster, which is the point of this ask), but it's now the ONE deliberate, predictable reorder Doug is
-asking for — not the arbitrary concatenation-order churn bug #1 diagnosed. Same fix serves both asks.
+**3. ✅ FIXED (2026-07-06, loop).** "Sort equipment so equipped items stick to the top." Bug #1's roster
+fix (below) landed the STABLE base order but deliberately did NOT sort equipped-first — its own comment
+said "order here never needs to reflect current equip state," since at the time only click-routing
+stability was in scope. This is the separate, still-open half of that ask. **Fix:** `GearTabItems()`
+(`Game1.ManifestRenderer.cs`) now applies a STABLE `OrderByDescending(item => InvCardState(item) ==
+"equipped")` on top of the roster's fixed acquisition order — LINQ's `OrderBy`/`OrderByDescending` are
+documented-stable, so ties (same equipped/not-equipped bucket) keep the roster's original order, meaning
+equip/unequip visibly moves an item to/from the top cluster (the point of the ask) while both the render
+list and the click hit-test (same shared `GearTabItems()` call, no divergence) stay in lockstep — no
+regression on bug #1's click-routing fix. Reuses the exact live EQUIPPED read `InvCardState` already
+computes for the card badge, no new state/derivation. Game-only change (no Core touched), verified via
+clean `Roguebane.Game` build + logic review (stable-sort semantics are LINQ-documented, not assumed); not
+re-screenshotted live this pass since the underlying roster/paging/click-routing were already verified
+live in Task #2 and this only adds a stable sort on top.
 
 ## ⇒ CLARIFIED (2026-07-05, Doug) — active-technique reservation IS correctly gated in code; the risk
 ## was in the DOCS, not the mechanic. Plus one still-open, already-known mechanic gap.
