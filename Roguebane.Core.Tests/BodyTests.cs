@@ -56,6 +56,28 @@ public class BodyTests
         Assert.Equal(4, body.Contribution(leftArm)); // capped at the part's share
     }
 
+    // Damaged() is the UI's third pip tier (bug #4): capacity lost to injury, distinct from both
+    // free (Available) and spoken-for-but-intact (Reserved).
+    [Fact]
+    public void DamagedIsZeroWhenNothingIsHurt()
+    {
+        var body = Build(out _, out _);
+        Assert.Equal(0, body.Damaged(Stat.Str));
+    }
+
+    [Fact]
+    public void DamagedReflectsExactCapacityLostAndClearsOnRepair()
+    {
+        var body = Build(out var leftArm, out _);
+        body.Damage(leftArm, 2); // STR 8 -> 6
+        Assert.Equal(2, body.Damaged(Stat.Str));
+        Assert.Equal(6, body.Capacity(Stat.Str));
+
+        body.Repair(leftArm, 2); // fully healed
+        Assert.Equal(0, body.Damaged(Stat.Str));
+        Assert.Equal(8, body.Capacity(Stat.Str));
+    }
+
     [Fact]
     public void CannotEngageGearWithoutEnoughStat()
     {

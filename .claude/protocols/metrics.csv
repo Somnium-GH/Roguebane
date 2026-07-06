@@ -5,3 +5,4 @@ date,task,minutes,lines_changed,estimate_minutes,method
 2026-07-06,bug1-gear-roster,45,110,-,commit-delta
 2026-07-06,bug2-invitems-cols-rediagnose,15,30,-,commit-delta
 2026-07-06,bug3-invtab-sizing-rediagnose,15,28,-,commit-delta
+2026-07-06,bug4-attr-pip-4zone-and-bindswap,55,175,-,commit-delta

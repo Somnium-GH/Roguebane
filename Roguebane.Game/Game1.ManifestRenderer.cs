@@ -827,7 +827,7 @@ public partial class Game1
                 // Nested pip strip (§12): a part carrying its OWN list stamps a leaf template per
                 // cell, the cells sliced from the ROW datum (pool rows / attr bars).
                 if (pp.List is { } nested && pp.Binds is "pool.attr.cells" or "attrs.cells"
-                    && datum is ValueTuple<string, string, int, int, string> rowD)
+                    && datum is AttrRow rowD)
                 {
                     if (_ui.Manifest is { } mN && mN.Templates.TryGetValue(nested.Template, out var pipT))
                     {
@@ -893,8 +893,11 @@ public partial class Game1
                 if (!stateBound)
                 {
                     // attr.color binds the swatch's fill TOKEN to the datum (str/int/dex/con);
-                    // attrs.pip picks per PIP INDEX: filled -> the attr's token, allocatable -> slot,
-                    // beyond the cap -> nothing.
+                    // attrs.pip picks per PIP INDEX, 4-way (§7 4-ZONE ENCODING): gear-reserved and
+                    // technique-reserved -> slot (this legacy color-fill path predates the textured
+                    // pip art and can't tell hash textures apart), free -> the attr's token, damaged
+                    // (lost, healable) -> "damage", beyond cap+damaged -> nothing. Dead in current
+                    // layout.json (attrs.cells/PoolCells is the live sprite path) but kept in shape.
                     // colorBind (manifest-declared) wins; the older bind-specific tinting stays as the
                     // fallback for manifests that predate it.
                     string? fillTok = ResolveColorToken(pp.ColorBind, datum);
@@ -902,10 +905,14 @@ public partial class Game1
                     if (fillTok is not null) { }
                     else if (pp.Binds == "attr.color" && datum is not null)
                         fillTok = ResolveBind(datum, pp.Binds);
-                    else if (pp.Binds == "attrs.pip" && datum is ValueTuple<string, string, int, int, string> ab)
+                    else if (pp.Binds == "attrs.pip" && datum is AttrRow ab)
                     {
                         var p = pipIx++;
-                        fillTok = p < ab.Item3 ? ab.Item5 : p < ab.Item4 ? "slot" : null;
+                        var reservedEnd = ab.GearReserved + ab.TechReserved;
+                        fillTok = p < reservedEnd ? "slot"
+                            : p < ab.Capacity ? ab.Token
+                            : p < ab.Capacity + ab.Damaged ? "damage"
+                            : null;
                         skipFill = fillTok is null;
                     }
                     // Glyph tiles colour by the datum's stat (technique/minion cards).
@@ -1156,12 +1163,25 @@ public partial class Game1
         _ => null,
     };
 
-    // One pool/attr row's pip cells: capacity cells total, free-first — free points render the
-    // stat-tinted full pip, reserved ones the reserved variant (design/01 pool rows, design/02 bars).
-    private static List<object> PoolCells(ValueTuple<string, string, int, int, string> row)
-        => Enumerable.Range(0, row.Item4).Select(i => (object)new PoolCell(
-            i < row.Item3 ? "full" : "reserved",
-            (i < row.Item3 ? "pip_full_" : "pip_reserved_") + row.Item5)).ToList();
+    // One attr row's pip cells (§7 "ATTRIBUTE PIP BAR — 4-ZONE ENCODING", LOCKED 2026-07-05): bar is
+    // authored to MAX (undamaged) capacity, so Capacity+Damaged cells total, left to right:
+    // 1. gear-reserved (armor/weapons, permanent while equipped) -> hashed pip_reserved
+    // 2. technique-reserved (active/charging, frees on deactivate) -> solid non-hashed pip_empty
+    // 3. free (whatever's left, unreserved) -> the stat-tinted solid pip_full
+    // 4. damaged (capacity lost to injury, gone until healed) -> hashed pip_damage, different tone
+    // All 4 looks already exist on disk (confirmed by direct view) -- pure wiring, no new art.
+    private static List<object> PoolCells(AttrRow row)
+    {
+        var gearEnd = row.GearReserved;
+        var techEnd = gearEnd + row.TechReserved;
+        var freeEnd = row.Capacity;
+        return Enumerable.Range(0, row.Capacity + row.Damaged).Select(i => (object)new PoolCell(
+            i < gearEnd ? "gear" : i < techEnd ? "tech" : i < freeEnd ? "free" : "damaged",
+            i < gearEnd ? "pip_reserved_" + row.Token
+                : i < techEnd ? "pip_empty"
+                : i < freeEnd ? "pip_full_" + row.Token
+                : "pip_damage")).ToList();
+    }
 
     // A campaign leg on the spine strip: taken / current / future (spineCity state key).
     private sealed record CityLeg(string Status);
@@ -1170,8 +1190,12 @@ public partial class Game1
 
     // A textured gauge/strip pip: live/spent + which ui/pip PNG renders it (imageBind).
     private sealed record PipPoint(bool Live, string Asset);
-    // One cell of a pool/attr pip strip: full/reserved + its per-stat ui/pip PNG.
+    // One cell of a pool/attr pip strip: gear/tech/free/damaged + its ui/pip PNG.
     private sealed record PoolCell(string State, string Asset);
+
+    // One attribute pip-bar row (§7 4-ZONE ENCODING): key, part label, the 2 reservation zone sizes,
+    // current (post-damage) capacity, capacity lost to damage, and the pip colour token.
+    private sealed record AttrRow(string Key, string Part, int GearReserved, int TechReserved, int Capacity, int Damaged, string Token);
 
     // Merchant list data (shell-side view records — the Core sells, the shell narrates).
     private sealed record MerchantOffer(string Name, string Note, int Price);
@@ -1298,18 +1322,18 @@ public partial class Game1
             _ui.Color(wp.Color, Ink), wp.FontPx);
     }
 
-    // The attribute bars/pool rows: one datum per stat — (key, part label §6, free pool, capacity,
-    // pip colour token). In a run the LIVE body supplies them (actives reserve, damage shrinks caps);
-    // pre-run it's the build preview, where nothing is reserved so free == capacity.
+    // The attribute bars/pool rows: one AttrRow per stat (§7 4-ZONE ENCODING). In a run the LIVE body
+    // supplies them (actives reserve, gear reserves, damage shrinks caps); pre-run it's the build
+    // preview, where nothing is reserved or damaged.
     private System.Collections.Generic.IReadOnlyList<object> AttrBars()
     {
         var b = InRun ? Exp.Player.Body : _build.Preview();
         return new object[]
         {
-            ("STR", "Arms", b.Available(Stat.Str), b.Capacity(Stat.Str), "str"),
-            ("INT", "Head", b.Available(Stat.Int), b.Capacity(Stat.Int), "int"),
-            ("DEX", "Legs", b.Available(Stat.Dex), b.Capacity(Stat.Dex), "dex"),
-            ("CON", "Chest", b.Available(Stat.Con), b.Capacity(Stat.Con), "con"),
+            new AttrRow("STR", "Arms", b.GearReserved(Stat.Str), b.TechReserved(Stat.Str), b.Capacity(Stat.Str), b.Damaged(Stat.Str), "str"),
+            new AttrRow("INT", "Head", b.GearReserved(Stat.Int), b.TechReserved(Stat.Int), b.Capacity(Stat.Int), b.Damaged(Stat.Int), "int"),
+            new AttrRow("DEX", "Legs", b.GearReserved(Stat.Dex), b.TechReserved(Stat.Dex), b.Capacity(Stat.Dex), b.Damaged(Stat.Dex), "dex"),
+            new AttrRow("CON", "Chest", b.GearReserved(Stat.Con), b.TechReserved(Stat.Con), b.Capacity(Stat.Con), b.Damaged(Stat.Con), "con"),
         };
     }
 
@@ -1515,12 +1539,18 @@ public partial class Game1
             "attr.color" => a.Item3,
             _ => null,
         },
-        ValueTuple<string, string, int, int, string> ab => bind switch // (key, part, free, cap, token) attr bar
+        // AttrRow (§7 4-ZONE ENCODING). Bind names read by MEANING, not by tuple position (that swap
+        // was bug #4's smaller half): "available" = free-right-now, "alloc" = the total pool
+        // allocated to this stat (== current Capacity).
+        AttrRow ab => bind switch
         {
-            "attrs.key" or "pool.attr.key" => ab.Item1,
-            "attrs.part" or "pool.attr.part" => ab.Item2,
-            "attrs.alloc" or "pool.attr.alloc" => ab.Item3.ToString(),
-            "attrs.available" or "pool.attr.available" => ab.Item4.ToString(),
+            "attrs.key" or "pool.attr.key" => ab.Key,
+            "attrs.part" or "pool.attr.part" => ab.Part,
+            "attrs.available" or "pool.attr.available" => (ab.Capacity - ab.GearReserved - ab.TechReserved).ToString(),
+            "attrs.alloc" or "pool.attr.alloc" => ab.Capacity.ToString(),
+            "attrs.damaged" or "pool.attr.damaged" => ab.Damaged.ToString(),
+            "attrs.gearReserved" or "pool.attr.gearReserved" => ab.GearReserved.ToString(),
+            "attrs.techReserved" or "pool.attr.techReserved" => ab.TechReserved.ToString(),
             _ => null,
         },
         MerchantSection sec => bind switch // §12 wares shelves (design/07)

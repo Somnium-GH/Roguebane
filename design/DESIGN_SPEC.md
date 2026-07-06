@@ -342,6 +342,20 @@ whether a piece **can be equipped at all** (the threshold check at equip time); 
 whether it **stays up** once several things share one shrinking pool — both are true, at different
 moments.
 
+**ATTRIBUTE PIP BAR — 4-ZONE ENCODING [LOCKED 2026-07-05, Doug]:** each stat's pip bar is authored to
+the RACE+PARTS' MAX capacity (undamaged), and reads as four contiguous zones, left to right:
+1. **Armor/weapon reservation** — HASHED pips, filling LEFT-TO-RIGHT starting at the left edge. Covers
+   worn armor + wielded/ranged weapons (permanent reservation while equipped, §7's "Reservation timing").
+2. **Active-technique reservation** — REGULAR (solid, non-hashed) pips, immediately after zone 1. Covers
+   whatever's currently active/charging/passively active (frees the instant it deactivates).
+3. **Free** — whatever's left of current (post-damage) capacity, unreserved.
+4. **Damage** — HASHED pips, filling RIGHT-TO-LEFT starting at the right edge; the gap between max and
+   current capacity (a damaged part shrinking its stat, §6/§8).
+Zones 1 and 4 are both hashed but read as OPPOSITE directions/ends so they never look interchangeable
+even in the same color family. This distinguishes "permanently spent on gear" (1) from "spent right now
+on an active verb, comes back the instant you toggle it off" (2) from "gone until the part heals" (4) —
+three different player-facing meanings the old free/not-free binary collapsed into one look.
+
 **PAPER-DOLL [render = CAPABILITY truth]:** equipped+active gear draws its morph layers (§7);
 **DISABLED gear is REMOVED from the render** (bare part — assignment truth stays on the red card);
 a weapon in a BROKEN arm never draws (the hand slot is physically gone, §6). Handedness (§6d) picks

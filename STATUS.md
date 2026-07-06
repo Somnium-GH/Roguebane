@@ -1,5 +1,50 @@
 # Status
 
+## ‼ HIGH PRIORITY (2026-07-05, Doug) — 3 more findings: pip-bar 4-zone build (art already exists!) —
+## ✅ FIXED 2026-07-06 (see bug #4 below for the full writeup) — pager-button skin bug (root-caused),
+## equipped-items-sort-to-top (also fixes bug #1 above)
+
+**1. ✅ FIXED (2026-07-06, loop).** Attribute pip bar 4-zone build — see bug #4's entry below for the
+complete fix writeup (`Body.GearReserved`/`TechReserved`/`Damaged`, `AttrRow`, 4-zone `PoolCells`). All 4
+zone looks were confirmed already on disk (`pip_full`, `pip_reserved`, `pip_damage`, `pip_empty`) — pure
+engine wiring, zero CD ask, exactly as diagnosed here.
+
+**2. Pager prev/next buttons ("rotated and overscaled") — ROOT-CAUSED, confirmed by viewing the actual
+PNGs.** `button_pager.png` (`Roguebane.Content/ui/button/`) is a small near-SQUARE frame — purpose-built
+for compact pager buttons. `button_normal/hover/down/disabled/on.png` are wide ~3:1 RECTANGULAR bar
+frames — built for full-width buttons like BEGIN THE RUN. `DrawStateSkin` (`Game1.ManifestRenderer.cs:
+1397`), which draws EVERY `"family":"button"` skinned element including the pager prev/next arrows,
+resolves its skin purely from `e.States[key]` → always `ui/button/button_{normal|hover|down|disabled|on}`
+— it never looks at the element's own `e.Image` field. So the pager buttons (authored with
+`"image": "Content/ui/button/button_pager.png"` specifically because they need the compact square
+frame — confirmed in `layout.json` on `invPagePrev/Next`, `corePagePrev/Next`, and the merchant pager)
+instead get the WIDE bar skin's corners (9-sliced at a corner size sized for a ~116px-wide button, fixed
+`ButtonSlice={12,12,12,12}` scaled by `dstCornerScale=0.5`) squeezed into a ~20x15px near-square target
+— the source's horizontal bar geometry, rivets and bevel get badly skewed/stretched into that mismatched
+aspect ratio, which reads as "rotated and overscaled." **Separately confirmed (a red herring, NOT the
+cause, but worth a real fix too):** `button_pager.png` is registered in the CD-side `Content.mgcb` but
+has ZERO entry in the GAME-side `Roguebane.Game/Content/Content.mgcb` — so even if the skin-selection bug
+were fixed today, the correct asset still isn't wired into the build (folds into CHUNK B's existing mgcb-
+mirror pass, item 1). **Fix (two parts, do both):** (a) mirror `button_pager.png`'s mgcb entry into the
+game-side Content.mgcb (CHUNK B), (b) make `DrawStateSkin` prefer a per-element skin when `e.Image` is
+authored — either treat `e.Image`'s basename as the state-asset stem (`button_pager` + suffix, if/when
+per-state pager variants get authored) or use `button_pager.png` untinted for all states on these small
+buttons since a distinct hover/down look matters less at this size — loop's call on which, just don't
+keep silently defaulting every skinned button to the wide-bar frame regardless of its own image field.
+
+**3. "Sort equipment so equipped items stick to the top" — this is also the real fix for finding #1
+above (GEAR-tab clicks resolving to the wrong item).** Doug's ask lines up exactly with the fix already
+prescribed there: replace `GearTabItems()`'s "concatenate live Body slots + Stash" (which reorders on
+every equip/unequip) with ONE STABLE roster — enumerate everything the player owns (equipped ON the body
+PLUS whatever's in `Exp.Stash`), sort **equipped-first** (then some stable secondary key — acquisition/
+equip-sequence order works, `Body` already tracks `_equipSeq`/`_handSeq`/`_armorSeq`/stash order for the
+disable-cascade tiebreak, reuse it here rather than inventing a new key), and compute EQUIPPED/EQUIPPABLE
+as a per-item property read off the CURRENT body/stash state at render/click time — never by which
+collection currently holds the item. Toggling equip/unequip still moves an item between the "equipped"
+and "unequipped" halves of the SAME list (so it still visually jumps to the top or out of the top
+cluster, which is the point of this ask), but it's now the ONE deliberate, predictable reorder Doug is
+asking for — not the arbitrary concatenation-order churn bug #1 diagnosed. Same fix serves both asks.
+
 ## ⇒ CLARIFIED (2026-07-05, Doug) — active-technique reservation IS correctly gated in code; the risk
 ## was in the DOCS, not the mechanic. Plus one still-open, already-known mechanic gap.
 Doug's rule, verbatim: "Equipment permanently reserves attr. A skill must reserve attr to be active and
@@ -112,23 +157,40 @@ either), is pure `layout.json` geometry: `invTab` template size, its item `size`
 longer labels don't need heavy shrinking); no engine change needed once it lands. Parked on CD, not
 blocking.
 
-**4. Equipment reservation is visually present but easy to miss — not fully absent.** `attrBar`
+**4. ✅ FIXED (2026-07-06, loop).** Same root cause as originally reported here, but the real fix ended
+up being the full DESIGN_SPEC-locked **4-zone** build (see item #1 at the top of this file, which this
+same change also closes) rather than a 3-way approximation — the first pass through this cycle built a
+3-way version before the 4-zone lock in item #1 was noticed mid-cycle; that intermediate 3-way state was
+never committed.
+
+Equipment reservation was visually present but easy to miss — not fully absent. `attrBar`
 (`layout.json:10901`, bound to `"attrs"` on the Equipment screen, `layout.json:6321`) DOES read live
-`Body.Available`/`Body.Capacity` data and DOES render a pip strip (`attrs.cells`/`attrPip`) — but the pip
-fill logic (`Game1.ManifestRenderer.cs:901-905`) only encodes TWO states: pip index `< Available` renders
-colored/filled (free), everything else (both genuinely RESERVED capacity and any capacity lost to damage)
-renders as the same plain `"slot"` token. DESIGN_SPEC's own "ATTRIBUTE-POOL PIP WIDGET" calls for THREE
-distinguishable states (free/reserved/damaged) — today reserved and damaged are visually identical to
-each other and to generic "unfilled," so equipping something that eats STR doesn't visibly change
-anything distinct from how the bar already looked. Separate, smaller mislabel found alongside this:
-the numeric readout binds `attrs.alloc` → `Item3` (which is actually `Available`, the FREE count) and
-`attrs.available` → `Item4` (which is actually `Capacity`, the TOTAL) — the bind names are swapped from
-what they actually carry (`Game1.ManifestRenderer.cs:1505-1508`); harmless today only because the template
-doesn't literally print the word "alloc"/"available" next to them, but worth fixing before anyone reads
-those bind names as documentation. Fix: give `PoolCells`/the pip-fill switch a real 3-way state (add a
-`Reserved(stat)` tier between free and damaged — `Body.Reserved(stat)` already exists and is currently
-NEVER called anywhere in `Roguebane.Game`, confirmed by grep), and swap the `alloc`/`available` bind names
-to match what they actually hold.
+`Body` data and DOES render a pip strip (`attrs.cells`/`attrPip`) — but the pip fill logic
+(`Game1.ManifestRenderer.cs:901-905`) only encoded TWO states: pip index `< Available` renders
+colored/filled (free), everything else (gear reservation, technique reservation, AND any capacity lost
+to damage, all three collapsed together) rendered as the same plain `"slot"` token. Also a separate
+mislabel: the numeric readout binds `attrs.alloc` → `Item3` (actually `Available`, the FREE count) and
+`attrs.available` → `Item4` (actually `Capacity`, the TOTAL) — swapped from what they actually carried.
+
+**Fix.** `Body.cs`: exposed `TechReserved(stat)` publicly (was private) and added `GearReserved(stat)`
+(`DisabledGear(stat).EnabledTotal`) so gear and technique reservation size their own zones instead of
+only being visible as the combined `Reserved()` total; added `Damaged(stat)` — capacity lost to injury,
+the gap between each part's undamaged `Capacity` and its live `Contribution`. `Game1.ManifestRenderer.cs`:
+replaced the old 5-arity attr-row tuple with a proper `AttrRow(Key, Part, GearReserved, TechReserved,
+Capacity, Damaged, Token)` record used by `AttrBars()`, the `attrs.cells`/`attrs.pip` dispatch,
+`PoolCells`, and the bind-resolution switch. `PoolCells` now emits `Capacity + Damaged` cells total (bar
+authored to MAX/undamaged capacity, so a damaged stat keeps its full width instead of shrinking) across 4
+zones left→right, matching DESIGN_SPEC's lock exactly: gear-reserved → hashed `pip_reserved_<attr>`,
+technique-reserved → solid non-hashed `pip_empty` (repurposed — no dedicated "tech" art exists, confirmed
+by viewing all 4 PNGs directly: `pip_full`/`pip_reserved`/`pip_damage` are unambiguous, `pip_empty` is the
+only remaining plain/solid look and reads correctly as "spent, but not permanently"), free → stat-tinted
+`pip_full_<attr>`, damaged → hashed `pip_damage` (different tone from `pip_reserved`'s hash, already on
+disk, never wired before this fix — zero new art). The dead (unreferenced in current `layout.json`)
+`attrs.pip` solid-color-fill switch branch got matching zone math for parity, though it can't represent
+hash-texture distinctions since it fills flat rects, not sprites. Fixed the `attrs.alloc`/`attrs.available`
+swap by reading bind names by MEANING (added `attrs.gearReserved`/`attrs.techReserved` binds too). 2 new
+headless tests (`BodyTests`: `DamagedIsZeroWhenNothingIsHurt`, `DamagedReflectsExactCapacityLostAndClears
+OnRepair`) — 418/418. Both `Roguebane.Core` and `Roguebane.Game` build clean.
 
 **5. Paper-doll missing sprites (NewGame heads + "almost every other paper doll") — ALREADY TRACKED, not
 a new bug.** This is CHUNK B item 1 below: the last CD drop updated `Roguebane.Content/Content.mgcb` but

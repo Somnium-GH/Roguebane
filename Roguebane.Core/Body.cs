@@ -74,12 +74,21 @@ public sealed class Body
     // the SAME shared pool per stat. Reserved = techniques (always-on once activated) + whatever
     // gear currently fits what's left (see DisabledGear) — so Available reflects the true headroom
     // for a new technique activation, gear equip disable is separate (raw Capacity gate at equip
-    // time, unchanged) from this ongoing sustain accounting.
-    private int TechReserved(Stat stat) => _actives.Where(a => a.Stat == stat).Sum(a => a.Reserve);
+    // time, unchanged) from this ongoing sustain accounting. Exposed as two public halves (not just
+    // the combined Reserved total) so the UI can draw the DESIGN_SPEC 4-zone pip bar (gear zone vs.
+    // technique zone are visually distinct — §7 "ATTRIBUTE PIP BAR — 4-ZONE ENCODING").
+    public int TechReserved(Stat stat) => _actives.Where(a => a.Stat == stat).Sum(a => a.Reserve);
 
-    public int Reserved(Stat stat) => TechReserved(stat) + DisabledGear(stat).EnabledTotal;
+    public int GearReserved(Stat stat) => DisabledGear(stat).EnabledTotal;
+
+    public int Reserved(Stat stat) => TechReserved(stat) + GearReserved(stat);
 
     public int Available(Stat stat) => Capacity(stat) - Reserved(stat);
+
+    // Capacity lost to damage, per stat -- the gap between a part's undamaged Capacity and its
+    // current Contribution. Distinct from Reserved(): reserved pool is still THERE, just spoken
+    // for; damaged pool is gone until healed. The pip bar's 4th zone (§7 4-ZONE ENCODING).
+    public int Damaged(Stat stat) => _parts.Where(p => p.Stat == stat).Sum(p => p.Capacity - Contribution(p));
 
     private readonly record struct GearCandidate(string Kind, int Reserve, int Seq, int HandIndex, Stat ArmorSlot);
 
