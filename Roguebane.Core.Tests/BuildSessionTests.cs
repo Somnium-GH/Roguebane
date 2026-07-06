@@ -167,6 +167,19 @@ public class BuildSessionTests
         }
     }
 
+    // Data invariant (2026-07-06 loop, Debt item): the action bar's ActionSlots must never be smaller
+    // than the starting Kit — every display/lock site that reads "how many technique slots" (NewGame
+    // preview, Equipment slotLabel/core.stats, the inventory lock threshold) was undersizing itself by
+    // reading Kit.Count instead of ActionSlots on the 5/7 cores where a rune-granted technique needs
+    // room the kit alone doesn't reserve. Pins the invariant those fixes now depend on.
+    [Fact]
+    public void EveryCoreRunesActionSlotsCoverItsOwnStartingKit()
+    {
+        foreach (var core in CoreRunes.Roster)
+            Assert.True(core.ActionSlots >= core.Kit.Count,
+                $"{core.Id}: ActionSlots {core.ActionSlots} < Kit.Count {core.Kit.Count}");
+    }
+
     [Fact]
     public void CyclingCoreRuneReseedsTheKit()
     {

@@ -672,10 +672,17 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
 - Rarity chips (COMMON/MAGIC/RARE) + rune-bag MARKS/PATHS/KEYSTONES sample runes appear in the refs —
   NO rarity/taxonomy model is designed; engine keeps gating those binds silent. Design-open (§17 #3),
   don't build from mock copy.
-- `Kit.Count`-vs-`ActionSlots` mismatch, 4 sites in `Game1.ManifestRenderer.cs` (~551/577/994/1057) —
-  line ~994 may gameplay-cap technique-equip at 3 instead of the real `ActionSlots` (4 for 5/7 cores).
-  See the TASK #2 COMPLETE banner above for detail. Needs an audit pass + per-core headless equip-cap
-  test, not yet started.
+- **⇒ FIXED (2026-07-06, loop):** `Kit.Count`-vs-`ActionSlots` mismatch, all 4 sites in
+  `Game1.ManifestRenderer.cs` (`preview.techniques` ~L555, `loadout.slotLabel` ~L581, the technique
+  `InvCardState` lock threshold ~L1005, `core.stats`'s `"actions"` row ~L1074) now read
+  `CoreRune.ActionSlots` instead of `Kit.Count`. Audited the click path first (`UpdateBarDrag` in
+  `Game1.cs` calls `toggle()` unconditionally — the "locked" chrome was cosmetic-only, no real
+  functional cap existed anywhere in Core), so this was a display-correctness fix, not an unblock:
+  5/7 cores (all but Summoner/Barbarian, both `ActionSlots == Kit.Count`) were showing/locking one
+  slot short of the real action-bar capacity. Added
+  `BuildSessionTests.EveryCoreRunesActionSlotsCoverItsOwnStartingKit` (Core.Tests) pinning the data
+  invariant these reads depend on (`ActionSlots >= Kit.Count` for every roster core) — 422/422 green;
+  `Roguebane.Game` clean rebuild (`--no-incremental`) 0 errors.
 - Barbarian's CORE EFFECT card text visually cuts off (Warlord's Might string vs box size, likely) —
   seen in a screenshot pass, not yet root-caused. Cosmetic, one card, not blocking.
 

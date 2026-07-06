@@ -552,7 +552,10 @@ public partial class Game1
         "preview.role" => _build.CoreRune.Archetype,
         "preview.hp" => _build.Race.Hp.ToString(),
         "preview.budget" => _build.CoreRune.RuneBudget.ToString(),
-        "preview.techniques" => _build.CoreRune.Kit.Count.ToString(),
+        // Labeled "ACTIONS" in the manifest (design/NewGame.dc.html previewActionsTile) — the action
+        // bar's real capacity, not the starting kit size (2026-07-06 loop: was Kit.Count, undersized
+        // on the 5/7 cores where a rune-granted technique has room the kit alone doesn't show).
+        "preview.techniques" => _build.CoreRune.ActionSlots.ToString(),
         "preview.bays" => _build.CoreRune.MinionCap.ToString(),
         "preview.coreEffectName" => _build.CoreRune.CoreEffectName,
         // *.coreEffect is the BLOCK container (border chrome; label/name/desc are their own
@@ -577,8 +580,10 @@ public partial class Game1
         // READY TO MARCH copy; a live fight reads FIGHTING.
         "run.state" => !InRun || Exp.State == Roguebane.Core.ExpeditionState.Choosing
             ? "READY TO MARCH" : Exp.State.ToString().ToUpperInvariant(),
+        // Denominator is the action bar's real capacity (ActionSlots), not the starting kit size —
+        // same undersizing bug as preview.techniques above (2026-07-06 loop).
         "loadout.slotLabel" => "TECHNIQUES - "
-            + (InRun ? Exp.Equipment.Count : _build.Equipment.Count) + " / " + _build.CoreRune.Kit.Count + " slotted",
+            + (InRun ? Exp.Equipment.Count : _build.Equipment.Count) + " / " + _build.CoreRune.ActionSlots + " slotted",
         "minions.slotLabel" => "MINIONS - "
             + (InRun ? Exp.Minions.Count : _build.CoreRune.MinionKit.Count) + " / " + _build.CoreRune.MinionCap + " slotted",
         // Equipment inventory pager (design/02): pages whichever tab is active, sized live off the
@@ -1001,8 +1006,11 @@ public partial class Game1
             && Exp.Player.Body.Capacity(ar2.Governing) >= ar2.Requirement ? "equippable" : "locked",
         Roguebane.Core.Technique t when (InRun ? Exp.Equipment : _build.Equipment).Contains(t)
             => "equipped",
+        // Threshold is ActionSlots (real action-bar capacity), not Kit.Count (starting kit size) — a
+        // rune-granted 4th technique has room on the 5/7 cores where ActionSlots > Kit.Count
+        // (2026-07-06 loop: card previously read "locked" one slot early).
         Roguebane.Core.Technique => (InRun ? Exp.Equipment.Count : _build.Equipment.Count)
-            >= _build.CoreRune.Kit.Count ? "locked" : "equippable",
+            >= _build.CoreRune.ActionSlots ? "locked" : "equippable",
         Roguebane.Core.Minion m when (InRun
             ? Exp.Minions.Contains(m) : _build.CoreRune.MinionKit.Contains(m)) => "equipped",
         Roguebane.Core.Minion => (InRun ? Exp.Minions.Count : _build.CoreRune.MinionKit.Count)
@@ -1070,7 +1078,7 @@ public partial class Game1
         "core.stats" => new List<object>
         {
             ("bays", _build.CoreRune.MinionCap.ToString()),
-            ("actions", _build.CoreRune.Kit.Count.ToString()),
+            ("actions", _build.CoreRune.ActionSlots.ToString()), // real capacity, not Kit.Count (2026-07-06 loop)
             ("budget", _build.CoreRune.RuneBudget.ToString()),
         },
         // CityMap chart legend (design/03): what the node icons mean — display metadata, same rows the
