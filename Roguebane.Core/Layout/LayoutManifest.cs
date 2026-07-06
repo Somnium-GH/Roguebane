@@ -85,6 +85,9 @@ public sealed class Element
     public int[] Offset { get; init; } = [];
     public int[] Size { get; init; } = [];
     public int Z { get; init; }
+    public string? Parent { get; init; } // resolve anchor+offset against THIS element's rect, not the
+                                         // screen (ScreenLayout.Resolve recurses; missing/cyclic id falls
+                                         // back to the viewport, same tolerant-degrade convention as elsewhere)
     public string? Binds { get; init; }
     public string? Image { get; init; }
     public string? Color { get; init; }

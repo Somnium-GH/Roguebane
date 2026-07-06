@@ -10,15 +10,53 @@ public readonly record struct LayoutRect(int X, int Y, int W, int H);
 // coordinates; mapping design->screen (cover/letterbox + integer stage) is a separate viewport pass.
 public static class ScreenLayout
 {
+    // Screen-aware entry points: an element carrying `Parent` resolves against THAT element's rect
+    // (recursively) instead of the viewport. Missing parent id or a cycle falls back to the viewport,
+    // same tolerant-degrade convention as the rest of the manifest bridge.
     public static LayoutRect Resolve(Screen screen, Element e)
-        => Resolve(screen.DesignSize[0], screen.DesignSize[1], e);
+        => Resolve(screen.DesignSize[0], screen.DesignSize[1], screen, e);
 
+    public static LayoutRect Resolve(int designW, int designH, Screen screen, Element e)
+        => ResolveRecursive(designW, designH, screen, e, new HashSet<string>());
+
+    // No-Screen entry point (e.g. synthetic elements with no id/parent, like FullWidthRect's stretched
+    // clone): always resolves against the viewport — cannot look up a parent without a Screen.
     public static LayoutRect Resolve(int designW, int designH, Element e)
+        => ResolveAgainstViewport(designW, designH, e);
+
+    private static LayoutRect ResolveRecursive(int designW, int designH, Screen screen, Element e,
+        HashSet<string> visiting)
+    {
+        if (string.IsNullOrEmpty(e.Parent) || !visiting.Add(e.Id))
+            return ResolveAgainstViewport(designW, designH, e);
+
+        var parentEl = Array.Find(screen.Elements, x => x.Id == e.Parent);
+        if (parentEl is null)
+        {
+            visiting.Remove(e.Id);
+            return ResolveAgainstViewport(designW, designH, e);
+        }
+
+        var parentRect = ResolveRecursive(designW, designH, screen, parentEl, visiting);
+        visiting.Remove(e.Id);
+        return ResolveAgainstRect(parentRect, e);
+    }
+
+    private static LayoutRect ResolveAgainstViewport(int designW, int designH, Element e)
     {
         var a = Parse(e.Anchor);
         var (ax, ay) = Point(designW, designH, a);   // anchor point on the viewport
         var (ex, ey) = Point(e.Size[0], e.Size[1], a); // the element's same-named corner, element-local
         return new LayoutRect(ax + e.Offset[0] - ex, ay + e.Offset[1] - ey, e.Size[0], e.Size[1]);
+    }
+
+    private static LayoutRect ResolveAgainstRect(LayoutRect parent, Element e)
+    {
+        var a = Parse(e.Anchor);
+        var (ax, ay) = Point(parent.W, parent.H, a);   // anchor point within the PARENT's resolved rect
+        var (ex, ey) = Point(e.Size[0], e.Size[1], a); // the element's same-named corner, element-local
+        return new LayoutRect(parent.X + ax + e.Offset[0] - ex, parent.Y + ay + e.Offset[1] - ey,
+            e.Size[0], e.Size[1]);
     }
 
     public static Anchor Parse(string anchor) => anchor switch

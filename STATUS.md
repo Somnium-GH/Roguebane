@@ -39,45 +39,17 @@ one thing I can't do in the sandbox is BUILD — run Core.Tests and confirm gree
   mechanics (still pins `CoreRuneRosterTests` line ~32 Grunt "Hollow Vessel" + the Summoner RefundsSummons
   test — update those), budgets + v6 race stats. All now UNBLOCKED.
 
-## ‼ HIFI, HIGH PRIORITY (2026-07-05, Doug screenshot) — `"parent"` in layout.json is DEAD DATA; every
-## nested/parent-relative element renders in the wrong place, screen-wide
-Doug's NewGame screenshot shows the title garbled ("Human Grunt"/"THE GENERALIST" bleeding into the
-"Roguebane"/"Choose your Loadout" header) and the whole right-side Loadout panel collapsed into one
-overlapping cluster (stat tiles, CORE EFFECT box, and the "BEGIN THE RUN" button all stacked on top of
-each other mid-screen instead of stacked down the panel with BEGIN at the true bottom bar).
-
-**Root cause, confirmed by reading the full chain, not assumed:** `layout.json` elements carry a
-`"parent": "<id>"` key (160 occurrences across the file) meaning "resolve my anchor+offset against
-THIS element's rect, not the screen." **Nothing in the engine reads it.** `Element`
-(`Roguebane.Core/Layout/LayoutManifest.cs:80-106`) has no `Parent` property at all — grepped `parent`
-case-insensitively across `LayoutManifest.cs`, `ScreenLayout.cs`, and `Game1.ManifestRenderer.cs`: zero
-hits in all three. `ScreenLayout.Resolve(int designW, int designH, Element e)` always anchors against
-the passed-in viewport size; `ManifestUi.Rect(Screen screen, Element e)` (`ManifestUi.cs:35-39`), the
-ONE chokepoint the whole renderer calls to place any element, always passes the SCREEN's (extended)
-design size — never a parent's rect. So every `parent`-carrying element silently resolves against the
-full screen instead of its container.
-
-This exactly explains the screenshot: `previewName`/`previewRole` (`parent: previewStage`, small
-TopLeft offsets like `[7,7]`) resolve against the raw viewport TopLeft instead of `previewStage`'s
-rect (which sits on the far right) — landing right on top of `logo`/`topBarSubtitle` at the screen's
-real top-left corner. `previewBudgetTile`/`previewActionsTile`/`previewBaysTile` (`parent:
-previewLayoutRow`), `previewCoreEffect*` (`parent: preview`/`previewCoreEffect`), and `beginBtn`
-(`parent: confirmBar`, anchor `Right`) are all anchored `Right`, so they all resolve against the same
-"viewport-Right-anchor, vertically centered" point, offset only by their own small deltas — which is
-why they all pile into one overlapping cluster instead of spreading from the Loadout header down to
-the real bottom confirm bar. **160 elements share this bug** — this is not scoped to NewGame; grep
-`"parent":` in `layout.json` for the full blast radius before assuming any other screen is clean.
-
-**Fix:** add `public string? Parent { get; init; }` to `Element`; give `ScreenLayout` (or `ManifestUi`,
-since it already holds the screen's element list via `Screen`) a parent-aware resolve: if `e.Parent` is
-set, look up that element by id in `screen.Elements`, resolve ITS rect first (recurse — parent chains
-nest, e.g. `previewCoreEffectLabel` → `previewCoreEffect` → `preview`; guard against cycles/missing ids
-by falling back to the screen viewport, matching today's tolerant-degrade convention noted in
-`ManifestUi.cs`'s file header), then resolve the child's anchor+offset+size against the PARENT's
-resolved rect (same anchor math as `ScreenLayout.Point`, just using the parent's W/H for the anchor
-point and adding the parent's X/Y as origin) instead of the screen's design size. Needs a headless
-`Roguebane.Core.Tests` case (`ScreenLayoutTests` or new) since `ScreenLayout` has zero MonoGame deps —
-assert a child with `parent` set resolves relative to a non-origin parent rect, not the viewport.
+## ✅ FIXED (2026-07-05, loop) — `"parent"` in layout.json now resolves; was the HIFI-HIGH-PRIORITY
+## overlapping-panel bug from Doug's NewGame screenshot
+`Element` (`LayoutManifest.cs`) gained `public string? Parent { get; init; }`. `ScreenLayout` gained a
+screen-aware `Resolve(int designW, int designH, Screen screen, Element e)` that recurses through the
+parent chain (cycle/missing-id guarded, falls back to viewport-anchor same as before) and resolves the
+child's anchor+offset against the PARENT's resolved rect instead of the screen's flat design size.
+`ManifestUi.Resolve` now passes `screen` through so every `Rect`/`ElementRect`/`ListCells` call site (and
+`Game1.cs`'s smoke-probe sidecar, which calls `ScreenLayout.Resolve(def, x)` directly) gets the fix for
+free — no call-site changes needed beyond the one `ManifestUi.Resolve` line. New headless tests in
+`ScreenLayoutTests.cs`: parented child resolves against a non-origin parent rect, missing parent id
+degrades to viewport, cyclic parent chain degrades to viewport instead of stack-overflowing. 395/395 green.
 
 **How to work this file (every pass):** read CLAUDE.md + `.claude/loop.md` first. Top of this file =
 priority; human revisions WIN. One task/run, tests green before commit, update this file, stop. History

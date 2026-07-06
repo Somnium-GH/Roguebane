@@ -29,7 +29,7 @@ public sealed class ManifestUi
 
     private LayoutRect Resolve(Screen screen, Element e) => ScreenLayout.Resolve(
         DesignW > 0 ? DesignW : screen.DesignSize[0],
-        DesignH > 0 ? DesignH : screen.DesignSize[1], e);
+        DesignH > 0 ? DesignH : screen.DesignSize[1], screen, e);
 
     // Resolve an element's design-space rect within its screen (extended space when set).
     public Rectangle Rect(Screen screen, Element e)
