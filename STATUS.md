@@ -1,36 +1,125 @@
 # Status
 
+## ‼ HIGH PRIORITY (2026-07-05, Doug) — inventory shows every technique in the game, not the core's kit
+## (POC leftover) — root-caused to ONE line, do this before the merchant backlog below.
+Root cause, confirmed: `Content/Sessions.cs`'s `NewBuild()` (the real NewGame entry point) seeds
+`BuildSession` with `BuildPalette = Techniques.All` (all 14 `Techniques.cs` entries) `.Concat(`Armory`'s
+5 weapon-verbs)` — literally every technique in the game, regardless of which core is selected. This was
+a POC convenience (comment: "so BuildSession.SeedKit can slot a kit built entirely from Armory verbs").
+`BuildSession.Palette` (the property `InventoryTabItems()`'s TECHNIQUES tab reads verbatim, `Game1.
+ManifestRenderer.cs:1206`) returns this SAME unfiltered 19-item list — `SeedKit()` only uses it to decide
+which subset gets pre-SLOTTED on the action bar (matching `CoreRune.Kit`), it never narrows what shows in
+the INVENTORY pool itself. `Content/Builds.cs`'s `AllSix`/`PowerLine`/`Sustainers`/`GlassEmber` are the
+same POC era (pre Race+CoreRune split, "chassis all-six") — confirm they're test-only, not used by any
+live session path (only `Sessions.cs` functions are, per the grep).
+**Fix:** the palette shown/available should be **the current core's kit (`CoreRune.Kit`) UNION whatever
+techniques the taken rune Marks grant** (`Mark.GrantedTechniques` exists — ladders CAN grant techniques,
+checked `Mark.cs`), **not** the full roster. Since `_palette` is a fixed field set once in `BuildSession`'s
+constructor and cores/runes change during a session (`CycleCoreRune`, `Climb`), it can't stay a static
+list — recompute it as a property/method reading `CoreRune.Kit.Concat(_runes.Taken.SelectMany(m =>
+m.GrantedTechniques))` at read time (mirrors how `SeedKit()` already re-runs on `CycleCoreRune`). In-run,
+the same rule applies plus whatever's in `Exp.Stash.Techniques` (already correctly additive per the
+existing `_build.Palette.Concat(Exp.Stash.Techniques)` in `Game1.cs`'s TECHNIQUES-tab code — that part's
+fine, only the `_build.Palette` half needs narrowing). Needs a headless test: a fresh build's inventory
+technique count equals its core's `Kit.Count` (plus any pre-taken rune grants), not 19, for every core.
+
+## ‼ PRIORITY BACKLOG (2026-07-05, Doug) — Merchant Wares feature build. Ranks directly after all
+## outstanding bug work above (the HIGH PRIORITY entries), ahead of CHUNK C/D and everything below.
+Three sub-features, in the order Doug gave them:
+1. **Ware rotation + randomization.** Map-tier-appropriate gear by default, occasionally above-tier
+   (a rare upgrade roll). Section presence: typically 2-3 of the 5 categories (Weapons/Armor/Techniques/
+   Minions/Runes) stocked per visit, occasionally all 5, weighted toward 3. `MerchantStock.Roll()`
+   already does a weighted independent per-category presence roll (locked 2026-07-03: 80%/25%/8% by
+   category class, cap 4-of-5, `SectionPicks=3`) — this is close to "2-3 typically, sometimes more,
+   weighted toward 3" already; what's missing is (a) TIER-AWARE item selection within a rolled category
+   (today's stock picks are tier-blind — confirm against `MerchantStock.cs`/`Shops.cs` before assuming,
+   don't re-derive the roll math that's already locked) and (b) the "occasionally above-tier" bonus roll.
+2. **Gear/technique/rune sales.** Stub the mechanic (real buy/sell flow, real gold cost, wired to the
+   existing `Stash`/`Exp.Gold`) with PLACEHOLDER presentation — Doug's words: "stub it the best you can,
+   we'll get CD on it with the next batch" — so this is deliberately NOT waiting on CD art; ship the
+   mechanic now with generic/reused chrome, flag the placeholder per CLAUDE.md's placeholder rule, and
+   queue the real card art as a CD ask (added to the payload below).
+3. **Supply / Summons / Charge purchase.** All three resources already exist engine-side (`Exp.Map.
+   Supplies`/`MaxSupplies`, `Exp.Summons`/`MaxSummons`, `Exp.Charge`/`MaxCharge` — confirmed referenced in
+   `Game1.ManifestRenderer.cs`'s `ResourceReadout` list) — build the merchant-side buy action for each
+   (gold cost per unit, capped at max, wired to a new merchant section or the existing provisions row).
+DoD per CLAUDE.md: headless Core tests for the rotation/tier logic and the buy/sell economy math (gold
+deducted, stock decremented, resource capped at max) — this is Core-testable, no MonoGame needed.
+
+## ‼ HIGH PRIORITY (2026-07-05, Doug, live screenshot) — the 4-zone pip build (previous entry, below) IS
+## landing, but its container is too narrow — same bug CLASS as waresShelves/invItems, THIRD instance.
+## This single miss cascades into 3 of Doug's 4 new reports; only 1 is a genuinely separate bug.
+Doug's screenshot (Equipment "Attributes" panel, Human+Grunt): STR shows 5 hashed pips + reads "6/1";
+INT/DEX show "6/6"; CON shows 2 empty + 3 filled, "6/4". **Root cause, confirmed by the numbers
+themselves:** STR capacity is 6 (Human base 5 + Grunt's +1 bonus, v6). The pip container
+(`attrs.cells`, `layout.json` rect width 326, `attrPip` template size `[53,9]` gap `2`) fits
+`floor((326+2)/55) = 5` cells — but `PoolCells()` (just landed, see the 4-ZONE entry below) emits
+`Capacity + Damaged` cells, which for undamaged STR is **6**. The 6th cell (source width needed:
+`6×53 + 5×2 = 328`, container is `326` — 2px short) silently DROPS, same "list overflow hides the last
+cell instead of partial-rendering" rule that bit `waresShelves` (1px) and `invItems` (1px) earlier this
+session. **This is why:**
+- **"Reservation doesn't show" / STR looks fully spent:** the dropped 6th cell IS the FREE pip. With it
+  gone, all 5 VISIBLE pips read "gear-reserved" (hashed) and the bar looks 100% spent when 1 unit is
+  actually still free (`Capacity 6, GearReserved 5` back-computes correctly to Grunt's DISCOUNTED total:
+  4 plate pieces × (2 raw − 1 JoAT) + 1 Longsword × (2 raw − 1 JoAT) = 4+1 = 5 — the JoAT aggregate math
+  checks out; nothing wrong with `Activate`/`EffectiveWeaponReserve` here, only the missing 6th pip cell).
+- **"Jab shouldn't activate but does":** it's not a bug — Jab's reserve is 1 (RULES_SNAPSHOT), and 1 STR
+  really is free (see above); the pip bar just never shows the free unit that makes that legal. Once the
+  container fits all 6 cells this will visually resolve itself — don't chase `Body.Activate` further, it
+  was already checked and confirmed correct last pass.
+- Fix: widen `attrs.cells`'s rect (or the parent `attrReadout`/`attrBar`) by the same handful of px as
+  the other two off-by-ones, OR (better, fixes the whole class at once) make the pip-grid/list layout
+  actually respect an authored total-cell-count / min-fit the same way `cols` should already be respected
+  (flagged earlier this session) instead of silently dropping overflow. Given this is the THIRD instance
+  of the identical bug shape, consider it a standing pattern worth a general fix, not three separate ones.
+
+**Genuinely separate bug (confirmed, different code path): weapon inventory cards show the RAW cost, not
+the Core-Effect-discounted one.** "Grunt paying 2 STR for a sword instead of 1" — `Game1.ManifestRenderer
+.cs`'s `"invItems.badgeNum" => w.Reserve.ToString()` (weapon card badge) prints `Weapon.Reserve` directly
+— it never calls `Body`'s private `EffectiveWeaponReserve` (which folds in JoAT/WarlordMight/FletcherLuck
+discounts). The actual RESERVATION math is correct (see the STR back-computation above: discounted 4+1=5,
+matching what's rendered) — this is a DISPLAY-only bug: the card just shows the wrong number, the game
+isn't actually charging the undiscounted amount. Same pattern likely affects technique cards
+(`"invItems.badgeNum" => t.Reserve.ToString()`, line ~1605 — Reaver's Finesse discount wouldn't show
+either). Fix: badge display needs access to a Body (or the equipping build/expedition's effect) to run
+the same discount math the reservation itself already uses, for both weapon and technique cards.
+
+**Not yet root-caused, needs a retest once the above two land:** "removing the shield and re-equipping it
+never reserves." Two live candidates, don't guess further without a fresh repro: (a) the still-open
+GEAR-tab click-misrouting bug (logged two entries below, `GearTabItems()` reordering on every toggle) may
+mean the click never actually hit the shield at all; (b) CON's own pip zone may hit the same container-
+width drop as STR, hiding a real change. Retest after both fixes land before treating this as a third
+distinct bug.
+
 ## ‼ HIGH PRIORITY (2026-07-05, Doug) — 3 more findings: pip-bar 4-zone build (art already exists!) —
-## ✅ FIXED 2026-07-06 (see bug #4 below for the full writeup) — pager-button skin bug (root-caused),
-## equipped-items-sort-to-top (also fixes bug #1 above)
+## ✅ ALL THREE FIXED 2026-07-06 — pager-button skin bug (below), equipped-items-sort-to-top
+## (also fixes bug #1 above), pip-bar 4-zone build (item 1 below)
 
 **1. ✅ FIXED (2026-07-06, loop).** Attribute pip bar 4-zone build — see bug #4's entry below for the
 complete fix writeup (`Body.GearReserved`/`TechReserved`/`Damaged`, `AttrRow`, 4-zone `PoolCells`). All 4
 zone looks were confirmed already on disk (`pip_full`, `pip_reserved`, `pip_damage`, `pip_empty`) — pure
 engine wiring, zero CD ask, exactly as diagnosed here.
 
-**2. Pager prev/next buttons ("rotated and overscaled") — ROOT-CAUSED, confirmed by viewing the actual
-PNGs.** `button_pager.png` (`Roguebane.Content/ui/button/`) is a small near-SQUARE frame — purpose-built
-for compact pager buttons. `button_normal/hover/down/disabled/on.png` are wide ~3:1 RECTANGULAR bar
-frames — built for full-width buttons like BEGIN THE RUN. `DrawStateSkin` (`Game1.ManifestRenderer.cs:
-1397`), which draws EVERY `"family":"button"` skinned element including the pager prev/next arrows,
-resolves its skin purely from `e.States[key]` → always `ui/button/button_{normal|hover|down|disabled|on}`
-— it never looks at the element's own `e.Image` field. So the pager buttons (authored with
-`"image": "Content/ui/button/button_pager.png"` specifically because they need the compact square
-frame — confirmed in `layout.json` on `invPagePrev/Next`, `corePagePrev/Next`, and the merchant pager)
-instead get the WIDE bar skin's corners (9-sliced at a corner size sized for a ~116px-wide button, fixed
-`ButtonSlice={12,12,12,12}` scaled by `dstCornerScale=0.5`) squeezed into a ~20x15px near-square target
-— the source's horizontal bar geometry, rivets and bevel get badly skewed/stretched into that mismatched
-aspect ratio, which reads as "rotated and overscaled." **Separately confirmed (a red herring, NOT the
-cause, but worth a real fix too):** `button_pager.png` is registered in the CD-side `Content.mgcb` but
-has ZERO entry in the GAME-side `Roguebane.Game/Content/Content.mgcb` — so even if the skin-selection bug
-were fixed today, the correct asset still isn't wired into the build (folds into CHUNK B's existing mgcb-
-mirror pass, item 1). **Fix (two parts, do both):** (a) mirror `button_pager.png`'s mgcb entry into the
-game-side Content.mgcb (CHUNK B), (b) make `DrawStateSkin` prefer a per-element skin when `e.Image` is
-authored — either treat `e.Image`'s basename as the state-asset stem (`button_pager` + suffix, if/when
-per-state pager variants get authored) or use `button_pager.png` untinted for all states on these small
-buttons since a distinct hover/down look matters less at this size — loop's call on which, just don't
-keep silently defaulting every skinned button to the wide-bar frame regardless of its own image field.
+**2. ✅ FIXED (2026-07-06, loop).** Pager prev/next buttons ("rotated and overscaled"). Root cause was
+as diagnosed: `button_pager.png` (`Roguebane.Content/ui/button/`) is a small near-SQUARE frame purpose-
+built for compact pager buttons; `button_normal/hover/down/disabled/on.png` are wide ~3:1 RECTANGULAR
+bars built for full-width buttons like BEGIN THE RUN. `DrawStateSkin` (`Game1.ManifestRenderer.cs`) drew
+EVERY `"family":"button"` element from `e.States[key]` only, ignoring `e.Image` entirely, so the 4 pager
+buttons (`invPagePrev/Next`, `corePagePrev/Next` — authored with `"image":"Content/ui/button/
+button_pager.png"` specifically for the compact frame) got the wide-bar skin's corners squeezed into a
+~20x15px target, skewing the bevel/rivets. **Fix, both parts landed:** (a) `Roguebane.Game/Content/
+Content.mgcb` now mirrors the `ui/button/button_pager` entry the CD-side mgcb already had (game-side had
+zero registration — a separate confirmed gap, folds into CHUNK B's mgcb-mirror pass); (b) `DrawStateSkin`
+now checks a new `FamilyOwnsImage(states, image)` helper before falling back to the state-key/9-slice
+path — if `e.Image` names a texture that does NOT match any of the element's own `states` values, it's a
+deliberate per-element override (not CD's usual same-family preview default, which DOES match a states
+entry) and gets drawn untinted at the element's own rect instead of 9-sliced. Verified by surveying all
+13 button-family elements' `image` vs `states` values: only the 4 pager buttons fail to match any state
+value (the other 9, e.g. `autoAttackBtn` imaging `button_on.png`, correctly still take the state-driven
+skin). **Verification:** clean `Roguebane.Game` build (0 errors/warnings), then `RB_SMOKE=1
+RB_SCREEN=newgame` screenshot of `corePageNext` — renders as a proper square 9-sliced frame with corner
+rivets and a centered, undistorted `▶` glyph (equipment screen's own pager was untestable this way, page
+count is 1/1 for a fresh Human Grunt so the buttons don't render at all there).
 
 **3. ✅ FIXED (2026-07-06, loop).** "Sort equipment so equipped items stick to the top." Bug #1's roster
 fix (below) landed the STABLE base order but deliberately did NOT sort equipped-first — its own comment

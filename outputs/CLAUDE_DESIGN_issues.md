@@ -5,8 +5,10 @@ DEV_LOOP_MEMORY, ships in every drop under `design/dchtml/`):** verified CD's la
 real tree, not the memo. CLOSED here: **B18 glyphs** (Flurry/Aimed Shot/Siphon/Barkskin/Sacrifice/Bind +
 the Frenzy/Flurry two-badge split) all present in `icons/technique/`; **B21 authoring** (the `parent`
 re-anchor — 160 `parent` keys now in `layout.json`). Both now have only ENGINE/OUR residual (dual-pool
-draw; recursive parent-box resolve), tracked in STATUS, no longer CD asks. Still OPEN for CD: B18's
-Parry/Steel/Suture + Iron Golem/Hound icons, B20 re-extraction, and the B-series below.
+draw; recursive parent-box resolve), tracked in STATUS, no longer CD asks. Also verified LANDED this
+pass: **B13/B14** (both list-container sizing fixes — see Confirm-to-close). Still OPEN for CD: B18's
+Parry/Steel/Suture + Iron Golem/Hound icons, B20 re-extraction, **B22 (NEW — merchant sale-card art,
+no rush)**, and the rest of the B-series below.
 
 **‼ RECONCILED against the 2026-07-05 v6/roster drop (Cowork):** figures for **5 races × 7 cores**
 (dwarf + halfling as asked, PLUS half_giant + barbarian unasked — both adopted: Half-Giant is now a
@@ -43,6 +45,10 @@ drop:** B0 (strips 203/gap 5), B0b (`core.label` split), B1a (campaignmap ships 
 memory. B9 is FOLDED into B2-GO (it was scoping for a batch that was on hold; the hold is lifted).
 
 ## Confirm-to-close (no action — just clear your memory)
+**B13 ✅ · B14 ✅ (2026-07-05, verified on the real tree) — both sizing fixes landed:** `waresShelves`
+is now `size:[692,384]` (was 377, needed ≥378 for the 3rd wares row) and `buildMinions` is now
+`size:[162,89]` (was 94, needed ≥131 to fit one `loadoutCard`). Both confirmed by direct read of the
+current `layout.json`. Thank you — clear both from your dev memory.
 **B17 ✅ (2026-07-05) — Dwarf + Halfling figure batch landed AND exceeded** (half_giant + barbarian
 came too, now both canon; worn sets + manifest sections regenerated cleanly, merge guard held). The
 race-card art/portrait + final blurbs/tags residue moves into B20. Thank you — clear from dev memory.
@@ -127,23 +133,6 @@ B11. **Bow sprites missing from the gear batch:** the catalog + sprite set cover
     EXCEPT bows (Short/Long/Compound/Elven — §6d ranged slot). The old sprites/gear/bow.png
     covers nothing in the new convention. Ask: 4 bow sprites (bow_short, bow_long, bow_compound,
     bow_elven) + catalog rows; engine ids will chase.
-B13. **Merchant `waresShelves` list is ONE PIXEL short of fitting its own authored 3-row layout.**
-    Element size `[692,377]`, item `{template:"shopSection", flow:"vertical", gap:12, size:[692,118]}`
-    — three rows need `3×118 + 2×12 = 378px`, the container is `377px`. Our list layout's overflow
-    rule silently drops any cell that doesn't fully fit rather than partial-rendering it, so the whole
-    3rd wares section (e.g. Minions) vanishes even though the page-count math says it should show
-    (Doug: "buy out one category and another appears that was invisible" — that's this). Ask: bump
-    `waresShelves.size[1]` to at least 378, ideally 382+ for margin.
-B14. **Equipment `buildMinions` list is sized for ZERO cards, not one.** Element size `[94,89]` with
-    no `item.size` override, so it falls back to `templates.loadoutCard`'s own size `[131,89]` —
-    wider than the container. Our list layout drops any cell that doesn't fully fit, so with a
-    131-wide card and a 94-wide container, NOTHING renders regardless of how many minions are
-    slotted (live screenshot: "MINIONS - 1/1 slotted" header correct, card area totally blank).
-    Compare `loadoutList` (technique action bar, same `loadoutCard` template): container `[681,89]`
-    with `item.size` explicitly `[131,89]` — sized to fit ~5 cards. `buildMinions` needs the same
-    treatment: widen to fit `Bays × (131 + gap)`, matching how the technique bar is sized for its
-    own bay count.
-
 **2026-07-05 batch (v6 design session + the roster drop's follow-ups):**
 
 B20. **RE-EXTRACTION to the per-core refs + the v6 roster (the big one — the engine renders only what
@@ -260,6 +249,17 @@ B21. **ABSOLUTE POSITIONING IN THE MANIFEST — the resolution-scaling bug. Erad
     binding regardless. Engine note (OURS, not a CD ask): once the manifest anchors correctly, any drift
     that remains is our anchor/scale interpreter — we own that half; this item is the authoring/extraction
     half, which is where the baked-in TopLeft absolutes come from.
+
+**2026-07-05 batch (Doug — Merchant Wares build kickoff):**
+
+B22. **Merchant gear/technique/rune SALE cards — placeholder now, real art next batch.** We're building
+    the buy/sell mechanic now (real gold cost, real stash wiring) on STUBBED presentation — reused/generic
+    chrome, flagged as a placeholder per our own hygiene rule, not shipped silently as final. Ask for your
+    next batch (no rush, this doesn't block our mechanic work): dedicated SALE card art/states for gear,
+    technique, and rune wares distinct from the existing `wareCard` — whatever visual distinction you'd
+    want between "this is in my inventory" (`invCard`) and "this is for sale" (a `wareCard` cousin) is
+    yours to propose; we have no locked design opinion here yet beyond "don't reuse invCard's chrome
+    unchanged forever." We'll keep using `wareCard` + generic labels as the flagged stopgap meanwhile.
 
 B12. **CLOSED 2026-07-04 — delivered + verified clean (744 files, no cross-product, no "plain",
     0 missing / 0 extra); see Confirm-to-close above. Convention is now canon in LAYOUT_CONTRACT §12a /

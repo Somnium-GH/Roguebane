@@ -3007,6 +3007,17 @@
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/ui/button/button_on.png;ui/button/button_on
 
+#begin ui/button/button_pager
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/ui/button/button_pager.png;ui/button/button_pager
+
 #begin ui/pip/pip_damage
 /importer:TextureImporter
 /processor:TextureProcessor

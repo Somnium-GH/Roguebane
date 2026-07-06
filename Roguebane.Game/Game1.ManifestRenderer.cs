@@ -1428,6 +1428,22 @@ public partial class Game1
         if (e.States.ValueKind != System.Text.Json.JsonValueKind.Object
             || !e.States.TryGetProperty("family", out var fam) || fam.GetString() != "button")
             return false;
+
+        // HIGH PRIORITY pager bug: the pager buttons author their own compact `button_pager.png` in
+        // `e.Image` specifically BECAUSE the family's normal/hover/down/disabled/on textures are wide
+        // ~3:1 bars sized for the ButtonSlice 9-slice — squeezing that geometry into a ~20x15px pager
+        // button skewed its bevel/rivets into a mismatched aspect ratio ("rotated and overscaled").
+        // When `e.Image` names a texture that ISN'T one of this family's own state textures, it's a
+        // deliberate per-element override (not just CD's usual same-family preview default, which DOES
+        // match one of the state entries and must keep using the normal state-driven skin/9-slice
+        // below) — draw it untinted for every interaction state instead of 9-slicing the wrong frame.
+        if (e.Image is { Length: > 0 } img && !FamilyOwnsImage(e.States, img)
+            && _assets.Texture(NormalizeContentPath(img)) is { } ownSkin)
+        {
+            _spriteBatch.Draw(ownSkin, r, Color.White);
+            return true;
+        }
+
         var key = !enabled ? "disabled"
             : e.Binds == "combat.autoAttack" && InRun && Exp.IsAuto() ? "on"
             : Hover(r) ? (Mouse.GetState().LeftButton == ButtonState.Pressed ? "down" : "hover")
@@ -1441,6 +1457,17 @@ public partial class Game1
             _spriteBatch.Draw(skin, new Rectangle(p.Dst.X, p.Dst.Y, p.Dst.W, p.Dst.H),
                 new Rectangle(p.Src.X, p.Src.Y, p.Src.W, p.Src.H), Color.White);
         return true;
+    }
+
+    // Whether `image` (a manifest-authored path) matches one of this family's own state textures —
+    // i.e. it's just CD's same-family preview default, not a genuinely distinct per-element skin.
+    private static bool FamilyOwnsImage(System.Text.Json.JsonElement states, string image)
+    {
+        var stem = NormalizeContentPath(image);
+        foreach (var prop in states.EnumerateObject())
+            if (prop.Value.ValueKind == System.Text.Json.JsonValueKind.String && prop.Value.GetString() == stem)
+                return true;
+        return false;
     }
 
     // colorBind (CD drop 2026-07-02, APPROVED): resolve a bound COLOUR — a palette token derived from
