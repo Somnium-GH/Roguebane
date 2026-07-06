@@ -73,32 +73,58 @@ public class BuildSessionTests
     }
 
     [Fact]
-    public void ToggleBuildsTheLoadoutInPaletteOrder()
+    public void EquipmentOnlyEverIncludesPaletteTechniques()
     {
-        var build = New(); // Grunt kit pre-seeds jab + brace
+        var build = New(); // Grunt kit: jab, brace, bandage — Siphon/Lunge aren't in it and no rune grants yet
         build.Toggle(Techniques.Siphon);
         build.Toggle(Techniques.Lunge);
 
         Assert.True(build.IsSelected(Techniques.Jab)); // kit
-        // palette order (jab, cleave, lunge, ember, siphon, brace, bandage); the Grunt kit adds bandage
-        Assert.Equal(new[] { "jab", "lunge", "siphon", "brace", "bandage" }, build.Equipment.Select(t => t.Id));
+        // off-palette toggles never surface in Equipment — the inventory can't offer more than the
+        // current core's kit plus whatever the runes taken so far grant
+        Assert.Equal(new[] { "jab", "brace", "bandage" }, build.Equipment.Select(t => t.Id));
 
         build.Toggle(Techniques.Jab); // a kit item can still be dropped
         Assert.False(build.IsSelected(Techniques.Jab));
+        Assert.Equal(new[] { "brace", "bandage" }, build.Equipment.Select(t => t.Id));
+    }
+
+    [Fact]
+    public void PaletteIsScopedToTheCurrentCoresKitForEveryChassis()
+    {
+        var build = New();
+        for (var i = 0; i < build.CoreRuneCount; i++)
+        {
+            // no rune grants taken yet, so the palette is exactly the chassis kit — never the whole roster
+            Assert.Equal(build.CoreRune.Kit.Count, build.Palette.Count);
+            build.CycleCoreRune(1);
+        }
+    }
+
+    [Fact]
+    public void ClimbingAGrantKeystoneAddsItsTechniqueToThePalette()
+    {
+        var build = new BuildSession(Races.Roster, CoreRunes.Roster, new[] { Paths.TempestLadder });
+        var baseCount = build.Palette.Count;
+
+        foreach (var _ in Paths.TempestLadder) build.Climb(Paths.TempestLadder);
+
+        Assert.Equal(baseCount + 1, build.Palette.Count);
+        Assert.Contains(build.Palette, t => t.Id == "maelstrom");
     }
 
     [Fact]
     public void LaunchMintsTheChosenBodyIntoARun()
     {
-        var build = New(); // kit: jab, brace
+        var build = New(); // kit: jab, brace, bandage
         build.Climb(Paths.VesselLadder);
-        build.Toggle(Techniques.Lunge);
+        build.Toggle(Techniques.Jab); // drop a kit item
 
         var run = Sieges.StandardRun();
         var session = build.Launch(run);
 
         Assert.Equal(SessionState.Fighting, session.State);
-        Assert.Equal(4, session.Equipment.Count); // kit (jab, brace, bandage) + lunge
+        Assert.Equal(2, session.Equipment.Count); // kit (brace, bandage) minus jab
         Assert.Equal(3, session.Run.Nodes.Count); // cp1, cp2, castle
     }
 

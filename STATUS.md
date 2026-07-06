@@ -1,27 +1,29 @@
 # Status
 
-## ‼ HIGH PRIORITY (2026-07-05, Doug) — inventory shows every technique in the game, not the core's kit
-## (POC leftover) — root-caused to ONE line, do this before the merchant backlog below.
-Root cause, confirmed: `Content/Sessions.cs`'s `NewBuild()` (the real NewGame entry point) seeds
-`BuildSession` with `BuildPalette = Techniques.All` (all 14 `Techniques.cs` entries) `.Concat(`Armory`'s
-5 weapon-verbs)` — literally every technique in the game, regardless of which core is selected. This was
-a POC convenience (comment: "so BuildSession.SeedKit can slot a kit built entirely from Armory verbs").
-`BuildSession.Palette` (the property `InventoryTabItems()`'s TECHNIQUES tab reads verbatim, `Game1.
-ManifestRenderer.cs:1206`) returns this SAME unfiltered 19-item list — `SeedKit()` only uses it to decide
-which subset gets pre-SLOTTED on the action bar (matching `CoreRune.Kit`), it never narrows what shows in
-the INVENTORY pool itself. `Content/Builds.cs`'s `AllSix`/`PowerLine`/`Sustainers`/`GlassEmber` are the
-same POC era (pre Race+CoreRune split, "chassis all-six") — confirm they're test-only, not used by any
-live session path (only `Sessions.cs` functions are, per the grep).
-**Fix:** the palette shown/available should be **the current core's kit (`CoreRune.Kit`) UNION whatever
-techniques the taken rune Marks grant** (`Mark.GrantedTechniques` exists — ladders CAN grant techniques,
-checked `Mark.cs`), **not** the full roster. Since `_palette` is a fixed field set once in `BuildSession`'s
-constructor and cores/runes change during a session (`CycleCoreRune`, `Climb`), it can't stay a static
-list — recompute it as a property/method reading `CoreRune.Kit.Concat(_runes.Taken.SelectMany(m =>
-m.GrantedTechniques))` at read time (mirrors how `SeedKit()` already re-runs on `CycleCoreRune`). In-run,
-the same rule applies plus whatever's in `Exp.Stash.Techniques` (already correctly additive per the
-existing `_build.Palette.Concat(Exp.Stash.Techniques)` in `Game1.cs`'s TECHNIQUES-tab code — that part's
-fine, only the `_build.Palette` half needs narrowing). Needs a headless test: a fresh build's inventory
-technique count equals its core's `Kit.Count` (plus any pre-taken rune grants), not 19, for every core.
+## ✅ FIXED (2026-07-06, loop) — inventory shows every technique in the game, not the core's kit
+Root cause was `Content/Sessions.cs`'s `NewBuild()` seeding `BuildSession` with a static
+`BuildPalette = Techniques.All.Concat(Armory's 5 weapon-verbs)` (19 items, every technique in the
+game) regardless of the chosen core — `BuildSession.Palette` returned this list verbatim and the
+UI's TECHNIQUES tab read it directly.
+**Fix:** `BuildSession.Palette` is now a computed property — `CoreRune.Kit.Concat(_runes.
+GrantedTechniques).ToList()` — instead of a fixed field, so it narrows to the current chassis's kit
+plus whatever the taken rune Marks grant (`RuneLoadout.GrantedTechniques`, already existed), and
+recomputes automatically across `CycleCoreRune`/`Climb`. The now-unused external-palette ctor param
+was removed from `BuildSession` and `Sessions.NewBuild()` (`BuildPalette` field deleted — clean
+removal, no back-compat shim); `SeedKit()`/`Equipment` read the same computed `Palette`. No Game-side
+changes were needed — `Game1.cs:353,355,377` and `Game1.ManifestRenderer.cs:1239` all read
+`_build.Palette` and pick up the narrower list automatically.
+Updated `BuildSessionTests.cs`: `ToggleBuildsTheLoadoutInPaletteOrder` → renamed
+`EquipmentOnlyEverIncludesPaletteTechniques` (proves off-palette toggles no longer leak into
+Equipment — this was the bug, now asserted the other way); `LaunchMintsTheChosenBodyIntoARun`
+adjusted (Lunge is no longer toggleable pre-grant, so the test drops a kit item instead). Added two
+new tests per the DoD ask: `PaletteIsScopedToTheCurrentCoresKitForEveryChassis` (loops the whole core
+roster, asserts `Palette.Count == CoreRune.Kit.Count` with no grants taken, not 19) and
+`ClimbingAGrantKeystoneAddsItsTechniqueToThePalette` (constructs a `BuildSession` with
+`Paths.TempestLadder` directly, climbs to the Eye of the Storm keystone, confirms `maelstrom` lands
+on the Palette — proves the grant-union half of the fix, since the live NewBuild ladders (Vessel/
+Resonance) don't currently grant any techniques themselves). `dotnet test Roguebane.Core.Tests`:
+420/420 green. `dotnet build Roguebane.Game`: 0 errors/0 warnings.
 
 ## ‼ PRIORITY BACKLOG (2026-07-05, Doug) — Merchant Wares feature build. Ranks directly after all
 ## outstanding bug work above (the HIGH PRIORITY entries), ahead of CHUNK C/D and everything below.

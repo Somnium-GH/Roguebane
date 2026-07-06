@@ -8,3 +8,4 @@ date,task,minutes,lines_changed,estimate_minutes,method
 2026-07-06,bug4-attr-pip-4zone-and-bindswap,55,175,-,commit-delta
 2026-07-06,bug3-gear-equipped-sort-to-top,20,45,-,commit-delta
 2026-07-06,bug2-pager-button-skin-and-mgcb,25,60,-,commit-delta
+2026-07-06,bug-technique-palette-scoped-to-core-kit,35,150,-,commit-delta

@@ -8,34 +8,31 @@ public sealed class BuildSession
 {
     private readonly IReadOnlyList<Race> _races;
     private readonly IReadOnlyList<CoreRune> _chassis;
-    private readonly IReadOnlyList<Technique> _palette;
     private readonly HashSet<string> _selected = new();
     private RuneLoadout _runes;
 
     public BuildSession(
         IReadOnlyList<Race> races,
         IReadOnlyList<CoreRune> chassis,
-        IReadOnlyList<IReadOnlyList<Mark>> paths,
-        IReadOnlyList<Technique> palette)
+        IReadOnlyList<IReadOnlyList<Mark>> paths)
     {
         if (races.Count == 0) throw new ArgumentException("a build needs at least one race", nameof(races));
         if (chassis.Count == 0) throw new ArgumentException("a build needs at least one chassis", nameof(chassis));
         _races = races;
         _chassis = chassis;
         Paths = paths;
-        _palette = palette;
         _runes = _chassis[0].NewLoadout();
         SeedKit();
     }
 
     // The current chassis ships a FIXED starting equipment (data) — pre-slot it so the bar is never
-    // empty and Launch needs no "pick a technique" gate. Only techniques on the palette are slotted.
+    // empty and Launch needs no "pick a technique" gate. Every kit technique is on the Palette by
+    // construction, so no filtering is needed here (unlike the old external-palette intersection).
     private void SeedKit()
     {
         _selected.Clear();
-        var ids = _palette.Select(t => t.Id).ToHashSet(StringComparer.Ordinal);
         foreach (var t in CoreRune.Kit)
-            if (ids.Contains(t.Id)) _selected.Add(t.Id);
+            _selected.Add(t.Id);
     }
 
     public int CoreRuneIndex { get; private set; }
@@ -44,7 +41,11 @@ public sealed class BuildSession
     public IReadOnlyList<CoreRune> Roster => _chassis; // the whole line-up, for the New Run core grid
     public RuneLoadout Runes => _runes;
     public IReadOnlyList<IReadOnlyList<Mark>> Paths { get; }
-    public IReadOnlyList<Technique> Palette => _palette;
+
+    // What's actually available to slot: the chassis's fixed kit plus whatever the runes taken so far
+    // grant (§7a). NOT the whole game's technique roster — a build can only ever field what its core
+    // and climbed ladders actually unlock.
+    public IReadOnlyList<Technique> Palette => CoreRune.Kit.Concat(_runes.GrantedTechniques).ToList();
 
     // The chosen Race supplies the body's attrs + HP (§7) — the NewGame two-step's first column.
     public int RaceIndex { get; private set; }
@@ -86,7 +87,7 @@ public sealed class BuildSession
     public bool IsSelected(Technique technique) => _selected.Contains(technique.Id);
 
     public IReadOnlyList<Technique> Equipment =>
-        _palette.Where(t => _selected.Contains(t.Id)).ToList();
+        Palette.Where(t => _selected.Contains(t.Id)).ToList();
 
     // The body as it stands now: the race's anatomy/attrs plus everything the allocated runes grant.
     public Body Preview() => CoreRune.NewBody(Race, _runes);
