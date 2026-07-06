@@ -424,6 +424,16 @@ feature. (FTL itself solves the same problem with a safe pre-battle screen where
 first real fight — worth keeping in mind if/when a similar staging beat gets designed here, but not
 required to ship this default-state fix.)
 
+**RE-ARM SCOPE between back-to-back encounters, same leg [LOCKED 2026-07-05, Doug]:** the neutral-start
+rule above governs a technique/minion's FIRST-ever activation state, not every single encounter boundary.
+**Techniques persist:** whatever's active/toggled when one encounter ends carries into the next
+unchanged — the player doesn't re-arm techniques every fight. **Minions do NOT persist:** every fielded
+minion is dismissed at encounter end, full stop; fielding one again next encounter re-pays Summons like
+any fresh summon (no carry-over, no discount for "it was already out last fight") — "at least for now
+that's the simple rule" (Doug). This is a deliberate asymmetry, not an oversight: minions are the
+resource-gated one-off commitment (Summons + a reservation), techniques are the FTL-style skill layer
+that's supposed to feel like a persistent, ongoing configuration.
+
 **Verbs are NOT bound to weapons.** A weapon is a stat-stick; techniques *consult* what's equipped
 ("Swing" = primary weapon; "Frenzy" = both, cost = sum). Techniques are a findable/slottable layer.
 

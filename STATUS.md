@@ -1,5 +1,36 @@
 # Status
 
+## ‼ HIGH PRIORITY (2026-07-05, Doug — interview answers, 4 small precise fixes)
+1. ✅ DONE (2026-07-06, loop) — `Content/Races.cs`: Dwarf `Hp: 20→17`, HalfGiant `Hp: 17→20`, Halfling
+   unchanged. New pinning test `RaceTests.DwarfAndHalfGiantHpMatchDougsConfirmedSwap`. 425/425 green.
+   (Original text preserved below for the exact rationale.) Current: `Dwarf = ... Hp: 20`,
+   `HalfGiant = ... Hp: 17` — backwards, since Dwarf is the CON-affinity race (CON converts to HP,
+   RACES.md's own rule) and should read HIGHER than Half-Giant (STR-affinity), not lower. Fix: Dwarf
+   → `Hp: 17`, HalfGiant → `Hp: 20`. Halfling (`Hp: 13`) unchanged. Still placeholder-blessed, not a
+   final balance pass — canon note added to `design/systems/RACES.md`.
+2. **Delete the `Shade` minion record outright** (Doug: "delete it now" — confirmed dead, not in any
+   current core kit/roster, no live reference beyond scattered mentions). Grep `Shade` across
+   `Roguebane.Core` (hits so far: `Content/CoreRunes.cs`, `Content/Minions.cs`, `Content/Paths.cs`) and
+   remove the record + every reference; if a rune-path Mark grants it as a keystone reward, either drop
+   that grant or point it at a real current minion — Doug's call if the loop hits ambiguity, don't invent.
+3. **Sacrifice's heal formula (4/8 part-points, T1/T2) is APPROVED as the standing placeholder** — stop
+   treating it as OPEN/unconfirmed (RULES_SNAPSHOT.md updated). No engine change needed, just unblocks
+   anything that was waiting on this confirm.
+4. **Minion re-arm scope — real behavior gap found while confirming this:** Doug's rule is "techniques
+   persist across back-to-back encounters, minions do NOT — every fielded minion dismisses at encounter
+   end and must be re-summoned (re-paying Summons) next fight." Checked `Caster.RearmForEncounter()`
+   (called from `Expedition.Enter()` on every new fight): it currently does NEITHER half correctly by
+   accident — it only resets TIMERS/cooldowns for whatever's already active/fielded (Resonance stacks,
+   technique cooldown, minion discharge timer); it never actually clears `_minions`, so a minion fielded
+   last fight silently STAYS fielded into the next one for free, with no fresh Summons charge. Techniques
+   already behave correctly (nothing clears `_active`, matching "persist" — no change needed there). Fix:
+   `RearmForEncounter()` (or `Expedition.Enter()` right before/after it) must actually DISMISS every
+   currently-fielded minion (clear `_minions`/`_minionCountdown`, same effect as `DismissMinion` for each)
+   before the new encounter starts, so re-fielding one costs Summons again like any fresh summon — no
+   special-case "it was already out" discount. DESIGN_SPEC §7's "RE-ARM SCOPE" paragraph now locks this
+   in writing. Needs a headless test: field a minion, clear/end the encounter, enter the next one, assert
+   `Exp.Minions` is empty and re-summoning charges `Summons` again.
+
 ## ✅ CHUNK B item 1 DONE (2026-07-06, loop) — game-side mgcb mirrored, 1846 new entries, build green
 `Roguebane.Game/Content/Content.mgcb` (the copy builds actually read) had ZERO of the new v6 race/core
 body-figure, worn-set, and icon entries that `Roguebane.Content/Content.mgcb` (CD source) already had —
@@ -615,8 +646,14 @@ crumbs landed along the way.
 ### CHUNK B — ASSET WIRING (mechanical; do right after A or interleave freely)
 1. ✅ DONE (2026-07-06, loop) — mirrored every new CD-source mgcb entry into `Roguebane.Game/Content/
    Content.mgcb` (the copy builds read); 1846 blocks, build green. See the FIXED banner at top of file.
-2. Run the drop guards this same pass: layout.json parse + `drop_audit.py` + the manifest→previous
-   key-set diff (screens/templates lost = repair verbatim + flag CD).
+2. ✅ DONE (2026-07-06, loop) — ran the 3 guards. `layout.json` parses clean. `drop_audit.py` found 4
+   genuine, previously-untracked extraction gaps: `encounter` screen's `minionField`/`minionFieldLabel`
+   elements + anon bind `encounter.minions.sprite` in `Encounter.dc.html` but absent from the manifest;
+   `equipment` screen's `minionCard` template binds `minions.hotkey` in html but manifest template
+   doesn't carry it. Likely fallout of the CHUNK A minion-content addition landing without a matching
+   re-extraction. Key-set diff (screens/templates) across the last 2 CD-drop commits touching
+   `layout.json` found ZERO lost screens/templates — no regression, net-new gap only. `layout.json` is
+   CD-owned (never hand-edited by the loop) — flagging for CD, not fixing here.
 3. `RB_SMOKE=1 RB_MF=all` + `SMOKE FIGURES`/`SMOKE ASSETS`: every figure × z-part × state resolves for
    ALL 35 player figures; worn resolution covers the 3 new races + barbarian themed (str) via the §12a
    fallback chain (`WornArmorBinding` already handles the chain — extend its race domain + tests).

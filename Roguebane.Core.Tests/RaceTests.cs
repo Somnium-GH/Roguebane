@@ -37,4 +37,15 @@ public class RaceTests
         Assert.True(Races.Elf.Con < Races.Human.Con);  // the frailer body
         Assert.True(Races.Elf.Hp < Races.Human.Hp);
     }
+
+    [Fact]
+    public void DwarfAndHalfGiantHpMatchDougsConfirmedSwap()
+    {
+        // Doug (2026-07-05, STATUS.md HIGH PRIORITY #1): the pre-swap numbers had this backwards.
+        // Pinning the confirmed placeholder values verbatim (not re-derived) so a future edit can't
+        // silently drift back.
+        Assert.Equal(17, Races.Dwarf.Hp);
+        Assert.Equal(20, Races.HalfGiant.Hp);
+        Assert.Equal(13, Races.Halfling.Hp); // unchanged
+    }
 }

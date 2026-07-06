@@ -79,7 +79,7 @@ Base technique speed **8.0s**; melee/ranged verbs CONSULT the weapon for damage;
 - **Tier scaling (PARKED — T1 only):** tier ↑ = bigger effect + longer charge (≈constant DPS) + more reserve — EXCEPT DEX attack skills, which tier into SPEED (charge down). Dual-wield flavor: DEX → speed, STR → damage.
 
 ## OPEN / not settled — do NOT treat as final
-- **Sacrifice** per-tier heal numbers (T1 ≈ 4 part-points, T2 ≈ 8, unconfirmed); the "consume a minion" technique-cost doesn't exist engine-side yet.
+- **Sacrifice** per-tier heal numbers **APPROVED as the standing placeholder (Doug, 2026-07-05 — "placeholder for now"): T1 = 4 part-points, T2 = 8.** Not final-locked, but no longer blocking — build/keep as-is until a real balance pass revisits it.
 - **Bow / sling damage** (§17 #9). **Minion + technique tier ladders** parked (T1 only).
 - **RuneDiscount** (old per-core rune-price discount) assumed retired to 0 — needs Doug confirm.
 - **HP per race**; **mono-attribute scaling** (mains scale high, little pulls secondary stats) — playtest concern.

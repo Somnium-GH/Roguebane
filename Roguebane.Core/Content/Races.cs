@@ -13,13 +13,13 @@ public static class Races
     public static readonly Race Elf = new("elf", Str: 4, Int: 6, Dex: 4, Con: 4, Hp: 13, Title: "Elf",
         Tag: "THE DEEP MINDED", Blurb: "A keen head for spellcraft, but frail - punishes a dropped block.");
 
-    public static readonly Race Dwarf = new("dwarf", Str: 4, Int: 4, Dex: 4, Con: 6, Hp: 20, Title: "Dwarf",
+    public static readonly Race Dwarf = new("dwarf", Str: 4, Int: 4, Dex: 4, Con: 6, Hp: 17, Title: "Dwarf",
         Tag: "THE UNYIELDING", Blurb: "Thick of chest and slow to fall - the line holds where a Dwarf stands.");
 
     public static readonly Race Halfling = new("halfling", Str: 4, Int: 4, Dex: 6, Con: 4, Hp: 13, Title: "Halfling",
         Tag: "THE QUICK STEP", Blurb: "Fast hands, faster feet - answers before the foe can.");
 
-    public static readonly Race HalfGiant = new("half_giant", Str: 6, Int: 4, Dex: 4, Con: 4, Hp: 17, Title: "Half-Giant",
+    public static readonly Race HalfGiant = new("half_giant", Str: 6, Int: 4, Dex: 4, Con: 4, Hp: 20, Title: "Half-Giant",
         Tag: "THE BROKEN GROUND", Blurb: "Strength enough to carry what breaks a smaller back.");
 
     // Roster order matches design/05's Race column.

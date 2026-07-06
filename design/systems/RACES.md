@@ -53,4 +53,9 @@ note for the full reconciliation.)
 ## Open / TBD
 - Current in-code values (Human 3/3/3/3-era placeholders) need updating; **Dwarf, Halfling + Half-Giant are
   the new races** to add (Half-Giant locked 2026-07-05, flagged placeholder-blessed).
-- HP per race; the **mono-attribute scaling** concern (mains scale high, little pulls secondary stats) — playtest.
+- **HP per race — Dwarf/Half-Giant SWAPPED (Doug, 2026-07-05):** the in-code values had Dwarf (CON
+  affinity) reading LOWER HP than Half-Giant (STR affinity) — backwards, since CON is the stat that
+  converts to HP (this doc's own "1 CON = 2 HP atop the race's natural base" rule). Doug: "swap dwarf
+  and half giant for now but still placeholders" — Dwarf takes Half-Giant's old number, Half-Giant takes
+  Dwarf's old number; Halfling unchanged. Still placeholder-blessed, not a final balance pass.
+- The **mono-attribute scaling** concern (mains scale high, little pulls secondary stats) — playtest.
