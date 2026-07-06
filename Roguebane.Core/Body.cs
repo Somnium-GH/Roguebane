@@ -75,9 +75,12 @@ public sealed class Body
     // SUSTAIN MODEL [DESIGN_SPEC §17 #16, resolved 2026-07-04]: gear and active techniques draw on
     // the SAME shared pool per stat. Reserved = techniques (always-on once activated) + whatever
     // gear currently fits what's left (see DisabledGear) — so Available reflects the true headroom
-    // for a new technique activation, gear equip disable is separate (raw Capacity gate at equip
-    // time, unchanged) from this ongoing sustain accounting. Exposed as two public halves (not just
-    // the combined Reserved total) so the UI can draw the DESIGN_SPEC 4-zone pip bar (gear zone vs.
+    // for a new technique activation. Gear equip-time gating is cumulative with other equipped gear
+    // too (2026-07-06 loop, DESIGN_SPEC §7 "Reservation timing" fix — see GearOnlyAvailable), so
+    // over-equipping is refused at the click instead of silently degrading via DisabledGear
+    // afterward; that cascade now only fires from a later capacity SHRINK (damage), not from
+    // stacking gear past the pool at equip time. Exposed as two public halves (not just the
+    // combined Reserved total) so the UI can draw the DESIGN_SPEC 4-zone pip bar (gear zone vs.
     // technique zone are visually distinct — §7 "ATTRIBUTE PIP BAR — 4-ZONE ENCODING").
     public int TechReserved(Stat stat) => _actives.Where(a => a.Stat == stat).Sum(a => a.Reserve);
 
@@ -86,6 +89,16 @@ public sealed class Body
     public int Reserved(Stat stat) => TechReserved(stat) + GearReserved(stat);
 
     public int Available(Stat stat) => Capacity(stat) - Reserved(stat);
+
+    // Equip-time headroom check [DESIGN_SPEC §7 "Reservation timing", fixed 2026-07-06 loop]:
+    // cumulative with other EQUIPPED gear on the same stat, but deliberately blind to TechReserved
+    // (same rule the GearOnly* sustain reads already enforce — the Equipment screen must never see
+    // in-combat technique activation state, locked 2026-07-04). Symmetric with how Activate refuses
+    // outright instead of degrading; DisabledGear's cascade still exists for capacity SHRINKING
+    // (Damage) after the fact. excludeArmorSlot: Equip() REPLACES whatever's in a slot rather than
+    // stacking alongside it, so a same-slot swap must not count the outgoing piece against itself.
+    private int GearOnlyAvailable(Stat stat, Stat? excludeArmorSlot = null) =>
+        Capacity(stat) - DisabledGear(stat, techReservedOverride: 0, excludeArmorSlot).EnabledTotal;
 
     // Capacity lost to damage, per stat -- the gap between a part's undamaged Capacity and its
     // current Contribution. Distinct from Reserved(): reserved pool is still THERE, just spoken
@@ -99,7 +112,7 @@ public sealed class Body
     // DISABLE CASCADE (§17 #16): when gear's combined reserve exceeds what's left of the pool after
     // techniques take their share, items disable highest-requirement-first, ties last-equipped-first
     // — a pure ranking over current attr level, so healing re-enables cheapest-first automatically.
-    private GearDisable DisabledGear(Stat stat, int? techReservedOverride = null)
+    private GearDisable DisabledGear(Stat stat, int? techReservedOverride = null, Stat? excludeArmorSlot = null)
     {
         var candidates = new List<GearCandidate>();
         for (var i = 0; i < _hands.Count; i++)
@@ -108,6 +121,7 @@ public sealed class Body
             candidates.Add(new GearCandidate("ranged", EffectiveWeaponReserve(r), _rangedSeq ?? 0, -1, default));
         foreach (var (slot, piece) in _armor)
         {
+            if (excludeArmorSlot == slot) continue;
             var eff = EffectiveArmor(piece);
             if (eff.Governing == stat)
                 candidates.Add(new GearCandidate("armor", eff.Requirement, _armorSeq[slot], -1, slot));
@@ -172,7 +186,7 @@ public sealed class Body
         if (weapon.Kind is WeaponKind.Bow or WeaponKind.Sling) return false;
         if (weapon.Kind is WeaponKind.Wand or WeaponKind.Staff && _ranged is not null) return false;
         if (_hands.Count >= 2) return false;
-        if (Capacity(weapon.Stat) < EffectiveWeaponReserve(weapon)) return false;
+        if (GearOnlyAvailable(weapon.Stat) < EffectiveWeaponReserve(weapon)) return false;
         _hands.Add(weapon);
         _handSeq.Add(++_equipSeq);
         return true;
@@ -194,7 +208,7 @@ public sealed class Body
     {
         if (w.Kind is not (WeaponKind.Bow or WeaponKind.Sling)) return false;
         if (_ranged is not null) return false;
-        if (Capacity(w.Stat) < EffectiveWeaponReserve(w)) return false;
+        if (GearOnlyAvailable(w.Stat) < EffectiveWeaponReserve(w)) return false;
         // Mutual exclusion (§6d): a held wand excludes the ranged slot; a staff blocks it too.
         if (_hands.Any(h => h.Kind is WeaponKind.Wand or WeaponKind.Staff)) return false;
         _ranged = w;
@@ -269,7 +283,7 @@ public sealed class Body
     public bool Equip(Armor piece)
     {
         var eff = EffectiveArmor(piece);
-        if (Capacity(eff.Governing) < eff.Requirement) return false;
+        if (GearOnlyAvailable(eff.Governing, excludeArmorSlot: piece.Slot) < eff.Requirement) return false;
         _armor[piece.Slot] = piece;
         _armorSeq[piece.Slot] = ++_equipSeq;
         return true;

@@ -120,8 +120,9 @@ public class BodyTests
     public void GearOnlyChecksIgnoreLingeringTechniqueReservation()
     {
         var body = Build(out _, out _); // STR 8
-        // Wield gates on raw Capacity only (SUSTAIN MODEL: equip-time gate is separate from ongoing
-        // sustain) — so activate the technique FIRST, then wield a piece the shared pool can't cover.
+        // Wield's equip-time gate is gear-only (blind to TechReserved, cumulative only with other
+        // EQUIPPED gear) -- so activate the technique FIRST, then wield a piece the shared pool
+        // can't cover; with no other gear yet equipped the wield still succeeds gear-only.
         var stance = new Active("stance", Stat.Str, 5);
         Assert.True(body.Activate(stance));
         Assert.True(body.Wield(new Weapon("sword", Stat.Str, 6, Power: 1))); // 5 + 6 = 11 > STR 8
@@ -157,27 +158,54 @@ public class BodyTests
         Assert.True(body.ArmorGearOnlySustained(plate));
     }
 
+    // Equip-time over-reservation gap fix [DESIGN_SPEC §7 "Reservation timing", STATUS 2026-07-05,
+    // fixed 2026-07-06 loop]: equipping must be refused OUTRIGHT once it would exceed cumulative
+    // gear reservation on a stat -- not silently accepted and left for DisabledGear to degrade
+    // afterward. Symmetric with how Activate already refuses instead of degrading.
+    [Fact]
+    public void WieldRefusesOutrightOnceOtherGearHasFilledThePool()
+    {
+        var body = Build(out _, out _); // STR 8
+        Assert.True(body.Wield(new Weapon("first", Stat.Str, 8, Power: 1))); // fills the pool exactly
+        Assert.False(body.Wield(new Weapon("second", Stat.Str, 1, Power: 1))); // any more is refused
+        Assert.Empty(body.Hands.Where(w => w.Id == "second")); // never assigned, unlike the old cascade-and-degrade
+    }
+
+    [Fact]
+    public void EquipArmorRefusesOutrightOnceOtherGearHasFilledThePool()
+    {
+        var body = Build(out _, out _); // STR 8
+        Assert.True(body.Wield(new Weapon("sword", Stat.Str, 8, Power: 1))); // fills the pool exactly
+        var plate = Content.ArmorLines.PlateLegs[0]; // Str-governed, Requirement 2
+        Assert.False(body.Equip(plate)); // refused at the click, not equipped-then-disabled
+        Assert.Null(body.ArmorOn(Stat.Str));
+    }
+
     // §17 #16 DISABLE CASCADE, exhaustive ranking coverage (thesis-adjacent economy math, per the
     // §6e lock: "highest-requirement-first, ties last-equipped-first, cheapest-first recovery").
-    // The single Str arm's Contribution is nudged directly to move the shared pool through several
-    // sizes and re-check the SAME three gear pieces each time -- DisabledGear recomputes live, it
-    // holds no toggle state of its own.
+    // Equip-time now gates cumulatively against other EQUIPPED gear on the same stat (2026-07-06
+    // loop, DESIGN_SPEC §7 "Reservation timing" fix), so the cascade can no longer be triggered by
+    // stacking gear past the pool AT equip time -- these tests start with enough headroom for every
+    // piece to equip, then shrink the pool via Damage to force the SAME cascade ranking. DisabledGear
+    // itself is untouched and still recomputes live off current Contribution.
     [Fact]
     public void DisableCascadeShedsHighestRequirementFirstAndRecoversCheapestFirst()
     {
-        var arm = new BodyPart("arm", Stat.Str, 6);
+        var arm = new BodyPart("arm", Stat.Str, 12); // headroom for all three to equip cumulatively
         var body = new Body();
         body.Add(arm);
 
-        var cheap = new Armor("low", "Low", Stat.Str, ArmorLine.Plate, 1);  // Requirement 2
-        var mid = new Armor("mid", "Mid", Stat.Con, ArmorLine.Plate, 2);    // Requirement 4
-        var costly = new Armor("top", "Top", Stat.Dex, ArmorLine.Plate, 3); // Requirement 6
-        Assert.True(body.Equip(cheap));  // all three gate on raw STR 6 at equip time -- each fits alone
-        Assert.True(body.Equip(mid));
-        Assert.True(body.Equip(costly));
+        // Slots deliberately avoid Stat.Str (the arm's own stat): Plate's part-mitigation soak
+        // (§6c, worn.PartMitigation) only applies when an armor piece's SLOT matches the damaged
+        // part's stat, and would otherwise silently blunt the Damage() calls below.
+        var cheap = new Armor("low", "Low", Stat.Con, ArmorLine.Plate, 1);  // Requirement 2
+        var mid = new Armor("mid", "Mid", Stat.Dex, ArmorLine.Plate, 2);    // Requirement 4
+        var costly = new Armor("top", "Top", Stat.Int, ArmorLine.Plate, 3); // Requirement 6
+        Assert.True(body.Equip(cheap));  // 2 <= 12
+        Assert.True(body.Equip(mid));    // 2 + 4 = 6 <= 12
+        Assert.True(body.Equip(costly)); // 2 + 4 + 6 = 12 <= 12, exactly fits
 
-        // Pool 6, combined demand 12: only the single most expensive piece needs to shed to fit
-        // the rest (2 + 4 = 6 <= 6) -- ties would break last-equipped-first, but reserves differ here.
+        body.Damage(arm, 6); // pool 12 -> 6: combined demand 12 > 6, only the priciest piece sheds
         Assert.False(body.ArmorSustained(costly));
         Assert.True(body.ArmorSustained(mid));
         Assert.True(body.ArmorSustained(cheap));
@@ -196,12 +224,18 @@ public class BodyTests
     [Fact]
     public void DisableCascadeTiesBreakLastEquippedFirst()
     {
-        var body = Build(out _, out _); // STR 8
+        var armL = new BodyPart("arm-l", Stat.Str, 5);
+        var armR = new BodyPart("arm-r", Stat.Str, 5);
+        var body = new Body();
+        body.Add(armL);
+        body.Add(armR); // STR 10 -- headroom for both weapons to wield cumulatively
+
         var first = new Weapon("first", Stat.Str, 5, Power: 1);
         var second = new Weapon("second", Stat.Str, 5, Power: 1);
-        Assert.True(body.Wield(first));  // seq 1
-        Assert.True(body.Wield(second)); // seq 2, sum 10 > STR 8, equal reserves
+        Assert.True(body.Wield(first));  // seq 1, 5 <= 10
+        Assert.True(body.Wield(second)); // seq 2, 5 + 5 = 10 <= 10, exactly fits
 
+        body.Damage(armL, 2); // STR 10 -> 8: sum 10 > 8, equal reserves -- tie-break kicks in
         Assert.False(body.HandItemUsable(1)); // last-equipped sheds first on a tie
         Assert.True(body.HandItemUsable(0));
     }
@@ -209,16 +243,25 @@ public class BodyTests
     [Fact]
     public void DisableCascadeRanksAcrossHandRangedAndArmorTogether()
     {
-        var body = Build(out _, out _); // STR 8
+        var armL = new BodyPart("arm-l", Stat.Str, 5);
+        var armR = new BodyPart("arm-r", Stat.Str, 5);
+        var body = new Body();
+        body.Add(armL);
+        body.Add(armR); // STR 10 -- headroom for all three to equip cumulatively
+
         var hand = new Weapon("sword", Stat.Str, 3, Power: 1);
         var ranged = new Weapon("great-bow", Stat.Str, 3, Power: 1, Kind: WeaponKind.Bow);
-        var armor = new Armor("heavy", "Heavy", Stat.Str, ArmorLine.Plate, 2); // Requirement 4
+        // Slot deliberately not Stat.Str (the damaged arm's own stat): Plate's part-mitigation soak
+        // only applies when an armor piece's SLOT matches the damaged part's stat and would
+        // otherwise blunt the Damage() call below even though this piece is Str-GOVERNED.
+        var armor = new Armor("heavy", "Heavy", Stat.Con, ArmorLine.Plate, 2); // Requirement 4
         Assert.True(body.Wield(hand));           // seq 1, reserve 3
         Assert.True(body.EquipRanged(ranged));   // seq 2, reserve 3
-        Assert.True(body.Equip(armor));          // seq 3, requirement 4 -- highest single reserve
+        Assert.True(body.Equip(armor));          // seq 3, requirement 4 -- 3+3+4=10 <= 10, exactly fits
 
-        // Combined demand 10 > STR 8: the armor sheds on MAGNITUDE alone despite being equipped
-        // last -- recency only breaks ties, it never overrides a higher requirement.
+        body.Damage(armL, 2); // STR 10 -> 8: combined demand 10 > 8
+        // The armor sheds on MAGNITUDE alone despite being equipped last -- recency only breaks
+        // ties, it never overrides a higher requirement.
         Assert.False(body.ArmorSustained(armor));
         Assert.True(body.HandItemUsable(0));
         Assert.True(body.RangedUsable);

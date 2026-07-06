@@ -1,5 +1,35 @@
 # Status
 
+## ✅ FIXED (2026-07-06, loop) — equip-time over-reservation gap: gear now refused cumulatively, not degraded after the fact
+Root cause was `Body.Wield`/`Body.EquipRanged`/`Body.Equip` each gating only on `Capacity(stat) <
+item's own Reserve` — raw capacity, never against what OTHER currently-equipped gear already
+reserved on that same stat. A player could equip more gear than the shared pool held; nothing
+blocked the equip action itself, only `DisabledGear`'s ongoing sustain cascade noticed afterward
+and silently marked the lowest-priority piece(s) DISABLED. Named and confirmed by DESIGN_SPEC §7's
+"Reservation timing" lock (2026-07-04) and Doug's exact prescribed fix in this file (2026-07-05).
+**Fix:** added `Body.GearOnlyAvailable(stat, excludeArmorSlot)` — cumulative with other EQUIPPED
+gear on the stat, but deliberately blind to `TechReserved` (same rule the existing `GearOnly*`
+sustain reads already enforce, so a lingering active technique from a finished fight can't wrongly
+block an unrelated equip — see `GearOnlyChecksIgnoreLingeringTechniqueReservation`). `Wield`/
+`EquipRanged`/`Equip` now gate on this instead of raw `Capacity` — symmetric with how `Activate`
+already refuses outright instead of degrading. `DisabledGear` gained an `excludeArmorSlot` param so
+`Equip`'s same-slot SWAP (a piece replacing whatever already occupies that slot) doesn't count the
+outgoing piece against the incoming one's own headroom check — without this, `GearingTests.
+EquippingArmorDisplacesTheWornPieceBackToThePack` would wrongly refuse the swap.
+The 3 existing `DisableCascade*` tests in `BodyTests.cs` previously triggered the cascade by
+stacking gear PAST the pool at equip time (each piece fit "alone" against raw capacity) — that
+pattern is now impossible by design, so all three were redesigned to start with enough headroom for
+every piece to equip cumulatively, then shrink the pool via `Damage()` to trigger the identical
+cascade-ranking assertions (cascade mechanism itself untouched). Redesigning surfaced a real
+adjacent subtlety: Plate armor's PartMitigation soak (§6c, 2/tier) applies whenever a piece's SLOT
+matches the damaged part's stat — two of the three tests originally picked slots that collided with
+the arm being damaged, silently blunting the `Damage()` calls; fixed by choosing non-colliding slots
+for the test armor pieces (comments left in place explaining why). Two new pinning tests added:
+`WieldRefusesOutrightOnceOtherGearHasFilledThePool`, `EquipArmorRefusesOutrightOnceOtherGearHasFilledThePool`.
+`dotnet test Roguebane.Core.Tests`: 424/424 green. Core-only change — no Game-side code calls
+`Wield`/`EquipRanged`/`Equip` directly (all go through `Gearing.EquipWeapon`/`EquipArmor`), so no
+Game rebuild was needed.
+
 ## ✅ FIXED (2026-07-06, loop) — inventory shows every technique in the game, not the core's kit
 Root cause was `Content/Sessions.cs`'s `NewBuild()` seeding `BuildSession` with a static
 `BuildPalette = Techniques.All.Concat(Armory's 5 weapon-verbs)` (19 items, every technique in the
@@ -181,18 +211,9 @@ belong. **Fixed this pass:** RULES_SNAPSHOT.md's reservation section now spells 
 triggers explicitly (equip-time unconditional reserve for gear vs. activation-only reserve for
 techniques/minions) and points back to DESIGN_SPEC §7 as the fuller lock.
 
-**One genuine, still-open mechanic gap (pre-existing, NOT touched by today's CHUNK A pass, not a new
-regression):** the EQUIP-TIME gates — `Body.Wield`, `Body.EquipRanged`, `Body.Equip` (armor) — each check
-only `Capacity(stat) < item's own Reserve`, i.e. against RAW capacity, never against what's already
-reserved by OTHER currently-equipped gear on that same stat. So a player CAN equip more gear than the
-shared pool actually holds; nothing blocks the equip action itself — only `DisabledGear`'s ongoing
-sustain cascade notices afterward and silently marks the lowest-priority piece(s) DISABLED. This matches
-DESIGN_SPEC §7's own "Reservation timing" paragraph, which already flags this exact gap by name ("today's
-engine gate only checks a single item's Reserve against raw Capacity... there IS currently no real
-cumulative equipment reservation") — confirmed still true today, not yet scheduled in CHUNK B/C. Fix:
-gate `Wield`/`EquipRanged`/`Equip` on `Available(stat) < effective reserve` (or equivalent) instead of
-raw `Capacity`, so over-equipping is refused at the equip click instead of silently degrading afterward —
-symmetric with how `Activate` already refuses instead of degrading.
+**Equip-time over-reservation gap: FIXED (2026-07-06, loop)** — see the FIXED entry at the top of this
+file. `Wield`/`EquipRanged`/`Equip` now gate cumulatively via `Body.GearOnlyAvailable`, not raw
+`Capacity`.
 
 ## ‼ HIGH PRIORITY (2026-07-05, Doug) — Equipment/Inventory screen: 4 distinct root-caused bugs + 1 known item
 Doug's live report bundled several symptoms under "Inventory." Read the actual code for each — these are
