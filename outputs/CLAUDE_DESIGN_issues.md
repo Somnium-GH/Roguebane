@@ -345,6 +345,21 @@ B22. **`inventory.invItems` (Equipment/GEAR tab) is 1px too narrow for its own a
     a pure geometry fix, no new binds/states needed. We'll pick up the extra column automatically
     once the width actually fits (no engine change required on our side).
 
+B23. **Equipment tab buttons (`invTab`) too narrow for two of their three labels, and the row leaves
+    ~290px of dead space.** `invTab` template is `size:[40,18]` with its label text drawn into a
+    card-local rect `[12,5,16,8]` (16px wide) — sized around "GEAR" (4 chars). The `invTabs` list
+    (`layout.json:6394`) authors its item `size` the same `[40,18]`, `gap:4`, so 3 tabs occupy only
+    `3*40+2*4=128px` of the container's ~403px usable width (`size:[419,29]` minus pad) — the rest
+    sits empty. "TECHNIQUES" (10 chars) and "MINIONS" (7 chars) don't fit the 16px label rect at the
+    authored `fontPx:6`; our renderer (`TextPxWrapped`) already auto-shrinks a single-line label
+    that overflows its rect rather than clipping or spilling into neighboring chrome (a small mercy —
+    nothing breaks), but the shrink is severe enough that the longer labels read as tiny/hard-to-read
+    next to "GEAR" at full size. No engine change would fix the readability or the dead space — both
+    are authored geometry. Ask: widen `invTab`'s `size`/label rect (and the `invTabs` item `size`) so
+    the 3 tabs actually fill their container width evenly — e.g. something near `(403-2*4)/3 ≈ 131px`
+    each — and widen the label rect enough that "TECHNIQUES" doesn't need heavy shrinking at the
+    authored font size. Pure `layout.json` geometry, no new binds/states/engine hooks needed.
+
 ## Standing FYIs (for context — not action items)
 - **Tier ladders for the new families** (for card copy / labels): Sling Shepherd's → Braided →
   Sinew → Giantsbane · Staff Wooden → Twisted → Ornate → Humming · Charm Wooden → Bone → Ornate →

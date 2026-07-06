@@ -99,15 +99,18 @@ geometry, same shape as the earlier `waresShelves` off-by-one, but this time in 
 `outputs/CLAUDE_DESIGN_issues.md` (widen `invItems.size[0]` to ≥404); no engine change needed once it
 lands. Parked on CD, not blocking.
 
-**3. GEAR/TECHNIQUES/MINIONS tab buttons mislabeled/mis-sized/mis-spaced.** The `invTab` template
-(`layout.json:10994`) is a fixed `40×18` box with its label text in a hardcoded `[12,5,16,8]` rect (16px
-wide) — sized and positioned around the 4-character word "GEAR" specifically (matches the template's own
-`sample: "GEAR"`), never adjusted for "TECHNIQUES" (10 chars) or "MINIONS" (7 chars), which will clip or
-run outside the 40px button at the same font size. Separately, the 3 tabs (3×40 + 2×4 gap = 128px) sit in
-a 419px-wide `invTabs` container (`layout.json:6394`) with no stretch/distribute rule, leaving ~290px of
-dead space — reads as "not properly spaced." Fix: either widen the template box (and re-check text-rect
-centering) or shrink the font per label length; distribute/stretch the 3 tabs across the container's real
-width instead of left-packing them.
+**3. ⇒ RE-DIAGNOSED (2026-07-06, loop) — not an engine bug, re-routed to CD as B23.** Checked the
+"will clip or run outside the button" claim against `TextPxWrapped` (`Game1.Canvas.cs:138`) directly:
+a single-line label that overflows its rect already auto-shrinks to fit width instead of clipping or
+spilling into neighboring chrome — confirmed working as intended, no engine gap. So "TECHNIQUES"/
+"MINIONS" don't clip, they just render smaller than "GEAR", which reads as mislabeled/uneven. That,
+plus the 128px-of-320px tab row leaving ~290px dead (no stretch/distribute concept exists anywhere in
+the manifest schema — `Item`/`Template` have no such field, so this isn't a missing engine feature
+either), is pure `layout.json` geometry: `invTab` template size, its item `size` on `invTabs`
+(`layout.json:6394`/`10994`), and the label rect width. Logged as **B23** in
+`outputs/CLAUDE_DESIGN_issues.md` (widen tabs to fill the container evenly, widen the label rect so
+longer labels don't need heavy shrinking); no engine change needed once it lands. Parked on CD, not
+blocking.
 
 **4. Equipment reservation is visually present but easy to miss — not fully absent.** `attrBar`
 (`layout.json:10901`, bound to `"attrs"` on the Equipment screen, `layout.json:6321`) DOES read live
