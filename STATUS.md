@@ -204,6 +204,34 @@ write an aspect-fill design doc only if 2–3 actually surfaced a need for it (t
 
 Build/tests green at commit time: `dotnet build` clean, `dotnet test Roguebane.Core.Tests` 412/412.
 
+## ✅ TASK #4 COMPLETE (2026-07-06, loop) — retrospective + indexed loop protocol docs
+Docs only, no code. New `.claude/protocols/` (index + 5 docs, ~240 lines total, none inlined into
+`loop.md`'s hot path — `loop.md` grew by ~10 lines of pointers only):
+- `INDEX.md` — one table, doc → trigger-condition. `loop.md` and STATUS.md's Pointers both link here
+  instead of duplicating content.
+- `RETRO.md` — dated retrospective entries (append future ones, don't rewrite). Covers this week's
+  Task #1 coupling surprise (slice boundary must match test boundary, not a size target), the 3
+  identical bind-gap bugs (gate score ≠ content-correctness proof), the `-3,-3` tooling-artifact
+  lesson (sanity-check a diff tool's own tie-break on the degenerate case), and fork-for-verification
+  as the top process win (Task #3 forked ≈112min vs Task #2 inline 179min for the same class of work).
+- `metrics.csv` + `metrics.md` — greppable `date,task,minutes,lines_changed,estimate_minutes,method`
+  log, seeded with real numbers for Tasks #1-3 (340/179/112 min; 840/425/129 lines). `loop.md` step 5
+  now appends one row per commit. All 3 seeded slices ran over the 60min target — #1 is one
+  deliberately atomic coupled slice (not a slicing failure), #2/#3 show forking the verify phase is
+  the lever, per RETRO.md.
+- `drift_guardrails.md` — names the EXISTING "measurement is sacred" channel explicitly: gate-relaxing
+  changes (baseline `--update`, threshold/mask edits, drive changes that dodge a divergence) go into
+  STATUS's Needs Doug tagged **BASELINE-UPDATE-REQUEST**, land only as their own commit after Doug
+  responds. No new mechanism invented — this session's 3 real M0 calls already followed this pattern.
+- `anti_block.md` — formalizes isolate-then-park: `git stash`/rebuild/re-run to prove a failing gate
+  pre-existing BEFORE diagnosing it (this session's `ui_gate.py`-red-everywhere case is the cited
+  precedent), commit your own clean slice regardless, log enumerated numbers, keep working the queue.
+  Distinguishes PARK (one item, proven, logged) from STOP (every remaining item proven blocked —
+  enumerated list required, same bar `loop.md` already set for STARVED/BLOCKED).
+
+This closes Doug's 4-part compound directive (race/core overhaul, UI paging, pixel-perfection,
+retrospective+protocols). All 4 landed: `6578c53`, `99238ed`, `3a42287`, this commit.
+
 ## 📐 RULES REFERENCE (2026-07-05, Cowork — STANDING; consult on ANY design conflict/ambiguity)
 The core/race/effect/kit/number design changed a lot this week. On any conflict or ambiguity about races,
 cores, Core Effects, stat bonuses, default kits, technique/gear reserves, or the reservation model,
@@ -441,6 +469,8 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
 - Design canon: `design/DESIGN_SPEC.md` (+ `design/systems/*.md` = operative content tables; FOES.md
   new). Layout contract: `design/LAYOUT_CONTRACT.md`. Pixel bar: `design/NN-*.png` + `design/SCREENS.md`.
 - CD outbox: `outputs/CLAUDE_DESIGN_issues.md` (OPEN items only; loop appends Needs-CD finds per pass).
+- Loop process detail (gate-approval channel, park-vs-stop, metrics, retro): `.claude/protocols/INDEX.md`
+  — not hot-path, read on trigger only. `loop.md` stays the terse per-run checklist.
 - Shipped history/rationale: `git log`. This file = current state only.
 
 ## Backlog (not prioritized; don't pull ahead)

@@ -1,6 +1,12 @@
 # /loop guidance — ONE task per run, then STOP.
 The built-in /loop re-fires for the next task. SHORT runs = clean context. Do NOT batch many tasks
-or grind 30+ min — that pollutes context. One good slice, commit, stop.
+or grind 30+ min — that pollutes context. One good slice, commit, stop. If a slice's VERIFY phase is
+open-ended (drive N states, compare N screenshots), fork it — keeps this loop's own turn short even
+when the fork itself runs long.
+
+Deeper protocol detail (gate-approval channel, park-vs-stop, metrics methodology, retro) lives in
+`.claude/protocols/INDEX.md` — not inlined here on purpose. Read a linked doc only when its trigger
+condition (named in the index) actually applies.
 
 Per run:
 1. SYNC then READ. `git pull --rebase` FIRST so any external changes land before you work (STATUS,
@@ -24,8 +30,9 @@ Per run:
      eyeballing. Never render text/chrome as an EMPTY box: unresolved content suppresses (or ships a
      FLAGGED shell label for a primary CTA).
      **MEASUREMENT IS SACRED: never change scoring/masks/thresholds/drives in a way that RAISES a
-     score without a STATUS-logged human approval FIRST. Fix the render, not the ruler.** Masks need
-     Doug's approval, each, logged. Before masking a "state divergence", ALIGN THE DRIVE to the ref
+     score without a STATUS-logged human approval FIRST. Fix the render, not the ruler.** Channel:
+     `.claude/protocols/drift_guardrails.md`. Masks need Doug's approval, each, logged. Before
+     masking a "state divergence", ALIGN THE DRIVE to the ref
      state instead. "Matches, it's just AA" claims require the alignment-search offset (≤0.5px) + a
      clean geometry-diff row — not eyeball. A screen is "done/at floor" only on UNBLURRED scores +
      geometry-diff clean + the enumerated residual list re-verified.
@@ -36,6 +43,8 @@ Per run:
      not BEHAVIOUR — don't trust a rendered control to do what it implies.
 4. Genuine human-need (unmade decision, feel call, secret)? Add to "Needs human" with cold-start
    context; route around it. Can't go green after a real try? Park it the same way. Don't thrash.
+   A failing gate that isn't yours: ISOLATE first (`git stash`, re-run, compare — don't assume),
+   then park-not-block if proven pre-existing. Full protocol: `.claude/protocols/anti_block.md`.
 5. COMMIT one small semantic slice. Update `STATUS.md`: check off, fix Debt + "Needs human", set the
    next target. Any NEW Needs-CD finding goes BOTH places in the same pass: the STATUS line AND a
    relay-ready item appended to `outputs/CLAUDE_DESIGN_issues.md` (the standing CD outbox — one entry
@@ -45,7 +54,9 @@ Per run:
    ENGINE-PENDING, record the closure in `CD_CLOSED_ITEMS.md` (repo-root — the REVERSE of the outbox; CD
    reads it in the repo to confirm-to-close + clear its own dev-memory): CD item # · what shipped ·
    `file:symbol` evidence · date. That file is a DURABLE confirmation log, not a work queue. Keep STATUS LEAN (prune resolved/stale lines). If the slice changed LOCKED design, also
-   reconcile `design/DESIGN_SPEC.md` (the canon). PUSH the commit when you can (remote reachable); never
+   reconcile `design/DESIGN_SPEC.md` (the canon). Append one line to `.claude/protocols/metrics.csv`
+   (date, task tag, minutes, lines_changed via `git show --shortstat`, estimate_minutes, method —
+   schema in `metrics.md`). PUSH the commit when you can (remote reachable); never
    force-push. If the step-1 pull or the push hits a CONFLICT you can't resolve cleanly, park it in
    "Needs human" rather than forcing. Then STOP — one task done.
 
@@ -57,3 +68,4 @@ STARVED/BLOCKED must be PROVEN, not felt: emit the ENUMERATED per-element remain
 tagged CD / system / human, with a reason). No backed-up list ⇒ you are NOT starved — keep pixel-perfecting
 what's achievable. Missing systems/content NEVER block perfecting the elements that DO exist. VERIFY
 DETERMINISTICALLY (element coverage + content bound-not-sample + a design-PNG diff), not by eyeballing.
+One red gate ≠ STARVED/BLOCKED — see `.claude/protocols/anti_block.md` for isolate-then-park.
