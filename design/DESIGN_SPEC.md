@@ -611,12 +611,13 @@ Minions yes; **party no** — one main character.
   reservation + Summons — it should not out-damage what the player's own action bar can do).
   **T1 blessed-initial numbers** (10 ticks/sec clock, matching Jab/Lunge's ~0.4 dmg/s benchmark):
   **Skeleton** (fast/weak, INT-gated, Reserve 2) — Timer 25 ticks (2.5s), Power 1 → ~0.4 dmg/s.
-  **Golem** (slow/strong, INT-gated, Reserve 3 — NEW, replaces Shade's role) — Timer 100 ticks (10s),
+  **Golem** (slow/strong, INT-gated, Reserve 3 — NEW) — Timer 100 ticks (10s),
   Power 4 → ~0.4 dmg/s. Tier growth (once a minion ladder exists, still OPEN) should follow the same
   archetype logic weapons use: a fast minion's tiers mostly SHORTEN its timer, a slow minion's tiers
-  mostly RAISE its power — tier is not yet built; T1 is the placeholder per-minion baseline. **Shade is
-  likely retired** (it duplicated Skeleton's role with no distinct playstyle, which Golem now fills
-  cleanly) — confirm before the loop deletes it.
+  mostly RAISE its power — tier is not yet built; T1 is the placeholder per-minion baseline. **Shade
+  retired (Doug confirmed, 2026-07-05)** — `Minions.Shade` deleted. The Conclave keystone's minion
+  grant (which used to hand out Shade) is now empty; assigning a real replacement minion or
+  redesigning that reward is Needs human (STATUS.md), not guessed here.
 - **Ranger's PET — DEX-gated Hound [content added 2026-07-04]:** per the DEX minion-role lean already on
   the books (**DEX = utility/evasion, NOT raw DPS** — so a shield-pierce/bow build doesn't also double-
   dip on a hard-hitting pet), Hound ships now as a minor chip-damage placeholder ONLY: Reserve 1 (DEX),

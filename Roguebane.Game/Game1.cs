@@ -126,7 +126,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         {
             if (_smokeScreen is "encounter" or "citymap")
             {
-                _build.CycleCoreRune(3);          // -> the Summoner (3 bays; fields Skeleton+Shade) for the bay lane
+                _build.CycleCoreRune(3);          // -> the Summoner (3 bays; fields Skeleton+Golem) for the bay lane
                 _build.Toggle(Techniques.Jab);   // add a STR card for variety on the bar
             }
             // loadout keeps the DEFAULT GRUNT build — design/02's authored state (CORE GRUNT,

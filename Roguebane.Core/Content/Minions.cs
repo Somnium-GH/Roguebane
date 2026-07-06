@@ -10,7 +10,7 @@ public static class Minions
     public static readonly Minion Skeleton = new("skeleton", Stat.Int, Reserve: 1, Power: 1, Timer: 30,
         Desc: "A raised thrall that strikes for {power} damage every {timer} ticks.");
 
-    // T2 INT, r2: slow/strong, replaces Shade's role. Timer 50 ticks (5.0s), Power 3 (v6 sync).
+    // T2 INT, r2: slow/strong. Timer 50 ticks (5.0s), Power 3 (v6 sync).
     public static readonly Minion IronGolem = new("iron_golem", Stat.Int, Reserve: 2, Power: 3, Timer: 50,
         Desc: "A bound iron golem that hits hard for {power} every {timer} ticks while its reserve holds.");
 
@@ -18,12 +18,6 @@ public static class Minions
     public static readonly Minion Hound = new("hound", Stat.Dex, Reserve: 1, Power: 1, Timer: 40,
         AccuracyBonus: 5,
         Desc: "A hound that nips for {power} every {timer} ticks and sharpens your aim while fielded.");
-
-    // Duplicated Skeleton's role with no distinct playstyle now that Golem fills the slow/strong slot
-    // (DESIGN_SPEC §9) -- likely retired, NOT yet deleted (Needs human: confirm with Doug first).
-    // Kept off `All` so new content doesn't pick it up by accident while the retire call is pending.
-    public static readonly Minion Shade = new("shade", Stat.Int, Reserve: 3, Power: 2, Timer: 50,
-        Desc: "A bound shade that hits hard for {power} every {timer} ticks while its reserve holds.");
 
     public static readonly IReadOnlyList<Minion> All = new[] { Skeleton, IronGolem, Hound };
 }

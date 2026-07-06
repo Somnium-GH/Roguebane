@@ -42,13 +42,14 @@ public static class Paths
 
     public static readonly IReadOnlyList<Mark> TempestLadder = new[] { TempestI, TempestII, EyeOfTheStorm };
 
-    // Another non-extension keystone: the Conclave keystone GRANTS a minion type (the bound Shade).
+    // Another non-extension keystone: the Conclave keystone GRANTS a minion type. It granted the bound
+    // Shade; Shade is retired (Doug, 2026-07-05), so this keystone currently grants NOTHING pending a
+    // replacement decision (Needs human — flagged in STATUS.md, don't invent a substitute here).
     public const string Conclave = "conclave";
 
     public static readonly Mark ConclaveI = new(Conclave, Rank: 1, Cost: 4, Refund: 2);
     public static readonly Mark ConclaveII = new(Conclave, Rank: 2, Cost: 5, Refund: 2);
-    public static readonly Mark BoundConclave = new(Conclave, Rank: 3, Cost: 6, Refund: 0, Keystone: true,
-        Minions: new[] { Minions.Shade });
+    public static readonly Mark BoundConclave = new(Conclave, Rank: 3, Cost: 6, Refund: 0, Keystone: true);
 
     public static readonly IReadOnlyList<Mark> ConclaveLadder = new[] { ConclaveI, ConclaveII, BoundConclave };
 

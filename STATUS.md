@@ -8,11 +8,17 @@
    RACES.md's own rule) and should read HIGHER than Half-Giant (STR-affinity), not lower. Fix: Dwarf
    → `Hp: 17`, HalfGiant → `Hp: 20`. Halfling (`Hp: 13`) unchanged. Still placeholder-blessed, not a
    final balance pass — canon note added to `design/systems/RACES.md`.
-2. **Delete the `Shade` minion record outright** (Doug: "delete it now" — confirmed dead, not in any
-   current core kit/roster, no live reference beyond scattered mentions). Grep `Shade` across
-   `Roguebane.Core` (hits so far: `Content/CoreRunes.cs`, `Content/Minions.cs`, `Content/Paths.cs`) and
-   remove the record + every reference; if a rune-path Mark grants it as a keystone reward, either drop
-   that grant or point it at a real current minion — Doug's call if the loop hits ambiguity, don't invent.
+2. ✅ DONE (2026-07-06, loop) — `Minions.Shade` deleted outright; every reference removed/updated
+   (`Content/CoreRunes.cs`, `Content/Paths.cs`, `Game1.cs` smoke-screen comment, `design/DESIGN_SPEC.md`).
+   `Paths.BoundConclave` (the Conclave keystone) used to grant Shade as its minion reward — hit the
+   documented ambiguity ("drop the grant or point it at a real minion — Doug's call"), so per the
+   don't-invent rule this is now **Needs human**: BoundConclave currently grants NO minion (empty), a
+   Cost-6 keystone with no reward. Doug needs to pick a real replacement minion or redesign the reward.
+   Tests: `MinionTests` rewired its Shade-as-generic-3rd-minion usages onto `IronGolem`/`Hound` (values
+   adjusted to match their real Reserve costs, not copy-pasted); `RuneGrantsTests
+   .AMinionKeystoneExposesItsGrantedMinion` now exercises the GENERIC keystone-grant mechanism via a
+   synthetic Mark, so the code path stays covered independent of Conclave's open decision. 425/425 green.
+   Verified via clean `dotnet build Roguebane.Game --no-incremental` (0 errors) — Game1.cs changed.
 3. **Sacrifice's heal formula (4/8 part-points, T1/T2) is APPROVED as the standing placeholder** — stop
    treating it as OPEN/unconfirmed (RULES_SNAPSHOT.md updated). No engine change needed, just unblocks
    anything that was waiting on this confirm.
@@ -732,10 +738,12 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
   **P0-manifest-reflow, not a font bug**: `coreEffectLabel`/`coreEffectName`/`coreEffectDesc` (Equipment
   + the NewGame preview mirror) physically don't fit their authored vertical space. Needs-CD to re-space
   the coreEffect identity block; the `--update` eyeball itself still just waits on A+C.
-- Standing design calls parked earlier: per-encounter re-arm scope for techniques + the free minion
-  re-enable primitive (§8/§9 FTL-parity lock's second half); mid-run rune-bag Climb → Body reapply
-  path (§11/§12); worn-armor DRAW composition (§17 #15) — B2-GO themed-half draw waits on it; Shade
-  record deletion.
+- Standing design calls parked earlier: the free minion re-enable primitive (§8/§9 FTL-parity lock's
+  second half — re-arm SCOPE itself is now locked, see DESIGN_SPEC §7); mid-run rune-bag Climb → Body
+  reapply path (§11/§12); worn-armor DRAW composition (§17 #15) — B2-GO themed-half draw waits on it.
+- **Conclave keystone (`Paths.BoundConclave`) grants no minion** (2026-07-06, loop): it used to hand
+  out the now-deleted `Minions.Shade`. Needs a real replacement minion or a redesigned reward — the
+  loop won't guess which.
 
 ## Debt (active)
 - Worn-armor DRAW wiring: `WornArmorBinding` resolves keys (all races after CHUNK B) but isn't wired

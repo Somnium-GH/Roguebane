@@ -23,8 +23,14 @@ public class RuneGrantsTests
     [Fact]
     public void AMinionKeystoneExposesItsGrantedMinion()
     {
-        var runes = Climbed(Paths.ConclaveLadder);
-        Assert.Contains(Minions.Shade, runes.GrantedMinions);
+        // Conclave granted the retired Shade (Doug, 2026-07-05); its own grant is now empty pending
+        // a replacement decision (Needs human, STATUS.md). Exercise the GENERIC grant mechanism with
+        // a synthetic keystone so this path stays covered independent of that open decision.
+        var minion = new Minion("test_grant", Stat.Int, Reserve: 1, Power: 1, Timer: 1);
+        var keystone = new Mark("synthetic", Rank: 1, Cost: 6, Refund: 0, Keystone: true, Minions: new[] { minion });
+        var runes = new RuneLoadout(30);
+        Assert.True(runes.TryTake(keystone));
+        Assert.Contains(minion, runes.GrantedMinions);
     }
 
     [Fact]

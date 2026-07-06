@@ -34,7 +34,7 @@ public class MinionTests
     {
         var caster = new Caster(IntBody(20), null);
         Assert.True(caster.Summon(Minions.Skeleton, minionCap: 1));
-        Assert.False(caster.Summon(Minions.Shade, minionCap: 1)); // no free slot
+        Assert.False(caster.Summon(Minions.IronGolem, minionCap: 1)); // no free slot
         Assert.Equal(1, caster.MinionCount);
     }
 
@@ -42,8 +42,8 @@ public class MinionTests
     public void SummoningGatesOnFreeStat()
     {
         var caster = new Caster(IntBody(2), null); // only 2 INT
-        Assert.True(caster.Summon(Minions.Skeleton, minionCap: 3)); // reserves 2 -> ok
-        Assert.False(caster.Summon(Minions.Shade, minionCap: 3));   // needs 3 more INT, none free
+        Assert.True(caster.Summon(Minions.Skeleton, minionCap: 3)); // reserves 1 -> ok, 1 left
+        Assert.False(caster.Summon(Minions.IronGolem, minionCap: 3)); // needs 2 more INT, only 1 free
     }
 
     [Fact]
@@ -77,10 +77,10 @@ public class MinionTests
     {
         var body = IntBody(5);
         var caster = new Caster(body, null);
-        caster.Summon(Minions.Shade, minionCap: 3); // reserves 3
-        Assert.Equal(2, body.Available(Stat.Int));
+        caster.Summon(Minions.IronGolem, minionCap: 3); // reserves 2
+        Assert.Equal(3, body.Available(Stat.Int));
 
-        caster.Dismiss(Minions.Shade);
+        caster.Dismiss(Minions.IronGolem);
         Assert.Equal(5, body.Available(Stat.Int));
         Assert.Equal(0, caster.MinionCount);
     }
@@ -161,13 +161,15 @@ public class MinionTests
     [Fact]
     public void DismissCompactsTheMinionOrderLeft()
     {
-        var caster = new Caster(IntBody(10), null); // IronGolem(2) + Skeleton(1) + Shade(3) = 6 INT
+        var body = IntBody(10);
+        body.Add(new BodyPart("legs", Stat.Dex, 10)); // Hound gates on DEX, not INT
+        var caster = new Caster(body, null); // IronGolem(2 INT) + Skeleton(1 INT) + Hound(1 DEX)
         caster.Summon(Minions.IronGolem, minionCap: 3);
         caster.Summon(Minions.Skeleton, minionCap: 3);
-        caster.Summon(Minions.Shade, minionCap: 3);
+        caster.Summon(Minions.Hound, minionCap: 3);
 
         caster.Dismiss(Minions.IronGolem); // remove the FIRST slot
-        Assert.Equal(new[] { "skeleton", "shade" }, caster.Minions.Select(m => m.Id));
+        Assert.Equal(new[] { "skeleton", "hound" }, caster.Minions.Select(m => m.Id));
     }
 
     [Fact]
@@ -202,9 +204,8 @@ public class MinionTests
     public void SummonMinionMovesAStashedMinionIntoAFreeSlot()
     {
         // v6: Wand+Charm+Ember+Barkskin leave the Summoner exactly 1 free INT after its kit's
-        // Skeleton+Golem -- Shade (3 INT, also retired from Minions.All) no longer fits. Hound
-        // gates on DEX instead, which the Summoner never touches, so it proves the free SLOT
-        // (MinionCap 3) fills independent of the INT pool being nearly spent.
+        // Skeleton+Golem. Hound gates on DEX instead, which the Summoner never touches, so it
+        // proves the free SLOT (MinionCap 3) fills independent of the INT pool being nearly spent.
         var exp = SummonerExpedition();
         Assert.Equal(2, exp.MinionCount); // Skeleton + Golem from the kit
         exp.Stash.AddMinion(Minions.Hound); // as if bought from a merchant
@@ -218,9 +219,9 @@ public class MinionTests
     public void SummonMinionFailsMidCombat()
     {
         var exp = SummonerExpedition();
-        exp.Stash.AddMinion(Minions.Shade);
+        exp.Stash.AddMinion(Minions.Hound);
         exp.Enter("a2"); // State -> Fighting
-        Assert.False(exp.SummonMinion(Minions.Shade));
+        Assert.False(exp.SummonMinion(Minions.Hound));
     }
 
     [Fact]
@@ -239,6 +240,6 @@ public class MinionTests
     public void DismissMinionFailsForAMinionNotInAnySlot()
     {
         var exp = SummonerExpedition();
-        Assert.False(exp.DismissMinion(Minions.Shade)); // never summoned
+        Assert.False(exp.DismissMinion(Minions.Hound)); // never summoned
     }
 }
