@@ -115,6 +115,33 @@ public sealed class Expedition
 
     public bool AtMerchant => State == ExpeditionState.Choosing && Map.Current.Type == NodeType.Merchant;
 
+    // §"Quests" (STATUS.md, 2026-07-07 Doug: partially unblocked): a Quest node's two-step
+    // accept/decline prompt. Only ONE stub quest exists (Content.Quests.Stub) -- real catalog is
+    // Needs-Doug-and-CD. _questsResolved keeps a resolved node from re-prompting on revisit (a
+    // Quest, unlike a Merchant, is a one-shot beacon).
+    private readonly HashSet<string> _questsResolved = new();
+    public bool AtQuest => State == ExpeditionState.Choosing && Map.Current.Type == NodeType.Quest
+        && !_questsResolved.Contains(Map.Current.Id);
+    public Quest? CurrentQuest => AtQuest ? Content.Quests.Stub : null;
+
+    public bool AcceptQuest() => ResolveQuest(Content.Quests.Stub.AcceptOutcome);
+    public bool DeclineQuest() => ResolveQuest(Content.Quests.Stub.DeclineOutcome);
+
+    private bool ResolveQuest(QuestOutcome outcome)
+    {
+        if (!AtQuest) return false;
+        if (outcome.Damage > 0) _player.Damage(outcome.Damage);
+        if (outcome.Gold > 0) _stash.AddGold(outcome.Gold);
+        if (outcome.Supplies) Map.AddSupplies(1);
+        if (outcome.Weapon is { } w) _stash.AddWeapon(w);
+        if (outcome.Armor is { } a) _stash.AddArmor(a);
+        if (outcome.Technique is { } t) _stash.AddTechnique(t);
+        if (outcome.Mark is { } m) _stash.AddMark(m);
+        if (outcome.Summon is { } s) _stash.AddMinion(s);
+        _questsResolved.Add(Map.Current.Id);
+        return true;
+    }
+
     // The merchant's gear stock and its prices (placeholder-sane: weapon = reserve+power, armor =
     // value+2). Buying spends gold, moves the piece into the Stash pack, and clears it from the stock.
     public IReadOnlyList<Weapon> OfferedWeapons => AtMerchant ? CurrentStock().Weapons : Array.Empty<Weapon>();
@@ -354,8 +381,8 @@ public sealed class Expedition
         if (Map.Outcome == CityMapOutcome.Overrun) { State = ExpeditionState.Lost; return true; }
 
         var node = Map.Current;
-        if (node.Type is NodeType.Merchant or NodeType.Camp)
-            return true; // no fight here: the merchant's verbs are shop/heal, the camp is safe ground
+        if (node.Type is NodeType.Merchant or NodeType.Camp or NodeType.Quest)
+            return true; // no fight here: merchant=shop/heal, camp=safe ground, quest=accept/decline prompt
 
         // RE-ARM SCOPE (DESIGN_SPEC §7, LOCKED 2026-07-05): rearm governs back-to-back encounters, not
         // the leg's FIRST fight -- the starting kit's assembly-time minions (Summoner/Ranger) must

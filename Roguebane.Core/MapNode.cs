@@ -8,6 +8,7 @@ public enum NodeType
     Skirmish,     // a fight (control point)
     ResourceHold, // a fight that, once taken, banks rallied support for the castle
     Merchant,     // shop + out-of-combat HP service (economy = G8)
+    Quest,        // two-step accept/decline prompt, no fight (placeholder catalog, real mechanism)
     Unknown,      // fogged; resolves to a concrete kind when revealed
     Castle,       // the structural boss; cracking it disbands the war party and wins the leg
 }

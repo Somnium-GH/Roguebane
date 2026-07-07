@@ -23,7 +23,7 @@ public class CityMapTests
     public void NodesCarryChartCoordsForTheGraphRender()
     {
         var map = Maps.StandardLeg();
-        Assert.Equal(7, map.Nodes.Count); // the whole chart is exposed, in declared order
+        Assert.Equal(8, map.Nodes.Count); // the whole chart is exposed, in declared order (+quest dead-end)
 
         var camp = map.Node("camp");
         var castle = map.Node("castle");

@@ -26,22 +26,32 @@ own pool, and drop rates land in a tolerance band around 8/35/20%. `ExpeditionTe
 ClearingNodesAwardsSpoils` updated from an exact `Assert.Equal(3, ...)` to `Assert.InRange(2, 4, ...)`
 now that spoils are randomized. Full `Core.Tests` green (454/454).
 
-## ✅ PARTIALLY UNBLOCKED (2026-07-07, Doug) — Quests: build the SYSTEM now on a stub quest, real catalog is separate
-The numbers-style unblock above doesn't apply here — the real gap isn't a missing percentage, it's
-missing CONTENT (narration text, the actual quest catalog, trigger/placement). Split it the same way
-Merchant Wares' sale cards shipped: build the real mechanic on placeholder presentation, flag it, let
-the content follow later.
-- **Build now:** a new CityMap node type (`NodeType.Quest`, fogged the same as Skirmish — see the
-  CityMap.Sees fix above, Quest must fall through the same Unknown-until-visited branch, not get a
-  special case) with ONE stub quest: a two-step accept/decline prompt (placeholder flavor text,
-  clearly flagged as such), an outcome that awards from the SAME loot vocabulary as the Loot backlog
-  above (gold/gear/supplies/summons), and a branch that can be negative-alone or negative+positive —
-  build the DATA SHAPE (a `Quest` record: prompt text, accept text, outcomes with loot + consequence)
-  so the mechanism is real and testable, even though only one (obviously placeholder) quest exists.
-- **Not now, needs Doug + CD:** the real quest catalog (actual narration, more than one quest), and
-  where/how often Quest nodes appear on the map graph (today's `Maps.StandardLegNodes()` is hand-
-  authored per node — adding one Quest slot to the existing standard leg is fine as the placeholder
-  wiring; a real placement/frequency model is a separate design pass, don't invent it here).
+## ✅ MECHANISM DONE (2026-07-07, loop) — Quests: system built on a stub quest, catalog still open
+The numbers-style unblock (Loot backlog above) didn't apply here — the real gap was missing CONTENT
+(narration, catalog, placement), not a percentage. Split the same way Merchant Wares' sale cards
+shipped: built the real mechanic on placeholder presentation, flagged it, catalog follows later.
+- **Built:** `NodeType.Quest` (`MapNode.cs`) — unlisted in `CityMap.Sees`'s switch, so it falls
+  through the existing default arm into Unknown-until-visited exactly like Skirmish, no special
+  case added. `Quest`/`QuestOutcome` records (`Roguebane.Core/Quest.cs`): a two-step accept/decline
+  prompt whose outcome draws from the SAME loot vocabulary as the Loot backlog (gold/gear/supplies/
+  summons via `Weapon?`/`Armor?`/`Technique?`/`Mark?`/`Minion?`/`bool Supplies` fields) plus a
+  `Damage` consequence. `Expedition` gained `AtQuest`/`CurrentQuest`/`AcceptQuest()`/
+  `DeclineQuest()`, wired into `Enter()`'s no-fight branch alongside Merchant/Camp, resolving
+  through the same `Stash`/`CityMap.AddSupplies` hooks combat loot uses; `_questsResolved` makes a
+  node one-shot (no re-prompt/re-payout on revisit). ONE stub quest (`Content/Quests.cs`,
+  `[PLACEHOLDER]`-tagged text throughout) demonstrates both outcome shapes: Accept is
+  negative+positive (4 damage, 5 gold), Decline is negative-alone (1 damage, no loot) — both
+  placeholder-blessed, not final. Wired into the live standard leg as one dead-end node off camp
+  (`Maps.StandardLegNodes()`; dead-ends are an already-supported chart shape) so the mechanism runs
+  in the real map, not just a test fixture.
+- **Tests:** `QuestTests.cs` (new, 4 tests) — entering a Quest node spins no Battle and offers the
+  stub prompt; accepting applies the negative+positive outcome and resolves the node once (a second
+  accept is a no-op, not a double payout); declining applies only the negative-alone outcome;
+  accept/decline outside a Quest node fails. `CityMapTests.NodesCarryChartCoordsForTheGraphRender`
+  updated for the standard leg's node count (7 → 8). Full `Core.Tests` green (458/458).
+- **Not now, needs Doug + CD:** the real quest catalog (actual narration, more than one quest, more
+  than one node on the graph), and a real placement/frequency model for where/how often Quest nodes
+  appear — today's one dead-end slot is placeholder wiring, not a design decision.
 
 ## ✅ RESOLVED (2026-07-07, loop) — CD #33 minion-column reflow double-check, no engine gap
 Closed the last open item in the stale "CD_STATUS.md items worth a fresh look" cross-check list (the

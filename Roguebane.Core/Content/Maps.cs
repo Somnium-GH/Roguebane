@@ -8,9 +8,13 @@ public static class Maps
     // c1/c2 -> castle. Row 1 is the centre lane; 0/2 are the upper/lower branches.
     public static IReadOnlyList<MapNode> StandardLegNodes() => new[]
     {
-        new MapNode("camp", NodeType.Camp, "a1", "a2").At(0, 1),
+        new MapNode("camp", NodeType.Camp, "a1", "a2", "quest").At(0, 1),
         new MapNode("a1", NodeType.ResourceHold, "b").At(1, 0),
         new MapNode("a2", NodeType.Skirmish, "b").At(1, 2),
+        // placeholder wiring (STATUS.md "Quests", 2026-07-07 Doug): one dead-end Quest slot off
+        // camp -- real placement/frequency on the map graph is a separate design pass, not invented
+        // here. Dead-ends are a supported chart shape (see MapNode's own doc comment).
+        new MapNode("quest", NodeType.Quest).At(1, 1),
         new MapNode("b", NodeType.Merchant, "c1", "c2").At(2, 1),
         new MapNode("c1", NodeType.Skirmish, "castle").At(3, 0),
         new MapNode("c2", NodeType.ResourceHold, "castle").At(3, 2),

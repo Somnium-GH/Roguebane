@@ -40,3 +40,4 @@ date,task,minutes,lines_changed,estimate_minutes,method
 2026-07-07,cd33-minion-column-reflow-check,20,43,-,commit-delta
 2026-07-07,chunkd-ogre-weapon-consult-gear-wiring,34,149,-,commit-delta
 2026-07-07,loot-backlog-gold-gear-supplies-summons-drops,27,173,-,commit-delta
+2026-07-07,quests-mechanism-stub-quest-standard-leg,31,181,-,commit-delta
