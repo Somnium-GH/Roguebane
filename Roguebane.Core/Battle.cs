@@ -36,7 +36,7 @@ public sealed class Battle
         var foe = encounter.Enemy;
         if (foe.Frame is not null && foe.Arsenal.Count > 0)
         {
-            var offense = new Caster(foe.Frame, _player);
+            var offense = new Caster(foe.Frame, _player, foeEffect: foe.Effect);
             offense.UseRng(_rng);
             foreach (var tech in foe.Arsenal) offense.Activate(tech); // foes fire unattended (auto on)
             _foeOffense.Add((foe, offense));

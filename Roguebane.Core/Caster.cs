@@ -44,7 +44,7 @@ public sealed class Caster
     // (untargeted holds, never falling back to a default front). Engine casters (foe offense, sims)
     // leave it false and keep the default-front auto-fire. Minions and Sustained reserves track the
     // front in BOTH modes — only the per-technique offensive FSM is gated.
-    public Caster(Body self, ICombatTarget? target = null, int maxCharge = 0, bool requireAim = false, int minionCap = 0, int maxSummons = -1, bool freeSummons = false, CoreEffectKind effect = CoreEffectKind.None)
+    public Caster(Body self, ICombatTarget? target = null, int maxCharge = 0, bool requireAim = false, int minionCap = 0, int maxSummons = -1, bool freeSummons = false, CoreEffectKind effect = CoreEffectKind.None, FoeEffectKind foeEffect = FoeEffectKind.None)
     {
         _self = self;
         _default = target;
@@ -59,12 +59,18 @@ public sealed class Caster
         SummonsLeft = MaxSummons;
         _freeSummons = freeSummons;
         _effect = effect;
+        _foeEffect = foeEffect;
     }
 
     // The Summoner's Core Effect (Conscription, CORE_RUNES.md): fielding a minion never spends the
     // Summons resource at all — a different mechanic from the old refund-on-Redeploy Legion effect.
     private readonly bool _freeSummons;
     private readonly CoreEffectKind _effect;
+
+    // A foe's OWN Foe Effect (FOES.md), for the handful of effects that key off the ATTACKING
+    // caster's own state (Regenerative Flesh) rather than the defender's, which `target` already
+    // covers. None for the player and for foes with no effect (the default, unaffected).
+    private readonly FoeEffectKind _foeEffect;
 
     public int MinionCap { get; } // how many minion slots this caster's chassis has (for the render lane)
 
@@ -408,7 +414,15 @@ public sealed class Caster
             }
             else
             {
-                _self.Repair(wound, EffectivePower(run.Tech));
+                // Foe Effect: Regenerative Flesh (FOES.md, Troll) doubles the mend's part-points --
+                // a foe-side read keyed on the ATTACKER's (healer's) own identity via _foeEffect,
+                // rather than `target` like Insubstantial/Stoneform. No separate "chest still whole"
+                // gate is needed: the mend is CON-reserved (Bandage/Suture), so "break the chest first"
+                // (FOES.md) is already the existing reservation cascade -- once chest damage drops the
+                // Troll's CON capacity below the technique's Reserve, the mend silences outright.
+                var healPower = EffectivePower(run.Tech);
+                if (_foeEffect == FoeEffectKind.RegenerativeFlesh) healPower *= 2;
+                _self.Repair(wound, healPower);
             }
             if (run.Tech.Kind == TechniqueKind.Timered) run.Countdown = EffectiveCooldown(run.Tech);
             return true;

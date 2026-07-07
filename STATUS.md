@@ -1089,17 +1089,17 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
      it needed nothing else built first. New `WraithInsubstantialTests.cs` (3 tests): a hit elsewhere
      lands power-1 while the head's whole; the hit that breaks the head lands in full; once broken,
      later hits elsewhere also land in full. Full `Core.Tests` green (463/463).
-   - **Item 1 is now fully closed.** Items 2–4 stay open. Item 2's effect vocabulary is 3/6 proven now
-     (Insubstantial/Brittle/Stoneform, all bare-fixture) but foe CONTENT is still just Wraith (done)
-     and Ogre-T1 gear (no effect wired onto it yet); Skeleton/Gargoyle content are both blocked on an
-     open gear-authoring question (Jab/Dagger, stone-fists-no-weapon-record respectively — see the
-     Needs-Doug note below), Bandit's *Plunder* and Ogre's *Overwhelm* are player-side-victim-drain
-     effects that don't fit either existing interpreter site (`Hit`/`Discharge` only see the
-     ATTACKER's own state or the DEFENDER's `Body`/`Frame`, never the defending `Caster`'s `Charge`/
-     `SummonsLeft`/shield-pool-on-evade — a real cross-`Caster` wiring gap, not yet designed), and
-     Troll's *Regenerative Flesh* (self-heal amplifier) is untouched. Plus item 2's Dire Ogre entry
-     specifically still needs the STR-budget note above reconciled first; items 3–4 (encounter-table
-     wiring, DoD economy asserts) unblocked but not started.
+   - **Item 1 is now fully closed.** Items 2–4 stay open. Item 2's effect vocabulary is 4/6 proven now
+     (Insubstantial/Brittle/Stoneform/Regenerative Flesh, all bare-fixture) but foe CONTENT is still
+     just Wraith (done) and Ogre-T1 gear (no effect wired onto it yet); Skeleton/Gargoyle/Troll content
+     are all blocked on open gear/spec authoring questions (Jab/Dagger, stone-fists-no-weapon-record,
+     and Troll's own gear isn't picked yet — see the Needs-Doug note below for the first two), and
+     Bandit's *Plunder* and Ogre's *Overwhelm* are player-side-victim-drain effects that don't fit
+     either existing interpreter site (`Hit`/`Discharge` only see the ATTACKER's own state or the
+     DEFENDER's `Body`/`Frame`, never the defending `Caster`'s `Charge`/`SummonsLeft`/
+     shield-pool-on-evade — a real cross-`Caster` wiring gap, not yet designed). Plus item 2's Dire
+     Ogre entry specifically still needs the STR-budget note above reconciled first; items 3–4
+     (encounter-table wiring, DoD economy asserts) unblocked but not started.
    - ⚠️ NEEDS DOUG (found 2026-07-07, loop, while scoping the Skeleton for item 2) — **FOES.md's
      Skeleton (T1) pairs a weapon with a technique that can't consult it.** Spec: Iron Dagger + Jab.
      Iron Dagger is `Stat.Dex` (`Armory.cs`); Jab is `Stat.Str` (`Content/Techniques.cs`);
@@ -1147,6 +1147,26 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
      still discounted; once the chest's fully broken, later hits elsewhere land full part damage; a
      power-1 hit still deals 1 part damage (min-1 floor holds, not zeroed). Full `Core.Tests` green
      (470/470).
+   - ◐ PARTIAL (2026-07-07, loop) — **Regenerative Flesh Foe Effect proven** (FOES.md's fourth effect,
+     Troll). A NEW shape, distinct from all three above: Insubstantial/Stoneform read the DEFENDER's
+     `Foe` via `target` (`Caster.Hit`); this one needs the ATTACKER's (healer's) own `FoeEffectKind` —
+     neither `Hit` nor `Discharge` had any route to "am I a foe, and what's my effect," since `Caster`
+     only ever held `_self: Body`. Closed the gap the same way `CoreEffectKind effect` already does for
+     the player side: added a parallel `FoeEffectKind foeEffect = FoeEffectKind.None` constructor
+     parameter + `_foeEffect` field to `Caster`, wired at `Battle.cs`'s one foe-offense-`Caster`
+     construction site (`new Caster(foe.Frame, _player, foeEffect: foe.Effect)`). Interpreter:
+     `Discharge`'s `Heals` branch (non-`ConsumesMinion` path) doubles `EffectivePower(run.Tech)` when
+     `_foeEffect == FoeEffectKind.RegenerativeFlesh`. Deliberately did NOT add a live "chest still
+     whole" read (unlike Insubstantial/Stoneform) — first attempt tried exactly that and a failing test
+     caught why it was redundant: the mend is CON-reserved (Bandage Reserve 2, Suture Reserve 3), so
+     FOES.md's "break the chest first" is already the EXISTING reservation cascade (`Caster.Activate`'s
+     `Capacity(stat) < Reserve` guard) — breaking a Troll's chest below the mend's Reserve silences the
+     technique outright, same mechanism any other consulted-stat break already uses; a separate gate
+     would have been undesigned, redundant nuance. New `TrollRegenerativeFleshTests.cs` (3 tests, bare
+     fixture, not `Foes.Troll` — that content isn't built yet): a Bandage-style heal doubles its base
+     part-points; a non-Troll foe never doubles; damaging a Troll's own chest below the mend's Reserve
+     makes `Activate` fail outright (the mend never fires at all) — proving the cascade, not new gate
+     logic. Full `Core.Tests` green (473/473).
 2. Content: the six built foes at FOES.md's T1/T2 specs (Skeleton/Bandit/Wraith/Ogre/Troll/Gargoyle,
    Dire variants, effects incl. *Brittle*/*Plunder*/*Insubstantial*/*Overwhelm*/*Regenerative Flesh*/
    *Stoneform*). Numbers are Cowork placeholder-blessed — build them, flag them, Doug tunes. Castle
