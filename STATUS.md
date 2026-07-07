@@ -690,11 +690,15 @@ crumbs landed along the way.
 4. DoD: build green, probes 0 missing (bow/shield known gaps exempt), Core.Tests green.
 
 ### CHUNK C — SCREENS: selection, accents, per-core pixel lanes (after A+B; render only what the manifest authors)
-1. **Roster stamping:** NewGame lists must seat 5 races × 7 cores. MEASURE first (headless
-   `ListLayout.Cells` against the authored `raceCards`/`coreCards` containers). If cells overflow (the
-   silent-drop rule), build the GENERIC container overflow/pager primitive (CD #4's deferred ask — the
-   trigger has arrived; same interaction family as the merchant pager) as a FLAGGED interim, and B20
-   asks CD to re-author the screen properly. No silently-hidden cards, ever.
+1. ✅ DONE (2026-07-06, loop) — **Roster stamping.** MEASURE done headlessly: `coreCards` (476x404
+   grid, 152x395 cells, gap 10) fits exactly 3/page (`GridCapacityMultipliesColsByRowsForNewGamesCoreGrid`,
+   already pinned) — 7 cores overflow 3, so `CorePager` (page size derived live from
+   `ManifestGridCapacity("newgame","cores")`, `Game1.ManifestRenderer.cs:1232`) was already wired in an
+   earlier cycle (`Game1.cs:266-274,838-843`, Task #2) — the GENERIC pager primitive this bullet asked
+   for already exists (`Pager.cs`) and is exactly what's in use, no new one needed. `raceCards` (209x423
+   vertical, 79-tall cells, gap 7) seats all 5 races exactly (423 = 5*79+4*7) — no pager needed there,
+   but nothing pinned that fact, so a future CD panel-shrink could silently drop a race card with no
+   test catching it. Added `RaceCardsSeatAllFiveRacesWithNoSilentDrop` to close that gap. 442/442 green.
 2. **Per-core tile colors (Doug's ask):** each NewGame core tile highlights with its core's BG color +
    Core-Effect TRIM color. The manifest already carries `colorBind: core.accent` (newgame preview +
    equipment identity) — supply `CoreRune.Accent` (+ a bg variant if the bind set needs it) as engine

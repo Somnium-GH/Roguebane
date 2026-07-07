@@ -112,4 +112,16 @@ public class ListLayoutTests
         var item = new Item { Template = "invCard", Flow = "grid", Gap = 6, Size = new[] { 199, 44 } };
         Assert.Equal(3, ListLayout.GridCapacity(new LayoutRect(0, 0, 403, 183), item)); // 1 col x 3 rows
     }
+
+    [Fact]
+    public void RaceCardsSeatAllFiveRacesWithNoSilentDrop()
+    {
+        // CHUNK C item 1's MEASURE step: NewGame's raceCards region/item exactly (layout.json
+        // racePanel.raceCards), vertical flow -- 5 races * 79 + 4 gaps * 7 = 423, exactly the region
+        // height, so all 5 seat with room to spare. Unlike coreCards (7 cores, 3/page grid), the race
+        // list needs no pager -- this pins that fact so a future CD re-drop that shrinks the panel
+        // trips this test instead of silently dropping a race card (Cells' overflow:hidden clip).
+        var item = new Item { Template = "raceCard", Flow = "vertical", Gap = 7, Size = new[] { 209, 79 } };
+        Assert.Equal(5, ListLayout.Cells(new LayoutRect(0, 0, 209, 423), item, 5).Count);
+    }
 }
