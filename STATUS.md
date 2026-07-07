@@ -991,8 +991,15 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
   `BuildSessionTests.EveryCoreRunesActionSlotsCoverItsOwnStartingKit` (Core.Tests) pinning the data
   invariant these reads depend on (`ActionSlots >= Kit.Count` for every roster core) — 422/422 green;
   `Roguebane.Game` clean rebuild (`--no-incremental`) 0 errors.
-- Barbarian's CORE EFFECT card text visually cuts off (Warlord's Might string vs box size, likely) —
-  seen in a screenshot pass, not yet root-caused. Cosmetic, one card, not blocking.
+- ⇒ ROOT-CAUSED (2026-07-07, loop) — Barbarian's CORE EFFECT card text visually cuts off. NOT
+  Barbarian-specific: live `RB_SMOKE` shots of both Barbarian's ("Warlord's Might") and Ranger's
+  ("Fletcher's Luck", an even longer string) equipment-screen cards show the SAME clip, 2 lines then
+  cut — this is the systemic **P0-manifest-reflow** finding already logged above ("Baseline re-pin
+  eyeball" bullet: `coreEffectLabel/coreEffectName/coreEffectDesc` physically don't fit their authored
+  vertical space) and already relayed to CD as **B20** sub-item 1 ("some rules text runs long... size
+  the coreEffect rects for it"). No new engine work owed — the box height is CD-authored
+  (`layout.json`, never hand-edited per CLAUDE.md), and CD already has the ask queued. Cosmetic, not
+  blocking, no further action until B20 lands.
 - **⇒ FIXED (2026-07-06, loop):** multi-word content ids showed with a literal underscore on cards —
   `"iron_golem"` rendered as `"Iron_golem"` (caught live in a merchant-stall smoke screenshot this
   session; `"aimed_shot"`'s technique-facing DisplayName reads had the same defect). Root cause:
