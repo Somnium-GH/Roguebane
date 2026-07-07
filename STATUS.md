@@ -798,11 +798,23 @@ crumbs landed along the way.
    `Roguebane.Game`, not headless-testable there per the project's Core/Game split) — verified per
    Task #2's established precedent (rebuild + RB_SMOKE screenshot, not an xunit test). Build clean,
    0 errors/warnings.
-4. **Pixel-perfect lanes:** keep the 6 classic gate lanes (old refs) as the REGRESSION bar. Add the 14
-   per-core refs as REPORT-ONLY lanes (drive race=human, core=<each> via the existing core-cycling
-   drive) — they become the failing bar only when B20's extraction lands. After A+C land, the
-   long-pending baseline re-pin happens ONCE with Doug's eyeball (the standing "don't `--update`
-   blind" rule) — content changed under every screen, the old numbers are noise now.
+4. ✅ DONE (2026-07-06, loop) — **Pixel-perfect lanes:** 6 classic gate lanes stay the REGRESSION bar
+   unchanged; added the 14 per-core refs as REPORT-ONLY lanes, non-gating by construction (`--percore`
+   in `tools/ui_gate.py`, `PERCORE_CORES`/`PERCORE_DRIVES`, loops `{loadout,encounter}` x 7 cores,
+   renders each via `RB_CHASSIS=<index>`, scores against `design/{01-encounter,02-equipment}-<core>.png`
+   with `fidelity_diff.py`, prints `{screen}/{core}: {score}%`, never appended to the gate's `failures`
+   list). Found + fixed a real bug along the way: `Game1.cs`'s `encounter`/`citymap` smoke drives
+   unconditionally forced `_build.CycleCoreRune(3)` (Summoner) regardless of `RB_CHASSIS`, silently
+   discarding the override for those two drives (only `loadout`/equipment respected it). Fixed by
+   gating on `RB_CHASSIS` being unset. Verified via direct `.exe` invocations (the gate's own python-
+   subprocess reference pass — `RB_SHOT` + 1920x1080 — is flaky in this sandbox independent of this
+   change; reproduced the identical crash with `--percore` OFF against the pipeline's pre-existing,
+   untouched passes, so it's environment noise, not a regression): default (no `RB_CHASSIS`) encounter
+   drive unchanged at `resolved=20/29` against baseline; `RB_CHASSIS=0`(grunt)/`6`(barbarian) equipment
+   at 69.7%/69.8%, `RB_CHASSIS=2`(adept) encounter at 81.1% — all in the same ballpark as the gated
+   screens' existing fidelity numbers, confirming the wiring is sound. Core tests 443/443 green (no
+   Core change). Baseline re-pin still deliberately NOT done — deferred to the standing "after A+C land,
+   Doug's eyeball, once" plan; per-core lanes are report-only exactly as scoped, not a new gate.
 5. DoD: 35 combos selectable and correct end-to-end (NewGame → Equipment → march), accents live, gate
    green on the classic lanes, per-core lane report attached to the pass notes.
 

@@ -126,7 +126,11 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         {
             if (_smokeScreen is "encounter" or "citymap")
             {
-                _build.CycleCoreRune(3);          // -> the Summoner (3 bays; fields Skeleton+Golem) for the bay lane
+                // CHUNK C item 4 (2026-07-06, loop): an explicit RB_CHASSIS (already applied above)
+                // picks the per-core report-only lane's chassis — only force the Summoner bay-lane
+                // demo when the caller didn't ask for a specific core.
+                if (Environment.GetEnvironmentVariable("RB_CHASSIS") is null)
+                    _build.CycleCoreRune(3);      // -> the Summoner (3 bays; fields Skeleton+Golem) for the bay lane
                 _build.Toggle(Techniques.Jab);   // add a STR card for variety on the bar
             }
             // loadout keeps the DEFAULT GRUNT build — design/02's authored state (CORE GRUNT,

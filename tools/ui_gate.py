@@ -48,6 +48,12 @@ SCREEN_DCHTML = {
     "campaignmap": "CampaignMap", "newgame": "NewGame", "merchant": "Merchant",
 }
 FIDELITY_TOLERANCE = 2.0  # points a score may dip before failing (antialias/scene jitter head-room)
+# CHUNK C item 4 (2026-07-06, loop): the 14 per-core refs (design/01 + design/02, one pair per core) as
+# REPORT-ONLY lanes. RB_CHASSIS=<index> (Roster order) already drives any core through "loadout"
+# (equipment) or "encounter" — this only ever prints; it becomes a gating bar once B20's manifest
+# extraction lands and the refs stop being a moving target for the loop-authored placeholder content.
+PERCORE_CORES = ["grunt", "warden", "adept", "summoner", "reaver", "ranger", "barbarian"]
+PERCORE_DRIVES = {"loadout": ("equipment", "02-equipment"), "encounter": ("encounter", "01-encounter")}
 # Tolerated placeholder zones (Doug 2026-07-03): design/05 v2 stat blocks are NOT adopted — the build
 # keeps its values until the live tuning session, so newgame's stat-digit regions are masked out of
 # the diff. Element-rect granularity; race/core-card digits live inside card templates and are
@@ -71,6 +77,8 @@ def main():
     ap.add_argument("--build-dir", default=str(ROOT / ".ui-gate-build"))
     ap.add_argument("--probes", action="store_true",
                      help="also run probes.py/geometry_diff.py (report only, non-gating)")
+    ap.add_argument("--percore", action="store_true",
+                     help="also score all 7 cores against design/01+02's per-core refs (report only, non-gating)")
     args = ap.parse_args()
 
     # P0-A.1 reference contract guard: every design ref must be EXACTLY 960K x 540K (integer K).
@@ -182,6 +190,30 @@ def main():
                 gr = run([sys.executable, str(ROOT / "tools" / "geometry_diff.py"),
                           str(dchtml), str(rects_json), str(textgeom_json)])
                 print(gr.stdout.strip() or gr.stderr.strip())
+
+    if args.percore:
+        print("\n-- REPORT ONLY (non-gating): per-core fidelity vs design/01+02 refs --")
+        for drive, (screen, design_prefix) in PERCORE_DRIVES.items():
+            for i, core in enumerate(PERCORE_CORES):
+                shot = build_dir / f"gate-percore-{drive}-{core}.png"
+                env = {"RB_SCREEN": drive, "RB_MF": "all", "RB_SMOKE": "1", "RB_SIZE": "1920x1080",
+                       "RB_CHASSIS": str(i), "RB_SHOT": str(shot)}
+                r = run([str(build_dir / "Roguebane.Game.exe")], cwd=str(build_dir), env={**os.environ, **env})
+                if r.returncode != 0:
+                    print(f"  {screen}/{core}: smoke exit {r.returncode} (skipped)")
+                    continue
+                shot_png = shot.parent / (shot.stem + f".{screen}.png")
+                design_png = ROOT / "design" / f"{design_prefix}-{core}.png"
+                if not shot_png.exists() or not design_png.exists():
+                    print(f"  {screen}/{core}: missing shot or ref (skipped)")
+                    continue
+                cmd = [sys.executable, str(ROOT / "tools" / "fidelity_diff.py"), str(shot_png), str(design_png)]
+                rects_json = shot_png.parent / (shot_png.stem + ".rects.json")
+                if rects_json.exists():
+                    cmd += ["--elements", str(rects_json)]
+                fr = run(cmd)
+                m = re.search(r"FIDELITY: ([\d.]+)%", fr.stdout)
+                print(f"  {screen}/{core}: {m.group(1)}%" if m else f"  {screen}/{core}: no score produced")
 
     # Scene-backdrop canvas coverage (any RB_SIZE, any drive): pinned ZERO, no baseline ride — a gap
     # means a `*.scene` backdrop stopped short of the current (possibly non-16:9-extended) canvas.
