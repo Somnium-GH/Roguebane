@@ -1,7 +1,14 @@
 # Loop metrics — schema + how to log a run
 
-Data lives in `metrics.csv`, one row per commit that closes a loop run/slice. Append, never rewrite
-history. Purpose: tune slice size against the ≤60min target with a query, not a feeling.
+**(2026-07-07, Doug) This is a byproduct, not a deliverable — a cheap breadcrumb, not a ritual.**
+Never spend a separate commit or a separate turn on it. If logging a row would cost more than typing
+one CSV line into the commit you're already making, skip it that cycle — a run whose only output is
+a metrics row is worthless and must not happen. `estimate_minutes` is RETIRED (see below); nothing
+needs to be estimated before starting.
+
+Data lives in `metrics.csv`, one row per commit that closes a loop run/slice — appended INSIDE that
+same commit, never a follow-up one. Append, never rewrite history. Purpose: tune slice size against
+the ≤60min target with a query, when convenient — a nice-to-have, not a gate, not a reason to run.
 
 ## Columns
 `date,task,minutes,lines_changed,estimate_minutes,method`
@@ -11,10 +18,9 @@ history. Purpose: tune slice size against the ≤60min target with a query, not 
   naming so a row is traceable back to what shipped.
 - `minutes` — wall-clock for the run. See `method` — this is a PROXY, not a stopwatch.
 - `lines_changed` — `git show --shortstat <sha>` insertions+deletions, this commit only.
-- `estimate_minutes` — the slice-size estimate made BEFORE starting (state one when you pick a
-  task; `-` if none was made — but make one going forward, that's the whole point of this column).
-- `method` — how `minutes` was derived (see below). Always fill this in; a number without its
-  method is not comparable to the others.
+- `estimate_minutes` — **RETIRED 2026-07-07.** Always `-`. It never got used in practice and isn't
+  worth the overhead of maintaining — don't estimate before starting, don't chase this column.
+- `method` — how `minutes` was derived (see below), if you're bothering to log at all.
 
 ## `method` values (and their honesty level)
 - `commit-delta` — this commit's timestamp minus the previous commit's. CHEAPEST but includes any

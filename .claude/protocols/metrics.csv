@@ -38,3 +38,4 @@ date,task,minutes,lines_changed,estimate_minutes,method
 2026-07-07,frenzy-flurry-dualpool-reservation-fix,35,78,-,commit-delta
 2026-07-07,cd30-pulse-glow-engine-draw,40,177,-,commit-delta
 2026-07-07,cd33-minion-column-reflow-check,20,43,-,commit-delta
+2026-07-07,chunkd-ogre-weapon-consult-gear-wiring,34,149,-,commit-delta

@@ -25,6 +25,25 @@ public static class Foes
         return new Foe(id, hp, frame, new[] { Strike }, figure, aim);
     }
 
+    // CHUNK D item 1 (STATUS.md, §8 symmetry): a GEARED foe that WIELDS a real Weapon and fights with a
+    // real weapon-consulting verb (Consults: Primary) instead of a flat hardcoded Power -- the SAME
+    // Body.Wield/Consulted/DisabledGear paths the player uses, so its damage scales off the actual
+    // Weapon record and a smashed weapon-arm silences it via the shared disable cascade (no foe-special-
+    // cased damage math). FOES.md T1 Ogre is the first case: Iron Mace + Swing. Armor-wiring needs no
+    // extra engine work either (Body.Equip/ArmorSustained are already foe-agnostic) -- the remaining
+    // FOES.md roster, Foe Effects (data + interpreter), and encounter-table wiring stay open (item 2-4).
+    public static Foe Ogre(string id, int hp = 14, int arm = 4, string figure = "ogre",
+        FoeAim aim = FoeAim.Random)
+    {
+        var frame = new Body();
+        frame.Add(new BodyPart($"{id}-arm", Stat.Str, arm));  // Parts[0]: wields the mace, powers Swing
+        frame.Add(new BodyPart($"{id}-head", Stat.Int, 1));
+        frame.Add(new BodyPart($"{id}-legs", Stat.Dex, 2));
+        frame.Add(new BodyPart($"{id}-chest", Stat.Con, 3));
+        frame.Wield(Armory.Maces[0]); // Iron Mace: Reserve 3 Str, fits arm STR 4 with headroom to spare
+        return new Foe(id, hp, frame, new[] { Armory.Swing }, figure, aim);
+    }
+
     // The castle boss's heavier strike: a real timered attack (STR arm), harder + faster than a raider's.
     private static readonly Technique BossStrike =
         new("boss-strike", Stat.Str, Reserve: 1, TechniqueKind.Timered, Cooldown: 25, Power: 3);

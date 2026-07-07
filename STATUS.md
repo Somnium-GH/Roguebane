@@ -1,5 +1,43 @@
 # Status
 
+## ‼ PROCESS CHANGE (2026-07-07, Doug) — metrics logging is a byproduct now, not a ritual
+Metrics are producing runs that only produce metrics — worthless, stop. `.claude/protocols/metrics.md`
+and `.claude/loop.md` updated: log a `metrics.csv` row ONLY inside the same commit as real work, never
+its own commit/turn; skip it entirely if it'd cost more than one CSV line. `estimate_minutes` is
+RETIRED — always `-`, don't estimate up front, don't chase the column. If logging isn't free, don't log.
+
+## ✅ UNBLOCKED (2026-07-07, Doug) — Loot backlog: placeholder-blessed numbers, build it
+Doug: we don't need his exact numbers every time — pick reasonable defaults, flag them placeholder,
+he'll tune later (same pattern as Sacrifice's heal formula / race HP). **Numbers to build against
+(placeholder-blessed, not final):**
+- **Gold** — randomize `Expedition.Spoils(NodeType)` around its current fixed values instead of a flat
+  number: Skirmish 2–4 (was flat 3), ResourceHold 3–6 (was flat 4), Castle 8–12 (was flat 10). Same
+  `Rng`/seed convention as the rest of `Expedition` (per-node, reproducible within a leg).
+- **Equipment / technique / rune drop** — rare: 8% per cleared encounter.
+- **Supplies drop** — "fairly frequent": 35% per cleared encounter.
+- **Summons drop** — good but less than supplies: 20% per cleared encounter.
+These are independent rolls (not a single shared reward slot) unless building it surfaces a reason
+they should share one — Doug's phrasing ("also," "and") reads as independent chances, not a table.
+Flag every number as placeholder-blessed in the commit/comment (same rule as everywhere else) — Doug
+tunes whenever he gets to a real economy pass. This is no longer Needs-Human; build it.
+
+## ✅ PARTIALLY UNBLOCKED (2026-07-07, Doug) — Quests: build the SYSTEM now on a stub quest, real catalog is separate
+The numbers-style unblock above doesn't apply here — the real gap isn't a missing percentage, it's
+missing CONTENT (narration text, the actual quest catalog, trigger/placement). Split it the same way
+Merchant Wares' sale cards shipped: build the real mechanic on placeholder presentation, flag it, let
+the content follow later.
+- **Build now:** a new CityMap node type (`NodeType.Quest`, fogged the same as Skirmish — see the
+  CityMap.Sees fix above, Quest must fall through the same Unknown-until-visited branch, not get a
+  special case) with ONE stub quest: a two-step accept/decline prompt (placeholder flavor text,
+  clearly flagged as such), an outcome that awards from the SAME loot vocabulary as the Loot backlog
+  above (gold/gear/supplies/summons), and a branch that can be negative-alone or negative+positive —
+  build the DATA SHAPE (a `Quest` record: prompt text, accept text, outcomes with loot + consequence)
+  so the mechanism is real and testable, even though only one (obviously placeholder) quest exists.
+- **Not now, needs Doug + CD:** the real quest catalog (actual narration, more than one quest), and
+  where/how often Quest nodes appear on the map graph (today's `Maps.StandardLegNodes()` is hand-
+  authored per node — adding one Quest slot to the existing standard leg is fine as the placeholder
+  wiring; a real placement/frequency model is a separate design pass, don't invent it here).
+
 ## ✅ RESOLVED (2026-07-07, loop) — CD #33 minion-column reflow double-check, no engine gap
 Closed the last open item in the stale "CD_STATUS.md items worth a fresh look" cross-check list (the
 other two, #36/#30, were already fixed in the two cycles below). #33 asked whether the "minion column
@@ -990,6 +1028,23 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
    consult/timer/cascade paths the player uses (frame parts already shared); arsenal entries use real
    `Technique` records at TECHNIQUES.md numbers; **Foe Effects as DATA + one interpreter** (exactly the
    Core-Effect pattern; FOES.md "design rules" constrain the vocabulary).
+   - ◐ PARTIAL (2026-07-07, loop) — **weapon-consult gear wiring proven, `Foes.Ogre` added.** Investigated
+     `Body.cs`/`Caster.cs`/`Battle.cs` first: `Wield`/`Equip`/`Consulted`/`DisabledGear`/`ArmorSustained`
+     are ALREADY fully foe-agnostic (zero player-special-casing — `Foe.Frame` is a plain `Body`, and a
+     foe's own offense `Caster` already runs its `Arsenal` through the identical `Discharge`/`Hit` path,
+     confirmed by the pre-existing `FoeSymmetryTests`). The actual CHUNK D item-1 gap lived entirely in
+     `Foes.cs`'s content: `Armed`/`ArmedHealing` never called `Wield`/`Equip`, only ever attached a flat
+     hardcoded-`Power`, `Consults: WeaponUse.None` technique. Added `Foes.Ogre` (`Content/Foes.cs`) at
+     FOES.md's T1 Ogre numbers (HP 14, parts 4/1/2/3) that `Wield`s a real `Armory.Maces[0]` (Iron Mace)
+     and fights with the already-generic `Armory.Swing` (`Consults: Primary`) instead of a flat verb.
+     New `FoeGearTests.cs` (3 tests, headless, `Roguebane.Core.Tests`): Swing's landed damage equals the
+     wielded weapon's own `Power` (not a hardcoded number); smashing the weapon arm below the mace's
+     `Reserve` drops it from `Consulted` — the same `DisabledGear` cascade a player gets, zero foe-special
+     code; with the arm pre-smashed the Ogre lands zero hits across 200 ticks. Full `Core.Tests` green
+     (451/451). **Still open in item 1**: armor-consult proof (mechanically the same — `Body.Equip` is
+     equally foe-agnostic, just not yet exercised by a builder/test) and the **Foe Effects DATA +
+     interpreter** (a real design/engine slice on its own, not started). Items 2–4 (full 6-foe roster,
+     encounter-table wiring, DoD economy asserts) stay open, unblocked by this slice.
 2. Content: the six built foes at FOES.md's T1/T2 specs (Skeleton/Bandit/Wraith/Ogre/Troll/Gargoyle,
    Dire variants, effects incl. *Brittle*/*Plunder*/*Insubstantial*/*Overwhelm*/*Regenerative Flesh*/
    *Stoneform*). Numbers are Cowork placeholder-blessed — build them, flag them, Doug tunes. Castle

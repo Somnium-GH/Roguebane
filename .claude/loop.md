@@ -54,9 +54,9 @@ Per run:
    ENGINE-PENDING, record the closure in `CD_CLOSED_ITEMS.md` (repo-root — the REVERSE of the outbox; CD
    reads it in the repo to confirm-to-close + clear its own dev-memory): CD item # · what shipped ·
    `file:symbol` evidence · date. That file is a DURABLE confirmation log, not a work queue. Keep STATUS LEAN (prune resolved/stale lines). If the slice changed LOCKED design, also
-   reconcile `design/DESIGN_SPEC.md` (the canon). Append one line to `.claude/protocols/metrics.csv`
-   (date, task tag, minutes, lines_changed via `git show --shortstat`, estimate_minutes, method —
-   schema in `metrics.md`). PUSH the commit when you can (remote reachable); never
+   reconcile `design/DESIGN_SPEC.md` (the canon). If it's genuinely quick, append one line to `.claude/protocols/metrics.csv` (schema in `metrics.md`)
+   IN THIS SAME COMMIT — never its own commit, never its own turn. This is a byproduct, not a
+   deliverable: skip it entirely rather than spend a separate cycle on it. PUSH the commit when you can (remote reachable); never
    force-push. If the step-1 pull or the push hits a CONFLICT you can't resolve cleanly, park it in
    "Needs human" rather than forcing. Then STOP — one task done.
 
