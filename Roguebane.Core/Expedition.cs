@@ -388,7 +388,7 @@ public sealed class Expedition
         // the leg's FIRST fight -- the starting kit's assembly-time minions (Summoner/Ranger) must
         // survive into that first battle, not be dismissed before they ever fielded.
         var isFirstEncounter = Battle is null;
-        Battle = new Battle(_caster, Maps.EncounterFor(node, Map.SupportBank), _player, Seed(node.Id));
+        Battle = new Battle(_caster, Maps.EncounterFor(node, Map.SupportBank, Seed(node.Id)), _player, Seed(node.Id));
         State = ExpeditionState.Fighting;
         if (!isFirstEncounter) _caster.RearmForEncounter(); // §17 default-activation-state LOCK: no free carry-over charge
         return true;

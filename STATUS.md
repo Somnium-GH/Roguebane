@@ -1098,8 +1098,9 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
      either existing interpreter site (`Hit`/`Discharge` only see the ATTACKER's own state or the
      DEFENDER's `Body`/`Frame`, never the defending `Caster`'s `Charge`/`SummonsLeft`/
      shield-pool-on-evade — a real cross-`Caster` wiring gap, not yet designed). Plus item 2's Dire
-     Ogre entry specifically still needs the STR-budget note above reconciled first; items 3–4
-     (encounter-table wiring, DoD economy asserts) unblocked but not started.
+     Ogre entry specifically still needs the STR-budget note above reconciled first; item 3
+     (encounter-table wiring) is now DONE (below) — it draws whatever's in the T1 pool today and grows
+     automatically as more roster content lands; item 4 (DoD economy asserts) unblocked but not started.
    - ⚠️ NEEDS DOUG (found 2026-07-07, loop, while scoping the Skeleton for item 2) — **FOES.md's
      Skeleton (T1) pairs a weapon with a technique that can't consult it.** Spec: Iron Dagger + Jab.
      Iron Dagger is `Stat.Dex` (`Armory.cs`); Jab is `Stat.Str` (`Content/Techniques.cs`);
@@ -1173,9 +1174,27 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
    keeps its current proven shape (reconcile onto the model, don't retune in the same pass).
    **Wraith T1 done** (item 1 above, `Foes.Wraith` + Insubstantial) — the other five T1s, all Dire
    variants, and their five remaining Foe Effects stay open.
-3. Encounter tables: keep today's node→foe mapping shape (`Maps.cs`/`Sieges.cs`) but pull from the new
-   roster (skirmish = T1 pool, resource-hold = tougher T1/T2, castle unchanged). Which-foe-where stays
-   design-open — use a seeded pick over the T1 pool, FLAGGED.
+3. ✅ DONE (2026-07-07, loop) — **Encounter tables pull from the T1 roster.** Same node→foe mapping
+   shape (`Maps.cs`/`Sieges.cs`), same call site (`Expedition.cs:391`) — `Maps.EncounterFor` gained a
+   `seed` parameter (the caller's own existing stable per-node `Seed(node.Id)`, already computed for
+   `Battle`'s own combat RNG — reused, not a new source of truth) and Skirmish/ResourceHold now route
+   through `Sieges.SkirmishPoint`/`ResourceHoldPoint`, a seeded pick over a new `T1Pool` (`Foes.Wraith`,
+   `Foes.Ogre` — the only two roster foes with real gear/effects built so far, item 2). The pick salts
+   the seed (`EncounterSalt`, same decorrelation pattern as `GearSalt`/`HealSalt`/`LootSalt`) so the
+   foe-choice roll never collides with the battle's own combat rolls; same `(leg, node)` always picks
+   the same foe (reproducible runs). Which-foe-where is deliberately unpinned — FLAGGED in `Sieges.cs`
+   as a placeholder ordering, not a design lock, exactly as this bullet asked. Resource-hold is
+   "tougher T1/T2" per the ask, but T2 content (Dire Ogre) is still blocked on the STR-budget note
+   above — rather than fabricate T2 stand-in content ahead of that call, resource-hold draws the SAME
+   T1 pool at a bumped HP (`hpBump: 6`), an honest partial that grows into real T2 once Doug reconciles
+   the budget. Castle is untouched (`Sieges.ArmedCastle`, still the fixed self-mending boss) exactly as
+   scoped. The old `Sieges.ArmedPoint`/`Foes.Armed`/`RaiderFigures` stand-in is NOT removed — it's still
+   the live fixture for `FoeArmingTests`/`SiegeFigureTests`' generic arming coverage, unrelated to which
+   content foe an encounter table names. New `EncounterTableRosterTests.cs` (6 tests): skirmish always
+   picks a roster foe (never the generic stand-in); same seed reproduces the same pick; 20 distinct
+   seeds hit both pool entries; resource-hold picks the same pool slot as skirmish at higher HP for a
+   shared seed; `Maps.EncounterFor` itself routes Skirmish/ResourceHold through the pool; Castle stays
+   the fixed boss. Full `Core.Tests` green (479/479), full solution build clean (0 errors/warnings).
 4. DoD: headless economy asserts per foe (kill-time vs player T1 kit inside FOES.md's envelope; foe DPS
    inside the band; arm-break actually cascades the arsenal off); campaign still winnable for all 35
    combos; **everything in FOES.md's IDEAS section stays unbuilt** (it's marked, believe it).

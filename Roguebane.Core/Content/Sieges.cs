@@ -30,6 +30,35 @@ public static class Sieges
         new("castle", Foes.ArmedHealing("castle", hp: 40, arm: 4, figure: "ogre", aim: FoeAim.Smart),
             supportAmount: supportAmount, supportEvery: 20);
 
+    // CHUNK D item 3 (STATUS.md): skirmish/resource-hold pull from the real FOES.md T1 roster (gear +
+    // Foe Effects wired, `Foes.Wraith`/`Foes.Ogre`) instead of the generic `Foes.Armed` stand-in above
+    // (that helper stays -- FoeArmingTests/SiegeFigureTests still exercise it as a bare arming fixture,
+    // unrelated to which content foe an encounter table picks). FOES.md doesn't pin node-type to a
+    // specific foe, so which-foe-where is a seeded pick over the pool, not a hand-authored order --
+    // FLAGGED as a placeholder ordering, not a design lock. The pool only lists T1 foes with real
+    // gear/effects built so far; it grows as Skeleton/Gargoyle/Troll/Bandit clear their Needs-Doug
+    // authoring blocks (STATUS.md CHUNK D item 2).
+    private static readonly Func<string, int, Foe>[] T1Pool =
+    {
+        (id, hpBump) => Foes.Wraith(id, hp: 10 + hpBump),
+        (id, hpBump) => Foes.Ogre(id, hp: 14 + hpBump),
+    };
+
+    private const ulong EncounterSalt = 0x454E4353; // decorrelates the foe-pick roll from the battle's own combat seed
+
+    private static Foe PickT1(string name, ulong seed, int hpBump) =>
+        T1Pool[new Rng(seed ^ EncounterSalt).Next(T1Pool.Length)](name, hpBump);
+
+    // Skirmish: the T1 pool at its base HP.
+    public static Encounter SkirmishPoint(string name, ulong seed) =>
+        new(name, PickT1(name, seed, hpBump: 0), foePartAim: true);
+
+    // Resource-hold: "tougher T1/T2" per CHUNK D item 3 -- T2 content (Dire Ogre) is still blocked on
+    // the STR-budget reconciliation above, so this stays the SAME T1 pool at a bumped HP rather than
+    // fabricating T2 stand-in content ahead of that call.
+    public static Encounter ResourceHoldPoint(string name, ulong seed) =>
+        new(name, PickT1(name, seed, hpBump: 6), foePartAim: true);
+
     public static Run StandardRun() =>
         new(new[] { ControlPoint("cp1", 12), ControlPoint("cp2", 10), Castle() });
 }

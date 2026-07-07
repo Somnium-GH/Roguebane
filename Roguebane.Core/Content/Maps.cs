@@ -34,14 +34,16 @@ public static class Maps
         return legs;
     }
 
-    // The combat a node hands the Expedition. Foes here are lightly ARMED (they chip the player) so
-    // the live run has real two-sided combat; the legacy Sieges.ControlPoint stays inert for headless
-    // balance sims. Castle support is the bank earned from resource-holds.
-    public static Encounter EncounterFor(MapNode node, int supportBank) => node.Type switch
+    // The combat a node hands the Expedition. Skirmish/resource-hold pull from the real FOES.md T1
+    // roster (CHUNK D item 3, STATUS.md) via a seeded pick -- `seed` is the caller's own stable
+    // per-node seed (Expedition.Seed), so the same (leg, node) always picks the same foe. Castle support
+    // is the bank earned from resource-holds; the castle boss itself stays the fixed self-mending stand-
+    // in (Sieges.ArmedCastle), unaffected by the roster pool.
+    public static Encounter EncounterFor(MapNode node, int supportBank, ulong seed) => node.Type switch
     {
-        NodeType.Skirmish => Sieges.ArmedPoint(node.Id, 6, 6),
-        NodeType.ResourceHold => Sieges.ArmedPoint(node.Id, 8),
+        NodeType.Skirmish => Sieges.SkirmishPoint(node.Id, seed),
+        NodeType.ResourceHold => Sieges.ResourceHoldPoint(node.Id, seed),
         NodeType.Castle => Sieges.ArmedCastle(supportBank),
-        _ => Sieges.ArmedPoint(node.Id, 6), // Unknown resolves to a light skirmish
+        _ => Sieges.SkirmishPoint(node.Id, seed), // Unknown resolves to a light skirmish
     };
 }
