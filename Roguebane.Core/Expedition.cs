@@ -352,9 +352,13 @@ public sealed class Expedition
         if (node.Type is NodeType.Merchant or NodeType.Camp)
             return true; // no fight here: the merchant's verbs are shop/heal, the camp is safe ground
 
+        // RE-ARM SCOPE (DESIGN_SPEC §7, LOCKED 2026-07-05): rearm governs back-to-back encounters, not
+        // the leg's FIRST fight -- the starting kit's assembly-time minions (Summoner/Ranger) must
+        // survive into that first battle, not be dismissed before they ever fielded.
+        var isFirstEncounter = Battle is null;
         Battle = new Battle(_caster, Maps.EncounterFor(node, Map.SupportBank), _player, Seed(node.Id));
         State = ExpeditionState.Fighting;
-        _caster.RearmForEncounter(); // §17 default-activation-state LOCK: no free carry-over charge
+        if (!isFirstEncounter) _caster.RearmForEncounter(); // §17 default-activation-state LOCK: no free carry-over charge
         return true;
     }
 

@@ -121,10 +121,11 @@ public sealed class Caster
     public bool IsActive(Technique technique) => _active.ContainsKey(technique.Id);
 
     // Default-activation-state LOCK (DESIGN_SPEC "nothing starts charging... at the beginning of an
-    // encounter"): rewind every active technique's cooldown and every summoned minion's timer to a full
-    // warm-up when a NEW encounter starts, so leftover charge from the last fight can't let something
-    // discharge instantly. On/off state (which techniques are toggled, which minions are summoned) is
-    // untouched here — only the charge clock resets. Sustained techniques have no cooldown to rewind.
+    // encounter") + RE-ARM SCOPE (DESIGN_SPEC §7, LOCKED 2026-07-05): techniques PERSIST across
+    // back-to-back encounters (on/off state untouched, only the charge clock rewinds so leftover
+    // charge can't discharge instantly); minions do NOT persist — every fielded minion is dismissed at
+    // encounter end, full stop, so re-fielding one next encounter re-pays Summons like any fresh
+    // summon (no carry-over, no "it was already out" discount).
     public void RearmForEncounter()
     {
         foreach (var run in _active.Values)
@@ -133,8 +134,8 @@ public sealed class Caster
                 run.ResonanceStacks = 0; // Resonance decays fresh each encounter — no cross-fight snowball
                 run.Countdown = EffectiveCooldown(run.Tech);
             }
-        foreach (var minion in _minions)
-            _minionCountdown[minion.Id] = minion.Timer;
+        foreach (var minion in _minions.ToList()) // snapshot: Dismiss mutates _minions mid-loop
+            Dismiss(minion);
     }
 
     // The ONE AUTO toggle (global, player-facing): ON => no module clears its target after firing (every

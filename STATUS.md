@@ -26,20 +26,20 @@
    approval. Real gap found: **the formula had NO headless test** — added `SacrificeHealTests` (pins
    4x-Reserve heal amount, highest-Reserve minion consumed first, hold-fire with no minion fielded).
    428/428 green.
-4. **Minion re-arm scope — real behavior gap found while confirming this:** Doug's rule is "techniques
-   persist across back-to-back encounters, minions do NOT — every fielded minion dismisses at encounter
-   end and must be re-summoned (re-paying Summons) next fight." Checked `Caster.RearmForEncounter()`
-   (called from `Expedition.Enter()` on every new fight): it currently does NEITHER half correctly by
-   accident — it only resets TIMERS/cooldowns for whatever's already active/fielded (Resonance stacks,
-   technique cooldown, minion discharge timer); it never actually clears `_minions`, so a minion fielded
-   last fight silently STAYS fielded into the next one for free, with no fresh Summons charge. Techniques
-   already behave correctly (nothing clears `_active`, matching "persist" — no change needed there). Fix:
-   `RearmForEncounter()` (or `Expedition.Enter()` right before/after it) must actually DISMISS every
-   currently-fielded minion (clear `_minions`/`_minionCountdown`, same effect as `DismissMinion` for each)
-   before the new encounter starts, so re-fielding one costs Summons again like any fresh summon — no
-   special-case "it was already out" discount. DESIGN_SPEC §7's "RE-ARM SCOPE" paragraph now locks this
-   in writing. Needs a headless test: field a minion, clear/end the encounter, enter the next one, assert
-   `Exp.Minions` is empty and re-summoning charges `Summons` again.
+4. ✅ DONE (2026-07-06, loop) — Minion re-arm scope fixed. `Caster.RearmForEncounter()` now actually
+   `Dismiss()`s every fielded minion (was only resetting `_minionCountdown`, never touching `_minions` —
+   a minion fielded last fight silently stayed fielded into the next one for free, no fresh Summons
+   charge). Techniques were already correct (persist across encounters, only the charge clock rewinds —
+   no change needed there). **Wrinkle found + fixed:** a naive "always rearm on Enter" would have
+   dismissed the chassis STARTING KIT (Summoner/Ranger's `DefaultMinions`, fielded at `Forge.Embark`
+   assembly time, before any encounter) on the leg's very first fight — that's not a back-to-back
+   carry-over. `Expedition.Enter()` now only calls `RearmForEncounter()` when `Battle` is already
+   non-null (skips it on the leg's first encounter, applies it on every one after). Tests:
+   `CasterFiringTests.RearmForEncounterDismissesEveryFieldedMinionAndFreesItsReservation` (replaces the
+   old test that pinned the buggy timer-reset-only behavior) pins dismiss + freed stat reservation +
+   re-summon re-paying Summons at the `Caster` level; `MinionTests.
+   TheStartingMinionSurvivesTheFirstEncounterButNotTheSecond` pins the first-encounter exemption +
+   second-encounter dismissal at the `Expedition` integration level. 429/429 green.
 
 ## ✅ CHUNK B item 1 DONE (2026-07-06, loop) — game-side mgcb mirrored, 1846 new entries, build green
 `Roguebane.Game/Content/Content.mgcb` (the copy builds actually read) had ZERO of the new v6 race/core

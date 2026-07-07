@@ -242,4 +242,28 @@ public class MinionTests
         var exp = SummonerExpedition();
         Assert.False(exp.DismissMinion(Minions.Hound)); // never summoned
     }
+
+    // RE-ARM SCOPE (DESIGN_SPEC §7, LOCKED 2026-07-05): the starting kit's minion survives the leg's
+    // FIRST encounter (it was never "carried over" from a previous fight — Battle is null beforehand),
+    // but every back-to-back encounter after that dismisses every fielded minion. The Caster-level
+    // dismiss/re-summon/Summons bookkeeping itself is pinned by CasterFiringTests.
+    // RearmForEncounterDismissesEveryFieldedMinionAndFreesItsReservation.
+    [Fact]
+    public void TheStartingMinionSurvivesTheFirstEncounterButNotTheSecond()
+    {
+        var chassis = CoreRunes.Ranger; // Hound kit minion, MinionCap 2, no free-Summons core effect
+        var exp = Forge.Embark(Races.Human, chassis, chassis.NewLoadout(), chassis.Kit,
+            Maps.StandardLeg(autoResolveCastle: false));
+        Assert.Equal(1, exp.MinionCount); // Hound fielded free at assembly
+
+        exp.Enter("a2"); // leg's FIRST encounter -- not a rearm boundary, the kit survives
+        Assert.Equal(1, exp.MinionCount);
+        exp.Retreat(); // fall back to the chart without needing a full kill
+
+        exp.Enter("b");  // merchant node: no fight, no rearm, still Choosing
+        exp.Enter("c1"); // second, back-to-back encounter -- rearm dismisses the fielded Hound
+
+        Assert.Equal(0, exp.MinionCount);
+        Assert.Empty(exp.Minions);
+    }
 }

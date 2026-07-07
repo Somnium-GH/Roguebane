@@ -108,22 +108,32 @@ public class CasterFiringTests
         Assert.True(c.IsActive(Techniques.Jab)); // on/off state untouched -- still toggled on
     }
 
+    // RE-ARM SCOPE (DESIGN_SPEC §7, LOCKED 2026-07-05): minions do NOT persist across back-to-back
+    // encounters -- every fielded minion is dismissed at encounter end, full stop, so re-fielding one
+    // next encounter re-pays Summons like any fresh summon (no carry-over discount).
     [Fact]
-    public void RearmForEncounterRewindsAChargedMinionBackToItsFullTimer()
+    public void RearmForEncounterDismissesEveryFieldedMinionAndFreesItsReservation()
     {
         var body = new Body();
         body.Add(new BodyPart("head", Stat.Int, 5)); // Skeleton reserves 2 Int
         var foe = new Foe("dummy", 100);
-        var c = new Caster(body, foe);
+        var c = new Caster(body, foe, maxSummons: 5);
         Assert.True(c.Summon(Minions.Skeleton, minionCap: 1)); // Timer 25, Power 1
+        var summonsBeforeRearm = c.SummonsLeft;
 
         for (var i = 0; i < Minions.Skeleton.Timer - 1; i++) c.Step(); // charged to 1 tick from firing
         c.RearmForEncounter();
 
-        for (var i = 0; i < Minions.Skeleton.Timer - 1; i++) c.Step();
-        Assert.Equal(100, foe.Hp); // still warming up -- the carry-over charge didn't survive
+        Assert.Equal(0, c.MinionCount); // dismissed, not just rewound
+        Assert.True(body.Available(Stat.Int) >= 5); // the Int reservation was freed too
 
-        c.Step();
-        Assert.Equal(99, foe.Hp); // fires once the full timer has run again
+        for (var i = 0; i < 60; i++) c.Step(); // no minion fielded -- nothing can fire
+        Assert.Equal(100, foe.Hp);
+
+        Assert.True(c.Summon(Minions.Skeleton, minionCap: 1)); // must re-summon to fight on
+        Assert.Equal(summonsBeforeRearm - 1, c.SummonsLeft); // re-pays Summons, no carry-over discount
+
+        for (var i = 0; i < Minions.Skeleton.Timer; i++) c.Step();
+        Assert.Equal(99, foe.Hp); // fires once re-fielded and its full timer has run
     }
 }
