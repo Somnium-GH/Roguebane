@@ -93,4 +93,29 @@ public class GearingTests
         Assert.Null(body.ArmorOn(Stat.Con));
         Assert.True(pack.HasArmor(plate));
     }
+
+    // Retest (2026-07-07, loop) of a Doug report ("removing the shield and re-equipping it never
+    // reserves") that STATUS.md flagged as needing a fresh look once two other fixes landed: the
+    // GEAR-tab click-misrouting bug and B25 (CON's own pip container was 2px short, same as STR's).
+    // Both have since landed independently. This pins the actual Core mechanic the report questioned:
+    // Available/Reserved are computed LIVE off Body's _hands each call, no cached counter to go stale,
+    // so a wield/unwield/re-wield round trip on the same shield reserves identically both times.
+    [Fact]
+    public void ReequippingAShieldAfterUnequippingReservesTheSameAmountBothTimes()
+    {
+        var pack = new Stash();
+        var body = new Body();
+        body.Add(new BodyPart("chest", Stat.Con, 4));
+        var shield = Armory.Shields[0]; // tier 1, Reserve 1, Con
+        pack.AddWeapon(shield);
+
+        Assert.True(Gearing.EquipWeapon(pack, body, shield));
+        Assert.Equal(3, body.Available(Stat.Con)); // 4 - 1
+
+        Assert.True(Gearing.UnequipWeapon(pack, body, shield));
+        Assert.Equal(4, body.Available(Stat.Con)); // fully restored, not left reserved
+
+        Assert.True(Gearing.EquipWeapon(pack, body, shield));
+        Assert.Equal(3, body.Available(Stat.Con)); // reserves again, identically
+    }
 }

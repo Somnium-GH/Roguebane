@@ -351,12 +351,19 @@ EffectiveTechniqueReserveIsPubliclyReadableForCardDisplayAndMatchesCasterReserva
 0 regardless of effect. 444/444 green; `Roguebane.Game` full rebuild 0 errors. Both badge halves now agree
 with their real equip/activate-time gates.
 
-**Not yet root-caused, needs a retest once the above two land:** "removing the shield and re-equipping it
-never reserves." Two live candidates, don't guess further without a fresh repro: (a) the still-open
-GEAR-tab click-misrouting bug (logged two entries below, `GearTabItems()` reordering on every toggle) may
-mean the click never actually hit the shield at all; (b) CON's own pip zone may hit the same container-
-width drop as STR, hiding a real change. Retest after both fixes land before treating this as a third
-distinct bug.
+**⇒ RETESTED, CONFIRMED NOT A LIVE BUG (2026-07-07, loop):** "removing the shield and re-equipping it
+never reserves." Both candidates this note was waiting on have since landed independently: (a) the
+GEAR-tab click-misrouting bug is fixed (see the ✅ FIXED entry below — `GearTabItems()` now reads a
+stable roster, so a click always hits the item the player is looking at); (b) B25 (CON's pip container
+was the same 2px-short width as STR's) landed content-side in the pass-10 CD drop. Traced the actual
+Core mechanic directly: `Body.Available(stat)`/`Reserved(stat)` are computed LIVE off `_hands`/`_armor`
+every call — there is no cached reservation counter anywhere to go stale, so a `Wield`/`Unwield`/re-
+`Wield` round trip on the same item can only ever reserve correctly. New test
+`GearingTests.ReequippingAShieldAfterUnequippingReservesTheSameAmountBothTimes` pins this through the
+real `Stash`/`Gearing` path a player's unequip/re-equip click drives (equip -1, unequip back to full,
+equip -1 again) — 445/445 green. The report's era predates both landed fixes, so it most likely reflects
+the click-misrouting bug (item never actually toggled) and/or the pip bar visually hiding the change
+(B25) — not a third, still-live defect. No engine change needed; closing this note.
 
 ## ‼ HIGH PRIORITY (2026-07-05, Doug) — 3 more findings: pip-bar 4-zone build (art already exists!) —
 ## ✅ ALL THREE FIXED 2026-07-06 — pager-button skin bug (below), equipped-items-sort-to-top
