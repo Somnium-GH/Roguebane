@@ -30,8 +30,11 @@ public sealed record CoreRune(
     bool CoreEffectFreeSummons = false, // Summoner's Conscription [LOCKED, CORE_RUNES.md]: fielding a
                                         // minion never spends the Summons resource at all (replaces the
                                         // old refund-on-Redeploy Legion effect above — genuinely different).
-    string Accent = "",     // colorBind accent (a palette token) for core.accent/preview.accent;
-                            // empty keeps the manifest's static chrome — per-core VALUES await design
+    string Accent = "",     // colorBind accent (a palette token, e.g. "amber") for core.accent/preview.accent;
+                            // empty keeps the manifest's static chrome. CHUNK C item 2 (2026-07-06, loop):
+                            // populated per core with the manifest's OWN existing palette tokens (str/int/
+                            // dex/amber/gold/teal) — a stopgap grouping, not a canonical design; B20 still
+                            // owns the real per-core token if CD wants to change it.
     string Badge = "")      // the role chip (STARTER/BULWARK/CASTER/SPECIALIST), design/05 v2 `core.badge`
 {
     // Display name for the cards ("grunt" -> "Grunt"); the Id stays the lowercase content key.

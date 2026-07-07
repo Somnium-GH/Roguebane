@@ -699,14 +699,20 @@ crumbs landed along the way.
    vertical, 79-tall cells, gap 7) seats all 5 races exactly (423 = 5*79+4*7) — no pager needed there,
    but nothing pinned that fact, so a future CD panel-shrink could silently drop a race card with no
    test catching it. Added `RaceCardsSeatAllFiveRacesWithNoSilentDrop` to close that gap. 442/442 green.
-2. **Per-core tile colors (Doug's ask):** each NewGame core tile highlights with its core's BG color +
-   Core-Effect TRIM color. The manifest already carries `colorBind: core.accent` (newgame preview +
-   equipment identity) — supply `CoreRune.Accent` (+ a bg variant if the bind set needs it) as engine
-   data. VALUES = FLAGGED placeholders keyed to each core's worn-theme line (`worn.themes`): str cores
-   → `str` #c2553f (Grunt overrides to amber #d9a441 as the generalist; Warden gold #cf9a44 to split
-   from Barbarian), int → `int` #6f8fc4 (Summoner teal #4f9a8a to split from Adept), dex → `dex`
-   #82a85e (Ranger keeps dex-green, Reaver a darker cut if needed). B20 asks CD for canonical tokens;
-   these are stopgaps, flag them in the commit.
+2. ✅ DONE (2026-07-06, loop) — **Per-core tile colors (Doug's ask).** Both `core.accent`/`preview.accent`
+   binds (`Game1.ManifestRenderer.cs:1487,1489`) are TEXT-color binds only (core badge label +
+   Core-Effect name, `layout.json:12511,12697`) — no fill/bg colorBind exists on either element today,
+   so no "bg variant" field was needed (checked before writing code; adding an unused one would've been
+   speculative). `CoreRune.Accent` (was `""` on every core) now carries a token, but the tokens are NOT
+   invented hexes — they're the manifest's OWN existing palette entries (`layout.json` `style.palette`:
+   `str`#c2553f/`int`#6f8fc4/`dex`#82a85e/`amber`#d9a441/`gold`#cf9a44/`teal`#4f9a8a — exact match to
+   this bullet's proposed values). Grouped by worn-armor line: Grunt=`amber` (splits off str as
+   generalist), Warden=`gold` (splits off str, away from Barbarian), Barbarian=`str` (base),
+   Adept=`int` (base), Summoner=`teal` (splits off int, away from Adept), Ranger=`dex` (base, kept
+   dex-green per this bullet), Reaver=`dex` (base — this bullet's "a darker cut if needed" named no
+   concrete second token, so Reaver stays unsplit rather than inventing one). **FLAGGED stopgap**: this
+   is a grouping call, not a canonical design — B20 still owns the real per-core token if CD wants to
+   change it. Pinned by `EveryCoreCarriesAnAccentTokenFromTheManifestsOwnPalette`. 443/443 green.
 3. **Identity binds:** budgets/actions/minions/base-hp/effect name+desc all flow through EXISTING binds
    (`core.stats`, `core.coreEffect*`) — verify per-core against the 02 refs. The stat-bonus CHIPS,
    action-card rules text, and "minions" labels are B20/B19 manifest work — flag, don't hand-draw.

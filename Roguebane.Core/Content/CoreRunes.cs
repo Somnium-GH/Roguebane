@@ -31,7 +31,10 @@ public static class CoreRunes
         Badge: "STARTER",
         CoreEffectName: "Jack of All Trades",
         CoreEffectDesc: "Every attribute cost you pay is reduced by 1.",
-        Effect: CoreEffectKind.JackOfAllTrades);
+        Effect: CoreEffectKind.JackOfAllTrades,
+        Accent: "amber"); // CHUNK C item 2 stopgap: splits Grunt off the str line as the generalist.
+        // Reuses the manifest's OWN palette token (layout.json style.palette) rather than inventing a
+        // value — B20 still owns the canonical per-core token if CD wants to change it later.
 
     // A caster specialist: tight budget, the widest action bar.
     public static readonly CoreRune Adept = new(
@@ -48,7 +51,8 @@ public static class CoreRunes
         Badge: "CASTER",
         CoreEffectName: "Resonance",
         CoreEffectDesc: "Each targeted spell that hits reduces its next charge time by 2%, stacking up to 5 times.",
-        Effect: CoreEffectKind.Resonance);
+        Effect: CoreEffectKind.Resonance,
+        Accent: "int"); // CHUNK C item 2 stopgap: base int-line color (robe kit).
 
     // The Wall: built to hold the line — modest budget, no minion capacity.
     public static readonly CoreRune Warden = new(
@@ -65,7 +69,8 @@ public static class CoreRunes
         Badge: "BULWARK",
         CoreEffectName: "Fortified",
         CoreEffectDesc: "Plate armor is paid in CON at 1 less per tier.",
-        Effect: CoreEffectKind.Fortified);
+        Effect: CoreEffectKind.Fortified,
+        Accent: "gold"); // CHUNK C item 2 stopgap: splits Warden off the str line, away from Barbarian.
 
     // The Binder: fights through summons — three minion slots, INT funds them all.
     public static readonly CoreRune Summoner = new(
@@ -84,7 +89,8 @@ public static class CoreRunes
         CoreEffectName: "Conscription",
         CoreEffectDesc: "Minions do not consume Summons when activated.",
         Effect: CoreEffectKind.Conscription,
-        CoreEffectFreeSummons: true); // §11 LOCKED; CD reconciles the card copy
+        CoreEffectFreeSummons: true, // §11 LOCKED; CD reconciles the card copy
+        Accent: "teal"); // CHUNK C item 2 stopgap: splits Summoner off the int line, away from Adept.
 
     // The Duelist: glass-cannon, no minion capacity — twin blades end parts before they answer.
     // Frenzy/Flurry are the real Task #3 kit (TECHNIQUES.md/CORE_RUNES.md LOCKED 2026-07-05): both
@@ -106,7 +112,10 @@ public static class CoreRunes
         Badge: "SPECIALIST",
         CoreEffectName: "Finesse",
         CoreEffectDesc: "Techniques requiring two weapons cost 1 less to activate.",
-        Effect: CoreEffectKind.Finesse);
+        Effect: CoreEffectKind.Finesse,
+        Accent: "dex"); // CHUNK C item 2 stopgap: base dex-line color (shared with Ranger — STATUS's
+        // "a darker cut if needed" named no concrete second token, so this stays unsplit rather than
+        // inventing one; B20 owns the real split if CD wants it).
 
     // The Marksman: ranged core. Its signature is the shield-piercing BOW (charge #4) — Aimed Shot
     // bypasses shields for Charge. But Charge is scarce (INT-pooled, no mid-fight refill), so a pure-bow
@@ -127,7 +136,8 @@ public static class CoreRunes
         Badge: "SPECIALIST",
         CoreEffectName: "Fletcher's Luck",
         CoreEffectDesc: "Bow techniques have a 20% chance to consume no charge when fired, and bows cost 1 less per tier to equip.",
-        Effect: CoreEffectKind.FletcherLuck);
+        Effect: CoreEffectKind.FletcherLuck,
+        Accent: "dex"); // CHUNK C item 2 stopgap: keeps dex-green per STATUS's explicit instruction.
 
     // The Warlord: Half-Giant's exact-fit home — a two-handed claymore and STR plate, built to spend
     // everything the body has on hitting hard and standing in it.
@@ -145,7 +155,8 @@ public static class CoreRunes
         Badge: "SPECIALIST",
         CoreEffectName: "Warlord's Might",
         CoreEffectDesc: "Two-handed swords cost 3 less strength to equip; STR plate costs 1 less strength per piece to equip.",
-        Effect: CoreEffectKind.WarlordMight);
+        Effect: CoreEffectKind.WarlordMight,
+        Accent: "str"); // CHUNK C item 2 stopgap: base str-line color (Grunt/Warden split off amber/gold).
 
     // Roster order matches design/05's Choose-Your-Core line-up.
     public static readonly IReadOnlyList<CoreRune> Roster =

@@ -39,6 +39,26 @@ public class CoreRuneRosterTests
     }
 
     [Fact]
+    public void EveryCoreCarriesAnAccentTokenFromTheManifestsOwnPalette()
+    {
+        // CHUNK C item 2 stopgap (2026-07-06, loop): each core's tile highlight resolves via
+        // colorBind core.accent/preview.accent (Game1.ManifestRenderer.cs) to a token the manifest's
+        // OWN palette already defines (layout.json style.palette) — never an invented hex, so a Core
+        // change here can never desync from what CD's manifest actually renders. Grouped by worn armor
+        // line (str=plate, int=robe, dex=leather): Grunt/Warden split off the str base with their own
+        // named tokens (generalist/wall identity), Summoner splits off the int base, Ranger/Reaver share
+        // the dex base since STATUS never named a concrete second DEX token.
+        Assert.Equal("amber", CoreRunes.Grunt.Accent);
+        Assert.Equal("str", CoreRunes.Barbarian.Accent);
+        Assert.Equal("gold", CoreRunes.Warden.Accent);
+        Assert.Equal("int", CoreRunes.Adept.Accent);
+        Assert.Equal("teal", CoreRunes.Summoner.Accent);
+        Assert.Equal("dex", CoreRunes.Ranger.Accent);
+        Assert.Equal("dex", CoreRunes.Reaver.Accent);
+        Assert.All(CoreRunes.Roster, c => Assert.False(string.IsNullOrEmpty(c.Accent), $"{c.Id} accent"));
+    }
+
+    [Fact]
     public void EveryTechniqueAndMinionCarriesDisplayCopy()
     {
         // Card DESCRIPTIONS are display data (design/01) like the Core Effect copy: every palette technique
