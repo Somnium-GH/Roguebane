@@ -225,6 +225,43 @@ public class ExpeditionTests
     }
 
 
+    // Bug-queue root-cause (2026-07-05 Doug note, "pager doesn't indicate page 2"): Seed(nodeId) is
+    // a pure function of the node id STRING (no leg index / campaign salt), and Maps.StandardLegNodes
+    // reuses the literal id "b" for the merchant on every leg. So node "b" rolls the SAME stock every
+    // visit, forever: exactly 3 sections (weapons/armor/minions; techniques+runes both roll false at
+    // this seed). SectionsPerPage is 3, so PageCount is always 1 at this node -- page 2 is mechanically
+    // unreachable in live play, not a broken indicator (Pager/bind/click all verified correct by hand
+    // and via a live RB_SMOKE screenshot). Needs Human: should node/battle seeds fold in leg index for
+    // per-leg variety? Pinned here so that's a deliberate future change, not silent drift.
+    [Fact]
+    public void MerchantNodeBNeverRollsMoreThanThreeSections()
+    {
+        var exp = FullLoadout();
+        exp.Enter("a2"); FightToEnd(exp);
+        exp.Enter("b");
+        Assert.Empty(exp.OfferedTechniques);
+        Assert.Empty(exp.OfferedMarks);
+        Assert.NotEmpty(exp.OfferedWeapons);
+        Assert.NotEmpty(exp.OfferedArmor);
+        Assert.NotEmpty(exp.OfferedMinions);
+    }
+
+    [Fact]
+    public void MerchantNodeBRollsIdenticalStockAcrossIndependentLegs()
+    {
+        var a = FullLoadout();
+        a.Enter("a2"); FightToEnd(a);
+        a.Enter("b");
+
+        var b = FullLoadout(); // a wholly separate Expedition/CityMap instance, same node id
+        b.Enter("a2"); FightToEnd(b);
+        b.Enter("b");
+
+        Assert.Equal(a.OfferedWeapons, b.OfferedWeapons);
+        Assert.Equal(a.OfferedArmor, b.OfferedArmor);
+        Assert.Equal(a.OfferedMinions, b.OfferedMinions);
+    }
+
     [Fact]
     public void TheMerchantSellsAWeaponIntoTheStashPack()
     {

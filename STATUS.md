@@ -741,10 +741,18 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
   Two items from this bullet's old parenthetical are still genuinely open, not tracked elsewhere — kept
   here so they aren't silently dropped: **#30 glow/pulse** (no engine primitive yet, not started) and
   **#32 worn-draw composition**, which IS tracked, see Debt below ("Worn-armor DRAW wiring").
-- **Merchant pager doesn't indicate page 2** (Doug 2026-07-05, not root-caused): needs a live repro
-  with a >3-section stock — check `MerchantSections()` count vs the `>` arrow's render/bind, and
-  whether B13's 1px row-drop masks page 2. Don't re-diagnose B13/B14 (both root-caused, CD-side,
-  logged); chase the landing instead.
+- **Merchant pager doesn't indicate page 2** — ROOT-CAUSED (2026-07-06): Pager/bind/click code is all
+  correct (verified by hand + a live `RB_SMOKE=1 RB_SCREEN=citymap RB_MF=merchant RB_SHOT=...`
+  screenshot at node "b": PAGE 1/1, 3 sections, no arrows — exactly right for `PageCount==1`). The real
+  cause: `Expedition.Seed(nodeId)` is a pure function of the node id STRING with no leg-index/campaign
+  salt, and `Maps.StandardLegNodes()` reuses the literal id `"b"` for the merchant on EVERY leg — so
+  node "b" rolls the identical stock (weapons/armor/minions, never techniques/runes) every visit,
+  every leg, every run. `SectionsPerPage` is 3, so page 2 is mechanically unreachable in live play —
+  not a broken indicator. Pinned by `ExpeditionTests.MerchantNodeBNeverRollsMoreThanThreeSections` +
+  `MerchantNodeBRollsIdenticalStockAcrossIndependentLegs`. **Needs Human**: should node/battle seeds
+  fold in leg index (or another per-leg salt) for run-to-run variety? Same underlying gap as the
+  Merchant Wares backlog's blocked map-tier signal above — no per-leg identity exists anywhere yet.
+  Don't re-diagnose B13/B14 (unrelated, both already root-caused CD-side).
 - **Targeting-FSM watch** (no clean repro): unaimed-charged misbehavior — Core FSM proven correct
   headlessly; if it reproduces live it's shell-side (card-state chip / stale Targeting cursor).
 
