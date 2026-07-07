@@ -13,10 +13,10 @@ model, armor DOES reserve)**, and the rest of the B-series below.
 
 **‼ RECONCILED against pass 10 (2026-07-06):** B19 (bay→minion rename) landed clean, confirmed via
 `DROP_AUDIT.md` — Encounter's combat-minion template correctly diverged to `combatMinionCard` rather
-than colliding with Equipment's existing `minionCard`. That divergence was your judgment call, not a
-mistake; whether Doug wants it unified into one shared template is pending his answer — a follow-up
-ask will land here if he says unify, otherwise this closes as shipped. B7/B4/B10/B24/B25/B23 all
-confirm-to-close per that same drop.
+than colliding with Equipment's existing `minionCard`. **Doug's call (2026-07-06): keep them separate —
+no unify ask.** The two cards genuinely show different things (combat state vs. build-time slot); your
+divergence was the right read, not a compromise. B19 fully CLOSED, nothing further needed. B7/B4/B10/
+B24/B25/B23 all confirm-to-close per that same drop.
 
 **‼ RECONCILED against the 2026-07-05 v6/roster drop (Cowork):** figures for **5 races × 7 cores**
 (dwarf + halfling as asked, PLUS half_giant + barbarian unasked — both adopted: Half-Giant is now a
@@ -178,17 +178,13 @@ B18. **Technique + minion ICONS — RECONCILED against CD_STATUS #34/#36 (pass 8
     Engine-side FYI (OURS, not a CD ask): the `either`/`payAttr` dual-pool manifest field + split-cost
     two-row draw (CD_STATUS #36 consequences) is engine work, tracked in STATUS — the glyph art is done.
 
-B19. **CANON RENAME (2026-07-05, Doug) — "bay(s)" is retired as the minion-slot term; vocabulary is
-    "Minions" only, no separate slot noun.** DESIGN_SPEC/CORE_RUNES/SCREENS canon already updated our
-    side. Your manifest still spells the retired term into ids/binds: template `minionBay`; element ids
-    `bayGroupLabel`/`bayList` (note: `bayGroupLabel`'s rendered TEXT already correctly says "MINIONS" —
-    only the id is stale); binds `bay.hotkey`, `bay.state`, `bay.name`, `bay.gateColor`, `bay.cost`,
-    `bay.description`, `bay.amount`, `loadout.bays`, `core.bays`, `preview.bays`; part `baysBox`. Ask:
-    next regen, rename these to the "minion" equivalent (e.g. `minionCard` template, `minion.hotkey`,
-    `minion.state`, `minion.name`, `minion.gateColor`, `minion.cost`, `minion.description`,
-    `minion.amount`, `loadout.minions`, `core.minionCap`, `preview.minionCap`, `minionsBox`) — same
-    class of ask as the earlier B6 vocabulary rename. Our renderer's bind-key literals wait for this
-    drop to land before renaming in lockstep (avoids breaking the live binding mid-flight).
+B19. **✅ CLOSED 2026-07-06 — CANON RENAME (2026-07-05, Doug), landed pass 10, verified on the real
+    tree.** "Bay(s)" retired as the minion-slot term everywhere; Encounter now binds singular
+    (`minion.hotkey/state/name/cost/gateColor/description`, `loadout.minions`, `core.minionCap`,
+    `preview.minionCap`, `minionsBox`) via template `combatMinionCard` (deliberately NOT `minionCard` —
+    that name was already Equipment's own build-minion card with a different layout; reusing it would
+    have collided). **Doug's call: keep the two templates separate, no unify ask** — they show genuinely
+    different things (combat state vs. build-time slot). Nothing further needed. Clear from dev memory.
 
 **2026-07-05 — STRUCTURAL directive (Doug): eradicate absolute positioning. This applies to EVERY
 screen, not a single asset — please treat it as a standing correctness rule, not a one-off fix.**

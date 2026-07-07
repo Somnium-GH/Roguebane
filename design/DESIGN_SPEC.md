@@ -868,10 +868,17 @@ points there so the canon stays design-focused.
     placeholder "apex"). Sweep `apex`→`Core Effect` across docs + code (`ApexName/ApexDesc` →
     `CoreEffectName/CoreEffectDesc`) + the manifest `apex*` binds/labels. (Leave §11's keystone
     "apex-tier" wording — different meaning.)
-15. Figure MORPH model + MULTI-SLOT equipment (§7): figures = human base + race morph + core-rune morph +
-    equipped-gear parts (a morph model, not per-race×core×gear art); a piece may cover multiple part slots
-    (robe = all/most). Exact morph mechanics + the multi-slot slot model — design BEFORE building the
-    gear-swap system (today gear is starting-set only; GEAR cards are sample/design-open).
+15. ~~Figure MORPH model~~ RESOLVED 2026-07-06 (Doug): **no true morph.** The base figure stays the
+    existing per-(race, core) art (`sprites/body/{race}_{core}/…`, already carries the core's silhouette
+    — Warden's bulk, etc.). Worn-armor parts are a FLAT overlay layer, keyed only by (race, slot, line/
+    tier, condition) — core-agnostic except where a piece happens to be the equipping core's OWN favored
+    line (then it draws the themed variant instead of generic). This is CD's shipped ~744-sprite
+    convention as-is, not a stopgap — adopted as the locked model, no procedural blend/warp engine work.
+    MULTI-SLOT equipment (a robe covering multiple part slots) rides the same per-slot key scheme: a
+    multi-slot piece just resolves the same sprite key for each slot it covers — no separate mechanic.
+    Unblocks: `WornArmorBinding.SpriteKeys` (already resolves race/slot/theme keys, STATUS.md Debt) needs
+    wiring into `Game1`'s figure compose — that's the only remaining gap, and it's an engine task now,
+    not a design question.
 16. ~~ITEM-RANKING / auto-unequip priority~~ RESOLVED 2026-07-03 (§6e): disables highest-requirement-
     first, ties last-equipped-first — a pure ranking over the live attr level. Numbers ride the
     balance pass like everything else.
