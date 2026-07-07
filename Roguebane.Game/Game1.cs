@@ -1193,6 +1193,31 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         Console.WriteLine($"SMOKE FIGURES: figures={m.Figures.Count} armored-missing={figMissing.Count}"
             + (figMissing.Count > 0 ? $" miss=[{string.Join(",", figMissing)}]" : "")
             + (bareLess.Count > 0 ? $" bare-less(fallback)=[{string.Join(",", bareLess)}]" : ""));
+
+        // CHUNK B item 3/4 DoD: now that WornArmorSprite is wired into the draw path (see
+        // DrawHumanoid), prove the GENERIC (unthemed, healthy-condition) worn-armor chain actually
+        // has art for every race x armor ladder — the row WornArmorBinding.SpriteKeys falls back to
+        // when no themed variant exists. Themed keys are a bonus rung (optional, silently skipped),
+        // never the gate; boots/shield/bow aren't §12a worn-slots at all and stay out of scope here.
+        var wornSlot = new Dictionary<Stat, string>
+        {
+            [Stat.Int] = "head", [Stat.Con] = "chest", [Stat.Str] = "arms", [Stat.Dex] = "legs",
+        };
+        var wornType = new Dictionary<ArmorLine, string>
+        {
+            [ArmorLine.Plate] = "str", [ArmorLine.Leather] = "dex", [ArmorLine.Robe] = "int",
+        };
+        var wornMissing = new SortedSet<string>();
+        var wornChecked = 0;
+        foreach (var race in Races.Roster)
+            foreach (var a in ArmorLines.All)
+            {
+                wornChecked++;
+                var key = $"sprites/gear/worn/{race.Id}/{wornSlot[a.Slot]}/{wornType[a.Line]}_{a.Tier}_healthy";
+                if (_assets.Texture(key) is null) wornMissing.Add(key);
+            }
+        Console.WriteLine($"SMOKE WORN: combos={wornChecked} missing={wornMissing.Count}"
+            + (wornMissing.Count > 0 ? $" miss=[{string.Join(",", wornMissing)}]" : ""));
     }
 
     private void RenderSceneOnce(Action draw)

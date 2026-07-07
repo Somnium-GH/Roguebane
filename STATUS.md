@@ -820,20 +820,23 @@ crumbs landed along the way.
    re-extraction. Key-set diff (screens/templates) across the last 2 CD-drop commits touching
    `layout.json` found ZERO lost screens/templates — no regression, net-new gap only. `layout.json` is
    CD-owned (never hand-edited by the loop) — flagging for CD, not fixing here.
-3. ◐ PARTIAL (2026-07-06, loop) — `WornArmorBinding.SpriteKeys` now takes an optional `theme` (a
-   core's own name, e.g. `"barbarian"`) and leads the candidate chain with the THEMED key
+3. ✅ DONE (2026-07-07, loop) — `WornArmorBinding.SpriteKeys` takes an optional `theme` (a core's own
+   name, e.g. `"barbarian"`) and leads the candidate chain with the THEMED key
    (`sprites/gear/worn/<race>/<slot>/<core>/<type>_<tier>_<cond>.png`, confirmed present in the
    mgcb mirror for all 7 cores × all 5 races on every slot they grow gear in) ahead of the existing
    generic/bare rungs; omitting `theme` keeps the old generic-only chain byte-identical (back-compat,
-   no caller migration forced). Race domain was ALREADY generic (race is just a string param, no
-   hardcoded list) — confirmed with a themed-chain test parametrized over all 5 races
-   (`dwarf`/`elf`/`half_giant`/`halfling`/`human`). 9 new tests in `WornArmorBindingTests.cs`, 438/438
-   green. **Still open**: the live `RB_SMOKE=1 RB_MF=all` figure/asset probe this bullet also asks for
-   can't run meaningfully yet — `SpriteKeys` isn't wired into the Game-side draw path at all (Debt
-   below, "Worn-armor DRAW wiring" / CD_CLOSED_ITEMS #32), so no `theme` argument is ever passed live.
-   That wiring is the actual gate for a real smoke pass; this cycle only widened what the resolver CAN
-   return once it's called.
-4. DoD: build green, probes 0 missing (bow/shield known gaps exempt), Core.Tests green.
+   no caller migration forced). 9 tests in `WornArmorBindingTests.cs`. **Live probe (this cycle)**: now
+   that `WornArmorSprite` wires `SpriteKeys` into the Game-side draw path (prior cycle), added a
+   `SMOKE WORN` check next to `SMOKE FIGURES`/`SMOKE ASSETS` (`Game1.cs`, in `ReportAssetResolution`) —
+   iterates every race × every `ArmorLines.All` ladder entry (Plate/Leather/Robe × all tiers × the
+   slots each line actually occupies, 200 combos total) and confirms the GENERIC healthy-condition key
+   `sprites/gear/worn/<race>/<slot>/<type>_<tier>_healthy` resolves (the row the chain falls back to
+   when no themed art exists — themed keys are a bonus rung, never the gate). `RB_SMOKE=1 RB_MF=all`
+   run: `SMOKE WORN: combos=200 missing=0`, `SMOKE FIGURES: figures=41 armored-missing=0`,
+   `SMOKE ASSETS: missing=0 unverifiable=3` (the 3 unverifiable are pre-existing unrelated
+   `{placeholder}` domains, not worn-armor). Core.Tests 443/443 green.
+4. ✅ DoD MET: build green, probes 0 missing (bow/shield aren't §12a worn-slots, out of scope by
+   construction), Core.Tests green.
 
 ### CHUNK C — SCREENS: selection, accents, per-core pixel lanes (after A+B; render only what the manifest authors)
 1. ✅ DONE (2026-07-06, loop) — **Roster stamping.** MEASURE done headlessly: `coreCards` (476x404
