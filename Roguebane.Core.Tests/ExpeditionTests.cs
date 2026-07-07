@@ -255,10 +255,11 @@ public class ExpeditionTests
     // technique -> palette pool, minion -> minion inventory, rune -> rune bag. Slotting stays
     // the Equipment screen's job. Category presence per node is the seeded roll's business, so
     // the technique/rune tests ride nodes whose rolls stock them ("m2" / "mk20" — deterministic).
-    private static Expedition MerchantAt(string nodeId)
+    private static Expedition MerchantAt(string nodeId, int maxSummons = -1, int minionCap = 0)
     {
         var body = Sessions.DemoBody();
-        var caster = new Caster(body, maxCharge: Forge.MagicCapacity(body), requireAim: true);
+        var caster = new Caster(body, maxCharge: Forge.MagicCapacity(body), requireAim: true,
+            minionCap: minionCap, maxSummons: maxSummons);
         var nodes = new[]
         {
             new MapNode("camp", NodeType.Camp, nodeId),
@@ -309,6 +310,27 @@ public class ExpeditionTests
         Assert.True(exp.BuyMark(pick));
         Assert.Contains(pick, exp.Stash.Marks);
         Assert.DoesNotContain(pick, exp.OfferedMarks);
+    }
+
+    // §12/§9: Summons is the finite deploy resource (not a ware category) -- the merchant tops it up
+    // same as Supplies/Charge (MerchantStocksSeededSuppliesAndCharge above), just gated by MaxSummons
+    // instead of a section roll. No prior coverage existed for this buy path.
+    [Fact]
+    public void MerchantRefillsSummonsUpToTheCap()
+    {
+        var exp = MerchantAt("b", maxSummons: 3, minionCap: 1);
+        Assert.True(exp.SummonMinion(Minions.Skeleton)); // spends 1 of 3
+        Assert.Equal(2, exp.Summons);
+        Assert.InRange(exp.SummonsStock, 1, 2);
+
+        var stock = exp.SummonsStock;
+        var gold = exp.Gold;
+        Assert.True(exp.BuySummons());
+        Assert.Equal(3, exp.Summons);
+        Assert.Equal(gold - exp.SummonsPrice, exp.Gold);
+        Assert.Equal(stock - 1, exp.SummonsStock);
+
+        Assert.False(exp.BuySummons()); // already full -- refuses rather than overfill
     }
 
     [Fact]

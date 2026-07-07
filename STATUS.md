@@ -119,26 +119,36 @@ Resonance) don't currently grant any techniques themselves). `dotnet test Rogueb
 
 ## ‼ PRIORITY BACKLOG (2026-07-05, Doug) — Merchant Wares feature build. Ranks directly after all
 ## outstanding bug work above (the HIGH PRIORITY entries), ahead of CHUNK C/D and everything below.
-Three sub-features, in the order Doug gave them:
-1. **Ware rotation + randomization.** Map-tier-appropriate gear by default, occasionally above-tier
-   (a rare upgrade roll). Section presence: typically 2-3 of the 5 categories (Weapons/Armor/Techniques/
-   Minions/Runes) stocked per visit, occasionally all 5, weighted toward 3. `MerchantStock.Roll()`
-   already does a weighted independent per-category presence roll (locked 2026-07-03: 80%/25%/8% by
-   category class, cap 4-of-5, `SectionPicks=3`) — this is close to "2-3 typically, sometimes more,
-   weighted toward 3" already; what's missing is (a) TIER-AWARE item selection within a rolled category
-   (today's stock picks are tier-blind — confirm against `MerchantStock.cs`/`Shops.cs` before assuming,
-   don't re-derive the roll math that's already locked) and (b) the "occasionally above-tier" bonus roll.
-2. **Gear/technique/rune sales.** Stub the mechanic (real buy/sell flow, real gold cost, wired to the
-   existing `Stash`/`Exp.Gold`) with PLACEHOLDER presentation — Doug's words: "stub it the best you can,
-   we'll get CD on it with the next batch" — so this is deliberately NOT waiting on CD art; ship the
-   mechanic now with generic/reused chrome, flag the placeholder per CLAUDE.md's placeholder rule, and
-   queue the real card art as a CD ask (added to the payload below).
-3. **Supply / Summons / Charge purchase.** All three resources already exist engine-side (`Exp.Map.
-   Supplies`/`MaxSupplies`, `Exp.Summons`/`MaxSummons`, `Exp.Charge`/`MaxCharge` — confirmed referenced in
-   `Game1.ManifestRenderer.cs`'s `ResourceReadout` list) — build the merchant-side buy action for each
-   (gold cost per unit, capped at max, wired to a new merchant section or the existing provisions row).
-DoD per CLAUDE.md: headless Core tests for the rotation/tier logic and the buy/sell economy math (gold
-deducted, stock decremented, resource capped at max) — this is Core-testable, no MonoGame needed.
+Three sub-features, in the order Doug gave them. **AUDITED (2026-07-06, loop): 2 and 3 were already
+shipped BEFORE this backlog note was written** (`cf638b3` "Merchant click-to-buy complete (P0-C.7)" +
+the resource-buy commits before it) — Doug's ask reads as a checklist written without the current code
+in front of him, not a from-scratch build. Only item 1 has real remaining work, and it's blocked:
+1. **◻ NEEDS HUMAN — ware rotation + randomization.** Map-tier-appropriate gear by default, occasionally
+   above-tier (a rare upgrade roll). Section presence (2-3 of 5 categories, weighted toward 3) is DONE —
+   `MerchantStock.Roll()`'s locked 2026-07-03 weights already deliver that. What's missing is (a)
+   TIER-AWARE item selection (confirmed: `MerchantStock.Pick<T>` is a tier-blind partial Fisher-Yates over
+   the WHOLE pool passed in — no tier filtering anywhere) and (b) an "occasionally above-tier" bonus roll.
+   **Blocker: there is no "map tier" signal anywhere to select against.** `Armor`/`Weapon` both carry a
+   `Tier` field, but the MAP side has nothing — `CityMap`/`MapNode` carry no tier/depth/rank field, and
+   §12's own Layer 1 (campaign map, cities → Capital) is explicitly `[OPEN]` in DESIGN_SPEC ("city count;
+   procgen vs authored" undecided) — the POC currently runs exactly one leg (`Maps.StandardLeg`), so
+   there is no notion yet of "which tier of the run this merchant sits in." Building tier-aware selection
+   now means INVENTING that signal (leg index? node depth-from-camp? an explicit authored field?) —
+   exactly the "no undesigned mechanics" line in CLAUDE.md. Doug needs to pick the source-of-truth for
+   map tier before this can be built without guessing.
+2. **✓ DONE (pre-dates this backlog) — gear/technique/rune sales.** `Expedition.BuyWeapon/BuyArmor/
+   BuyTechnique/BuyMinion/BuyMark` all wired to `Stash`/`Gold`, real gold cost (`Expedition.Price(...)`
+   overloads), stock cleared on purchase, landed in the run inventory per §12's receiving rule. Covered
+   by `ExpeditionTests.cs` (`TheMerchantSells*IntoThe*` × 5, `WarePurchasesRejectWhenGoldRunsShort`).
+   Presentation is still placeholder chrome (flagged, per CLAUDE.md's placeholder rule) — that's a CD ask,
+   not engine work.
+3. **✓ DONE (pre-dates this backlog) — Supply / Summons / Charge purchase.** `Expedition.BuySupplies/
+   BuyCharge/BuySummons` all exist, gold cost per unit (seeded per-node, stable), capped at max, decrement
+   their own per-visit stock. Covered by `ExpeditionTests.MerchantStocksSeededSuppliesAndCharge` +
+   `MerchantRefillsSummonsUpToTheCap` (2026-07-06, loop — `BuySummons` had zero test coverage until now).
+DoD per CLAUDE.md: headless Core tests for the buy/sell economy math (gold deducted, stock decremented,
+resource capped at max) exist for 2/3. Item 1's tier-aware logic stays unbuilt until the map-tier
+question above is answered — do not guess at a signal to unblock it.
 
 ## ‼ HIGH PRIORITY (2026-07-05, Doug, live screenshot) — the 4-zone pip build (previous entry, below) IS
 ## landing, but its container is too narrow — same bug CLASS as waresShelves/invItems, THIRD instance.
