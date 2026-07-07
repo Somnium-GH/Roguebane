@@ -664,9 +664,19 @@ crumbs landed along the way.
    re-extraction. Key-set diff (screens/templates) across the last 2 CD-drop commits touching
    `layout.json` found ZERO lost screens/templates — no regression, net-new gap only. `layout.json` is
    CD-owned (never hand-edited by the loop) — flagging for CD, not fixing here.
-3. `RB_SMOKE=1 RB_MF=all` + `SMOKE FIGURES`/`SMOKE ASSETS`: every figure × z-part × state resolves for
-   ALL 35 player figures; worn resolution covers the 3 new races + barbarian themed (str) via the §12a
-   fallback chain (`WornArmorBinding` already handles the chain — extend its race domain + tests).
+3. ◐ PARTIAL (2026-07-06, loop) — `WornArmorBinding.SpriteKeys` now takes an optional `theme` (a
+   core's own name, e.g. `"barbarian"`) and leads the candidate chain with the THEMED key
+   (`sprites/gear/worn/<race>/<slot>/<core>/<type>_<tier>_<cond>.png`, confirmed present in the
+   mgcb mirror for all 7 cores × all 5 races on every slot they grow gear in) ahead of the existing
+   generic/bare rungs; omitting `theme` keeps the old generic-only chain byte-identical (back-compat,
+   no caller migration forced). Race domain was ALREADY generic (race is just a string param, no
+   hardcoded list) — confirmed with a themed-chain test parametrized over all 5 races
+   (`dwarf`/`elf`/`half_giant`/`halfling`/`human`). 9 new tests in `WornArmorBindingTests.cs`, 438/438
+   green. **Still open**: the live `RB_SMOKE=1 RB_MF=all` figure/asset probe this bullet also asks for
+   can't run meaningfully yet — `SpriteKeys` isn't wired into the Game-side draw path at all (Debt
+   below, "Worn-armor DRAW wiring" / CD_CLOSED_ITEMS #32), so no `theme` argument is ever passed live.
+   That wiring is the actual gate for a real smoke pass; this cycle only widened what the resolver CAN
+   return once it's called.
 4. DoD: build green, probes 0 missing (bow/shield known gaps exempt), Core.Tests green.
 
 ### CHUNK C — SCREENS: selection, accents, per-core pixel lanes (after A+B; render only what the manifest authors)

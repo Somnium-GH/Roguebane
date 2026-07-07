@@ -88,4 +88,84 @@ public class WornArmorBindingTests
         b.Equip(Shops.Hide);
         Assert.Empty(WornArmorBinding.SpriteKeys(b, "boots", "human"));
     }
+
+    // CHUNK B item 3: THEMED art (B12) landed for all 7 cores across the 5 races -- the fallback
+    // chain now offers the core's own line ahead of generic, falling through to generic then bare
+    // when omitted or when that slot has no themed line at all (adept/summoner arms).
+    [Fact]
+    public void ThemeLeadsTheChainAheadOfGenericThenFallsToBare()
+    {
+        var b = Humanoid(out _, out _);
+        b.Equip(Shops.Plate);
+        var keys = WornArmorBinding.SpriteKeys(b, "torso", "human", "barbarian");
+        Assert.Equal(new[]
+        {
+            "sprites/gear/worn/human/chest/barbarian/str_1_healthy",
+            "sprites/gear/worn/human/chest/str_1_healthy",
+            "sprites/gear/worn/human/chest/bare_healthy",
+        }, keys);
+    }
+
+    [Fact]
+    public void ThemeAddsItsOwnHealthyFallbackRungWhenDamaged()
+    {
+        var b = Humanoid(out var torso, out _);
+        b.Equip(Shops.Plate);
+        b.Damage(torso, 6); // -> damaged, same as DamagedConditionAddsTheHealthyFallbackRungs
+        var keys = WornArmorBinding.SpriteKeys(b, "torso", "human", "barbarian");
+        Assert.Equal(new[]
+        {
+            "sprites/gear/worn/human/chest/barbarian/str_1_damaged",
+            "sprites/gear/worn/human/chest/barbarian/str_1_healthy",
+            "sprites/gear/worn/human/chest/str_1_damaged",
+            "sprites/gear/worn/human/chest/str_1_healthy",
+            "sprites/gear/worn/human/chest/bare_damaged",
+            "sprites/gear/worn/human/chest/bare_healthy",
+        }, keys);
+    }
+
+    [Fact]
+    public void OmittingThemeKeepsTheOldGenericOnlyChain()
+    {
+        var b = Humanoid(out _, out _);
+        b.Equip(Shops.Plate);
+        var keys = WornArmorBinding.SpriteKeys(b, "torso", "human");
+        Assert.Equal(new[]
+        {
+            "sprites/gear/worn/human/chest/str_1_healthy",
+            "sprites/gear/worn/human/chest/bare_healthy",
+        }, keys);
+    }
+
+    [Fact]
+    public void UnarmoredPartIgnoresThemeEntirely()
+    {
+        // No worn armor -> no armored rung at all, themed or generic -- straight to bare, same as
+        // UnarmoredPartFallsStraightToBareHealthy.
+        var b = Humanoid(out _, out _);
+        var keys = WornArmorBinding.SpriteKeys(b, "torso", "human", "barbarian");
+        Assert.Equal(new[] { "sprites/gear/worn/human/chest/bare_healthy" }, keys);
+    }
+
+    [Theory]
+    [InlineData("dwarf")]
+    [InlineData("elf")]
+    [InlineData("half_giant")]
+    [InlineData("halfling")]
+    [InlineData("human")]
+    public void EveryNewRaceResolvesTheSameThemedChainShapeAsHuman(string race)
+    {
+        // The 3 v6 races (dwarf/half_giant/halfling) plus the 2 original (human/elf) all shipped the
+        // same mgcb worn tree (CHUNK B item 1) -- SpriteKeys has no race-specific branching, so this
+        // pins that the race token alone drives the folder, same shape for all 5.
+        var b = Humanoid(out _, out _);
+        b.Equip(Shops.Plate);
+        var keys = WornArmorBinding.SpriteKeys(b, "torso", race, "barbarian");
+        Assert.Equal(new[]
+        {
+            $"sprites/gear/worn/{race}/chest/barbarian/str_1_healthy",
+            $"sprites/gear/worn/{race}/chest/str_1_healthy",
+            $"sprites/gear/worn/{race}/chest/bare_healthy",
+        }, keys);
+    }
 }

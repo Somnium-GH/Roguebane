@@ -3,10 +3,13 @@ namespace Roguebane.Core.Layout;
 // §12a worn-armor PART SELECTION (race-first, full-part sprites — CORRECTION #3, 2026-07-04:
 // supersedes the earlier line-first overlay draft). Each candidate key names a COMPLETE part sprite
 // (body + armor drawn in), not a runtime overlay — so this resolver picks ONE key, it doesn't
-// composite several. GENERIC + bare selection only: THEMED (a core's own favored line, §7a) is the
-// same slice's second half once CD's B12 art lands. How the selected part composes with the
-// existing per-core figure geometry (Warden's bulkier torso etc.) is still an OPEN engine question
-// (STATUS §17 #15, deferred) — this class only answers "which key", not "draw instead of what".
+// composite several. THEMED (a core's own favored line, §7a) now leads the chain, ahead of generic:
+// CHUNK B item 1's mgcb mirror landed sprites/gear/worn/<race>/<slot>/<core>/<type>_<tier>_<cond>.png
+// for all 7 cores across every slot they actually grow gear in (adept/summoner have no arms line —
+// INT cores don't grow STR-slot kit, so that themed rung is simply never offered for them). How the
+// selected part composes with the existing per-core figure geometry (Warden's bulkier torso etc.) is
+// still an OPEN engine question (STATUS §17 #15, deferred) — this class only answers "which key",
+// not "draw instead of what".
 public static class WornArmorBinding
 {
     // §12a slot set: head/chest/arms/legs only. Boots shares the DEX group for condition/border
@@ -33,10 +36,12 @@ public static class WornArmorBinding
         _ => "healthy",
     };
 
-    // Ordered candidate keys, generic tier down to bare (no themed lookup yet): armored same-
-    // condition -> armored healthy -> bare same-condition -> bare healthy. Empty only when this
-    // visual part has no §12a slot at all (boots, or anything FigureBinding doesn't map to a stat).
-    public static IReadOnlyList<string> SpriteKeys(Body body, string visualPart, string race)
+    // Ordered candidate keys: themed armored same-condition -> themed armored healthy -> generic
+    // armored same-condition -> generic armored healthy -> bare same-condition -> bare healthy.
+    // Empty only when this visual part has no §12a slot at all (boots, or anything FigureBinding
+    // doesn't map to a stat). `theme` (a core's name, e.g. "barbarian") is optional — omit it to get
+    // the old generic-only chain unchanged.
+    public static IReadOnlyList<string> SpriteKeys(Body body, string visualPart, string race, string? theme = null)
     {
         if (visualPart == "boots") return Array.Empty<string>();
 
@@ -50,6 +55,12 @@ public static class WornArmorBinding
         if (body.ArmorOn(s) is { } worn && body.ArmorSustained(worn))
         {
             var type = TypeWord[worn.Line];
+            if (theme is { Length: > 0 })
+            {
+                var themedKey = $"{baseKey}/{theme}/{type}_{worn.Tier}_{cond}";
+                keys.Add(themedKey);
+                if (cond != "healthy") keys.Add($"{baseKey}/{theme}/{type}_{worn.Tier}_healthy");
+            }
             keys.Add($"{baseKey}/{type}_{worn.Tier}_{cond}");
             if (cond != "healthy") keys.Add($"{baseKey}/{type}_{worn.Tier}_healthy");
         }
