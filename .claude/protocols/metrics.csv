@@ -30,3 +30,4 @@ date,task,minutes,lines_changed,estimate_minutes,method
 2026-07-06,b19-bay-to-minion-engine-rename,40,142,-,commit-delta
 2026-07-06,citymap-sees-adjacency-fog-leak-fix,15,25,-,commit-delta
 2026-07-07,expedition-seed-leg-index-merchant-fix,25,65,-,commit-delta
+2026-07-07,wornarmor-draw-wiring-figure-compose,30,48,-,commit-delta
