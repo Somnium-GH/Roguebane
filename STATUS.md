@@ -1184,10 +1184,30 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
    weapon arm to 0 drops the axe from consulted gear (same cascade as Ogre); Bandage's mend doubles
    through `RegenerativeFlesh` in a real fight (2 pts, not the base 1); breaking the chest below
    Bandage's Reserve silences the doubled mend outright (FOES.md's "break the chest first" lesson, for
-   free off the existing reservation cascade). Skeleton (Jab/Dagger stat mismatch), Bandit (Plunder
-   needs undesigned cross-Caster wiring), Gargoyle (no stone-fists `Weapon` record yet), and all four
-   Dire variants (Dire Ogre's STR-budget conflict + un-scoped Dire numbers generally) remain open,
-   blocked as already noted elsewhere in this chunk.
+   free off the existing reservation cascade). **Gargoyle T1 done (2026-07-07, loop)** — new
+   `Foes.Gargoyle` (HP 12, parts 3/2/1/4). The prior "no stone-fists `Weapon` record yet" blocker note
+   UNDERSOLD it: FOES.md's own text qualifies "no weapon (stone fists ≈ Iron Axe profile)," and Jab
+   (`Stat.Str, Consults: Primary`) matches Iron Axe's `Stat.Str` exactly — no Skeleton-style stat
+   mismatch. Wielding `Armory.Axes[0]` narratively AS the stone fists is the same trick
+   `Foes.Ogre`/`Foes.Troll` already use for their own gear fluff, so no new `Weapon` record or engine
+   work was needed — the blocker was a stale read, not a real gap. Stoneform (`GargoyleStoneformTests`,
+   prior cycle) is a live CON-chest read, not a reservation, so it needed no wiring either. New
+   `FoeGargoyleTests.cs` (4 tests): Jab deals half the wielded axe's power rounded away-from-zero
+   through a real `Battle`; smashing the fist arm drops the axe from consulted gear; Stoneform discounts
+   part damage by 1 (min-1 floor) through real `Foes.Gargoyle` content while the chest holds, HP landing
+   full; breaking the chest first removes the discount entirely. Full `Core.Tests` green (494/494).
+   - ⚠️ NEEDS DOUG (found 2026-07-07, loop, while scoping Bandit T1 for item 2) — **FOES.md's Bandit T1
+     CON budget doesn't fit its own gear+arsenal.** Spec: parts 3/2/3/2 (chest CON 2), Iron Axe + Wooden
+     Shield, arsenal Swing + Brace. Wooden Shield's own equip cost is 1 CON (`Armory.Shields[0]`,
+     `reqPerTier: 1`); Brace's `Reserve` is 2 CON (`Techniques.Brace`) — both draw the SAME chest CON
+     pool (`Body.Reserved` sums `GearReserved` + `TechReserved`), so wielding the shield AND activating
+     Brace needs 3 CON against a chest that only has 2. Same class of thing as the Skeleton Jab/Dagger
+     and Dire Ogre STR-budget notes above — not silently retuned (raising chest CON, lowering Brace's
+     Reserve, or dropping the shield's own cost are all Doug's spreadsheet call) — `Foes.Bandit` stays
+     blocked on this reconciling, on top of Plunder's already-noted undesigned cross-Caster wiring gap.
+   Skeleton (Jab/Dagger stat mismatch), Bandit (CON budget above, Plunder needs undesigned cross-Caster
+   wiring), and all four Dire variants (Dire Ogre's STR-budget conflict + un-scoped Dire numbers
+   generally) remain open, blocked as already noted elsewhere in this chunk.
 3. ✅ DONE (2026-07-07, loop) — **Encounter tables pull from the T1 roster.** Same node→foe mapping
    shape (`Maps.cs`/`Sieges.cs`), same call site (`Expedition.cs:391`) — `Maps.EncounterFor` gained a
    `seed` parameter (the caller's own existing stable per-node `Seed(node.Id)`, already computed for

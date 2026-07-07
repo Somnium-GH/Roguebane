@@ -79,6 +79,26 @@ public static class Foes
             FoeEffectKind.RegenerativeFlesh);
     }
 
+    // CHUNK D item 2's fifth roster foe (FOES.md, Gargoyle): "no weapon (stone fists" reads as an
+    // unbuilt Weapon record, but FOES.md itself qualifies it "~ Iron Axe profile" -- and its arsenal
+    // (Jab, Stat.Str/Consults:Primary) matches Iron Axe's own Stat.Str exactly, unlike Skeleton's
+    // Dagger(Dex)/Jab(Str) mismatch. Wielding Armory.Axes[0] narratively AS the stone fists is the same
+    // trick Ogre/Troll already use for their own weapon fluff -- no new Weapon record needed, no engine
+    // work; the earlier "no real Weapon record" blocker note undersold it. Stoneform (already proven
+    // bare in GargoyleStoneformTests) reads the CON chest LIVE in Caster.Hit, not a reservation -- so
+    // it needs no wiring here either, just a chest part with headroom to spare.
+    public static Foe Gargoyle(string id, int hp = 12, int arm = 3, string figure = "gargoyle",
+        FoeAim aim = FoeAim.Random)
+    {
+        var frame = new Body();
+        frame.Add(new BodyPart($"{id}-arm", Stat.Str, arm));  // Parts[0]: wields the "fists," powers Jab
+        frame.Add(new BodyPart($"{id}-head", Stat.Int, 2));
+        frame.Add(new BodyPart($"{id}-legs", Stat.Dex, 1));
+        frame.Add(new BodyPart($"{id}-chest", Stat.Con, 4));  // Parts[3]: Stoneform's live "still whole" read
+        frame.Wield(Armory.Axes[0]); // Iron Axe: Reserve 1 Str, fits arm STR 3 with headroom to spare
+        return new Foe(id, hp, frame, new[] { Techniques.Jab }, figure, aim, FoeEffectKind.Stoneform);
+    }
+
     // The castle boss's heavier strike: a real timered attack (STR arm), harder + faster than a raider's.
     private static readonly Technique BossStrike =
         new("boss-strike", Stat.Str, Reserve: 1, TechniqueKind.Timered, Cooldown: 25, Power: 3);
