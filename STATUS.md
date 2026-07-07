@@ -1,5 +1,69 @@
 # Status
 
+## ‼ BUG (2026-07-06, Doug) — city map reveals adjacent Skirmish/Quest tiles; only Merchant/ResourceHold/Castle/Camp should ever be knowable before landing
+Doug's ask, verbatim: the map "should basically just make you guess your way through it taking chances
+besides the revealing of merchants and the resource nodes" — Camp (own origin) and Castle (visible afar,
+the objective) are implicitly fine too; everything else (Skirmish today, **Quest** once the Loot/Quests
+backlog above is built) must stay `?` until you actually commit to landing on it, not resolve early just
+because you're standing next to it.
+**Root cause, `CityMap.Sees(MapNode node)` (`CityMap.cs:88-101`):** the switch's catch-all is
+`_ when adjacent => node.Type` (line 98) — this reveals the TRUE type of ANY node the instant it's one
+jump away, which defeats the guess-your-way-through design for Skirmish (and will silently do the same
+for Quest the moment that node type exists, since it's data-driven and would fall through the same
+branch). Only the `Merchant when adjacent` case above it is supposed to resolve early; the generic
+adjacency fallback shouldn't exist at all.
+**Fix:** delete the `_ when adjacent => node.Type` line entirely, so anything that isn't Camp/
+ResourceHold/Castle/Merchant(adjacent) falls straight to `NodeType.Unknown` until `node.Visited`. Net
+effect: `Sees` becomes exactly Camp (always) / ResourceHold (always) / Castle (always) / Merchant (only
+once adjacent) / everything else Unknown-until-visited. No new mechanism, no `adjacent` local var needed
+beyond the Merchant case (fine to inline `Adjacent(node.Id)` there instead of keeping the now-mostly-
+unused local, or keep the local — either is fine, just don't reintroduce a generic adjacency reveal).
+**Test to fix, not just add:** `CityMapTests.FogShowsHoldsAndCastleAfarButKeepsDistantSkirmishesHidden`
+(`CityMapTests.cs:74-84`) currently PINS the bug — its own name claims distant skirmishes stay hidden,
+but its assertion (`Assert.Equal(NodeType.Skirmish, map.Sees(map.Node("a2")))`, line 80) explicitly
+checks the buggy ADJACENT-reveal behavior and calls it correct. Flip that line to
+`Assert.Equal(NodeType.Unknown, map.Sees(map.Node("a2")))` and update the comment above it (currently
+"a2 is an adjacent skirmish (adjacency resolves it)" — that's the bug being described as intended
+behavior). Re-check `MerchantResolvesOneJumpOut` (`CityMapTests.cs:86-92`) still passes unchanged (it
+should — Merchant's own explicit case is untouched). Grep for any other test or live code path assuming
+adjacency reveals node type before assuming this is the only site.
+
+## ‼ HIGH PRIORITY (2026-07-06, Doug — interview #2 answers, 3 precise directives)
+1. **Merchant per-leg seed gap — Doug: GLOBAL fix, salt `Expedition.Seed(nodeId)` itself (not scoped to
+   just the merchant).** Root cause (already pinned by `ExpeditionTests.MerchantNodeBNeverRollsMoreThan
+   ThreeSections`/`MerchantNodeBRollsIdenticalStockAcrossIndependentLegs`): `Expedition.Seed(string
+   nodeId)` is a pure FNV-1a hash of the node id string only — no leg/run identity — so `Maps.
+   StandardLegNodes()` reusing literal id `"b"` for the merchant rolls identical stock every leg/run.
+   Doug chose the global fix deliberately: this also varies foe/encounter/loot rolls per leg, not just
+   merchant stock, since ALL of those currently route through the same `Seed(nodeId)`.
+   **Fix shape:** `Campaign` already tracks `_legIndex` (`Campaign.cs:23`, exposed via `LegIndex`) but
+   never passes it down — `NewLeg()` (`Campaign.cs:53-54`) constructs each `Expedition` with no leg
+   identity at all. Thread it through: add an `int leg = 0` param to `Expedition`'s constructor
+   (default preserves every existing single-leg caller — `Sessions.cs`, `Forge.cs`, tests — byte-
+   identical), store it, and mix it into `Seed(string nodeId)` (e.g. XOR the leg into the FNV-1a seed
+   or fold `(ulong)leg` into the hash before the id chars) so **same node + same leg ⇒ same rolls
+   (within-leg reproducibility preserved), different leg ⇒ different rolls.** `Campaign.NewLeg()` passes
+   `_legIndex` through.
+   **Tests:** `MerchantNodeBRollsIdenticalStockAcrossIndependentLegs` currently PINS the buggy sameness
+   — it must FLIP to assert stock DIFFERS across two `Campaign` legs at the same node id (construct via
+   `Campaign`, not two bare `Expedition`s, so the leg index actually varies). Re-verify no OTHER seeded-
+   content test (foe rolls, loot rolls, heal price) is accidentally leg-0-only and silently still passes
+   for the wrong reason — grep test usages of `Seed(` reasoning before assuming only the merchant tests
+   need touching.
+2. **Conclave keystone (`Paths.BoundConclave`) — Doug: leave it granting no minion, explicitly ACCEPTED
+   as a placeholder, not an oversight.** No code change. Removed from Needs-Human below — this is
+   resolved, not deferred-and-forgotten; revisit only if Doug raises it again.
+3. **Figure/worn-armor composition (§17 #15) — Doug: adopt CD's shipped convention as the locked model.**
+   No true morph; the existing per-(race,core) body figure IS the base, worn-armor parts are a flat
+   per-(race,slot,line,tier,condition) overlay on top — `DESIGN_SPEC.md` #15 updated to RESOLVED with
+   the full ruling. **This unblocks real engine work, no longer a design question:** `WornArmorBinding.
+   SpriteKeys` already resolves the right keys (optional `theme` param leads the themed candidate before
+   generic/bare, per the CHUNK B partial note) but isn't wired into `Game1`'s actual figure draw/compose
+   path (STATUS.md Debt: "Worn-armor DRAW wiring"). Wire it up: `Game1`'s figure compose should call
+   `WornArmorBinding.SpriteKeys` per equipped slot and draw the resolved sprite over the base body
+   figure, in the existing z-list order. This is the item B2-GO's "themed-half draw" was waiting on —
+   now unblocked, take it as its own CHUNK item.
+
 ## ✅ RESOLVED (2026-07-06, Doug) — armor-reservation model conflict: POOL model is correct, no engine change
 Doug's ruling, verbatim: **"Armor consumes pool, eradicate incorrect design documentation in that regard."**
 This closes the conflict raised in the pass-10 drop entry below (kept intact underneath for history). The
@@ -29,8 +93,8 @@ correctly next pass. Nothing for the loop to build here.
 - **B7 (raceCard head stretch)** — confirm-to-close, re-extracted clean, no action.
 - **B4, B10** — confirm-to-close, already correct, no action.
 
-**B19 (bay→minion rename) is FULLY LANDED — the engine literal-rename we deliberately held back can go
-NOW.** Important: it's **not** a uniform find-replace. Two screens, two different outcomes:
+✅ DONE (2026-07-06, loop) — **B19 (bay→minion rename) landed engine-side.** Two screens, two different
+outcomes (as the drop specified — not a uniform find-replace):
 - **Encounter** (combat minion lane): template renamed `minionBay` → **`combatMinionCard`** (NOT
   `minionCard` — that name was already taken by Equipment's own build-minion card; a same-name collision
   would have silently overwritten one with the other, CD caught it and diverged the name on purpose).
@@ -40,9 +104,19 @@ NOW.** Important: it's **not** a uniform find-replace. Two screens, two differen
   `minions.*` binds. It never used "bay" terminology, so B19 didn't touch it. Don't rename it to match
   Encounter; that's a real divergence CD flagged as a minor future-consistency nit, not a bug.
 Engine fix: every `"bay.hotkey"/"bay.state"/"bay.name"/"bay.gateColor"/"bay.cost"/"bay.description"`
-literal in `Game1.ManifestRenderer.cs` (6 call sites, all currently Encounter-only per a quick check) →
-the `minion.*` singular equivalent. No collision risk since Equipment never matched on `"bay.*"` to begin
-with. Add/update the ScreenLayoutTests-style headless coverage this pass added for other renames.
+literal in `Game1.ManifestRenderer.cs` (7 occurrences, 6 distinct binds) → the `minion.*` singular
+equivalent, plus the 3 sibling summary binds the drop's note also renamed: `"core.bays"` →
+`"core.minionCap"`, `"preview.bays"` → `"preview.minionCap"`, `"loadout.bays"` → `"loadout.minions"`
+(found by cross-checking `layout.json`'s actual bind literals, not just the 6 call sites named in the
+drop note — those 3 would have silently kept resolving to nothing otherwise). No collision risk since
+Equipment never matched on `"bay.*"` to begin with. **No new Core.Tests pinning added**: `LayoutManifestTests`'s
+own header rule (and the project's DoD) is explicit that these tests must assert the manifest SCHEMA,
+never CD's literal bind names, so a bind rename can't redden them — adding a test that pins
+`"core.minionCap"` would violate that on the next rename. Verified per the established Game-layer
+precedent instead (rebuild + `RB_SMOKE` screenshot, not an xunit test): `RB_CHASSIS=3` (Summoner, has a
+starting minion kit) encounter drive resolved=20/29, equipment resolved=22/34 — byte-identical to the
+pre-rename baseline counts and unresolved sets (all still state-gated, none newly broken by the rename).
+Build clean 0 errors/warnings, Core tests 443/443 green (no Core change).
 
 **‼ REAL DESIGN CONFLICT SURFACED — needs Doug, not a unilateral engine fix either way.**
 `CD_STATUS.md` #34 ("Deterministic per-core gear + reservation model") states the INTENDED model as:
@@ -888,10 +962,11 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
   the coreEffect identity block; the `--update` eyeball itself still just waits on A+C.
 - Standing design calls parked earlier: the free minion re-enable primitive (§8/§9 FTL-parity lock's
   second half — re-arm SCOPE itself is now locked, see DESIGN_SPEC §7); mid-run rune-bag Climb → Body
-  reapply path (§11/§12); worn-armor DRAW composition (§17 #15) — B2-GO themed-half draw waits on it.
-- **Conclave keystone (`Paths.BoundConclave`) grants no minion** (2026-07-06, loop): it used to hand
-  out the now-deleted `Minions.Shade`. Needs a real replacement minion or a redesigned reward — the
-  loop won't guess which.
+  reapply path (§11/§12).
+- ~~Conclave keystone grants no minion~~ RESOLVED 2026-07-06 (Doug): explicitly accepted as-is, see the
+  HIGH PRIORITY banner above.
+- ~~Worn-armor DRAW composition (§17 #15)~~ RESOLVED 2026-07-06 (Doug): no longer a design question, now
+  an engine directive — see the HIGH PRIORITY banner above.
 
 ## Debt (active)
 - Worn-armor DRAW wiring: `WornArmorBinding` resolves keys (all races after CHUNK B) but isn't wired
@@ -960,3 +1035,30 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
 ## Backlog (not prioritized; don't pull ahead)
 - String/i18n externalization posture (route strings through content/binds; no hardcoding growth).
 - Race↔core restriction matrix (POC allows all 35). Campaign graph model (§12 Layer 1) + city roster.
+- **Loot (2026-07-06, Doug)** — richer post-encounter rewards. Current state: `Expedition.Spoils
+  (NodeType)` already grants a FIXED gold amount per node type on `BattleOutcome.Cleared`
+  (`Expedition.cs` ~line 103/384) — everything below is new scope on top of that, not a fix.
+  - Every encounter: gold amount becomes RANDOM (not the current fixed-per-type value) — needs a
+    range/distribution per node type, not specified yet.
+  - Low-probability equipment / technique / rune drop.
+  - Somewhat-better-than-that chance of a Supplies drop — "fairly frequent."
+  - Good chance of a Summons drop, but rarer than Supplies.
+  **Needs human before build:** exact probabilities/ranges for all four tiers (gold range per node
+  type, and the relative odds of drop / supplies / summons — Doug gave an ORDERING — rare drop <
+  frequent supplies, summons good-but-less-than-supplies — not numbers). Don't invent percentages;
+  surface for Doug's numbers when this is picked up, per CLAUDE.md's no-undesigned-mechanics rule.
+- **Quests (2026-07-06, Doug)** — a new non-combat narrated-interaction system. No existing code or
+  design doc coverage; this is a genuinely new content type, not an extension of anything built.
+  - Narrates an interaction besides combat (a new node/encounter TYPE, presumably — exact trigger/
+    placement on the map undecided).
+  - Can award any loot (gold/equipment/technique/rune/supplies/summons) in thematically appropriate
+    ways — rides the same reward vocabulary as Loot above, so design these two together.
+  - Can have negative consequences: sometimes negative alone, sometimes paired with a positive (a
+    mixed/bittersweet outcome).
+  - Usually two-step: an in-fiction prompt asking whether to attempt the quest BEFORE it resolves
+    (a commit/decline gate), narrated lorefully rather than a bare yes/no.
+  **Needs human before build:** this is a content-authoring system as much as an engine one — quest
+  TEXT/narration, the specific quest catalog, and the trigger/placement model (map node type? random
+  event on travel? merchant-adjacent?) all need actual design content, not invented here. Likely needs
+  its own design pass (Doug + CD) before any Core work starts, same class of gap as Merchant Wares'
+  missing map-tier signal above.

@@ -556,7 +556,7 @@ public partial class Game1
         // bar's real capacity, not the starting kit size (2026-07-06 loop: was Kit.Count, undersized
         // on the 5/7 cores where a rune-granted technique has room the kit alone doesn't show).
         "preview.techniques" => _build.CoreRune.ActionSlots.ToString(),
-        "preview.bays" => _build.CoreRune.MinionCap.ToString(),
+        "preview.minionCap" => _build.CoreRune.MinionCap.ToString(),
         "preview.coreEffectName" => _build.CoreRune.CoreEffectName,
         // *.coreEffect is the BLOCK container (border chrome; label/name/desc are their own
         // elements/parts) — resolving it to the desc painted the copy TWICE (the doubled-text P0).
@@ -859,7 +859,7 @@ public partial class Game1
                 // FSM state parts resolve from the LIVE run — an idle card shows no chip/label at all
                 // (never the sample), so resolve BEFORE chrome and bail when there's nothing to say.
                 string? stateText = null;
-                var isStatePart = pp.Binds is "technique.state" or "bay.state" or "technique.cooldownLabel";
+                var isStatePart = pp.Binds is "technique.state" or "minion.state" or "technique.cooldownLabel";
                 if (isStatePart)
                 {
                     // The card the targeting FSM is picking a foe for reads AIMING / "locking on".
@@ -958,7 +958,7 @@ public partial class Game1
                     // Hotkey chips (design/01, §8): the number IS the card's bar position — techniques
                     // first, then bays continue the sequence (same order the D1..D6 keys press).
                     "technique.hotkey" => (i + 1).ToString(),
-                    "bay.hotkey" => (TechniqueCount() + i + 1).ToString(),
+                    "minion.hotkey" => (TechniqueCount() + i + 1).ToString(),
                     _ => datum is not null ? ResolveBind(datum, pp.Binds) : null,
                 } ?? pp.Sample;
                 if (string.IsNullOrEmpty(text)) continue;
@@ -1098,8 +1098,8 @@ public partial class Game1
         "pool" => AttrBars(),
         "loadout.techniques" => InRun ? Exp.Equipment.Cast<object>().ToList()
                                       : _build.Equipment.Cast<object>().ToList(),
-        "loadout.bays" => InRun ? Exp.Minions.Cast<object>().ToList()
-                                : _build.CoreRune.MinionKit.Cast<object>().ToList(),
+        "loadout.minions" => InRun ? Exp.Minions.Cast<object>().ToList()
+                                    : _build.CoreRune.MinionKit.Cast<object>().ToList(),
         // Shield bar (§6b): one bool per pip, filled first. No standing sources -> no pips at all.
         "ShieldPool.points" => InRun
             ? Enumerable.Range(0, Exp.Player.Body.ShieldLayers)
@@ -1492,7 +1492,7 @@ public partial class Game1
         "core.accent" when datum is Roguebane.Core.CoreRune c =>
             c.Accent is { Length: > 0 } ca ? ca : null,
         "attr.color" when datum is not null => ResolveBind(datum, "attr.color"),
-        "technique.attrColor" or "loadout.attrColor" or "invItems.attrColor" or "bay.gateColor" =>
+        "technique.attrColor" or "loadout.attrColor" or "invItems.attrColor" or "minion.gateColor" =>
             datum switch
             {
                 Roguebane.Core.Technique t => t.Stat.ToString().ToLowerInvariant(),
@@ -1555,7 +1555,7 @@ public partial class Game1
             "core.role" => c.Archetype,
             "core.badge" => c.Badge, // the role chip datum (07-03 drop A1)
             "core.budget" => c.RuneBudget.ToString(),
-            "core.bays" => c.MinionCap.ToString(),
+            "core.minionCap" => c.MinionCap.ToString(),
             "core.actionSlots" => c.ActionSlots.ToString(), // the bar's real capacity (RULES_SNAPSHOT
                                                              // "Actions") -- was Kit.Count, undersized
                                                              // 5 of 7 cores (fixed 2026-07-06)
@@ -1683,12 +1683,12 @@ public partial class Game1
         },
         Roguebane.Core.Minion mn => bind switch
         {
-            "loadout.name" or "invItems.name" or "bay.name" => DisplayName(mn.Id),
+            "loadout.name" or "invItems.name" or "minion.name" => DisplayName(mn.Id),
             "loadout.id" => mn.Id,
             "loadout.attr" => mn.Stat.ToString().ToUpperInvariant() + " " + mn.Reserve,
-            "invItems.badgeLabel" or "bay.cost" => mn.Stat.ToString().ToUpperInvariant(),
+            "invItems.badgeLabel" or "minion.cost" => mn.Stat.ToString().ToUpperInvariant(),
             "invItems.badgeNum" => mn.Reserve.ToString(),
-            "bay.description" => mn.DescText,
+            "minion.description" => mn.DescText,
             _ => null,
         },
         _ => null,
@@ -1737,7 +1737,7 @@ public partial class Game1
             };
         }
         // A fielded minion is ACTIVE by definition (the bays list holds the live retinue in a run).
-        return datum is Roguebane.Core.Minion && bind == "bay.state" ? "ACTIVE" : null;
+        return datum is Roguebane.Core.Minion && bind == "minion.state" ? "ACTIVE" : null;
     }
 
     // Which rung a rune-group row shows: the held rung (or the first) then the next — the pair the
