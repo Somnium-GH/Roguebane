@@ -487,7 +487,17 @@ public sealed class Caster
         // power, from the one hit. No part-vs-HP split, no HP-only-on-overkill path, no flat CON block or
         // plate blunt (shields + full evade are the ONLY mitigations).
         if (part is not null) frame?.Damage(part, power);
-        target.Damage(power);
+
+        // Foe Effect: Insubstantial (FOES.md) is the one designed exception to "same power" above — it
+        // reads the part damage this same hit just applied, so a hit that lands ON the INT part still
+        // deals full HP (that hit is what "breaks" the effect); every other hit is reduced by 1 (min 1)
+        // while the INT part stands whole.
+        var hpPower = power;
+        if (target is Foe { Effect: FoeEffectKind.Insubstantial } && frame is not null &&
+            frame.Damaged(Stat.Int) == 0)
+            hpPower = Math.Max(1, power - 1);
+
+        target.Damage(hpPower);
         return part is not null && !wasBroken && !shielded;
     }
 

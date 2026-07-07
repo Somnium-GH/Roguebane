@@ -44,6 +44,22 @@ public static class Foes
         return new Foe(id, hp, frame, new[] { Armory.Swing }, figure, aim);
     }
 
+    // CHUNK D item 1's last piece (STATUS.md, §8 symmetry): the first FOES.md roster foe with a real
+    // Foe Effect wired, not just gear. FOES.md T1 Wraith: no weapon, no armor — its INT part (not an
+    // arm) powers Ember, and Insubstantial (Caster.Hit) reads that same part live, so smashing it both
+    // silences Ember (the shared DisabledGear-style reserve cascade) AND permanently breaks the
+    // damage-reduction — one part, two designed consequences, no bespoke foe-only bookkeeping.
+    public static Foe Wraith(string id, int hp = 10, int headInt = 4, string figure = "wraith",
+        FoeAim aim = FoeAim.Random)
+    {
+        var frame = new Body();
+        frame.Add(new BodyPart($"{id}-arm", Stat.Str, 1));
+        frame.Add(new BodyPart($"{id}-head", Stat.Int, headInt)); // Parts[1]: powers Ember, gates Insubstantial
+        frame.Add(new BodyPart($"{id}-legs", Stat.Dex, 2));
+        frame.Add(new BodyPart($"{id}-chest", Stat.Con, 2));
+        return new Foe(id, hp, frame, new[] { Techniques.Ember }, figure, aim, FoeEffectKind.Insubstantial);
+    }
+
     // The castle boss's heavier strike: a real timered attack (STR arm), harder + faster than a raider's.
     private static readonly Technique BossStrike =
         new("boss-strike", Stat.Str, Reserve: 1, TechniqueKind.Timered, Cooldown: 25, Power: 3);

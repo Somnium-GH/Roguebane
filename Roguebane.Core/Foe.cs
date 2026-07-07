@@ -25,8 +25,11 @@ public sealed class Foe : ICombatTarget
     // Which player limb this foe goes for (§8 personality, data). Inert/unaimed foes default RANDOM.
     public FoeAim Aim { get; }
 
+    // The foe's ONE Foe Effect (FOES.md design rule), data-only — Caster.Hit is the one interpreter.
+    public FoeEffectKind Effect { get; }
+
     public Foe(string id, int hp, Body? frame = null, IReadOnlyList<Technique>? arsenal = null,
-        string figure = "ogre", FoeAim aim = FoeAim.Random)
+        string figure = "ogre", FoeAim aim = FoeAim.Random, FoeEffectKind effect = FoeEffectKind.None)
     {
         Id = id;
         MaxHp = hp;
@@ -35,6 +38,7 @@ public sealed class Foe : ICombatTarget
         Arsenal = arsenal ?? Array.Empty<Technique>();
         Figure = figure;
         Aim = aim;
+        Effect = effect;
     }
 
     public bool Down => Hp <= 0;

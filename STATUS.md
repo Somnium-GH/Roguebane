@@ -1075,14 +1075,30 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
      a piece, discount the requirement) — that's a spreadsheet call. Building the actual `Foes.DireOgre`
      content (item 2) is blocked on this reconciling; the armor-consult PROOF above sidesteps it
      entirely (no weapon on the test fixture) so it isn't blocked by it.
-   - **Still open in item 1**: the **Foe Effects DATA + interpreter** (a real design/engine slice on its
-     own, not started). Items 2–4 (full 6-foe roster, encounter-table wiring, DoD economy asserts) stay
-     open, unblocked by this slice — item 2's Dire Ogre entry additionally needs the STR-budget note above
-     reconciled first.
+   - ◐ PARTIAL (2026-07-07, loop) — **item 1 CLOSED: Foe Effects DATA + interpreter proven, first
+     roster foe built.** New `FoeEffectKind` (`Roguebane.Core/FoeEffect.cs`) mirrors `CoreEffectKind`'s
+     pattern (data enum, one interpreter site) — only `Insubstantial` is wired (FOES.md design rules:
+     "one effect per foe," build what's used, not the whole vocabulary ahead of content). `Foe` gained
+     an `Effect` property (default `None`, zero impact on existing foes). Interpreter site: `Caster.Hit`
+     — the ONE place §8's "same power" hit resolution lives — reads `target.Frame.Damaged(Stat.Int)`
+     (the same live-recompute Body already uses for `ArmorSustained`/`DisabledGear`, no new bookkeeping)
+     and shaves 1 (min 1) off the HP-only half of a landed hit while the INT part stands whole; the hit
+     that damages the INT part itself still lands full HP, matching FOES.md's "breaks with the first
+     head part-damage." Added `Foes.Wraith` (`Content/Foes.cs`) at FOES.md's T1 spec (HP 10, parts
+     1/4/2/2, no weapon/armor, Ember arsenal, Insubstantial) — the roster's simplest foe, chosen because
+     it needed nothing else built first. New `WraithInsubstantialTests.cs` (3 tests): a hit elsewhere
+     lands power-1 while the head's whole; the hit that breaks the head lands in full; once broken,
+     later hits elsewhere also land in full. Full `Core.Tests` green (463/463).
+   - **Item 1 is now fully closed.** Items 2–4 stay open: item 2's remaining five foes (Skeleton/
+     Bandit/Ogre-T2/Troll/Gargoyle, each needing its own Foe Effect wired the same way) plus item 2's
+     Dire Ogre entry specifically still needs the STR-budget note above reconciled first; items 3–4
+     (encounter-table wiring, DoD economy asserts) unblocked but not started.
 2. Content: the six built foes at FOES.md's T1/T2 specs (Skeleton/Bandit/Wraith/Ogre/Troll/Gargoyle,
    Dire variants, effects incl. *Brittle*/*Plunder*/*Insubstantial*/*Overwhelm*/*Regenerative Flesh*/
    *Stoneform*). Numbers are Cowork placeholder-blessed — build them, flag them, Doug tunes. Castle
    keeps its current proven shape (reconcile onto the model, don't retune in the same pass).
+   **Wraith T1 done** (item 1 above, `Foes.Wraith` + Insubstantial) — the other five T1s, all Dire
+   variants, and their five remaining Foe Effects stay open.
 3. Encounter tables: keep today's node→foe mapping shape (`Maps.cs`/`Sieges.cs`) but pull from the new
    roster (skirmish = T1 pool, resource-hold = tougher T1/T2, castle unchanged). Which-foe-where stays
    design-open — use a seeded pick over the T1 pool, FLAGGED.
