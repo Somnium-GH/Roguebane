@@ -1195,9 +1195,28 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
    seeds hit both pool entries; resource-hold picks the same pool slot as skirmish at higher HP for a
    shared seed; `Maps.EncounterFor` itself routes Skirmish/ResourceHold through the pool; Castle stays
    the fixed boss. Full `Core.Tests` green (479/479), full solution build clean (0 errors/warnings).
-4. DoD: headless economy asserts per foe (kill-time vs player T1 kit inside FOES.md's envelope; foe DPS
-   inside the band; arm-break actually cascades the arsenal off); campaign still winnable for all 35
-   combos; **everything in FOES.md's IDEAS section stays unbuilt** (it's marked, believe it).
+4. ✅ DONE (2026-07-07, loop) — **DoD economy asserts, for the two roster foes built so far.** Investigated
+   coverage first: "campaign still winnable for all 35 combos" was ALREADY proven by the pre-existing
+   `CoreCampaignTests.EveryRaceAndCoreWinsTheCampaignWithPartAimPlay` (now running through this same T1
+   pool since item 3) — noted here, not re-built. Generic arm-break-cascades-the-arsenal-off was already
+   covered (`FoeOffenseTests`, synthetic fixture) and Ogre's specifically (`FoeGearTests`); Wraith's own
+   cascade (head-break silences Ember, the Reserve-shedding mechanic `Technique.cs` documents) was NOT
+   covered — closed that gap. New `FoeEconomyTests.cs` (7 tests, headless, `Battle`/bystander-`Fighter`
+   pattern matching `FoeGearTests`): HP-in-band for both foes; measured DPS-in-band for Wraith (Ember,
+   ~0.345, inside FOES.md's T1 0.2-0.4); Wraith head-break silences Ember exactly like a player's broken
+   part silences a spell; kill-time-vs-a-representative-T1-player-kit (HP 20, DPS pinned at the band's
+   0.556 midpoint) falls inside the HP/DPS-band-implied envelope for both foes.
+   - ⚠️ NEEDS DOUG (found 2026-07-07, loop, while asserting the DPS band) — **Ogre's Swing (Iron Mace)
+     measures ~0.595 DPS, outside FOES.md's own stated T1 band (0.2-0.4) and its inline "~0.35 DPS"
+     claim** — it lands inside T2's band (0.4-0.6) instead. Traced to the item-1 weapon-consult wiring
+     (`chunkd-ogre-weapon-consult-gear-wiring`): Iron Mace's Power(5)/`Swing`'s base Cooldown(80 ticks)
+     compose to a harder hit than FOES.md's own T1 offense framing ("1-2 dmg per hit") describes. Not
+     silently retuned — same class of call as the Dire Ogre STR-budget and Skeleton Jab/Dagger notes
+     above (which weapon tier/Power a T1 Ogre should wield, or Swing's own cooldown, is a spreadsheet
+     call). `OgresSwingDpsIsPinnedAboveFoesMdsT1BandNeedsDougReview` regression-pins the CURRENT value so
+     a future retune is deliberate, not silent drift.
+   - **Everything in FOES.md's IDEAS section stays unbuilt** (it's marked, believe it) — nothing in this
+     pass touched it. Full `Core.Tests` green (486/486).
 
 ### Then: the standing bug queue (loop-actionable, in order)
 - **Engine: recursive `parent`-box resolution — ✅ DONE, this bullet was stale (2026-07-06, loop).**
