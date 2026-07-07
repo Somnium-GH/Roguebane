@@ -7,8 +7,16 @@ the Frenzy/Flurry two-badge split) all present in `icons/technique/`; **B21 auth
 re-anchor — 160 `parent` keys now in `layout.json`). Both now have only ENGINE/OUR residual (dual-pool
 draw; recursive parent-box resolve), tracked in STATUS, no longer CD asks. Also verified LANDED this
 pass: **B13/B14** (both list-container sizing fixes — see Confirm-to-close). Still OPEN for CD: B18's
-Parry/Steel/Suture + Iron Golem/Hound icons, B20 re-extraction, **B22 (NEW — merchant sale-card art,
-no rush)**, and the rest of the B-series below.
+Parry/Steel/Suture + Iron Golem/Hound icons, B20 re-extraction, **B22 (merchant sale-card art, no
+rush)**, **B26 (NEW — correct your `CD_STATUS.md` #34 armor-reservation text, Doug's ruling: pool
+model, armor DOES reserve)**, and the rest of the B-series below.
+
+**‼ RECONCILED against pass 10 (2026-07-06):** B19 (bay→minion rename) landed clean, confirmed via
+`DROP_AUDIT.md` — Encounter's combat-minion template correctly diverged to `combatMinionCard` rather
+than colliding with Equipment's existing `minionCard`. That divergence was your judgment call, not a
+mistake; whether Doug wants it unified into one shared template is pending his answer — a follow-up
+ask will land here if he says unify, otherwise this closes as shipped. B7/B4/B10/B24/B25/B23 all
+confirm-to-close per that same drop.
 
 **‼ RECONCILED against the 2026-07-05 v6/roster drop (Cowork):** figures for **5 races × 7 cores**
 (dwarf + halfling as asked, PLUS half_giant + barbarian unasked — both adopted: Half-Giant is now a
@@ -371,6 +379,17 @@ B23. **Equipment tab buttons (`invTab`) too narrow for two of their three labels
     the 3 tabs actually fill their container width evenly — e.g. something near `(403-2*4)/3 ≈ 131px`
     each — and widen the label rect enough that "TECHNIQUES" doesn't need heavy shrinking at the
     authored font size. Pure `layout.json` geometry, no new binds/states/engine hooks needed.
+
+B26. **CORRECTION — `CD_STATUS.md` #34 has the armor-reservation model backwards; please fix your own
+    tracking entry.** #34 states the intended model as "armor is threshold-gated only (no pool pips);
+    only weapons + the shield OBJECT reserve pool points." **That's not the design.** Doug's explicit
+    ruling (2026-07-06): **"Armor consumes pool, eradicate incorrect design documentation in that
+    regard."** The correct model — already locked in our `DESIGN_SPEC.md` SUSTAIN MODEL paragraph and
+    already how `Body.cs` behaves today — is the **POOL model**: worn armor is a standing reservation
+    against the shared per-stat pool, exactly like an active technique or a wielded weapon. A full plate
+    kit CAN visibly crowd out a technique activation on the same stat; it is not merely a one-time equip
+    threshold. No engine or DESIGN_SPEC change needed on our side (already correct) — this ask is just
+    for your #34 entry to stop stating the opposite, so future asks/QA built off it don't drift.
 
 ## Standing FYIs (for context — not action items)
 - **Tier ladders for the new families** (for card copy / labels): Sling Shepherd's → Braided →

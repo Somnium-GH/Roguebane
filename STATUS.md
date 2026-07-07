@@ -1,5 +1,17 @@
 # Status
 
+## ✅ RESOLVED (2026-07-06, Doug) — armor-reservation model conflict: POOL model is correct, no engine change
+Doug's ruling, verbatim: **"Armor consumes pool, eradicate incorrect design documentation in that regard."**
+This closes the conflict raised in the pass-10 drop entry below (kept intact underneath for history). The
+**POOL model — worn armor is a standing reservation against the shared per-stat pool, same as an active
+technique — is canon.** `Body.cs` (`EffectiveArmor(piece).Requirement` feeding `DisabledGear`/`GearReserved`)
+and `DESIGN_SPEC.md`'s SUSTAIN MODEL paragraph (§7, "worn/wielded gear AND active techniques all draw on
+the SAME live pool") already state/implement this correctly — verified fresh, no drift, **no code or
+DESIGN_SPEC change needed.** The WRONG doc is CD's own `design/dchtml/CD_STATUS.md` #34 ("armor is
+threshold-gated only, no pool pips"), which is CD-authored/ships-with-every-drop, not ours to hand-edit —
+correction relayed to CD via `outputs/CLAUDE_DESIGN_issues.md` (new **B26**) so their own tracking reads
+correctly next pass. Nothing for the loop to build here.
+
 ## ⇒ CD DROP LANDED — pass 10, 2026-07-06 (`design/dchtml/DROP_AUDIT.md` + `CD_STATUS.md`) — examined in
 ## full. THREE of our own HIFI bugs are CLOSED content-side; ONE rename can finally proceed; ONE real
 ## design conflict surfaced that needs Doug's call, not ours to silently resolve.
