@@ -387,6 +387,22 @@ B26. **CORRECTION — `CD_STATUS.md` #34 has the armor-reservation model backwar
     threshold. No engine or DESIGN_SPEC change needed on our side (already correct) — this ask is just
     for your #34 entry to stop stating the opposite, so future asks/QA built off it don't drift.
 
+B27. **`CD_STATUS.md` #33 double-check result: the "minion column collapses at 0 minion-cap, width
+    scales with count" reflow does NOT exist — confirmed by live render, not just reading the
+    schema.** Verified against both live-0-minion-cap cores (Adept, Reaver): `equipment` screen's
+    `minionColumn` (`layout.json:7215`, `parent: "actionBar"`) is a fixed `size:[170,99]` panel —
+    no conditional-visibility or data-driven-width field exists anywhere in the `Element`/`Item`
+    schema, so there is nothing for our renderer to key off even if we wanted to collapse/scale it.
+    At MinionCap 0 the column still renders full-width with its left border and a correct
+    `"MINIONS - 0 / 0 slotted"` label, just with an empty list body (`buildMinions`, no cards) —
+    confirmed via `RB_SMOKE`, no crash, no wrong data, just an always-full-width empty box. This is
+    the SAME class of finding as B23/the tab-row dead-space ask: pure authored geometry, no missing
+    engine hook. Ask: if you want the column to shrink at 0 cap or scale with `minions.slotLabel`'s
+    live count, that needs either (a) a new conditional-width/hide-when-empty field on `Element`, or
+    (b) us being told which cap tiers should map to which pixel widths so it can be threshold-authored
+    per screen state — your call on which. Not blocking (data is correct either way); low urgency,
+    cosmetic only.
+
 ## Standing FYIs (for context — not action items)
 - **Tier ladders for the new families** (for card copy / labels): Sling Shepherd's → Braided →
   Sinew → Giantsbane · Staff Wooden → Twisted → Ornate → Humming · Charm Wooden → Bone → Ornate →
