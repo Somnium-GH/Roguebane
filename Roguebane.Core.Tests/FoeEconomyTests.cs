@@ -2,8 +2,8 @@ using Roguebane.Core.Content;
 
 namespace Roguebane.Core.Tests;
 
-// CHUNK D item 4 (STATUS.md DoD): headless economy asserts per built roster foe (Wraith, Ogre --
-// the only two with real gear/effects wired so far; grows as Skeleton/Gargoyle/Troll/Bandit clear
+// CHUNK D item 4 (STATUS.md DoD): headless economy asserts per built roster foe (Wraith, Ogre, Troll,
+// Gargoyle -- the four with real gear/effects wired so far; grows further as Skeleton/Bandit clear
 // their Needs-Doug authoring blocks, same growing-fixture pattern as EncounterTableRosterTests).
 // FOES.md's "Balance envelope" section is the spec under test: T1 foe HP 8-16, offense 0.2-0.4 DPS;
 // player T1 kit HP 20, DPS 0.4-0.7. "Campaign still winnable for all 35 combos" is already proven
@@ -37,6 +37,18 @@ public class FoeEconomyTests
     }
 
     [Fact]
+    public void TrollHpFallsInsideFoesMdsT1Band()
+    {
+        Assert.InRange(Foes.Troll("t").MaxHp, 8, 16);
+    }
+
+    [Fact]
+    public void GargoyleHpFallsInsideFoesMdsT1Band()
+    {
+        Assert.InRange(Foes.Gargoyle("g").MaxHp, 8, 16);
+    }
+
+    [Fact]
     public void WraithsEmberDpsFallsInsideFoesMdsT1OffenseBand()
     {
         // FOES.md: "T1 foe ... offense 0.2-0.4 DPS (1-2 dmg per 4-6 s)" -- Ember (1 dmg/~2.9s haste'd) lands here.
@@ -54,6 +66,26 @@ public class FoeEconomyTests
         // call, flagged in STATUS.md) -- this pins the CURRENT measured value as a regression guard so
         // a future change is deliberate, not a silent drift.
         Assert.InRange(MeasuredDps(Foes.Ogre("o")), 0.55, 0.65);
+    }
+
+    [Fact]
+    public void TrollsSwingDpsIsPinnedFractionallyAboveFoesMdsT1BandNeedsDougReview()
+    {
+        // FOES.md's T1 band is 0.2-0.4 DPS; Iron Axe Power(3)/Swing's base Cooldown(80 ticks) haste'd by
+        // the Troll's own DEX-2 legs measures ~0.43 here -- just over the stated ceiling, same class of
+        // spec/engine mismatch as Ogre's Iron Mace note above (not silently retuned; Doug's spreadsheet
+        // call). Pins the CURRENT measured value as a regression guard so a future change is deliberate.
+        Assert.InRange(MeasuredDps(Foes.Troll("t")), 0.4, 0.46);
+    }
+
+    [Fact]
+    public void GargoylesJabDpsIsPinnedInsideFoesMdsT2BandNotItsOwnT1NeedsDougReview()
+    {
+        // FOES.md's T1 band is 0.2-0.4 DPS; Jab's half-power hit off the wielded Iron Axe, haste'd by
+        // the Gargoyle's own DEX-1 legs, measures ~0.567 here -- inside T2's 0.4-0.6 band instead, the
+        // same mismatch shape as Ogre's Iron Mace note above (not silently retuned; Doug's spreadsheet
+        // call). Pins the CURRENT measured value as a regression guard so a future change is deliberate.
+        Assert.InRange(MeasuredDps(Foes.Gargoyle("g")), 0.53, 0.6);
     }
 
     [Fact]

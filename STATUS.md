@@ -1251,6 +1251,24 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
      a future retune is deliberate, not silent drift.
    - **Everything in FOES.md's IDEAS section stays unbuilt** (it's marked, believe it) — nothing in this
      pass touched it. Full `Core.Tests` green (486/486).
+   - **Extended (2026-07-07, loop) to Troll and Gargoyle** now that both cleared their own Needs-Doug
+     authoring blocks (item 2, this chunk) — `FoeEconomyTests.cs`'s own comment promised this growth.
+     Added: HP-in-band for both (16 and 12, both inside FOES.md's T1 8-16). Measured DPS surfaced TWO
+     more spec/engine mismatches, same class as Ogre's above:
+     - ⚠️ NEEDS DOUG — **Troll's Swing (Iron Axe) measures ~0.43 DPS**, fractionally over FOES.md's own
+       T1 ceiling (0.4). Iron Axe Power(3)/`Swing`'s base Cooldown(80 ticks) haste'd by the Troll's own
+       DEX-2 legs composes just past the stated band, not a dramatic miss like Ogre's but still outside
+       it. `TrollsSwingDpsIsPinnedFractionallyAboveFoesMdsT1BandNeedsDougReview` regression-pins the
+       current value.
+     - ⚠️ NEEDS DOUG — **Gargoyle's Jab (half the wielded Iron Axe's power) measures ~0.567 DPS**,
+       outside its own T1 band (0.2-0.4) and landing inside T2's (0.4-0.6) instead — the same mismatch
+       shape as Ogre's. `GargoylesJabDpsIsPinnedInsideFoesMdsT2BandNotItsOwnT1NeedsDougReview`
+       regression-pins the current value. Neither retuned silently — which weapon tier/Power/Cooldown a
+       T1 foe should carry is Doug's spreadsheet call, same as the other DPS-band notes in this chunk.
+     Kill-time-vs-a-representative-T1-player-kit was NOT extended to Troll/Gargoyle this pass (Wraith/
+     Ogre's coverage already proves the pattern works; adding two more foes whose own DPS is already
+     flagged out-of-band would just restate the same finding through a slower assertion — diminishing
+     return, not a coverage gap). Full `Core.Tests` green (498/498).
 
 ### Then: the standing bug queue (loop-actionable, in order)
 - **Engine: recursive `parent`-box resolution — ✅ DONE, this bullet was stale (2026-07-06, loop).**
