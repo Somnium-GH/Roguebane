@@ -32,3 +32,4 @@ date,task,minutes,lines_changed,estimate_minutes,method
 2026-07-07,expedition-seed-leg-index-merchant-fix,25,65,-,commit-delta
 2026-07-07,wornarmor-draw-wiring-figure-compose,30,48,-,commit-delta
 2026-07-07,chunkb-item3-worn-armor-smoke-probe,20,50,-,commit-delta
+2026-07-07,technique-badge-effective-reserve-accessor,25,51,-,commit-delta
