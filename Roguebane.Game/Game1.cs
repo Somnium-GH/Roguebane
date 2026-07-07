@@ -1302,6 +1302,12 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                 ptex = _assets.Texture(fb);
             }
             Sprite(ptex, SX(r[0]), SY(r[1]), (int)(r[2] * f), (int)(r[3] * f), color);
+            // §17 #15 locked ruling: no true morph — the base body sprite above already carries the
+            // core's silhouette; worn armor is a FLAT overlay on top, keyed by (race, slot, line/tier,
+            // condition), themed line leading when it's the wearer's own core. allowBare gates this to
+            // race_core figures (player + build preview) — foes pass a bare figure key, not a chassis one.
+            if (allowBare && WornArmorSprite(body, p.Part, figureId) is { } armorTex)
+                Sprite(armorTex, SX(r[0]), SY(r[1]), (int)(r[2] * f), (int)(r[3] * f), color);
             // Composed armour indicator for parts with no armoured sprite row (torso/head/boots):
             // ring the part so worn plate is visible (bare-capable parts already show armour via sprite).
             if (allowBare && !FigureBinding.HasBareVariant(p.Part) && FigureBinding.IsArmored(body, p.Part))
@@ -1331,6 +1337,21 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             _spriteBatch.Draw(tex, new Rectangle(gx + off, gy + off, gw, gh), new Color(0, 0, 0, 110));
             Sprite(tex, gx, gy, gw, gh, color);
         }
+    }
+
+    // Resolves the worn-armor overlay for one figure part (null when unarmored, or when no candidate
+    // key has shipped art yet — an optional overlay skips silently, unlike the base body row's mandatory
+    // gap box). figureId is race_core (FigureKey); the core token doubles as WornArmorBinding's theme.
+    private Texture2D? WornArmorSprite(Body body, string part, string figureId)
+    {
+        var stat = FigureBinding.StatOf(part);
+        if (stat is not { } s || body.ArmorOn(s) is not { } worn || !body.ArmorSustained(worn)) return null;
+        var cut = figureId.LastIndexOf('_');
+        var race = cut < 0 ? figureId : figureId[..cut];
+        var theme = cut < 0 ? null : figureId[(cut + 1)..];
+        foreach (var key in WornArmorBinding.SpriteKeys(body, part, race, theme))
+            if (_assets.Texture(key) is { } tex) return tex;
+        return null;
     }
 
     // Legacy fallback (manifest missing): the old stat-offset composite with composed gear markers.

@@ -40,16 +40,24 @@ signature untouched, no Game rebuild needed.
 2. **Conclave keystone (`Paths.BoundConclave`) — Doug: leave it granting no minion, explicitly ACCEPTED
    as a placeholder, not an oversight.** No code change. Removed from Needs-Human below — this is
    resolved, not deferred-and-forgotten; revisit only if Doug raises it again.
-3. **Figure/worn-armor composition (§17 #15) — Doug: adopt CD's shipped convention as the locked model.**
-   No true morph; the existing per-(race,core) body figure IS the base, worn-armor parts are a flat
-   per-(race,slot,line,tier,condition) overlay on top — `DESIGN_SPEC.md` #15 updated to RESOLVED with
-   the full ruling. **This unblocks real engine work, no longer a design question:** `WornArmorBinding.
-   SpriteKeys` already resolves the right keys (optional `theme` param leads the themed candidate before
-   generic/bare, per the CHUNK B partial note) but isn't wired into `Game1`'s actual figure draw/compose
-   path (STATUS.md Debt: "Worn-armor DRAW wiring"). Wire it up: `Game1`'s figure compose should call
-   `WornArmorBinding.SpriteKeys` per equipped slot and draw the resolved sprite over the base body
-   figure, in the existing z-list order. This is the item B2-GO's "themed-half draw" was waiting on —
-   now unblocked, take it as its own CHUNK item.
+3. **✅ FIXED (2026-07-07, loop) — Figure/worn-armor composition (§17 #15) DRAW wiring.**
+   `WornArmorBinding.SpriteKeys` had zero callers in the Game layer despite being fully unit-tested.
+   Added `Game1.WornArmorSprite(Body, string part, string figureId)` (next to `DrawHumanoid`): resolves
+   the part's stat slot, checks the body actually has sustained armor there, splits `figureId` on its
+   LAST underscore (`half_giant` itself contains one, so `LastIndexOf('_')` — not `IndexOf`) into
+   race/theme, and returns the first candidate texture `WornArmorBinding.SpriteKeys` offers (themed →
+   generic → bare, healthy-fallback each). Wired into `DrawHumanoid`'s part-compose loop: drawn as a
+   sprite directly over the base body part, gated on `allowBare` — the pre-existing flag that already
+   separates the two race_core chassis call sites (player body, NewGame build-preview) from the foe
+   call site (`allowBare: false`, different figure-key convention entirely; untouched).
+   **Verified:** A/B smoke-shot of the `encounter` screen (Plate chest equipped) — pre-fix the torso
+   renders as the bare Summoner-robe base sprite (uniform purple); post-fix it renders the Plate overlay
+   (grey) over the same base, arms/head unchanged (no gear equipped there) — confirms the overlay draws,
+   confirms it doesn't touch unarmored parts. `crash.log` clean. Core tests 443/443 (Game-layer-only
+   change, untouched by this). `python tools/ui_gate.py` run both pre- and post-fix for comparison: **every
+   number is identical between the two runs** (encounter 77.8%/77.8%, equipment 68.6%/68.7%, all
+   overflow/collision "rose X → Y" lines match exactly) — the gate's current FAILED state is pre-existing
+   and unrelated to this change (see new Debt entry below), not something this fix caused or masked.
 
 ## ✅ RESOLVED (2026-07-06, Doug) — armor-reservation model conflict: POOL model is correct, no engine change
 Doug's ruling, verbatim: **"Armor consumes pool, eradicate incorrect design documentation in that regard."**
@@ -950,8 +958,15 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
   an engine directive — see the HIGH PRIORITY banner above.
 
 ## Debt (active)
-- Worn-armor DRAW wiring: `WornArmorBinding` resolves keys (all races after CHUNK B) but isn't wired
-  into `Game1` figure compose — blocked on the §17 #15 composition call above.
+- **NEEDS HUMAN** — `python tools/ui_gate.py` currently reports GATE FAILED on `main` itself (pre-fix,
+  no local changes): fidelity drops + text-overflow/collision rises across encounter/equipment/citymap/
+  campaignmap/newgame/merchant, plus a near-universal `-3,-3`px shift pattern on failing elements —
+  looks systemic (DPI/font-bake mismatch between this loop's render environment and the checked-in
+  reference PNGs), not a regression from any one change. Not previously logged. Confirmed via direct
+  pre/post A/B (see HIGH PRIORITY #3 above) that the worn-armor DRAW wiring lands with byte-identical
+  gate numbers, so this isn't from that change — but it means the gate can't currently gate anything
+  truthfully until a human re-baselines or root-causes the shift. Needs Doug's call before any redo of
+  the reference captures (measurement is sacred — not ours to silently re-baseline).
 - Bow not mounted on figures (back-mount layer = B2-GO art + §17 #22 assumed-not-drawn).
 - Flat `sprites/char/chassis/*` legacy dir + mgcb entries — retire when cards compose from parts.
 - Gradient fills: vertical/horizontal only. Minion `AltCost` summon un-costed placeholder.
