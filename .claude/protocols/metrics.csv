@@ -27,3 +27,4 @@ date,task,minutes,lines_changed,estimate_minutes,method
 2026-07-06,chunkc-item2-coreaccent-palette-tokens,30,57,-,commit-delta
 2026-07-06,chunkc-item3-corestats-basehp-bind-gap,35,33,-,commit-delta
 2026-07-06,chunkc-item4-percore-report-lanes-plus-chassis-fix,50,60,-,commit-delta
+2026-07-06,b19-bay-to-minion-engine-rename,40,142,-,commit-delta
