@@ -36,3 +36,4 @@ date,task,minutes,lines_changed,estimate_minutes,method
 2026-07-07,barbarian-coreeffect-cutoff-rootcause-dedup,15,9,-,commit-delta
 2026-07-07,shield-reequip-reservation-retest-confirm,20,38,-,commit-delta
 2026-07-07,frenzy-flurry-dualpool-reservation-fix,35,78,-,commit-delta
+2026-07-07,cd30-pulse-glow-engine-draw,40,177,-,commit-delta
