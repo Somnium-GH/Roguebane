@@ -802,6 +802,15 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
   `Roguebane.Game` clean rebuild (`--no-incremental`) 0 errors.
 - Barbarian's CORE EFFECT card text visually cuts off (Warlord's Might string vs box size, likely) —
   seen in a screenshot pass, not yet root-caused. Cosmetic, one card, not blocking.
+- **⇒ FIXED (2026-07-06, loop):** multi-word content ids showed with a literal underscore on cards —
+  `"iron_golem"` rendered as `"Iron_golem"` (caught live in a merchant-stall smoke screenshot this
+  session; `"aimed_shot"`'s technique-facing DisplayName reads had the same defect). Root cause:
+  `Game1.ManifestRenderer.DisplayName(id)` only capitalised the id's first character, never touched
+  underscores. Fixed to split on `_`, capitalise each word, and rejoin with spaces — `"Iron Golem"`,
+  `"Aimed Shot"`. Verified via clean `dotnet build Roguebane.Game --no-incremental` (0 errors) + a
+  `RB_SMOKE=1 RB_SCREEN=citymap RB_MF=merchant RB_SHOT=...` screenshot confirming the Iron Golem ware
+  card now reads correctly. Game-side only (no Game.Tests project exists) — Core.Tests unaffected,
+  441/441 green.
 
 ## Asset gaps (Needs Claude Design) — see outputs/CLAUDE_DESIGN_issues.md for the payload versions
 - B20 (NEW): re-extraction for the per-core refs (stat-bonus chips, action-card rules text, minions

@@ -1690,9 +1690,12 @@ public partial class Game1
         _ => null,
     };
 
-    // Content ids are lower-case ("swing", "skeleton"); cards show them capitalised, per design/02.
-    private static string DisplayName(string id) =>
-        id.Length == 0 ? id : char.ToUpperInvariant(id[0]) + id[1..];
+    // Content ids are lower-case, underscore-separated for multi-word ones ("swing", "iron_golem");
+    // cards show them capitalised with underscores as spaces, per design/02 (bug: "iron_golem" was
+    // rendering as literal "Iron_golem" on the merchant wares card — only the id's first char was
+    // ever capitalised, the underscore never touched).
+    private static string DisplayName(string id) => string.Join(" ", id.Split('_')
+        .Select(w => w.Length == 0 ? w : char.ToUpperInvariant(w[0]) + w[1..]));
 
     // A core's starting weapons, joined "+" (matches the coreCard's one-line WEAPON row); a repeated
     // weapon (Reaver's twin daggers) collapses to "2x Name" instead of listing it twice.
