@@ -1,32 +1,27 @@
 # Status
 
-## ‼ BUG (2026-07-06, Doug) — city map reveals adjacent Skirmish/Quest tiles; only Merchant/ResourceHold/Castle/Camp should ever be knowable before landing
+## ✅ FIXED (2026-07-06, loop) — city map reveals adjacent Skirmish/Quest tiles; only Merchant/ResourceHold/Castle/Camp should ever be knowable before landing
 Doug's ask, verbatim: the map "should basically just make you guess your way through it taking chances
 besides the revealing of merchants and the resource nodes" — Camp (own origin) and Castle (visible afar,
-the objective) are implicitly fine too; everything else (Skirmish today, **Quest** once the Loot/Quests
-backlog above is built) must stay `?` until you actually commit to landing on it, not resolve early just
-because you're standing next to it.
-**Root cause, `CityMap.Sees(MapNode node)` (`CityMap.cs:88-101`):** the switch's catch-all is
-`_ when adjacent => node.Type` (line 98) — this reveals the TRUE type of ANY node the instant it's one
-jump away, which defeats the guess-your-way-through design for Skirmish (and will silently do the same
-for Quest the moment that node type exists, since it's data-driven and would fall through the same
-branch). Only the `Merchant when adjacent` case above it is supposed to resolve early; the generic
-adjacency fallback shouldn't exist at all.
-**Fix:** delete the `_ when adjacent => node.Type` line entirely, so anything that isn't Camp/
-ResourceHold/Castle/Merchant(adjacent) falls straight to `NodeType.Unknown` until `node.Visited`. Net
-effect: `Sees` becomes exactly Camp (always) / ResourceHold (always) / Castle (always) / Merchant (only
-once adjacent) / everything else Unknown-until-visited. No new mechanism, no `adjacent` local var needed
-beyond the Merchant case (fine to inline `Adjacent(node.Id)` there instead of keeping the now-mostly-
-unused local, or keep the local — either is fine, just don't reintroduce a generic adjacency reveal).
-**Test to fix, not just add:** `CityMapTests.FogShowsHoldsAndCastleAfarButKeepsDistantSkirmishesHidden`
-(`CityMapTests.cs:74-84`) currently PINS the bug — its own name claims distant skirmishes stay hidden,
-but its assertion (`Assert.Equal(NodeType.Skirmish, map.Sees(map.Node("a2")))`, line 80) explicitly
-checks the buggy ADJACENT-reveal behavior and calls it correct. Flip that line to
-`Assert.Equal(NodeType.Unknown, map.Sees(map.Node("a2")))` and update the comment above it (currently
-"a2 is an adjacent skirmish (adjacency resolves it)" — that's the bug being described as intended
-behavior). Re-check `MerchantResolvesOneJumpOut` (`CityMapTests.cs:86-92`) still passes unchanged (it
-should — Merchant's own explicit case is untouched). Grep for any other test or live code path assuming
-adjacency reveals node type before assuming this is the only site.
+the objective) are implicitly fine too.
+**Root cause, `CityMap.Sees(MapNode node)` (`CityMap.cs:88-101`):** the switch's catch-all was
+`_ when adjacent => node.Type` — revealed the TRUE type of ANY node one jump away, defeating the
+guess-your-way-through design for Skirmish (and would have silently done the same for Quest the moment
+that node type exists, data-driven, same fall-through branch). Only `Merchant when adjacent` was meant
+to resolve early.
+**Fix:** deleted the generic `_ when adjacent => node.Type` arm; everything but Camp/ResourceHold/
+Castle/Merchant(adjacent) now falls straight to `NodeType.Unknown` until `node.Visited`. Net: `Sees` is
+exactly Camp (always) / ResourceHold (always) / Castle (always) / Merchant (only once adjacent) /
+everything else Unknown-until-visited. Dropped the now-single-use `adjacent` local, inlined
+`Adjacent(node.Id)` at the one remaining call site.
+**Test flipped, not just added:** `CityMapTests.FogShowsHoldsAndCastleAfarButKeepsDistantSkirmishesHidden`
+previously PINNED the bug (asserted `map.Sees(map.Node("a2"))` — an adjacent skirmish — resolved to
+`NodeType.Skirmish`); now asserts `NodeType.Unknown`, comment updated to explain why. `MerchantResolvesOneJumpOut`
+re-verified unchanged/still passing (Merchant's own explicit case untouched). Grepped every `.Sees(` call
+site in the repo (`Game1.ManifestRenderer.cs:477` is the only other one) — it just renders whatever
+`Sees` returns, no adjacency assumption of its own, nothing else to fix. Core tests 443/443 green
+(assertion flipped in place, not a net-new test — count unchanged). Core-only change, `Sees`'s public
+signature untouched, no Game rebuild needed.
 
 ## ‼ HIGH PRIORITY (2026-07-06, Doug — interview #2 answers, 3 precise directives)
 1. **Merchant per-leg seed gap — Doug: GLOBAL fix, salt `Expedition.Seed(nodeId)` itself (not scoped to

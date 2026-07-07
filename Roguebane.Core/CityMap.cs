@@ -88,15 +88,13 @@ public sealed class CityMap
     public NodeType Sees(MapNode node)
     {
         if (node.Visited) return node.Type;
-        var adjacent = Adjacent(node.Id);
         return node.Type switch
         {
             NodeType.Camp => NodeType.Camp,                 // your own origin — always known
             NodeType.ResourceHold => NodeType.ResourceHold, // visible afar
             NodeType.Castle => NodeType.Castle,             // visible afar
-            NodeType.Merchant when adjacent => NodeType.Merchant, // resolves one jump out
-            _ when adjacent => node.Type,                   // adjacency resolves the rest
-            _ => NodeType.Unknown,                          // still fogged
+            NodeType.Merchant when Adjacent(node.Id) => NodeType.Merchant, // resolves one jump out
+            _ => NodeType.Unknown,                          // everything else stays fogged until visited
         };
     }
 

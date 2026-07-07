@@ -75,9 +75,10 @@ public class CityMapTests
     public void FogShowsHoldsAndCastleAfarButKeepsDistantSkirmishesHidden()
     {
         var map = Maps.StandardLeg();
-        // From camp: a1 is a hold (visible), a2 is an adjacent skirmish (adjacency resolves it).
+        // From camp: a1 is a hold (visible), a2 is an adjacent skirmish (stays fogged — guess-your-way-
+        // through: only Merchant resolves early on adjacency, everything else needs an actual visit).
         Assert.Equal(NodeType.ResourceHold, map.Sees(map.Node("a1")));
-        Assert.Equal(NodeType.Skirmish, map.Sees(map.Node("a2")));
+        Assert.Equal(NodeType.Unknown, map.Sees(map.Node("a2")));
         // The castle reads from afar; a distant merchant stays fogged until one jump out.
         Assert.Equal(NodeType.Castle, map.Sees(map.Node("castle")));
         Assert.Equal(NodeType.Unknown, map.Sees(map.Node("b")));
