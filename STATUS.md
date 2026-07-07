@@ -1056,10 +1056,29 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
      wielded weapon's own `Power` (not a hardcoded number); smashing the weapon arm below the mace's
      `Reserve` drops it from `Consulted` — the same `DisabledGear` cascade a player gets, zero foe-special
      code; with the arm pre-smashed the Ogre lands zero hits across 200 ticks. Full `Core.Tests` green
-     (451/451). **Still open in item 1**: armor-consult proof (mechanically the same — `Body.Equip` is
-     equally foe-agnostic, just not yet exercised by a builder/test) and the **Foe Effects DATA +
-     interpreter** (a real design/engine slice on its own, not started). Items 2–4 (full 6-foe roster,
-     encounter-table wiring, DoD economy asserts) stay open, unblocked by this slice.
+     (451/451).
+   - ◐ PARTIAL (2026-07-07, loop) — **armor-consult proof closed.** `Body.Equip`/`Damage`'s
+     `PartMitigation`/`ArmorSustained` confirmed foe-agnostic by direct reading (same as the weapon half —
+     no `Foe` type anywhere in that path). New `FoeArmorTests.cs` (2 tests, headless): a foe-shaped `Body`
+     wearing `ArmorLines.PlateChest[0]` (Iron Breastplate) mitigates part damage by its `PartMitigation`
+     exactly like `WornArmorBindingTests`' player case; smashing the governing STR part below the
+     Breastplate's `Requirement` drops it out of `ArmorSustained` via the same `DisabledGear` cascade, and
+     the next hit lands full raw damage. Deliberately a bare test fixture, NOT `Foes.Ogre` or a new
+     `Foes.DireOgre` — see the Needs-Doug note below for why. Full `Core.Tests` green (460/460).
+   - ⚠️ NEEDS DOUG (found 2026-07-07, loop, while scoping the armor-consult proof) — **FOES.md's Dire
+     Ogre (T2) numbers don't fit their own body.** Spec: parts 5/1/2/4 (arm/head/legs/chest), Iron
+     Warhammer, STR Breastplate. Iron Warhammer's `Reserve` is 5 (2H, tier 1) — wielding it alone spends
+     the ENTIRE arm STR pool (5/5), leaving 0 headroom for the Breastplate's `Requirement` (2, STR-
+     governed regardless of its CON chest slot — §6c Governing/Slot decoupling). The two pieces of gear
+     FOES.md names for this foe cost 7 STR combined against a 5-STR arm — same class of drift as the
+     2026-07-05 Barbarian STR mismatch (`CORE_RUNES.md` note). Did NOT invent a fix (raise the stat, drop
+     a piece, discount the requirement) — that's a spreadsheet call. Building the actual `Foes.DireOgre`
+     content (item 2) is blocked on this reconciling; the armor-consult PROOF above sidesteps it
+     entirely (no weapon on the test fixture) so it isn't blocked by it.
+   - **Still open in item 1**: the **Foe Effects DATA + interpreter** (a real design/engine slice on its
+     own, not started). Items 2–4 (full 6-foe roster, encounter-table wiring, DoD economy asserts) stay
+     open, unblocked by this slice — item 2's Dire Ogre entry additionally needs the STR-budget note above
+     reconciled first.
 2. Content: the six built foes at FOES.md's T1/T2 specs (Skeleton/Bandit/Wraith/Ogre/Troll/Gargoyle,
    Dire variants, effects incl. *Brittle*/*Plunder*/*Insubstantial*/*Overwhelm*/*Regenerative Flesh*/
    *Stoneform*). Numbers are Cowork placeholder-blessed — build them, flag them, Doug tunes. Castle
