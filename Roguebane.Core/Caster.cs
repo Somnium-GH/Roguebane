@@ -497,7 +497,16 @@ public sealed class Caster
         // §8 [LOCKED]: every hit deals BOTH — the targeted PART's stat AND HP — simultaneously, the same
         // power, from the one hit. No part-vs-HP split, no HP-only-on-overkill path, no flat CON block or
         // plate blunt (shields + full evade are the ONLY mitigations).
-        if (part is not null) frame?.Damage(part, power);
+        //
+        // Foe Effect: Stoneform (FOES.md, Gargoyle) is the inverse of Insubstantial -- it reduces the
+        // PART damage of THIS hit (not HP) by 1 (min 1), gated on its own CON (chest) part standing
+        // whole going INTO this hit; HP still lands full below. A hit that lands on the chest itself is
+        // still discounted (checked pre-damage, same "gated on standing whole" read Insubstantial uses).
+        var partPower = power;
+        if (target is Foe { Effect: FoeEffectKind.Stoneform } && frame is not null &&
+            frame.Parts.FirstOrDefault(p => p.Stat == Stat.Con) is { } chest && frame.Contribution(chest) > 0)
+            partPower = Math.Max(1, power - 1);
+        if (part is not null) frame?.Damage(part, partPower);
 
         // Foe Effect: Insubstantial (FOES.md) is the one designed exception to "same power" above — it
         // reads the part damage this same hit just applied, so a hit that lands ON the INT part still

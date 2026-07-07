@@ -1089,10 +1089,17 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
      it needed nothing else built first. New `WraithInsubstantialTests.cs` (3 tests): a hit elsewhere
      lands power-1 while the head's whole; the hit that breaks the head lands in full; once broken,
      later hits elsewhere also land in full. Full `Core.Tests` green (463/463).
-   - **Item 1 is now fully closed.** Items 2–4 stay open: item 2's remaining five foes (Skeleton/
-     Bandit/Ogre-T2/Troll/Gargoyle, each needing its own Foe Effect wired the same way) plus item 2's
-     Dire Ogre entry specifically still needs the STR-budget note above reconciled first; items 3–4
-     (encounter-table wiring, DoD economy asserts) unblocked but not started.
+   - **Item 1 is now fully closed.** Items 2–4 stay open. Item 2's effect vocabulary is 3/6 proven now
+     (Insubstantial/Brittle/Stoneform, all bare-fixture) but foe CONTENT is still just Wraith (done)
+     and Ogre-T1 gear (no effect wired onto it yet); Skeleton/Gargoyle content are both blocked on an
+     open gear-authoring question (Jab/Dagger, stone-fists-no-weapon-record respectively — see the
+     Needs-Doug note below), Bandit's *Plunder* and Ogre's *Overwhelm* are player-side-victim-drain
+     effects that don't fit either existing interpreter site (`Hit`/`Discharge` only see the
+     ATTACKER's own state or the DEFENDER's `Body`/`Frame`, never the defending `Caster`'s `Charge`/
+     `SummonsLeft`/shield-pool-on-evade — a real cross-`Caster` wiring gap, not yet designed), and
+     Troll's *Regenerative Flesh* (self-heal amplifier) is untouched. Plus item 2's Dire Ogre entry
+     specifically still needs the STR-budget note above reconciled first; items 3–4 (encounter-table
+     wiring, DoD economy asserts) unblocked but not started.
    - ⚠️ NEEDS DOUG (found 2026-07-07, loop, while scoping the Skeleton for item 2) — **FOES.md's
      Skeleton (T1) pairs a weapon with a technique that can't consult it.** Spec: Iron Dagger + Jab.
      Iron Dagger is `Stat.Dex` (`Armory.cs`); Jab is `Stat.Str` (`Content/Techniques.cs`);
@@ -1122,6 +1129,24 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
      mismatch): breaking the arm refunds and is immediately ready again; a non-breaking hit refunds
      nothing; a second foe with two STR parts only refunds on the first break, not the second. Full
      `Core.Tests` green (466/466).
+   - ◐ PARTIAL (2026-07-07, loop) — **Stoneform Foe Effect proven** (FOES.md's third effect, Gargoyle).
+     A foe-side read like Insubstantial (lives in `Caster.Hit`), but the inverse of it: Insubstantial
+     shaves the HP half of a landed hit while its INT part stands whole; Stoneform shaves the PART half
+     (1, min 1) while its CON ("chest") part stands whole — HP always lands full. Structurally this
+     meant reading `frame.Contribution` on the CON part BEFORE `frame?.Damage(part, power)` runs (not
+     after, like Insubstantial's HP-half read), since the discount has to apply to that very call.
+     Gated the same way Insubstantial is ("stands whole going into this hit," so the hit that breaks
+     the chest is itself still discounted, then gone for good) rather than re-deriving a new gate.
+     `FoeEffectKind.Stoneform` added (`FoeEffect.cs`); no `Foe`/`Foes.cs` changes needed (no one-shot
+     latch — reads live state like Insubstantial, not a trigger like Brittle). Proven via a bare
+     fixture, not `Foes.Gargoyle`: FOES.md's Gargoyle T1 gear is "stone fists ~ Iron Axe profile," no
+     real `Weapon` record — same class of open authoring question the Skeleton Jab/Dagger conflict
+     raised, not checked yet, so building the actual `Foes.Gargoyle` content stays open (item 2, not
+     blocking this effect proof). New `GargoyleStoneformTests.cs` (4 tests): a hit elsewhere lands
+     part-power-1 while the chest's whole (HP lands full); the hit that damages the chest itself is
+     still discounted; once the chest's fully broken, later hits elsewhere land full part damage; a
+     power-1 hit still deals 1 part damage (min-1 floor holds, not zeroed). Full `Core.Tests` green
+     (470/470).
 2. Content: the six built foes at FOES.md's T1/T2 specs (Skeleton/Bandit/Wraith/Ogre/Troll/Gargoyle,
    Dire variants, effects incl. *Brittle*/*Plunder*/*Insubstantial*/*Overwhelm*/*Regenerative Flesh*/
    *Stoneform*). Numbers are Cowork placeholder-blessed — build them, flag them, Doug tunes. Castle

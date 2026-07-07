@@ -44,3 +44,4 @@ date,task,minutes,lines_changed,estimate_minutes,method
 2026-07-07,chunkd-armor-consult-proof-foe-body-plus-dire-ogre-str-conflict,35,79,-,commit-delta
 2026-07-07,chunkd-foe-effects-interpreter-plus-wraith-insubstantial,32,137,-,commit-delta
 2026-07-07,chunkd-brittle-effect-plus-skeleton-jab-dagger-conflict,55,133,-,commit-delta
+2026-07-07,chunkd-stoneform-effect-gargoyle,33,132,-,commit-delta

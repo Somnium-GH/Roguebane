@@ -10,4 +10,5 @@ public enum FoeEffectKind
     None,
     Insubstantial, // Wraith: while its INT part is undamaged, a landed hit deals 1 less HP damage (min 1); breaks on the first hit that damages that part.
     Brittle, // Skeleton: the first hit that breaks this foe's STR (arm) part refunds the attacker's aimed Timered technique's cooldown (ready to fire again immediately). One-shot per foe (Foe.EffectTriggered).
+    Stoneform, // Gargoyle: while its CON part (chest) is undamaged, a landed hit deals 1 less PART damage (min 1) to whatever part it's aimed at; HP still lands full. Gone for good once the chest takes any damage.
 }
