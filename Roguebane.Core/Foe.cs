@@ -25,8 +25,13 @@ public sealed class Foe : ICombatTarget
     // Which player limb this foe goes for (§8 personality, data). Inert/unaimed foes default RANDOM.
     public FoeAim Aim { get; }
 
-    // The foe's ONE Foe Effect (FOES.md design rule), data-only — Caster.Hit is the one interpreter.
+    // The foe's ONE Foe Effect (FOES.md design rule), data-only — Caster.Hit/Discharge is the interpreter.
     public FoeEffectKind Effect { get; }
+
+    // One-shot latch for effects that fire only once per foe (Brittle) — effects that read LIVE part
+    // state instead (Insubstantial) never touch this.
+    public bool EffectTriggered { get; private set; }
+    public void TriggerEffect() => EffectTriggered = true;
 
     public Foe(string id, int hp, Body? frame = null, IReadOnlyList<Technique>? arsenal = null,
         string figure = "ogre", FoeAim aim = FoeAim.Random, FoeEffectKind effect = FoeEffectKind.None)

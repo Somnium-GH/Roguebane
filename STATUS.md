@@ -1093,6 +1093,35 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
      Bandit/Ogre-T2/Troll/Gargoyle, each needing its own Foe Effect wired the same way) plus item 2's
      Dire Ogre entry specifically still needs the STR-budget note above reconciled first; items 3–4
      (encounter-table wiring, DoD economy asserts) unblocked but not started.
+   - ⚠️ NEEDS DOUG (found 2026-07-07, loop, while scoping the Skeleton for item 2) — **FOES.md's
+     Skeleton (T1) pairs a weapon with a technique that can't consult it.** Spec: Iron Dagger + Jab.
+     Iron Dagger is `Stat.Dex` (`Armory.cs`); Jab is `Stat.Str` (`Content/Techniques.cs`);
+     `Body.Consulted` only returns a wielded weapon whose `Stat`/`AltStat` matches the technique's own
+     `Stat` — so Jab can never consult a Dagger, and `Activate()` would fail outright for that pairing
+     (nothing to swing). `TECHNIQUES.md`'s own canonical weapon-verb table already pairs Iron Dagger
+     with Lunge (DEX), not Jab — so this reads as authoring drift in FOES.md, not a balance call, but
+     same class of thing as the Dire Ogre STR-budget note above: not silently swapped (Lunge would also
+     re-type the arm part to DEX, breaking every other foe's "STR arm powers strikes" convention) —
+     that's a spreadsheet/content call for Doug. Building the actual `Foes.Skeleton` content stays
+     blocked on this reconciling.
+   - ◐ PARTIAL (2026-07-07, loop) — **Brittle Foe Effect proven** (FOES.md's second effect, ahead of
+     the blocked Skeleton content — see the Needs-Doug note directly above for why it's a bare fixture,
+     not `Foes.Skeleton`). Unlike Insubstantial (a foe-side read, lives in `Caster.Hit`), Brittle is a
+     player-side reward — it refunds the ATTACKER's own Timered cooldown, so it needs `Run.Countdown`,
+     which only `Caster.Discharge` (not `Hit`) has access to. Added `FoeEffectKind.Brittle`
+     (`FoeEffect.cs`) + a one-shot `Foe.EffectTriggered`/`TriggerEffect()` latch (`Foe.cs`, mirrors the
+     shared on-hit-boon gate style of the existing Siphon/Resonance blocks). Interpreter: after
+     `Discharge`'s `Hit()` call, a CLEAN landed hit (Hit's own not-already-broken gate) on the foe's STR
+     ("arm," per FOES.md's own body-part convention) part that just broke it (`frame.Contribution(part)
+     == 0` post-hit) triggers the latch and resets `Countdown` to 0 instead of the normal
+     `EffectiveCooldown` — the reset is applied AFTER the unconditional cooldown-set at the bottom of
+     `Discharge` (not instead of it), since that assignment would otherwise clobber the refund back to a
+     full cooldown; caught by a failing `IsReady` assertion during headless testing, not by inspection.
+     New `BrittleEffectTests.cs` (3 tests, headless, bare STR-part fixture foes + a bare
+     `Consults: WeaponUse.None` custom Timered technique — deliberately sidesteps the Jab/Dagger
+     mismatch): breaking the arm refunds and is immediately ready again; a non-breaking hit refunds
+     nothing; a second foe with two STR parts only refunds on the first break, not the second. Full
+     `Core.Tests` green (466/466).
 2. Content: the six built foes at FOES.md's T1/T2 specs (Skeleton/Bandit/Wraith/Ogre/Troll/Gargoyle,
    Dire variants, effects incl. *Brittle*/*Plunder*/*Insubstantial*/*Overwhelm*/*Regenerative Flesh*/
    *Stoneform*). Numbers are Cowork placeholder-blessed — build them, flag them, Doug tunes. Castle

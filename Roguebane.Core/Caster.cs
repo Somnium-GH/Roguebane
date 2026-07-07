@@ -444,6 +444,16 @@ public sealed class Caster
         if (run.Tech.Stat == Stat.Int)
             power = (int)Math.Round(power * _self.TomeSpellMult, MidpointRounding.AwayFromZero);
         var landed = Hit(target, part, power, run.Tech.ShieldPiercing, wandCast);
+        // Foe Effect: Brittle (FOES.md) — a CLEAN landed hit (Hit's own "not already broken" gate,
+        // same as Siphon below) on this foe's STR (arm) part that just broke it refunds the attacker's
+        // OWN Timered cooldown, once per foe (Foe.EffectTriggered latches it — a second broken STR
+        // part, if a foe ever had one, would not refund again). Applied AFTER the normal cooldown-set
+        // below (not instead of it) so that unconditional assignment can't clobber the refund back to
+        // a full cooldown.
+        var brittleRefund = landed && part is not null && part.Stat == Stat.Str &&
+            target is Foe { Effect: FoeEffectKind.Brittle, EffectTriggered: false } brittleFoe &&
+            brittleFoe.Frame is not null && brittleFoe.Frame.Contribution(part) == 0;
+        if (brittleRefund) ((Foe)target).TriggerEffect();
         // Siphon lifesteal (TECHNIQUES.md, shared on-hit-boon gate): only on a CLEAN landed part-hit —
         // never a shield-absorbed hit, never an already-broken part. Heals by the damage just dealt.
         if (run.Tech.Lifesteal && landed)
@@ -454,7 +464,8 @@ public sealed class Caster
         // Adept's Resonance (shared on-hit-boon gate): a landed hit stacks −2%/stack off this
         // technique's OWN next charge time, capped at 5 stacks.
         if (_effect == CoreEffectKind.Resonance && landed) run.ResonanceStacks = Math.Min(5, run.ResonanceStacks + 1);
-        if (run.Tech.Kind == TechniqueKind.Timered) run.Countdown = EffectiveCooldown(run.Tech, run.ResonanceStacks);
+        if (run.Tech.Kind == TechniqueKind.Timered)
+            run.Countdown = brittleRefund ? 0 : EffectiveCooldown(run.Tech, run.ResonanceStacks);
         return true;
     }
 
