@@ -1,3 +1,74 @@
+# DROP AUDIT — 2026-07-06 (pass 10: payload B geometry fixes + minion vocab rename + confirm-to-close)
+
+**Pass 10 delta (payload B-series, SOURCE-DRIVEN per Doug "do it from dc.html" — no asset churn):**
+All geometry was authored in the `.dc.html` sources and re-extracted through the real pipeline
+(`proto/extract_all.html` → `extract_merge.js`); numbers below read off the merged `layout.json`.
+
+- **B24 — Equipment GEAR tab now seats 2 columns.** `invItems` grid columns pinned `402px 402px`
+  (was `1fr 1fr`, which rounded each card UP to exactly ½ the container and overshot by 1px → the
+  engine's honest GridCapacity under-seated to 1 col). Emits `invItems.size [411,183]`, item `[201,44]`
+  → `201×2+6 = 408 ≤ 411` (3px slack) → engine seats 2. Widened via the inventory content-wrapper
+  padding `16→8`.
+- **B25 — Attributes panel now renders the 6th (free) pip.** `attrs.cells` strip widened to design
+  rect width **332** (was 326; needed ≥328) by trimming the `attrBar` row gap `11→8`, AND `attrPip`
+  capped `max-width:106px` so a 6-pip sample extracts `pipW=53` (not 54) instead of flexing up with the
+  container. `6×53+5×2 = 328 ≤ 332` → engine capacity **6**. High pools (e.g. Reaver DEX 10) still flex
+  below the cap → no overflow (verified in `02-equipment-reaver.png`).
+- **B23 — Inventory tabs fill the row; long labels stop shrinking.** `invTab` fixed `width:262px`
+  (design 131) `text-align:center` (was `padding:8px 22px`, ~40px content-width leaving ~290px dead
+  space). 3 tabs `3×131+2×4 = 401 ≤ 403` usable → all seat at full size; "TECHNIQUES"/"MINIONS" no
+  longer force `TextPxWrapped` to shrink. (Fixed width, not `flex:1`, to dodge the same 1px round-up
+  under-seat as B24.)
+- **B19 — "bay" vocabulary eradicated; "minion" only.** Encounter + NewGame renamed (Equipment already
+  carried no "bay" term). Encounter: template `minionBay`→**`combatMinionCard`**, element ids
+  `bayGroupLabel`→`minionGroupLabel` / `bayList`→`minionList`, container bind `loadout.bays`→
+  `loadout.minions`, item binds `bay.{icon,hotkey,state,name,cost,gateColor,description}`→`minion.*`.
+  NewGame: `core.bays`→`core.minionCap`, `preview.bays`→`preview.minionCap`, part `baysBox`→`minionsBox`.
+  Retired `templates.minionBay` deleted from `layout.json` (intentional-removal, so the key-set guard
+  passed). **Verified: zero `bay.*` / `loadout.bays` / `core.bays` / `preview.bays` / `minionBay` /
+  `bayList` / `bayGroupLabel` / `baysBox` remain anywhere in the manifest.**
+  - ⚠ **DEVIATION from B19's literal `minionCard`:** Equipment ALREADY owns the global template name
+    `minionCard` (its build minion card — no combat state chip), and template names are a flat global
+    namespace in the extractor, so renaming Encounter's `minionBay`→`minionCard` would COLLIDE (the
+    later-extracted Equipment card silently overwrites Encounter's, dropping its combat `state` chip).
+    Encounter's combat card is therefore **`combatMinionCard`**; Equipment's stays `minionCard`
+    (untouched). Flag if you'd rather unify the two into one template.
+  - **FYI (not touched):** Equipment's minion item-binds are plural (`minions.*`); Encounter's are now
+    singular (`minion.*`, matching its own `technique.*` item convention). B19 targeted only "bay"
+    terms, so Equipment was left as-is; the plural/singular split is a minor future-consistency nit.
+- **B7 — raceCard head no longer stretches (confirm-to-close).** The source was already corrected in a
+  prior pass (one bound `<img height:70 width:auto>` with `data-shadow` + `race.headImage` +
+  `sprites/body/{race.id}_grunt/head_healthy`, on its own square element, background panel a plain
+  gradient). This pass RE-EXTRACTED so `layout.json`'s `raceCard` now carries the head imageBind on the
+  **square rect `[10,22,35,35]`** (aspect 1.0, shadowed) — the portrait-aspect background panel is gone.
+- **B4 — confirm-to-close, no change.** `nav.equipment` button already authored on Encounter (DISABLED
+  in combat) and CampaignMap (both carry a "payload B4" comment). Nothing owed.
+- **B10 — confirm-to-close, no change.** DEX/INT ladder names are already §6c-canon in
+  `design/dchtml/gear_catalog.json` (Leather Cap→Hardened Cap→Studded Cap→Reinforced Hood; Cloth Cap→
+  Silk Hood→Ornate Circlet→Humming Circlet; Padded→Leather→Studded→Reinforced Leather) and in
+  `roster_gen.js`'s per-tier `names[]` arrays; `layout.json` carries no gear `name` fields. No
+  "Leather Leather …" drift anywhere.
+
+- **Changed files:** `Encounter.dc.html` (B19), `Equipment.dc.html` (B23/B24/B25), `NewGame.dc.html`
+  (B19) + their `drop/design/dchtml/` mirrors; `Content/layout.json` re-extracted (all 6 screens,
+  guard passed); `design/02-equipment-<core>.png` ×7 + `reference/screens/equipment-<core>.png` ×7
+  re-stitched (all verified EXACTLY 1920×1080). `CD_STATUS.md` #31 removed (resolved). No removals of
+  shipped assets.
+- **NOT rebuilt (correctly):** `asset-manifest.js` + `Content.mgcb` — **no `Content/**/*.png` add or
+  remove this pass** (only `Content/layout.json` changed in the package). No re-render of
+  `01-encounter-*` (B19 is an attribute rename → zero pixel change) or `05-newgame` (rename-only +
+  B7 already reflected in the current source render).
+- **CD_STATUS #31 CLOSED (removed):** Equipment inventory card states (`invCard`/`loadoutCard`/`invTab`
+  families) were previously hand-mirrored into `layout.json`; this pass they are genuinely produced by
+  `proto/extract_all.html` → `extract_merge.js` (clean merge, guard passed), so the "re-extract to
+  confirm the hand-patch" condition is met.
+- **Engine follow-up (OURS, per B19):** the renderer's bind-key literals update in lockstep now this
+  drop lands — new keys: `combatMinionCard`, `minion.{icon,hotkey,state,name,cost,gateColor,description}`,
+  `loadout.minions`, `core.minionCap`, `preview.minionCap`, `minionsBox`.
+- **Manual design edits (Doug/user) since pass 9:** none.
+
+---
+
 # DROP AUDIT — 2026-07-05 (pass 9: dual-attr Frenzy/Flurry + split glyph capture)
 
 **Pass 9 delta (dual-attribute techniques, Doug — SOURCE ONLY, no asset churn):**

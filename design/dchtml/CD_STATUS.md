@@ -187,19 +187,6 @@ with the sources, so the engine side always has the current open-gap status alon
 - **Status:** OPEN until the engine implements the primitive — nothing engine-side draws
   `style.pulse` / `pulse` / `glow` yet. Ride the next drop-audit.
 
-### 31. Equipment inventory card states — renamed + `family` keys added, NOT yet re-verified through
-     the capture/extraction pipeline
-- **What:** payload B5/B6a/B6b: `invCard` (equipped/disabled/equippable/locked + hover), `loadoutCard`
-  (slotted/empty + hover), `invTab` (idle/hover/active) states were renamed + given `family` keys +
-  hover added, both in the `.dc.html` sources (`data-states="invCard"` etc., resolved against new
-  `style_tokens.js` `interactionStates` entries) and hand-mirrored into `Content/layout.json`'s
-  `templates` section directly — NOT regenerated via `proto/extract_all.html`. The hand-patch should
-  match exactly (same JSON shape the extractor would emit for a bare family-name `data-states`, per the
-  existing `pickerCard`/`button` precedent), but a real re-extraction pass hasn't confirmed it byte-for-
-  byte.
-- **Status:** OPEN until `proto/extract_all.html` is run and the merge reconciles cleanly against this
-  hand-patch (should be a no-op diff if authored correctly).
-
 ### 26. Rich inline text runs flatten to one colour (accepted, low priority)
 - **What:** a text element with styled inline spans (citymap `supportNote`'s amber "2 resource
   holds") extracts as ONE text run in the wrapper's colour — the manifest has no per-span text

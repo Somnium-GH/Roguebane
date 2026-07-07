@@ -92,7 +92,7 @@
       <span data-el="attrTitle" data-shadow="title" style="font-size:23px;letter-spacing:1px;margin-bottom:10px;">Attributes</span>
       <div data-el="attrReadout" data-container="1" data-template="attrBar" data-flow="vertical" data-binds="attrs" style="display:flex;flex-direction:column;gap:9px;">
         <sc-for list="{{ attrs }}" as="a" hint-placeholder-count="4">
-          <div data-tpl="attrBar" style="display:flex;align-items:center;gap:11px;">
+          <div data-tpl="attrBar" style="display:flex;align-items:center;gap:8px;">
             <span style="width:13px;height:13px;border:2px solid #0a0807;background:{{ a.color }};"></span>
             <span data-binds="attrs.key" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;width:34px;color:#e9d6b0;">{{ a.key }}</span>
             <span data-binds="attrs.part" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8d775c;width:46px;">{{ a.part }}</span>
@@ -100,7 +100,7 @@
                  ui/pip/* imageBind instead of flat fills -->
             <div data-container="1" data-template="attrPip" data-flow="horizontal" data-binds="attrs.cells" style="flex:1;display:flex;gap:3px;">
               <sc-for list="{{ a.pips }}" as="p" hint-placeholder-count="8">
-                <span data-tpl="attrPip" data-binds="cell.state" data-image-bind="ui/pip/{cell.asset}" style="flex:1;height:18px;background:{{ p.bg }};border:1px {{ p.style }} {{ p.bd }};"></span>
+                <span data-tpl="attrPip" data-binds="cell.state" data-image-bind="ui/pip/{cell.asset}" style="flex:1;max-width:106px;height:18px;background:{{ p.bg }};border:1px {{ p.style }} {{ p.bd }};"></span>
               </sc-for>
             </div>
             <div style="display:flex;align-items:baseline;justify-content:flex-end;gap:5px;width:74px;font-family:'JetBrains Mono',monospace;">
@@ -119,11 +119,11 @@
         </div>
         <div data-el="invTabs" data-container="1" data-template="invTab" data-flow="horizontal" data-binds="inventory.tabs" style="display:flex;gap:8px;padding:10px 16px 12px;">
           <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="2">
-            <div data-tpl="invTab" data-binds="tab.label" data-states="invTab" onClick="{{ t.onClick }}" style="padding:8px 22px;cursor:pointer;border:2px solid {{ t.border }};background:{{ t.bg }};font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;color:{{ t.color }};">{{ t.label }}</div>
+            <div data-tpl="invTab" data-binds="tab.label" data-states="invTab" onClick="{{ t.onClick }}" style="width:262px;flex:none;text-align:center;padding:8px 0;cursor:pointer;border:2px solid {{ t.border }};background:{{ t.bg }};font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;color:{{ t.color }};">{{ t.label }}</div>
           </sc-for>
         </div>
-        <div style="flex:1;padding:0 16px 12px;overflow:hidden;display:flex;flex-direction:column;">
-          <div data-el="invItems" data-container="1" data-template="invCard" data-flow="grid" data-cols="2" data-binds="inventory.activeTab.items" style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:start;">
+        <div style="flex:1;padding:0 8px 12px;overflow:hidden;display:flex;flex-direction:column;">
+          <div data-el="invItems" data-container="1" data-template="invCard" data-flow="grid" data-cols="2" data-binds="inventory.activeTab.items" style="flex:1;display:grid;grid-template-columns:402px 402px;gap:12px;align-content:start;">
             <sc-for list="{{ invItems }}" as="r" hint-placeholder-count="6">
               <div data-tpl="invCard" data-states="invCard" onClick="{{ r.onClick }}" style="display:flex;align-items:flex-start;gap:12px;border:2px solid {{ r.border }};background:{{ r.bg }};padding:12px 13px;min-height:84px;cursor:pointer;opacity:{{ r.op }};">
                 <span data-binds="invItems.badge" data-color-bind="invItems.attrColor" style="width:52px;height:36px;border:2px solid #0a0807;background:{{ r.badgeColor }};display:flex;flex-direction:column;align-items:center;justify-content:center;flex:none;line-height:1;margin-top:1px;">

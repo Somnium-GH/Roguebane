@@ -1,5 +1,70 @@
 # Status
 
+## ⇒ CD DROP LANDED — pass 10, 2026-07-06 (`design/dchtml/DROP_AUDIT.md` + `CD_STATUS.md`) — examined in
+## full. THREE of our own HIFI bugs are CLOSED content-side; ONE rename can finally proceed; ONE real
+## design conflict surfaced that needs Doug's call, not ours to silently resolve.
+
+**Closed by this drop — verify live, but no engine code owed:**
+- **B24 (2-col GEAR tab)** — `invItems` now pins explicit `402px 402px` columns source-side (worked around
+  the engine's honest-but-unhelpful grid math rather than waiting on our `cols`-hint fix). Should render 2
+  columns now. If it still doesn't, that's a NEW bug, not the one we tracked — re-verify fresh, don't
+  assume our old diagnosis still applies.
+- **B25 (6th/free pip on the Attributes bar)** — `attrs.cells` widened + `attrPip` capped so 6 pips fit.
+  This is the SAME pip bar the 4-ZONE ENCODING work landed on — worth a fresh screenshot check now that
+  BOTH halves (our zone logic + their container width) should be correct together.
+- **B23 (inventory tab sizing/labels)** — `invTab` now fixed-width 262px design / centered text; GEAR/
+  TECHNIQUES/MINIONS should all render at full size, no more shrink-to-fit.
+- **B7 (raceCard head stretch)** — confirm-to-close, re-extracted clean, no action.
+- **B4, B10** — confirm-to-close, already correct, no action.
+
+**B19 (bay→minion rename) is FULLY LANDED — the engine literal-rename we deliberately held back can go
+NOW.** Important: it's **not** a uniform find-replace. Two screens, two different outcomes:
+- **Encounter** (combat minion lane): template renamed `minionBay` → **`combatMinionCard`** (NOT
+  `minionCard` — that name was already taken by Equipment's own build-minion card; a same-name collision
+  would have silently overwritten one with the other, CD caught it and diverged the name on purpose).
+  Binds are now **singular**: `minion.icon/hotkey/state/name/cost/gateColor/description`,
+  `loadout.minions`, `core.minionCap`, `preview.minionCap`, `minionsBox`.
+- **Equipment** (build minion card): UNCHANGED — still template `minionCard`, still **plural**
+  `minions.*` binds. It never used "bay" terminology, so B19 didn't touch it. Don't rename it to match
+  Encounter; that's a real divergence CD flagged as a minor future-consistency nit, not a bug.
+Engine fix: every `"bay.hotkey"/"bay.state"/"bay.name"/"bay.gateColor"/"bay.cost"/"bay.description"`
+literal in `Game1.ManifestRenderer.cs` (6 call sites, all currently Encounter-only per a quick check) →
+the `minion.*` singular equivalent. No collision risk since Equipment never matched on `"bay.*"` to begin
+with. Add/update the ScreenLayoutTests-style headless coverage this pass added for other renames.
+
+**‼ REAL DESIGN CONFLICT SURFACED — needs Doug, not a unilateral engine fix either way.**
+`CD_STATUS.md` #34 ("Deterministic per-core gear + reservation model") states the INTENDED model as:
+**"armor is threshold-gated only (no pool pips); only weapons + the shield OBJECT reserve pool points."**
+That is NOT what our own `DESIGN_SPEC.md`'s locked SUSTAIN MODEL paragraph says, and NOT what `Body.cs`
+currently does: today, `EffectiveArmor(piece).Requirement` feeds directly into `DisabledGear`/
+`GearReserved`, so ALL 4 worn plate pieces count against the shared pool exactly like a weapon does (this
+is the basis of last round's STR pip math — Grunt's 5-of-6 STR reserved was computed AS IF armor reserves
+pool). **Two real, different models, both currently "canon" somewhere:**
+1. **Pool model (ours, in `Body.cs` + DESIGN_SPEC today):** worn armor is a standing reservation against
+   the shared pool, same as an active technique — equipping enough gear can visibly starve out something
+   else that wants that stat.
+2. **Gate model (CD's #34, attributed to "Doug"):** armor only checks a one-time threshold at equip (and
+   an ongoing "is the covered part still above threshold" disable check) — it does NOT consume from the
+   pool other things draw against; only weapons/shield actually reserve pool capacity.
+These produce DIFFERENT numbers and different disable behavior under the same gear (e.g. whether a full
+plate kit can ever crowd out a technique activation). **Don't resolve this by picking one silently** —
+surface to Doug which is actually intended, then reconcile DESIGN_SPEC + `Body.cs` + `CD_STATUS.md` #34
+to agree. Whichever way it goes, the 4-ZONE PIP BAR's "zone 1 = armor/weapon reservation" wording holds
+either way — only the NUMBERS zone 1 computes from would change (armor included or excluded).
+
+**Other CD_STATUS.md items worth a fresh look (not new discoveries, but worth cross-checking against our
+own tracking so nothing silently drifts):**
+- **#36 (`either` dual-attr Frenzy/Flurry, STR-or-DEX):** manifest field + split-glyph art landed;
+  ENGINE dual-pool reserve + two-row cost draw is NOT built yet — this is new work, not yet in our CHUNK
+  queue anywhere. Worth its own CHUNK item.
+- **#30 (`glow`/`pulse` primitive):** design fully spec'd + shipped (`style.pulse`, periodMs 1800,
+  border-alpha breathe + glow ring + a third "self" whole-element pulse mode) — ZERO engine draw exists.
+  This is the primitive B8's CityMap "current node" ask was blocked on; it's now unblocked design-side.
+- **#33 (core-parameterized action bar):** substantially matches what CHUNK A already built (7 real
+  CoreRune definitions, real per-core Kit/MinionCap) — but double-check the specific "minion column
+  collapses at 0 minion-cap, width scales with count" reflow behavior against the real action-bar draw
+  before assuming it's fully covered.
+
 ## ‼ HIGH PRIORITY (2026-07-05, Doug — interview answers, 4 small precise fixes)
 1. ✅ DONE (2026-07-06, loop) — `Content/Races.cs`: Dwarf `Hp: 20→17`, HalfGiant `Hp: 17→20`, Halfling
    unchanged. New pinning test `RaceTests.DwarfAndHalfGiantHpMatchDougsConfirmedSwap`. 425/425 green.

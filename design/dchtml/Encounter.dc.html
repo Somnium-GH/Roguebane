@@ -247,24 +247,24 @@
         <!-- bays group (action-bar reflow): whole group + divider hidden when bayCap 0 (Reaver); width scales with bay count -->
         <sc-if value="{{ hasBays }}" hint-placeholder-val="{{ true }}">
         <div data-el="minionGroup" data-anchor="Right" style="width:{{ bayWidth }};flex:none;display:flex;flex-direction:column;border-left:2px solid #2e2218;padding-left:14px;">
-          <div data-el="bayGroupLabel" style="font-family: 'JetBrains Mono',monospace; font-size: 10px; letter-spacing: 2px; color: #cdb497; margin-bottom: 7px">MINIONS<br></div>
-          <div data-el="bayList" data-container="1" data-template="minionBay" data-flow="horizontal" data-binds="loadout.bays" style="display:flex;gap:12px;flex:1;">
+          <div data-el="minionGroupLabel" style="font-family: 'JetBrains Mono',monospace; font-size: 10px; letter-spacing: 2px; color: #cdb497; margin-bottom: 7px">MINIONS<br></div>
+          <div data-el="minionList" data-container="1" data-template="combatMinionCard" data-flow="horizontal" data-binds="loadout.minions" style="display:flex;gap:12px;flex:1;">
             <sc-for list="{{ bays }}" as="b" hint-placeholder-count="1">
-              <div data-tpl="minionBay" data-states="{&quot;active&quot;:{&quot;border&quot;:&quot;teal&quot;,&quot;fill&quot;:&quot;panelDeep&quot;},&quot;idle&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;fill&quot;:&quot;panelCard&quot;,&quot;opacity&quot;:0.7},&quot;starved&quot;:{&quot;border&quot;:&quot;lockRed&quot;,&quot;fill&quot;:&quot;panelDeep&quot;,&quot;opacity&quot;:0.82}}" style="flex:1;border:2px {{ b.cardBorderStyle }} {{ b.border }};background:{{ b.bg }};opacity:{{ b.op }};display:flex;flex-direction:column;">
+              <div data-tpl="combatMinionCard" data-states="{&quot;active&quot;:{&quot;border&quot;:&quot;teal&quot;,&quot;fill&quot;:&quot;panelDeep&quot;},&quot;idle&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;fill&quot;:&quot;panelCard&quot;,&quot;opacity&quot;:0.7},&quot;starved&quot;:{&quot;border&quot;:&quot;lockRed&quot;,&quot;fill&quot;:&quot;panelDeep&quot;,&quot;opacity&quot;:0.82}}" style="flex:1;border:2px {{ b.cardBorderStyle }} {{ b.border }};background:{{ b.bg }};opacity:{{ b.op }};display:flex;flex-direction:column;">
                 <div data-part="" style="padding:8px 9px 7px;border-bottom:1px solid #233028;">
                   <div style="display:flex;align-items:center;justify-content:space-between;">
                     <span style="display:flex;align-items:center;gap:6px;">
-                      <span data-binds="bay.icon" data-image-bind="sprites/minions/{minion.type}" style="width:30px;height:30px;border:2px {{ b.iconBorderStyle }} #0a0807;background:{{ b.iconBg }};image-rendering:pixelated;"></span>
-                      <span data-binds="bay.hotkey" style="min-width:20px;height:20px;padding:0 5px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#e9d6b0;background:#241a12;border:1px solid #6e5026;">{{ b.hotkey }}</span>
+                      <span data-binds="minion.icon" data-image-bind="sprites/minions/{minion.type}" style="width:30px;height:30px;border:2px {{ b.iconBorderStyle }} #0a0807;background:{{ b.iconBg }};image-rendering:pixelated;"></span>
+                      <span data-binds="minion.hotkey" style="min-width:20px;height:20px;padding:0 5px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#e9d6b0;background:#241a12;border:1px solid #6e5026;">{{ b.hotkey }}</span>
                     </span>
-                    <span data-binds="bay.state" style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;padding:2px 5px;color:{{ b.stateColor }};border:1px solid {{ b.stateColor }};">{{ b.state }}</span>
+                    <span data-binds="minion.state" style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;padding:2px 5px;color:{{ b.stateColor }};border:1px solid {{ b.stateColor }};">{{ b.state }}</span>
                   </div>
                   <div style="display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-top:7px;">
-                    <span data-binds="bay.name" style="font-size:17px;color:#ece0cb;">{{ b.name }}</span>
-                    <span data-binds="bay.cost" data-color-bind="bay.gateColor" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:{{ b.gateColor }};white-space:nowrap;">{{ b.attrLabel }} {{ b.cost }}</span>
+                    <span data-binds="minion.name" style="font-size:17px;color:#ece0cb;">{{ b.name }}</span>
+                    <span data-binds="minion.cost" data-color-bind="minion.gateColor" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:{{ b.gateColor }};white-space:nowrap;">{{ b.attrLabel }} {{ b.cost }}</span>
                   </div>
                 </div>
-                <div data-binds="bay.description" style="padding:9px;flex:1;font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:16.5px;line-height:1.5;color:#cdbfa8;">{{ b.descNode }}</div>
+                <div data-binds="minion.description" style="padding:9px;flex:1;font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:16.5px;line-height:1.5;color:#cdbfa8;">{{ b.descNode }}</div>
               </div>
             </sc-for>
           </div>

@@ -5403,7 +5403,7 @@
           "color": "ink",
           "font": "display",
           "fontPx": 8,
-          "image": "Content/ui/reticle/focus_p2.png",
+          "image": "Content/ui/reticle/focus_p0.png",
           "frames": [
             "ui/reticle/focus_p0",
             "ui/reticle/focus_p1",
@@ -5981,7 +5981,7 @@
           "fontPx": 8
         },
         {
-          "id": "bayGroupLabel",
+          "id": "minionGroupLabel",
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
@@ -6000,7 +6000,7 @@
           "content": "MINIONS"
         },
         {
-          "id": "bayList",
+          "id": "minionList",
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
@@ -6013,12 +6013,12 @@
           ],
           "z": 39,
           "parent": "minionGroup",
-          "binds": "loadout.bays",
+          "binds": "loadout.minions",
           "color": "ink",
           "font": "display",
           "fontPx": 8,
           "item": {
-            "template": "minionBay",
+            "template": "combatMinionCard",
             "flow": "horizontal",
             "gap": 6,
             "size": [
@@ -6419,7 +6419,7 @@
               8
             ],
             "size": [
-              40,
+              131,
               18
             ]
           }
@@ -6429,11 +6429,11 @@
           "type": "list",
           "anchor": "TopLeft",
           "offset": [
-            14,
+            10,
             54
           ],
           "size": [
-            403,
+            411,
             183
           ],
           "z": 17,
@@ -6448,7 +6448,7 @@
             "gap": 6,
             "cols": 2,
             "size": [
-              199,
+              201,
               44
             ]
           }
@@ -6458,11 +6458,11 @@
           "type": "panel",
           "anchor": "TopLeft",
           "offset": [
-            14,
+            10,
             242
           ],
           "size": [
-            403,
+            411,
             15
           ],
           "z": 18,
@@ -6477,7 +6477,7 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            152,
+            156,
             0
           ],
           "size": [
@@ -6506,7 +6506,7 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            178,
+            182,
             4
           ],
           "size": [
@@ -6527,7 +6527,7 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            232,
+            236,
             0
           ],
           "size": [
@@ -9036,7 +9036,7 @@
           ],
           "z": 24,
           "parent": "previewLayoutRow",
-          "binds": "preview.bays",
+          "binds": "preview.minionCap",
           "color": "mutedDim",
           "fill": "panelDeep",
           "border": {
@@ -9061,7 +9061,7 @@
               "fontPx": 10,
               "align": "center",
               "sample": "2",
-              "binds": "preview.bays"
+              "binds": "preview.minionCap"
             },
             {
               "part": "label",
@@ -10742,7 +10742,7 @@
         }
       }
     },
-    "minionBay": {
+    "combatMinionCard": {
       "size": [
         78,
         136
@@ -10784,7 +10784,7 @@
           "font": "display",
           "fontPx": 8,
           "imageBind": "sprites/minions/{minion.type}",
-          "binds": "bay.icon"
+          "binds": "minion.icon"
         },
         {
           "rect": [
@@ -10802,7 +10802,7 @@
           },
           "font": "mono",
           "fontPx": 6,
-          "binds": "bay.hotkey",
+          "binds": "minion.hotkey",
           "sample": "5"
         },
         {
@@ -10814,7 +10814,7 @@
           ],
           "font": "mono",
           "fontPx": 4,
-          "binds": "bay.state"
+          "binds": "minion.state"
         },
         {
           "rect": [
@@ -10826,7 +10826,7 @@
           "color": "ink",
           "font": "display",
           "fontPx": 8.5,
-          "binds": "bay.name"
+          "binds": "minion.name"
         },
         {
           "rect": [
@@ -10837,8 +10837,8 @@
           ],
           "font": "mono",
           "fontPx": 6.5,
-          "colorBind": "bay.gateColor",
-          "binds": "bay.cost"
+          "colorBind": "minion.gateColor",
+          "binds": "minion.cost"
         },
         {
           "rect": [
@@ -10850,7 +10850,7 @@
           "color": "parch",
           "font": "display",
           "fontPx": 8.25,
-          "binds": "bay.description",
+          "binds": "minion.description",
           "sample": "open bay"
         }
       ],
@@ -10906,7 +10906,7 @@
       "parts": [
         {
           "rect": [
-            12,
+            11,
             2,
             17,
             9
@@ -10919,7 +10919,7 @@
         },
         {
           "rect": [
-            35,
+            32,
             3,
             23,
             7
@@ -10970,9 +10970,9 @@
         },
         {
           "rect": [
-            63,
+            59,
             2,
-            326,
+            332,
             9
           ],
           "list": {
@@ -10993,13 +10993,13 @@
     },
     "invTab": {
       "size": [
-        40,
+        131,
         18
       ],
       "parts": [
         {
           "rect": [
-            12,
+            57,
             5,
             16,
             8
@@ -11007,6 +11007,7 @@
           "color": "inkBright",
           "font": "mono",
           "fontPx": 6,
+          "align": "center",
           "sample": "GEAR"
         }
       ],
@@ -11020,6 +11021,7 @@
       },
       "font": "mono",
       "fontPx": 6,
+      "align": "center",
       "states": {
         "family": "invTab",
         "idle": {
@@ -11041,7 +11043,7 @@
     },
     "invCard": {
       "size": [
-        199,
+        201,
         44
       ],
       "parts": [
@@ -11105,7 +11107,7 @@
         },
         {
           "rect": [
-            165,
+            168,
             8,
             26,
             10
@@ -11126,7 +11128,7 @@
           "rect": [
             40,
             19,
-            152,
+            154,
             6
           ],
           "color": "good",
@@ -11163,7 +11165,7 @@
           "rect": [
             40,
             28,
-            152,
+            154,
             9
           ],
           "color": "mutedWarm",
@@ -12647,7 +12649,7 @@
           "font": "display",
           "fontPx": 8,
           "align": "center",
-          "part": "baysBox"
+          "part": "minionsBox"
         },
         {
           "rect": [
@@ -12660,7 +12662,7 @@
           "font": "mono",
           "fontPx": 9,
           "align": "center",
-          "binds": "core.bays",
+          "binds": "core.minionCap",
           "sample": "2"
         },
         {
