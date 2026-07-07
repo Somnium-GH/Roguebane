@@ -210,4 +210,38 @@ public sealed class Style
     public Dictionary<string, string> PartStates { get; init; } = new();
     public JsonElement Pip { get; init; }
     public Dictionary<string, Frame> Frames { get; init; } = new(); // the reusable nine-slice frame set
+    public Pulse Pulse { get; init; } = new();
+}
+
+// CD #30 (LOCKED 2026-07-04): the ONE fixed-tick breathing primitive behind three template-state
+// flags — `pulse: true` (border alpha), `glow: true` (outer ring + halo), `pulse: "self"` (whole-
+// element alpha). One shared phase drives all three so unrelated elements breathe in lockstep.
+public sealed class Pulse
+{
+    public int PeriodMs { get; init; } = 1800;
+    public AlphaRange Border { get; init; } = new();
+    public GlowPulse Glow { get; init; } = new();
+    public AlphaRange Self { get; init; } = new();
+}
+
+public class AlphaRange
+{
+    public double AlphaLo { get; init; }
+    public double AlphaHi { get; init; } = 1;
+}
+
+public sealed class GlowPulse
+{
+    public RingPulse Ring { get; init; } = new();
+    public HaloPulse Halo { get; init; } = new();
+}
+
+public sealed class RingPulse : AlphaRange
+{
+    public double W { get; init; } = 1;
+}
+
+public sealed class HaloPulse : AlphaRange
+{
+    public int Blur { get; init; }
 }

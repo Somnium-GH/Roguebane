@@ -299,6 +299,50 @@ public class LayoutManifestTests
     }
 
     [Fact]
+    public void ParsesThePulsePrimitiveFromAFixture()
+    {
+        // CD #30 (LOCKED 2026-07-04, test-owned fixture): ONE fixed-tick primitive drives border-
+        // alpha breathe, glow ring+halo breathe, and whole-element ("self") alpha breathe.
+        var m = LayoutManifest.Parse("""
+        {
+          "style": { "pulse": { "periodMs": 1800, "easing": "easeInOut", "clock": "fixedTick",
+            "border": { "alphaLo": 0.45, "alphaHi": 1 },
+            "glow": { "ring": { "w": 1.5, "alphaLo": 0.4, "alphaHi": 0.73 },
+                      "halo": { "blur": 11, "alphaLo": 0, "alphaHi": 0.33 } },
+            "self": { "alphaLo": 0.45, "alphaHi": 1 } } }
+        }
+        """);
+        var p = m.Style.Pulse;
+        Assert.Equal(1800, p.PeriodMs);
+        Assert.Equal(0.45, p.Border.AlphaLo);
+        Assert.Equal(1, p.Border.AlphaHi);
+        Assert.Equal(1.5, p.Glow.Ring.W);
+        Assert.Equal(0.4, p.Glow.Ring.AlphaLo);
+        Assert.Equal(0.73, p.Glow.Ring.AlphaHi);
+        Assert.Equal(11, p.Glow.Halo.Blur);
+        Assert.Equal(0.33, p.Glow.Halo.AlphaHi);
+        Assert.Equal(0.45, p.Self.AlphaLo);
+    }
+
+    [Fact]
+    public void RealManifestCarriesASanePulsePrimitiveAndAtLeastOneFlaggedState()
+    {
+        // Contract-only: whatever periodMs/alpha values CD tunes, they must stay in sane ranges, and
+        // at least one template state must actually opt into pulse/glow (else the primitive is dead
+        // code) -- without pinning WHICH template/state does so.
+        var m = Real();
+        Assert.True(m.Style.Pulse.PeriodMs > 0);
+        Assert.InRange(m.Style.Pulse.Border.AlphaLo, 0.0, 1.0);
+        Assert.InRange(m.Style.Pulse.Border.AlphaHi, 0.0, 1.0);
+        var flagged = m.Templates.Values
+            .Where(t => t.States.ValueKind == System.Text.Json.JsonValueKind.Object)
+            .SelectMany(t => t.States.EnumerateObject())
+            .Where(st => st.Value.ValueKind == System.Text.Json.JsonValueKind.Object)
+            .Count(st => st.Value.TryGetProperty("pulse", out _) || st.Value.TryGetProperty("glow", out _));
+        Assert.True(flagged > 0, "no template state opts into pulse/glow -- CD #30 primitive would be unused");
+    }
+
+    [Fact]
     public void EveryElementShadowParsesWithSaneFields()
     {
         // §10 drop shadow: any element shadow must give the renderer usable numbers -- a non-negative

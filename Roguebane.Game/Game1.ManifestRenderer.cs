@@ -52,6 +52,10 @@ public partial class Game1
     private static readonly HashSet<string> FullBarIds = ["statusStrip", "footer"];
     private static bool IsFullBarElement(Element e) => FullBarIds.Contains(e.Id);
 
+    // CD #30's fixed-tick pulse/glow clock: cosmetic-only wall time, sampled once per Draw(GameTime)
+    // in Game1.cs. Never read by Update or Core — purely how far along the current breathe cycle is.
+    private double _pulseMs;
+
     private void DrawManifestBackdrop(string screenId)
     {
         var s = _ui.ScreenDef(screenId);
@@ -1386,18 +1390,67 @@ public partial class Game1
         var fillTok = t.Fill?.Token;
         var borderTok = t.Border?.Color;
         var key = stateKey ?? (datum is not null && t.Binds is { } b ? ResolveBind(datum, b) : null);
+        // CD #30 (LOCKED 2026-07-04): a state may additionally carry `pulse`/`glow` — the ONE
+        // fixed-tick breathe primitive, three ways (border alpha / outer ring+halo / whole-element).
+        var pulseBorder = false;
+        var pulseSelf = false;
+        var glow = false;
         if (key is not null && t.States.ValueKind == System.Text.Json.JsonValueKind.Object
             && t.States.TryGetProperty(key, out var st)
             && st.ValueKind == System.Text.Json.JsonValueKind.Object)
         {
             if (st.TryGetProperty("fill", out var f)) fillTok = f.GetString();
             if (st.TryGetProperty("border", out var bo)) borderTok = bo.GetString();
+            if (st.TryGetProperty("pulse", out var pu))
+            {
+                pulseBorder = pu.ValueKind == System.Text.Json.JsonValueKind.True;
+                pulseSelf = pu.ValueKind == System.Text.Json.JsonValueKind.String && pu.GetString() == "self";
+            }
+            if (st.TryGetProperty("glow", out var gl)) glow = gl.ValueKind == System.Text.Json.JsonValueKind.True;
         }
+        var pulse = _ui.Manifest?.Style.Pulse;
+        var t01 = pulse is not null && (pulseBorder || pulseSelf || glow) ? PulseT(pulse.PeriodMs) : 0f;
+        var selfAlpha = pulseSelf && pulse is not null ? Lerp(pulse.Self.AlphaLo, pulse.Self.AlphaHi, t01) : 1f;
         if (fillTok is { Length: > 0 })
-            DrawFill(new Rectangle(cell.X, cell.Y, cell.W, cell.H), new Fill { Token = fillTok });
+            DrawFill(new Rectangle(cell.X, cell.Y, cell.W, cell.H), new Fill { Token = fillTok }, selfAlpha);
         if (borderTok is { Length: > 0 })
-            Border(cell.X, cell.Y, cell.W, cell.H, _ui.Color(borderTok, Border0),
-                BorderPx(t.Border?.W ?? 1), t.Border?.Sides);
+        {
+            var borderColor = _ui.Color(borderTok, Border0) * selfAlpha;
+            if (pulseBorder && pulse is not null)
+                borderColor = _ui.Color(borderTok, Border0) * Lerp(pulse.Border.AlphaLo, pulse.Border.AlphaHi, t01);
+            Border(cell.X, cell.Y, cell.W, cell.H, borderColor, BorderPx(t.Border?.W ?? 1), t.Border?.Sides);
+            if (glow && pulse is not null) DrawGlow(cell, borderColor, pulse.Glow, t01);
+        }
+    }
+
+    // CD #30: the shared fixed-tick breathe phase, 0..1, easeInOut via a sine (fastest at the
+    // midpoint, resting at the extremes) — one clock so every pulsing element stays in lockstep.
+    private float PulseT(int periodMs)
+    {
+        var period = Math.Max(1, periodMs);
+        var phase = _pulseMs % period / period;
+        return (float)((Math.Sin(phase * Math.PI * 2 - Math.PI / 2) + 1) / 2);
+    }
+
+    private static float Lerp(double lo, double hi, float t) => (float)(lo + (hi - lo) * t);
+
+    // CD #30 glow: a thin outer ring (breathing alpha) plus a soft halo OUTSIDE the border. MonoGame's
+    // SpriteBatch has no blur primitive, so the halo reuses DrawShadow's own concentric-decaying-
+    // ring approximation (already the established stand-in for blur in this renderer) rather than a
+    // solid fill, so the interior border/fill chrome stays undimmed underneath it.
+    private void DrawGlow(LayoutRect cell, Color tint, GlowPulse glow, float t01)
+    {
+        var haloEnvelope = Lerp(glow.Halo.AlphaLo, glow.Halo.AlphaHi, t01);
+        if (haloEnvelope > 0f)
+            for (var i = 1; i <= glow.Halo.Blur; i++)
+            {
+                var a = haloEnvelope * (glow.Halo.Blur - i + 1) / (glow.Halo.Blur + 1);
+                Border(cell.X - i, cell.Y - i, cell.W + 2 * i, cell.H + 2 * i, tint * a, 1, null);
+            }
+        var ringAlpha = Lerp(glow.Ring.AlphaLo, glow.Ring.AlphaHi, t01);
+        var ringW = Math.Max(1, (int)Math.Round(glow.Ring.W));
+        Border(cell.X - ringW, cell.Y - ringW, cell.W + 2 * ringW, cell.H + 2 * ringW,
+            tint * ringAlpha, ringW, null);
     }
 
     // A self-styled LEAF template (no parts): the cell itself is the visual — its fill/border restyled
@@ -1811,14 +1864,14 @@ public partial class Game1
                 new Rectangle(p.Src.X, p.Src.Y, p.Src.W, p.Src.H), Color.White);
     }
 
-    private void DrawFill(Rectangle r, Fill fill)
+    private void DrawFill(Rectangle r, Fill fill, float alpha = 1f)
     {
         if (fill.IsGradient)
             DrawGradient(r.X, r.Y, r.Width, r.Height,
-                _ui.Color(fill.From ?? "panel", PanelTop), _ui.Color(fill.To ?? "border", PanelBot),
+                _ui.Color(fill.From ?? "panel", PanelTop) * alpha, _ui.Color(fill.To ?? "border", PanelBot) * alpha,
                 fill.Dir == "horizontal" ? GradientDir.Horizontal : GradientDir.Vertical);
         else if (!string.IsNullOrEmpty(fill.Token))
-            Rect(r.X, r.Y, r.Width, r.Height, _ui.Color(fill.Token!, Panel0));
+            Rect(r.X, r.Y, r.Width, r.Height, _ui.Color(fill.Token!, Panel0) * alpha);
     }
 
     private enum GradientDir { Vertical, Horizontal }

@@ -1,5 +1,38 @@
 # Status
 
+## ✅ FIXED (2026-07-07, loop) — CD #30 pulse/glow primitive, engine-side draw
+`CD_STATUS.md` #30: design LOCKED 2026-07-04 ("yes it's that glow"), manifest already shipping
+`style.pulse` (periodMs 1800, easeInOut, fixedTick) plus 4 template states flagged `pulse`/`glow`
+(techCard/targeting, beaconNode/current, cityNode/current, spineCity/current) — #30 itself noted engine
+draw was the only missing piece, and was also the primitive B8's CityMap "current node" ask was blocked on.
+**Model, `LayoutManifest.cs`:** `Style.Pulse` (new `Pulse`/`AlphaRange`/`GlowPulse`/`RingPulse`/`HaloPulse`
+classes) types the ONE fixed-tick primitive behind THREE flags: `pulse: true` (border alpha breathe),
+`glow: true` (outer ring + halo breathe), `pulse: "self"` (whole-element alpha breathe). `AlphaRange` is
+unsealed since `RingPulse`/`HaloPulse` both extend it (W and Blur respectively).
+**Draw, `Game1.ManifestRenderer.cs`:** `DrawTemplateRootChrome` reads the state's `pulse`/`glow` flags
+alongside its existing `fill`/`border` override lookup, computes a shared phase `t01` once per element
+(`PulseT`, a sine ease over `_pulseMs % periodMs`), then `Lerp`s the relevant alpha range. `DrawGlow` draws
+the ring/halo as concentric hollow `Border` rings with per-ring decaying alpha — the same "fake a blur with
+concentric shapes" idiom `DrawShadow` already uses for drop shadows (adapted to rings since a halo needs to
+read as a ring, not a filled blob). `DrawFill` gained an `alpha` multiplier (default 1, so every existing
+non-pulsing call site is unchanged) for the `pulse: "self"` whole-element case. Clock: `Game1.cs`'s
+`Draw(GameTime)` stamps `_pulseMs = gameTime.TotalGameTime.TotalMilliseconds` once per frame — cosmetic-only
+wall time, never read by Update or Core.
+**Tests:** `LayoutManifestTests.ParsesThePulsePrimitiveFromAFixture` (test-owned fixture, pins every field).
+`RealManifestCarriesASanePulsePrimitiveAndAtLeastOneFlaggedState` (CONTRACT-only against the real
+`layout.json`: periodMs>0, alphas in [0,1], and at least one template state actually opts into pulse/glow —
+proves the primitive isn't dead code without pinning which state). 448/448 green.
+**Game-side verify (no Game.Tests project — build+smoke precedent):** clean `dotnet build Roguebane.slnx`
+(4 projects, 0 errors/warnings). `RB_SMOKE=1 RB_MF=all` — all 7 screens (encounter, equipment, citymap,
+newgame, campaignmap, merchant) render with no crash; citymap/campaignmap exercise beaconNode/cityNode/
+spineCity, encounter exercises techCard/targeting. Bind/textgeom gaps reported are pre-existing (state-gated/
+Needs-CD, unrelated to this change). Animation correctness verified by hand against `PulseT`'s formula
+(sine ease, `(sin(phase*2π - π/2)+1)/2`): at ms=0/450/900/1350/1800 (quarters of the 1800ms period) it
+yields 0/0.5/1/0.5/0 — a symmetric breathe, not a frozen value — since a single headless screenshot only
+proves one instant, not that the value moves.
+**Not in scope (CD-owned):** any additional citymap/B8 asset work beyond what's already flagged in the
+shipped manifest — this closes only the engine draw primitive #30 called out as missing.
+
 ## ✅ FIXED (2026-07-07, loop) — dual-pool (STR/DEX) reservation for Frenzy/Flurry, CD_STATUS #36 engine half
 TECHNIQUES.md (LOCKED 2026-07-05): Frenzy/Flurry are "paid in STR or DEX by what you wield" — a Reaver's
 twin daggers (DEX weapons) should reserve from DEX, not be blocked because the technique's own `Stat` field

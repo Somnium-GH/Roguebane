@@ -837,6 +837,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
 
     protected override void Draw(GameTime gameTime)
     {
+        _pulseMs = gameTime.TotalGameTime.TotalMilliseconds; // CD #30 breathe clock, cosmetic-only
         EnsureSceneMatchesBackbuffer();
         // Smoke: RB_PAGE=<n> advances the screen's pager n pages before the shot, so a short last
         // page / exactly-full page can be verified without a real click (CorePager/InvPager pick
