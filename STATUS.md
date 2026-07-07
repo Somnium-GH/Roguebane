@@ -6,20 +6,25 @@ and `.claude/loop.md` updated: log a `metrics.csv` row ONLY inside the same comm
 its own commit/turn; skip it entirely if it'd cost more than one CSV line. `estimate_minutes` is
 RETIRED — always `-`, don't estimate up front, don't chase the column. If logging isn't free, don't log.
 
-## ✅ UNBLOCKED (2026-07-07, Doug) — Loot backlog: placeholder-blessed numbers, build it
+## ✅ DONE (2026-07-07, loop) — Loot backlog built at Doug's placeholder-blessed numbers
 Doug: we don't need his exact numbers every time — pick reasonable defaults, flag them placeholder,
-he'll tune later (same pattern as Sacrifice's heal formula / race HP). **Numbers to build against
-(placeholder-blessed, not final):**
-- **Gold** — randomize `Expedition.Spoils(NodeType)` around its current fixed values instead of a flat
-  number: Skirmish 2–4 (was flat 3), ResourceHold 3–6 (was flat 4), Castle 8–12 (was flat 10). Same
-  `Rng`/seed convention as the rest of `Expedition` (per-node, reproducible within a leg).
-- **Equipment / technique / rune drop** — rare: 8% per cleared encounter.
-- **Supplies drop** — "fairly frequent": 35% per cleared encounter.
-- **Summons drop** — good but less than supplies: 20% per cleared encounter.
-These are independent rolls (not a single shared reward slot) unless building it surfaces a reason
-they should share one — Doug's phrasing ("also," "and") reads as independent chances, not a table.
-Flag every number as placeholder-blessed in the commit/comment (same rule as everywhere else) — Doug
-tunes whenever he gets to a real economy pass. This is no longer Needs-Human; build it.
+he'll tune later (same pattern as Sacrifice's heal formula / race HP). **Built:**
+- **Gold** — `Expedition.Spoils(Rng, NodeType)` now randomizes around the old fixed values: Skirmish
+  2–4 (was flat 3), ResourceHold 3–6 (was flat 4), Castle 8–12 (was flat 10). Same node-seed
+  convention as the rest of `Expedition` (per-node, reproducible within a leg).
+- **New `LootDrop.Roll`** (`Roguebane.Core/LootDrop.cs`), called from `Expedition.Tick`'s Cleared
+  case on ONE shared `Rng` stream (seeded `Seed(nodeId) ^ LootSalt`, decorrelated from the encounter/
+  gear-stock seeds) alongside gold: **equipment/technique/rune** 8% (one shared slot, an equal-
+  weighted pick across weapon/armor/technique/mark pools — no design weighting given), **supplies**
+  35% (`CityMap.AddSupplies(1)`, reuses the existing merchant-resupply path, capped at `MaxSupplies`),
+  **summons** 20% (`Stash.AddMinion`). Independent rolls, matching Doug's "also"/"and" phrasing.
+  All numbers flagged placeholder-blessed in code comments — Doug tunes whenever he gets to a real
+  economy pass.
+**Tests:** `LootDropTests.cs` (new, 3 tests, 400-seed sweeps, same convention as
+`MerchantStockTests`) — seeded/reproducible, at most one gear kind per roll and each drawn from its
+own pool, and drop rates land in a tolerance band around 8/35/20%. `ExpeditionTests.
+ClearingNodesAwardsSpoils` updated from an exact `Assert.Equal(3, ...)` to `Assert.InRange(2, 4, ...)`
+now that spoils are randomized. Full `Core.Tests` green (454/454).
 
 ## ✅ PARTIALLY UNBLOCKED (2026-07-07, Doug) — Quests: build the SYSTEM now on a stub quest, real catalog is separate
 The numbers-style unblock above doesn't apply here — the real gap isn't a missing percentage, it's

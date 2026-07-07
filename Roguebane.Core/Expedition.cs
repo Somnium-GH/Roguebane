@@ -101,12 +101,15 @@ public sealed class Expedition
     public int Gold => _stash.Gold;
 
     private const ulong HealSalt = 0x4845414C; // decorrelate the heal-price roll from combat seeds
+    private const ulong LootSalt = 0x4C4F4F54; // decorrelate the node-clear loot roll from combat/gear seeds
 
-    private static int Spoils(NodeType type) => type switch
+    // Spoils gold, randomized around the old flat values (STATUS.md "Loot backlog", 2026-07-07
+    // Doug-unblocked, placeholder-blessed): Skirmish 2-4, ResourceHold 3-6, Castle 8-12.
+    private static int Spoils(Rng rng, NodeType type) => type switch
     {
-        NodeType.Castle => 10,
-        NodeType.ResourceHold => 4,
-        NodeType.Skirmish => 3,
+        NodeType.Castle => 8 + rng.Next(5),
+        NodeType.ResourceHold => 3 + rng.Next(4),
+        NodeType.Skirmish => 2 + rng.Next(3),
         _ => 2,
     };
 
@@ -387,7 +390,16 @@ public sealed class Expedition
                 State = ExpeditionState.Lost;
                 break;
             case BattleOutcome.Cleared:
-                _stash.AddGold(Spoils(Map.Current.Type)); // spoils for taking the node
+                var lootRng = new Rng(Seed(Map.Current.Id) ^ LootSalt);
+                _stash.AddGold(Spoils(lootRng, Map.Current.Type)); // spoils for taking the node
+                var loot = LootDrop.Roll(lootRng, Armory.All, Shops.ArmorPool,
+                    Content.Techniques.All, Paths.AllMarks, Content.Minions.All);
+                if (loot.Weapon is { } lootWeapon) _stash.AddWeapon(lootWeapon);
+                if (loot.Armor is { } lootArmor) _stash.AddArmor(lootArmor);
+                if (loot.Technique is { } lootTechnique) _stash.AddTechnique(lootTechnique);
+                if (loot.Mark is { } lootMark) _stash.AddMark(lootMark);
+                if (loot.Supplies) Map.AddSupplies(LootDrop.SuppliesAmount);
+                if (loot.Summon is { } lootSummon) _stash.AddMinion(lootSummon);
                 _caster.Recharge();                       // magic refills in the lull after a fight
                 if (Map.AtCastle) { Map.CrackCastle(); State = ExpeditionState.Won; }
                 // A cleared node banks its hold, then HOLDS at Cleared — the shell shows the result and

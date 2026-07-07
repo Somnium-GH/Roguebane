@@ -466,7 +466,7 @@ public class ExpeditionTests
         var exp = FullLoadout();
         Assert.Equal(0, exp.Gold);
         exp.Enter("a2"); FightToEnd(exp);
-        Assert.Equal(3, exp.Gold); // a skirmish pays 3
+        Assert.InRange(exp.Gold, 2, 4); // a skirmish pays 2-4 (randomized, was flat 3)
     }
 
     [Fact]
