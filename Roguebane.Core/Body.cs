@@ -44,6 +44,19 @@ public sealed class Body
         return Math.Max(0, r);
     }
 
+    // Mirrors Caster.Reservation's math (a live Caster needs a combat target the pre-run Equipment
+    // screen doesn't have, so it can't be used there) so the invItems technique-card badge shows what
+    // Activate() will actually charge instead of the raw Technique.Reserve (2026-07-07 loop bug, same
+    // shape as EffectiveWeaponReserve above).
+    public int EffectiveTechniqueReserve(Technique t)
+    {
+        if (t.Consults == WeaponUse.Primary) return 0;
+        var r = t.Reserve;
+        if (t.Consults == WeaponUse.Both && _effect == CoreEffectKind.Finesse) r -= 1;
+        if (_effect == CoreEffectKind.JackOfAllTrades) r -= 1;
+        return Math.Max(0, r);
+    }
+
     // Fortified/WarlordMight/JackOfAllTrades: an equip-time discount on armor's governing attribute
     // and requirement. Fortified reassigns Plate's governing STR to CON (paid in CON instead) at a
     // per-tier rate; WarlordMight's STR-plate discount is a flat per-piece amount — two distinct

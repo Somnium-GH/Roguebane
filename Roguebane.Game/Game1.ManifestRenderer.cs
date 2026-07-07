@@ -1643,7 +1643,10 @@ public partial class Game1
             "loadout.name" or "invItems.name" or "technique.name" => DisplayName(t.Id),
             "loadout.attr" => t.Stat.ToString().ToUpperInvariant() + " " + t.Reserve,
             "invItems.badgeLabel" or "technique.cost" => t.Stat.ToString().ToUpperInvariant(),
-            "invItems.badgeNum" => t.Reserve.ToString(),
+            // Discounted, not raw — same shape as Weapon's invItems.badgeNum fix (2026-07-06): a
+            // technique card must show what Activate()'s Consults/Finesse/JackOfAllTrades gate
+            // actually charges, not Technique.Reserve.
+            "invItems.badgeNum" => (InRun ? Exp.Player.Body.EffectiveTechniqueReserve(t) : t.Reserve).ToString(),
             // same gap as Weapon/Armor's invItems.effect (2026-07-06): every technique card in the
             // Inventory list fell back to the static gear SAMPLE ("...DPS.") instead of its own copy.
             "technique.description" or "invItems.effect" => t.DescText,

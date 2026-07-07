@@ -164,6 +164,29 @@ public class CoreEffectTests
         Assert.Equal(claymore.Reserve - 3, warlord.EffectiveWeaponReserve(claymore));
     }
 
+    // --- Display-facing regression (2026-07-07 loop): the invItems technique-card badge must read
+    // this SAME number Caster.Reservation would charge at Activate() time, not Technique.Reserve raw —
+    // the pre-run Equipment screen has no live Caster (needs a combat target) to ask directly.
+    [Fact]
+    public void EffectiveTechniqueReserveIsPubliclyReadableForCardDisplayAndMatchesCasterReservation()
+    {
+        var plain = new Body();
+        Assert.Equal(Armory.Flurry.Reserve, plain.EffectiveTechniqueReserve(Armory.Flurry)); // no effect -> raw
+
+        var finesse = new Body();
+        finesse.SetCoreEffect(CoreEffectKind.Finesse);
+        Assert.Equal(Armory.Flurry.Reserve - 1, finesse.EffectiveTechniqueReserve(Armory.Flurry));
+
+        var jack = new Body();
+        jack.SetCoreEffect(CoreEffectKind.JackOfAllTrades);
+        Assert.Equal(Armory.Flurry.Reserve - 1, jack.EffectiveTechniqueReserve(Armory.Flurry));
+
+        // Primary-consult (e.g. AimedShot): the one weapon it swings already reserves as gear, so the
+        // technique itself always reserves 0 regardless of its raw Reserve or any active core effect.
+        Assert.Equal(0, plain.EffectiveTechniqueReserve(Armory.AimedShot));
+        Assert.Equal(0, jack.EffectiveTechniqueReserve(Armory.AimedShot));
+    }
+
     [Fact]
     public void FletcherLuckSkipsChargeOnALuckyRollWhileABaselineCasterNeverFiresDry()
     {

@@ -339,16 +339,17 @@ call the SAME discount math the equip gate already used — no duplicated formul
 EffectiveWeaponReserveIsPubliclyReadableForCardDisplayAndMatchesTheEquipGate` pins the public contract
 directly (WarlordMight -3 on a 2H claymore). 421/421 green; `Roguebane.Game` full clean rebuild (`--no-
 incremental`, `scratch-build-stale-obj` memory) 0 errors.
-**Technique half NOT done — separate, harder slice, still open:** `"invItems.badgeNum" =>
-t.Reserve.ToString()` (technique card badge, same file ~line 1632) still prints raw. Reason it's not the
-same fix: technique reservation isn't a flat per-item discount like weapons/armor — `Caster.Reservation`
-(private, Caster.cs:196) branches on `Consults`: a `Primary`-consult technique (e.g. Jab) reserves **0** of
-its own (the ONE weapon it swings already reserves as gear — baking `t.Reserve` in too would double-count),
-while a `Both`-consult technique (Frenzy/Flurry) reserves its own `t.Reserve` minus Finesse/JoAT. Showing
-the *right* badge needs that same branch, but `Caster` is a combat-time object (needs a target to
-construct) — not something the pre-run Equipment/build screen has lying around the way `Exp.Player.Body`
-already did for weapons. Needs a display-only accessor (Body- or Technique-side, not a full `Caster`) before
-this half can land — a real design/API question, not a one-line wire-up. Left as-is, not touched this pass.
+**⇒ TECHNIQUE HALF FIXED (2026-07-07, loop):** `"invItems.badgeNum"` for a `Technique` now reads
+`Exp.Player.Body.EffectiveTechniqueReserve(t)` (InRun) instead of `t.Reserve` raw — same shape as the
+weapon fix above. New `Body.EffectiveTechniqueReserve(Technique t)` (public, pure function) mirrors
+`Caster.Reservation`'s branch (`Consults == Primary` -> 0; `Both` -> `t.Reserve` minus Finesse/JoAT,
+floored at 0) WITHOUT needing a live `Caster` — the pre-run Equipment/build screen has no combat target
+to construct one, but `Body.SetCoreEffect` is already stamped at `CoreRune.NewBody` time (Forge.cs /
+`BuildSession.Preview`), so `_effect` is there to read either way. New test `CoreEffectTests.
+EffectiveTechniqueReserveIsPubliclyReadableForCardDisplayAndMatchesCasterReservation` pins Flurry
+(Both-consult, Reserve 2) at plain/Finesse/JackOfAllTrades, and AimedShot (Primary-consult, Reserve 2) at
+0 regardless of effect. 444/444 green; `Roguebane.Game` full rebuild 0 errors. Both badge halves now agree
+with their real equip/activate-time gates.
 
 **Not yet root-caused, needs a retest once the above two land:** "removing the shield and re-equipping it
 never reserves." Two live candidates, don't guess further without a fresh repro: (a) the still-open
