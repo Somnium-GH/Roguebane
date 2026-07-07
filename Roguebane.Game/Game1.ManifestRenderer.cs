@@ -1074,12 +1074,16 @@ public partial class Game1
         // is OPEN (§17), so the model's actual grouping (ladders) is what renders.
         "runeGroups" => _build.Paths.Cast<object>().ToList(),
         // Equipment identity block (design/02): the core's headline numbers as label/value rows —
-        // all live core/build data, no invented figures.
+        // all live core/build data, no invented figures. Order matches the 2x2 grid in the 02 refs
+        // (budget/actions top row, bays/base hp bottom row); "base hp" was missing entirely until
+        // CHUNK C item 3 (2026-07-06, loop) — it's the RACE's flat Hp (pre-CON-scaling), the same
+        // field Fighter.Scaled's _base reads, never the live/CON-scaled MaxHp.
         "core.stats" => new List<object>
         {
-            ("bays", _build.CoreRune.MinionCap.ToString()),
-            ("actions", _build.CoreRune.ActionSlots.ToString()), // real capacity, not Kit.Count (2026-07-06 loop)
             ("budget", _build.CoreRune.RuneBudget.ToString()),
+            ("actions", _build.CoreRune.ActionSlots.ToString()), // real capacity, not Kit.Count (2026-07-06 loop)
+            ("bays", _build.CoreRune.MinionCap.ToString()),
+            ("base hp", _build.Race.Hp.ToString()),
         },
         // CityMap chart legend (design/03): what the node icons mean — display metadata, same rows the
         // legacy legend drew; icon tokens through NodeToken so the key can't drift from the chart.

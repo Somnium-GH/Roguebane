@@ -713,9 +713,26 @@ crumbs landed along the way.
    concrete second token, so Reaver stays unsplit rather than inventing one). **FLAGGED stopgap**: this
    is a grouping call, not a canonical design — B20 still owns the real per-core token if CD wants to
    change it. Pinned by `EveryCoreCarriesAnAccentTokenFromTheManifestsOwnPalette`. 443/443 green.
-3. **Identity binds:** budgets/actions/minions/base-hp/effect name+desc all flow through EXISTING binds
-   (`core.stats`, `core.coreEffect*`) — verify per-core against the 02 refs. The stat-bonus CHIPS,
-   action-card rules text, and "minions" labels are B20/B19 manifest work — flag, don't hand-draw.
+3. ✅ DONE (2026-07-06, loop) — **Identity binds.** Verified against `design/02-equipment-grunt.png`:
+   the reference's bottom-left identity block is a 4-row 2x2 grid (budget/actions top, bays/base hp
+   bottom) — `core.stats` (`Game1.ManifestRenderer.cs:1078`) emitted only 3 rows (bays/actions/budget,
+   wrong order too), **`base hp` was missing entirely**, a real pre-existing bind gap (same class as
+   Task #2's 3 bind-gap bugs). Fixed: added `("base hp", _build.Race.Hp.ToString())` — the RACE's flat
+   Hp (`Race.cs:14`), the same field `Fighter.Scaled`'s `_base` reads, never the live CON-scaled
+   `MaxHp` (`Fighter.cs:40`) — and reordered to `budget, actions, bays, base hp` to match the grid's
+   row-major fill. `core.coreEffectName`/`core.coreEffectDesc` were already correctly wired
+   (`_build.CoreRune.CoreEffectName`/`CoreEffectDesc`, pre-existing). The stat-bonus CHIPS
+   (`core.statBonus`) have NO `ListData` case — confirmed this is intentional (B20/B19 manifest work,
+   correctly un-hand-drawn: no data means the chip row silently doesn't render, same "state-gated, ok"
+   pattern as every other unresolved bind, not fabricated content). Verified live via
+   `RB_SMOKE=1 RB_MF=all RB_SCREEN=equipment` (Grunt/Human, the loadout drive's build): all 4 rows now
+   render with real data (`budget 20`, `actions 4`, `bays 2`, `base hp 16`) — screenshot confirms
+   correct labels/order/values. The engine reads are generic per-core/race (`CoreRune.RuneBudget`/
+   `ActionSlots`/`MinionCap`, `Race.Hp`), not Grunt-special-cased, so this generalizes across all 35
+   combos without a per-core render pass. No Core change (Game-layer `ResolveBind`/`ListData` fix in
+   `Roguebane.Game`, not headless-testable there per the project's Core/Game split) — verified per
+   Task #2's established precedent (rebuild + RB_SMOKE screenshot, not an xunit test). Build clean,
+   0 errors/warnings.
 4. **Pixel-perfect lanes:** keep the 6 classic gate lanes (old refs) as the REGRESSION bar. Add the 14
    per-core refs as REPORT-ONLY lanes (drive race=human, core=<each> via the existing core-cycling
    drive) — they become the failing bar only when B20's extraction lands. After A+C land, the
