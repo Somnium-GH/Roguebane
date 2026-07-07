@@ -1,5 +1,31 @@
 # Status
 
+## ✅ FIXED (2026-07-07, loop) — dual-pool (STR/DEX) reservation for Frenzy/Flurry, CD_STATUS #36 engine half
+TECHNIQUES.md (LOCKED 2026-07-05): Frenzy/Flurry are "paid in STR or DEX by what you wield" — a Reaver's
+twin daggers (DEX weapons) should reserve from DEX, not be blocked because the technique's own `Stat` field
+is `Stat.Str`. `CD_STATUS.md` #36 flags this exact gap under OPEN: "which pool the live reserve draws from
+is a RUNTIME decision the engine must make... engine dual-pool reserve... NOT yet done."
+**Root cause, `Caster.Reservation` (now `ResolveReservation`, `Caster.cs`):** always built its `Active` off
+`Technique.Stat` (hardcoded `Str` on Frenzy/Flurry), completely ignoring `Technique.AltStat` (`Dex`) even
+though `Body.cs`'s weapon-consult lookup already resolves `AltStat` correctly for damage. A pure-DEX body
+(no STR body part at all) wielding twin daggers could never activate Frenzy/Flurry — `Body.Activate` gated
+on `Capacity(Stat.Str)` which was always 0.
+**Fix:** `ResolveReservation` now picks whichever pool (`Stat` or `AltStat`) can afford the reserve, else
+(a lock shortfall on both) whichever has the most room — mirroring CD's own can-afford-else-most-room
+display resolver. Ties (including "both can afford it") default to the technique's own `Stat`, so the
+existing STR-preferring behavior is unchanged whenever STR is actually available (no regression risk for
+every non-dual-pool technique, and for Frenzy/Flurry when STR has room). The picked stat is cached on
+`Run.Reservation` at `Activate()` time and reused verbatim by `Deactivate`/`PruneSilenced` — recomputing at
+those call sites would let a later capacity shift (damage) pick a DIFFERENT pool than the one actually
+reserved, leaking the real reservation forever.
+**Tests:** new `CoreEffectTests.DualWieldTechniqueReservesFromWhicheverPoolCanAffordItWhenPrimaryCannot`
+(0-STR twin-dagger body activates Frenzy, reserves from DEX, frees from DEX on Deactivate). Existing
+`FinesseDiscountsDualWieldTechniqueReservationByOne` re-verified unchanged (both pools have room there, so
+the STR tie-break still applies) — no existing assertion needed to change. 446/446 green.
+**Not in scope (CD-owned):** the manifest/`layout.json` side of #36 (extractor `either`/`payAttr` field,
+two-row split-cost draw on the action bar/inventory cards) — that's CD's own drop-audit item, not ours to
+hand-edit; this closes only the engine-mechanic half CD_STATUS explicitly called out as the blocker.
+
 ## ✅ FIXED (2026-07-06, loop) — city map reveals adjacent Skirmish/Quest tiles; only Merchant/ResourceHold/Castle/Camp should ever be knowable before landing
 Doug's ask, verbatim: the map "should basically just make you guess your way through it taking chances
 besides the revealing of merchants and the resource nodes" — Camp (own origin) and Castle (visible afar,

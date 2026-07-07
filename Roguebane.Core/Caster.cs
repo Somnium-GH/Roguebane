@@ -14,6 +14,10 @@ public sealed class Caster
         public BodyPart? Part;       // per-technique PART aim within Aimed; null => whole-target HP
         public bool Auto = true;     // AUTO: discharge on cadence when ready. Off => hold for a Fire() command.
         public int ResonanceStacks;  // Adept's Resonance: landed hits stack a −2%/stack charge discount (cap 5)
+        public required Active Reservation; // the Active actually reserved at Activate() time -- Deactivate/
+        // PruneSilenced MUST reuse this exact value rather than recomputing, since a dual-pool (AltStat)
+        // technique's pool choice depends on live stat room at activation time; recomputing later (after
+        // damage has shifted that room) could free/check the WRONG stat and leak the real reservation.
     }
 
     private const int HasteRate = 2; // % cooldown reduction per point of DEX (action speed)
@@ -194,13 +198,30 @@ public sealed class Caster
     // Primary-consulting technique reserves NOTHING of its own: the one weapon it swings already
     // reserves as gear, and baking that into the technique's Active too would double-count the same
     // stat. Activate() below gates weapon-consulting techniques on having something to swing instead.
-    private Active Reservation(Technique t)
+    // TECHNIQUES.md/CD_STATUS #36 (LOCKED 2026-07-05): a Both-consulting technique with an AltStat
+    // (Frenzy/Flurry) is "paid in STR or DEX by what you wield" -- picks whichever pool can afford the
+    // reserve, else (a lock shortfall either way) whichever pool has the most room, mirroring the CD
+    // display resolver's can-afford-else-most-room rule. Ties (including "both afford it") default to
+    // the technique's own Stat. Called ONLY at Activate() time; the result is cached on the Run so a
+    // later capacity shift never changes which pool a running technique is charged against.
+    private Active ResolveReservation(Technique t)
     {
         if (t.Consults == WeaponUse.Primary) return new Active(t.Id, t.Stat, 0);
         var reserve = t.Reserve;
         if (t.Consults == WeaponUse.Both && _effect == CoreEffectKind.Finesse) reserve -= 1;
         if (_effect == CoreEffectKind.JackOfAllTrades) reserve -= 1;
-        return new Active(t.Id, t.Stat, Math.Max(0, reserve));
+        reserve = Math.Max(0, reserve);
+
+        var stat = t.Stat;
+        if (t.AltStat is { } alt)
+        {
+            var primaryRoom = _self.Capacity(t.Stat) - _self.TechReserved(t.Stat);
+            var altRoom = _self.Capacity(alt) - _self.TechReserved(alt);
+            var primaryAffords = primaryRoom >= reserve;
+            var altAffords = altRoom >= reserve;
+            if (!primaryAffords && (altAffords || altRoom > primaryRoom)) stat = alt;
+        }
+        return new Active(t.Id, stat, reserve);
     }
 
     private int EffectivePower(Technique t) => t.Consults == WeaponUse.None
@@ -238,9 +259,9 @@ public sealed class Caster
             if (technique.Reserve <= 0 && !technique.ConsumesMinion) return false;
         }
         else if (_self.Consulted(technique).Count == 0) return false; // nothing to swing
-        var reservation = Reservation(technique);
+        var reservation = ResolveReservation(technique);
         if (!_self.Activate(reservation)) return false;
-        _active[technique.Id] = new Run { Tech = technique, Countdown = EffectiveCooldown(technique), Auto = auto };
+        _active[technique.Id] = new Run { Tech = technique, Countdown = EffectiveCooldown(technique), Auto = auto, Reservation = reservation };
         if (technique.ShieldLayers > 0) _self.RaiseShield(technique.Id, technique.ShieldLayers, ShieldRegenTicks(technique));
         return true;
     }
@@ -252,8 +273,9 @@ public sealed class Caster
 
     public void Deactivate(Technique technique)
     {
-        if (!_active.Remove(technique.Id)) return;
-        _self.Deactivate(Reservation(technique));
+        if (!_active.TryGetValue(technique.Id, out var run)) return;
+        _active.Remove(technique.Id);
+        _self.Deactivate(run.Reservation);
         if (technique.ShieldLayers > 0) _self.DropShield(technique.Id);
     }
 
@@ -472,7 +494,7 @@ public sealed class Caster
     private void PruneSilenced()
     {
         foreach (var run in _active.Values.ToList())
-            if (!_self.IsActive(Reservation(run.Tech)))
+            if (!_self.IsActive(run.Reservation))
             {
                 _active.Remove(run.Tech.Id);
                 if (run.Tech.ShieldLayers > 0) _self.DropShield(run.Tech.Id); // a smashed source sheds its shield

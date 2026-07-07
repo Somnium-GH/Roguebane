@@ -136,6 +136,29 @@ public class CoreEffectTests
         Assert.Equal(10 - 2, finesse.Available(Stat.Str)); // Reserve 3 - Finesse's -1
     }
 
+    // --- Dual-pool reservation (TECHNIQUES.md LOCKED 2026-07-05 / CD_STATUS #36, engine half): Frenzy/
+    // Flurry are "paid in STR or DEX by what you wield," not gated on STR existing at all. Before this
+    // fix, Reservation() always charged the technique's own Stat (hardcoded Str) regardless of AltStat,
+    // so a pure-DEX body (no STR part whatsoever) could never activate a dual-wield technique even while
+    // wielding two DEX daggers.
+    [Fact]
+    public void DualWieldTechniqueReservesFromWhicheverPoolCanAffordItWhenPrimaryCannot()
+    {
+        var body = new Body();
+        body.Add(new BodyPart("leg", Stat.Dex, 10)); // no STR part at all
+        body.Wield(Armory.Daggers[0]);
+        body.Wield(Armory.Daggers[0]);
+
+        var caster = new Caster(body);
+        Assert.Equal(0, body.Capacity(Stat.Str)); // sanity: STR pool genuinely doesn't exist
+        var beforeActivate = body.Available(Stat.Dex); // 10 minus the two daggers' own gear reserve
+        Assert.True(caster.Activate(Armory.Frenzy));
+        Assert.Equal(beforeActivate - 3, body.Available(Stat.Dex)); // reserved from DEX, the only pool that can afford it
+
+        caster.Deactivate(Armory.Frenzy);
+        Assert.Equal(beforeActivate, body.Available(Stat.Dex)); // freed from the SAME pool it was reserved on, gear untouched
+    }
+
     // --- FletcherLuck (Ranger): bow reserve -1/tier, plus a 20% chance to skip a pierce's Charge
     // spend entirely. maxCharge:0 makes discharge possible ONLY on a lucky roll, isolating the
     // mechanic deterministically for a fixed seed.
