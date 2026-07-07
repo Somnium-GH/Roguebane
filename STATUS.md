@@ -24,27 +24,19 @@ site in the repo (`Game1.ManifestRenderer.cs:477` is the only other one) — it 
 signature untouched, no Game rebuild needed.
 
 ## ‼ HIGH PRIORITY (2026-07-06, Doug — interview #2 answers, 3 precise directives)
-1. **Merchant per-leg seed gap — Doug: GLOBAL fix, salt `Expedition.Seed(nodeId)` itself (not scoped to
-   just the merchant).** Root cause (already pinned by `ExpeditionTests.MerchantNodeBNeverRollsMoreThan
-   ThreeSections`/`MerchantNodeBRollsIdenticalStockAcrossIndependentLegs`): `Expedition.Seed(string
-   nodeId)` is a pure FNV-1a hash of the node id string only — no leg/run identity — so `Maps.
-   StandardLegNodes()` reusing literal id `"b"` for the merchant rolls identical stock every leg/run.
-   Doug chose the global fix deliberately: this also varies foe/encounter/loot rolls per leg, not just
-   merchant stock, since ALL of those currently route through the same `Seed(nodeId)`.
-   **Fix shape:** `Campaign` already tracks `_legIndex` (`Campaign.cs:23`, exposed via `LegIndex`) but
-   never passes it down — `NewLeg()` (`Campaign.cs:53-54`) constructs each `Expedition` with no leg
-   identity at all. Thread it through: add an `int leg = 0` param to `Expedition`'s constructor
-   (default preserves every existing single-leg caller — `Sessions.cs`, `Forge.cs`, tests — byte-
-   identical), store it, and mix it into `Seed(string nodeId)` (e.g. XOR the leg into the FNV-1a seed
-   or fold `(ulong)leg` into the hash before the id chars) so **same node + same leg ⇒ same rolls
-   (within-leg reproducibility preserved), different leg ⇒ different rolls.** `Campaign.NewLeg()` passes
-   `_legIndex` through.
-   **Tests:** `MerchantNodeBRollsIdenticalStockAcrossIndependentLegs` currently PINS the buggy sameness
-   — it must FLIP to assert stock DIFFERS across two `Campaign` legs at the same node id (construct via
-   `Campaign`, not two bare `Expedition`s, so the leg index actually varies). Re-verify no OTHER seeded-
-   content test (foe rolls, loot rolls, heal price) is accidentally leg-0-only and silently still passes
-   for the wrong reason — grep test usages of `Seed(` reasoning before assuming only the merchant tests
-   need touching.
+1. **✅ FIXED (2026-07-07, loop) — Merchant per-leg seed gap.** `Expedition` gained an `int leg = 0`
+   constructor param (default preserves every existing single-leg caller — `Sessions.cs`, `Forge.cs`,
+   tests — byte-identical) stored in `_leg` and folded into `Seed(string nodeId)` (skipped entirely when
+   `_leg == 0`, so leg-0 rolls are bit-for-bit the old formula; XORed in before the id chars otherwise).
+   `Campaign.NewLeg()` (`Campaign.cs:53-54`) now passes `_legIndex` through — same node + same leg ⇒ same
+   rolls, different leg ⇒ different rolls, and this is global (foe/encounter/loot/heal-price/stock all
+   route through the same `Seed`, not just merchant stock). `ExpeditionTests.
+   MerchantNodeBRollsIdenticalStockAcrossIndependentLegs` (which pinned the bug) replaced with
+   `MerchantNodeBRollsDifferentStockAcrossCampaignLegs`, built through a real `Campaign` across two legs
+   at the same node id "b", asserting the offered weapons/armor/minions aren't all identical across legs.
+   Grepped the whole test suite for other `Seed(`/`EncounterFor`/`MerchantStock.Roll` usages outside
+   `ExpeditionTests.cs` — none found, so no other test was silently leg-0-only. Core tests 443/443 green
+   (net swap, not a net-new test).
 2. **Conclave keystone (`Paths.BoundConclave`) — Doug: leave it granting no minion, explicitly ACCEPTED
    as a placeholder, not an oversight.** No code change. Removed from Needs-Human below — this is
    resolved, not deferred-and-forgotten; revisit only if Doug raises it again.
@@ -926,18 +918,12 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
   Two items from this bullet's old parenthetical are still genuinely open, not tracked elsewhere — kept
   here so they aren't silently dropped: **#30 glow/pulse** (no engine primitive yet, not started) and
   **#32 worn-draw composition**, which IS tracked, see Debt below ("Worn-armor DRAW wiring").
-- **Merchant pager doesn't indicate page 2** — ROOT-CAUSED (2026-07-06): Pager/bind/click code is all
-  correct (verified by hand + a live `RB_SMOKE=1 RB_SCREEN=citymap RB_MF=merchant RB_SHOT=...`
-  screenshot at node "b": PAGE 1/1, 3 sections, no arrows — exactly right for `PageCount==1`). The real
-  cause: `Expedition.Seed(nodeId)` is a pure function of the node id STRING with no leg-index/campaign
-  salt, and `Maps.StandardLegNodes()` reuses the literal id `"b"` for the merchant on EVERY leg — so
-  node "b" rolls the identical stock (weapons/armor/minions, never techniques/runes) every visit,
-  every leg, every run. `SectionsPerPage` is 3, so page 2 is mechanically unreachable in live play —
-  not a broken indicator. Pinned by `ExpeditionTests.MerchantNodeBNeverRollsMoreThanThreeSections` +
-  `MerchantNodeBRollsIdenticalStockAcrossIndependentLegs`. **Needs Human**: should node/battle seeds
-  fold in leg index (or another per-leg salt) for run-to-run variety? Same underlying gap as the
-  Merchant Wares backlog's blocked map-tier signal above — no per-leg identity exists anywhere yet.
-  Don't re-diagnose B13/B14 (unrelated, both already root-caused CD-side).
+- **Merchant pager doesn't indicate page 2** — ROOT-CAUSED (2026-07-06), underlying seed gap ✅ FIXED
+  (2026-07-07, loop) — see the HIGH PRIORITY banner above (`Expedition.Seed` now folds in `Campaign`'s
+  leg index, so node "b" no longer rolls identical stock every leg/run). Page 2 is still mechanically
+  unreachable at `SectionsPerPage==3` with only 3 offerable sections (weapons/armor/minions) — that part
+  was never a bug, just a low ceiling; not re-opening it. Don't re-diagnose B13/B14 (unrelated, both
+  already root-caused CD-side).
 - **Targeting-FSM watch** (no clean repro): unaimed-charged misbehavior — Core FSM proven correct
   headlessly; if it reproduces live it's shell-side (card-state chip / stale Targeting cursor).
 

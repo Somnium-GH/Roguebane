@@ -231,8 +231,7 @@ public class ExpeditionTests
     // visit, forever: exactly 3 sections (weapons/armor/minions; techniques+runes both roll false at
     // this seed). SectionsPerPage is 3, so PageCount is always 1 at this node -- page 2 is mechanically
     // unreachable in live play, not a broken indicator (Pager/bind/click all verified correct by hand
-    // and via a live RB_SMOKE screenshot). Needs Human: should node/battle seeds fold in leg index for
-    // per-leg variety? Pinned here so that's a deliberate future change, not silent drift.
+    // and via a live RB_SMOKE screenshot).
     [Fact]
     public void MerchantNodeBNeverRollsMoreThanThreeSections()
     {
@@ -246,20 +245,45 @@ public class ExpeditionTests
         Assert.NotEmpty(exp.OfferedMinions);
     }
 
+    // Fixed (2026-07-07, Doug's HIGH PRIORITY #1, global fix): Expedition.Seed(nodeId) now folds in
+    // Campaign's leg index, so the SAME node id "b" on two different legs of the SAME campaign rolls
+    // DIFFERENT stock -- no more identical merchant every leg/run. Two bare, leg-0 Expeditions (the old
+    // test's setup) are still identical by design: that's within-leg reproducibility, not the bug.
     [Fact]
-    public void MerchantNodeBRollsIdenticalStockAcrossIndependentLegs()
+    public void MerchantNodeBRollsDifferentStockAcrossCampaignLegs()
     {
-        var a = FullLoadout();
-        a.Enter("a2"); FightToEnd(a);
-        a.Enter("b");
+        var c = Sessions.NewCampaign();
+        foreach (var t in Techniques.All) c.Toggle(t);
+        c.SetAuto(true);
 
-        var b = FullLoadout(); // a wholly separate Expedition/CityMap instance, same node id
-        b.Enter("a2"); FightToEnd(b);
-        b.Enter("b");
+        void Step(string node)
+        {
+            c.Enter(node);
+            var guard = 0;
+            while (c.Current.State == ExpeditionState.Fighting && guard++ < 10000)
+            {
+                if (c.Enemy is { } foe) foreach (var t in Techniques.All) if (c.IsActive(t)) c.Aim(t, foe);
+                c.Tick();
+            }
+            c.Redeploy();
+        }
 
-        Assert.Equal(a.OfferedWeapons, b.OfferedWeapons);
-        Assert.Equal(a.OfferedArmor, b.OfferedArmor);
-        Assert.Equal(a.OfferedMinions, b.OfferedMinions);
+        Step("a2");
+        c.Enter("b"); // leg 0's merchant
+        var (weapons0, armor0, minions0) = (c.Current.OfferedWeapons, c.Current.OfferedArmor, c.Current.OfferedMinions);
+
+        Step("c1");
+        Step("castle"); // wins leg 0 -> advances to leg 1
+        Assert.Equal(1, c.LegIndex);
+
+        Step("a2");
+        c.Enter("b"); // leg 1's merchant -- same node id "b", different leg
+        var (weapons1, armor1, minions1) = (c.Current.OfferedWeapons, c.Current.OfferedArmor, c.Current.OfferedMinions);
+
+        Assert.False(
+            weapons0.SequenceEqual(weapons1) &&
+            armor0.SequenceEqual(armor1) &&
+            minions0.SequenceEqual(minions1));
     }
 
     [Fact]

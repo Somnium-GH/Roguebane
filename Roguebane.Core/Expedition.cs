@@ -21,6 +21,7 @@ public sealed class Expedition
     private readonly Caster _caster;
     private readonly List<Technique> _equipment;
     private readonly Stash _stash;
+    private readonly int _leg; // folded into Seed() so a merchant/encounter/heal/stock roll differs leg to leg
     // §12 gear stock: rolled ONCE per merchant node from its seed (reproducible), purchases consume
     // it. Techniques/minions/runes are OFFERED but not yet buyable — their receiving models (mid-run
     // palette/minion/rune mutation) are the design-open gate.
@@ -60,7 +61,7 @@ public sealed class Expedition
 
     public Expedition(Fighter player, Caster caster, IReadOnlyList<Technique> equipment, CityMap map,
         Stash? stash = null, string figureId = "human_grunt",
-        int techniqueSlots = int.MaxValue)
+        int techniqueSlots = int.MaxValue, int leg = 0)
     {
         _player = player;
         _caster = caster;
@@ -69,6 +70,7 @@ public sealed class Expedition
         _stash = stash ?? new Stash();
         FigureId = figureId;
         TechniqueSlots = techniqueSlots;
+        _leg = leg;
 
         // Forge equips the chassis kit straight onto the Body before an Expedition exists, so those
         // pieces never pass through Stash.AddWeapon/AddArmor -- seed the GEAR roster with them here so
@@ -362,10 +364,14 @@ public sealed class Expedition
         return true;
     }
 
-    // A stable per-node seed: same node id => same combat rolls, so the run stays reproducible.
-    private static ulong Seed(string nodeId)
+    // A stable per-node seed: same (leg, node id) => same combat/merchant rolls, so the run stays
+    // reproducible. leg=0 (the default, every pre-Campaign caller) folds in nothing, so this is
+    // byte-identical to the old single-leg formula; a later leg mixes its index in first so the
+    // SAME node id in leg 2 doesn't roll the SAME gear/heal-price/encounter as leg 0's node "a1".
+    private ulong Seed(string nodeId)
     {
         ulong h = 1469598103934665603; // FNV-1a over the id
+        if (_leg != 0) { h ^= (ulong)_leg; h *= 1099511628211; }
         foreach (var c in nodeId) { h ^= c; h *= 1099511628211; }
         return h;
     }

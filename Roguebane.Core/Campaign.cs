@@ -51,7 +51,7 @@ public sealed class Campaign
     public bool OnFinalLeg => _legIndex == _legs.Count - 1;
 
     private Expedition NewLeg() =>
-        new(_player, _caster, _loadout, _legs[_legIndex](), _stash, _figureId, _techniqueSlots);
+        new(_player, _caster, _loadout, _legs[_legIndex](), _stash, _figureId, _techniqueSlots, _legIndex);
 
     // Top-level passthroughs so a driver talks to the campaign, not the swapping leg underneath.
     public bool Enter(string nodeId)
