@@ -60,6 +60,25 @@ public static class Foes
         return new Foe(id, hp, frame, new[] { Techniques.Ember }, figure, aim, FoeEffectKind.Insubstantial);
     }
 
+    // CHUNK D item 2's fourth roster foe (FOES.md): the DPS-race teacher. Real Iron Axe (Swing-consulted,
+    // §8 symmetry, same as Ogre) PLUS a real self-mend (Bandage, CON-reserved off its own chest) run by
+    // its own offense caster -- Battle passes RegenerativeFlesh through as that caster's foeEffect, so
+    // the mend doubles automatically (Caster.cs, proven bare in TrollRegenerativeFleshTests). No separate
+    // "chest still whole" gate needed: Bandage's own CON reservation cascade already silences it if the
+    // chest breaks below Reserve 2 -- FOES.md's "break the chest first" lesson, for free.
+    public static Foe Troll(string id, int hp = 16, int arm = 4, string figure = "troll",
+        FoeAim aim = FoeAim.Random)
+    {
+        var frame = new Body();
+        frame.Add(new BodyPart($"{id}-arm", Stat.Str, arm));  // Parts[0]: wields the axe, powers Swing
+        frame.Add(new BodyPart($"{id}-head", Stat.Int, 1));
+        frame.Add(new BodyPart($"{id}-legs", Stat.Dex, 2));
+        frame.Add(new BodyPart($"{id}-chest", Stat.Con, 4));  // Parts[3]: powers Bandage, doubled by RegenerativeFlesh
+        frame.Wield(Armory.Axes[0]); // Iron Axe: Reserve 1 Str, fits arm STR 4 with headroom to spare
+        return new Foe(id, hp, frame, new[] { Armory.Swing, Techniques.Bandage }, figure, aim,
+            FoeEffectKind.RegenerativeFlesh);
+    }
+
     // The castle boss's heavier strike: a real timered attack (STR arm), harder + faster than a raider's.
     private static readonly Technique BossStrike =
         new("boss-strike", Stat.Str, Reserve: 1, TechniqueKind.Timered, Cooldown: 25, Power: 3);

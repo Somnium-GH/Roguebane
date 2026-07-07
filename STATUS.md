@@ -1172,8 +1172,22 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
    Dire variants, effects incl. *Brittle*/*Plunder*/*Insubstantial*/*Overwhelm*/*Regenerative Flesh*/
    *Stoneform*). Numbers are Cowork placeholder-blessed — build them, flag them, Doug tunes. Castle
    keeps its current proven shape (reconcile onto the model, don't retune in the same pass).
-   **Wraith T1 done** (item 1 above, `Foes.Wraith` + Insubstantial) — the other five T1s, all Dire
-   variants, and their five remaining Foe Effects stay open.
+   **Wraith T1 done** (item 1 above, `Foes.Wraith` + Insubstantial). **Troll T1 done (2026-07-07,
+   loop)** — new `Foes.Troll` (HP 16, parts 4/1/2/4, `Armory.Axes[0]` Iron Axe wielded + `Armory.Swing`,
+   `Techniques.Bandage` off its CON chest, `FoeEffectKind.RegenerativeFlesh`) mirrors the `Foes.Ogre`
+   gear pattern exactly — no new engine work, `RegenerativeFlesh` was already proven bare
+   (`TrollRegenerativeFleshTests`, prior cycle) and just needed real roster content wired to it. No
+   Needs-Doug blocker found: Iron Axe is STR (matches Swing), fits the arm's STR 4 with headroom
+   (Reserve 1), and Bandage's Reserve 2 fits the chest's CON 4 with room for `RegenerativeFlesh` to
+   double its output without ever exceeding capacity. New `FoeTrollTests.cs` (4 tests, real `Foes.Troll`
+   through a real `Battle`, not a bare fixture): Swing deals the wielded axe's actual Power; smashing the
+   weapon arm to 0 drops the axe from consulted gear (same cascade as Ogre); Bandage's mend doubles
+   through `RegenerativeFlesh` in a real fight (2 pts, not the base 1); breaking the chest below
+   Bandage's Reserve silences the doubled mend outright (FOES.md's "break the chest first" lesson, for
+   free off the existing reservation cascade). Skeleton (Jab/Dagger stat mismatch), Bandit (Plunder
+   needs undesigned cross-Caster wiring), Gargoyle (no stone-fists `Weapon` record yet), and all four
+   Dire variants (Dire Ogre's STR-budget conflict + un-scoped Dire numbers generally) remain open,
+   blocked as already noted elsewhere in this chunk.
 3. ✅ DONE (2026-07-07, loop) — **Encounter tables pull from the T1 roster.** Same node→foe mapping
    shape (`Maps.cs`/`Sieges.cs`), same call site (`Expedition.cs:391`) — `Maps.EncounterFor` gained a
    `seed` parameter (the caller's own existing stable per-node `Seed(node.Id)`, already computed for
