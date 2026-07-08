@@ -80,11 +80,16 @@ The head, not the arm, powers its arsenal — the anti-caster lesson: aim the HE
 
 ### Ogre — *the brute* (figure `ogre`; today's `Foes.Armed/ArmedHealing` default)
 - **T1 "Ogre"** — HP 14 · parts 4/1/2/3 · Club ≈ Iron Mace · no armor ·
-  arsenal: Swing (mace consult, ~0.35 DPS) · aim Random.
-- **T2 "Dire Ogre"** (the 01-encounter ref foe) — HP 20 · parts 5/1/2/4 · Iron Warhammer ·
-  STR Breastplate · arsenal: Swing + Cleave · aim Smart.
-- **Foe Effect: *Overwhelm*** — its hits knock 1 point off your ACTIVE shield pool even when evaded;
-  **Dire: *Rampage*** — each part YOU lose speeds its next charge by 25%.
+  arsenal: Swing (mace consult, ~0.35 DPS) · aim Random. (Live-measured Swing DPS reads ~0.595, above
+  this band — flagged separately in STATUS.md, still open, not resolved by this pass.)
+- **T2 "Dire Ogre"** (the 01-encounter ref foe) — HP 20 · parts **8**/1/2/4 (arm STR **raised 5→8,
+  2026-07-07 Doug** — "up it especially since we're calling that a T2 foe": Iron Warhammer's 5 STR +
+  STR Breastplate's 2 STR = 7 needed against the old 5-STR arm; 8 gives real T2 headroom, not just an
+  exact fit) · Iron Warhammer · STR Breastplate · arsenal: Swing + Cleave · aim Smart.
+- **Foe Effect: *Overwhelm*** — **STUBBED (2026-07-07, Doug), same call as Plunder above:** ship
+  `Foes.DireOgre` with `FoeEffectKind.None` for now rather than building the shield-pool-drain-on-
+  evaded-hit wiring. Original intent kept for later: its hits knock 1 point off your ACTIVE shield
+  pool even when evaded; **Dire: *Rampage*** — each part YOU lose speeds its next charge by 25%.
 
 ### Troll — *the sustain check* (figure `troll`)
 The DPS-race teacher: out-damage the mend or lose the long game. (The castle's ArmedHealing shape,
@@ -118,8 +123,9 @@ must stay symmetric). Foes should typically carry the shield/gear their profile 
 shield when the profile calls for one" is the working default; the player side already has (and may
 grow) exceptions to that same default, and foes may eventually get symmetric exceptions too, but that's
 a future call, not now. Rule of thumb: **change FOE attrs for the sake of equipment, symmetry, and
-balance.** Applied so far: Bandit's chest CON (2→3) above. Check every remaining roster foe with named
-gear against this rule before building it — don't assume only this one had a gap.
+balance.** Applied so far: Bandit's chest CON (2→3) and Dire Ogre's arm STR (5→8) above. Check every
+remaining roster foe with named gear against this rule before building it — don't assume only these
+two had a gap.
 
 ## Weapon/technique stat mismatch — intentionally unaddressed [NOTED 2026-07-07, Doug; CORRECTED 2026-07-07]
 **Correcting this note's own original premise** (found building `FoeSkeletonTests` against real
@@ -141,6 +147,16 @@ Effects use ONLY designed mechanics (shields §6b, regen, charge/cooldown, reser
 evade, gold, Charge §10). On-hit effects obey the shared rule: a LANDED PART-hit, never shield-absorbed,
 never a broken part. No new resources, no auras, no multi-foe anything (§8). One effect per foe; Dire
 may upgrade or swap it.
+
+**Open design question (2026-07-07, Doug) — the bespoke Foe Effect vocabulary itself may not be the
+long-term shape.** Plunder and Overwhelm are stubbed above rather than built, because Doug isn't sure
+the "one bespoke effect per foe, own interpreter site" pattern (mirroring Core Effects) is where this
+ends up — a future pass may design REAL foes with REAL Core Rune effects instead, and "a lot of the
+time we might just make the foes wear a playable core rune" (i.e., a foe literally sockets an existing
+CoreRune and gets its CoreEffect for free, rather than a parallel Foe-Effect system). Insubstantial/
+Brittle/Stoneform/Regenerative Flesh stay built and wired (real, tested, not placeholder busywork) —
+this note is about NOT expanding the roster of distinct bespoke Foe Effects further until that bigger
+design question resolves, not about undoing what's already proven.
 
 ## IDEAS — [IDEA] every line; do NOT build any of these unless promoted above
 Roles cover the four stat lanes + mixed. Tier is a suggested first home. "FX:" is the Foe Effect sketch.

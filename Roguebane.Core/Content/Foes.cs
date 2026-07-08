@@ -138,6 +138,23 @@ public static class Foes
         return new Foe(id, hp, frame, new[] { Armory.Swing, Techniques.Brace }, figure, aim, FoeEffectKind.None);
     }
 
+    // CHUNK D item 2's eighth roster foe (FOES.md, Dire Ogre T2): arm STR raised 5->8 (Doug 2026-07-07,
+    // the Foe attribute-for-equipment rule) -- Iron Warhammer's 5 STR + STR Breastplate's 2 STR = 7
+    // against the old 5-STR arm left zero headroom; 8 gives real T2 headroom per Doug's "up it
+    // especially since we're calling that a T2 foe." Overwhelm is STUBBED (Doug 2026-07-07): ships as
+    // FoeEffectKind.None, not the shield-pool-drain-on-evade wiring FOES.md parks for later.
+    public static Foe DireOgre(string id, int hp = 20, string figure = "ogre", FoeAim aim = FoeAim.Smart)
+    {
+        var frame = new Body();
+        frame.Add(new BodyPart($"{id}-arm", Stat.Str, 8));   // Parts[0]: wields the warhammer, powers Swing+Cleave
+        frame.Add(new BodyPart($"{id}-head", Stat.Int, 1));
+        frame.Add(new BodyPart($"{id}-legs", Stat.Dex, 2));
+        frame.Add(new BodyPart($"{id}-chest", Stat.Con, 4));
+        frame.Wield(Armory.Warhammers[0]);          // Iron Warhammer: Reserve 5 Str, 2H
+        frame.Equip(ArmorLines.PlateChest[0]);      // Iron Breastplate: Plate line, Governing Str, Requirement 2
+        return new Foe(id, hp, frame, new[] { Armory.Swing, Techniques.Cleave }, figure, aim, FoeEffectKind.None);
+    }
+
     // The castle boss's heavier strike: a real timered attack (STR arm), harder + faster than a raider's.
     private static readonly Technique BossStrike =
         new("boss-strike", Stat.Str, Reserve: 1, TechniqueKind.Timered, Cooldown: 25, Power: 3);

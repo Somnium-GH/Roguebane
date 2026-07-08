@@ -1,5 +1,42 @@
 # Status
 
+## ✅ CHUNK D item 2 DONE (2026-07-07, loop) — Foes.Skeleton, Foes.Bandit, Foes.DireOgre built + tested;
+## Foes.DireBandit NOT built (confirmed CON-budget conflict); one technical premise below corrected
+Built straight from `FOES.md`'s canon numbers/rules (banner kept for rationale, corrected where wrong):
+1. **CORRECTED: this banner's original item 1 premise was wrong, not just Skeleton's block status.** It
+   originally said a Consults-mismatched technique (Jab on an Iron Dagger) "activates and reserves STR
+   just fine — it simply has nothing to Consult, so it deals no weapon-scaled damage." **That's false.**
+   Every real caller goes through `Caster.Activate`, which gates ANY `Consults != None` technique on
+   `Consulted(technique).Count == 0 => return false` BEFORE `Body.Activate` ever runs — a mismatched
+   technique never activates at all, zero offense, not "activates for zero weapon damage." Proven by
+   `WeaponTests.WithoutAWeaponAConsultingTechniqueCannotActivate` and now by real content in
+   `FoeSkeletonTests` (`Foes.Skeleton` deals 0 damage across a full battle). `FOES.md`'s own stat-mismatch
+   note is corrected to match. Doug's underlying call is unchanged: **`Foes.Skeleton` ships exactly as
+   specced (Iron Dagger + Jab), do not add a stat-matching restriction** — only the expected-behavior
+   description was wrong. Built: `Foes.Skeleton` (HP 8, parts 2/1/2/1, Iron Dagger, arsenal Jab, Brittle).
+   Tests: `FoeSkeletonTests.cs` (3 tests — Jab never activates, zero damage over 500 ticks, arm-break
+   still triggers Brittle through real content).
+2. **Foe attribute-for-equipment rule applied, built:** `Foes.Bandit` (HP 12, parts 3/2/3/2, chest CON
+   2→3 fits Wooden Shield 1 CON + Brace 2 CON exactly, no headroom) — Iron Axe + Wooden Shield, Leather
+   chest, arsenal Swing + Brace, `FoeEffectKind.None` (Plunder stubbed per item 4). Tests:
+   `FoeBanditTests.cs` (4 tests — Swing lands the wielded axe's Power, arm-break drops the axe from
+   Consulted, chest CON is exactly exhausted (`Available(Con) == 0`) once Battle activates the arsenal,
+   Brace's shield pool starts full and absorbs a hit before HP).
+   **Dire Bandit CON budget CONFIRMED broken, not built:** Iron Buckler (2) + Brace (2) + Bandage (2) = 6
+   against chest CON 3 spec'd in `FOES.md` — exceeds by 3, a real gap not a near-miss. Raising chest CON
+   3→6 to close it is a big jump for a T2 stat block Doug should call, not something to guess at. Flagged
+   in `FOES.md`; `Foes.DireBandit` does not exist in `Foes.cs`.
+3. **Dire Ogre arm STR 5→8 applied, built:** `Foes.DireOgre` (HP 20, parts 8/1/2/4) — Iron Warhammer +
+   STR Breastplate (5+2=7 of 8, real T2 headroom), arsenal Swing + Cleave, aim Smart,
+   `FoeEffectKind.None` (Overwhelm stubbed per item 4). Tests: `FoeDireOgreTests.cs` (5 tests — both
+   Swing and Cleave consult the warhammer, Swing lands full Power, Cleave lands 1.5x Power, arm-break
+   drops the warhammer from BOTH techniques' Consulted, exactly 1 STR headroom).
+4. **Plunder (Bandit) and Overwhelm (Ogre) shipped STUBBED** (`FoeEffectKind.None`) exactly as ruled —
+   no cross-Caster drain wiring built. Insubstantial/Brittle/Stoneform/Regenerative Flesh unaffected.
+**Full `Core.Tests` green: 510/510** (+12 new: 3 Skeleton + 4 Bandit + 5 DireOgre).
+**Still open, NOT addressed by this pass:** the three DPS-band mismatches (Ogre ~0.595, Troll ~0.43,
+Gargoyle ~0.567, all above their own T1 band) — stay flagged Needs-Doug, lower priority, unchanged.
+
 ## ‼ PROCESS CHANGE (2026-07-07, Doug) — metrics logging is a byproduct now, not a ritual
 Metrics are producing runs that only produce metrics — worthless, stop. `.claude/protocols/metrics.md`
 and `.claude/loop.md` updated: log a `metrics.csv` row ONLY inside the same commit as real work, never
