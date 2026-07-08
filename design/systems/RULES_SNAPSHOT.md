@@ -75,6 +75,18 @@ Base technique speed **8.0s**; melee/ranged verbs CONSULT the weapon for damage;
   (DESIGN_SPEC §7 "Reservation timing" is the fuller lock this compresses — read it if this summary
   and the code ever seem to disagree.)
 - A part's damage drops its stat → active things that need that stat **deactivate** until it heals (§5/§6).
+- **Weapon/technique stat mismatch is legal, intentionally unaddressed [NOTED 2026-07-07, Doug;
+  CORRECTED 2026-07-07].** This note originally claimed a mismatched technique (STR technique, DEX-only
+  weapon) "activates and reserves fine, it just has nothing to Consult for weapon-scaled damage" — that's
+  wrong. Every real caller goes through `Caster.Activate`, which gates ANY `Consults != None` technique
+  on `Consulted(technique).Count == 0 => return false` BEFORE `Body.Activate`'s pool check ever runs — a
+  mismatched technique **never activates at all**, zero offense, not "activates for zero weapon damage."
+  Proven generically by `WeaponTests.WithoutAWeaponAConsultingTechniqueCannotActivate`, pinned through
+  real content by `FoeSkeletonTests` (`Foes.Skeleton`'s Iron Dagger + Jab deals zero damage across a full
+  battle). Doug's underlying ruling is unchanged: this is legal and intentional, do NOT add a
+  stat-matching restriction — only the technical description of what "as written" does was wrong. A
+  flexible technique (`AltStat` set, e.g. Frenzy/Flurry) is unaffected — it activates off whichever
+  stat's wielded weapon it actually consults. See `FOES.md`'s matching corrected note.
 - **Demand** = the full-kit reserve per stat with effect discounts applied (the "req" above).
 - **Tier scaling (PARKED — T1 only):** tier ↑ = bigger effect + longer charge (≈constant DPS) + more reserve — EXCEPT DEX attack skills, which tier into SPEED (charge down). Dual-wield flavor: DEX → speed, STR → damage.
 

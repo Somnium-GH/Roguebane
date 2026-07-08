@@ -99,6 +99,26 @@ public static class Foes
         return new Foe(id, hp, frame, new[] { Techniques.Jab }, figure, aim, FoeEffectKind.Stoneform);
     }
 
+    // CHUNK D item 2's sixth roster foe (FOES.md, Skeleton): the fodder chassis, and the roster's ONE
+    // deliberate weapon/technique stat MISMATCH (Iron Dagger is Stat.Dex; Jab is Stat.Str) -- NOTED not
+    // fixed (FOES.md "Weapon/technique stat mismatch" section, Doug 2026-07-07): leave it exactly as
+    // FOES.md specifies. Verified (FoeSkeletonTests, correcting the note's own technical premise):
+    // Caster.Activate's `Consulted(technique).Count == 0 => return false` gate (Caster.cs) fires BEFORE
+    // Body.Activate ever runs, for ANY Consults != None technique with nothing to consult -- so Jab
+    // never activates at all here, not "activates for 0 weapon-scaled damage" as first assumed. Skeleton
+    // ships with zero offense as a result; Brittle (proven bare in BrittleEffectTests) is wired anyway
+    // since it's a defensive/part-aim reward, independent of whether Jab ever fires.
+    public static Foe Skeleton(string id, int hp = 8, string figure = "skeleton", FoeAim aim = FoeAim.Random)
+    {
+        var frame = new Body();
+        frame.Add(new BodyPart($"{id}-arm", Stat.Str, 2));  // Parts[0]: Jab's Reserve, never Consulted (Dagger is Dex)
+        frame.Add(new BodyPart($"{id}-head", Stat.Int, 1));
+        frame.Add(new BodyPart($"{id}-legs", Stat.Dex, 2));
+        frame.Add(new BodyPart($"{id}-chest", Stat.Con, 1));
+        frame.Wield(Armory.Daggers[0]); // Iron Dagger: Stat.Dex -- never Consulted by the Str-keyed Jab
+        return new Foe(id, hp, frame, new[] { Techniques.Jab }, figure, aim, FoeEffectKind.Brittle);
+    }
+
     // The castle boss's heavier strike: a real timered attack (STR arm), harder + faster than a raider's.
     private static readonly Technique BossStrike =
         new("boss-strike", Stat.Str, Reserve: 1, TechniqueKind.Timered, Cooldown: 25, Power: 3);

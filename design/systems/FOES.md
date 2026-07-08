@@ -100,6 +100,21 @@ promoted to a field foe.)
 Reconcile it onto the model above when foes gain gear (its strike becomes a real weapon consult);
 numbers already proven winnable — don't retune in the same pass as the field roster.
 
+## Weapon/technique stat mismatch — intentionally unaddressed [NOTED 2026-07-07, Doug; CORRECTED 2026-07-07]
+**Correcting this note's own original premise** (found building `FoeSkeletonTests` against real
+`Foes.Skeleton` content): `Body.Activate` alone gates only on `Capacity(stat) - TechReserved(stat) >=
+Reserve`, true — but every real caller goes through `Caster.Activate`, which has an EARLIER gate for any
+`Consults != None` technique: `Consulted(technique).Count == 0 => return false` (`Caster.cs`). No
+wielded weapon matching the technique's `Stat`/`AltStat` means the technique **never activates at all**
+— it does NOT "activate and reserve fine, just dealing no weapon-scaled damage" as this note originally
+said. Proven generically by `WeaponTests.WithoutAWeaponAConsultingTechniqueCannotActivate`, now pinned
+through real content by `FoeSkeletonTests`: `Foes.Skeleton` (Iron Dagger + Jab) deals ZERO damage across
+a full battle — Jab's Str reservation never engages, full stop. Doug's underlying call is UNCHANGED by
+this correction — **leave the mismatch alone, do not add a stat-matching restriction, `Foes.Skeleton`
+ships exactly as specced** — only the technical description of what "as written" actually does was wrong
+and is fixed here. A flexible technique (`AltStat` set, e.g. Frenzy/Flurry) is unaffected — it still
+activates off whichever stat's wielded weapon it actually consults.
+
 ## Foe-effect design rules (for the roster + ideas)
 Effects use ONLY designed mechanics (shields §6b, regen, charge/cooldown, reserves, part/HP damage §8,
 evade, gold, Charge §10). On-hit effects obey the shared rule: a LANDED PART-hit, never shield-absorbed,
