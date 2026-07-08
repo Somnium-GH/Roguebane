@@ -82,10 +82,12 @@ The head, not the arm, powers its arsenal — the anti-caster lesson: aim the HE
 - **T1 "Ogre"** — HP 14 · parts 4/1/2/3 · Club ≈ Iron Mace · no armor ·
   arsenal: Swing (mace consult, ~0.35 DPS) · aim Random. (Live-measured Swing DPS reads ~0.595, above
   this band — flagged separately in STATUS.md, still open, not resolved by this pass.)
-- **T2 "Dire Ogre"** (the 01-encounter ref foe) — HP 20 · parts **8**/1/2/4 (arm STR **raised 5→8,
-  2026-07-07 Doug** — "up it especially since we're calling that a T2 foe": Iron Warhammer's 5 STR +
-  STR Breastplate's 2 STR = 7 needed against the old 5-STR arm; 8 gives real T2 headroom, not just an
-  exact fit) · Iron Warhammer · STR Breastplate · arsenal: Swing + Cleave · aim Smart.
+- **T2 "Dire Ogre"** (the 01-encounter ref foe) — HP 20 · parts **10**/1/2/4 (arm STR **raised
+  5→8→10, 2026-07-07** — the 8 only fit gear (Iron Warhammer 5 STR + STR Breastplate 2 STR = 7); the
+  same-day reservation-additive bug fix (`Caster.ResolveReservation`/`Body.EffectiveTechniqueReserve`
+  — Consults==Primary techniques no longer zero their own Reserve) makes Cleave's own 2 STR reserve
+  additively real once active, so true demand is 7 + 2 = 9; 10 keeps the +1-headroom preference over
+  an exact fit) · Iron Warhammer · STR Breastplate · arsenal: Swing + Cleave · aim Smart.
 - **Foe Effect: *Overwhelm*** — **STUBBED (2026-07-07, Doug), same call as Plunder above:** ship
   `Foes.DireOgre` with `FoeEffectKind.None` for now rather than building the shield-pool-drain-on-
   evaded-hit wiring. Original intent kept for later: its hits knock 1 point off your ACTIVE shield

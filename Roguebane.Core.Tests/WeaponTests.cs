@@ -50,6 +50,23 @@ public class WeaponTests
     }
 
     [Fact]
+    public void JabReservesAdditivelyOnTopOfThePrimaryWeaponsOwnReserve()
+    {
+        // Reservation-timing fix (2026-07-07, Doug bug report -- RULES_SNAPSHOT "Reservation / combat
+        // model"): a Consults==Primary technique's OWN Reserve field used to be zeroed by
+        // Caster.ResolveReservation/Body.EffectiveTechniqueReserve as a special case. Equipment reserves
+        // at equip time and techniques reserve SEPARATELY and ADDITIVELY on activation -- no exception
+        // for weapon-consulting verbs. Iron Longsword (Reserve 2) + Jab (Reserve 1) must reserve 3, not 2.
+        var (body, _, _) = ArmsBody(3); // 6 STR
+        body.Wield(Armory.Sword);       // Iron Longsword: reserve 2
+        var foe = new Foe("front", 100);
+        var caster = new Caster(body, foe);
+
+        Assert.True(caster.Activate(Techniques.Jab));
+        Assert.Equal(3, body.Reserved(Stat.Str)); // sword's 2 + Jab's own 1, additive
+    }
+
+    [Fact]
     public void WithoutAWeaponAConsultingTechniqueCannotActivate()
     {
         var (body, _, _) = ArmsBody(6);

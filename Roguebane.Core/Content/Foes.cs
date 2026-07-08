@@ -138,15 +138,19 @@ public static class Foes
         return new Foe(id, hp, frame, new[] { Armory.Swing, Techniques.Brace }, figure, aim, FoeEffectKind.None);
     }
 
-    // CHUNK D item 2's eighth roster foe (FOES.md, Dire Ogre T2): arm STR raised 5->8 (Doug 2026-07-07,
-    // the Foe attribute-for-equipment rule) -- Iron Warhammer's 5 STR + STR Breastplate's 2 STR = 7
-    // against the old 5-STR arm left zero headroom; 8 gives real T2 headroom per Doug's "up it
-    // especially since we're calling that a T2 foe." Overwhelm is STUBBED (Doug 2026-07-07): ships as
-    // FoeEffectKind.None, not the shield-pool-drain-on-evade wiring FOES.md parks for later.
+    // CHUNK D item 2's eighth roster foe (FOES.md, Dire Ogre T2): arm STR raised 5->8->10 (Doug
+    // 2026-07-07, the Foe attribute-for-equipment rule). The 8 fit only covered EQUIPPED gear (Iron
+    // Warhammer 5 STR + STR Breastplate 2 STR = 7, +1 headroom) -- the same-day reservation-additive
+    // bug fix (Caster.ResolveReservation/Body.EffectiveTechniqueReserve: Consults==Primary techniques
+    // no longer zero their own Reserve) makes Cleave's own 2 STR reserve additively real, so true
+    // demand while Cleave holds active is 7 + 2 = 9. 10 keeps Doug's stated +1-headroom preference
+    // (matching the original 7->8 bump) rather than an exact 9 fit. Overwhelm is STUBBED (Doug
+    // 2026-07-07): ships as FoeEffectKind.None, not the shield-pool-drain-on-evade wiring FOES.md
+    // parks for later.
     public static Foe DireOgre(string id, int hp = 20, string figure = "ogre", FoeAim aim = FoeAim.Smart)
     {
         var frame = new Body();
-        frame.Add(new BodyPart($"{id}-arm", Stat.Str, 8));   // Parts[0]: wields the warhammer, powers Swing+Cleave
+        frame.Add(new BodyPart($"{id}-arm", Stat.Str, 10));  // Parts[0]: wields the warhammer, powers Swing+Cleave
         frame.Add(new BodyPart($"{id}-head", Stat.Int, 1));
         frame.Add(new BodyPart($"{id}-legs", Stat.Dex, 2));
         frame.Add(new BodyPart($"{id}-chest", Stat.Con, 4));

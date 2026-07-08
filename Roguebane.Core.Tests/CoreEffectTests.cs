@@ -204,10 +204,12 @@ public class CoreEffectTests
         jack.SetCoreEffect(CoreEffectKind.JackOfAllTrades);
         Assert.Equal(Armory.Flurry.Reserve - 1, jack.EffectiveTechniqueReserve(Armory.Flurry));
 
-        // Primary-consult (e.g. AimedShot): the one weapon it swings already reserves as gear, so the
-        // technique itself always reserves 0 regardless of its raw Reserve or any active core effect.
-        Assert.Equal(0, plain.EffectiveTechniqueReserve(Armory.AimedShot));
-        Assert.Equal(0, jack.EffectiveTechniqueReserve(Armory.AimedShot));
+        // Primary-consult (e.g. AimedShot) reserves its own Reserve too, additively on top of whatever
+        // the wielded weapon already reserves as equipped gear (2026-07-07, Doug bug fix — RULES_SNAPSHOT
+        // "Reservation / combat model": equipment and techniques reserve on two separate, additive
+        // triggers, no exception for weapon-consulting verbs).
+        Assert.Equal(Armory.AimedShot.Reserve, plain.EffectiveTechniqueReserve(Armory.AimedShot));
+        Assert.Equal(Armory.AimedShot.Reserve - 1, jack.EffectiveTechniqueReserve(Armory.AimedShot));
     }
 
     [Fact]

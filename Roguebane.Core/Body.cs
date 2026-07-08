@@ -44,13 +44,14 @@ public sealed class Body
         return Math.Max(0, r);
     }
 
-    // Mirrors Caster.Reservation's math (a live Caster needs a combat target the pre-run Equipment
-    // screen doesn't have, so it can't be used there) so the invItems technique-card badge shows what
-    // Activate() will actually charge instead of the raw Technique.Reserve (2026-07-07 loop bug, same
-    // shape as EffectiveWeaponReserve above).
+    // Mirrors Caster.ResolveReservation's math (a live Caster needs a combat target the pre-run
+    // Equipment screen doesn't have, so it can't be used there) so the invItems technique-card badge
+    // shows what Activate() will actually charge instead of the raw Technique.Reserve. Every technique,
+    // including weapon-consulting ones, reserves its own Reserve additively — see ResolveReservation's
+    // comment in Caster.cs (2026-07-07, Doug: fixes a bug where Primary-consulting verbs badged/charged
+    // zero of their own cost).
     public int EffectiveTechniqueReserve(Technique t)
     {
-        if (t.Consults == WeaponUse.Primary) return 0;
         var r = t.Reserve;
         if (t.Consults == WeaponUse.Both && _effect == CoreEffectKind.Finesse) r -= 1;
         if (_effect == CoreEffectKind.JackOfAllTrades) r -= 1;

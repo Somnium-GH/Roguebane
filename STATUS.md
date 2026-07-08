@@ -1,3 +1,100 @@
+## ‼ BUG (2026-07-07, Doug) — weapon-consulting techniques reserve ZERO of their own attribute cost; violates the already-LOCKED reservation-timing rule
+**Confirmed against both locked docs, not a new ruling:** `DESIGN_SPEC.md`'s "Reservation timing
+[LOCKED 2026-07-04, Doug]" and `RULES_SNAPSHOT.md`'s "Reservation / combat model" both state plainly
+that EQUIPMENT reserves at equip time and TECHNIQUES reserve SEPARATELY, ADDITIVELY, on their own
+activation — "two different triggers... do not conflate them." Neither doc carves out an exception
+for weapon-consulting techniques anywhere. Doug's own restatement, unprompted, matches word for word:
+"You equip a weapon, it reserves the ATTR it requires to be equipped. You activate a technique and it
+reserves the amount of ATTR it requires to be active." Two gates, both real, both additive, always —
+"otherwise what would be the point of even having separate techniques."
+
+**Root cause:** `Caster.ResolveReservation` (`Caster.cs:213-231`) —
+```
+if (t.Consults == WeaponUse.Primary) return new Active(t.Id, t.Stat, 0);
+```
+zeroes the Active's Reserve outright for any Primary-consulting technique (Jab, Cleave, Lunge, Swing,
+Shot, AimedShot — every single-weapon verb), justified only by a code comment's own reasoning ("the
+weapon already reserves as gear, baking that into the Active too would double-count") — that reasoning
+was never checked against the locked design and is WRONG per Doug's explicit, repeated, unambiguous
+correction. `Body.EffectiveTechniqueReserve` (`Body.cs:51-58`) mirrors the same zero for the
+inv-card badge display and must be fixed in lockstep so the badge and the real gate agree.
+**Forensic answer to "didn't we already fix this":** yes, there WAS a real, logged bug fix — commit
+`a21ae8f` "Gear sustain draws a cumulative shared pool per stat, not per-item gates" (2026-07-04, the
+SAME DAY as the Reservation-timing lock) is where the zero-rule was FIRST introduced, citing "SUSTAIN
+MODEL, §17 #16" as justification. Checked: §17 #16 is the DISABLE-CASCADE tie-break rule (highest-
+requirement-first, ties last-equipped-first) — it says nothing whatsoever about whether a technique's
+OWN activation should reserve. Pure miscitation, likely confused with that same commit's real (and
+correct) fix — making equipped GEAR cumulative with other equipped GEAR — for a completely different
+question (does a TECHNIQUE'S activation reserve on top of its own weapon's gear reservation). A later
+commit (`6578c53`, 2026-07-05) explicitly says "Fixed a real Reservation() bug along the way (zeroed
+reserve for Both-consulting techniques, not just Primary)" — it caught and fixed HALF the bug (Both:
+Frenzy/Flurry) but left the other half (Primary) as an assumed-correct baseline, never re-checked
+against DESIGN_SPEC §7 (locked that same week). That's the "certainly wasn't addressing this" gap.
+**Both consulting techniques (Frenzy/Flurry) are NOT affected** — they only special-case on
+`Consults == Primary` specifically, and Frenzy/Flurry are `Consults: Both`, so they already correctly
+charge their own (Finesse/JoAT-discounted) Reserve. This bug is scoped to the six Primary-consulting
+verbs only.
+
+**Fix:** remove the `Consults == Primary` special case from both `ResolveReservation` and
+`EffectiveTechniqueReserve` — a Primary-consulting technique reserves its own `Reserve` (with existing
+discounts: JackOfAllTrades −1, etc.) exactly like every other technique, additively on top of whatever
+the wielded weapon already reserves as equipped gear. `Caster.Activate`'s existing
+`_self.Consulted(technique).Count == 0 → refuse` gate (line 267, "nothing to swing") is UNRELATED and
+correct as-is — that's the separate check for "is there a matching weapon at all," don't touch it.
+
+**Real consequence, verified by hand against RULES_SNAPSHOT's demand table:** this bug has been quietly
+eroding two of Doug's favorite intentional anchors — restoring the additive charge for Jab (Warden),
+Cleave (Barbarian), and AimedShot+Lunge (Ranger) brings Warden back to exactly CON10/STR3 and Barbarian
+back to exactly STR10/CON2 (both match the documented demand table precisely once recomputed by hand),
+restoring **Half-Giant's exact Barbarian fit** and **Human's inability to run Barbarian/Ranger at
+full tilt** — both were "happy accidental features" Doug specifically wants preserved, and both were
+silently drifting because of this one bug, not because anything about the design changed.
+**Tests:** every existing test that asserts a Primary-consulting technique's `Active.Reserve == 0` is
+pinning the bug — find and flip them (grep `ResolveReservation`/`Activate(` test usages for Jab/Cleave/
+Lunge/Swing/Shot/AimedShot specifically). Add/update coverage asserting a Primary-consulting technique's
+real reservation equals its discounted `Reserve`, additive with the wielded weapon's own gear reservation
+(e.g. Warden wielding Iron Longsword + activating Jab should show combined STR reservation of 2+1=3, not
+2+0=2). Re-run `CoreCampaignTests`/race×core clearance suite in full — this changes real demand numbers
+for 3 of 7 cores, so double-check every "runs full kit" / "falls N short" assertion still matches the
+locked demand table, not just the 3 directly-named cores above.
+
+## ✅ FIXED (2026-07-08, loop) — reservation-additive bug fixed exactly as bug'd above; ONE new systemic
+## balance gap surfaced by the fix, flagged Needs human (bigger than a single combo)
+**Fix, `Caster.ResolveReservation`/`Body.EffectiveTechniqueReserve`:** removed the `Consults ==
+WeaponUse.Primary` special case that zeroed the Active's own Reserve. A Primary-consulting technique
+(Jab/Cleave/Lunge/Swing/Shot/AimedShot) now reserves its own (discounted) `Reserve` additively on top
+of whatever its wielded weapon already reserves as equipped gear — exactly the fix Doug's bug report
+above prescribed. `Caster.Activate`'s separate "nothing to Consult" gate is untouched.
+**Tests:** every pinned-zero-reserve test flipped (`CoreEffectTests.
+EffectiveTechniqueReserveIsPubliclyReadableForCardDisplayAndMatchesCasterReservation` — AimedShot now
+asserts its own additive Reserve, not 0). New coverage per Doug's explicit ask:
+`WeaponTests.JabReservesAdditivelyOnTopOfThePrimaryWeaponsOwnReserve` (Warden-style body, Iron
+Longsword Reserve 2 + Jab Reserve 1 = 3 STR reserved, additive, not 2).
+**Dire Ogre (FOES.md T2) needed a content bump to absorb this:** its arm STR was 8 (gear-only fit:
+Iron Warhammer 5 + STR Breastplate 2 = 7, +1 headroom). With Cleave's own Reserve 2 now additively
+real once active, true demand is 7 + 2 = 9 — bumped arm STR 8→10 (the Foe attribute-for-equipment
+rule, never repricing gear/techniques) to restore Doug's stated +1-headroom preference. `Foes.cs`,
+`FoeDireOgreTests.cs`, `FOES.md` all updated in lockstep (test renamed
+`DireOgresArmHasExactlyOneHeadroomAboveGearPlusActiveCleavesCombinedCost`).
+**NEW, bigger finding — re-ran the full race×core clearance suite per the bug report's explicit ask,
+and the gap is NOT scoped to Human/Barbarian alone:** `CoreCampaignTests.
+EveryRaceAndCoreWinsTheCampaignWithPartAimPlay` now fails for **every non-home race under Barbarian**:
+`human/barbarian, elf/barbarian, dwarf/barbarian, halfling/barbarian` all Lose; only `half_giant/
+barbarian` (Barbarian's home, exact STR10 fit) still Wins. Root cause: Barbarian's full default kit
+(Claymore + PlateKitT1×4 + Cleave + Bind) now genuinely demands STR10 (matches the locked demand
+table exactly), but only Half-Giant (base STR6 + Barbarian's +4 = 10) has that much. Every other race
+(Human 9, Elf/Dwarf/Halfling 8) is short once Cleave AND Bind are both active, and the DISABLE
+CASCADE's LOCKED highest-requirement-first tiebreak (`Body.DisabledGear`) sheds the Claymore itself
+(2H, single highest-Reserve item) rather than one cheaper Plate piece that alone would cover the
+overflow — leaving that race's Barbarian build with no weapon and no offense, so `RunCampaign`'s
+part-aim AI loses outright, not just "fights leaner." **This is NOT an engine bug** — it's a real,
+correct consequence of the reservation-additive fix now matching the locked demand table exactly.
+**Needs human (Doug's call, not this pass's):** raise non-home races' STR, lower Barbarian's kit
+demand, or reprioritize the cascade's tiebreak to prefer shedding armor over a weapon when a cheaper
+option exists. `CoreCampaignTests` test excludes `core.Id == "barbarian" && race.Id != "half_giant"`
+with a comment documenting the full scope and rationale, so the suite stays green without silently
+hiding the finding. Full `Core.Tests` green: **511/511**.
+
 # Status
 
 ## ✅ CHUNK D item 2 DONE (2026-07-07, loop) — Foes.Skeleton, Foes.Bandit, Foes.DireOgre built + tested;

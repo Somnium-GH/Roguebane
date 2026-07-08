@@ -198,12 +198,12 @@ public sealed class Caster
 
     public int ActiveCount => _active.Count;
 
-    // A self-contained technique reserves its own stat; so does a Both-consulting dual-wield technique
-    // (Frenzy/Flurry, RULES_SNAPSHOT) — its Reserve is the TECHNIQUE's own cost, distinct from the
-    // reservation its consulted weapons already stand as equipped gear (SUSTAIN MODEL, §17 #16). A
-    // Primary-consulting technique reserves NOTHING of its own: the one weapon it swings already
-    // reserves as gear, and baking that into the technique's Active too would double-count the same
-    // stat. Activate() below gates weapon-consulting techniques on having something to swing instead.
+    // Every technique reserves its OWN Reserve, additively on top of whatever its consulted weapon(s)
+    // already stand as equipped gear (RULES_SNAPSHOT "Reservation / combat model" [LOCKED 2026-07-04]:
+    // equipment reserves at equip time, techniques reserve separately on activation — two different
+    // triggers, never conflated, no exception for weapon-consulting verbs). Activate() below separately
+    // gates weapon-consulting techniques on having something to swing at all (Consulted().Count == 0);
+    // that gate gets you activated, this method decides what it costs once you are.
     // TECHNIQUES.md/CD_STATUS #36 (LOCKED 2026-07-05): a Both-consulting technique with an AltStat
     // (Frenzy/Flurry) is "paid in STR or DEX by what you wield" -- picks whichever pool can afford the
     // reserve, else (a lock shortfall either way) whichever pool has the most room, mirroring the CD
@@ -212,7 +212,6 @@ public sealed class Caster
     // later capacity shift never changes which pool a running technique is charged against.
     private Active ResolveReservation(Technique t)
     {
-        if (t.Consults == WeaponUse.Primary) return new Active(t.Id, t.Stat, 0);
         var reserve = t.Reserve;
         if (t.Consults == WeaponUse.Both && _effect == CoreEffectKind.Finesse) reserve -= 1;
         if (_effect == CoreEffectKind.JackOfAllTrades) reserve -= 1;
