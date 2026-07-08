@@ -1339,9 +1339,12 @@ Build the FOES.md symmetry model so existing foes get tougher + T1–T2 balanced
      and Dire Ogre STR-budget notes above — not silently retuned (raising chest CON, lowering Brace's
      Reserve, or dropping the shield's own cost are all Doug's spreadsheet call) — `Foes.Bandit` stays
      blocked on this reconciling, on top of Plunder's already-noted undesigned cross-Caster wiring gap.
-   Skeleton (Jab/Dagger stat mismatch), Bandit (CON budget above, Plunder needs undesigned cross-Caster
-   wiring), and all four Dire variants (Dire Ogre's STR-budget conflict + un-scoped Dire numbers
-   generally) remain open, blocked as already noted elsewhere in this chunk.
+   STALE as of 2026-07-07/08 (see the CHUNK D item 2 DONE banner near the top of this file) — Skeleton,
+   Bandit (chest CON 2->3), and Dire Ogre (arm STR 5->8->10) are ALL BUILT now, their stat-mismatch
+   notes resolved/reconciled. Genuinely still open: **Dire Bandit** (CON-budget conflict confirmed, not
+   built) and Dire Troll/Dire Gargoyle (un-scoped Dire numbers, not authored yet). Plunder/Overwhelm ship
+   stubbed (`FoeEffectKind.None`) per the banner, not blocked — the cross-Caster wiring gap is a future
+   item, not a blocker on shipping the T1/T2 roster as-is.
 3. ✅ DONE (2026-07-07, loop) — **Encounter tables pull from the T1 roster.** Same node→foe mapping
    shape (`Maps.cs`/`Sieges.cs`), same call site (`Expedition.cs:391`) — `Maps.EncounterFor` gained a
    `seed` parameter (the caller's own existing stable per-node `Seed(node.Id)`, already computed for
