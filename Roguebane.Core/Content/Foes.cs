@@ -119,6 +119,25 @@ public static class Foes
         return new Foe(id, hp, frame, new[] { Techniques.Jab }, figure, aim, FoeEffectKind.Brittle);
     }
 
+    // CHUNK D item 2's seventh roster foe (FOES.md, Bandit): the first SHIELDED foe -- a real Brace
+    // (Sustained, CON) run by the foe's own offense Caster alongside Swing, same as the player gets a
+    // shield pool. Chest CON raised 2->3 (Doug 2026-07-07, the Foe attribute-for-equipment rule) to fit
+    // Wooden Shield's 1 CON equip + Brace's 2 CON reserve exactly (3/3, no headroom -- a deliberately
+    // tight fit per the ruling, not a mistake). Plunder is STUBBED (Doug 2026-07-07): ships as
+    // FoeEffectKind.None, not the cross-Caster drain wiring FOES.md parks for later.
+    public static Foe Bandit(string id, int hp = 12, string figure = "bandit", FoeAim aim = FoeAim.Random)
+    {
+        var frame = new Body();
+        frame.Add(new BodyPart($"{id}-arm", Stat.Str, 3));   // Parts[0]: wields the axe, powers Swing
+        frame.Add(new BodyPart($"{id}-head", Stat.Int, 2));
+        frame.Add(new BodyPart($"{id}-legs", Stat.Dex, 3));
+        frame.Add(new BodyPart($"{id}-chest", Stat.Con, 3)); // Parts[3]: Wooden Shield (1) + Brace (2) -- exact fit
+        frame.Wield(Armory.Axes[0]);           // Iron Axe: Reserve 1 Str, fits arm STR 3 with headroom
+        frame.Wield(Armory.Shields[0]);        // Wooden Shield: Reserve 1 Con
+        frame.Equip(ArmorLines.LeatherChest[0]); // Padded Armor: Leather line, Governing Dex, Requirement 1 -- fits legs DEX 3
+        return new Foe(id, hp, frame, new[] { Armory.Swing, Techniques.Brace }, figure, aim, FoeEffectKind.None);
+    }
+
     // The castle boss's heavier strike: a real timered attack (STR arm), harder + faster than a raider's.
     private static readonly Technique BossStrike =
         new("boss-strike", Stat.Str, Reserve: 1, TechniqueKind.Timered, Cooldown: 25, Power: 3);

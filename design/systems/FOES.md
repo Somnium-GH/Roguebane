@@ -49,14 +49,24 @@ Weapons/armor name real `WEAPONS.md`/`ARMOR.md` records — the consult/timer/ga
   up at half HP with every part at half health (once).
 
 ### Bandit — *the mirror-match human* (figure `bandit`)
-- **T1 "Bandit"** — HP 12 · parts 3/2/3/2 · Iron Axe + Wooden Shield · Leather chest ·
-  arsenal: Swing + **Brace** (real shield source, pool 2 — the first shielded foe) · aim Random.
+- **T1 "Bandit"** — HP 12 · parts 3/2/**3**/2 (chest CON **raised 2→3, 2026-07-07 Doug** — fits Wooden
+  Shield's 1 CON equip + Brace's 2 CON reserve; see the Foe attribute-for-equipment rule below) ·
+  Iron Axe + Wooden Shield · Leather chest · arsenal: Swing + **Brace** (real shield source, pool 2 —
+  the first shielded foe) · aim Random.
 - **T2 "Dire Bandit"** — HP 18 · parts 4/2/4/3 · Steel Axe + Iron Buckler · Leather chest+legs ·
-  arsenal: Swing, Brace (pool 3), Bandage (the §8-symmetric mend) · aim Smart.
-- **Foe Effect: *Plunder*** — every part-hit it LANDS on you drains 1 Charge AND 1 Summons (recovered
-  on victory); Dire: drains 2 of each. Neither refills mid-fight, so Plunder pressures both fragile
-  pools at once — the pierce economy Brace (its own shield) forces you to spend into, and the minion
-  economy if you've fielded one. The mirror-match human punishes shield-piercing and summoning alike.
+  arsenal: Swing, Brace (pool 3), Bandage (the §8-symmetric mend) · aim Smart. **CON budget CONFIRMED
+  broken, 2026-07-07 — needs human before building:** Iron Buckler Reserve 2 + Brace Reserve 2 + Bandage
+  Reserve 2 = 6 against chest CON 3 (exceeds by 3, not a near-miss). The Foe attribute-for-equipment rule
+  says raise the foe's own attribute, but chest CON 3→6 to close this is a big jump for a T2 stat block —
+  that call belongs to Doug, not this pass. **`Foes.DireBandit` is NOT built.** T1 `Foes.Bandit` above is
+  unaffected (its own CON 3 fit was separately verified exact via `FoeBanditTests`).
+- **Foe Effect: *Plunder*** — **STUBBED (2026-07-07, Doug): not the highest priority, don't build the
+  cross-Caster wiring it needs right now.** Ship `Foes.Bandit`/`Foes.DireBandit` with no Foe Effect
+  (`FoeEffectKind.None`) rather than inventing the drain-the-defender's-own-Charge/Summons plumbing —
+  Doug isn't sold on the bespoke Foe Effect vocabulary as the long-term shape (a future pass may
+  redesign foes around real Core Rune effects instead — see the note at the end of this section).
+  Original design intent kept below for whenever that pass happens: every part-hit it LANDS on you
+  drains 1 Charge AND 1 Summons (recovered on victory); Dire: drains 2 of each.
 
 ### Wraith — *the caster / INT lane* (figure `wraith`)
 The head, not the arm, powers its arsenal — the anti-caster lesson: aim the HEAD.
@@ -99,6 +109,17 @@ promoted to a field foe.)
 `Foes.ArmedHealing` stays the campaign boss: HP 40 · arm 4 · BossStrike (3/2.5s) + Bandage · aim Smart.
 Reconcile it onto the model above when foes gain gear (its strike becomes a real weapon consult);
 numbers already proven winnable — don't retune in the same pass as the field roster.
+
+## Foe attribute-for-equipment rule [LOCKED 2026-07-07, Doug]
+Foes are balanced AGAINST THE PLAYER, not authored freely — a foe whose named gear+arsenal costs more
+than its own attribute budget is a spec error, and the fix is always to **raise the foe's own
+attribute**, never to reprice the gear or the technique (those numbers are shared with the player and
+must stay symmetric). Foes should typically carry the shield/gear their profile names — "always have a
+shield when the profile calls for one" is the working default; the player side already has (and may
+grow) exceptions to that same default, and foes may eventually get symmetric exceptions too, but that's
+a future call, not now. Rule of thumb: **change FOE attrs for the sake of equipment, symmetry, and
+balance.** Applied so far: Bandit's chest CON (2→3) above. Check every remaining roster foe with named
+gear against this rule before building it — don't assume only this one had a gap.
 
 ## Weapon/technique stat mismatch — intentionally unaddressed [NOTED 2026-07-07, Doug; CORRECTED 2026-07-07]
 **Correcting this note's own original premise** (found building `FoeSkeletonTests` against real
