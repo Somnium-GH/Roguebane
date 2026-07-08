@@ -394,19 +394,6 @@ surface to Doug which is actually intended, then reconcile DESIGN_SPEC + `Body.c
 to agree. Whichever way it goes, the 4-ZONE PIP BAR's "zone 1 = armor/weapon reservation" wording holds
 either way — only the NUMBERS zone 1 computes from would change (armor included or excluded).
 
-**Other CD_STATUS.md items — cross-check log (this whole block is now stale/closed; kept one pass for
-paper trail, safe to delete on next whittle):**
-- ~~#36 (dual-pool Frenzy/Flurry)~~ — ✅ engine half FIXED 2026-07-07, see banner at top of file.
-- ~~#30 (glow/pulse primitive)~~ — ✅ engine draw FIXED 2026-07-07, see banner at top of file.
-- ~~#33 (core-parameterized action bar / minion-column reflow)~~ — ✅ RESOLVED 2026-07-07 (loop):
-  double-checked live against both 0-minion-cap cores (Adept, Reaver) via `RB_SMOKE` screenshots —
-  the "column collapses at 0 minion-cap, width scales with count" behavior does NOT exist and can't,
-  today: `minionColumn` (`layout.json:7215`) is a fixed `size:[170,99]` panel and the `Element`/`Item`
-  schema has no conditional-width/hide-when-empty field to key off, even engine-side. No bug: at
-  MinionCap 0 the column renders correctly (empty list, accurate `"0 / 0 slotted"` label, no crash),
-  just always full-width. Logged as **B27** in `outputs/CLAUDE_DESIGN_issues.md` — CD's call whether to
-  author a new schema field or width-per-cap-tier; not blocking, cosmetic only. No engine change owed.
-
 ## ‼ HIGH PRIORITY (2026-07-05, Doug — interview answers, 4 small precise fixes)
 1. ✅ DONE (2026-07-06, loop) — `Content/Races.cs`: Dwarf `Hp: 20→17`, HalfGiant `Hp: 17→20`, Halfling
    unchanged. New pinning test `RaceTests.DwarfAndHalfGiantHpMatchDougsConfirmedSwap`. 425/425 green.
