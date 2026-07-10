@@ -20,6 +20,20 @@ public class FigureBindingTests
     }
 
     [Fact]
+    public void PairIndexOfDistinguishesLeftRightLimbsAndIsMinusOneForUnpaired()
+    {
+        // The reticle-mount fix (Doug item 3) maps an aimed limb to its visual half via this index;
+        // L=0, R=1, and unpaired parts (head/torso/boots) return -1 so they read as a single part.
+        Assert.Equal(0, FigureBinding.PairIndexOf("armL"));
+        Assert.Equal(1, FigureBinding.PairIndexOf("armR"));
+        Assert.Equal(0, FigureBinding.PairIndexOf("legL"));
+        Assert.Equal(1, FigureBinding.PairIndexOf("legR"));
+        Assert.Equal(-1, FigureBinding.PairIndexOf("head"));
+        Assert.Equal(-1, FigureBinding.PairIndexOf("torso"));
+        Assert.Equal(-1, FigureBinding.PairIndexOf("boots"));
+    }
+
+    [Fact]
     public void PairedLimbsSplitLeftAndRightAcrossTheGroup()
     {
         var b = Humanoid(out var armL, out _, out _, out _);

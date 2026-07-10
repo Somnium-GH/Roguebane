@@ -363,17 +363,19 @@ public partial class Game1
                         ? _assets.Texture(frames[_animTick / 10 % frames.Length])
                         : _assets.Reticle("focus");
                     var tex = picking ? _assets.Reticle("secondary") ?? focus : focus;
-                    // Group aims per part: one reticle per part, its AIM TAG stack = the hotkey
-                    // NUMBERS of every module kept on it (design/01: several actives stack).
-                    var aims = new System.Collections.Generic.Dictionary<Stat, List<int>>();
+                    // Group aims per PART: one reticle per aimed part, its AIM TAG stack = the hotkey
+                    // NUMBERS of every module kept on it (design/01: several actives stack). Keyed by the
+                    // specific BodyPart (not its Stat) so a paired limb aims land on THAT arm/leg, not the
+                    // union-centre of both — which sat on the torso (Doug item 3).
+                    var aims = new System.Collections.Generic.Dictionary<Roguebane.Core.BodyPart, List<int>>();
                     for (var ti = 0; ti < Exp.Equipment.Count; ti++)
                         if (Exp.PartOf(Exp.Equipment[ti]) is { } aimed)
-                            (aims.TryGetValue(aimed.Stat, out var l)
-                                ? l : aims[aimed.Stat] = new List<int>()).Add(ti);
+                            (aims.TryGetValue(aimed, out var l)
+                                ? l : aims[aimed] = new List<int>()).Add(ti);
                     var tagT = _ui.Manifest?.Templates.GetValueOrDefault("aimTag");
-                    foreach (var (stat, cardIxs) in aims)
+                    foreach (var (aimedPart, cardIxs) in aims)
                     {
-                        if (FoePartScreenRect(ef, stat, r) is not { } fr2 || tex is null) continue;
+                        if (FoeAimedPartScreenRect(ef, aimedPart, r) is not { } fr2 || tex is null) continue;
                         var scenePx = Math.Clamp(Math.Max(fr2.Width, fr2.Height) * SS * 1.5f, 64f, 136f);
                         var d = (int)(scenePx / SS);
                         var top = fr2.Y + fr2.Height / 2 - d / 2;

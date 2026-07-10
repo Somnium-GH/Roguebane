@@ -32,6 +32,12 @@ public static class FigureBinding
     public static Stat? StatOf(string visualPart) =>
         PartStat.TryGetValue(visualPart, out var s) ? s : null;
 
+    // A paired limb's index within its stat group (armL/legL = 0, armR/legR = 1); -1 for unpaired
+    // parts (head/torso/boots). Lets the shell mount a reticle on the SPECIFIC aimed limb rather than
+    // the union of both (which centres between them, on the torso — Doug item 3).
+    public static int PairIndexOf(string visualPart) =>
+        PairIndex.TryGetValue(visualPart, out var i) ? i : -1;
+
     public static PartCondition Condition(Body body, string visualPart)
     {
         if (!PartStat.TryGetValue(visualPart, out var stat)) return PartCondition.Healthy;

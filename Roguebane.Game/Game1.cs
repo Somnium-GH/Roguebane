@@ -127,7 +127,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
 
         _mfScreen = Environment.GetEnvironmentVariable("RB_MF"); // dev: render this screen from the manifest
 
-        if (_smokeScreen is "encounter" or "citymap" or "loadout") // march the real loop for the screenshot
+        if (_smokeScreen is "encounter" or "citymap" or "loadout" or "aim") // march the real loop for the screenshot
         {
             if (_smokeScreen is "encounter" or "citymap")
             {
@@ -195,6 +195,20 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                 Exp.Stash.AddArmor(Shops.Plate); Exp.EquipArmor(Shops.Plate);
                 _screen = Screen.Equipment; // 2026-07-02: the FULL Equipment screen replaced the popover
                 _equipReturnTo = Screen.Run;
+            }
+            else if (_smokeScreen == "aim") // reticle verification (Doug item 3): live combat, aim at a
+            {                                // PAIRED limb (arm/leg) so the mount position is checkable
+                _campaign.Enter("a1");
+                if (Exp.Enemy is { } foe && foe.Frame is { } fr)
+                {
+                    // Prefer a STR arm, else a DEX leg — a paired-limb part exposes the union-centre bug;
+                    // an unpaired head/torso would mount correctly and hide it.
+                    var limb = fr.Parts.FirstOrDefault(p => p.Stat == Stat.Str)
+                               ?? fr.Parts.FirstOrDefault(p => p.Stat == Stat.Dex);
+                    if (limb is not null) _campaign.Aim(Exp.Equipment[0], foe, limb);
+                    _campaign.SetAuto(true);
+                }
+                // Do NOT resolve: stay in the first fight so DrawEncounterScreen + the focus reticle render.
             }
         }
         else if (_smokeScreen == "equipment") _screen = Screen.Equipment; // else fall through to NewGame
@@ -808,24 +822,29 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     private Rectangle FoeRect() => ManifestElementRect("encounter", "encounter.foe")
         ?? new Rectangle(632, 96, 224, 252);
 
-    // The SCREEN rect a foe stat-group occupies (union of its visual part rects, e.g. both arms),
-    // via the same manifest transform DrawHumanoid uses — so reticles land on the drawn limbs.
-    private Rectangle? FoePartScreenRect(Foe foe, Stat stat, Rectangle box)
+    // The SCREEN rect of the SPECIFIC aimed foe part — its single visual limb, not the union of every
+    // part sharing the stat (that union centres between paired limbs, i.e. on the torso — Doug item 3).
+    // Maps the aimed BodyPart's index within its stat group to the visual part whose PairIndex matches;
+    // unpaired stats (head/torso) have one visual part and read it directly.
+    private Rectangle? FoeAimedPartScreenRect(Foe foe, BodyPart aimed, Rectangle box)
     {
         var manifest = _layout.Manifest;
-        if (manifest is null || !manifest.Figures.TryGetValue(foe.Figure, out var fig)) return null;
+        if (manifest is null || foe.Frame is null || !manifest.Figures.TryGetValue(foe.Figure, out var fig))
+            return null;
+        var group = foe.Frame.Parts.Where(p => p.Stat == aimed.Stat).ToList();
+        var idx = group.IndexOf(aimed);               // 0/1 for a paired limb, 0 for an unpaired part
         var f = (float)box.Height / fig.Size[1];
         int cx = box.X + box.Width / 2, cy = box.Y + box.Height;
         var px = fig.Pivot[0]; var py = fig.Pivot[1];
-        Rectangle? acc = null;
         foreach (var (name, part) in fig.Parts)
         {
-            if (FigureBinding.StatOf(name) != stat) continue;
-            var rr = new Rectangle(cx + (int)((part.Rect[0] - px) * f), cy + (int)((part.Rect[1] - py) * f),
+            if (FigureBinding.StatOf(name) != aimed.Stat) continue;
+            var vi = FigureBinding.PairIndexOf(name);
+            if (vi >= 0 && group.Count > 1 && vi != idx) continue; // wrong limb of a pair — skip
+            return new Rectangle(cx + (int)((part.Rect[0] - px) * f), cy + (int)((part.Rect[1] - py) * f),
                 (int)(part.Rect[2] * f), (int)(part.Rect[3] * f));
-            acc = acc is null ? rr : Rectangle.Union(acc.Value, rr);
         }
-        return acc;
+        return null;
     }
 
     // The foe PART under a screen point (structured foe only), else null = whole-HP aim. Uses each

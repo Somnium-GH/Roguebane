@@ -406,16 +406,16 @@ part and mount correctly, which is why only STR/DEX aims look wrong. Compounding
 comment one line up ("**one reticle per part**, its AIM TAG stack = the hotkey NUMBERS") — the Core
 already aims per specific `BodyPart` (`Exp.PartOf` returns one part), so the stat-grouping is what
 discards which limb and forces the union.
-**Fix direction (not applied):** group aims by the specific aimed `BodyPart` and mount each on THAT
-part's single visual-limb rect — map the aimed part's index within its stat group to the visual part
-whose `FigureBinding.PairIndex` matches (armL=0/armR=1, legL=0/legR=1). That aligns the code with its
-stated "one reticle per part" design and lands the reticle on the actual aimed limb.
-**Why not applied this pass — no verification path.** The reticle only renders in LIVE combat with an
-active aim; the headless `RB_SMOKE RB_SCREEN=encounter` path marches the real loop straight to an
-OVERRUN loss (no frame with a live aim to shoot), so a fix can't get a receipt the way #4/#5/#9 did.
-Shipping a blind combat-render change breaks the verify-it discipline. **Prereq for the verified fix:**
-a smoke affordance that stops mid-combat with a technique aimed at a foe part (mirrors what `RB_RACE`/
-`RB_CHASSIS` do for the build screen), or a Doug playtest. Build that first, then apply the fix above.
+✅ FIXED (2026-07-10, loop). The reticle now groups aims by the specific aimed `BodyPart` (not its
+Stat) and mounts each on that part's single visual-limb rect via new `FoeAimedPartScreenRect`
+(`Game1.cs`), which maps the aimed part's index within its stat group to the visual part whose
+`FigureBinding.PairIndexOf` matches (armL=0/armR=1, legL=0/legR=1; unpaired = one part). Aligns the
+code with its own "one reticle per part" design comment; the old union-based `FoePartScreenRect` was
+deleted (dead). **Verified end-to-end** with a NEW `RB_SCREEN=aim` smoke affordance (enters the first
+fight, aims card 0 at a paired limb, stays Fighting so the combat screen + focus reticle render):
+before/after receipts show the reticle move from the foe's torso centre onto its actual arm. Build
+0/0, Core.Tests 519/519 (+1 `PairIndexOf` contract test). (Bonus confirmations in the `aim` receipt:
+#9's stretched STR pips render in combat too, and #1's CON row is visibly cut off — the B31 CD ask.)
 
 **4–12, UI/layout, not individually root-caused this pass — reported as-is for the loop to trace:**
 4. ✅ FIXED (2026-07-10, loop) — authored `align:"center"` was being DROPPED at parse. `TemplatePart`
