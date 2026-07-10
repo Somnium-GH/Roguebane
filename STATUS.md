@@ -1,3 +1,17 @@
+## ⚠ FLAGGED — CON row intermittently missing from Attributes (Equipment + Encounter), then
+## reappeared on its own with no fix applied (2026-07-09, Doug: "I dunno what the deal is")
+Not a clean reproducible bug — this needs a live trace, not another static read, but two things are
+worth having on record before that happens. **`AttrBars()` (`Game1.ManifestRenderer.cs:1349-1358`)
+always returns all 4 rows (STR/INT/DEX/CON) — the data source is not the problem.** **`attrReadout`'s
+authored container (`Roguebane.Content/layout.json:6309-6319`, size `[431,67]`) against the `attrBar`
+row template (`size:[431,13]`, `gap:5`) computes to EXACTLY `4×13 + 3×5 = 67`** — a zero-margin fit
+for precisely 4 rows, no slack at all. Not provably the cause of an intermittent drop, but exactly the
+kind of geometry that would be uniquely sensitive to any per-frame rounding/letterbox-scaling jitter —
+worth giving it a few px of headroom regardless, low-risk, independent of whatever the real cause
+turns out to be. Given today ALSO surfaced a genuinely stale-DLL-lock issue on the quest-button fix
+(see below — a *real* stale `Roguebane.Game.exe` was holding the lock, not just a theory), check for
+the same class of staleness here too before assuming it's a rendering race.
+
 ## ‼ HIGH PRIORITY (2026-07-09, Doug live playtest) — TWO reports that directly contradict current
 ## source; strongest lead is a STALE BUILD, not new regressions — verify with a fresh build FIRST
 Doug: "there is evidently no reservation of activated techniques and I've reported this bug a few
