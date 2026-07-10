@@ -163,6 +163,29 @@ Parry, Steel, Suture (technique glyphs — absent from the tree); minion icons I
 `skeleton.png` is in `icons/minion/`). Icons + mgcb source (we mirror game-side). (Rapier/Staff/
 Charm/Tome weapon sprites are tracked in Figure + Gear Asset Regen above, not here.)
 
+### Technique Action-Bar Lists Are 1px Short For a 4th Card (B30)
+Root-caused STATUS.md items 10/11 (Doug's "4th technique invisible" + "action bar shows the wrong
+abilities" reports): both are the SAME bug, and it's purely a region-width shortfall in your authored
+sizes, not an engine cap. `ListLayout.Cells` (`Roguebane.Core/Layout/ListLayout.cs:44`) deliberately
+drops any cell whose right edge would exceed its list region (overflow:hidden, by design — the same
+rule that clips an oversized HP-pip strip) — but for BOTH technique bars, the region is exactly 1px
+narrower than 4 cells actually need:
+- `equipment` screen's `loadoutList` (`layout.json:7187-7213`): region `size:[613,89]`, item
+  `size:[149,89]` gap `6` → 4 cells need `4*149 + 3*6 = 614`, region only offers `613`. The 4th
+  `loadoutCard` silently drops. (Its sibling `techSlotCount` label right above it already samples
+  `"TECHNIQUES · 3 / 4 slotted"` — the 4-slot design is already assumed elsewhere on the same screen,
+  just not sized for.)
+- `encounter` screen's `techList` (`layout.json:5930-5955`): region `size:[433,136]`, item
+  `size:[104,136]` gap `6` → 4 cells need `4*104 + 3*6 = 434`, region only offers `433`. Same drop.
+Both parent panels have plenty of spare width to absorb the fix (`equipment`'s `actionBar` is 810px
+wide, `encounter`'s is 630px, vs. the ~613-620/~433-440 the lists themselves occupy) — this isn't a
+"nothing fits" constraint, just a rounding/authoring gap. Ask: widen `loadoutList.size[0]` to ≥614 and
+`techList.size[0]` to ≥434 (a little slack beyond the exact minimum recommended, so a future 5th slot
+class doesn't reopen the same 1px trap). Not a "first card repeats 3×" data bug on our side — we
+confirmed `ListData`/`ResolveBind` correctly resolve each of the 4 distinct equipped techniques
+per-index; the 4th one just never gets a cell to draw into, and older reports of "wrong abilities on
+the action bar" were the same silent 3-cell cap, not a real duplication.
+
 ## Confirm-to-Close (landed and verified — nothing to do, just clear these from memory)
 - **B0 · B0b · B1a · B3** — evening 2026-07-03 drop, all verified landed.
 - **B4** — "open Equipment" button elements on Encounter + CampaignMap, landed.

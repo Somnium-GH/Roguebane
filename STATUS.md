@@ -414,13 +414,18 @@ three already-functioning buttons that use the same parented-element pattern.
 9. Attribute bar scaling: the scale is being applied UNIFORMLY across all four attribute bars; each
    bar should scale INDIVIDUALLY so it maxes out its own available width. Doug notes a previous fix
    attempt for this apparently didn't land correctly — check for a half-applied change.
-10. Equipment screen's action bar shows the wrong abilities: same shape as the earlier "can't equip
-    anything but the first thing" bug — the first equipped technique repeats 3× instead of showing the
-    actual distinct equipped set. Likely the same root cause class as that earlier bug; check whatever
-    fixed that one for a parallel spot that didn't get the same fix.
-11. Adept (4 technique slots): equipping a 4th skill makes it not appear in EITHER the equipment
-    screen or the encounter screen. Doug believes this is a pure layout issue (data-side equip likely
-    fine, rendering loop likely capped at 3 visible slots somewhere).
+10. ⇒ ROOT-CAUSED (2026-07-10, loop), routed to CD (B30) — items 10 and 11 are the SAME bug, not two.
+    Traced `ListData`/`DrawManifestList`/`ResolveBind` (`Game1.ManifestRenderer.cs`) by hand first —
+    each per-index technique resolves correctly, no duplication in the data path. The real cause is
+    `ListLayout.Cells`'s deliberate overflow-drop (`Roguebane.Core/Layout/ListLayout.cs:44`, "cells past
+    the region edge drop instead of spilling") combined with `layout.json` region widths that are
+    exactly 1px short of fitting a 4th card: `equipment`'s `loadoutList` region is `613` vs. `614`
+    needed (`4*149 + 3*6`); `encounter`'s `techList` region is `433` vs. `434` needed (`4*104 + 3*6`).
+    So the 4th technique's card never gets a cell — no data bug, no engine bug, a CD-authored region
+    1px short of its own `techSlotCount` label ("TECHNIQUES · 3 / 4 slotted", already assuming 4).
+    Logged as B30 in `outputs/CLAUDE_DESIGN_issues.md` (CD-owned file, not hand-edited) asking for both
+    regions to widen with a little slack. Nothing to fix engine-side.
+11. See item 10 — same bug, same fix, same CD ask (B30).
 12. Attribute bars: should render EMPTY when unreserved, FILLED (unhatched) when reserved for an
     active technique — confirm current rendering actually reads live reservation state per bar rather
     than a stale/default fill.
