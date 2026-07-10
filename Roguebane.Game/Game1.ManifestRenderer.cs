@@ -1196,11 +1196,15 @@ public partial class Game1
         var gearEnd = row.GearReserved;
         var techEnd = gearEnd + row.TechReserved;
         var freeEnd = row.Capacity;
+        // §7 4-ZONE ENCODING [LOCKED 2026-07-05]: zone 1 gear/weapon = HASHED (pip_reserved), zone 2
+        // active-technique reservation = REGULAR SOLID (pip_full), zone 3 free = EMPTY, zone 4 damage
+        // = HASHED. Filled reads as "reserved/in use," empty as "free" (Doug bug #12); zones 2 and 3
+        // were previously swapped, so activating a technique EMPTIED a pip instead of filling one.
         return Enumerable.Range(0, row.Capacity + row.Damaged).Select(i => (object)new PoolCell(
             i < gearEnd ? "gear" : i < techEnd ? "tech" : i < freeEnd ? "free" : "damaged",
             i < gearEnd ? "pip_reserved_" + row.Token
-                : i < techEnd ? "pip_empty"
-                : i < freeEnd ? "pip_full_" + row.Token
+                : i < techEnd ? "pip_full_" + row.Token
+                : i < freeEnd ? "pip_empty"
                 : "pip_damage")).ToList();
     }
 

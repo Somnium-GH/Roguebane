@@ -138,6 +138,12 @@ a stale `Body` reference, or the Encounter screen simply isn't re-querying/redra
 the same cadence real gameplay state changes — check whether `AttrBars()` is called fresh every
 frame/on every state change, or cached somewhere from encounter-start.
 
+⇒ LEAD (2026-07-10, loop): traced — the display path is NOT stale/cached (`ListData`→`AttrBars`→live
+`Exp.Player.Body` every frame; `Body.TechReserved` sums live `_actives`). The real defect was the
+INVERTED pip fill in `PoolCells`, now fixed (see bug #12 above): activation was emptying a pip rather
+than filling one, so it read as "reservation not showing." Re-check this specific report in a live
+combat playtest now that zone-2 pips fill solid; if it still misreads, THEN it's a separate live bug.
+
 **Separately flagged by Doug, blocked on #1 being fixed before it's checkable:** HP dropped 28→12 in
 one test with no visible damage on any STR/INT/DEX bar — can't rule out all of it landed on CON parts
 specifically until CON is actually visible to look at. Re-check once #1 lands.
@@ -436,9 +442,22 @@ three already-functioning buttons that use the same parented-element pattern.
     Logged as B30 in `outputs/CLAUDE_DESIGN_issues.md` (CD-owned file, not hand-edited) asking for both
     regions to widen with a little slack. Nothing to fix engine-side.
 11. See item 10 — same bug, same fix, same CD ask (B30).
-12. Attribute bars: should render EMPTY when unreserved, FILLED (unhatched) when reserved for an
-    active technique — confirm current rendering actually reads live reservation state per bar rather
-    than a stale/default fill.
+12. ✅ FIXED (2026-07-10, loop) — the fill semantics were INVERTED vs the LOCKED §7 4-ZONE ENCODING.
+    `PoolCells` (`Game1.ManifestRenderer.cs`) mapped zone-2 (active-technique reservation) to
+    `pip_empty` and zone-3 (free/unreserved) to `pip_full_<token>` — exactly backwards from §7's
+    "zone 2 = REGULAR SOLID pips, zone 3 = free" and Doug's own "EMPTY when unreserved, FILLED when
+    reserved for an active technique." The data path was never the problem (it reads live `Body`
+    per-frame, confirmed by static trace: `ListData`→`AttrBars`→`Exp.Player.Body`, no caching;
+    `Body.TechReserved` sums live `_actives`). Fix: swapped the two asset assignments so reserved =
+    solid `pip_full_<token>`, free = `pip_empty`. Verified: build 0/0, Core.Tests 514/514 (Core
+    untouched), and an `RB_SMOKE=1 RB_SCREEN=equipment` receipt shows gear-reserved STR as HASHED
+    (`pip_reserved`, zone 1) and fully-free INT/DEX/CON (6/6) as EMPTY pips (zone 3) — previously
+    those free pips drew solid. **Likely also resolves bug #3** (attr bar "doesn't visibly update on
+    activation"): under the inverted mapping, activating a technique turned a `pip_full` into a
+    `pip_empty` — a pip EMPTIED where the player expected one to FILL, reading as "reservation not
+    showing." With the swap, activation now fills a solid zone-2 pip. Zone 2 isn't exercised on the
+    equipment screen (techniques activate in combat), so #3's final close still wants a live combat
+    playtest, but the mechanism is identified and this is the strongest lead yet.
 
 **13. Reserved/total number order is flipped** — e.g. "2 / 11" (2 reserved of 11 max) is currently
 displaying as "11 / 2". Simple format-string argument-order fix, wherever that readout is built.
