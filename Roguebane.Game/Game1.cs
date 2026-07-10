@@ -116,6 +116,10 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         // (humanoid + robed) can be RB_SMOKE-verified, not just the default.
         if (_smoke && int.TryParse(Environment.GetEnvironmentVariable("RB_CHASSIS"), out var ci))
             _build.CycleCoreRune(ci - _build.CoreRuneIndex);
+        // Smoke: RB_RACE=<index> selects a race, so uneven-stat races (Elf 4/6/4/4) can be
+        // RB_SMOKE-verified for per-stat pip-bar widths, not just even-stat Human.
+        if (_smoke && int.TryParse(Environment.GetEnvironmentVariable("RB_RACE"), out var rci))
+            _build.CycleRace(rci - _build.RaceIndex);
         // Smoke: RB_ITAB=<0|1|2> pins the Equipment screen's inventory tab, so GEAR/TECHNIQUES/MINIONS
         // pagination can each be shot without a real click (mirrors RB_CHASSIS's role for the core picker).
         if (_smoke && int.TryParse(Environment.GetEnvironmentVariable("RB_ITAB"), out var it))

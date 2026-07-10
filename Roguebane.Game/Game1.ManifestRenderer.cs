@@ -841,7 +841,11 @@ public partial class Game1
                     if (_ui.Manifest is { } mN && mN.Templates.TryGetValue(nested.Template, out var pipT))
                     {
                         var cellsData = PoolCells(rowD);
-                        var pipCells = ListLayout.Cells(pp.Rect, nested, cellsData.Count, pipT.Size);
+                        // Stretch the pips to fill this bar's width (Doug #9): each stat's bar maxes its
+                        // own region instead of all bars sharing a fixed pip size, so a 5-pip bar reads
+                        // as long as a 7-pip one. For a 6-pip bar this computes ~the authored pip width.
+                        var pipH = pipT.Size.Length > 1 ? pipT.Size[1] : pp.Rect.H;
+                        var pipCells = ListLayout.StretchCells(pp.Rect, cellsData.Count, nested.Gap, pipH);
                         for (var pi = 0; pi < pipCells.Count; pi++)
                             DrawLeafTemplate(pipT, pipCells[pi], cellsData[pi]);
                     }

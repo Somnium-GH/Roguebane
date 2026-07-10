@@ -39,6 +39,27 @@ public class ListLayoutTests
     }
 
     [Fact]
+    public void StretchCellsFillTheFullRegionWidthRegardlessOfCount()
+    {
+        // Attr pip strips (Doug #9): N cells span the whole region so a 5-pip bar reads as long as a
+        // 7-pip one. Last cell lands flush against the region's right edge for any N — no gap.
+        var region = new LayoutRect(59, 2, 332, 9);
+        foreach (var n in new[] { 4, 5, 6, 7 })
+        {
+            var cells = ListLayout.StretchCells(region, n, gap: 2, cellHeight: 9);
+            Assert.Equal(n, cells.Count);
+            Assert.Equal(region.X, cells[0].X);                          // flush left
+            Assert.Equal(region.X + region.W, cells[^1].X + cells[^1].W); // flush right, no trailing gap
+            Assert.All(cells, c => Assert.Equal(9, c.H));
+            Assert.All(cells, c => Assert.True(c.W >= 1));
+        }
+    }
+
+    [Fact]
+    public void StretchCellsEmptyForNonPositiveCount()
+        => Assert.Empty(ListLayout.StretchCells(new LayoutRect(0, 0, 100, 10), 0, 2, 10));
+
+    [Fact]
     public void ZeroCountIsEmpty()
     {
         Assert.Empty(ListLayout.Cells(Region, Horizontal, 0));

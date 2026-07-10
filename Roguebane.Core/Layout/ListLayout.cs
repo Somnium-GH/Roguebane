@@ -47,6 +47,28 @@ public static class ListLayout
         return cells;
     }
 
+    // Stretch `count` cells to fill the region's WIDTH (horizontal only): each cell is
+    // (region.W - (count-1)*gap) / count wide, so N cells always span the full region regardless of N.
+    // Used by the attribute pip strips so every stat's bar maxes its own available width instead of
+    // all bars sharing one fixed pip size (a 5-pip bar then reads shorter than a 7-pip one) — Doug #9.
+    // Also removes the fixed-size overflow-drop for these strips (a stat whose pip count barely exceeds
+    // the authored fit no longer loses its last pip). Height comes from `cellHeight` (the pip template's).
+    public static IReadOnlyList<LayoutRect> StretchCells(LayoutRect region, int count, int gap, int cellHeight)
+    {
+        var cells = new List<LayoutRect>(Math.Max(0, count));
+        if (count <= 0) return cells;
+        var inner = region.W - (count - 1) * gap;
+        for (var i = 0; i < count; i++)
+        {
+            // Round each cell's left edge from the exact fractional position so rounding never
+            // accumulates a gap on the right — the last cell lands flush against the region edge.
+            var x0 = region.X + (int)Math.Round(i * (inner / (double)count + gap));
+            var x1 = region.X + (int)Math.Round(i * (inner / (double)count + gap) + inner / (double)count);
+            cells.Add(new LayoutRect(x0, region.Y, Math.Max(1, x1 - x0), cellHeight));
+        }
+        return cells;
+    }
+
     // How many grid cells actually FIT the region (cols * rows), for callers that need to page a grid
     // list to what's visible (Cells itself never clips grid overflow — see GridWrapsLeftToRightThen-
     // TopToBottom — so a pager derives its page size from this instead of a hand-picked constant).

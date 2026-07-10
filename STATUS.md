@@ -117,16 +117,18 @@ Encounter screenshot; Equipment correctly shows 6). ⇒ ROOT-CAUSED (2026-07-10,
 same 1px class as #1, on the same `poolRow` template. The cells part (`layout.json:10500`) is rect
 width `207`; its `poolPip` cell is `size:[33,10]`, `gap:2` → 6 pips need `6×33 + 5×2 = 208`, region
 offers only `207`, so the 6th (free) pip drops. Equipment's `attrBar` cells rect is `332` vs. the
-`328` six pips need (4px slack) — which is why it shows 6 there and never here. CD-owned geometry,
-nothing to fix engine-side.
+`328` six pips need (4px slack) — which is why it shows 6 there and never here.
+✅ SUPERSEDED/FIXED (2026-07-10, loop) by the #9 stretch fix: the pip strips now use
+`ListLayout.StretchCells`, which sizes exactly `count` pips to fill the region (never drops), so the
+encounter 6th pip renders regardless of the 1px shortfall. #2 no longer needs the CD region widen.
 
-### ⇒ ROUTED TO CD (2026-07-10, loop) — items #1 and #2 both logged as B31
-Both #1 (CON row, `poolRows` container `[309,77]` vs. 78 needed) and #2 (5-of-6 pips, `poolRow` cells
-rect `207` vs. 208 needed) are pure CD-authored 1px region shortfalls on the encounter `poolRows`/
-`poolRow` template — same class as B25 (equipment pips) and B30 (action-bar lists), verified against
-the live `layout.json` this pass. Logged as **B31** in `outputs/CLAUDE_DESIGN_issues.md` asking both
-regions widened with a little slack. No engine change needed once it lands. #3 (display-path stale)
-is still open and genuinely engine-side — needs the live trace described below, not a geometry fix.
+### ⇒ ROUTED TO CD then PARTLY RESOLVED (2026-07-10, loop) — B31 now #1 only; #2 fixed engine-side
+Originally both #1 (CON row, `poolRows` container `[309,77]` vs. 78 needed — a VERTICAL row-height
+shortfall) and #2 (6th pip, horizontal) were logged as **B31**. The #9 stretch-fill resolved #2
+engine-side (horizontal pip width is now computed to fit `count`, so a 1px-short region no longer
+drops the last pip), so B31 was trimmed to the CON-row half only — still a real CD ask (row height
+`77` vs `78`, which horizontal stretch does NOT address). #3 (display path) is engine-side and covered
+by the #12 pip-inversion fix; re-check live.
 
 **3. CORRECTED 2026-07-09 (Doug): the techniques themselves work fine — Jab/Bandage/Brace all fire
 and do their real effect. The bug is scoped narrower than "activation is broken": ONLY the attribute
@@ -468,9 +470,15 @@ receipt like the Quest fix did — confirmed instead by code inspection: `Screen
 array per screen regardless of `Parent` nesting (`LayoutManifest.cs:77`), so `closeBtn`'s `Parent:
 "statusStrip"` doesn't block the `FirstOrDefault(x => x.Binds == binds)` lookup, exactly like the
 three already-functioning buttons that use the same parented-element pattern.
-9. Attribute bar scaling: the scale is being applied UNIFORMLY across all four attribute bars; each
-   bar should scale INDIVIDUALLY so it maxes out its own available width. Doug notes a previous fix
-   attempt for this apparently didn't land correctly — check for a half-applied change.
+9. ✅ FIXED (2026-07-10, loop) — no half-applied change existed (`ListLayout`/`PoolCells` were clean
+   fixed-size); the pip strips just used ONE authored pip width, so a stat with fewer pips (Elf STR/
+   DEX/CON = 5) rendered a shorter bar than a higher one (Elf INT = 7). New `ListLayout.StretchCells`
+   sizes each bar's N pips to fill its region width (width = (region − gaps)/N), wired into the attr
+   pip draw (`Game1.ManifestRenderer.cs`, both `attrs.cells` and `pool.attr.cells`). For a 6-pip bar
+   this computes ≈ the authored 53px, so even-stat races are visually unchanged; uneven races now have
+   every bar max its own width. Verified: build 0/0, Core.Tests 518/518 (+2 `StretchCells` tests), and
+   a new `RB_RACE=1` (Elf) smoke override shows STR/DEX/CON bars extending to INT's right edge
+   post-fix where they stopped ~90px short pre-fix (before/after receipts).
 10. ⇒ ROOT-CAUSED (2026-07-10, loop), routed to CD (B30) — items 10 and 11 are the SAME bug, not two.
     Traced `ListData`/`DrawManifestList`/`ResolveBind` (`Game1.ManifestRenderer.cs`) by hand first —
     each per-index technique resolves correctly, no duplication in the data path. The real cause is
