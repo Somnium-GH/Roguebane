@@ -403,69 +403,47 @@ B27. **`CD_STATUS.md` #33 double-check result: the "minion column collapses at 0
     per screen state — your call on which. Not blocking (data is correct either way); low urgency,
     cosmetic only.
 
-B28. **`attrBar`'s alloc/available pair reads backwards vs. every other pool readout in the game
-    (Doug playtest #13, "reserved/total order flipped").** `layout.json:10901` (`attrBar` template):
-    the two number slots are laid out `attrs.alloc` (total capacity) at rect x=410, then a literal
-    `"/"` glyph at x=418, then `attrs.available` (current free) at x=425 — i.e. **TOTAL / AVAILABLE**,
-    left to right. Every other pool readout in the manifest (HP, Supplies, Charge, Summons, the
-    Equipment/minion "slotted" counts) shows **current-value / max**, e.g. `"14/20"`, `"7/8"` — this
-    is the one place that puts the max on the left. Doug reads the swapped order as "2/11" showing as
-    "11/2." Confirmed this is pure element order/position, not a resolver bug: `Game1.ManifestRenderer.cs`
-    binds `attrs.alloc`/`attrs.available` by MEANING already (see the comment at `:1641`, "that swap was
-    a smaller earlier bug's half" — a real tuple-position mix-up already fixed once; swapping which
-    VALUE each bind name returns now would reintroduce exactly that class of bug, just hidden one level
-    deeper, and isn't ours to do per the manifest-is-CD-owned rule anyway). Ask: swap the two rects'
-    contents in `attrBar` — `attrs.available` first (x≈410), then `/`, then `attrs.alloc` last
-    (x≈425) — so it reads `available / alloc` like every other readout. No new binds/states/engine
-    hooks needed, pure `layout.json` element reorder.
-    **CONFIRMED 2026-07-09 (Doug asked how a bug like this could be CD's when your own design looked
-    right): it's native to your own authored source, not something our extraction introduced.** Read
-    `design/dchtml/Equipment.dc.html` directly (~line 106-109) — the hand-written HTML itself has
-    `data-binds="attrs.alloc"` first, then `/`, then `data-binds="attrs.available"` (with
-    `color:{{ a.availColor }}`) last. `layout.json` is a faithful mechanical extraction of exactly that
-    markup — there is no separate translation step on our side where an order flip could sneak in, so
-    this isn't a mystery, it is simply how the source already reads.
-    **Second, related question surfaced while checking this — please answer, don't just reorder and
-    assume it's covered:** `availColor` is bound to `attrs.available`, which our engine defines as
-    capacity MINUS whatever is currently reserved by gear+techniques — a usage quantity. `attrs.alloc`
-    is the one that is already damage-adjusted (`== current Capacity`, drops when a part is hurt). Doug
-    described the color's intent as "flags when damage/debuff reduced the total" — that description
-    matches `alloc`, not `available`. So the reorder above and the color binding are two separate asks:
-    if the color is meant to track damage specifically, `availColor` should move to whichever span
-    renders `attrs.alloc` after the reorder, not just ride along with `available` to its new spot.
-    Your call which value the color should track — flagging so it isn't assumed fixed for free.
-    **RESOLVED 2026-07-09 — Doug confirmed against a real screenshot, full spec now:** left slot =
-    `attrs.available` (unallocated, decreases as gear/techniques reserve it), right slot =
-    `attrs.alloc` (the natural undamaged max). The right slot's color is CONDITIONAL, not static:
-    white/neutral when `attrs.damaged == 0` (nothing reduced it), only switches to the flag color
-    when `attrs.damaged > 0`. Example Doug read directly off a live card: capacity 6, 5 STR reserved
-    by gear, right side showed "1" (wrong — that's `available`) instead of "6" (correct — that's
-    `alloc`, undamaged, should be white). This closes both open questions from the entry above in one
-    pass — please build to this exact spec, no more back-and-forth needed on this one.
+B28. **`attrBar`'s two number slots need a reorder, a color-binding fix, and a rename — one
+    coordinated ask, all in the same element.** `design/dchtml/Equipment.dc.html` (~line 106-109) and
+    its extracted `layout.json:10901` both currently read, left to right: `attrs.alloc` (total
+    capacity), `/`, `attrs.available` (current free, colored via `a.availColor`). Every other pool
+    readout in the game (HP, Supplies, Charge, Summons, the Equipment/minion "slotted" counts) shows
+    current-value / max — this is the one place that puts the max on the left, which Doug read live as
+    "2/11" displaying as "11/2." Confirmed this is native to your own authored source, not something
+    our extraction introduced — nothing to fix on our end, this is a `.dc.html`/`layout.json` ask only.
+    **Full spec, confirmed against a live screenshot:** left slot = `attrs.available` (unallocated,
+    decreases as gear/techniques reserve it); right slot = the total-capacity field, RENAMED from
+    `attrs.alloc` to **`attrs.total`** (matches how HP/Supplies/Charge already talk about themselves —
+    current/max, never "alloc"; the old name was confusing enough that it caused the back-and-forth
+    that found this bug in the first place). The right slot's color is CONDITIONAL: white/neutral when
+    `attrs.damaged == 0`, only switches to the flag color when `attrs.damaged > 0` — move `availColor`
+    off `attrs.available` and onto `attrs.total` to match. Example: capacity 6, 5 STR reserved by gear,
+    right side should read "6" in white (undamaged total), not "1" (that's available, and it's in the
+    wrong slot). Rename `attrs.alloc`/`pool.attr.alloc` → `attrs.total`/`pool.attr.total` everywhere
+    this bind is authored, clean rename, no dual-name fallback — every `data-binds="attrs.alloc"`
+    across the `.dc.html` sources moves together, then re-extract. Our side renames the matching
+    bind-resolution switch in lockstep so nothing goes stale on either end.
 
-B29. **NEW (2026-07-09) — CityMap has a THIRD ad-hoc placeholder popover (Quest), same shape the
-    Merchant one had before its manifest cutover; needs a real card template.** `NodeType.Quest` had
-    no Game-layer template at all — entering one crashed (fixed engine-side, an `AssetRegistry`
-    node-icon lookup, not a CD ask). Past that fix there's still no manifest template for a quest
-    prompt, so `Game1.CityMap.cs`'s `DrawQuestScreen()` hand-draws a raw panel + a literal "QUEST
-    [PLACEHOLDER]" title + wrapped prompt text + two generic Y/N buttons — explicitly code-commented
-    as a flagged stopgap, not finished design, same pattern as the pre-07-03 Merchant popover. Ask: a
-    real `quest` screen/card template — prompt text area + Accept/Decline actions — matching the
-    panel/card chrome already established on Merchant/Equipment. The quest CONTENT itself (catalog,
-    copy) is a separate, bigger design pass Doug still owns; this ask is just the card template so the
-    engine has something real to render into once that content exists.
-    **CORRECTED 2026-07-09 (Doug): the card's HOST CONTEXT is changing, not just its own content.**
-    The quest prompt should render inside the Encounter screen shell (foeless — no enemy present),
-    not floated over the CityMap chart as it does today — "partly to make it feel like you're
-    moving." There is also a THIRD landing outcome to design for: a node with no quest and no combat
-    ("nothing here"), needing its own beat in the same shell, likely with no popover at all. And
-    separately: the CityMap's RETREAT button needs a second visual state — relabels to REDEPLOY and
-    turns gold once a node clears, replacing a standalone engine-only overlay that exists today. All
-    three are one connected ask: the Encounter-screen shell needs to host non-combat arrivals (quest
-    prompt, or nothing) cleanly, and the header button needs the state to match. A DEX-gated timer for
-    Retreat/Redeploy availability is also coming (Doug wants "some mechanism based on dexterity that
-    will time the availability of that button") but the exact shape/UX is still undecided on our side
-    — don't build against a guessed timer yet.
+B29. **The Encounter screen shell needs to host non-combat arrivals — Quest, "nothing here," and
+    Camp — plus a quest card template and a header-button state change. One connected ask.**
+    `NodeType.Quest` had no Game-layer template at all (the crash from entering one is fixed
+    engine-side, not a CD ask). Today it's patched as an ad-hoc popover floated over the CityMap chart
+    (`Game1.CityMap.cs`'s `DrawQuestScreen()` — a flagged, explicitly-not-finished stopgap: raw panel,
+    literal "QUEST [PLACEHOLDER]" title, generic Y/N buttons). That's the wrong host: Doug wants the
+    quest prompt rendering inside the Encounter screen shell instead (foeless, no enemy present) —
+    "partly to make it feel like you're moving" — and the same shell needs to cover two more cases:
+    a node with no quest and no combat ("nothing here," likely no popover at all, just the arrive
+    beat), and Camp, which should also become a foeless "empty encounter" so a player can
+    pre-activate their techniques and have them already charging before the next real fight (this
+    matters because only Sustained/shield techniques auto-activate on encounter entry now — Timered
+    attacks wait for the player, so Camp is where you'd prep them). Ask: (1) a real `quest` card
+    template — prompt text + Accept/Decline actions, matching the Merchant/Equipment panel chrome
+    (quest CONTENT/catalog is Doug's own separate pass, this is just the template); (2) confirm the
+    Encounter shell can render foeless for all three cases (Quest, nothing-here, Camp); (3) the
+    CityMap's RETREAT button needs a second visual state — relabels to REDEPLOY, turns gold, once a
+    node clears — replacing a standalone engine-only overlay that exists today. A DEX-gated timer on
+    Retreat/Redeploy availability is coming but the exact shape/UX is still undecided on our side —
+    don't build against a guessed timer yet.
 
 ## Standing FYIs (for context — not action items)
 - **Tier ladders for the new families** (for card copy / labels): Sling Shepherd's → Braided →

@@ -1,3 +1,37 @@
+## ✅ LOCKED (2026-07-09, Doug) — only Sustained/shield-type techniques auto-activate on encounter
+## entry; Timered attacks (Jab etc.) must NOT — resolves the open design question from this file
+Doug's rule, plain: "only shield auto-activates so that you don't get hit the first time." This
+answers the "should Jab auto-charge on entry" question directly — it should not. Build the
+activation default keyed off `TechniqueKind` (Sustained = auto-on at encounter start, Timered
+attacks = off by default, needs an explicit player activation) rather than the current uniform
+`auto:true` for everything.
+
+## FEATURE (2026-07-09, Doug) — Camp should be a foeless "empty encounter" too, so players can
+## pre-activate Timered techniques before the next real fight — extends the Quest-hosting pattern
+Follows directly from the LOCKED rule above: if Timered attacks no longer auto-start, a player
+walking into a fresh fight starts every attack from zero charge. Doug's fix: "we actually need the
+camp screen to be an empty encounter as well so you can activate your techniques and have them start
+charging automatically on the next encounter if you want." This is the SAME architecture already
+asked for Quest nodes and the "nothing here" landing case (both route through the Encounter shell,
+foeless) — Camp becomes a third case of that one pattern: no foe, but the action bar/attribute pool
+are live and interactive, so pre-arming before departing is a real, intentional strategic choice.
+Route to CD alongside B29 if Camp needs new manifest surface beyond what Quest/nothing-here already
+asks for.
+
+## FEATURE/RENAME (2026-07-09, Doug) — "alloc" is a confusing bind/field name; it's the actual root
+## cause of this whole multi-message mixup and should be renamed, not just re-explained again
+Doug: "alloc is a really confusing name is root cause here... can't we come up with a better name?"
+Fair — `alloc` reads ambiguously (sounds like "how much has been allocated/reserved," when it
+actually means the opposite: total undamaged capacity). Proposed: rename to `total` (matches how
+every other pool readout in the game already talks about itself — HP/Supplies/Charge all present as
+current/max, never "alloc") — `attrs.alloc`/`pool.attr.alloc` → `attrs.total`/`pool.attr.total`
+everywhere: the C# bind-resolution switch (`Game1.ManifestRenderer.cs`), AND the CD source
+(`design/dchtml/Equipment.dc.html`'s `data-binds="attrs.alloc"`) AND the extracted `layout.json`, all
+in the same pass — a bind name that only changes on one side silently stops resolving. This is a
+CLEAN RENAME per this file's own standing rule: no alias, no dual-name fallback, every usage moves
+together. Route to CD outbox alongside B28 (the order/color fix already pending) since B28 already
+touches this exact element — bundle them, one relay, not two.
+
 ## ‼ HIGH PRIORITY (2026-07-09, Doug — 6 screenshots, Equipment vs Encounter side by side) —
 ## THREE confirmed, precisely root-caused bugs, all specific to the ENCOUNTER screen's attribute
 ## display; supersedes the "intermittent/maybe stale" framing directly below, this is real and reproducible
@@ -23,17 +57,15 @@ Encounter screenshot; Equipment correctly shows 6). Not yet root-caused with the
 for a 6-capacity stat the way the row container was under-sized for a 4th row. Needs the same kind
 of dimension check as #1 against `poolRow`'s actual pip-cell part rects.
 
-**3. Activating/deactivating a technique (Jab, Bandage tested directly, twice each) produces ZERO
-visible change — not in the attribute bar's reservation numbers, not in the technique's own card
-state.** This is no longer "maybe stale build" — Doug tested it repeatedly and consistently across
-multiple screenshots, this reads as a real, reproducible bug. **Strong parallel worth checking
-first:** today's quest-popover fix found mouse clicks were never wired to `UpdateChoosing`'s input
-handling even though the buttons rendered and hovered fine — check whether the Encounter action-bar
-card click handlers have the same gap (visually toggles/renders, but doesn't actually call
-`Caster.Activate`/`Deactivate`, or calls it but the UI reads a stale snapshot rather than live
-`Body.TechReserved`). This supersedes the earlier "verify stale build first" framing for the
-reservation report specifically — treat as a real bug needing a live trace, not a build-freshness
-question.
+**3. CORRECTED 2026-07-09 (Doug): the techniques themselves work fine — Jab/Bandage/Brace all fire
+and do their real effect. The bug is scoped narrower than "activation is broken": ONLY the attribute
+bar's reservation display fails to visibly update.** So this is NOT the same class as the quest-button
+bug (that parallel doesn't hold — `Caster.Activate`/`Deactivate` and `Body.TechReserved`'s real
+bookkeeping are apparently fine, since the mechanical effects land). Narrow the live trace to the
+DISPLAY path specifically: `AttrBars()`/`PoolCells()` (`Game1.ManifestRenderer.cs`) most likely reads
+a stale `Body` reference, or the Encounter screen simply isn't re-querying/redrawing this element on
+the same cadence real gameplay state changes — check whether `AttrBars()` is called fresh every
+frame/on every state change, or cached somewhere from encounter-start.
 
 **Separately flagged by Doug, blocked on #1 being fixed before it's checkable:** HP dropped 28→12 in
 one test with no visible damage on any STR/INT/DEX bar — can't rule out all of it landed on CON parts
