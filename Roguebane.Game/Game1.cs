@@ -475,6 +475,10 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         else if (Exp.State == ExpeditionState.Cleared)
         {
             if (Pressed(keys, Keys.Space) || Click(ClearedRedeployRect)) _campaign.Redeploy(); // back to the chart
+            // FIXED 2026-07-10, Doug: "equipment should become enabled after combat" -- Cleared is out
+            // of combat same as Choosing, so the E key must open Equipment here too (no button is drawn
+            // on the battlefield screen for it, so keyboard-only, unlike UpdateChoosing's rect+key check).
+            else if (Pressed(keys, Keys.E)) { _equipReturnTo = Screen.Run; _screen = Screen.Equipment; }
         }
         else UpdateChoosing(keys);
     }

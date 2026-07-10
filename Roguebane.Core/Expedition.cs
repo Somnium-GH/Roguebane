@@ -113,6 +113,12 @@ public sealed class Expedition
         _ => 2,
     };
 
+    // Equipment gate [FIXED 2026-07-10, Doug: "equipment should become enabled after combat"]: a just-
+    // cleared fight (State == Cleared, before the player presses Redeploy) is out of combat exactly as
+    // much as Choosing is -- both are "not actively fighting" per §6e's intent -- so every roster/gear
+    // mutation below must accept either, not gate on Choosing alone.
+    private bool CanEditLoadout => State is ExpeditionState.Choosing or ExpeditionState.Cleared;
+
     public bool AtMerchant => State == ExpeditionState.Choosing && Map.Current.Type == NodeType.Merchant;
 
     // §"Quests" (STATUS.md, 2026-07-07 Doug: partially unblocked): a Quest node's two-step
@@ -207,13 +213,13 @@ public sealed class Expedition
     // moving the piece between the Stash pack and the body via Gearing (which enforces the wield/wear
     // gates). Returns false if mid-fight or the move isn't legal.
     public bool EquipWeapon(Weapon weapon) =>
-        State == ExpeditionState.Choosing && Gearing.EquipWeapon(_stash, _player.Body, weapon);
+        CanEditLoadout && Gearing.EquipWeapon(_stash, _player.Body, weapon);
     public bool UnequipWeapon(Weapon weapon) =>
-        State == ExpeditionState.Choosing && Gearing.UnequipWeapon(_stash, _player.Body, weapon);
+        CanEditLoadout && Gearing.UnequipWeapon(_stash, _player.Body, weapon);
     public bool EquipArmor(Armor armor) =>
-        State == ExpeditionState.Choosing && Gearing.EquipArmor(_stash, _player.Body, armor);
+        CanEditLoadout && Gearing.EquipArmor(_stash, _player.Body, armor);
     public bool UnequipArmor(Stat group) =>
-        State == ExpeditionState.Choosing && Gearing.UnequipArmor(_stash, _player.Body, group);
+        CanEditLoadout && Gearing.UnequipArmor(_stash, _player.Body, group);
 
     // Technique roster membership — out of combat only (§6e: "Equipment is only reachable OUT of
     // combat"). Ordering per §6e: equip lands in the first free slot (append; the list has no gaps to
@@ -221,7 +227,7 @@ public sealed class Expedition
     // currently powered gets deactivated on unequip so it can't leave a dangling FSM reference.
     public bool EquipTechnique(Technique technique)
     {
-        if (State != ExpeditionState.Choosing) return false;
+        if (!CanEditLoadout) return false;
         if (_equipment.Contains(technique) || _equipment.Count >= TechniqueSlots) return false;
         _equipment.Add(technique);
         return true;
@@ -229,7 +235,7 @@ public sealed class Expedition
 
     public bool UnequipTechnique(Technique technique)
     {
-        if (State != ExpeditionState.Choosing || !_equipment.Remove(technique)) return false;
+        if (!CanEditLoadout || !_equipment.Remove(technique)) return false;
         if (_caster.IsActive(technique)) _caster.Deactivate(technique);
         return true;
     }
@@ -238,7 +244,7 @@ public sealed class Expedition
     // no reservation change (same "out of combat only" gate as equip/unequip above).
     public bool ReorderTechnique(Technique technique, int newIndex)
     {
-        if (State != ExpeditionState.Choosing) return false;
+        if (!CanEditLoadout) return false;
         var i = _equipment.IndexOf(technique);
         if (i < 0) return false;
         newIndex = Math.Clamp(newIndex, 0, _equipment.Count - 1);
@@ -252,7 +258,7 @@ public sealed class Expedition
     // the equipped-technique list. No Campaign-side mirror needed — Campaign hands every leg the
     // SAME Caster instance (see Campaign.NewLeg), so minion order already survives a leg advance.
     public bool ReorderMinion(Minion minion, int newIndex) =>
-        State == ExpeditionState.Choosing && _caster.ReorderMinion(minion, newIndex);
+        CanEditLoadout && _caster.ReorderMinion(minion, newIndex);
 
     // The merchant's HP service price (§10): gold per 1 HP, randomized within a loot-bounded range and
     // STABLE per merchant node (same node id => same price, so the run stays reproducible).
@@ -343,9 +349,9 @@ public sealed class Expedition
     // gate-reservation + Summons-resource bookkeeping (§9), so these are thin out-of-combat gates
     // over them.
     public bool SummonMinion(Minion minion) =>
-        State == ExpeditionState.Choosing && _caster.Summon(minion, MinionCap);
+        CanEditLoadout && _caster.Summon(minion, MinionCap);
     public bool DismissMinion(Minion minion) =>
-        State == ExpeditionState.Choosing && _caster.Dismiss(minion);
+        CanEditLoadout && _caster.Dismiss(minion);
 
     // Live per-technique state for the action-bar render (cooldown fill + card state).
     public Caster.TechStatus Status(Technique technique) => _caster.StatusOf(technique);

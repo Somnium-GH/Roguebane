@@ -1,4 +1,4 @@
-## HIGH PRIORITY (2026-07-09, Doug) — Equipment is unreachable in the `Cleared` state (right after
+## ✅ FIXED (2026-07-10, loop) — Equipment is unreachable in the `Cleared` state (right after
 ## winning a fight, before Redeploy) — confirmed real bug, precise root cause, two-layer fix needed
 Doug: "equipment should become enabled after combat." Confirmed: today Equipment is NOT reachable
 immediately after a fight ends, only after pressing REDEPLOY (i.e. only once `Exp.State` is back to
@@ -21,6 +21,12 @@ the design intent per §6e is "out of combat," which `Cleared` already is). Shel
 `UpdateRun`'s `Cleared` branch also check the Equipment button/`E` key (same handling `UpdateChoosing`
 already does), not just the Redeploy click. Returning from Equipment (`_equipReturnTo = Screen.Run`)
 already works regardless of the underlying `Exp.State`, so no further change needed there.
+
+**Fix:** added `Expedition.CanEditLoadout` (`State is Choosing or Cleared`) and switched every roster/gear
+gate (`EquipWeapon`/`UnequipWeapon`, `EquipArmor`/`UnequipArmor`, `EquipTechnique`, `UnequipTechnique`,
+`ReorderTechnique`, `ReorderMinion`, `SummonMinion`/`DismissMinion`) onto it. `Game1.UpdateRun`'s `Cleared`
+branch now also checks `Keys.E` to open Equipment (keyboard-only there — no button drawn on the
+battlefield screen for it). Covered by `ExpeditionTests.RosterAndGearCanBeEditedWhileHoldingAtCleared`.
 
 ## CONFIRMED (2026-07-09, Doug asked to check) — unequip/re-equip of a technique already resets it to
 ## inactive today; the LOCKED auto-activate-by-Kind feature (directly below) must be built so this

@@ -134,6 +134,25 @@ public class ExpeditionTests
         Assert.Equal(ExpeditionState.Choosing, exp.State); // now back on the chart
     }
 
+    // FIXED 2026-07-10, Doug: "equipment should become enabled after combat" -- Cleared (right after a
+    // win, before Redeploy) is out of combat exactly as much as Choosing, so the roster/gear mutation
+    // gates must accept both, not Choosing alone.
+    [Fact]
+    public void RosterAndGearCanBeEditedWhileHoldingAtCleared()
+    {
+        var exp = FullLoadout();
+        exp.Enter("a2");
+        var guard = 0;
+        while (exp.State == ExpeditionState.Fighting && guard++ < 10000) { AimAll(exp); exp.Tick(); }
+        Assert.Equal(ExpeditionState.Cleared, exp.State);
+
+        Assert.True(exp.UnequipTechnique(Techniques.Bandage));
+        Assert.True(exp.EquipTechnique(Techniques.Bandage));
+        Assert.True(exp.ReorderTechnique(Techniques.Bandage, 0));
+        Assert.True(exp.UnequipWeapon(Armory.Dagger)); // DemoBody wields the Dagger already
+        Assert.True(exp.EquipWeapon(Armory.Dagger));
+    }
+
     // Bug fix (2026-07-04, Doug): a technique aimed at THIS fight's foe must not carry a stale lock
     // into the NEXT one — Redeploy() clears every equipped technique's aim.
     [Fact]
