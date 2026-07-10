@@ -1,3 +1,112 @@
+## ⚠ NEEDS HUMAN — FOES need to heal with techniques (2026-07-09, Doug) — confirmed a real AI gap,
+## not a content gap; do not let the loop invent the decision rule unsupervised
+**Doug's own framing, correctly:** "that's kind of a deep AI need... it needs to start prioritizing."
+Confirmed by reading `Battle.cs`/`FoeTargeting.cs`/`Foe.cs`: **`FoeAim` (Random/Smart/Inept) only
+governs which PLAYER part a foe's swing lands on — it has zero say over which of the FOE'S OWN
+techniques fires or when.** `Battle.cs`'s foe-offense setup is `foreach (var tech in foe.Arsenal)
+offense.Activate(tech); // foes fire unattended (auto on)` — every technique in a foe's Arsenal just
+runs forever on its own cooldown from the start of the fight, with NO read of the foe's own HP or
+part damage anywhere in that loop. **This means Troll and the castle boss (`ArmedHealing`) aren't
+actually healing "smartly" today either** — `Bandage` just ticks blind on its fixed 8s timer
+regardless of whether the foe is hurt; it reads as sensible over a long fight only because Bandage
+is a no-op when nothing's damaged, not because anything decided to prioritize it.
+**The real gap:** foes need a technique-choice layer parallel to `FoeAim` but for "which of MY OWN
+techniques matters right now," gated on the foe's own state — at minimum "don't waste a heal
+tick/slot when nothing's hurt" is already free (Bandage no-ops), but genuine prioritization ("hold
+the attack this tick, my chest is about to break, mend it instead") is new decision logic that
+doesn't exist anywhere in `Caster`/`Battle` today.
+**Why this is Needs Human, not a loop task to just build:** the actual trigger rule is a design
+choice, not an engineering one — candidates to react to, not a recommendation: (a) a flat
+HP-percent threshold ("below X%, prefer any Heals:true technique off cooldown over attacking"), (b)
+a per-part read ("if the SAME part that powers my main attack is below its own Reserve threshold,
+mend it before it breaks and silences the attack" — ties in neatly with the disable-cascade model
+already governing everything else), or (c) something simpler that's just "stop firing Bandage on a
+blind timer and instead only fire it when something's actually damaged" (a smaller, safer first
+step that doesn't require new decision infrastructure, since `Bandage`'s own "mends most-damaged
+part" already knows what's hurt — the gap is WHEN it competes against the attack technique for the
+same tick, not whether it knows what to heal). Also open: does fixing this retroactively change
+Troll/ArmedHealing's balance (they'd start ACTUALLY prioritizing survival instead of a coin-flip
+timer overlap), which would need a re-check against their existing tests/thesis once built.
+
+## ‼ BUG BATCH (2026-07-09, Doug playtest) — 13 items from a live playtest pass; crash first, then a
+## confirmed non-bug (unarmed-foe question, answered), then the rest as reported
+Doug played a live build and filed 13 items in one pass, several purely from memory of symptoms —
+static-read triage below, prioritized. None of this has been build-verified (no dotnet in this
+sandbox); treat root-cause notes as strong leads, not confirmed fixes.
+
+**1. CRASH (highest priority) — a specific node on the first map's own STATUS. Directly off the Camp
+node in the center of the first map (selectable as the player's very first move), a dead-end node
+(dead-end is fine/intended) crashes the game when selected.** Strongest lead found by static read:
+`Expedition`/`CityMap` (Core) already carry `NodeType.Quest` and `Expedition.AtQuest`/`CurrentQuest`/
+`AcceptQuest`/`DeclineQuest` (built this session, one stub quest, catalog still open per the Quests
+backlog entry below in this file) — but grepping `Roguebane.Game` for "quest" (any case) turns up
+**zero matches** in `Game1.cs` or `Game1.ManifestRenderer.cs`. If the first map's generator places a
+Quest node, the Game layer has no rendering/interaction path for it at all, which is a very plausible
+crash (unhandled node-type case, or a null encounter-template lookup on entry). First thing to check:
+confirm the crashing node's actual `NodeType` in a debugger/log, then look for a `switch` over
+`NodeType` in `Game1.cs` missing a `Quest` arm. If it's NOT a Quest node, next-check the Merchant/
+ResourceHold entry paths for the same "no case for this type" shape.
+
+**2. Enemy with no visible weapon dealing damage — investigated, not a single simple answer, both
+paths are legitimate/expected depending on which foe it was; not evidence of a new "unarmed"
+mechanic being invented.** Two distinct explanations exist in current code, either of which fits:
+   - **If it was one of the `Foes.Armed(...)` factory foes** (the original/lightest content-foe
+     shape, `Foes.cs:17-26` — used before the CHUNK D geared roster): these are LITERALLY unarmed by
+     design. `Strike` (`Foes.cs:10-11`) is `Consults: None`, Stat.Str, Reserve 1 — it never wields
+     anything (`Armed()` never calls `frame.Wield`), it just spends STR capacity like a spell spends
+     INT. This already IS an "unarmed technique," just on the foe side, quietly, since before this
+     session's redesign talk — not something newly introduced, and not a player-facing option (Doug's
+     own parked idea from earlier this session was about a PLAYER unarmed/caster-style 50/50 verb,
+     unrelated to this).
+   - **If it was one of the geared CHUNK D foes** (Ogre/Troll/Gargoyle/Bandit/DireOgre — all of which
+     `frame.Wield` a real `Armory` weapon and deal real weapon-scaled damage): "looked unarmed" is
+     almost certainly a rendering gap, not a mechanics gap. `Game1.cs:1343-1345`'s own comment says it
+     plainly: "No sprite for a weapon id => simply unarmed" — if `sprites/gear/{weapon.Id}` has no
+     texture, the figure draws with nothing in its hand even though it's mechanically wielding and
+     consulting the weapon fine. Check `GearCatalogTests.cs` coverage against every `Armory` weapon a
+     `Foes.cs` foe actually wields (Mace/Axe/Warhammer) for a missing catalog entry.
+   - **Confirmed either way: yes, foes still need a working arm to attack.** For the geared foes, this
+     is the same `Consulted`/`HandUsable` disable-cascade the player uses (proven in `FoeBanditTests`,
+     "arm-break drops the axe from Consulted"). For `Armed()`'s bare `Strike`, there's no weapon to
+     consult, but the arm is the ONLY `Stat.Str` BodyPart on that frame, so breaking it still zeroes
+     `Capacity(Str)` below Strike's Reserve and silences it — same practical outcome, different gating
+     mechanism (capacity-starvation, not a Consulted check). Worth knowing the two are mechanically
+     different paths if this ever needs debugging again.
+
+**3. Active/charging/targeted skill reticle mounts wrong** — sits centrally at the top of the torso;
+Doug recalls a prototype-era white hitbox outline in a different position and suspects the same
+overlapping-hitbox regression. Files with reticle code: `Game1.cs`, `Game1.ManifestRenderer.cs`,
+`AssetRegistry.cs`, `Content.mgcb` — not traced further this pass, needs a fresh look at whatever
+socket/anchor the reticle reads vs. the part-hitbox anchors it should align to.
+
+**4–12, UI/layout, not individually root-caused this pass — reported as-is for the loop to trace:**
+4. New-game screen: attribute numbers not centered in their boxes (text alignment).
+5. Gold boxes rendering around armor (unclear if intended chrome or a stray border draw).
+6. Rarity badges: the box around each badge is missing, only colored text shows. (`Game1.
+   ManifestRenderer.cs` is the one file referencing rarity — start there.)
+7. New-game screen's Core Rune effect cards: the colored sliver renders UNDER the text, a contrast
+   violation. Doug: should match the treatment already working correctly on the Equipment screen —
+   diff the two card-drawing paths, the equipment screen's is the reference implementation.
+8. Equipment screen's close button does not work — Doug flags this as long-standing, not new.
+9. Attribute bar scaling: the scale is being applied UNIFORMLY across all four attribute bars; each
+   bar should scale INDIVIDUALLY so it maxes out its own available width. Doug notes a previous fix
+   attempt for this apparently didn't land correctly — check for a half-applied change.
+10. Equipment screen's action bar shows the wrong abilities: same shape as the earlier "can't equip
+    anything but the first thing" bug — the first equipped technique repeats 3× instead of showing the
+    actual distinct equipped set. Likely the same root cause class as that earlier bug; check whatever
+    fixed that one for a parallel spot that didn't get the same fix.
+11. Adept (4 technique slots): equipping a 4th skill makes it not appear in EITHER the equipment
+    screen or the encounter screen. Doug believes this is a pure layout issue (data-side equip likely
+    fine, rendering loop likely capped at 3 visible slots somewhere).
+12. Attribute bars: should render EMPTY when unreserved, FILLED (unhatched) when reserved for an
+    active technique — confirm current rendering actually reads live reservation state per bar rather
+    than a stale/default fill.
+
+**13. Reserved/total number order is flipped** — e.g. "2 / 11" (2 reserved of 11 max) is currently
+displaying as "11 / 2". Simple format-string argument-order fix, wherever that readout is built.
+
+---
+
 ## ‼ BUG (2026-07-07, Doug) — weapon-consulting techniques reserve ZERO of their own attribute cost; violates the already-LOCKED reservation-timing rule
 **Confirmed against both locked docs, not a new ruling:** `DESIGN_SPEC.md`'s "Reservation timing
 [LOCKED 2026-07-04, Doug]" and `RULES_SNAPSHOT.md`'s "Reservation / combat model" both state plainly
