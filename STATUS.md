@@ -231,6 +231,35 @@ per this correction; it should be the Encounter screen (no foe rendered) instead
 Encounter screen's shell/entry point is, not the CityMap draw call. Folded into CD outbox B29 (the
 quest card template ask) since the popover's HOST context changed, not just its own content.
 
+### ⇒ SCOPED (2026-07-10, loop) — this is a LARGE Core+Game+CD change, needs Doug/CD, not a blind loop build
+Traced the whole path to size it precisely before building. It is NOT a quick render swap — it needs a
+new **foeless-encounter** concept in Core that doesn't exist today:
+- **Core state machine has no foeless encounter.** `ExpeditionState` is only `Choosing/Fighting/Cleared/
+  Won/Lost`, and `Expedition.Enter` (`Expedition.cs:390`) SHORT-CIRCUITS Merchant/Camp/Quest with a bare
+  `return true` — they stay in `Choosing` (no `Battle`, no encounter). Fight nodes build a `Battle` and go
+  `Fighting`. So Camp/Quest never enter an encounter at all today.
+- **Camp is the hard part — it needs a LIVE action bar.** Doug's Camp ask (see the Camp entry near the top
+  of this file) is to pre-activate Timered techniques so they charge before the next fight. That requires a
+  real foeless encounter that TICKS (techniques charge, cooldowns run) with NO enemy and no `BattleOutcome`
+  — i.e. `Battle`/`Tick` must run foeless, and a new state (or a foeless `Battle` variant) must exist. This
+  interacts with the LOCKED re-arm/activation rules (`ApplyEncounterDefaults`/`RearmForEncounter`,
+  `Expedition.cs:399-400`): entering Camp should ApplyEncounterDefaults so Sustained arms, and leaving Camp
+  for the next fight must NOT re-rearm away the charge the player built (the whole point). That rule
+  interaction is a design call, not an engineering guess.
+- **"Nothing-here" is undesigned content.** There is no `NodeType` for it (`MapNode.cs`: Camp/Skirmish/
+  ResourceHold/Merchant/Quest/Unknown/Castle) and the map generator never places one. Doug's "land somewhere
+  with no quest or any other encounter type" is a NEW node outcome — needs a design decision (new NodeType?
+  an Unknown that resolves to empty?) before it can be built.
+- **CD-blocked half:** B29 (still Open) owns the quest-card template AND "confirm the Encounter shell can
+  render foeless" — the shell-render contract is partly CD's to bless. The current quest popover is a flagged
+  `[PLACEHOLDER]` pending that template.
+**Suggested slice order when this gets a supervised pass:** (1) Core: a foeless-encounter state + foeless
+`Battle`/`Tick` (no enemy, techniques charge, exit via Redeploy) with headless tests pinning the charge-
+persists-into-next-fight behaviour Doug wants; (2) Game: `DrawEncounterScreen` renders foeless (skip the foe
+figure/HP), route Quest+Camp entry into it; (3) CD B29: real quest card template; (4) Doug: decide the
+nothing-here node type, then wire it as a third foeless case. Steps 1 + Doug's rule calls gate everything
+else — flagging, not starting, so a half-built foeless state machine can't destabilise the combat loop.
+
 ## ✅ FIXED (2026-07-10, loop) — UI CONSOLIDATION: RETREAT header button becomes REDEPLOY (gold) on
 ## node-clear; standalone "NODE CLEARED / REDEPLOY" overlay deleted
 Doug: "remove the green screen that pops over with a button on it saying redeploy... the retreat
