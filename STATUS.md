@@ -155,6 +155,26 @@ socket/anchor the reticle reads vs. the part-hitbox anchors it should align to.
    violation. Doug: should match the treatment already working correctly on the Equipment screen —
    diff the two card-drawing paths, the equipment screen's is the reference implementation.
 8. Equipment screen's close button does not work — Doug flags this as long-standing, not new.
+
+### ✅ FIXED (2026-07-09, loop) — item 8: closeBtn rendered but had no click handler wired
+**Root cause:** `layout.json`'s `equipment` screen has a `closeBtn` element (`:6843`, `binds:
+"nav.close"`) that renders correctly (`Game1.ManifestRenderer.cs:634` resolves `"nav.close" =>
+"CLOSE"`), but `Game1.UpdateEquipment` only ever checked keyboard (`Escape`/`E`) to close the
+screen — no `ManifestElementRect("equipment", "nav.close")` + `Click(...)` check existed, unlike
+every sibling button on other screens (`nav.equipment` on citymap, `combat.retreat`/`combat.paused`
+on encounter, `merchant.leave` on merchant — all wired via the identical pattern in `Game1.cs`).
+The button was simply missed when Equipment's manifest cut-over landed; a purely mechanical gap,
+not a design question.
+**Fix:** added the missing `ManifestElementRect("equipment", "nav.close") is { } cl && Click(cl)`
+check alongside the existing Escape/E handling in `UpdateEquipment` (`Game1.cs`), same shape as the
+three working precedents.
+**Verified:** `dotnet build` — 0 errors/warnings; `dotnet test Roguebane.Core.Tests` — 511/511 green
+(Core untouched, this is a Game-layer-only fix). No mouse-click smoke harness exists (`RB_SMOKE` only
+drives Core state + renders one frame, no input injection) so this couldn't get a visual click
+receipt like the Quest fix did — confirmed instead by code inspection: `ScreenDef.Elements` is a flat
+array per screen regardless of `Parent` nesting (`LayoutManifest.cs:77`), so `closeBtn`'s `Parent:
+"statusStrip"` doesn't block the `FirstOrDefault(x => x.Binds == binds)` lookup, exactly like the
+three already-functioning buttons that use the same parented-element pattern.
 9. Attribute bar scaling: the scale is being applied UNIFORMLY across all four attribute bars; each
    bar should scale INDIVIDUALLY so it maxes out its own available width. Doug notes a previous fix
    attempt for this apparently didn't land correctly — check for a half-applied change.

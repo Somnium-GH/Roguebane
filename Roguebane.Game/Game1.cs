@@ -346,7 +346,12 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     private void UpdateEquipment(KeyboardState keys)
     {
         // P0 (2026-07-02, Doug): E TOGGLES — the same key that opened Equipment closes it (with Esc).
-        if (Pressed(keys, Keys.Escape) || Pressed(keys, Keys.E)) { _screen = _equipReturnTo; return; }
+        // Doug bug #8 (2026-07-09): closeBtn renders (nav.close bind) but had no click handler wired —
+        // every sibling button (nav.equipment, combat.retreat, merchant.leave) follows this same
+        // ManifestElementRect+Click pattern; this one was simply missed.
+        if (Pressed(keys, Keys.Escape) || Pressed(keys, Keys.E)
+            || (ManifestElementRect("equipment", "nav.close") is { } cl && Click(cl)))
+        { _screen = _equipReturnTo; return; }
 
         // §6e click semantics: the Equipment screen is a pure roster equip/unequip surface, never
         // activation (that's the encounter screen's card-press, via CombatTargeting/Exp.Toggle) —
