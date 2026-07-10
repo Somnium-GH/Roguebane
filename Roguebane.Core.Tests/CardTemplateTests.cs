@@ -64,6 +64,37 @@ public class CardTemplateTests
     }
 
     [Fact]
+    public void PlaceCarriesPartAlign()
+    {
+        // A template part's authored text-align (center/right, Doug #4 — NewGame race attr tiles) must
+        // survive Place so the renderer can honor it, not silently drop to left like it did before.
+        var t = new Template
+        {
+            Size = new[] { 100, 40 },
+            Parts = new[]
+            {
+                new TemplatePart { Rect = new[] { 0, 0, 23, 8 }, Sample = "5", Binds = "v", Align = "center" },
+                new TemplatePart { Rect = new[] { 30, 0, 20, 8 }, Sample = "x", Binds = "k" },
+            },
+        };
+
+        var placed = CardTemplate.Place(t, 10, 20);
+
+        Assert.Equal("center", placed[0].Align);
+        Assert.Null(placed[1].Align); // unauthored align stays null (renderer treats as left)
+    }
+
+    [Fact]
+    public void TemplatePartAlignBindsFromJson()
+    {
+        // Match production deserialization (LayoutManifest.Parse uses case-insensitive names).
+        var opts = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var part = System.Text.Json.JsonSerializer.Deserialize<TemplatePart>(
+            "{\"rect\":[0,0,23,8],\"binds\":\"race.attrs.value\",\"align\":\"center\"}", opts);
+        Assert.Equal("center", part!.Align);
+    }
+
+    [Fact]
     public void PlaceTranslatesPartsByTheOrigin()
     {
         var tech = Manifest().Templates.Values.First(t => t.Parts.Length > 0); // any real parts-carrying template

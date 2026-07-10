@@ -399,7 +399,17 @@ overlapping-hitbox regression. Files with reticle code: `Game1.cs`, `Game1.Manif
 socket/anchor the reticle reads vs. the part-hitbox anchors it should align to.
 
 **4–12, UI/layout, not individually root-caused this pass — reported as-is for the loop to trace:**
-4. New-game screen: attribute numbers not centered in their boxes (text alignment).
+4. ✅ FIXED (2026-07-10, loop) — authored `align:"center"` was being DROPPED at parse. `TemplatePart`
+   (`LayoutManifest.cs`) had no `Align` property, so `race.attrs.value`/`race.attrs.key` (and every
+   other template part authoring `align`, e.g. the core budget tiles) deserialized without it and the
+   list-item text path drew top-left via `TextPxWrapped`, ignoring alignment — unlike screen-element
+   parts, which `DrawElementParts` already center. Fix threads align through: added `Align` to
+   `TemplatePart` + `PlacedPart` + `CardTemplate.Place`, and the list-item draw now honors
+   center/right for any single-line label that fits its band (too-wide runs fall through to the
+   wrapped left draw, so nothing clips). Verified: build 0/0, Core.Tests 516/516 (+2:
+   `PlaceCarriesPartAlign`, `TemplatePartAlignBindsFromJson`, test-owned fixtures — no manifest
+   pinning), and an `RB_SMOKE=1 RB_SCREEN=newgame` receipt shows the race + loadout attribute numbers
+   centered in their boxes (previously left-hugging).
 5. Gold boxes rendering around armor (unclear if intended chrome or a stray border draw).
 6. ⚠ NEEDS HUMAN (2026-07-10, loop) — NOT a render bug: rarity is an UNBUILT mechanic. Traced —
    Core has no `Rarity` enum/tier anywhere (grep: only an unrelated comment in `Shops.cs`), and the

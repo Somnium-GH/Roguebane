@@ -979,8 +979,26 @@ public partial class Game1
                         _ui.Color("mutedDim", Muted), 4.5);
                     continue;
                 }
-                TextPxWrapped(pp.Font == "display" ? _assets.Display : _assets.Mono,
-                    text!, RectOf(pp.Rect), _ui.Color(pp.Color ?? "ink", Ink), pp.FontPx);
+                var tfont = pp.Font == "display" ? _assets.Display : _assets.Mono;
+                // Honor authored align (center/right) for a single-line label that fits its band —
+                // matches DrawElementParts' screen-side treatment (NewGame race attr tiles, Doug #4).
+                // A run too wide to fit falls through to the wrapped left draw so nothing clips.
+                if (pp.Align is "center" or "right")
+                {
+                    var abase = tfont == _assets.Display ? DisplayDesignPx : MonoDesignPx;
+                    var asz = MeasureText(tfont, text!) * (float)(pp.FontPx / abase);
+                    if (asz.X <= pp.Rect.W)
+                    {
+                        var ax = pp.Align == "center"
+                            ? (int)(pp.Rect.X + pp.Rect.W / 2f - asz.X / 2f)
+                            : (int)(pp.Rect.X + pp.Rect.W - asz.X);
+                        var ay = (int)(pp.Rect.Y + pp.Rect.H / 2f - asz.Y / 2f);
+                        RecordTextBox(InkBox(tfont, text!, ax, ay, pp.FontPx), RectOf(pp.Rect), text!, tfont);
+                        TextPx(tfont, text!, ax, ay, _ui.Color(pp.Color ?? "ink", Ink), pp.FontPx);
+                        continue;
+                    }
+                }
+                TextPxWrapped(tfont, text!, RectOf(pp.Rect), _ui.Color(pp.Color ?? "ink", Ink), pp.FontPx);
             }
         }
     }
