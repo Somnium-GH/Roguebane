@@ -1,5 +1,54 @@
+## ‼ HIGH PRIORITY (2026-07-09, Doug — 6 screenshots, Equipment vs Encounter side by side) —
+## THREE confirmed, precisely root-caused bugs, all specific to the ENCOUNTER screen's attribute
+## display; supersedes the "intermittent/maybe stale" framing directly below, this is real and reproducible
+Doug did a real side-by-side test (Equipment screen vs. Encounter screen, same character, same
+moment) and it isolates things precisely. Equipment (`attrReadout`/`attrBar` template) renders
+correctly: all 4 rows, 6 pips each. Encounter (`poolRows`/`poolRow` template — **a completely
+separate, independently-authored element from Equipment's, not a shared component**) is broken in
+three specific, confirmed ways:
+
+**1. CON row missing from Encounter's Attribute Pool, every screenshot, not intermittent.**
+Root-caused precisely: `poolRows` (`Roguebane.Content/layout.json:5825-5850`) is authored
+`size:[309,77]`; its `poolRow` item is `size:[309,15]`, `gap:6`. Four rows need `4×15 + 3×6 = 78`.
+**The container is exactly 1px short.** (Equipment's equivalent, `attrReadout`, is sized exactly
+right — `4×13+3×5=67` matches its `size:[431,67]` precisely — which is why CON shows fine there and
+never on Encounter. These are two separate templates; fixing one does not fix the other.) Fix: grow
+`poolRows` to at least `[309,78]` (a couple extra px of headroom recommended, this was a razor-exact
+fit with zero margin even before the 1px shortfall). CD-owned (`layout.json` geometry) — route to
+the outbox alongside B28.
+
+**2. Attribute bars show 5 pip segments on Encounter where capacity is 6** (confirmed in every
+Encounter screenshot; Equipment correctly shows 6). Not yet root-caused with the same precision as
+#1 — same template (`poolRow`) is the suspect, likely its pip-strip WIDTH is similarly under-sized
+for a 6-capacity stat the way the row container was under-sized for a 4th row. Needs the same kind
+of dimension check as #1 against `poolRow`'s actual pip-cell part rects.
+
+**3. Activating/deactivating a technique (Jab, Bandage tested directly, twice each) produces ZERO
+visible change — not in the attribute bar's reservation numbers, not in the technique's own card
+state.** This is no longer "maybe stale build" — Doug tested it repeatedly and consistently across
+multiple screenshots, this reads as a real, reproducible bug. **Strong parallel worth checking
+first:** today's quest-popover fix found mouse clicks were never wired to `UpdateChoosing`'s input
+handling even though the buttons rendered and hovered fine — check whether the Encounter action-bar
+card click handlers have the same gap (visually toggles/renders, but doesn't actually call
+`Caster.Activate`/`Deactivate`, or calls it but the UI reads a stale snapshot rather than live
+`Body.TechReserved`). This supersedes the earlier "verify stale build first" framing for the
+reservation report specifically — treat as a real bug needing a live trace, not a build-freshness
+question.
+
+**Separately flagged by Doug, blocked on #1 being fixed before it's checkable:** HP dropped 28→12 in
+one test with no visible damage on any STR/INT/DEX bar — can't rule out all of it landed on CON parts
+specifically until CON is actually visible to look at. Re-check once #1 lands.
+
+**Design question, not a bug — needs Doug's call, don't silently build either way:** Jab (a Timered
+attack technique) appears to start already active/charging on encounter entry. Doug's expectation:
+"really only shields should start active." Current engine behavior activates everything `auto:true`
+by default (`Caster.Activate`'s existing default) — if Doug wants Timered attacks to NOT auto-start,
+that's a real behavior change (activation default should probably key off `TechniqueKind`, Sustained
+auto-on but Timered attacks off-by-default), not something to infer and build unsupervised.
+
 ## ⚠ FLAGGED — CON row intermittently missing from Attributes (Equipment + Encounter), then
-## reappeared on its own with no fix applied (2026-07-09, Doug: "I dunno what the deal is")
+## reappeared on its own with no fix applied (2026-07-09, Doug: "I dunno what the deal is") —
+## SUPERSEDED by the precise root-cause above (kept for the geometry cross-check, still useful)
 Not a clean reproducible bug — this needs a live trace, not another static read, but two things are
 worth having on record before that happens. **`AttrBars()` (`Game1.ManifestRenderer.cs:1349-1358`)
 always returns all 4 rows (STR/INT/DEX/CON) — the data source is not the problem.** **`attrReadout`'s

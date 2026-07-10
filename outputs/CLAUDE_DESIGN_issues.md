@@ -434,6 +434,14 @@ B28. **`attrBar`'s alloc/available pair reads backwards vs. every other pool rea
     if the color is meant to track damage specifically, `availColor` should move to whichever span
     renders `attrs.alloc` after the reorder, not just ride along with `available` to its new spot.
     Your call which value the color should track — flagging so it isn't assumed fixed for free.
+    **RESOLVED 2026-07-09 — Doug confirmed against a real screenshot, full spec now:** left slot =
+    `attrs.available` (unallocated, decreases as gear/techniques reserve it), right slot =
+    `attrs.alloc` (the natural undamaged max). The right slot's color is CONDITIONAL, not static:
+    white/neutral when `attrs.damaged == 0` (nothing reduced it), only switches to the flag color
+    when `attrs.damaged > 0`. Example Doug read directly off a live card: capacity 6, 5 STR reserved
+    by gear, right side showed "1" (wrong — that's `available`) instead of "6" (correct — that's
+    `alloc`, undamaged, should be white). This closes both open questions from the entry above in one
+    pass — please build to this exact spec, no more back-and-forth needed on this one.
 
 B29. **NEW (2026-07-09) — CityMap has a THIRD ad-hoc placeholder popover (Quest), same shape the
     Merchant one had before its manifest cutover; needs a real card template.** `NodeType.Quest` had
