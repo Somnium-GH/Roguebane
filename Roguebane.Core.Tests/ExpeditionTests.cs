@@ -28,6 +28,10 @@ public class ExpeditionTests
     // the player redeploys). The one test that checks the Cleared state inlines the fight instead.
     private static void FightToEnd(Expedition exp)
     {
+        // Activation default refinement [LOCKED 2026-07-09]: Timered techniques go cold on every
+        // encounter rearm now, so the harness must re-toggle them each fight like a real player would --
+        // filtered to inactive so an already-active Sustained default (Brace) is never double-toggled off.
+        foreach (var t in exp.Equipment) if (!exp.IsActive(t)) exp.Toggle(t);
         var guard = 0;
         while (exp.State == ExpeditionState.Fighting && guard++ < 10000) { AimAll(exp); exp.Tick(); }
         exp.Redeploy();
@@ -92,6 +96,19 @@ public class ExpeditionTests
         Assert.True(exp.Enter("a2")); // a skirmish
         Assert.Equal(ExpeditionState.Fighting, exp.State);
         Assert.NotNull(exp.Battle);
+    }
+
+    // Activation default refinement [LOCKED 2026-07-09, Doug: "only shield auto-activates so that you
+    // don't get hit the first time"]: entering ANY encounter (first included) auto-powers equipped
+    // Sustained techniques but leaves Timered attacks cold until the player explicitly activates them.
+    [Fact]
+    public void EnteringACombatNodeAutoActivatesSustainedButNotTimeredTechniques()
+    {
+        var exp = Sessions.Expedition(); // nothing toggled by hand -- pure encounter-entry default
+        Assert.True(exp.Enter("a2"));
+
+        Assert.True(exp.IsActive(Techniques.Brace));  // Sustained: shield auto-on
+        Assert.False(exp.IsActive(Techniques.Jab));   // Timered: still needs an explicit activation
     }
 
     [Fact]
@@ -259,6 +276,9 @@ public class ExpeditionTests
         void Step(string node)
         {
             c.Enter(node);
+            // Activation default refinement [LOCKED 2026-07-09]: Timered techniques go cold on every
+            // encounter rearm now, so re-toggle each fight like a real player would.
+            foreach (var t in c.Current.Equipment) if (!c.IsActive(t)) c.Toggle(t);
             var guard = 0;
             while (c.Current.State == ExpeditionState.Fighting && guard++ < 10000)
             {

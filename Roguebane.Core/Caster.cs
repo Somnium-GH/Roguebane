@@ -130,22 +130,30 @@ public sealed class Caster
 
     public bool IsActive(Technique technique) => _active.ContainsKey(technique.Id);
 
-    // Default-activation-state LOCK (DESIGN_SPEC "nothing starts charging... at the beginning of an
-    // encounter") + RE-ARM SCOPE (DESIGN_SPEC §7, LOCKED 2026-07-05): techniques PERSIST across
-    // back-to-back encounters (on/off state untouched, only the charge clock rewinds so leftover
-    // charge can't discharge instantly); minions do NOT persist — every fielded minion is dismissed at
-    // encounter end, full stop, so re-fielding one next encounter re-pays Summons like any fresh
-    // summon (no carry-over, no "it was already out" discount).
+    // RE-ARM SCOPE (DESIGN_SPEC, LOCKED 2026-07-05, narrowed 2026-07-09): a Timered technique's on/off
+    // state does NOT carry into the next encounter — Doug: "only shield auto-activates so that you
+    // don't get hit the first time," meaning Timered attacks must start cold every fight, same as their
+    // very first activation. Deactivating (not just rewinding the countdown) also frees the reservation
+    // it was holding. Minions still do NOT persist — every fielded minion is dismissed at encounter
+    // end, full stop, so re-fielding one next encounter re-pays Summons like any fresh summon (no
+    // carry-over, no "it was already out" discount).
     public void RearmForEncounter()
     {
-        foreach (var run in _active.Values)
-            if (run.Tech.Kind == TechniqueKind.Timered)
-            {
-                run.ResonanceStacks = 0; // Resonance decays fresh each encounter — no cross-fight snowball
-                run.Countdown = EffectiveCooldown(run.Tech);
-            }
+        foreach (var run in _active.Values.Where(r => r.Tech.Kind == TechniqueKind.Timered).ToList())
+            Deactivate(run.Tech);
         foreach (var minion in _minions.ToList()) // snapshot: Dismiss mutates _minions mid-loop
             Dismiss(minion);
+    }
+
+    // Encounter-entry default [LOCKED 2026-07-09, Doug]: equipped Sustained techniques (the shield
+    // layer) auto-power at the start of every encounter, first included — RearmForEncounter above only
+    // runs from the second encounter on, and neither it nor a fresh Caster ever activates anything on
+    // its own, so this is the one call site that actually arms the guard. Activate() is a no-op if
+    // already active, so re-calling this every encounter for an already-sustained technique is safe.
+    public void ApplyEncounterDefaults(IEnumerable<Technique> equipment)
+    {
+        foreach (var t in equipment)
+            if (t.Kind == TechniqueKind.Sustained) Activate(t);
     }
 
     // The ONE AUTO toggle (global, player-facing): ON => no module clears its target after firing (every

@@ -13,6 +13,10 @@ public class CoreCampaignTests
     private static void Fight(Campaign c, string node)
     {
         c.Enter(node);
+        // Activation default refinement [LOCKED 2026-07-09]: Timered techniques go cold on every
+        // encounter rearm now, so re-toggle each fight like a real player would (filtered to inactive
+        // so an already-active Sustained default is never double-toggled off).
+        foreach (var t in c.Current.Equipment) if (!c.IsActive(t)) c.Toggle(t);
         var guard = 0;
         while (c.Current.State == ExpeditionState.Fighting && guard++ < 10000)
         {

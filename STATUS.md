@@ -1,10 +1,65 @@
-## ✅ LOCKED (2026-07-09, Doug) — only Sustained/shield-type techniques auto-activate on encounter
+## HIGH PRIORITY (2026-07-09, Doug) — Equipment is unreachable in the `Cleared` state (right after
+## winning a fight, before Redeploy) — confirmed real bug, precise root cause, two-layer fix needed
+Doug: "equipment should become enabled after combat." Confirmed: today Equipment is NOT reachable
+immediately after a fight ends, only after pressing REDEPLOY (i.e. only once `Exp.State` is back to
+`Choosing`). Root cause, two coordinated layers:
+
+**Shell layer** (`Game1.cs:471-480`, `UpdateRun`): the state dispatch is `Fighting → UpdateCombat`,
+`Cleared → ONLY checks Space/Redeploy-rect`, `else → UpdateChoosing` (where the `nav.equipment` button
+click + `E` key are actually handled, `Game1.cs:531-536`). While `Exp.State == Cleared`,
+`UpdateChoosing` is never called at all — the Equipment button is unclickable, full stop.
+
+**Core layer** (`Expedition.cs`): even if the shell let you open the screen, every roster-mutation
+method gates strictly on `State == ExpeditionState.Choosing`, excluding `Cleared`: `EquipTechnique`
+(line 224), `UnequipTechnique` (line 232), `EquipWeapon`/`UnequipWeapon` (210/212), `EquipArmor`/
+`UnequipArmor` (214/216), `ReorderTechnique` (241), `SummonMinion`/`DismissMinion` (345/348) — all
+would silently no-op during `Cleared` even with the button wired.
+
+**Fix:** broaden every one of those Core gates from `State == ExpeditionState.Choosing` to
+`State is ExpeditionState.Choosing or ExpeditionState.Cleared` (both are "not actively fighting" —
+the design intent per §6e is "out of combat," which `Cleared` already is). Shell-side, let
+`UpdateRun`'s `Cleared` branch also check the Equipment button/`E` key (same handling `UpdateChoosing`
+already does), not just the Redeploy click. Returning from Equipment (`_equipReturnTo = Screen.Run`)
+already works regardless of the underlying `Exp.State`, so no further change needed there.
+
+## CONFIRMED (2026-07-09, Doug asked to check) — unequip/re-equip of a technique already resets it to
+## inactive today; the LOCKED auto-activate-by-Kind feature (directly below) must be built so this
+## stays true, not implemented as "restore prior active state"
+Doug: "we need the removal and re-equipping of a skill to result in it being inactive again unless
+it's a passive shield technique." Checked: this already holds today. `UnequipTechnique`
+(`Expedition.cs:230-235`) deactivates on removal if active (`_caster.Deactivate(technique)`), and
+`Caster.Deactivate` (`Caster.cs:279-285`) fully removes the technique's entry from `_active` — no
+lingering reference. `EquipTechnique` (`Expedition.cs:222-228`) never calls `Activate` — a re-equipped
+technique starts with no active entry, Sustained or Timered alike. No bug here today.
+
+**The thing to get right when building the auto-activate-by-Kind feature below:** implement it as a
+fresh per-encounter-entry evaluation — "for every currently-equipped technique with no active entry,
+activate it iff `Kind == Sustained`" — NOT as "remember whether this technique was active before it
+got unequipped and restore that." The former satisfies Doug's ask for free (a freshly re-equipped
+Timered technique has no active entry and isn't Sustained, so it stays off; a freshly re-equipped
+Sustained/shield technique gets armed like any other). The latter would need extra bookkeeping and
+risks resurrecting a Timered technique's old active state on re-equip — exactly what Doug is flagging
+against. No code change needed for this half, just a build-time constraint on the feature below.
+
+## ✅ FIXED (2026-07-10, loop) — only Sustained/shield-type techniques auto-activate on encounter
 ## entry; Timered attacks (Jab etc.) must NOT — resolves the open design question from this file
 Doug's rule, plain: "only shield auto-activates so that you don't get hit the first time." This
 answers the "should Jab auto-charge on entry" question directly — it should not. Build the
 activation default keyed off `TechniqueKind` (Sustained = auto-on at encounter start, Timered
 attacks = off by default, needs an explicit player activation) rather than the current uniform
 `auto:true` for everything.
+
+**Fix:** `Caster.RearmForEncounter` now DEACTIVATES every active Timered technique outright (not
+just rewinds its charge) — Timered starts cold every encounter, first included, matching the
+neutral-by-default rule. New `Caster.ApplyEncounterDefaults(equipment)` auto-activates equipped
+Sustained techniques (idempotent — safe to call every encounter even if already active); wired into
+`Expedition.Enter()` alongside the existing rearm call. `design/DESIGN_SPEC.md`'s RE-ARM SCOPE lock
+is annotated as narrowed by a new paragraph rather than rewritten, per the reconciliation rule.
+Multi-encounter test harnesses (`CampaignTests`, `CoreCampaignTests`, `ExpeditionTests`) toggled
+every technique on ONCE before the first fight and never retoggled — under the old
+persists-across-encounters rule that was enough for a whole campaign, but now Timered attacks go
+cold after encounter 1 and those harnesses' fighters lose their offense. Fixed by retoggling any
+inactive equipped technique right after each `Enter()`, matching what a real player must now do.
 
 ## FEATURE (2026-07-09, Doug) — Camp should be a foeless "empty encounter" too, so players can
 ## pre-activate Timered techniques before the next real fight — extends the Quest-hosting pattern

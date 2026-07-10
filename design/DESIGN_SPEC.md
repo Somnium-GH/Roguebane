@@ -424,8 +424,9 @@ feature. (FTL itself solves the same problem with a safe pre-battle screen where
 first real fight — worth keeping in mind if/when a similar staging beat gets designed here, but not
 required to ship this default-state fix.)
 
-**RE-ARM SCOPE between back-to-back encounters, same leg [LOCKED 2026-07-05, Doug]:** the neutral-start
-rule above governs a technique/minion's FIRST-ever activation state, not every single encounter boundary.
+**RE-ARM SCOPE between back-to-back encounters, same leg [LOCKED 2026-07-05, Doug; narrowed to
+Sustained-only by the 2026-07-09 rule below]:** the neutral-start rule above governs a
+technique/minion's FIRST-ever activation state, not every single encounter boundary.
 **Techniques persist:** whatever's active/toggled when one encounter ends carries into the next
 unchanged — the player doesn't re-arm techniques every fight. **Minions do NOT persist:** every fielded
 minion is dismissed at encounter end, full stop; fielding one again next encounter re-pays Summons like
@@ -433,6 +434,17 @@ any fresh summon (no carry-over, no discount for "it was already out last fight"
 that's the simple rule" (Doug). This is a deliberate asymmetry, not an oversight: minions are the
 resource-gated one-off commitment (Summons + a reservation), techniques are the FTL-style skill layer
 that's supposed to feel like a persistent, ongoing configuration.
+
+**Activation default refinement, Timered vs. Sustained [LOCKED 2026-07-09, Doug — narrows, does not
+repeal, the two locks above]:** the neutral-by-default rule and the "techniques persist" RE-ARM SCOPE
+rule above both continue to govern **Timered** techniques exactly as written — a Timered attack
+(Jab etc.) starts cold on a leg's first encounter AND starts cold again on every later encounter in
+that leg; its on/off state does NOT carry across an encounter boundary, so the player must re-activate
+it each fight. **Sustained** techniques (the shield layer: Brace/Steel/Barkskin/etc.) instead
+auto-activate at the start of EVERY encounter, first included, so a passive guard is already up before
+the first hit lands: "only shield auto-activates so that you don't get hit the first time" (Doug). The
+"do not build any auto-activate / smart-default logic" instruction above still holds for Timered
+attacks — this refinement is scoped to Sustained only.
 
 **Verbs are NOT bound to weapons.** A weapon is a stat-stick; techniques *consult* what's equipped
 ("Swing" = primary weapon; "Frenzy" = both, cost = sum). Techniques are a findable/slottable layer.

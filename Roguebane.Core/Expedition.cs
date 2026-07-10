@@ -391,6 +391,7 @@ public sealed class Expedition
         Battle = new Battle(_caster, Maps.EncounterFor(node, Map.SupportBank, Seed(node.Id)), _player, Seed(node.Id));
         State = ExpeditionState.Fighting;
         if (!isFirstEncounter) _caster.RearmForEncounter(); // §17 default-activation-state LOCK: no free carry-over charge
+        _caster.ApplyEncounterDefaults(_equipment); // 2026-07-09 LOCKED: Sustained auto-powers every encounter, Timered stays cold
         return true;
     }
 

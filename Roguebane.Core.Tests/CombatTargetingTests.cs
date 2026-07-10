@@ -148,10 +148,14 @@ public class CombatTargetingTests
         var ix = IndexOf(exp, Techniques.Brace);
         Assert.True(ix >= 0);
         Assert.True(Techniques.Brace.IsPassive);
-        ctrl.CardPress(exp, ix);                // power (reserve + hold, §6b)
+        // Activation default refinement [LOCKED 2026-07-09]: Sustained techniques auto-power on
+        // encounter entry, so Brace is already active by the time Fighting() returns.
         Assert.True(exp.IsActive(exp.Equipment[ix]));
-        ctrl.CardPress(exp, ix);                // press again -> toggle OFF, never the FSM
+        ctrl.CardPress(exp, ix);                // active -> toggle OFF, never the FSM
         Assert.False(exp.IsActive(exp.Equipment[ix]));
+        Assert.Equal(-1, ctrl.Targeting);
+        ctrl.CardPress(exp, ix);                // inactive -> toggle back ON, still never the FSM
+        Assert.True(exp.IsActive(exp.Equipment[ix]));
         Assert.Equal(-1, ctrl.Targeting);
     }
 }

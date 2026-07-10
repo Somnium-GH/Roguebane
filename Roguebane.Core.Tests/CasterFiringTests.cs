@@ -90,11 +90,11 @@ public class CasterFiringTests
         Assert.True(flank.Hp < 100);   // the aimed flank took the hit
     }
 
-    // §17 default-activation-state LOCK: a technique that stayed active across a fight ends up
-    // charged/ready (leftover from the last encounter) — RearmForEncounter must rewind that so the
-    // NEXT encounter can't get an instant free discharge off carry-over charge.
+    // Activation default refinement [LOCKED 2026-07-09, Doug]: a Timered technique's on/off state does
+    // NOT carry into the next encounter -- RearmForEncounter must deactivate it outright (not just
+    // rewind its charge), so the player starts every fight cold and must re-activate it explicitly.
     [Fact]
-    public void RearmForEncounterRewindsAReadyTechniqueBackToItsFullCooldown()
+    public void RearmForEncounterDeactivatesATimeredTechniqueEntirely()
     {
         var foe = new Foe("dummy", 1000);
         var c = new Caster(Body(), foe);
@@ -104,8 +104,27 @@ public class CasterFiringTests
         Assert.True(c.IsReady(Techniques.Jab));
 
         c.RearmForEncounter();
-        Assert.False(c.IsReady(Techniques.Jab)); // back to uncharged, must warm up again
-        Assert.True(c.IsActive(Techniques.Jab)); // on/off state untouched -- still toggled on
+        Assert.False(c.IsActive(Techniques.Jab)); // fully off, not just rewound -- must be re-activated
+        Assert.False(c.IsReady(Techniques.Jab));
+    }
+
+    // ApplyEncounterDefaults [LOCKED 2026-07-09, Doug]: the one call site that actually arms the
+    // Sustained "shield" default -- a fresh Caster and RearmForEncounter both leave everything off, so
+    // this is what powers Brace on without the player having to toggle it, while leaving a Timered
+    // attack like Jab untouched (cold, same as today).
+    [Fact]
+    public void ApplyEncounterDefaultsActivatesEquippedSustainedButLeavesTimeredAlone()
+    {
+        var body = new Body();
+        body.Add(new BodyPart("arm", Stat.Str, 6));
+        body.Add(new BodyPart("chest", Stat.Con, 8));
+        body.Wield(Armory.Sword);
+        var c = new Caster(body, new Foe("dummy", 100));
+
+        c.ApplyEncounterDefaults(new[] { Techniques.Jab, Techniques.Brace });
+
+        Assert.True(c.IsActive(Techniques.Brace));
+        Assert.False(c.IsActive(Techniques.Jab));
     }
 
     // RE-ARM SCOPE (DESIGN_SPEC §7, LOCKED 2026-07-05): minions do NOT persist across back-to-back
