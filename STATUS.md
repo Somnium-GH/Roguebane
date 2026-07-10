@@ -394,11 +394,28 @@ mechanic being invented.** Two distinct explanations exist in current code, eith
      mechanism (capacity-starvation, not a Consulted check). Worth knowing the two are mechanically
      different paths if this ever needs debugging again.
 
-**3. Active/charging/targeted skill reticle mounts wrong** — sits centrally at the top of the torso;
-Doug recalls a prototype-era white hitbox outline in a different position and suspects the same
-overlapping-hitbox regression. Files with reticle code: `Game1.cs`, `Game1.ManifestRenderer.cs`,
-`AssetRegistry.cs`, `Content.mgcb` — not traced further this pass, needs a fresh look at whatever
-socket/anchor the reticle reads vs. the part-hitbox anchors it should align to.
+**3. Active/charging/targeted skill reticle mounts wrong** — sits centrally at the top of the torso.
+⇒ ROOT-CAUSED (2026-07-10, loop), precise, NOT yet fixed (needs a verification path first — see
+below). The focus reticle mounts at the CENTER of `FoePartScreenRect(foe, stat, box)`
+(`Game1.ManifestRenderer.cs:376-380`), and that method (`Game1.cs:813-828`) UNIONS every foe visual
+part whose `FigureBinding.StatOf == stat`. For a PAIRED-limb stat (STR = armL+armR, DEX = legL+legR)
+the union spans BOTH limbs, so its center falls between them — squarely on the torso. That's the
+"centrally at the top of the torso" mount exactly. Unpaired stats (INT=head, CON=torso) union a single
+part and mount correctly, which is why only STR/DEX aims look wrong. Compounding it, the mount loop
+(`:368-372`) groups aims by `Stat` into a `Dictionary<Stat,…>`, directly contradicting its OWN design
+comment one line up ("**one reticle per part**, its AIM TAG stack = the hotkey NUMBERS") — the Core
+already aims per specific `BodyPart` (`Exp.PartOf` returns one part), so the stat-grouping is what
+discards which limb and forces the union.
+**Fix direction (not applied):** group aims by the specific aimed `BodyPart` and mount each on THAT
+part's single visual-limb rect — map the aimed part's index within its stat group to the visual part
+whose `FigureBinding.PairIndex` matches (armL=0/armR=1, legL=0/legR=1). That aligns the code with its
+stated "one reticle per part" design and lands the reticle on the actual aimed limb.
+**Why not applied this pass — no verification path.** The reticle only renders in LIVE combat with an
+active aim; the headless `RB_SMOKE RB_SCREEN=encounter` path marches the real loop straight to an
+OVERRUN loss (no frame with a live aim to shoot), so a fix can't get a receipt the way #4/#5/#9 did.
+Shipping a blind combat-render change breaks the verify-it discipline. **Prereq for the verified fix:**
+a smoke affordance that stops mid-combat with a technique aimed at a foe part (mirrors what `RB_RACE`/
+`RB_CHASSIS` do for the build screen), or a Doug playtest. Build that first, then apply the fix above.
 
 **4–12, UI/layout, not individually root-caused this pass — reported as-is for the loop to trace:**
 4. ✅ FIXED (2026-07-10, loop) — authored `align:"center"` was being DROPPED at parse. `TemplatePart`
