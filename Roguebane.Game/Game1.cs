@@ -1364,11 +1364,14 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             // core's silhouette; worn armor is a FLAT overlay on top, keyed by (race, slot, line/tier,
             // condition), themed line leading when it's the wearer's own core. allowBare gates this to
             // race_core figures (player + build preview) — foes pass a bare figure key, not a chassis one.
-            if (allowBare && WornArmorSprite(body, p.Part, figureId) is { } armorTex)
+            var armorTex = allowBare ? WornArmorSprite(body, p.Part, figureId) : null;
+            if (armorTex is not null)
                 Sprite(armorTex, SX(r[0]), SY(r[1]), (int)(r[2] * f), (int)(r[3] * f), color);
-            // Composed armour indicator for parts with no armoured sprite row (torso/head/boots):
-            // ring the part so worn plate is visible (bare-capable parts already show armour via sprite).
-            if (allowBare && !FigureBinding.HasBareVariant(p.Part) && FigureBinding.IsArmored(body, p.Part))
+            // Composed armour indicator: ring the part gold ONLY when no worn-armor sprite drew for it
+            // (boots has no §12a slot; a race missing an art row). Head/chest now DO ship worn sprites
+            // (WornArmorBinding keys them), so ringing them on top just painted a spurious gold box over
+            // real armour (Doug #5) — gate on the sprite's absence, not the static bare-variant list.
+            else if (allowBare && !FigureBinding.HasBareVariant(p.Part) && FigureBinding.IsArmored(body, p.Part))
                 Border(SX(r[0]), SY(r[1]), (int)(r[2] * f), (int)(r[3] * f), Amber);
         }
 

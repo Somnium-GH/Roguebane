@@ -410,7 +410,22 @@ socket/anchor the reticle reads vs. the part-hitbox anchors it should align to.
    `PlaceCarriesPartAlign`, `TemplatePartAlignBindsFromJson`, test-owned fixtures — no manifest
    pinning), and an `RB_SMOKE=1 RB_SCREEN=newgame` receipt shows the race + loadout attribute numbers
    centered in their boxes (previously left-hugging).
-5. Gold boxes rendering around armor (unclear if intended chrome or a stray border draw).
+5. ✅ FIXED (2026-07-10, loop) — it was BOTH: a stray redundant box on head/chest, plus one genuinely
+   intended box on boots. `DrawHumanoid` (`Game1.cs`) drew a gold "composed armour indicator" ring on
+   any armored part failing `HasBareVariant` (head/torso/boots) — a static list that predates worn
+   sprites shipping for head/chest. `WornArmorBinding.SpriteKeys` now keys head (Int→head) and chest
+   (Con→chest) real worn-armor sprites (confirmed on disk, e.g. `sprites/gear/worn/human/chest/grunt/
+   str_1_healthy.png`), so an armored head/torso drew its real sprite AND got ringed gold on top — the
+   spurious box Doug saw. Fix: gate the ring on the worn sprite being ABSENT (`WornArmorSprite is
+   null`), not on the static bare-variant list — so a part with real armour art no longer double-draws.
+   **Boots keeps its ring by design** (`WornArmorBinding:46` gives boots no §12a slot, so it can never
+   show armour via sprite — the ring is its only indicator; verified still present in the receipt).
+   Verified: build 0/0; `RB_SMOKE=1 RB_SCREEN=equipment` renders clean, boots ring intact, no
+   regression. The head/chest suppression is by-code + confirmed-sprite (the Grunt smoke kit wears
+   STR-plate on the bare-capable arms, which never ringed, so it doesn't exercise CON/INT armor —
+   that's why neither receipt showed a head/chest ring to begin with). **Open for Doug:** if boots
+   should stop ringing when its DEX/leg armour already shows on the leg sprites, boots needs either its
+   own worn-sprite slot (CD) or a "suppress when legs armoured" rule — flagging, not deciding.
 6. ⚠ NEEDS HUMAN (2026-07-10, loop) — NOT a render bug: rarity is an UNBUILT mechanic. Traced —
    Core has no `Rarity` enum/tier anywhere (grep: only an unrelated comment in `Shops.cs`), and the
    renderer has no resolver for `invItems.rarity`, so the badge text falls back to the static sample
