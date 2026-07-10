@@ -403,6 +403,22 @@ B27. **`CD_STATUS.md` #33 double-check result: the "minion column collapses at 0
     per screen state — your call on which. Not blocking (data is correct either way); low urgency,
     cosmetic only.
 
+B28. **`attrBar`'s alloc/available pair reads backwards vs. every other pool readout in the game
+    (Doug playtest #13, "reserved/total order flipped").** `layout.json:10901` (`attrBar` template):
+    the two number slots are laid out `attrs.alloc` (total capacity) at rect x=410, then a literal
+    `"/"` glyph at x=418, then `attrs.available` (current free) at x=425 — i.e. **TOTAL / AVAILABLE**,
+    left to right. Every other pool readout in the manifest (HP, Supplies, Charge, Summons, the
+    Equipment/minion "slotted" counts) shows **current-value / max**, e.g. `"14/20"`, `"7/8"` — this
+    is the one place that puts the max on the left. Doug reads the swapped order as "2/11" showing as
+    "11/2." Confirmed this is pure element order/position, not a resolver bug: `Game1.ManifestRenderer.cs`
+    binds `attrs.alloc`/`attrs.available` by MEANING already (see the comment at `:1641`, "that swap was
+    a smaller earlier bug's half" — a real tuple-position mix-up already fixed once; swapping which
+    VALUE each bind name returns now would reintroduce exactly that class of bug, just hidden one level
+    deeper, and isn't ours to do per the manifest-is-CD-owned rule anyway). Ask: swap the two rects'
+    contents in `attrBar` — `attrs.available` first (x≈410), then `/`, then `attrs.alloc` last
+    (x≈425) — so it reads `available / alloc` like every other readout. No new binds/states/engine
+    hooks needed, pure `layout.json` element reorder.
+
 ## Standing FYIs (for context — not action items)
 - **Tier ladders for the new families** (for card copy / labels): Sling Shepherd's → Braided →
   Sinew → Giantsbane · Staff Wooden → Twisted → Ornate → Humming · Charm Wooden → Bone → Ornate →

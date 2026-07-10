@@ -172,6 +172,19 @@ socket/anchor the reticle reads vs. the part-hitbox anchors it should align to.
 **13. Reserved/total number order is flipped** — e.g. "2 / 11" (2 reserved of 11 max) is currently
 displaying as "11 / 2". Simple format-string argument-order fix, wherever that readout is built.
 
+### ⇒ TRIAGED (2026-07-09, loop) — confirmed real, NOT an engine bug; parked on CD as B28
+Not a format-string bug — there's no combined "X / Y" string anywhere in code to swap. `attrs.alloc`
+(total) and `attrs.available` (free-right-now) are two SEPARATE manifest-bound text elements, and
+`layout.json`'s `attrBar` template (`:10901`) lays them out `alloc` (x=410) then a literal `"/"`
+glyph (x=418) then `available` (x=425) — i.e. TOTAL / AVAILABLE, left to right. Every other pool
+readout in the game (HP, Supplies, Charge, Summons, Equipment slot counts) shows current/max the
+other way round, which is why it reads backwards. `Game1.ManifestRenderer.cs` already binds these two
+by MEANING, not tuple position (a real earlier bug, already fixed — see the comment at `:1641`); a
+code-side value-swap now would just reintroduce that same mistake one layer deeper, and it isn't ours
+to hand-patch regardless — `layout.json` is CD-owned, never hand-edited per CLAUDE.md. Logged as
+**B28** in `outputs/CLAUDE_DESIGN_issues.md` (swap the two rects so `available` renders first, `alloc`
+second). No engine change needed once it lands.
+
 ---
 
 ## ‼ BUG (2026-07-07, Doug) — weapon-consulting techniques reserve ZERO of their own attribute cost; violates the already-LOCKED reservation-timing rule
