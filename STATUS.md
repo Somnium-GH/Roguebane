@@ -21,6 +21,29 @@ would explain both symptoms at once with one root cause. If a fresh build still 
 that's a real, separate bug and needs the live trace described above; don't assume stale-build and
 close this without confirming.
 
+### ✅ FIXED (2026-07-09, loop) — quest popover half of this WAS real, not stale build: mouse clicks
+### were never wired, only the Y/N keys; the reservation half is still open, needs the live trace
+**Root cause found on a fresh build (killed a stale `Roguebane.Game.exe` holding the DLL lock first,
+confirming the build really was current):** `DrawButton` (`Game1.Canvas.cs:260`) renders hover/down
+states for the quest popover's Y/N buttons — visually indistinguishable from every other clickable
+button in the game — but its own doc comment says plainly "input lives in Update," and `UpdateChoosing`
+(`Game1.cs:543-548`) only ever checked `Pressed(keys, Keys.Y/N/Escape)`, never a `Click()` on the
+button rects. A player clicking with the mouse (as Doug did) saw a hover highlight and nothing else —
+exactly "the screen gets stuck." The earlier read of `UpdateChoosing` in this file's own entry above
+only checked that the *keyboard* path was wired and missed that the *mouse* path never was.
+**Fix:** extracted the button geometry into two shared properties (`QuestAcceptRect`/`QuestDeclineRect`,
+`Game1.CityMap.cs`) used by both `DrawQuestScreen` (render) and `UpdateChoosing` (input) — the rects
+can no longer drift apart the way the crash-fix's original hand-copied constants could have. Added
+`Click(QuestAcceptRect)`/`Click(QuestDeclineRect)` alongside the existing key checks.
+**Verified:** `dotnet build` 0 errors/warnings; `Core.Tests` 511/511 green (Core untouched); fresh
+`RB_SMOKE=1 RB_SCREEN=quest` receipt confirms no visual regression from the refactor (panel/buttons
+render identically). No click-injection smoke path exists (`Click()`/`Hover()` need real mouse state,
+absent in headless `RB_SMOKE`) so the click itself isn't receipt-verified, same limit as bug #8's fix —
+but the fix mirrors that already-proven pattern exactly.
+**Reservation-display report is still unresolved** — nothing above touched `Caster`/`Body`/`AttrBars()`;
+that half still needs the live trace described above (a real playtest run with Doug, not another
+static read) before concluding stale-build vs. real bug.
+
 ## ⚠ FEATURE MISS + UI CORRECTION (2026-07-09, Doug) — quest resolution should live inside the
 ## Encounter screen shell (foeless), not a popover over CityMap; also a "nothing here" landing case
 **Doug's correction:** "The encounter screen should actually be loaded when a quest happens, just

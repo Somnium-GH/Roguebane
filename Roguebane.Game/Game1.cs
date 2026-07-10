@@ -542,8 +542,9 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         // one-shot -- but drop it explicitly here to match the merchant LEAVE precedent below.
         if (_questOpen && Exp.AtQuest)
         {
-            if (Pressed(keys, Keys.Y)) { Exp.AcceptQuest(); _questOpen = false; }
-            else if (Pressed(keys, Keys.N) || Pressed(keys, Keys.Escape)) { Exp.DeclineQuest(); _questOpen = false; }
+            if (Pressed(keys, Keys.Y) || Click(QuestAcceptRect)) { Exp.AcceptQuest(); _questOpen = false; }
+            else if (Pressed(keys, Keys.N) || Pressed(keys, Keys.Escape) || Click(QuestDeclineRect))
+                { Exp.DeclineQuest(); _questOpen = false; }
             return; // no map click-through under the prompt
         }
 

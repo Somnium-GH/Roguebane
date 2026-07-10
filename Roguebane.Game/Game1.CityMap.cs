@@ -29,19 +29,27 @@ public partial class Game1
     // manifest template exists yet for a real quest card (a CD content ask, same split as the Merchant
     // popover before its 07-03 manifest cut-over) -- flagged [PLACEHOLDER] like the quest content
     // itself so this doesn't read as finished design.
+    // Shared with UpdateChoosing so the mouse hit-rects can never drift from where these actually
+    // draw (2026-07-09 Doug fix: the buttons rendered hover/down states but nothing checked Click()
+    // on them -- only the Y/N keys worked, so a mouse click on the quest popover did nothing).
+    private const int QuestPanelW = 560, QuestPanelH = 260;
+    private Rectangle QuestAcceptRect => new((W - QuestPanelW) / 2 + 20, (H - QuestPanelH) / 2 + 180, QuestPanelW - 40, 32);
+    private Rectangle QuestDeclineRect => new((W - QuestPanelW) / 2 + 20, (H - QuestPanelH) / 2 + 220, QuestPanelW - 40, 32);
+
     private void DrawQuestScreen()
     {
         DrawCityMapScreen(); // the chart stays visible under the prompt
         if (Exp.CurrentQuest is not { } quest) return;
 
-        const int pw = 560, ph = 260;
-        var px = (W - pw) / 2;
-        var py = (H - ph) / 2;
-        Panel(px, py, pw, ph);
-        DrawCentered(_assets.Display, "QUEST [PLACEHOLDER]", Amber, px + pw / 2, py + 16);
-        DrawWrapped(quest.Prompt, px + 20, py + 56, pw - 40, Ink);
-        DrawButton($"Y - {quest.AcceptText}", px + 20, py + 180, pw - 40, 32, true, Keys.Y);
-        DrawButton($"N - {quest.DeclineText}", px + 20, py + 220, pw - 40, 32, true, Keys.N);
+        var px = (W - QuestPanelW) / 2;
+        var py = (H - QuestPanelH) / 2;
+        Panel(px, py, QuestPanelW, QuestPanelH);
+        DrawCentered(_assets.Display, "QUEST [PLACEHOLDER]", Amber, px + QuestPanelW / 2, py + 16);
+        DrawWrapped(quest.Prompt, px + 20, py + 56, QuestPanelW - 40, Ink);
+        var ar = QuestAcceptRect;
+        var dr = QuestDeclineRect;
+        DrawButton($"Y - {quest.AcceptText}", ar.X, ar.Y, ar.Width, ar.Height, true, Keys.Y);
+        DrawButton($"N - {quest.DeclineText}", dr.X, dr.Y, dr.Width, dr.Height, true, Keys.N);
     }
 
     private static int IndexOf(IReadOnlyList<MapNode> list, MapNode node)
