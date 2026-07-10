@@ -148,6 +148,15 @@ until it lands.
    2×6 — cells past the container silently drop, so the screen can't show the new picks). Each core
    tile carries its core's BG color + Core-Effect trim color — publish the per-core accent tokens in
    the style block so the engine reads them instead of our flagged stopgap palette.
+   - **coreCard Core-Effect accent is a full fill behind the text — contrast bug (Doug #7).** The
+     `coreCard` effect block (`layout.json:12681`, rect `[8,174,136,41]`) carries
+     `colorBind:"core.accent"`, which the engine renders as a FULL-RECT fill — so the per-core accent
+     paints the entire block behind the effect name (y183) and desc (y196), a contrast violation Doug
+     reported directly. The **Equipment** screen's `coreEffectBlock` (`:7035`) is the correct
+     reference: it shows the accent as a LEFT-BORDER sliver (`border.sides:["left"]`) over a plain
+     `ink` panel, no fill. Ask: on the re-authored `coreCard`, apply `core.accent` to the block's
+     LEFT-BORDER color (the trim sliver), NOT as a full-rect `colorBind` fill — match the Equipment
+     treatment so the effect text stays legible.
 3. Refresh the stale refs to v6 data: 05-newgame (new roster + tile colors), 03/07 if their strips
    show core identity; a `01/02-*-<core>` set for any future core additions. Race-card art/portraits +
    final race blurbs/tags for Dwarf/Halfling/Half-Giant (Doug supplies copy) ride here too.

@@ -401,11 +401,27 @@ socket/anchor the reticle reads vs. the part-hitbox anchors it should align to.
 **4–12, UI/layout, not individually root-caused this pass — reported as-is for the loop to trace:**
 4. New-game screen: attribute numbers not centered in their boxes (text alignment).
 5. Gold boxes rendering around armor (unclear if intended chrome or a stray border draw).
-6. Rarity badges: the box around each badge is missing, only colored text shows. (`Game1.
-   ManifestRenderer.cs` is the one file referencing rarity — start there.)
-7. New-game screen's Core Rune effect cards: the colored sliver renders UNDER the text, a contrast
-   violation. Doug: should match the treatment already working correctly on the Equipment screen —
-   diff the two card-drawing paths, the equipment screen's is the reference implementation.
+6. ⚠ NEEDS HUMAN (2026-07-10, loop) — NOT a render bug: rarity is an UNBUILT mechanic. Traced —
+   Core has no `Rarity` enum/tier anywhere (grep: only an unrelated comment in `Shops.cs`), and the
+   renderer has no resolver for `invItems.rarity`, so the badge text falls back to the static sample
+   "MAGIC" for every item (a placeholder). The box IS authored in `layout.json` (`:11108`, fill+border
+   `rareMagic`) but the engine deliberately gates it off (`Game1.ManifestRenderer.cs:901`,
+   `.rarity`-bound parts skip the whole chrome block; the `:1330` comment says the same — "rarity
+   tags whose model isn't built"). The 4 tier color tokens exist (`rareCommon/rareMagic/rareRare/
+   rareEpic`), but WHICH items are which tier, and the tier-assignment rules, are undesigned. Drawing
+   the box now would just make an undesigned placeholder look finished (drift). **Doug's call:** design
+   the rarity mechanic (per-item tiers + assignment rules), OR suppress the badge until then, OR keep
+   it as a flagged placeholder. Don't build a rarity model unsupervised.
+7. ⇒ ROUTED TO CD (2026-07-10, loop) — root-caused, it's a `layout.json` authoring bug, not engine.
+   The NewGame `coreCard` effect block (`layout.json:12681`, rect `[8,174,136,41]`) carries
+   `colorBind:"core.accent"`, which the engine renders as a FULL-RECT `DrawFill` (the established
+   `colorBind` = fill semantic). The name (`:12703`, y183) and desc (`:12716`, y196) both sit INSIDE
+   that y174–215 block, so the saturated per-core accent fills the whole card behind the text — the
+   "sliver under text" contrast violation exactly. The Equipment reference (`coreEffectBlock`,
+   `:7035`) has NO accent fill: it shows the accent as a LEFT-BORDER sliver only (`border.sides:
+   ["left"]`), text on the plain `ink` panel. Fix is CD-side (layout is CD-owned, never hand-edited):
+   move `core.accent` off the full-rect `colorBind` and onto the block's left-border color, matching
+   Equipment. Logged under B20 (which already owns the coreCard re-author) in the CD outbox.
 8. Equipment screen's close button does not work — Doug flags this as long-standing, not new.
 
 ### ✅ FIXED (2026-07-09, loop) — item 8: closeBtn rendered but had no click handler wired
