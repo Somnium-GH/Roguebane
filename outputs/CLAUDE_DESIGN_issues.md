@@ -446,6 +446,18 @@ B29. **NEW (2026-07-09) — CityMap has a THIRD ad-hoc placeholder popover (Ques
     panel/card chrome already established on Merchant/Equipment. The quest CONTENT itself (catalog,
     copy) is a separate, bigger design pass Doug still owns; this ask is just the card template so the
     engine has something real to render into once that content exists.
+    **CORRECTED 2026-07-09 (Doug): the card's HOST CONTEXT is changing, not just its own content.**
+    The quest prompt should render inside the Encounter screen shell (foeless — no enemy present),
+    not floated over the CityMap chart as it does today — "partly to make it feel like you're
+    moving." There is also a THIRD landing outcome to design for: a node with no quest and no combat
+    ("nothing here"), needing its own beat in the same shell, likely with no popover at all. And
+    separately: the CityMap's RETREAT button needs a second visual state — relabels to REDEPLOY and
+    turns gold once a node clears, replacing a standalone engine-only overlay that exists today. All
+    three are one connected ask: the Encounter-screen shell needs to host non-combat arrivals (quest
+    prompt, or nothing) cleanly, and the header button needs the state to match. A DEX-gated timer for
+    Retreat/Redeploy availability is also coming (Doug wants "some mechanism based on dexterity that
+    will time the availability of that button") but the exact shape/UX is still undecided on our side
+    — don't build against a guessed timer yet.
 
 ## Standing FYIs (for context — not action items)
 - **Tier ladders for the new families** (for card copy / labels): Sling Shepherd's → Braided →

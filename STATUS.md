@@ -1,3 +1,60 @@
+## ‼ HIGH PRIORITY (2026-07-09, Doug live playtest) — TWO reports that directly contradict current
+## source; strongest lead is a STALE BUILD, not new regressions — verify with a fresh build FIRST
+Doug: "there is evidently no reservation of activated techniques and I've reported this bug a few
+times now" (Attribute Pool showing gear-only numbers, no technique contribution) AND separately "the
+quest popover buttons don't do anything so the screen gets stuck." **Read the current source for both
+and neither matches what Doug describes:**
+- `Caster.ResolveReservation` (`Caster.cs:213-230`) does NOT have the old `Consults==Primary → 0`
+  special case anymore — `reserve` starts at `t.Reserve`, only Finesse/JoAT discount it, and the real
+  value flows into the returned `Active`. This is the already-"FIXED (2026-07-08)" state per this
+  file's own earlier entry. If it's still showing as unreserved live, the break is somewhere between
+  this method returning a correct `Active` and `Body.Activate`/`Body.TechReserved` actually banking
+  it, OR the UI (`AttrBars()`, `Game1.ManifestRenderer.cs:1349-1358`) is reading a stale snapshot —
+  needs an actual live trace with a real build, not another source read (already at the limit of what
+  static reading can settle here).
+- `UpdateChoosing` (`Game1.cs:539-548`) DOES wire Y/N: `Pressed(keys, Keys.Y) → Exp.AcceptQuest();
+  _questOpen = false` and same for N/Escape → `DeclineQuest()`. This looks correctly built, not
+  missing.
+**Given BOTH reports contradict the current source, check whether Doug is testing a build that
+predates recent commits before spending a cycle re-debugging already-fixed code** — a stale binary
+would explain both symptoms at once with one root cause. If a fresh build still reproduces either one,
+that's a real, separate bug and needs the live trace described above; don't assume stale-build and
+close this without confirming.
+
+## ⚠ FEATURE MISS + UI CORRECTION (2026-07-09, Doug) — quest resolution should live inside the
+## Encounter screen shell (foeless), not a popover over CityMap; also a "nothing here" landing case
+**Doug's correction:** "The encounter screen should actually be loaded when a quest happens, just
+without a foe and the popover shows there. This is partly to make it feel like you're moving." Also:
+"you can land somewhere with no quest or any other encounter type" — a third node outcome (no combat,
+no quest) that also needs to route through this same shell, presumably with no popover at all, just
+the arrive/nothing-here beat. **Current state (`Game1.CityMap.cs`'s `DrawQuestScreen`) draws the quest
+prompt over `DrawCityMapScreen()`** — the chart stays visible underneath, which is the wrong backdrop
+per this correction; it should be the Encounter screen (no foe rendered) instead. Re-architect
+`_questOpen`'s draw path (and add the no-encounter landing case) to route through whatever the
+Encounter screen's shell/entry point is, not the CityMap draw call. Folded into CD outbox B29 (the
+quest card template ask) since the popover's HOST context changed, not just its own content.
+
+## ⚠ FEATURE MISS + UI CONSOLIDATION (2026-07-09, Doug) — remove the ad-hoc "NODE CLEARED / REDEPLOY"
+## overlay; the existing RETREAT button should become that button instead (relabel + gold)
+Doug: "remove the green screen that pops over with a button on it saying redeploy. We actually need
+the retreat button to become the redeploy button and become gold." Two separate pieces of UI
+(the header's RETREAT button + a standalone green "NODE CLEARED" overlay with its own REDEPLOY button)
+should become ONE element: the existing header button relabels to REDEPLOY and recolors gold once a
+node clears, instead of a second overlay appearing on top. Delete the standalone overlay once this
+lands. This is a CD-relevant change too (a new/second visual STATE for an existing manifest button
+element, not just an engine relabel) — flag to CD alongside B29's other Encounter-screen asks.
+
+## ⚠ NEEDS HUMAN — new feature: DEX-timed gate on Retreat/Redeploy availability + progress UX
+## (2026-07-09, Doug) — real mechanic, not yet designed, don't build numbers unsupervised
+Doug: "we will need some mechanism based on dexterity that will time the availability of that button
+and probably will need to redo it or add some other UX for the progress towards being able to
+retreat/redeploy." Currently (implied) Retreat/Redeploy is instantly available with no gate. Open,
+Doug's calls to make: the actual DEX→time formula (matches the haste-rate shape already used for
+cooldowns, `Caster.EffectiveCooldown`'s `Capacity(Dex) * HasteRate` pattern, or something new);
+whether this timer starts on node-clear/node-arrival or is continuous; and the progress UX itself
+(a fill bar on the button, a separate readout, something else). Route to CD once the UX shape is
+picked — this is a new element, not a reskin of something that exists.
+
 ## ⚠ NEEDS HUMAN — FOES need to heal with techniques (2026-07-09, Doug) — confirmed a real AI gap,
 ## not a content gap; do not let the loop invent the decision rule unsupervised
 **Doug's own framing, correctly:** "that's kind of a deep AI need... it needs to start prioritizing."
