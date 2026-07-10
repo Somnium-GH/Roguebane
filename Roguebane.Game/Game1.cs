@@ -127,7 +127,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
 
         _mfScreen = Environment.GetEnvironmentVariable("RB_MF"); // dev: render this screen from the manifest
 
-        if (_smokeScreen is "encounter" or "citymap" or "loadout" or "aim") // march the real loop for the screenshot
+        if (_smokeScreen is "encounter" or "citymap" or "loadout" or "aim" or "cleared") // march the real loop
         {
             if (_smokeScreen is "encounter" or "citymap")
             {
@@ -209,6 +209,13 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                     _campaign.SetAuto(true);
                 }
                 // Do NOT resolve: stay in the first fight so DrawEncounterScreen + the focus reticle render.
+            }
+            else if (_smokeScreen == "cleared") // node-cleared state: RETREAT->REDEPLOY (gold), no overlay
+            {
+                _campaign.Enter("a1");
+                if (Exp.Enemy is { } foe) { _campaign.Aim(Exp.Equipment[0], foe); _campaign.SetAuto(true); }
+                for (var i = 0; i < 1000 && Exp.State == ExpeditionState.Fighting; i++) _campaign.Tick();
+                // Win holds on the battlefield in Cleared+Redeploying; do NOT Redeploy so it renders.
             }
         }
         else if (_smokeScreen == "equipment") _screen = Screen.Equipment; // else fall through to NewGame
@@ -492,7 +499,11 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         if (Exp.State == ExpeditionState.Fighting) UpdateCombat(keys, gameTime);
         else if (Exp.State == ExpeditionState.Cleared)
         {
-            if (Pressed(keys, Keys.Space) || Click(ClearedRedeployRect)) _campaign.Redeploy(); // back to the chart
+            // The header RETREAT button becomes REDEPLOY when cleared (relabel + gold, ManifestRenderer);
+            // clicking it here redeploys. Replaces the deleted standalone "NODE CLEARED" overlay button.
+            if (Pressed(keys, Keys.Space)
+                || (ManifestElementRect("encounter", "combat.retreat") is { } rb && Click(rb)))
+                _campaign.Redeploy(); // back to the chart
             // FIXED 2026-07-10, Doug: "equipment should become enabled after combat" -- Cleared is out
             // of combat same as Choosing, so the E key must open Equipment here too (no button is drawn
             // on the battlefield screen for it, so keyboard-only, unlike UpdateChoosing's rect+key check).
@@ -1470,20 +1481,12 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
 
 
 
-    private static readonly Rectangle ClearedRedeployRect = new(W / 2 - 90, H / 2 + 24, 180, 34);
-
     private void DrawStateOverlay()
     {
-        // A cleared fight: dim the field, name the win, and offer REDEPLOY (no silent return to the map).
+        // A cleared fight HOLDS on the battlefield: the header RETREAT button relabels to REDEPLOY and
+        // turns gold (ManifestRenderer) — no standalone "NODE CLEARED" overlay anymore (Doug 2026-07-09).
         if (_campaign.State == CampaignState.Redeploying && Exp.State == ExpeditionState.Cleared)
-        {
-            Rect(0, 0, W, H, new Color(20, 45, 30, 120));
-            var s = MeasureText(_assets.Display, "NODE CLEARED");
-            Text(_assets.Display, "NODE CLEARED", (int)(W / 2 - s.X / 2), H / 2 - 40, Ink);
-            DrawButton("REDEPLOY", ClearedRedeployRect.X, ClearedRedeployRect.Y,
-                ClearedRedeployRect.Width, ClearedRedeployRect.Height, true, Keys.Space);
             return;
-        }
 
         (Color tint, string label)? overlay = _campaign.State switch
         {

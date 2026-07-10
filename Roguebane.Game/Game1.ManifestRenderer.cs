@@ -226,6 +226,11 @@ public partial class Game1
                     break;
                 }
                 var txt = e.Content ?? ResolveScreenBind(e.Binds);
+                // Node cleared: the header RETREAT button BECOMES the REDEPLOY button (relabel here +
+                // gold skin in DrawStateSkin), replacing the removed standalone "NODE CLEARED" overlay
+                // (Doug 2026-07-09). The click is rewired to Redeploy in UpdateRun's Cleared branch.
+                if (e.Binds == "combat.retreat" && InRun && Exp.State == ExpeditionState.Cleared)
+                    txt = (e.Content ?? txt)?.Replace("RETREAT", "REDEPLOY"); // keep the authored glyph/prefix
                 // A bindless text element carrying a static image (doomHost's enemy-host icon) IS
                 // that image — blit it. State-skinned elements (buttons) keep their skin machinery.
                 if (string.IsNullOrEmpty(txt) && e.Image is { Length: > 0 } img
@@ -1539,6 +1544,9 @@ public partial class Game1
 
         var key = !enabled ? "disabled"
             : e.Binds == "combat.autoAttack" && InRun && Exp.IsAuto() ? "on"
+            // Node cleared: RETREAT->REDEPLOY reuses the gold "on" skin (Doug wants it gold; the "on"
+            // texture already ships on every button-family element — no new CD asset needed).
+            : e.Binds == "combat.retreat" && InRun && Exp.State == ExpeditionState.Cleared ? "on"
             : Hover(r) ? (Mouse.GetState().LeftButton == ButtonState.Pressed ? "down" : "hover")
             : "normal";
         if (!e.States.TryGetProperty(key, out var pathEl) || pathEl.GetString() is not { Length: > 0 } path

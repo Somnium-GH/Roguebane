@@ -231,15 +231,19 @@ per this correction; it should be the Encounter screen (no foe rendered) instead
 Encounter screen's shell/entry point is, not the CityMap draw call. Folded into CD outbox B29 (the
 quest card template ask) since the popover's HOST context changed, not just its own content.
 
-## ⚠ FEATURE MISS + UI CONSOLIDATION (2026-07-09, Doug) — remove the ad-hoc "NODE CLEARED / REDEPLOY"
-## overlay; the existing RETREAT button should become that button instead (relabel + gold)
-Doug: "remove the green screen that pops over with a button on it saying redeploy. We actually need
-the retreat button to become the redeploy button and become gold." Two separate pieces of UI
-(the header's RETREAT button + a standalone green "NODE CLEARED" overlay with its own REDEPLOY button)
-should become ONE element: the existing header button relabels to REDEPLOY and recolors gold once a
-node clears, instead of a second overlay appearing on top. Delete the standalone overlay once this
-lands. This is a CD-relevant change too (a new/second visual STATE for an existing manifest button
-element, not just an engine relabel) — flag to CD alongside B29's other Encounter-screen asks.
+## ✅ FIXED (2026-07-10, loop) — UI CONSOLIDATION: RETREAT header button becomes REDEPLOY (gold) on
+## node-clear; standalone "NODE CLEARED / REDEPLOY" overlay deleted
+Doug: "remove the green screen that pops over with a button on it saying redeploy... the retreat
+button [should] become the redeploy button and become gold." Done, all engine-side and — contrary to
+this entry's original assumption — with NO new CD asset: the `retreatBtn` (`combat.retreat`) already
+ships an `"on"` state texture (`button_on`, the same gold skin the AUTO-ATTACK toggle lights up with),
+so REDEPLOY reuses it. Three changes: (1) `Game1.ManifestRenderer.cs` relabels the button
+"RETREAT"→"REDEPLOY" (deriving from the authored content, keeping its glyph) and selects the gold
+`"on"` skin when `Exp.State == Cleared`; (2) `UpdateRun`'s Cleared branch rewires the button's click
+to `Redeploy()` (Space still works); (3) the standalone overlay draw + its `ClearedRedeployRect` are
+deleted. Verified with a new `RB_SCREEN=cleared` smoke receipt: foe dead, header reads gold "REDEPLOY",
+no green overlay. Build 0/0, Core.Tests 519/519 (Core untouched). CD may still author a DEDICATED
+redeploy state later if the reused "on" skin isn't the final look — optional, not blocking.
 
 ## ⚠ NEEDS HUMAN — new feature: DEX-timed gate on Retreat/Redeploy availability + progress UX
 ## (2026-07-09, Doug) — real mechanic, not yet designed, don't build numbers unsupervised
