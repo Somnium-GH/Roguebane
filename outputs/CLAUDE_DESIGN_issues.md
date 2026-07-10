@@ -418,6 +418,34 @@ B28. **`attrBar`'s alloc/available pair reads backwards vs. every other pool rea
     contents in `attrBar` — `attrs.available` first (x≈410), then `/`, then `attrs.alloc` last
     (x≈425) — so it reads `available / alloc` like every other readout. No new binds/states/engine
     hooks needed, pure `layout.json` element reorder.
+    **CONFIRMED 2026-07-09 (Doug asked how a bug like this could be CD's when your own design looked
+    right): it's native to your own authored source, not something our extraction introduced.** Read
+    `design/dchtml/Equipment.dc.html` directly (~line 106-109) — the hand-written HTML itself has
+    `data-binds="attrs.alloc"` first, then `/`, then `data-binds="attrs.available"` (with
+    `color:{{ a.availColor }}`) last. `layout.json` is a faithful mechanical extraction of exactly that
+    markup — there is no separate translation step on our side where an order flip could sneak in, so
+    this isn't a mystery, it is simply how the source already reads.
+    **Second, related question surfaced while checking this — please answer, don't just reorder and
+    assume it's covered:** `availColor` is bound to `attrs.available`, which our engine defines as
+    capacity MINUS whatever is currently reserved by gear+techniques — a usage quantity. `attrs.alloc`
+    is the one that is already damage-adjusted (`== current Capacity`, drops when a part is hurt). Doug
+    described the color's intent as "flags when damage/debuff reduced the total" — that description
+    matches `alloc`, not `available`. So the reorder above and the color binding are two separate asks:
+    if the color is meant to track damage specifically, `availColor` should move to whichever span
+    renders `attrs.alloc` after the reorder, not just ride along with `available` to its new spot.
+    Your call which value the color should track — flagging so it isn't assumed fixed for free.
+
+B29. **NEW (2026-07-09) — CityMap has a THIRD ad-hoc placeholder popover (Quest), same shape the
+    Merchant one had before its manifest cutover; needs a real card template.** `NodeType.Quest` had
+    no Game-layer template at all — entering one crashed (fixed engine-side, an `AssetRegistry`
+    node-icon lookup, not a CD ask). Past that fix there's still no manifest template for a quest
+    prompt, so `Game1.CityMap.cs`'s `DrawQuestScreen()` hand-draws a raw panel + a literal "QUEST
+    [PLACEHOLDER]" title + wrapped prompt text + two generic Y/N buttons — explicitly code-commented
+    as a flagged stopgap, not finished design, same pattern as the pre-07-03 Merchant popover. Ask: a
+    real `quest` screen/card template — prompt text area + Accept/Decline actions — matching the
+    panel/card chrome already established on Merchant/Equipment. The quest CONTENT itself (catalog,
+    copy) is a separate, bigger design pass Doug still owns; this ask is just the card template so the
+    engine has something real to render into once that content exists.
 
 ## Standing FYIs (for context — not action items)
 - **Tier ladders for the new families** (for card copy / labels): Sling Shepherd's → Braided →
