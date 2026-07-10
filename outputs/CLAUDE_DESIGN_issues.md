@@ -54,6 +54,24 @@ it yet. Two asks: (a) author real hover/current states for the CityMap beacon no
 CampaignMap spine; (b) tell us what `glow:true` should actually look like (steady? pulse rate?) so we
 build the primitive once and wire both screens to it.
 
+### Encounter Attribute Pool — CON Row + 6th Pip Both 1px Short (B31)
+The Encounter screen's Attribute Pool (the `poolRows`/`poolRow` template — a separate element from
+Equipment's working `attrReadout`/`attrBar`) drops its 4th row and its 6th pip, both from the same
+1px-authoring-shortfall class as B25 (equipment pips) and B30 (action-bar lists). Root-caused against
+the real `layout.json`, confirmed on the Equipment reference which is sized correctly and shows both:
+- **CON row missing** (`layout.json:5825` `poolRows`): container `size:[309,77]`, item `poolRow`
+  `size:[309,15]` gap `6`, vertical → 4 rows need `4*15 + 3*6 = 78`, region offers only `77`. The 4th
+  row (CON) never gets placed. Ask: grow `poolRows.size[1]` to ≥78 (a couple px slack recommended —
+  this was a zero-margin fit even before the 1px shortfall).
+- **Attribute bars show 5 pips where capacity is 6** (`layout.json:10500` `poolRow`'s cells part):
+  pip-strip rect width `207`, `poolPip` cell `size:[33,10]` gap `2`, horizontal → 6 pips need
+  `6*33 + 5*2 = 208`, region offers only `207`. The 6th (free) pip drops. Ask: widen that cells
+  part rect width to ≥208. (Equipment's equivalent `attrBar` cells rect is `332` vs. the `328` six
+  pips need — 4px slack, which is why it renders all 6 there and never here.)
+Both are on the `poolRows`/`poolRow` template only; Equipment's `attrReadout`/`attrBar` is already
+correct and unaffected. No engine change on our side — same as B30, purely a CD-authored region
+resize. Recommend a few px slack on both so a future 5th row / 7th pip class doesn't reopen the trap.
+
 ### Encounter Shell Hosts Non-Combat — Quest, Camp, Nothing-Here (B29)
 The Encounter screen shell needs to host non-combat arrivals — Quest, "nothing here," and Camp —
 plus a quest card template and a header-button state change. `NodeType.Quest` had no Game-layer

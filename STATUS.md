@@ -109,14 +109,24 @@ Root-caused precisely: `poolRows` (`Roguebane.Content/layout.json:5825-5850`) is
 right — `4×13+3×5=67` matches its `size:[431,67]` precisely — which is why CON shows fine there and
 never on Encounter. These are two separate templates; fixing one does not fix the other.) Fix: grow
 `poolRows` to at least `[309,78]` (a couple extra px of headroom recommended, this was a razor-exact
-fit with zero margin even before the 1px shortfall). CD-owned (`layout.json` geometry) — route to
-the outbox alongside B28.
+fit with zero margin even before the 1px shortfall). CD-owned (`layout.json` geometry) — ⇒ logged as
+B31 (2026-07-10, loop), see the routing note under #2 below.
 
 **2. Attribute bars show 5 pip segments on Encounter where capacity is 6** (confirmed in every
-Encounter screenshot; Equipment correctly shows 6). Not yet root-caused with the same precision as
-#1 — same template (`poolRow`) is the suspect, likely its pip-strip WIDTH is similarly under-sized
-for a 6-capacity stat the way the row container was under-sized for a 4th row. Needs the same kind
-of dimension check as #1 against `poolRow`'s actual pip-cell part rects.
+Encounter screenshot; Equipment correctly shows 6). ⇒ ROOT-CAUSED (2026-07-10, loop) — exactly the
+same 1px class as #1, on the same `poolRow` template. The cells part (`layout.json:10500`) is rect
+width `207`; its `poolPip` cell is `size:[33,10]`, `gap:2` → 6 pips need `6×33 + 5×2 = 208`, region
+offers only `207`, so the 6th (free) pip drops. Equipment's `attrBar` cells rect is `332` vs. the
+`328` six pips need (4px slack) — which is why it shows 6 there and never here. CD-owned geometry,
+nothing to fix engine-side.
+
+### ⇒ ROUTED TO CD (2026-07-10, loop) — items #1 and #2 both logged as B31
+Both #1 (CON row, `poolRows` container `[309,77]` vs. 78 needed) and #2 (5-of-6 pips, `poolRow` cells
+rect `207` vs. 208 needed) are pure CD-authored 1px region shortfalls on the encounter `poolRows`/
+`poolRow` template — same class as B25 (equipment pips) and B30 (action-bar lists), verified against
+the live `layout.json` this pass. Logged as **B31** in `outputs/CLAUDE_DESIGN_issues.md` asking both
+regions widened with a little slack. No engine change needed once it lands. #3 (display-path stale)
+is still open and genuinely engine-side — needs the live trace described below, not a geometry fix.
 
 **3. CORRECTED 2026-07-09 (Doug): the techniques themselves work fine — Jab/Bandage/Brace all fire
 and do their real effect. The bug is scoped narrower than "activation is broken": ONLY the attribute
