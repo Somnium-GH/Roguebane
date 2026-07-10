@@ -28,6 +28,41 @@ same tick, not whether it knows what to heal). Also open: does fixing this retro
 Troll/ArmedHealing's balance (they'd start ACTUALLY prioritizing survival instead of a coin-flip
 timer overlap), which would need a re-check against their existing tests/thesis once built.
 
+**Doug's follow-up (2026-07-09), CONFIRMED by reading `Caster.Activate`/`Battle.cs`: this is two
+separate problems, and the first one is bigger than "add an AI."** Doug's own test: "if [the ask] is
+any more complex than keeping everything active that's possible to activate... then we don't have
+full technique reservation symmetry yet." Checked — **we don't.** `Caster.Activate` (`Caster.cs:257`)
+is idempotent (`if (_active.ContainsKey(...)) return true`) but if it FAILS (insufficient capacity at
+that instant) it just `return false`s and is never retried. `Battle.cs`'s foe setup calls
+`Activate` on the whole `Arsenal` exactly ONCE, at encounter start; the per-tick loop only calls
+`Aim`/`ClearAim`/`Step` afterward — nothing re-attempts a technique that failed to activate at t=0,
+even if capacity frees up later (another technique deactivates, a disable-cascade lifts, etc).
+**So "try to heal whenever it can, for free" isn't achievable as pure AI on top of what exists — it
+needs a continuous best-effort retry (attempt every not-yet-active Arsenal technique each tick, or on
+every capacity-change event), which is Part 1, and is really an engine-symmetry fix that benefits
+EVERY technique in every Arsenal, not just healing (anything that lost the capacity race at t=0 is
+currently dead for the whole fight, foe or player-facing implications TBD).** Only once that exists
+does "focus on healing when other important things are gone / HP<25%" become Part 2 — the genuine new
+decision layer, actively freeing capacity FOR a heal rather than just picking up whatever's left over.
+Keep these two parts separate when this gets built; Part 1 alone already delivers most of what was
+asked.
+
+**Also confirmed, separately: yes, losing the chest currently kills ALL CON techniques at once, not
+just healing** — `Race.cs`'s `BodyPartsWithBonus` puts 100% of CON on the single chest part (Head=INT,
+Chest=CON, Arms×2 split STR, Legs×2 split DEX — CON and INT both live on ONE unpaired part each,
+unlike STR/DEX which get built-in redundancy from having two limbs). So a broken chest doesn't just
+end Bandage/Suture, it ALSO drops Brace/Steel (the CON shield line) in the same instant — whoever's
+CON-shielded loses their shield exactly when a hit just landed hard enough to break a part, which
+reads as a real "getting hit should matter" moment, not obviously a bug — flagging as observed, not
+prescribing a fix. **Adept genuinely escapes the chest-specific version of this** — Siphon is
+`Stat.Int`, routed through the head, so a broken chest doesn't touch it, confirming the earlier
+"mirror healing across attributes" idea is already paying off for the one core that has it. Worth
+knowing this isn't a full escape though: INT lives on the head just as exclusively as CON lives on
+the chest, and Adept's OFFENSE (Ember/Siphon, both weapon-independent) is ALSO INT/head-gated — so
+where a CON-primary build keeps its attack after losing heal+shield to a chest break, Adept loses
+attack AND heal together if the head goes, since both draw from the exact same unpaired pool. Not
+better or worse, just a different single point of failure, worth having on record precisely.
+
 ## ‼ BUG BATCH (2026-07-09, Doug playtest) — 13 items from a live playtest pass; crash first, then a
 ## confirmed non-bug (unarmed-foe question, answered), then the rest as reported
 Doug played a live build and filed 13 items in one pass, several purely from memory of symptoms —
@@ -46,6 +81,38 @@ crash (unhandled node-type case, or a null encounter-template lookup on entry). 
 confirm the crashing node's actual `NodeType` in a debugger/log, then look for a `switch` over
 `NodeType` in `Game1.cs` missing a `Quest` arm. If it's NOT a Quest node, next-check the Merchant/
 ResourceHold entry paths for the same "no case for this type" shape.
+
+### ✅ FIXED (2026-07-09, loop) — item 1 crash confirmed exactly as suspected: `NodeType.Quest`, two stacked gaps, both closed
+**Root cause, build-verified this pass (dotnet IS available in this sandbox — the earlier "no dotnet"
+caveat was specific to the triage pass that filed the batch, not this environment):** two separate
+gaps, both hit by the same dead-end `"quest"` node off camp (`Maps.StandardLegNodes`,
+`Content/Maps.cs:17`).
+1. **The actual crash:** `AssetRegistry.NodeName` (`AssetRegistry.cs`) is a dictionary keyed by every
+   `NodeType` EXCEPT `Quest` — once the node is `Visited`, `CityMap.Sees` correctly returns its true
+   type (`CityMap.cs:88-98`, unconditional for visited nodes), and the citymap's node-icon draw loop
+   (`Game1.ManifestRenderer.cs`) indexes `NodeName[type]` directly with no fallback, throwing
+   `KeyNotFoundException`. Fixed: added the missing `[NodeType.Quest] = "quest"` entry.
+2. **A second, deeper gap the crash was masking:** even past that dictionary fix, `Game1.cs` had ZERO
+   rendering/interaction path for a Quest node at all (confirmed: zero "quest" matches pre-fix, exactly
+   as the original triage note suspected) — Core already fully implements the mechanism
+   (`Expedition.AtQuest`/`CurrentQuest`/`AcceptQuest`/`DeclineQuest`, one stub `Quest` in
+   `Content/Quests.cs`, `[PLACEHOLDER]`-tagged), but nothing on the Game side consumed it. Built a
+   minimal popover mirroring the existing `_merchantOpen` full-screen-popover precedent: `_questOpen`
+   field, arrival wiring (`_questOpen = Exp.AtQuest` alongside the existing merchant line),
+   `UpdateChoosing` Y/N/Esc handling calling `AcceptQuest()`/`DeclineQuest()`, and `DrawQuestScreen()`
+   (`Game1.CityMap.cs`) rendering the stub's `Prompt`/`AcceptText`/`DeclineText` in a centered panel —
+   **explicitly flagged `[PLACEHOLDER]` on-screen** (no CD manifest template exists yet for a real quest
+   card; this is a content ask, same split the Merchant popover had before its 07-03 manifest cut-over).
+**Verified two ways, not just "should compile":** (a) `dotnet build` on the full solution — 0
+errors/warnings; `dotnet test Roguebane.Core.Tests` — 511/511 green, no regressions (Core untouched).
+(b) Headless smoke receipt (`RB_SMOKE=1 RB_SCREEN=quest`, new smoke branch added alongside the existing
+citymap/encounter/loadout/equipment ones): drives the REAL `Maps.StandardLegs` map, enters the actual
+`"quest"` node, renders — no crash, no `crash.log`, and the saved PNG shows the popover rendering
+correctly with both prompt text and working Y/N buttons over the live chart.
+**Still open (not this pass):** `QuestOutcome.Text` (the result message after Accept/Decline) isn't
+surfaced to the player anywhere yet — `ResolveQuest` applies the effect but nothing displays the
+outcome text. A real quest-card manifest template and actual quest catalog content are separate,
+already-tracked asks (see the Quests entry in the "standing bug queue" section below).
 
 **2. Enemy with no visible weapon dealing damage — investigated, not a single simple answer, both
 paths are legitimate/expected depending on which foe it was; not evidence of a new "unarmed"

@@ -33,6 +33,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     private Campaign _campaign = null!;
     private bool _paused;
     private bool _merchantOpen; // design/07 full-screen merchant; opens on arrival, LEAVE returns to the map
+    private bool _questOpen; // ad-hoc placeholder popover (2026-07-09 crash fix); opens on arrival, Y/N resolves it
     private Screen _equipReturnTo = Screen.Run; // where BACK leads from the (in-run) Equipment screen
     private string? _mfScreen;  // dev: RB_MF=<screenId> renders that screen straight from the manifest (RESCUE arc)
     private readonly CombatTargeting _ctrl = new(); // the targeting FSM (headless, in Core); shell just feeds it intents
@@ -193,6 +194,14 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             }
         }
         else if (_smokeScreen == "equipment") _screen = Screen.Equipment; // else fall through to NewGame
+        else if (_smokeScreen == "quest") // 2026-07-09 Doug crash fix receipt: the quest popover itself
+        {
+            _campaign = _build.Redeploy(Maps.StandardLegs(3));
+            _screen = Screen.Run;
+            foreach (var t in Exp.Equipment) _campaign.Toggle(t);
+            _campaign.Enter("quest"); // dead-end off camp (Maps.StandardLegNodes) -- the exact node type
+            _questOpen = Exp.AtQuest; // that threw KeyNotFoundException before the AssetRegistry fix
+        }
 
         base.Initialize();
     }
@@ -522,6 +531,17 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
             return;
         }
 
+        // The ad-hoc quest popover swallows input while open: Y accepts, N/Esc declines (Exp handles
+        // both branches through the same loot vocabulary as node-clear spoils). _questOpen naturally
+        // closes itself next frame too -- AtQuest goes false the moment ResolveQuest marks the node
+        // one-shot -- but drop it explicitly here to match the merchant LEAVE precedent below.
+        if (_questOpen && Exp.AtQuest)
+        {
+            if (Pressed(keys, Keys.Y)) { Exp.AcceptQuest(); _questOpen = false; }
+            else if (Pressed(keys, Keys.N) || Pressed(keys, Keys.Escape)) { Exp.DeclineQuest(); _questOpen = false; }
+            return; // no map click-through under the prompt
+        }
+
         // The design/07 merchant screen swallows input while open: row clicks buy, LEAVE/Esc returns
         // to the map (the node stays a merchant; keyboard verbs below still work map-side).
         if (_merchantOpen && Exp.AtMerchant)
@@ -597,6 +617,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
                 foreach (var t in Exp.Equipment)  // keep the bar armed into the next fight/leg
                     if (!_campaign.IsActive(t)) _campaign.Toggle(t);
                 _merchantOpen = Exp.AtMerchant; // arriving at a merchant opens the stall screen
+                _questOpen = Exp.AtQuest; // arriving at a quest opens the accept/decline popover
                 break;
             }
     }
@@ -1239,6 +1260,7 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         // chart. The chart shows only once the player has redeployed (Choosing).
         if (Exp.State is ExpeditionState.Fighting or ExpeditionState.Cleared) DrawEncounterScreen();
         else if (_merchantOpen && Exp.AtMerchant) DrawManifestScreen("merchant"); // design/07 stall
+        else if (_questOpen && Exp.AtQuest) DrawQuestScreen(); // ad-hoc placeholder popover
         else DrawCityMapScreen();
     }
 

@@ -61,6 +61,7 @@ public sealed class AssetRegistry
         [NodeType.Skirmish] = "skirmish", // dedicated icon landed 2026-07-01 (stopgap "?" retired)
         [NodeType.ResourceHold] = "resource",
         [NodeType.Merchant] = "merchant",
+        [NodeType.Quest] = "quest", // 2026-07-09 Doug crash fix: missing entry threw KeyNotFoundException
         [NodeType.Unknown] = "unknown",
         [NodeType.Castle] = "castle",
     };
