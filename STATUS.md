@@ -1,3 +1,121 @@
+## ✅ LOCKED (2026-07-12, Doug) — Charm/Tome/Staff bonus scalar CONFIRMED ("T3 = +3"): flat +1/tier
+## owned, staff = tome exactly (no 2× stacking) — supersedes the NEEDS-HUMAN block and item 3 of the
+## balance-pass entry below; annotation fix already applied, code catch-up ready to build
+Doug's answer to the blocking question both entries below were waiting on: **"T3 = +3."** A T1-owned
+Charm/Tome/Staff grants +1, T2 grants +2, T3 grants +3 — flat, additive, per tier OWNED (not
+multiplicative, matching the doc's literal "+1... / tier" reading, ruling out the alternate "+2/tier"
+staff reading). Since staff and tome resolve to the identical formula, the old "staff = 2× a tome"
+claim is retired — **doc fix already made**: `WEAPONS.md` line 34 and `RULES_SNAPSHOT.md`'s weapon-
+numbers line both had the stale "(2× a tome)" annotation removed (mechanical doc reconciliation, no
+design change).
+
+**Code catch-up — fully unambiguous now, build this:**
+1. `Body.cs:269-272`: replace `CharmMinionMult => 1.0 + 0.1 * tier` / `TomeSpellMult => 1.0 + 0.1 *
+   tier` with flat additive `CharmMinionBonus => tier` / `TomeSpellBonus => tier` (int; `tier` IS the
+   bonus at T1=1/T2=2/T3=3). Rename per this file's clean-rename rule — no `Mult` alias left behind.
+2. `Caster.cs:394` (minion) / `Caster.cs:466` (spell): `power * _self.CharmMinionMult` →
+   `power + _self.CharmMinionBonus`; same swap for `TomeSpellMult` → `TomeSpellBonus`.
+3. New: Staff's OWN spell bonus while wielded, same flat `+1/tier` formula (identical to Tome, does
+   NOT stack with an offhand Tome — take the max tier across usable INT-spell-bonus sources, don't sum
+   two sources, since the "2×" idea that would have justified summing is exactly what got retired).
+   Staff is 2H with no offhand slot, so this reads off the wielded weapon directly, not via
+   `UsableHands().Where(Kind == Charm/Tome)` — needs its own small consultation path.
+4. `WandTests.cs`: rewrite the asserts pinning `TomeSpellMult==1.4` / `CharmMinionMult==1.2`
+   (multiplicative T4 values) to the flat equivalents (T4 owned = +4). Add a T3 case asserting exactly
+   `+3` — Doug's own worked example — so this confirmation is pinned in tests, not just doc.
+5. Does NOT touch Staff's wield-gating `Stat` (INT→STR) — that's the separate item 1 in the balance-
+   pass entry below, already unblocked on its own; keep the two changes in separate commits if clean.
+
+## ‼ TOP PRIORITY / LOCKED (2026-07-12, Doug) — shield mitigation rule CHANGE: any standing shield
+## point fully blocks a normal hit (no bleed-through); this is a BEHAVIOR CHANGE, existing tests
+## asserting the old spillover math must be corrected, not just re-greened
+Doug's exact rule, with worked examples (3 damage vs. 2 shield points):
+1. **Normal (non-pierce, non-subtract) hit:** shield had 2 points, hit is 3 power → shield drops to 0,
+   **zero damage lands on part/HP.** Any standing point (even 1) fully blocks the ENTIRE hit, regardless
+   of whether the hit's power exceeds the point count.
+2. **Shield already at 0:** the next hit (before any regen) lands **completely unmitigated.**
+3. **Shield-subtract (wand):** unchanged — `power - ShieldPoints` lands, shields take zero damage,
+   points are never consumed by a subtract-type hit.
+4. **Shield-piercing:** unchanged — full power lands, shields untouched.
+
+**Current code does NOT match #1** — confirmed by reading `Caster.Hit` (`Caster.cs:497-543`).
+`frame.AbsorbShields(power)` (`Body.cs:388-396` → `ShieldPool.Absorb`, `ShieldPool.cs:33-39`) eats
+`Math.Min(points, damage)` and returns the UNABSORBED REMAINDER, which today lands as real damage —
+so 3 power vs. 2 points currently deals 1 damage through. Doug's rule removes that spillover entirely.
+
+**Fix — small and clean, reuses existing state:** `Hit` already computes `var shielded = frame is not
+null && frame.ShieldPoints > 0;` (line 506) BEFORE any absorption happens — exactly the flag needed.
+Change the non-pierce block (lines 512-516) from:
+```
+power = subtract ? Math.Max(0, power - frame.ShieldPoints) : frame.AbsorbShields(power);
+if (power <= 0) return false;
+```
+to:
+```
+if (subtract) power = Math.Max(0, power - frame.ShieldPoints);
+else if (shielded) { frame.AbsorbShields(power); power = 0; }
+if (power <= 0) return false;
+```
+`AbsorbShields` still runs (so points still deplete by up to what's standing — rule #1's "shield drops
+to 0" still happens via the same `ShieldPool.Absorb` math), the difference is the RETURN value is no
+longer used as leftover damage for a normal hit — `power` is forced to 0 outright whenever `shielded`
+was true going in. Bonus: this makes `Hit`'s own final return value (`!shielded` gates the "clean
+landed hit" on-hit-boon signal, used by Siphon lifesteal/Brittle/Resonance) more internally consistent
+too — a hit that was ever shielded now ALSO deals literally zero damage, instead of the previous
+slight inconsistency (flagged "not clean" while still landing partial damage).
+
+**Test impact — do not just re-green, VERIFY the new numbers are correct per the rule above:** any
+existing `Core.Tests` asserting the old spillover math (a shielded hit dealing partial damage when
+power > points) will now fail and needs its ASSERTED VALUE corrected to 0 landed damage for that case,
+plus a new test for each of Doug's 4 examples verbatim (3 dmg/2 shield normal → 0 landed, shield → 0;
+next hit at 0 shield → full 3 landed; 3 dmg/2 shield subtract → 1 landed, shield unchanged at 2; 3
+dmg/2 shield pierce → 3 landed, shield unchanged at 2).
+
+## ‼ HIGH PRIORITY / LOCKED (2026-07-12, Doug balance pass — Roguebane_Balance (14).xlsx) — three
+## concrete, ready-to-build content changes, no remaining design ambiguity
+Doug's latest balance spreadsheet (`Kits` sheet) has already locked these; routing to build.
+
+**1. Staff flips from INT to STR — makes Jab a free backup attack, zero changes needed to Jab itself.**
+Today `Armory.cs:71`: `Staffs = Named("staff", Stat.Int, WeaponKind.Staff, ...)`. Change `Stat.Int` →
+`Stat.Str`. `Jab` (`Techniques.cs:12-15`) is already `Stat.Str, Consults: WeaponUse.Primary` — once
+Staff's own `Stat` matches, `Body.Consulted`'s `WeaponUse.Primary` match (`w.Stat == technique.Stat`)
+picks the wielded Staff up automatically, no Jab changes required. Adept's kit becomes: INT
+(robe+cap+Ember+Siphon+Stoneskin) + a real STR pressure (Staff+Jab) — the "3 stat pressures" pattern
+this file has been chasing all week, confirmed by the spreadsheet's own Demand tab (Adept: STR 3 / INT
+8, was INT-only before). **Reconcile `design/systems/WEAPONS.md`** in the same pass — its Staff row
+(line 34) still reads "2H INT... 2 INT" req, now stale against both the spreadsheet and this change.
+
+**2. ✅ FULLY LOCKED 2026-07-12 (Doug) — New technique: Blast (INT, wand-consulting attack) for
+Summoner.** Doesn't exist in `Techniques.cs` yet — confirmed by reading the file. Doug's numbers:
+**Cooldown 1.5s, DamageMult 1×, no Charge consumption** ("since it's not a pure pierce" — correct:
+`Caster.cs:201`'s dry-check is `t.ShieldPiercing && _charge < ChargeCost`, "only pierce draws charge,"
+so leaving `ShieldPiercing: false`/`ChargeCost: 0` at their defaults is already exactly zero-Charge
+behavior, no special-casing needed). Cooldown is authored in COMBAT TICKS at 10/sec (`Techniques.cs`
+header comment) — 1.5s = **15 ticks**. Exact definition, mirroring Jab's own pattern:
+```
+new("blast", Stat.Int, Reserve: 1, TechniqueKind.Timered, Cooldown: 15, Power: 0, DamageMult: 1.0,
+    Consults: WeaponUse.Primary,
+    Desc: "A quick bolt from your wand for {power} damage, subtracting from the target's shields as it lands.")
+```
+`Consults: WeaponUse.Primary` on `Stat.Int` picks up a wielded Wand automatically and resolves through
+the EXISTING wand shield-subtraction path (`Caster.cs`'s `wandCast = consulted.Count > 0 &&
+consulted.All(w => w.Kind == WeaponKind.Wand)`) — no new resolution logic, just the technique
+definition. Wire into Summoner's kit (`CoreRunes.cs`, replacing/joining the Wand+Ember+Sacrifice+Brace+
+skeleton loadout per the spreadsheet's `Kits` sheet). Gives Summoner a wand-specific attack distinct
+from Ember (stays weapon-independent, `Consults: None`). **Desc text is plain-mechanical placeholder**
+matching Jab/Ember's own in-code copy style (no lore invented) — flagging per this file's placeholder
+rule in case Doug wants different wording later; the MECHANIC is fully locked regardless.
+
+**3. ✅ RESOLVED 2026-07-12 — see the "T3 = +3" LOCKED entry at the top of this file** for the
+confirmed scalar and the exact code catch-up steps. (Superseded in place rather than deleted, per this
+file's history-preserving convention.)
+
+**Flagged for later, not urgent — Doug's own concern, not mine:** Reaver may be under-kitted — no
+shield in its starting kit (glass) AND its Frenzy/Flurry dual-wield kit may leave it with NO attack at
+all if either Longsword or Rapier becomes unusable (broken arm / stat drop). Worth checking whether
+Frenzy/Flurry's `Consults: WeaponUse.Both` still function on a SINGLE remaining weapon or require both
+present — revisit when the balance pass reaches Reaver specifically.
+
 ## ✅ RE-ARM — CD DROP PASS 11 PROCESSED (2026-07-12) — LOOP MAY RESUME
 Correction to the STOP block below: the drop wasn't staged in `.drop/` — it was already unpacked
 directly into the working tree (uncommitted) when I checked, matching CD's own
@@ -107,6 +225,24 @@ popups DO still appear at their own nodes once the engine hosts those foeless ar
   field (`{bind, item, gap, pad, hideAtZero}` — CD_STATUS #38) requiring an ENGINE implementation:
   width = `count×item + (count−1)×gap + pad`, hidden entirely at count 0. No engine code reads this
   field yet — build it, then Equipment `minionColumn` + Encounter `minionGroup` pick it up automatically.
+  ### ✅ BUILT (2026-07-12, loop) — `b515b2a`
+  Full implementation, container AND children reflow. **Core (tested):** `CountWidth` schema on `Element`
+  (`LayoutManifest.cs`) with `WidthFor(count)` = `count*item + (count-1)*gap + pad` (0 items → pad alone,
+  no negative gap; negatives clamp) and `VisibleAt(count)` (hideAtZero collapses only 0);
+  `LayoutManifestTests.CountWidthParsesAndComputesTheReflowFormula` pins it against the real params
+  (78/6/8 → count 2 = 170 = authored `minionGroup` size, confirming the authored box is the 2-slot case).
+  **Game:** `ResolveCountBind` (`loadout.minionCap`/`minions.cap` → live minion cap, build pre-run /
+  expedition in-run); `CountWidthLayout` precomputes hidden+reflowed per draw; `ManifestUi.RectWithWidth`
+  re-resolves the container at its data width keeping the Right anchor. **Children reflow too**
+  (`ReflowChild`): the label + minion list are TopLeft-anchored into the parent, and the flat draw loop
+  resolves parents from AUTHORED size, so without this a child would sit at the 2-slot width and spill
+  past the reflowed left border at cap 1 — I caught and handled this rather than shipping a container-only
+  half that looks broken on Warden/Barbarian. hideAtZero hides container + children together (cap-0
+  Grunt/Adept/Reaver no longer show an empty minion box — the headline). Lands: cap0 hidden, cap1 → 86px,
+  cap2 → 170px. 534/534. Game compiled clean via a scratch full-rebuild (normal `Game/bin` was locked by a
+  live `Roguebane.Game` instance — Doug playtesting; the running build picks these up on its next rebuild).
+  Small documented assumption in `ReflowChild`: children have zero right-inset (holds for both columns'
+  children today); a future right-inset child would need the inset carried through.
 - **B20/#40 (coreCard accent contrast) — NEW engine work:** `border.colorBind` (bind resolves INSIDE
   the border spec, tints the border only, never a full-rect fill) needs engine support — apply it when
   drawing any element/part border. Also read the newly-published `style.coreAccents` token block
@@ -137,33 +273,13 @@ popups DO still appear at their own nodes once the engine hosts those foeless ar
 **Not this drop's problem, no action:** the 4 pre-existing extraction gaps above; `#35` (parent-relative
 positioning, still engine-pending, unrelated); `#33` (prototype Core Effects note, informational).
 
-## ‼ NEEDS HUMAN (2026-07-12, external WEAPONS.md edit) — INT-implement damage rescaled MULT→FLAT in canon; code still multiplicative; staff value self-contradicts, do NOT reconcile until Doug confirms
-An external edit to `design/systems/WEAPONS.md` (folded into the loop's commit, accepted) changed the
-three INT-implement damage bonuses from MULTIPLICATIVE fractions to FLAT per-tier increments:
-- Staff SPELL: `+0.2× / tier (2× a tome)` → `+1 / tier (2× a tome)`
-- Charm MINION: `+0.1× / tier` → `+1 / tier`
-- Tome SPELL: `+0.1× / tier` → `+1 / tier`
-
-**Why not auto-reconciled (two blockers):**
-1. **Internal contradiction in the edit.** Old values were consistent (staff 0.2 = 2× tome 0.1, matching
-   the "(2× a tome)" annotation). New values set BOTH staff and tome to `+1/tier`, so staff is no longer
-   2× a tome — yet the "(2× a tome)" annotation stayed, AND `RULES_SNAPSHOT.md:64` (which SUPERSEDES per
-   CLAUDE.md) still reads "Staff … magic dmg = 2× a tome." So staff should likely be `+2/tier`, not `+1`.
-   This reads like an in-progress edit, not a finished number set — needs Doug to confirm staff = +1 or +2.
-2. **It's a mechanics/balance change, spreadsheet-driven.** Code currently implements the OLD multiplicative
-   form: `Body.CharmMinionMult`/`TomeSpellMult` = `1.0 + 0.1×tier` (`Body.cs:269-272`), consumed as
-   `power * mult` (`Caster.cs:394` minion, `Caster.cs:466` spell). Flipping to flat `+N/tier` means
-   rename→`…Bonus` (int), rewire both consumers to `power + bonus`, and rewrite the 4 asserts in
-   `WandTests.cs` (`TomeSpellMult==1.4`, `CharmMinionMult==1.2`) that pin the multiplicative values.
-   These numbers ride Doug's off-repo balance spreadsheet — per CLAUDE.md, reconcile on a spreadsheet drop,
-   not a raw contradictory doc edit.
-
-**Also:** staff's SPELL bonus is UNIMPLEMENTED regardless (no `StaffSpellMult` in code — only charm-minion
-and tome-spell exist), so the staff line is doc-only today either way. **Ask Doug:** confirm (a) flat
-`+1/tier` for charm-minion and tome-spell is final, and (b) staff = `+1` or `+2` per tier. On his yes,
-one clean pass reconciles `Body.cs` + `Caster.cs` + `WandTests.cs` (and wires the staff bonus if he wants
-it live). Until then code stays multiplicative and green (533/533) — canon and code KNOWINGLY diverge here,
-flagged, not silently dropped.
+## ✅ RESOLVED 2026-07-12 (was: NEEDS HUMAN — INT-implement damage rescaled MULT→FLAT, staff value
+## self-contradicted) — Doug confirmed "T3 = +3"; see the LOCKED entry at the top of this file
+Doug's answer resolves both blockers this entry originally raised: the scalar is flat `+1/tier owned`
+(not `+2/tier`), and staff = tome exactly, so the "(2× a tome)" annotation was wrong, not the numbers —
+fixed in `WEAPONS.md` and `RULES_SNAPSHOT.md`. Full code catch-up steps (rename to `…Bonus`, rewire
+`Caster.cs`, rewrite `WandTests.cs`, wire Staff's own bonus) are spelled out in the top-of-file entry —
+kept here only as a pointer so this superseded block doesn't read as still-blocking.
 
 ## ‼ URGENT CORRECTION (2026-07-12, Doug) — the CardPress fix the loop ALREADY SHIPPED for the
 ## Self-technique deactivate bug went the WRONG DIRECTION; the rule is the opposite of what was built
