@@ -125,6 +125,39 @@
 /processorParam:TextureFormat=Color
 /build:../../Roguebane.Content/icons/minion/skeleton.png;icons/minion/skeleton
 
+#begin icons/technique/parry
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/icons/technique/parry.png;icons/technique/parry
+
+#begin icons/technique/steel
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/icons/technique/steel.png;icons/technique/steel
+
+#begin icons/technique/suture
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Roguebane.Content/icons/technique/suture.png;icons/technique/suture
+
 #begin icons/node/camp
 /importer:TextureImporter
 /processor:TextureProcessor
