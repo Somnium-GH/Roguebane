@@ -87,8 +87,22 @@ popups DO still appear at their own nodes once the engine hosts those foeless ar
 **What else this drop unblocks (reprioritize forward, formerly-blocked work):**
 - **B30 (technique bars 4th card) — CD says fixed, landed in this drop's `layout.json`.** Verify live:
   a 4-technique kit (e.g. Adept) should show all 4 action-bar cards on both Equipment and Encounter now.
+  ### ◻ HEADLESS-CHECKED, live-confirm still owed (2026-07-12, loop)
+  Structurally consistent with fixed: `techCard` is `[103,136]` in the encounter `actionBar` region 630
+  (630/103 ≈ 6 cards of room) and `loadoutCard` `[148,89]` in equipment 810 (fits 5) — both comfortably
+  hold 4. But card capacity is renderer-COMPUTED from the `loadout` bind + template (no static `list`
+  spec in `layout.json` to assert against), so whether the 4th card actually DRAWS is a live-visual fact,
+  not headlessly closeable. **Deferred to Doug's live check** (as the re-arm itself asked). The old
+  Kit.Count-vs-ActionSlots undersizing was a SEPARATE, already-fixed bug (see `ResolveScreenBind`
+  `preview.techniques` comment); this B30 is pure CD geometry.
 - **B31 (Encounter CON row) — CD says fixed** (`poolRows` grown to `[309,82]`). Verify live against the
   earlier screenshot repro — CON should now render on Encounter same as Equipment.
+  ### ◻ HEADLESS-CHECKED, live-confirm still owed (2026-07-12, loop)
+  CD's `[309,82]` is described in their source notes; the extracted `layout.json` has no `poolRows` key —
+  the landed evidence is the `poolRow` TEMPLATE at width **309** (matches CD's number). Row height 15 ×
+  4 attr rows + gaps ≈ 82, consistent with a region grown to fit CON. As with B30, the pool is renderer-
+  computed from `Body.pool` (no static list region to assert), so "CON row actually renders on Encounter"
+  is live-visual. **Deferred to Doug's live check** per the re-arm.
 - **B27 (minion column reflow) — NEW engine work, not yet built:** `countWidth` is a brand new manifest
   field (`{bind, item, gap, pad, hideAtZero}` — CD_STATUS #38) requiring an ENGINE implementation:
   width = `count×item + (count−1)×gap + pad`, hidden entirely at count 0. No engine code reads this
@@ -107,6 +121,18 @@ popups DO still appear at their own nodes once the engine hosts those foeless ar
   Warlord's Might corrected (claymore −3 AND STR plate −1/piece, kit demand recalculated to STR 10).
   Confirm `design/systems/CORE_RUNES.md` doesn't need a reconciliation pass on our side — this reads
   like CD following our existing doc, not introducing a new number, but worth a quick cross-check.
+  ### ✅ CONFIRMED — no reconciliation needed; code, canon, and Doug's spreadsheet all aligned (2026-07-12, loop)
+  Cross-checked `CoreRunes.cs` against `CORE_RUNES.md` end to end, and the re-arm's read was right —
+  CD followed our existing doc, no new number. **Reaver** (`CoreRunes.cs:101`): budget 19 / actions 4 /
+  cap 0, DEX +5, `Finesse` copy verbatim, and `Techniques.Bandage` IS in `DefaultEquipment` — matches
+  canon (§ Reaver, "Bandage added 2026-07-05"). **Barbarian** (`CoreRunes.cs:144`): budget 14 / actions
+  3 / cap 1, STR +4 / CON +1, `Warlord's Might` copy verbatim ("Two-handed swords cost 3 less strength;
+  STR plate costs 1 less strength per piece"). The STR-10 exact-fit isn't just documented, it's IMPLEMENTED
+  and ASSERTED: `Body.cs:41` applies −3 to a 2H STR weapon, `Body.cs:74` applies −1 per Plate piece,
+  `Races.cs:22` Half-Giant STR 6 (+4 = 10) — so claymore 2 + plate 4 + Cleave 2 + Bind 2 = 10 = the exact
+  fit CORE_RUNES.md's corrected math states, and `CoreCampaignTests.EveryRaceAndCoreWinsTheCampaignWith
+  PartAimPlay` pins half_giant/barbarian as a full-kit campaign win (non-home races excluded there, an
+  already-documented Needs-human, not this drop's). Core.Tests 533/533. ⇒ **No doc or code change owed.**
 
 **Not this drop's problem, no action:** the 4 pre-existing extraction gaps above; `#35` (parent-relative
 positioning, still engine-pending, unrelated); `#33` (prototype Core Effects note, informational).
