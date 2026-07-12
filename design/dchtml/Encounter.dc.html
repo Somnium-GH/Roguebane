@@ -30,15 +30,18 @@
   <div data-el="backdrop" data-anchor="Center" data-z="0" data-binds="encounter.scene" style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:url('Content/bg/combat_field.png') center top/cover no-repeat;image-rendering:pixelated;"></div>
   <!-- torch glow (your side) — animated runtime overlay on top of baked backdrop -->
   <div style="position:absolute;left:0;top:56px;width:760px;height:560px;background:radial-gradient(60% 60% at 22% 32%,#e0913a55,transparent 70%);animation:rb-torch 3.2s infinite;pointer-events:none;"></div>
-  <!-- hostile glow (foe side) -->
+  <!-- hostile glow (foe side) — combat arrivals only (payload B29: the shell also hosts foeless
+       Quest / Camp / nothing-here arrivals; the engine gates the foe cluster on encounter.foe) -->
+  <sc-if value="{{ hasFoe }}" hint-placeholder-val="{{ true }}">
   <div style="position:absolute;right:0;top:56px;width:760px;height:560px;background:radial-gradient(60% 60% at 80% 30%,#8a2f2f55,transparent 70%);pointer-events:none;"></div>
+  </sc-if>
 
   <!-- ===== TOP STATUS STRIP ===== -->
   <div data-el="statusStrip" data-anchor="Top" data-z="6" style="position:absolute;left:0;top:0;width:1920px;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;background:linear-gradient(#241a12,#1b130d);border-bottom:2px solid #4a3729;z-index:6;">
     <div style="display:flex;align-items:center;gap:18px;">
       <span data-el="logo" style="font-size:23px;letter-spacing:.5px;color:#e9d6b0;">Roguebane</span>
       <!-- node TYPE only (2026-07-03 review: flavor place names dropped — no naming model needed) -->
-      <span data-el="sceneLabel" data-binds="encounter.label" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#9a8468;letter-spacing:1px;">SKIRMISH</span>
+      <span data-el="sceneLabel" data-binds="encounter.label" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#9a8468;letter-spacing:1px;">{{ sceneLabel }}</span>
     </div>
     <span data-el="heldBadge" data-anchor="Top" data-binds="combat.paused" data-bind-gate="" style="display:flex;align-items:center;gap:9px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:2px;color:#d9a441;padding:5px 14px;border:2px solid #6e5026;background:#2a1d10;">❚❚ HELD</span>
     <div data-el="topControls" data-anchor="Right" style="display:flex;align-items:center;gap:10px;">
@@ -75,7 +78,9 @@
     <!-- zone labels -->
     <span data-el="youLabel" data-shadow="title" style="position:absolute;left:26px;top:12px;font-size:20px;letter-spacing:1px;color:#e9d6b0;text-shadow:0 2px 6px #000;">You</span>
     <span style="position:absolute;left:50%;top:14px;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:#8d775c;">— BATTLEFIELD —</span>
+    <sc-if value="{{ hasFoe }}" hint-placeholder-val="{{ true }}">
     <span data-el="foeLabel" data-anchor="TopRight" data-shadow="title" style="position:absolute;right:26px;top:12px;font-size:20px;letter-spacing:1px;color:#e9c7bd;text-shadow:0 2px 6px #000;">Foe</span>
+    </sc-if>
 
     <!-- ===== YOU — paper-doll ===== -->
     <div data-el="heroFigure" data-anchor="BottomLeft" data-z="2" data-binds="Body" data-type="figure" style="position:absolute;left:120px;top:150px;width:360px;height:430px;">
@@ -124,7 +129,8 @@
     </div>
     </sc-if>
 
-    <!-- foe incoming -->
+    <!-- foe incoming + the foe paper-doll + foe HP — combat arrivals only (payload B29) -->
+    <sc-if value="{{ hasFoe }}" hint-placeholder-val="{{ true }}">
     <div style="position:absolute;left:640px;top:430px;width:680px;height:14px;background-image:repeating-linear-gradient(90deg,transparent 0 12px,#b23b3255 12px 18px,transparent 18px 30px);background-size:30px 100%;animation:rb-stream .7s linear infinite reverse;opacity:.6;"></div>
 
     <!-- ===== FOE — ogre paper-doll ===== -->
@@ -152,6 +158,37 @@
         </sc-for>
       </div>
     </div>
+    </sc-if>
+
+    <!-- ===== QUEST ARRIVAL (payload B29.1) — the quest prompt renders INSIDE the Encounter shell
+         (foeless, "it feels like you're moving"), not as a CityMap popover. Same card chrome as the
+         Merchant/Equipment panels. Always in the DOM at canonical geometry for extraction; the
+         design toggles it via the `arrival` prop (visibility only — zero layout shift), the engine
+         gates it on the encounter.quest bind. Quest copy/catalog is Doug's separate pass — the
+         title/prompt below are bound SAMPLES. -->
+    <div data-el="questPanel" data-anchor="Right" data-binds="encounter.quest" data-bind-gate="" data-shadow="panel" data-frame="card" style="position:absolute;left:1180px;top:168px;width:560px;visibility:{{ questVis }};box-sizing:border-box;background:#1d150e;border:12px solid transparent;border-image-source:url('Content/ui/frame/card.png');border-image-slice:12 fill;border-image-width:12px;border-image-repeat:round;box-shadow:0 4px 10px rgba(10,8,7,.5);padding:12px 16px;z-index:4;">
+      <div data-el="questKicker" style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;color:#8d775c;">QUEST</div>
+      <div data-el="questTitle" data-binds="quest.title" style="font-size:28px;letter-spacing:.5px;color:#f0dcb4;line-height:1.15;margin-top:7px;">A Plea From the Millers</div>
+      <div data-el="questPrompt" data-binds="quest.prompt" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:19px;line-height:1.55;color:#cdbfa8;margin-top:9px;">We beg your host's protection — the mill on the far bank is overrun. Clear it, and the village will muster a wagon of supplies for your camp.</div>
+      <div data-el="questActions" style="display:flex;gap:12px;margin-top:16px;">
+        <div data-el="questAccept" data-binds="quest.accept" data-bind-gate="" data-states="button" style="flex:1;height:44px;background:url('Content/ui/button/button_on.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;letter-spacing:1.5px;color:#1a130c;">✓ ACCEPT</span>
+        </div>
+        <div data-el="questDecline" data-binds="quest.decline" data-bind-gate="" data-states="button" style="flex:1;height:44px;background:url('Content/ui/button/button_normal.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:1px;color:#cdb497;">✕ DECLINE</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CAMP ARRIVAL (payload B29.2) — a foeless "empty encounter": the player can pre-activate
+         techniques here so Timered attacks are already charging before the next real fight. The
+         "nothing here" arrival is this shell with NO marker at all (just the arrive beat — no new
+         elements needed; the engine simply resolves neither encounter.foe nor encounter.quest/camp). -->
+    <div data-el="campMarker" data-anchor="Right" data-binds="encounter.camp" data-bind-gate="" style="position:absolute;left:1350px;top:240px;width:240px;visibility:{{ campVis }};display:flex;flex-direction:column;align-items:center;gap:10px;z-index:3;">
+      <img data-el="campMarkerIcon" data-type="icon" data-shadow="soft" src="Content/icons/node/camp.png" width="88" height="88" style="image-rendering:pixelated;filter:drop-shadow(0 3px 5px #0009);" alt="camp">
+      <span data-el="campMarkerLabel" data-shadow="title" style="font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:3px;color:#7fa05a;text-shadow:0 1px 3px #000;">CAMP</span>
+      <span data-el="campMarkerNote" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:17px;line-height:1.5;color:#cdbfa8;text-align:center;">The host rests. Activate techniques now and they charge before the next fight.</span>
+    </div>
   </div>
 
   <!-- ===== BOTTOM BAND: POOL | ACTION BAR (§10: engine-drawn drop shadow, DATA not baked into any
@@ -166,7 +203,9 @@
         <span data-el="attrPoolTitle" style="font-size:24px;letter-spacing:1px;color:#f0dcb4;">Attribute Pool</span>
       </div>
 
-      <div data-el="poolRows" data-container="1" data-template="poolRow" data-flow="vertical" data-binds="pool" style="display:flex;flex-direction:column;gap:11px;margin-top:14px;">
+      <!-- min-height 164px → design size[1] 82 (payload B31: the measured 4-row height rounded to
+           77 while 4×15+3×6=78 — the CON row silently dropped; slack so the 1px class can't recur) -->
+      <div data-el="poolRows" data-container="1" data-template="poolRow" data-flow="vertical" data-binds="pool" style="display:flex;flex-direction:column;gap:11px;margin-top:14px;min-height:164px;">
         <sc-for list="{{ pool }}" as="a" hint-placeholder-count="4">
           <div data-tpl="poolRow" style="display:flex;align-items:center;gap:12px;">
             <div style="width:96px;">
@@ -174,9 +213,9 @@
               <div data-binds="pool.attr.part" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#8d775c;margin-top:1px;">{{ a.part }}</div>
             </div>
             <div style="display:flex;align-items:baseline;gap:4px;width:84px;font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;">
-              <span data-binds="pool.attr.alloc" style="color:#ece0cb;">{{ a.alloc }}</span>
+              <span data-binds="pool.attr.available" style="color:#ece0cb;">{{ a.available }}</span>
               <span style="color:#6b5a44;font-size:15px;">/</span>
-              <span data-binds="pool.attr.available" style="color:{{ a.availColor }};">{{ a.available }}</span>
+              <span data-binds="pool.attr.total" data-color-bind="pool.attr.totalColor" style="color:{{ a.totalColor }};">{{ a.total }}</span>
             </div>
             <div style="flex:1;">
               <!-- pip strip as PARTS (payload #3): nested list the engine stamps from live pool cells,
@@ -211,7 +250,11 @@
           <div data-el="techGroupLabel" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:#cdb497;margin-bottom:7px;">TECHNIQUES</div>
           <div data-el="techList" data-container="1" data-template="techCard" data-flow="horizontal" data-binds="loadout.techniques" style="display:flex;gap:12px;flex:1;">
             <sc-for list="{{ techniques }}" as="t" hint-placeholder-count="5">
-              <div data-tpl="techCard" data-states="actionCard" style="flex:1;border:2px {{ t.borderStyle }} {{ t.border }};background:{{ t.bg }};display:flex;flex-direction:column;opacity:{{ t.op }};animation:{{ t.anim }};">
+              <!-- max-width 206px → item 103 design: 4×103+3×6=430 ≤ region 433 (payload B30 — flex
+                   items round UP on extraction (207.5→104 → 434>433) and the 4th card silently
+                   dropped; fixed cap = the B23/B24/B25 idiom, and every core now shares ONE card
+                   width, matching the single template size the engine stamps) -->
+              <div data-tpl="techCard" data-states="actionCard" style="flex:1;max-width:206px;border:2px {{ t.borderStyle }} {{ t.border }};background:{{ t.bg }};display:flex;flex-direction:column;opacity:{{ t.op }};animation:{{ t.anim }};">
                 <div data-part="" style="padding:8px 9px 7px;border-bottom:1px solid #2e2218;">
                   <div style="display:flex;align-items:center;justify-content:space-between;">
                     <span style="display:flex;align-items:center;gap:6px;">
@@ -246,7 +289,7 @@
         </div>
         <!-- bays group (action-bar reflow): whole group + divider hidden when bayCap 0 (Reaver); width scales with bay count -->
         <sc-if value="{{ hasBays }}" hint-placeholder-val="{{ true }}">
-        <div data-el="minionGroup" data-anchor="Right" style="width:{{ bayWidth }};flex:none;display:flex;flex-direction:column;border-left:2px solid #2e2218;padding-left:14px;">
+        <div data-el="minionGroup" data-anchor="Right" data-count-width="{&quot;bind&quot;:&quot;loadout.minionCap&quot;,&quot;item&quot;:78,&quot;gap&quot;:6,&quot;pad&quot;:8,&quot;hideAtZero&quot;:true}" style="width:{{ bayWidth }};flex:none;display:flex;flex-direction:column;border-left:2px solid #2e2218;padding-left:14px;">
           <div data-el="minionGroupLabel" style="font-family: 'JetBrains Mono',monospace; font-size: 10px; letter-spacing: 2px; color: #cdb497; margin-bottom: 7px">MINIONS<br></div>
           <div data-el="minionList" data-container="1" data-template="combatMinionCard" data-flow="horizontal" data-binds="loadout.minions" style="display:flex;gap:12px;flex:1;">
             <sc-for list="{{ bays }}" as="b" hint-placeholder-count="1">
@@ -276,7 +319,7 @@
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1080},&quot;core&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;grunt&quot;,&quot;warden&quot;,&quot;adept&quot;,&quot;summoner&quot;,&quot;reaver&quot;,&quot;ranger&quot;,&quot;barbarian&quot;],&quot;default&quot;:&quot;grunt&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vessel&quot;},&quot;race&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;human&quot;,&quot;elf&quot;,&quot;dwarf&quot;,&quot;halfling&quot;,&quot;half_giant&quot;],&quot;default&quot;:&quot;human&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vessel&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1080},&quot;core&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;grunt&quot;,&quot;warden&quot;,&quot;adept&quot;,&quot;summoner&quot;,&quot;reaver&quot;,&quot;ranger&quot;,&quot;barbarian&quot;],&quot;default&quot;:&quot;grunt&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vessel&quot;},&quot;race&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;human&quot;,&quot;elf&quot;,&quot;dwarf&quot;,&quot;halfling&quot;,&quot;half_giant&quot;],&quot;default&quot;:&quot;human&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vessel&quot;},&quot;arrival&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;combat&quot;,&quot;quest&quot;,&quot;camp&quot;,&quot;empty&quot;],&quot;default&quot;:&quot;combat&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Arrival&quot;}}">
 class Component extends DCLogic {
   /* Encounter (combat). The `core` prop sets which of the six PROTOTYPE cores is lit; the `race`
    * prop sets the vessel race (pools = race base + core stat bonus, HP = 10 + 2×CON — v6 sheet), so
@@ -303,11 +346,22 @@ class Component extends DCLogic {
     const coreId = this.props.core || 'grunt';
     const fallback = { youHp: [], foeHp: [], pool: [], techniques: [], bays: [], resources: [], shieldPips: [], aimTags: [],
       hasBays: true, bayWidth: '172px', heroFig: 'human_grunt', heroStates: null, heroHide: [], hpLabel: 'GRUNT · HP',
-      youHpText: '', hasFieldMinion: false, fieldLabel: '', fieldArt: '', retAnim: 'none' };
+      youHpText: '', hasFieldMinion: false, fieldLabel: '', fieldArt: '', retAnim: 'none',
+      hasFoe: true, questVis: 'hidden', campVis: 'hidden', sceneLabel: 'SKIRMISH' };
     if (!K) return fallback;
     const core = K.get(coreId);
     const race = K.RACES[this.props.race] ? this.props.race : 'human';
     const R = K.resolve(core, race);
+
+    // ARRIVAL (payload B29): the shell hosts combat AND the three foeless arrivals — quest / camp /
+    // "nothing here". Foeless: the foe cluster unmounts (engine: encounter.foe unresolved), a
+    // TARGETING intent relaxes to READY (nothing to aim at — HELD/CHARGING keep reserving, which is
+    // the whole point of Camp pre-activation), and the quest card / camp marker show per arrival.
+    // The quest panel stays in the DOM (visibility-only toggle) so extraction always carries it.
+    const arrival = ['combat', 'quest', 'camp', 'empty'].includes(this.props.arrival) ? this.props.arrival : 'combat';
+    const hasFoe = arrival === 'combat';
+    if (!hasFoe) R.techniques = R.techniques.map(t => t.state === 'TARGETING' ? { ...t, state: 'READY' } : t);
+    const sceneLabel = { combat: 'SKIRMISH', quest: 'QUEST', camp: 'CAMP', empty: 'QUIET FIELD' }[arrival];
 
     // hero HP: max = the race formula (10 + 2×CON); current is a combat sample (live bind)
     const hpMax = K.raceHp(race), hpCur = hpMax - 6;
@@ -379,7 +433,7 @@ class Component extends DCLogic {
 
     // targeting → the focus reticle PULSES and the aim-tag stack echoes each targeting hotkey (§8d)
     const aimTags = [];
-    R.techniques.forEach((t, i) => { if (t.state === 'TARGETING') aimTags.push({ hotkey: String(i + 1) }); });
+    if (hasFoe) R.techniques.forEach((t, i) => { if (t.state === 'TARGETING') aimTags.push({ hotkey: String(i + 1) }); });
     const retAnim = aimTags.length ? 'rb-retpulse 1.2s infinite' : 'none';
 
     // deployed minion — per-TYPE deploy art (sprites/minions/<type>.png); shown only when a bay is ACTIVE
@@ -389,7 +443,8 @@ class Component extends DCLogic {
       hpLabel: K.RACES[race].name.toUpperCase() + ' ' + core.cls.toUpperCase() + ' · HP',
       youHpText: hpCur + ' / ' + hpMax,
       hasFieldMinion: !!active, fieldLabel: active ? active.name.toUpperCase() : '',
-      fieldArt: active ? "Content/sprites/minions/" + (K.MINION_SPRITE[active.name] || 'skeleton') + ".png" : '', retAnim };
+      fieldArt: active ? "Content/sprites/minions/" + (K.MINION_SPRITE[active.name] || 'skeleton') + ".png" : '', retAnim,
+      hasFoe, sceneLabel, questVis: arrival === 'quest' ? 'visible' : 'hidden', campVis: arrival === 'camp' ? 'visible' : 'hidden' };
   }
 }
 </script>

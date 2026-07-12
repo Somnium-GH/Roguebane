@@ -74,6 +74,15 @@ const RB_TECHS_V6 = [
 // bg halves zero out cleanly. Overlay renders these with a matching gradient bg (RB_buildChipOverlay).
 // Batch of 2 at x = 6 + i*130, y:6:
 //   RB_buildTechChips({ techs: RB_TECHS_SPLIT, y:6, outDirs, capture, vw })
+// v6 T2-ladder glyphs (payload B18, 2026-07-12): Parry / Steel / Suture — the last open technique
+// icons. Same synth pipeline (RB_buildChipOverlay batch at x=6+i*130, y:6); glyph chars + glyphBg
+// mirror core-kits.js `T` (parry DEX green; steel/suture CON gold).
+//   RB_buildTechChips({ techs: RB_TECHS_T2, y:6, outDirs, capture, vw })
+const RB_TECHS_T2 = [
+  ['parry',  '#82a85e', 6,   '❰'], // DEX — held deflecting guard (T1 DEX ward)
+  ['steel',  '#cf9a44', 136, '◆'], // CON — greater ward: solid diamond, T2 of Brace's ◈ outline
+  ['suture', '#cf9a44', 266, '✛'], // CON — greater mend: open cross, T2 of Bandage's ✚
+];
 const RB_TECHS_SPLIT = [
   ['frenzy', ['#c2553f', '#82a85e'], 6,   '⇶'], // STR|DEX — three-arc dual-wield (Reaver)
   ['flurry', ['#c2553f', '#82a85e'], 136, '⇉'], // STR|DEX — fast dual-wield flurry (Reaver)
@@ -184,4 +193,4 @@ async function RB_buildNodes(env) {
   }
   return rects.length;
 }
-if (typeof module !== 'undefined' && module.exports) module.exports = { RB_renderPips, RB_buildTechChips, RB_buildNodes, RB_TECHS_SYNTH, RB_TECHS_V6, RB_TECHS_SPLIT };
+if (typeof module !== 'undefined' && module.exports) module.exports = { RB_renderPips, RB_buildTechChips, RB_buildNodes, RB_TECHS_SYNTH, RB_TECHS_V6, RB_TECHS_SPLIT, RB_TECHS_T2 };

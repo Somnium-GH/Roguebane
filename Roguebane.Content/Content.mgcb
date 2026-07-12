@@ -133,6 +133,28 @@
 /processorParam:TextureFormat=Color
 /build:icons/map/enemy_host_near.png
 
+#begin icons/minion/golem.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/minion/golem.png
+
+#begin icons/minion/hound.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/minion/hound.png
+
 #begin icons/minion/skeleton.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -551,6 +573,17 @@
 /processorParam:TextureFormat=Color
 /build:icons/technique/lunge.png
 
+#begin icons/technique/parry.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/technique/parry.png
+
 #begin icons/technique/sacrifice.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -584,6 +617,17 @@
 /processorParam:TextureFormat=Color
 /build:icons/technique/siphon.png
 
+#begin icons/technique/steel.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/technique/steel.png
+
 #begin icons/technique/stoneskin.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -594,6 +638,17 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:icons/technique/stoneskin.png
+
+#begin icons/technique/suture.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icons/technique/suture.png
 
 #begin icons/technique/swing.png
 /importer:TextureImporter

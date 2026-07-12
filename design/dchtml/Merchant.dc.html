@@ -138,9 +138,17 @@
                   <div data-binds="ware.note" style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#9a8468;line-height:1.6;margin-top:4px;">{{ w.note }}</div>
                   <div data-binds="ware.desc" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:14.5px;line-height:1.5;color:#cdbfa8;margin-top:7px;">{{ w.desc }}</div>
                 </div>
-                <div style="padding:0 12px 10px;display:flex;align-items:baseline;justify-content:space-between;">
+                <!-- SALE price-counter strip (payload B22): the proposed "for sale" signature — a
+                     gold-trimmed counter footer (HELD-chip gold family) carrying the coin + price,
+                     so a sale card is never mistaken for an inventory row (invCard has no counter).
+                     Per-kind chip ART (technique glyph / rune polygon on the sale face) rides the
+                     real-catalog pass — sample names here don't all map to captured glyph ids yet. -->
+                <div data-part="priceStrip" style="border-top:2px solid #6e5026;background:#221a0e;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;">
                   <span data-binds="ware.buyState" style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;padding:2px 6px;color:{{ w.buyColor }};border:1px solid {{ w.buyColor }};">{{ w.buyLabel }}</span>
-                  <span data-binds="ware.price" style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#d9a441;">{{ w.price }}g</span>
+                  <span style="display:flex;align-items:center;gap:7px;">
+                    <span data-binds="ware.priceIcon" data-image-bind="icons/resource/spoils" style="width:20px;height:20px;background:url('Content/icons/resource/spoils.png') center/100% 100% no-repeat;image-rendering:pixelated;"></span>
+                    <span data-binds="ware.price" style="font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;color:#d9a441;">{{ w.price }}g</span>
+                  </span>
                 </div>
               </div>
             </sc-for>

@@ -16,11 +16,15 @@
 
 async function RB_stitchRef(env, tileDir, outPaths) {
   const { readImage, createCanvas, saveFile, log } = env;
+  // env.skip (default 0): number of leading non-tile captures in the dir — a capture run whose
+  // step 0 is the async prep (load pipeline + RB_prepScreenCapture) writes 01-t.png as a throwaway
+  // pane shot and the real tiles land at 02..10; pass skip:1 for that pattern.
+  const skip = env.skip || 0;
   const T = { w: 640, h: 360, cols: 3, n: 9 };
   const canvas = createCanvas(1920, 1080);
   const ctx = canvas.getContext('2d');
   for (let i = 0; i < T.n; i++) {
-    const img = await readImage(tileDir + '/0' + (i + 1) + '-t.png');
+    const img = await readImage(tileDir + '/' + String(i + 1 + skip).padStart(2, '0') + '-t.png');
     if (img.width < T.w || img.height < T.h) throw new Error('tile ' + i + ' smaller than tile size: ' + img.width + 'x' + img.height + ' — pane too small?');
     ctx.drawImage(img, 0, 0, T.w, T.h, (i % T.cols) * T.w, Math.floor(i / T.cols) * T.h, T.w, T.h);
   }

@@ -49,6 +49,14 @@
           </div>
         </sc-for>
       </div>
+      <!-- RETREAT / REDEPLOY (payload B29.3 — replaces the engine-only overlay): ONE button, two
+           authored states. `retreat` = pull the host back to camp mid-node (neutral chrome);
+           `redeploy` = the node is CLEARED — relabels + turns gold (button_on skin, dark label).
+           States carry `label` + `asset` so the relabel/skin swap is data, not a second element.
+           Sample shows REDEPLOY (the current beacon — camp — is cleared). -->
+      <div data-el="retreatBtn" data-anchor="TopRight" data-binds="nav.retreat" data-bind-gate="" data-states="{&quot;retreat&quot;:{&quot;asset&quot;:&quot;ui/button/button_normal&quot;,&quot;color&quot;:&quot;parch&quot;,&quot;label&quot;:&quot;⮐ RETREAT&quot;},&quot;redeploy&quot;:{&quot;asset&quot;:&quot;ui/button/button_on&quot;,&quot;color&quot;:&quot;panelCard&quot;,&quot;label&quot;:&quot;⚑ REDEPLOY&quot;}}" title="Redeploy from this cleared beacon" style="position:relative;width:156px;height:40px;background:url('Content/ui/button/button_on.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:1.5px;color:#1a130c;">⚑ REDEPLOY</span>
+      </div>
       <span data-el="layerNote" data-anchor="TopRight" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#b09a82;">LAYER 2<br></span>
     </div>
   </div>
@@ -338,10 +346,12 @@ class Component extends DCLogic {
     const ST = { taken: { border: '#7fa05a', op: '1' }, current: { border: '#382a1d', op: '1', anim: 'rb-spulse 1.8s ease-in-out infinite' }, future: { border: '#382a1d', op: '.45' } };
     const spineCities = ['taken', 'taken', 'current', 'future', 'future', 'future'].map(s => ({ anim: 'none', ...ST[s] }));
     const ATTR = { STR: '#c2553f', INT: '#6f8fc4', DEX: '#82a85e', CON: '#cf9a44' };
+    // samples mirror the grunt v6 starter kit (the old Sword/Round Shield names were pre-catalog
+    // vestiges, and greaves gate STR, not DEX)
     const packChips = [
-      { name: 'Sword',        color: ATTR.STR },
-      { name: 'Round Shield', color: ATTR.CON },
-      { name: 'Iron Greaves', color: ATTR.DEX },
+      { name: 'Iron Longsword', color: ATTR.STR },
+      { name: 'Wooden Shield',  color: ATTR.CON },
+      { name: 'Iron Greaves',   color: ATTR.STR },
     ];
 
     return { edges, beacons, suppliesPips, supportPips, fortParts, spineCities, packChips,

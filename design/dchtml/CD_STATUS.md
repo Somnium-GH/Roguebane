@@ -28,6 +28,50 @@ with the sources, so the engine side always has the current open-gap status alon
 
 ## OPEN
 
+### 40. `border.colorBind` — accent binds now target the BORDER draw site (B20 / Doug #7); engine apply pending
+- **What (2026-07-12):** the coreCard Core-Effect block's `colorBind:"core.accent"` was engine-drawn as a
+  FULL-RECT fill behind the effect text — a contrast violation Doug reported. The accent is a LEFT-BORDER
+  trim sliver, so the extractor now supports `data-color-bind-target="border"`: the bind is emitted INSIDE
+  the border spec (`border.colorBind`) instead of element-level `colorBind`. Authored on the NewGame
+  coreCard effect block + previewCoreEffect AND Equipment's `coreEffectBlock` (previously a STATIC token —
+  same bug class, it never re-tinted per core).
+- **Consequences (engine, NOT yet done):** apply `border.colorBind` when drawing an element/part border
+  (all sides listed in `border.sides`); element-level `colorBind` keeps its current fill/text semantics.
+- **Related:** `style.coreAccents` is now published in `style_tokens.js` / `layout.json.style` (B20.2)
+  — the per-core accent tokens (grunt…barbarian, lockstep with core-kits.js `CORES.<id>.accent`); read
+  these instead of the engine's flagged stopgap palette.
+- **Status:** OPEN until the engine tints bound borders + reads `style.coreAccents`.
+
+### 39. Encounter FOELESS arrivals (quest / camp / nothing-here) + CityMap retreat→redeploy states (B29) — engine gating/draw pending
+- **What (2026-07-12):** the Encounter shell now hosts non-combat arrivals. (a) `questPanel` (+
+  questTitle/questPrompt/questAccept/questDecline children) — the quest prompt card INSIDE the shell
+  (card-frame chrome, ACCEPT gold / DECLINE neutral), gated on `encounter.quest` (`data-bind-gate`);
+  title/prompt are bound SAMPLES (quest copy/catalog is Doug's separate pass). (b) `campMarker`
+  (icon + CAMP + note), gated on `encounter.camp` — Camp is a foeless encounter so techniques can be
+  pre-activated (HELD/CHARGING still reserve; a TARGETING intent relaxes to READY foeless). (c)
+  "nothing here" = the shell with NO marker — no new elements; the engine resolves neither
+  `encounter.foe` nor quest/camp. The foe cluster (glow, stream, foeFigure, foeHp, foeLabel, reticle,
+  aim tags) must UNMOUNT when `encounter.foe` is unresolved. (d) CityMap gains `retreatBtn` with two
+  authored states: `retreat` (neutral) / `redeploy` (gold, relabelled) — replacing the engine-only
+  overlay. ⚠ the states carry NEW fields: `label` (per-state text swap) and `asset` (per-state
+  ui/button skin swap) — no engine support exists for either yet.
+- **Consequences (engine, NOT yet done):** foe-cluster unmount on unresolved `encounter.foe`;
+  quest/camp element gating; per-state `label`/`asset` swap on `retreatBtn`. The DEX-gated
+  retreat/redeploy TIMER is undecided on the engine side — deliberately NOT designed against (per B29).
+- **Renders:** quest + camp ship as their own refs (`design/01-encounter-quest.png` /
+  `01-encounter-camp.png`) — mutually-exclusive whole-screen states, same rule as the cores.
+- **Status:** OPEN until the engine hosts all three foeless arrivals + the two-state button.
+
+### 38. `countWidth` (data-driven group width + hide-at-zero, B27) — NEW manifest field, engine draw pending
+- **What (2026-07-12):** Equipment `minionColumn` + Encounter `minionGroup` now emit
+  `countWidth: {bind, item, gap, pad, hideAtZero}` — engine width = count×item + (count−1)×gap + pad
+  (design px, bind = `minions.cap` / `loadout.minionCap`), hidden entirely at count 0. This is the
+  declarative form of the design-side reflow (the dc.html computes the same width from bayCap; at
+  MinionCap 0 the sc-if drops the whole column). The static `size` stays the design-sample width, so an
+  engine without the field draws exactly as today (the B27 "always-full-width" cosmetic).
+- **Status:** OPEN until the engine resolves `countWidth` (closes payload B27; supersedes the fixed
+  [170,99] read).
+
 ### 36. `either` (dual-attr technique cost — pay in STR **or** DEX) — NEW manifest concept, no engine draw
 - **What (2026-07-05, Doug):** Frenzy + Flurry are now payable from EITHER pool. `core-kits.js` technique
   defs carry `either: ['STR','DEX']` (order = STR top / DEX bottom); the resolver picks the pool that can
@@ -88,41 +132,22 @@ with the sources, so the engine side always has the current open-gap status alon
 - **Status:** OPEN — floated for a UI + play pass; not locked into DESIGN_SPEC §11. Ride the next
   drop-audit; re-extract `layout.json` + re-render 01/02/05 in the same PR.
 
-### 34. Deterministic per-core gear + reservation model (2026-07-04) — layout.json screens/renders STALE,
-     new technique glyphs uncaptured, mounts hand-patched
-- **What:** `core-kits.js` is now the ONE deterministic source for BOTH screens. It carries per-core
-  STARTER GEAR (weapons/armor/shield per DESIGN_SPEC §7a), a per-core run SCENARIO (part damage →
-  attribute loss + figStates), and a `resolve(core)` pass that computes: weapon/shield STANDING
-  reservation (§6e, hatched pips from the LEFT), armor THRESHOLD gating (no pips; disabled when the
-  pool < threshold or its own covered part breaks), the §6e disable CASCADE (highest-req first, ties
-  last-equipped), §6d technique weapon-gates (twoWeapons/bow/melee/shield), and combat technique/minion
-  states that MATCH the reservation (unaffordable → LOCKED / IDLE). Equipment pool = gear only
-  (techniques don't reserve there, per Doug); Encounter pool = gear hatch + active solid. The paper-doll
-  now HIDES disabled/broken-arm weapons (Figure `hidemounts`). This supersedes #34's old "kit-only, no
-  gear reserve" state.
-- **Consequences (engine/extraction, NOT yet done):**
-  1. `Content/layout.json` `screens.equipment` / `.encounter` + the `design/0N-*.png` / `reference/
-     screens/*` renders are STALE against: the reversed-hatch gear pip (now used on Equipment too, via
-     `pip_reserved_<attr>`), the resolved LOCKED/IDLE states, the richer inventory tiles (effect blurb +
-     rarity + kind·state), the Encounter-style Equipment action-bar cards, and the inventory PAGER.
-     Re-extract + re-render 01/02 (+ 05 unaffected) in the same PR.
-  2. **Inventory PAGINATION** is now real on Equipment (per-tab, `PER_PAGE`=6) — same 3-per-page idiom as
-     Merchant; closes part of #4 for this screen. New asset **`ui/button/button_pager.png`** (88×68,
-     `proto/ui_gen.js` `buildPager`) drives both pagers — in the manifest + mgcb.
-  3. **Paper-doll mounts were HAND-PATCHED** in `layout.json` (human_* + elf_* cores) to the correct
-     starter weapons (grunt longsword+wooden shield, warden longsword+buckler, adept staff, summoner
-     wand+charm, reaver twin daggers, ranger bow+short sword) — `proto/roster_gen.js` still emits the OLD
-     generic mounts (sword/staff/dagger/bow/tower_shield). Reconcile the mount table into roster_gen.js so
-     a regenerate doesn't revert them.
-  4. **New technique/minion GLYPHS** — CLOSED. Minion deploy sprites captured pass 6; the 6 v6
-     technique glyphs (`siphon/sacrifice/barkskin/flurry/aimed_shot/bind`) captured pass 8. All
-     `icons/technique/{id}` imageBinds now resolve.
-  5. **ARMOR reservation semantics** — armor is threshold-gated only (no pool pips), per §6 "light
-     effect layer"; only weapons + the shield OBJECT reserve pool points. If the engine later treats
-     worn armor as a summed pool reservation (the §6e reading), the pool math + the starter-kit fit
-     change — flagged as a Doug call in DROP_AUDIT.
-- **Status:** OPEN — manifest/screens carry the model; engine consumer + re-extraction + glyph capture
-  pending. Ride the next drop-audit.
+### 34. Deterministic per-core gear + reservation model (2026-07-04) — engine consumer pending
+- **What:** `core-kits.js` is the ONE deterministic source for the Encounter/Equipment/NewGame screens.
+  It carries per-core STARTER GEAR, a per-core run SCENARIO, and a `resolve(core, race)` pass computing
+  standing gear reservations, the §6e disable CASCADE, §6d weapon-gates, and combat technique/minion
+  states that MATCH the reservation. The paper-doll HIDES disabled/broken-arm weapons (`hidemounts`).
+- **ARMOR RESERVATION SEMANTICS — CORRECTED (B26, Doug 2026-07-12: "armor consumes pool; eradicate
+  incorrect design documentation in that regard").** Worn armor is a STANDING RESERVATION against the
+  shared per-stat pool, exactly like a wielded weapon or an active technique — a full plate kit CAN
+  visibly crowd out a technique activation on the same stat. This is what `core-kits.js` has implemented
+  since the v6 rewrite (pass 6) and what DESIGN_SPEC's SUSTAIN MODEL + `Body.cs` already do. The old
+  sub-entry here claiming "armor is threshold-gated only (no pool pips)" was WRONG — do not rebuild
+  from it.
+- **Consequences (engine, remaining):** consume the resolved reservation model fields (LOCKED/IDLE
+  states, per-tab inventory PAGINATION idiom — `ui/button/button_pager.png` is in the manifest+mgcb).
+  Re-extraction/renders + glyph capture from the original entry are DONE (passes 6–11).
+- **Status:** OPEN until the engine consumer lands.
 
 ### 32. Worn-armor part set (B12 corrected) + `worn` inventory block — assets/data SHIPPED, engine draw pending
 - **What:** payload B12 CORRECTED (2026-07-04): 744 FULL part sprites under

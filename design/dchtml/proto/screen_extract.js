@@ -229,7 +229,15 @@
       // element's accent colour (applied to the captured colour/fill/border wherever the design used
       // it), so per-core / per-attribute accents stop rendering as the first exemplar's token.
       var cb = el.getAttribute('data-color-bind');
-      if (cb) out.colorBind = cb;
+      if (cb) {
+        // data-color-bind-target="border" (payload B20 / Doug #7, 2026-07-12): the bound accent
+        // colours the element's BORDER (the trim sliver), NOT a full-rect fill — the engine was
+        // painting element-level colorBind as a fill behind text (coreCard Core-Effect contrast bug).
+        // Emitted INSIDE the border spec (border.colorBind) so the draw site is unambiguous.
+        var cbt = el.getAttribute('data-color-bind-target');
+        if (cbt === 'border' && out.border) out.border.colorBind = cb;
+        else out.colorBind = cb;
+      }
       // per-state styling (payload v5 §D): bare name -> style.interactionStates family reference;
       // inline JSON literal -> verbatim spec (palette tokens, never hex).
       var sts = el.getAttribute('data-states');
@@ -237,6 +245,13 @@
         if (sts.charAt(0) === '{') { try { out.states = JSON.parse(sts); } catch (e) { /* bad JSON: skip, never crash the extract */ } }
         else if (STYLE.interactionStates && STYLE.interactionStates[sts]) out.states = Object.assign({ family: sts }, STYLE.interactionStates[sts]);
       }
+      // data-count-width (payload B27, 2026-07-12): DATA-DRIVEN width + hide-at-zero for a group
+      // whose width scales with a live count (the Equipment minionColumn / Encounter minionGroup).
+      // JSON: {"bind":"minions.cap","item":78,"gap":6,"pad":8,"hideAtZero":true} — engine width =
+      // count*item + (count-1)*gap + pad (design px); count 0 hides the element entirely. The static
+      // `size` stays the design-sample width, so an engine without this field draws exactly as today.
+      var cwj = el.getAttribute('data-count-width');
+      if (cwj) { try { out.countWidth = JSON.parse(cwj); } catch (e) { /* bad JSON: skip */ } }
     }
 
     // container PADDING (payload #9 "citymap legend rows overlap their panel's top edge (item pad)"):
@@ -500,7 +515,8 @@
 
   // mirror style_tokens.js into the layout.json `style` block (§8)
   function RB_styleBlock(STYLE) {
-    return { palette: STYLE.palette, fonts: STYLE.fonts, partStates: STYLE.partStates, pip: STYLE.pip,
+    return { palette: STYLE.palette, coreAccents: STYLE.coreAccents, fonts: STYLE.fonts,
+             partStates: STYLE.partStates, pip: STYLE.pip,
              shadows: STYLE.shadows, frames: STYLE.frames, pulse: STYLE.pulse,
              interactionStates: STYLE.interactionStates };
   }

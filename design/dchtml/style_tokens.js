@@ -67,6 +67,14 @@
       rareEpic:   '#e0a23c',
     },
 
+    // ---- PER-CORE ACCENT TOKENS (payload B20.2 — published so the ENGINE reads these instead of
+    // its flagged stopgap palette). Mirrors core-kits.js CORES.<id>.accent — keep in LOCKSTEP; the
+    // NewGame core tiles + Core-Effect trim slivers and the Equipment identity block all paint these. ----
+    coreAccents: {
+      grunt: '#7fa05a', warden: '#cf9a44', adept: '#6f8fc4', summoner: '#9a78b0',
+      reaver: '#c2553f', ranger: '#82a85e', barbarian: '#cf7a44',
+    },
+
     // ---- FONTS (role -> family + intent). Sizes are DESIGN-SPACE px (dc.html px ÷ 2). ----
     fonts: {
       display: { family: "'IM Fell English', Georgia, serif", role: 'world & names (storybook serif)' },

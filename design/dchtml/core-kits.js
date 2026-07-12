@@ -19,13 +19,16 @@
 //   Warden   — Iron Longsword + Iron Buckler; Iron plate ×4 (CON via Fortified) · Jab, Brace, Bandage.
 //   Adept    — Wooden Staff; Cotton Robe + Cloth Cap · Ember, Siphon, Stoneskin.
 //   Summoner — Adept Wand + Wooden Charm; Cotton Robe + Cloth Cap · Ember, Sacrifice, Barkskin · Skeleton.
-//   Reaver   — 2× Iron Dagger; Leather ×4 · Frenzy, Flurry (no heal — glass cannon).
+//   Reaver   — 2× Iron Dagger; Leather ×4 · Frenzy, Flurry, Bandage (CORE_RUNES.md 2026-07-05: the
+//              flat CON part-heal is baseline on every core bar Adept/Summoner — "no heal" retired).
 //   Ranger   — Iron Dagger + Short Bow; Leather ×4 · Aimed Shot, Lunge, Bandage · Hound.
 //
 // CORE EFFECT DISCOUNTS (v6 §A — applied by the resolver, costs below are BASE sheet costs):
 //   Grunt "Jack of All Trades" — every attribute cost −1.
 //   Warden "Fortified"         — plate (STR-line) armor is paid in CON at −1 per tier.
-//   Barbarian "Warlord's Might"— two-handed swords (claymore) cost 2 less STR to equip.
+//   Barbarian "Warlord's Might"— claymores cost 3 less STR; STR plate costs 1 less STR per piece
+//              (CORE_RUNES.md corrected 2026-07-05 — the old −2-claymore-only reading was a hand-math
+//              error; with these discounts Half-Giant clears the full kit at EXACTLY STR 10).
 //   Reaver "Finesse"           — techniques requiring two weapons cost −1.
 //   Ranger "Fletcher's Luck"   — bows cost −1 per tier to equip (the 20% no-charge roll is engine RNG).
 //
@@ -159,6 +162,10 @@ const T = {
   brace:     { name: 'Brace',      attr: 'CON', cost: 2, glyph: '◈', needs: 'shield',     desc: 'Raise your shield and turn each blow aside; pool 4, refills a pip every 2.0s.' },
   bandage:   { name: 'Bandage',    attr: 'CON', cost: 2, glyph: '✚', desc: 'Mend one of your damaged parts, chosen randomly each pass.' },
   bind:      { name: 'Bind',       attr: 'STR', cost: 2, glyph: '⛓', desc: 'A ward of raw sinew and will — a STR shield source; pool 3, refills a pip every 2.5s.' },
+  // v6 T2 ladder (B18 — glyph + copy source for the icon capture; not slotted in any sample kit yet):
+  parry:     { name: 'Parry',      attr: 'DEX', cost: 2, glyph: '❰', desc: 'A held guard — keeps a 1-point ward, refilling a pip every 2.0s.' },
+  steel:     { name: 'Steel',      attr: 'CON', cost: 3, glyph: '◆', desc: 'The greater CON ward — turn each blow aside behind hardened steel.' },
+  suture:    { name: 'Suture',     attr: 'CON', cost: 3, glyph: '✛', desc: 'Mends your most-damaged part, 2 points every 8.0s.' },
   sacrifice: { name: 'Sacrifice',  attr: '—',   cost: 0, glyph: '❖', costLabel: '1 MINION', desc: 'Consume one of your minions to mend your body.' },
 };
 const tk = (key, intent) => ({ ...T[key], intent });
@@ -281,7 +288,7 @@ export const CORES = {
     id: 'reaver', cls: 'Reaver', role: 'THE DUELIST', badge: 'SPECIALIST', accent: '#c2553f',
     figure: 'reaver', budget: 19,
     effect: { name: 'Finesse', rules: 'Techniques requiring two weapons cost 1 less to activate.' },
-    blurb: 'Twin blades, no shield, no heal — pure offense, cheaper in pairs.',
+    blurb: 'Twin blades, no shield — pure offense, cheaper in pairs.',
     // SCENARIO — one leg broken (DEX −3). The leggings disable with the part; both daggers still fit,
     // and the Finesse-discounted pair techniques keep swinging — the glass cannon fights on, unhealed.
     scenario: { damage: { DEX: 3 }, debuff: {}, figStates: { legL: 'broken' } },
@@ -291,7 +298,7 @@ export const CORES = {
       ...PLAIN_LEATHER,
     ],
     techCap: 4,
-    techniques: [tk('frenzy', 'READY'), tk('flurry', 'READY')],
+    techniques: [tk('frenzy', 'READY'), tk('flurry', 'READY'), tk('bandage', 'COOLDOWN')],
     bayCap: 0, bays: [],
     finds: {
       gear: [
@@ -333,13 +340,13 @@ export const CORES = {
   barbarian: {
     id: 'barbarian', cls: 'Barbarian', role: 'THE WARLORD', badge: 'SPECIALIST', accent: '#cf7a44',
     figure: 'barbarian', budget: 14,
-    effect: { name: "Warlord's Might", rules: 'Two-handed swords cost 2 less strength to equip.' },
+    effect: { name: "Warlord's Might", rules: 'Two-handed swords cost 3 less strength to equip; STR plate costs 1 less strength per piece to equip.' },
     blurb: 'A greatsword swung one-handed — Warlord\u2019s Might makes the claymore all but free.',
     // SCENARIO — the sword-arm is BROKEN. A 2H claymore can't be held in a broken arm, so it drops off
     // the paper-doll and Cleave (needs a melee weapon) LOCKS — but the raw-STR Bind ward still holds.
     scenario: { damage: {}, debuff: {}, figStates: { armL: 'broken' } },
     gear: [
-      W('claymore_iron', 'Iron Claymore', 'STR', 3, 'handL', 'iron', 'MAGIC'),
+      W('claymore_iron', 'Iron Claymore', 'STR', 5, 'handL', 'iron', 'MAGIC'),
       ...IRON_PLATE,
     ],
     techCap: 3,
@@ -347,7 +354,7 @@ export const CORES = {
     bayCap: 1, bays: [],
     finds: {
       gear: [
-        W('claymore_steel', 'Steel Claymore', 'STR', 3, 'handL', 'steel', 'RARE'),
+        W('claymore_steel', 'Steel Claymore', 'STR', 5, 'handL', 'steel', 'RARE'),
         AR('armor_str_chest_steel', 'Steel Breastplate', 'STR', 'torso', 2, 'steel', 'RARE'),
       ],
       tech: [{ ...T.jab }, { ...T.brace }],
@@ -396,7 +403,10 @@ export function gearGate(coreId, piece) {
     attr = 'CON'; cost = Math.max(0, cost - (TIER_NUM[piece.tier] || 1));
   }
   if (coreId === 'ranger' && /^bow_/.test(piece.id)) cost = Math.max(0, cost - (TIER_NUM[piece.tier] || 1)); // Fletcher's Luck
-  if (coreId === 'barbarian' && /^claymore/.test(piece.id)) cost = Math.max(0, cost - 2);   // Warlord's Might (2H sword)
+  // Warlord's Might (CORE_RUNES.md corrected 2026-07-05): claymore −3 AND STR plate −1/piece —
+  // claymore 5−3=2 + plate 4×(2−1) + Cleave 2 + Bind 2 = STR 10 (Half-Giant's exact fit).
+  if (coreId === 'barbarian' && /^claymore/.test(piece.id)) cost = Math.max(0, cost - 3);
+  if (coreId === 'barbarian' && piece.kind === 'armor' && piece.attr === 'STR') cost = Math.max(0, cost - 1);
   if (coreId === 'grunt' && ATTR[attr]) cost = Math.max(0, cost - 1);            // Jack of All Trades
   return { attr, cost };
 }
@@ -573,8 +583,14 @@ export function poolRows(core, mode, raceId) {
     for (let i = 0; i < free; i++)   cells.push({ bg: '#241b14',          bd: '#0a0807', style: 'solid', state: 'empty',    asset: 'pip_empty' });
     for (let i = 0; i < deb; i++)    cells.push({ bg: HASH.deb,           bd: '#0a0807', style: 'solid', state: 'debuff',   asset: 'pip_debuff' });
     for (let i = 0; i < dmg; i++)    cells.push({ bg: HASH.dmg,           bd: '#0a0807', style: 'solid', state: 'damage',   asset: 'pip_damage' });
-    return { key: k, part: PART[k], color: ATTR[k], alloc: gear + active, available: avail,
-             availColor: availColor(dmg, deb), pips: cells };
+    // B28 (Doug 2026-07-09): readout reads current/max like every other pool in the game —
+    // available (unallocated free, LEFT, neutral) / total (capacity, RIGHT, flag-coloured only when
+    // damaged). `alloc`/`available:avail` retired (clean rename, no dual-name); the reserved count
+    // still reads off the pip strip. totalColor gates the flag on damage (white when undamaged).
+    return { key: k, part: PART[k], color: ATTR[k],
+             total: total, available: free, damaged: dmg, debuffed: deb,
+             totalColor: dmg > 0 ? availColor(dmg, deb) : '#ece0cb',
+             pips: cells };
   });
 }
 

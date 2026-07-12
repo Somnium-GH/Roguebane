@@ -86,8 +86,26 @@ async function RB_buildAtoms(env) {
     x.fillStyle=OUT; x.beginPath(); x.arc(S*0.40,S*0.46,S*0.065,0,7); x.fill(); x.beginPath(); x.arc(S*0.60,S*0.46,S*0.065,0,7); x.fill();
     poly(x,[[S*0.47,S*0.54],[S*0.53,S*0.54],[S*0.5,S*0.61]]); x.fill(); out['icons/minion/skeleton']=c; })();
 
-  for(const k in out) await saveFile('Content/'+k+'.png', out[k]);
-  log('UI atoms ('+Object.keys(out).length+'):', Object.keys(out).join(', '));
-  return Object.keys(out);
+  // ---------- MINION — iron golem (payload B18): riveted iron visage, same flat-pictogram register
+  // as the skull (fill + slit eyes + rivets, bold black outline). ----------
+  (function(){ const [c,x]=cv(S,S); x.translate(0,S*0.02);
+    shape(x, ()=>poly(x,[[S*0.30,S*0.20],[S*0.70,S*0.20],[S*0.76,S*0.34],[S*0.72,S*0.70],[S*0.60,S*0.80],[S*0.40,S*0.80],[S*0.28,S*0.70],[S*0.24,S*0.34]]), '#9aa0a6', S);
+    x.fillStyle=OUT; x.fillRect(S*0.34,S*0.42,S*0.115,S*0.06); x.fillRect(S*0.545,S*0.42,S*0.115,S*0.06);   // slit eyes
+    x.fillRect(S*0.44,S*0.60,S*0.12,S*0.05);                                                                // mouth seam
+    [[S*0.33,S*0.27],[S*0.67,S*0.27],[S*0.31,S*0.66],[S*0.69,S*0.66]].forEach(([X,Y])=>{ x.beginPath(); x.arc(X,Y,S*0.028,0,7); x.fill(); });  // rivets
+    out['icons/minion/golem']=c; })();
+
+  // ---------- MINION — hound (payload B18): pricked-ear head in profile, flat + outlined. ----------
+  (function(){ const [c,x]=cv(S,S); x.translate(0,S*0.03);
+    shape(x, ()=>poly(x,[[S*0.28,S*0.18],[S*0.42,S*0.30],[S*0.58,S*0.30],[S*0.80,S*0.46],[S*0.80,S*0.55],[S*0.62,S*0.58],[S*0.52,S*0.72],[S*0.34,S*0.70],[S*0.24,S*0.50],[S*0.24,S*0.32]]), '#a97d4f', S);
+    x.fillStyle=OUT; x.beginPath(); x.arc(S*0.42,S*0.44,S*0.05,0,7); x.fill();                              // eye
+    x.beginPath(); x.arc(S*0.77,S*0.49,S*0.045,0,7); x.fill();                                              // nose
+    out['icons/minion/hound']=c; })();
+
+  const names = env.only ? Object.keys(out).filter(k => env.only.includes(k)) : Object.keys(out);
+  const dirs = env.outDirs || ['Content'];   // pass ['Content','drop/Roguebane.Content'] to land straight in the drop
+  for (const k of names) for (const d of dirs) await saveFile(d + '/' + k + '.png', out[k]);
+  log('UI atoms ('+names.length+'):', names.join(', '));
+  return names;
 }
 if (typeof module !== 'undefined' && module.exports) module.exports = { RB_buildAtoms };

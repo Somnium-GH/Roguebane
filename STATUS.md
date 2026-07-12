@@ -1,3 +1,78 @@
+## ✅ RE-ARM — CD DROP PASS 11 PROCESSED (2026-07-12) — LOOP MAY RESUME
+Correction to the STOP block below: the drop wasn't staged in `.drop/` — it was already unpacked
+directly into the working tree (uncommitted) when I checked, matching CD's own
+`design/dchtml/DROP_AUDIT.md` "pass 11" entry (payload B18/B20/B22/B26/B27/B29/B30/B31 + doc closes).
+Guards run, results below. **Loop: resume normal STATUS work; this block's items below are the new
+priorities, ranked highest-first.**
+
+**Guards:**
+- `layout.json` parses clean (python `json.load` roundtrip). ✅
+- `tools/drop_audit.py`: 6 extraction gaps reported, NONE block accepting this drop —
+  `minionField`/`minionFieldLabel`/`encounter.minions.sprite` (Encounter) and `minions.hotkey`
+  (Equipment) are **PRE-EXISTING**, byte-identical in `HEAD` before this drop landed (verified via
+  `git show HEAD:...`) — old, standing debt, not a pass-11 regression; leaving as-is, not reprioritizing
+  off this drop. `questPanel`/`campMarker` "no content/sample literal" are **EXPECTED per CD's own
+  notes** (CD_STATUS #39: "copy = bound SAMPLES, quest catalog stays Doug's pass" — deliberately blank
+  pending Doug's quest-content pass, not a defect).
+- **⚠ GAP FOUND, needs a fix before the new icons will actually build:** the 5 new icon assets
+  (`icons/technique/{parry,steel,suture}.png`, `icons/minion/{golem,hound}.png`) are appended to
+  `Roguebane.Content/Content.mgcb` (CD's own copy) but **NOT mirrored into
+  `Roguebane.Game/Content/Content.mgcb`** — the copy the actual build reads (this repo's own standing
+  gotcha, not new). Files exist on disk (`Roguebane.Content/icons/...`), just not wired for the game
+  build yet. Mirror the 5 `#begin`/`/build:` blocks across before anything tries to render these icons.
+
+**‼ TOP PRIORITY — root-caused Doug's live bug report (screenshot: an empty "QUEST" box floating over
+a REAL combat encounter, foe alive at 19/28 HP).** This is a genuine ENGINE gap, not a CD mistake — CD's
+own notes flag it as open (CD_STATUS #39: "OPEN until the engine hosts all three foeless arrivals").
+Root cause, precise: `DrawManifestElement`'s existing "data-bind-gate" check
+(`Game1.ManifestRenderer.cs:71-79`, doc comment: "a closed gate draws nothing, chrome included — never
+an empty box") is scoped to `e.Type == "text"` and `e.Type == "icon"` ONLY. `questPanel` and
+`campMarker` (`layout.json`, both `"type": "panel"`, `binds: "encounter.quest"` /
+`binds: "encounter.camp"` respectively) fall completely outside that check — nothing in the renderer
+gates a panel-type element at all, so both draw UNCONDITIONALLY on every single encounter regardless of
+node type (the lone exception, `foeFigure`, only avoids this because it has its own hand-written
+special case at line 344, not the generic gate). Compounding it: `ResolveScreenBind`
+(`Game1.ManifestRenderer.cs:560+`) has no case for `"encounter.quest"` or `"encounter.camp"` at all yet
+— both binds need to resolve to something non-null ONLY when the current node is actually that type
+(`Exp.AtQuest`-style check / `Map.Current.Type`), null otherwise. **Fix, two parts:** (1) generalize the
+bind-gate check to cover container/panel-type elements too (not just text/icon) — any element with a
+non-empty `Binds` that resolves null should draw nothing, full stop; (2) add the two missing
+`ResolveScreenBind` cases so `encounter.quest`/`encounter.camp` actually resolve false outside their
+real state. **Also verify the questPanel/campMarker CHILDREN** (questTitle/questPrompt/questAccept/
+questDecline, camp's icon+note) — the draw loop is a flat `OrderBy(Z)` pass, not a parent→child
+skip-cascade, so gating the parent panel alone may not stop children from independently drawing; each
+child likely needs the same bind-gate (or an explicit parent-gate check) so the whole cluster
+disappears together, not just its background chrome. Add a Core/shell test: render `encounter` with no
+quest/camp/foe state resolved and assert neither `questPanel` nor `campMarker` (nor their children)
+paint anything.
+
+**What else this drop unblocks (reprioritize forward, formerly-blocked work):**
+- **B30 (technique bars 4th card) — CD says fixed, landed in this drop's `layout.json`.** Verify live:
+  a 4-technique kit (e.g. Adept) should show all 4 action-bar cards on both Equipment and Encounter now.
+- **B31 (Encounter CON row) — CD says fixed** (`poolRows` grown to `[309,82]`). Verify live against the
+  earlier screenshot repro — CON should now render on Encounter same as Equipment.
+- **B27 (minion column reflow) — NEW engine work, not yet built:** `countWidth` is a brand new manifest
+  field (`{bind, item, gap, pad, hideAtZero}` — CD_STATUS #38) requiring an ENGINE implementation:
+  width = `count×item + (count−1)×gap + pad`, hidden entirely at count 0. No engine code reads this
+  field yet — build it, then Equipment `minionColumn` + Encounter `minionGroup` pick it up automatically.
+- **B20/#40 (coreCard accent contrast) — NEW engine work:** `border.colorBind` (bind resolves INSIDE
+  the border spec, tints the border only, never a full-rect fill) needs engine support — apply it when
+  drawing any element/part border. Also read the newly-published `style.coreAccents` token block
+  instead of the current flagged stopgap per-core palette.
+- **B29 CityMap retreat/redeploy — NEW engine work:** `retreatBtn` now carries two states (`retreat`
+  neutral / `redeploy` gold) with NEW per-state `label` (text swap) and `asset` (skin swap) fields —
+  no engine support exists for EITHER field yet on any button. This is a broader primitive than just
+  this button; check whether other buttons will want per-state label/asset swaps before building a
+  one-off.
+- **Reaver kit + Barbarian STR correction (B20 content, no engine work):** `core-kits.js` resynced to
+  `design/systems/CORE_RUNES.md` — Reaver now carries Bandage (no-heal framing retired); Barbarian's
+  Warlord's Might corrected (claymore −3 AND STR plate −1/piece, kit demand recalculated to STR 10).
+  Confirm `design/systems/CORE_RUNES.md` doesn't need a reconciliation pass on our side — this reads
+  like CD following our existing doc, not introducing a new number, but worth a quick cross-check.
+
+**Not this drop's problem, no action:** the 4 pre-existing extraction gaps above; `#35` (parent-relative
+positioning, still engine-pending, unrelated); `#33` (prototype Core Effects note, informational).
+
 ## ‼ URGENT CORRECTION (2026-07-12, Doug) — the CardPress fix the loop ALREADY SHIPPED for the
 ## Self-technique deactivate bug went the WRONG DIRECTION; the rule is the opposite of what was built
 **The loop already landed a fix** (`CombatTargeting.cs:20-33`, current code): `if (t.IsPassive ||

@@ -7,32 +7,6 @@ moves to **## Confirm-to-Close** (one line, nothing to do but clear it from memo
 
 ## Open
 
-### Armor-Reservation Doc Correction (B26)
-`CD_STATUS.md` #34 has the model backwards — it states armor is "threshold-gated only (no pool
-pips), only weapons + the shield object reserve pool points." That's not the design. Doug's ruling:
-**"Armor consumes pool, eradicate incorrect design documentation in that regard."** The real model
-(already locked in our `DESIGN_SPEC.md` SUSTAIN MODEL paragraph, already how `Body.cs` behaves): worn
-armor is a standing reservation against the shared per-stat pool, exactly like an active technique or
-a wielded weapon — a full plate kit CAN visibly crowd out a technique activation on the same stat, not
-just a one-time equip threshold. No engine or DESIGN_SPEC change needed on our side. Ask: fix your #34
-entry so future asks/QA built off it don't drift.
-
-### Attribute Bar Order, Color & Rename (B28)
-`attrBar`'s two number slots need a reorder, a color-binding fix, and a rename — one coordinated ask,
-same element. `design/dchtml/Equipment.dc.html` (~line 106-109) and its extracted `layout.json:10901`
-currently read, left to right: `attrs.alloc` (total capacity), `/`, `attrs.available` (current free,
-colored via `a.availColor`). Every other pool readout in the game (HP, Supplies, Charge, Summons, the
-Equipment/minion "slotted" counts) shows current-value / max — this is the one place that puts the
-max on the left. Confirmed native to your own authored source, not our extraction — a `.dc.html`/
-`layout.json` ask only. **Full spec:** left slot = `attrs.available` (unallocated, decreases as
-gear/techniques reserve it); right slot = the total-capacity field, RENAMED from `attrs.alloc` to
-**`attrs.total`** (matches how HP/Supplies/Charge already talk about themselves — current/max, never
-"alloc"). The right slot's color is CONDITIONAL: white/neutral when `attrs.damaged == 0`, only
-switches to the flag color when `attrs.damaged > 0` — move `availColor` off `attrs.available` and
-onto `attrs.total`. Rename `attrs.alloc`/`pool.attr.alloc` → `attrs.total`/`pool.attr.total`
-everywhere authored, clean rename, no dual-name fallback, then re-extract. Our side renames the
-matching bind-resolution switch in lockstep.
-
 ### Attribute Pip Stretch — Prototype Parity (B32)
 Your own mockup/prototype doesn't stretch pip rows to a common width — a preview parity gap, not a
 shipping bug. A reference screenshot shows 4 attribute pip rows at different capacities (4/8/4/8),
@@ -44,62 +18,45 @@ bring your own prototype/`.dc.html` preview's pip rendering in line with stretch
 reference material stops visually contradicting what's actually shipping — low urgency, doesn't block
 anything, just keeps future design review from being misled by a stale-looking mockup.
 
-### Audit Key-Set Diff (B1b)
-Add a key-set diff (screens/templates vs. the previous manifest) to your pre-ship audit, so a
-silently dropped screen can't ship again (the campaignmap-loss class — you re-included it, the guard
-ask still stands; we run the same diff drop-side).
+### Contextual Encounter Backgrounds — Camp / Quest / Resource Nodes (NEW, Doug direction — not urgent, real new work)
+Doug, on seeing the current `campMarker` placeholder (B29): **"the CAMP icon on the encounter screen
+isn't what we're going for... the real solution is real new work."** Today literally every encounter —
+Skirmish, ResourceHold, Camp, Quest, Castle, all of them — draws the SAME single hardcoded backdrop
+(`bg/combat_field.png`, `Game1.cs:1315`), so nothing about the scene reflects what kind of node you're
+actually at. The direction Doug wants instead:
 
-### Bow Sprites Missing (B11)
-The gear catalog + sprite set covers every ladder except bows (Short/Long/Compound/Elven — §6d ranged
-slot). The old `sprites/gear/bow.png` doesn't cover the new convention. Ask: 4 bow sprites
-(`bow_short`, `bow_long`, `bow_compound`, `bow_elven`) + catalog rows; engine ids will chase.
+- **A sense of journey.** The Encounter background should make the player feel like they're traveling
+  from camp, through the surrounding lands, toward the city — not standing in the same generic field
+  every single fight.
+- **Camp** gets its own backdrop that actually reads as a camp — Doug's specific suggestion: push the
+  scene so the RIGHT side of the screen (where a foe normally stands) shows camp-in-the-foreground —
+  campfire, tents, gear — so a camp visit feels like you're sitting at your own camp, not facing an
+  empty field with an icon floating over it. This replaces `campMarker`'s current icon+note treatment
+  entirely, not just its art.
+- **Quest and Skirmish nodes** get terrain-appropriate backdrops — a forest quest gets a forest
+  background, a mountain quest gets a mountain background, etc. Doug's framing: "the quests can
+  involve those features" — i.e. this isn't just decorative, the backdrop is meant to be available for
+  quest CONTENT (Doug's own separate quest-catalog pass) to actually reference/interact with later.
+- **ResourceHold** nodes get operation-themed backdrops — his examples: a quarry, a lumber operation.
+  Reads like more than one variant is wanted here (plural examples), not a single generic "resource"
+  backdrop.
 
-### CityMap Node Hover/Current States (B8)
-CityMap's beacon-graph nodes have no CD-authored hover or current-position treatment at all (checked
-DESIGN_SPEC — never specified). Today the engine hardcodes a bare stopgap in C# (hover = swap border
-between two flat colors; current = static amber ring, no animation) because there's no template/
-states data for these nodes — unlike `cityNode` (CampaignMap's spine template), which DOES author
-`states.current: {border:"amber", glow:true}`. Note `glow` isn't implemented engine-side anywhere
-either (dead data), so even where you've signaled a pulsing/glowing intent, we have no primitive for
-it yet. Two asks: (a) author real hover/current states for the CityMap beacon nodes, not just the
-CampaignMap spine; (b) tell us what `glow:true` should actually look like (steady? pulse rate?) so we
-build the primitive once and wire both screens to it.
-
-### Encounter Attribute Pool — CON Row 1px Short (B31)
-The Encounter screen's Attribute Pool (the `poolRows`/`poolRow` template — a separate element from
-Equipment's working `attrReadout`/`attrBar`) drops its 4th (CON) row, a 1px VERTICAL shortfall of the
-same class as B25/B30. Root-caused against the real `layout.json`:
-- **CON row missing** (`layout.json:5825` `poolRows`): container `size:[309,77]`, item `poolRow`
-  `size:[309,15]` gap `6`, vertical → 4 rows need `4*15 + 3*6 = 78`, region offers only `77`. The 4th
-  row (CON) never gets placed. Ask: grow `poolRows.size[1]` to ≥78 (a couple px slack recommended —
-  zero-margin fit even before the shortfall).
-On the `poolRows` template only; Equipment's `attrReadout` is unaffected. Purely a CD-authored region
-resize. (The sibling "6th pip drops" half of this item was resolved engine-side — the attribute pip
-strips now stretch each bar's pips to fill their region regardless of count, so a 1px-short pip row no
-longer clips; that half is no longer a CD ask. This vertical row-height half still needs the widen.)
-
-### Encounter Shell Hosts Non-Combat — Quest, Camp, Nothing-Here (B29)
-The Encounter screen shell needs to host non-combat arrivals — Quest, "nothing here," and Camp —
-plus a quest card template and a header-button state change. `NodeType.Quest` had no Game-layer
-template at all (the crash from entering one is fixed engine-side, not a CD ask). Today it's patched
-as an ad-hoc popover floated over the CityMap chart (`Game1.CityMap.cs`'s `DrawQuestScreen()` — a
-flagged, explicitly-not-finished stopgap: raw panel, literal "QUEST [PLACEHOLDER]" title, generic Y/N
-buttons). Wrong host: the quest prompt should render inside the Encounter screen shell instead
-(foeless, no enemy present) — "partly to make it feel like you're moving" — and the same shell needs
-two more cases: a node with no quest and no combat ("nothing here," likely no popover, just the
-arrive beat), and Camp, which should also become a foeless "empty encounter" so a player can
-pre-activate techniques and have them already charging before the next real fight (only Sustained/
-shield techniques auto-activate on encounter entry now — Timered attacks wait for the player, so Camp
-is where you'd prep them). Ask: (1) a real `quest` card template — prompt text + Accept/Decline
-actions, matching the Merchant/Equipment panel chrome (quest content/catalog is Doug's own separate
-pass, this is just the template); (2) confirm the Encounter shell can render foeless for all three
-cases; (3) the CityMap's RETREAT button needs a second visual state — relabels to REDEPLOY, turns
-gold, once a node clears, replacing a standalone engine-only overlay that exists today. A DEX-gated
-timer on Retreat/Redeploy availability is coming but the exact shape/UX is still undecided on our
-side — don't build against a guessed timer yet.
+**This is already your existing pipeline, not a new asset category.** `combat_field.png` (and
+`build_alcove`/`map_chart`/`merchant_stall`/`spine_road`) are all procedurally generated by
+`design/dchtml/proto/bg_gen.js` — deterministic canvas drawing (gradients, EGA dither, silhouette
+skylines, starfields/embers, vignette), no hand-painted source art, per that file's own comment
+("Procedural stand-in like every backdrop — Doug's call, no hand-painted scene art"). Each background
+is just one self-contained block in that file using the shared helper toolkit. New contextual variants
+(forest/mountain quest terrain, quarry/lumber ResourceHold, camp-foreground Camp) are the same pattern —
+more blocks in `bg_gen.js`, same toolkit, ships via `asset-manifest.js`/`Content.mgcb` like any other
+asset. On our side: once there's more than one Encounter backdrop, the engine needs a background PICKED
+per node type (currently one hardcoded call, `Game1.cs:1315`) — small, not something to build ahead of
+the art. **Status:** open-ended on exact variant count/list — Doug flagged this as "real new work" in
+volume, not mechanism, so scope the actual set together rather than treating this as a quick single-shot
+ask.
 
 ### Figure + Gear Asset Regen Batch (B2-GO)
-The commissioning order — the whole batch:
+Bow sprites landed (see Confirm-to-Close) — the rest of the batch is still open:
 1. **Weapon sprites** — ONE silhouette per type, FOUR material palettes (Iron → Steel → Mithral →
    Dwarven Steel), hand-socket mounts per LAYOUT_CONTRACT: Longsword · Axe · Mace · Claymore ·
    Battleaxe · Warhammer · Dagger · Rapier · Short Sword.
@@ -107,12 +64,10 @@ The commissioning order — the whole batch:
    hand-socket mounts · wands are HAND items now (hand-socket mount; dual = one per hand; never
    alongside bow/sling) · a ranged BACK-MOUNT layer (bow/sling) so an equipped ranged weapon renders
    while melee hands are full.
-3. **Armor worn-layers:** DONE — see B12 in Confirm-to-Close, no longer part of this batch's open
-   scope.
-4. **Race × core figure regen** on the established part/z-list contract (robe figures stay
+3. **Race × core figure regen** on the established part/z-list contract (robe figures stay
    legitimately ~12-part); fix the elf_ranger chest-accent neckline in this batch (strap sits too
    high, reads as fused to the head).
-5. **Ship with:** updated figure defs + asset inventory in `layout.json`, mgcb source updates (we
+4. **Ship with:** updated figure defs + asset inventory in `layout.json`, mgcb source updates (we
    mirror game-side), refreshed 00-assets sheets. Our smoke-figures + asset-exists probes verify
    completeness on landing — an inventory list in the drop notes helps us confirm fast.
 
@@ -120,25 +75,11 @@ Note: figure-MORPH mechanics residuals (§7/§17 #15) are our composition questi
 proceed on the current contract; propose contract changes in drop notes, don't block.
 
 ### Merchant Sale Card Art (B22)
-Merchant gear/technique/rune SALE cards — placeholder now, real art next batch, no rush, doesn't
-block our mechanic work. We're building the buy/sell mechanic (real gold cost, real stash wiring) on
-stubbed presentation — reused/generic chrome, flagged as a placeholder, not shipped silently as final.
-Ask for your next batch: dedicated SALE card art/states for gear, technique, and rune wares distinct
-from the existing `wareCard` — whatever visual distinction you'd want between "in my inventory"
-(`invCard`) and "for sale" (a `wareCard` cousin) is yours to propose; no locked design opinion here
-beyond "don't reuse invCard's chrome unchanged forever."
-
-### Minion Column Reflow at 0 Cap (B27)
-`CD_STATUS.md` #33's claimed "minion column collapses at 0 minion-cap, width scales with count"
-reflow does not exist — confirmed by live render (Adept, Reaver at 0 minion-cap), not just reading
-the schema. `equipment`'s `minionColumn` (`layout.json:7215`) is a fixed `size:[170,99]` panel, no
-conditional-visibility or data-driven-width field anywhere in the schema. At MinionCap 0 it still
-renders full-width with a correct "MINIONS - 0/0 slotted" label, just an empty list body — no crash,
-no wrong data, just always-full-width. Same class of finding as the tab-row dead-space items below.
-Ask: if you want the column to shrink at 0 cap or scale with live count, that needs either (a) a new
-conditional-width/hide-when-empty field on `Element`, or (b) telling us which cap tiers map to which
-pixel widths so it's threshold-authored per screen state — your call. Not blocking, low urgency,
-cosmetic only.
+The SALE card grammar itself landed (gold-trimmed `priceStrip` footer on `wareCard` — BUY/short-of-coin
+chip + spoils coin + price, the visual signature an `invCard` never has) — that structural half is done,
+see Confirm-to-Close for the next batch scope. Still open: **per-kind chip ART** (technique glyph / rune
+polygon on the sale face) — deliberately deferred on your side pending the real sale catalog (sample
+names don't all map to captured glyph ids yet), no rush, doesn't block our mechanic work.
 
 ### Minion Combat Card — Name/Description Vertical Overlap (B34)
 Doug (2026-07-12 playtest): the Hound minion card's description text overlaps its name/attr —
@@ -157,53 +98,22 @@ the card is 136px tall). `.dc.html` + re-extracted `layout.json`. No engine chan
 template already renders correctly with the same fields.
 
 ### Re-Extraction for the v6 Roster (B20)
-The big one — the engine renders only what the manifest authors, so everything here is render-blocked
-until it lands.
-1. The 01/02-`<core>` refs show elements the manifest doesn't author yet: per-core STAT-BONUS chips
-   (`core.statBonus` list on the NewGame coreCard + Equipment identity block; one colored chip per
-   non-zero stat: Grunt +1 all · Warden +5 CON · Adept +5 INT · Summoner +3 INT/+2 CON · Reaver +5
-   DEX · Ranger +4 DEX/+1 CON · Barbarian +4 STR/+1 CON), action-bar cards with rules text (name +
-   cost + italic description + footer state line), and the "minions" label vocabulary. New Core-Effect
-   copy is in `design/systems/CORE_RUNES.md` — some rules text runs long (Ranger's compound sentence),
-   size the coreEffect rects for it.
+The coreCard accent contrast fix + accent tokens landed (see Confirm-to-Close) — the rest of the
+re-extraction is still open, the engine renders only what the manifest authors:
+1. Per-core STAT-BONUS chips (`core.statBonus` list on the NewGame coreCard + Equipment identity
+   block; one colored chip per non-zero stat: Grunt +1 all · Warden +5 CON · Adept +5 INT · Summoner
+   +3 INT/+2 CON · Reaver +5 DEX · Ranger +4 DEX/+1 CON · Barbarian +4 STR/+1 CON), action-bar cards
+   with rules text (name + cost + italic description + footer state line), and the "minions" label
+   vocabulary. New Core-Effect copy is in `design/systems/CORE_RUNES.md` — some rules text runs long
+   (Ranger's compound sentence), size the coreEffect rects for it.
 2. NewGame re-author for the grown roster: 5 races × 7 cores (raceCards/coreCards currently seat
-   2×6 — cells past the container silently drop, so the screen can't show the new picks). Each core
-   tile carries its core's BG color + Core-Effect trim color — publish the per-core accent tokens in
-   the style block so the engine reads them instead of our flagged stopgap palette.
-   - **coreCard Core-Effect accent is a full fill behind the text — contrast bug (Doug #7).** The
-     `coreCard` effect block (`layout.json:12681`, rect `[8,174,136,41]`) carries
-     `colorBind:"core.accent"`, which the engine renders as a FULL-RECT fill — so the per-core accent
-     paints the entire block behind the effect name (y183) and desc (y196), a contrast violation Doug
-     reported directly. The **Equipment** screen's `coreEffectBlock` (`:7035`) is the correct
-     reference: it shows the accent as a LEFT-BORDER sliver (`border.sides:["left"]`) over a plain
-     `ink` panel, no fill. Ask: on the re-authored `coreCard`, apply `core.accent` to the block's
-     LEFT-BORDER color (the trim sliver), NOT as a full-rect `colorBind` fill — match the Equipment
-     treatment so the effect text stays legible.
+   2×6 — cells past the container silently drop, so the screen can't show the new picks).
 3. Refresh the stale refs to v6 data: 05-newgame (new roster + tile colors), 03/07 if their strips
    show core identity; a `01/02-*-<core>` set for any future core additions. Race-card art/portraits +
    final race blurbs/tags for Dwarf/Halfling/Half-Giant (Doug supplies copy) ride here too.
 4. FYI: mock numbers in the refs that disagree with the systems docs (e.g. Claymore "6 dmg · 1.4×" vs
    WEAPONS.md's 7 dmg · 1.3×) are non-canon — docs win, no action needed unless you'd rather
    regenerate the copy.
-
-### Resolution-Independence Invariant — No Absolute Positioning (B21)
-The CD-authoring half of this is DONE (the `parent`-field re-extraction landed, 160 `parent` keys
-across the 6 screens, confirmed on the real tree) — confirm-to-close, clear the build work from
-memory. The remaining half is engine-side (recursive parent-box resolution), not a CD ask. What's
-still worth keeping visible: the standing rule this bug produced, which should live permanently in
-your dev-loop guide so the class of bug can't recur —
-
-> **No absolute positioning (resolution-independence).** A screen element's position must be a pure
-> function of its anchor, its design-px offset, its parent box, and the screen size — never its raw
-> pixel coordinate on the fixed 1920×1080 authoring stage. Every positioned element gets an explicit
-> `data-anchor` (one of the 9 anchors) OR is nested in a parent and positioned relative to it. Grouped
-> elements (panel + contents, readout + pips, card innards) are authored as true parent→child
-> containment so the group reflows as one unit — never as sibling stage-absolutes. Before shipping a
-> screen, re-render it at a non-1920×1080 size (≥1 larger + ≥1 off-aspect) and confirm zero drift/
-> gaps/overlap. A layout that only lines up at exactly 1920×1080 is a bug.
-
-Also written into `design/LAYOUT_CONTRACT.md` §3, so it's binding regardless of whether this note
-stays here.
 
 ### ResourceStrip Value Text — 4px Slot Clips "current/max" (B33)
 Doug (2026-07-12 playtest): the top resourceStrip reads as illegible — "only GOLD's number is
@@ -221,54 +131,47 @@ push/reflow the label (and likely the 47px chip width + the strip's own `size[0]
 1px nudge — the slot is ~6× too narrow, not a razor-margin shortfall. One template fix covers all five
 screens' strips.
 
-### Technique + Minion Icons Still Needed (B18)
-Flurry, Aimed Shot, Siphon, Barkskin, Sacrifice, Bind, and the Frenzy/Flurry two-badge split-fill are
-all landed (confirm-to-close, see below). **Still needed for the v6 kits — the only open icons:**
-Parry, Steel, Suture (technique glyphs — absent from the tree); minion icons Iron Golem, Hound (only
-`skeleton.png` is in `icons/minion/`). Icons + mgcb source (we mirror game-side). (Rapier/Staff/
-Charm/Tome weapon sprites are tracked in Figure + Gear Asset Regen above, not here.)
-
-### Technique Action-Bar Lists Are 1px Short For a 4th Card (B30)
-Root-caused STATUS.md items 10/11 (Doug's "4th technique invisible" + "action bar shows the wrong
-abilities" reports): both are the SAME bug, and it's purely a region-width shortfall in your authored
-sizes, not an engine cap. `ListLayout.Cells` (`Roguebane.Core/Layout/ListLayout.cs:44`) deliberately
-drops any cell whose right edge would exceed its list region (overflow:hidden, by design — the same
-rule that clips an oversized HP-pip strip) — but for BOTH technique bars, the region is exactly 1px
-narrower than 4 cells actually need:
-- `equipment` screen's `loadoutList` (`layout.json:7187-7213`): region `size:[613,89]`, item
-  `size:[149,89]` gap `6` → 4 cells need `4*149 + 3*6 = 614`, region only offers `613`. The 4th
-  `loadoutCard` silently drops. (Its sibling `techSlotCount` label right above it already samples
-  `"TECHNIQUES · 3 / 4 slotted"` — the 4-slot design is already assumed elsewhere on the same screen,
-  just not sized for.)
-- `encounter` screen's `techList` (`layout.json:5930-5955`): region `size:[433,136]`, item
-  `size:[104,136]` gap `6` → 4 cells need `4*104 + 3*6 = 434`, region only offers `433`. Same drop.
-Both parent panels have plenty of spare width to absorb the fix (`equipment`'s `actionBar` is 810px
-wide, `encounter`'s is 630px, vs. the ~613-620/~433-440 the lists themselves occupy) — this isn't a
-"nothing fits" constraint, just a rounding/authoring gap. Ask: widen `loadoutList.size[0]` to ≥614 and
-`techList.size[0]` to ≥434 (a little slack beyond the exact minimum recommended, so a future 5th slot
-class doesn't reopen the same 1px trap). Not a "first card repeats 3×" data bug on our side — we
-confirmed `ListData`/`ResolveBind` correctly resolve each of the 4 distinct equipped techniques
-per-index; the 4th one just never gets a cell to draw into, and older reports of "wrong abilities on
-the action bar" were the same silent 3-cell cap, not a real duplication.
-
 ## Confirm-to-Close (landed and verified — nothing to do, just clear these from memory)
 - **B0 · B0b · B1a · B3** — evening 2026-07-03 drop, all verified landed.
+- **B1b** — key-set diff guard now runs automatically in `extract_merge.js` on every merge.
 - **B4** — "open Equipment" button elements on Encounter + CampaignMap, landed.
 - **B5 · B6** — `invCard`/`loadoutCard`/`invTab` `states.family` + hover overlays, landed.
 - **B7** — raceCard head-portrait imageBind moved to the correct (square) element, landed.
-- **B9** — folded into Figure + Gear Asset Regen (B2-GO) above, no separate item.
+- **B8** — CityMap beaconNode hover/current states authored, `glow` spec'd (`style.pulse`, steady
+  1.8s ease-in-out breathe). Building the pulse primitive + wiring it is ours now, not a CD ask.
+- **B9** — folded into Figure + Gear Asset Regen (B2-GO), no separate item.
 - **B10** — gear catalog display-name drift vs. §6c canon, corrected.
-- **B12** — worn-armor part set (race-first, full-part convention): 744 files landed clean, 0
-  cross-product leaks, no "plain" type, 0 missing/extra. Convention is canon in LAYOUT_CONTRACT §12a /
-  DESIGN_SPEC §7a. Remaining wiring (game-mgcb mirror + engine themed-half draw) is ours, not a CD ask.
+- **B11** — bow sprites `bow_{short,long,compound,elven}` (+ `*_back`) + catalog rows, landed.
+- **B12** — worn-armor part set (race-first, full-part convention): 744 files landed clean. Canon in
+  LAYOUT_CONTRACT §12a / DESIGN_SPEC §7a.
 - **B13 · B14** — `waresShelves`/`buildMinions` sizing fixes, landed.
-- **B17** — Dwarf + Halfling figure batch, landed and exceeded (Half-Giant + Barbarian came too, both
-  now canon).
-- **B19** — "bay(s)" retired as the minion-slot term everywhere, landed; combat vs. build-time minion
-  cards deliberately stay separate templates, no unify ask.
+- **B17** — Dwarf + Halfling figure batch, landed and exceeded (Half-Giant + Barbarian too).
+- **B18** — every technique/minion icon now shipped: Flurry/Aimed Shot/Siphon/Barkskin/Sacrifice/Bind/
+  Frenzy-Flurry split-fill, plus this pass's Parry/Steel/Suture + Iron Golem/Hound. Nothing open.
+- **B19** — "bay(s)" retired as the minion-slot term everywhere, landed.
+- **B20 (partial)** — coreCard Core-Effect accent contrast (Doug #7) fixed: `border.colorBind` now
+  tints the LEFT-BORDER trim, never a full-rect fill, on NewGame coreCard/previewCoreEffect AND
+  Equipment's coreEffectBlock. `style.coreAccents` published (all 7 cores). Rest of B20 still open
+  above.
+- **B21** — no-absolute-positioning: `parent`-field re-extraction landed (160 keys, 6 screens), and
+  the standing invariant is now permanent in `CLAUDE.md`/`LAYOUT_CONTRACT.md` §3. Remaining piece
+  (engine recursive parent-box resolution) is ours, not a CD ask.
 - **B23** — Equipment tab buttons (`invTab`) widened to fill their row, three labels readable.
 - **B24** — `inventory.invItems` widened to fit its authored 2-column grid.
 - **B25** — `attrs.cells` pip strip widened so a 6-capacity stat's 6th (free) pip renders.
+- **B26** — `CD_STATUS.md` #34 armor-reservation wording corrected (armor consumes pool, same as
+  weapons/techniques) — stale sub-items cleared too.
+- **B27** — minion column reflow: new declarative `countWidth` field (`{bind,item,gap,pad,hideAtZero}`)
+  on Equipment `minionColumn` + Encounter `minionGroup`. Reading the field is ours now, not a CD ask.
+- **B28** — attrBar reorder/rename/color, closed directly by Doug.
+- **B29** — Encounter shell hosts quest/camp/nothing-here + CityMap retreat→redeploy: all three CD-side
+  asks delivered (`questPanel`+children gated on `encounter.quest`, `campMarker` gated on
+  `encounter.camp`, "nothing here" = bare shell needing no new elements, `retreatBtn` two states with
+  new `label`/`asset` per-state fields). Remaining work (engine element-gating, foe-cluster unmount,
+  per-state label/asset swap) is ours, not a CD ask.
+- **B30** — both technique action-bars (Equipment `loadoutList`, Encounter `techList`) now seat a 4th
+  card; region-width fix, same idiom as B23-B25.
+- **B31** — Encounter `poolRows` grown to `[309,82]`; the CON row renders.
 
 ## Standing FYIs (context, not action items)
 - **Name lengths:** the "Dwarven Steel Short Sword" (24ch) class overflows current card name rects —
@@ -284,5 +187,6 @@ the action bar" were the same silent 3-cell cap, not a real duplication.
 - **The v6 stat blocks are adopted canon:** race bases Human 5/5/5/5 · Elf 4/6/4/4 · Dwarf 4/4/4/6 ·
   Halfling 4/4/6/4 · Half-Giant 6/4/4/4, plus the per-core bonuses in `design/systems/{RACES,
   CORE_RUNES}.md` — the NewGame re-render (Re-Extraction above) samples from these.
-- **Drops apply via a stop/apply/re-arm handshake:** stage in `.drop/`, Cowork applies with the loop
-  halted, guards run before the tree resumes.
+- **Drops apply via a stop/apply/re-arm handshake:** stage in `.drop/` (or, this pass, direct-unpacked
+  into the working tree — Cowork applied it either way), loop halted, guards run before the tree
+  resumes.

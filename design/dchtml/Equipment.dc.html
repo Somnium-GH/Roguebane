@@ -104,9 +104,9 @@
               </sc-for>
             </div>
             <div style="display:flex;align-items:baseline;justify-content:flex-end;gap:5px;width:74px;font-family:'JetBrains Mono',monospace;">
-              <span data-binds="attrs.alloc" style="font-size:20px;font-weight:700;color:#ece0cb;">{{ a.alloc }}</span>
+              <span data-binds="attrs.available" style="font-size:20px;font-weight:700;color:#ece0cb;">{{ a.available }}</span>
               <span style="color:#6b5a44;font-size:14px;">/</span>
-              <span data-binds="attrs.available" style="font-size:20px;font-weight:700;color:{{ a.availColor }};">{{ a.available }}</span>
+              <span data-binds="attrs.total" data-color-bind="attrs.totalColor" style="font-size:20px;font-weight:700;color:{{ a.totalColor }};">{{ a.total }}</span>
             </div>
           </div>
         </sc-for>
@@ -226,7 +226,10 @@
         </sc-for>
       </div>
       <!-- Core Effect (renamed from "apex" — DESIGN_SPEC §17.14) -->
-      <div data-el="coreEffectBlock" data-binds="core.coreEffect" style="margin-top: 12px; border-left: 3px solid {{ coreAccent }}; padding: 3px 0 3px 12px">
+      <!-- accent = LEFT-BORDER trim sliver only, bound per-core via border.colorBind (payload B20 /
+           Doug #7 — a full-rect accent fill behind the text is the contrast bug; this block is the
+           canonical reference treatment) -->
+      <div data-el="coreEffectBlock" data-binds="core.coreEffect" data-color-bind="core.accent" data-color-bind-target="border" style="margin-top: 12px; border-left: 3px solid {{ coreAccent }}; padding: 3px 0 3px 12px">
         <div data-el="coreEffectLabel" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:#8d775c;">CORE EFFECT</div>
         <div data-el="coreEffectName" data-binds="core.coreEffectName" style="font-size:20px;color:#f0dcb4;line-height:1.1;margin-top:3px;">{{ coreEffectName }}</div>
         <div data-el="coreEffectDesc" data-binds="core.coreEffectDesc" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#9a8468;line-height:1.55;margin-top:5px;">{{ coreEffectDesc }}</div>
@@ -242,7 +245,10 @@
           <div data-el="techSlotCount" data-binds="loadout.slotLabel" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:#cdb497;margin-bottom:7px;">{{ slotLabel }}</div>
           <div data-el="loadoutList" data-container="1" data-template="loadoutCard" data-flow="horizontal" data-binds="loadout" style="display:flex;gap:12px;flex:1;">
             <sc-for list="{{ loadout }}" as="l" hint-placeholder-count="5">
-              <div data-tpl="loadoutCard" data-states="loadoutCard" style="flex:1;border:2px {{ l.style }} {{ l.border }};background:{{ l.bg }};display:flex;flex-direction:column;opacity:{{ l.op }};">
+              <!-- max-width 296px → item 148 design: 4×148+3×6=610 ≤ region 613 (payload B30 — flex
+                   items round UP on extraction (297.5→149 → 614>613) and the 4th loadoutCard silently
+                   dropped; fixed cap = the B23/B24/B25 idiom, one card width across every core) -->
+              <div data-tpl="loadoutCard" data-states="loadoutCard" style="flex:1;max-width:296px;border:2px {{ l.style }} {{ l.border }};background:{{ l.bg }};display:flex;flex-direction:column;opacity:{{ l.op }};">
                 <div data-part="" style="padding:8px 9px 7px;border-bottom:1px solid #2e2218;">
                   <div style="display:flex;align-items:center;gap:6px;">
                     <span data-binds="loadout.glyph" data-image-bind="icons/technique/{loadout.id}" data-color-bind="loadout.attrColor" style="width:30px;height:30px;border:{{ l.glyphBorder }};background:{{ l.glyphBg }};display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;line-height:1;color:{{ l.glyphColor }};">{{ l.glyph }}</span>
@@ -262,7 +268,7 @@
           </div>
         </div>
         <sc-if value="{{ hasBays }}" hint-placeholder-val="{{ true }}">
-        <div data-el="minionColumn" data-anchor="Right" style="width:{{ bayWidth }};flex:none;display:flex;flex-direction:column;border-left:2px solid #2e2218;padding-left:14px;">
+        <div data-el="minionColumn" data-anchor="Right" data-count-width="{&quot;bind&quot;:&quot;minions.cap&quot;,&quot;item&quot;:78,&quot;gap&quot;:6,&quot;pad&quot;:8,&quot;hideAtZero&quot;:true}" style="width:{{ bayWidth }};flex:none;display:flex;flex-direction:column;border-left:2px solid #2e2218;padding-left:14px;">
           <div data-el="minionSlotCount" data-binds="minions.slotLabel" style="font-family: 'JetBrains Mono',monospace; font-size: 10px; letter-spacing: 2px; color: #cdb497; margin-bottom: 7px">{{ minionSlotLabel }}</div>
           <div data-el="buildMinions" data-container="1" data-template="minionCard" data-flow="horizontal" data-binds="minions" style="display:flex;gap:12px;flex:1;">
             <sc-for list="{{ minions }}" as="m" hint-placeholder-count="1">
