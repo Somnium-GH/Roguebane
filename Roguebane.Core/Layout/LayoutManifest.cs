@@ -106,6 +106,7 @@ public sealed class Element
     public ElementPart[] Parts { get; init; } = []; // named sub-parts — when present, THEY carry the text (§12)
     public string? ImageBind { get; init; } // {bind}-templated icon path — or a STATIC ui/pattern/* path,
                                             // which TILES that PNG across the element rect (§12)
+    public CountWidth? CountWidth { get; init; } // data-driven width from a live count (B27); overrides Size.W
 }
 
 // A named sub-part of a screen element (§12): the dc.html source keeps value/label spans (and named
@@ -165,6 +166,28 @@ public sealed class Border
     public int W { get; init; }
     public string Style { get; init; } = "";
     public string[]? Sides { get; init; } // per-side borders, e.g. ["top"]; null/empty = all four
+}
+
+// A DATA-DRIVEN width (CD_STATUS #38, B27): the element's width is derived from a live COUNT `Bind`
+// (e.g. a core's minion capacity), NOT its authored size — so a minion column reflows to exactly the
+// number of slots the core has, and vanishes entirely at zero. `Item` is one slot's width, `Gap` the
+// space between slots, `Pad` a fixed surround. The renderer resolves the count and applies WidthFor;
+// a right-anchored element keeps its right edge and grows leftward.
+public sealed class CountWidth
+{
+    public string Bind { get; init; } = ""; // resolves to an item COUNT (int)
+    public int Item { get; init; }          // width of one item
+    public int Gap { get; init; }           // gap between adjacent items
+    public int Pad { get; init; }           // fixed padding added once
+    public bool HideAtZero { get; init; }   // at count 0, don't draw the element at all
+
+    // Width for `count` items: count*Item + (count-1)*Gap + Pad. No items => Pad alone (no negative
+    // gap term); a single item has no gaps. Counts below zero clamp to zero.
+    public int WidthFor(int count) =>
+        count <= 0 ? Pad : count * Item + (count - 1) * Gap + Pad;
+
+    // Whether the element draws at all for this count (HideAtZero collapses an empty column entirely).
+    public bool VisibleAt(int count) => !(HideAtZero && count <= 0);
 }
 
 // A repeated UI card (techCard/poolRow/invCard/…): a fixed-size box of styled sub-parts whose

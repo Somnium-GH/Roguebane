@@ -58,6 +58,17 @@ public sealed class ManifestUi
         return new Rectangle(r.X, r.Y, r.W, r.H);
     }
 
+    // B27: resolve the element at a DATA-DRIVEN width (countWidth), keeping its authored anchor/offset —
+    // a right-anchored minion column holds its right edge and grows leftward as the width changes. Same
+    // clone-and-resolve trick as FullWidthRect; only the width is overridden.
+    public Rectangle RectWithWidth(Screen screen, Element e, int width)
+    {
+        var sized = new Element { Anchor = e.Anchor, Offset = e.Offset, Parent = e.Parent,
+            Size = [width, e.Size.Length > 1 ? e.Size[1] : 0] };
+        var r = Resolve(screen, sized);
+        return new Rectangle(r.X, r.Y, r.W, r.H);
+    }
+
     public Rectangle? ElementRect(string screen, string id)
     {
         var m = _layout.Manifest;

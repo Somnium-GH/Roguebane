@@ -28,16 +28,27 @@ public partial class Game1
         if (s is null) return;
         // 07-03 drop: manifest z is ONE convention — a PAINT ORDINAL, back->front. Draw ascending;
         // the scene backdrop is found by its *.scene bind, never by z==0 (LAYOUT_CONTRACT §12).
+        var (hiddenCounts, reflowed) = CountWidthLayout(s); // B27: minion columns reflow / collapse
         foreach (var e in s.Elements.OrderBy(x => x.Z))
         {
             if (ReferenceEquals(e, skip)) continue;
+            // A collapsed countWidth container and every element parented to it draw nothing (the flat
+            // loop visits children independently, so gating the container alone wouldn't hide them).
+            if (hiddenCounts.Count > 0 && (hiddenCounts.Contains(e.Id)
+                || (e.Parent is { } hp && hiddenCounts.Contains(hp))))
+                continue;
             _textOwner = e.Id; // collision detector context (recorded only while _collectText)
             _curScreen = s;    // panel headers confine to the band above their contained children
             // Scene/backdrop art stretches to the FULL design canvas — never its authored anchor/size
             // — so it can't diverge from edge-anchored chrome when the canvas extends past 16:9 (§13).
-            DrawManifestElement(e, IsSceneElement(e) ? _ui.FullCanvasRect(s)
+            // A visible countWidth container (and its children) reflow to the data-driven width (B27).
+            Rectangle rect =
+                IsSceneElement(e) ? _ui.FullCanvasRect(s)
                 : IsFullBarElement(e) ? _ui.FullWidthRect(s, e)
-                : _ui.Rect(s, e));
+                : reflowed.TryGetValue(e.Id, out var own) ? own
+                : e.Parent is { } rp && reflowed.TryGetValue(rp, out var par) ? ReflowChild(par, e)
+                : _ui.Rect(s, e);
+            DrawManifestElement(e, rect);
         }
         _textOwner = null;
     }
@@ -564,6 +575,49 @@ public partial class Game1
                     label, RectOf(pp.Rect), _ui.Color(pp.Color ?? "ink", Ink), pp.FontPx);
             }
         }
+    }
+
+    // B27: resolve a countWidth's COUNT bind to a live integer. Both the encounter minionGroup
+    // (`loadout.minionCap`) and the equipment minionColumn (`minions.cap`) read the current core's minion
+    // capacity — pre-run from the build, in-run from the expedition. Unknown binds resolve 0 (collapses).
+    private int ResolveCountBind(string? bind) => bind switch
+    {
+        "loadout.minionCap" or "minions.cap" => InRun ? Exp.MinionCap : _build.CoreRune.MinionCap,
+        _ => 0,
+    };
+
+    // B27 per-draw resolution of every countWidth container on the screen. `hidden` = collapsed at
+    // count 0 (the container AND its parented children draw nothing). `reflowed` = each VISIBLE
+    // container's data-driven rect; children parented to it reflow against THAT rect (the flat draw
+    // loop resolves parents from authored size, so a child would otherwise sit at the authored 2-slot
+    // width — its content spilling past the reflowed border at any other count).
+    private (HashSet<string> hidden, Dictionary<string, Rectangle> reflowed) CountWidthLayout(
+        Roguebane.Core.Layout.Screen s)
+    {
+        HashSet<string>? hidden = null;
+        Dictionary<string, Rectangle>? reflowed = null;
+        foreach (var e in s.Elements)
+            if (e.CountWidth is { } cw)
+            {
+                var count = ResolveCountBind(cw.Bind);
+                if (!cw.VisibleAt(count)) (hidden ??= new()).Add(e.Id);
+                else (reflowed ??= new())[e.Id] = _ui.RectWithWidth(s, e, cw.WidthFor(count));
+            }
+        return (hidden ?? EmptyIds, reflowed ?? EmptyRects);
+    }
+    private static readonly HashSet<string> EmptyIds = new();
+    private static readonly Dictionary<string, Rectangle> EmptyRects = new();
+
+    // A child of a reflowed countWidth container, placed against the container's LIVE rect. The minion-
+    // column children are TopLeft-anchored with an [offsetX,offsetY] into the parent and a zero right-
+    // inset (offsetX + childW == authored parentW), so the child spans [offsetX .. parentW]; the reflow
+    // keeps that span, shrinking/growing width with the box while holding the left offset and height.
+    private static Rectangle ReflowChild(Rectangle parent, Element child)
+    {
+        int ox = child.Offset.Length > 0 ? child.Offset[0] : 0;
+        int oy = child.Offset.Length > 1 ? child.Offset[1] : 0;
+        int h = child.Size.Length > 1 ? child.Size[1] : 0;
+        return new Rectangle(parent.X + ox, parent.Y + oy, Math.Max(0, parent.Width - ox), h);
     }
 
     // Maps a quest/camp cluster member (by id) to the screen-bind that gates its whole cluster, or

@@ -358,6 +358,38 @@ public class LayoutManifestTests
     }
 
     [Fact]
+    public void CountWidthParsesAndComputesTheReflowFormula()
+    {
+        // B27 (CD_STATUS #38): a minion column's width is DERIVED from the core's minion capacity, not
+        // its authored size, and it vanishes at zero. Test-owned fixture pins the SCHEMA parse; the
+        // formula is asserted with the real minionGroup params (item 78, gap 6, pad 8) -- note count 2
+        // gives 170, which is exactly the authored minionGroup size, i.e. the authored box is the 2-slot
+        // case and countWidth generalizes it.
+        var m = LayoutManifest.Parse("""
+        {
+          "screens": { "s": { "designSize": [960,540], "elements": [
+            { "id": "col", "type": "panel", "anchor": "Right", "offset": [0,0], "size": [170,146],
+              "z": 1, "countWidth": { "bind": "minions.cap", "item": 78, "gap": 6, "pad": 8,
+                "hideAtZero": true } } ] } }
+        }
+        """);
+        var cw = m.Screens["s"].Elements[0].CountWidth;
+        Assert.NotNull(cw);
+        Assert.Equal("minions.cap", cw!.Bind);
+        Assert.True(cw.HideAtZero);
+        // count*item + (count-1)*gap + pad; zero => pad alone (no negative gap); one => no gaps.
+        Assert.Equal(8, cw.WidthFor(0));            // pad only
+        Assert.Equal(86, cw.WidthFor(1));           // 78 + 0 + 8
+        Assert.Equal(170, cw.WidthFor(2));          // 156 + 6 + 8  == authored size
+        Assert.Equal(254, cw.WidthFor(3));          // 234 + 12 + 8
+        Assert.Equal(8, cw.WidthFor(-1));           // negative clamps to zero-count
+        // hideAtZero collapses only the empty case.
+        Assert.False(cw.VisibleAt(0));
+        Assert.True(cw.VisibleAt(1));
+        Assert.True(cw.VisibleAt(2));
+    }
+
+    [Fact]
     public void NodeConditionalPopupIdsMatchTheirGatePrefix()
     {
         // Cross-layer CONTRACT, not CD content (Doug 2026-07-12: an empty "QUEST" box floated over a
