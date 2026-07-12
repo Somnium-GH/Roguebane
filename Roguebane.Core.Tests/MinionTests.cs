@@ -134,6 +134,31 @@ public class MinionTests
         Assert.Equal(0, exp.MinionCount); // no capacity -> nothing fielded
     }
 
+    // Item 3 (STATUS.md 2026-07-12 round 2, Doug: "I can't summon my hound for some reason"). Settle it
+    // headlessly on the REAL Marksman kit: the Hound is the Ranger's DEFAULT minion, so it is already
+    // fielded at assembly -- re-summoning it is a no-op-true (HasMinion short-circuits), which reads as
+    // "does nothing." The gates (cap 2, MaxSummons = cap+2, DEX 1) are all satisfiable: dismiss the
+    // Hound and it re-summons cleanly. So the summon path is NOT mechanically broken -- any live "can't
+    // summon" is the already-fielded no-op (a feedback gap) or a spent gate, not a broken Summon.
+    [Fact]
+    public void TheMarksmanHoundIsFieldedAtAssemblyAndReSummonsAfterDismiss()
+    {
+        var ranger = CoreRunes.Ranger;
+        var exp = Forge.Embark(Races.Human, ranger, ranger.NewLoadout(), ranger.Kit, Maps.StandardLeg(autoResolveCastle: false));
+
+        Assert.Contains(exp.Minions, m => m.Id == Minions.Hound.Id); // default minion fielded at assembly
+        var fielded = exp.MinionCount;
+
+        Assert.True(exp.SummonMinion(Minions.Hound)); // already present -> no-op-true
+        Assert.Equal(fielded, exp.MinionCount);        // nothing changed: "does nothing" when it's already out
+
+        Assert.True(exp.DismissMinion(Minions.Hound));
+        Assert.DoesNotContain(exp.Minions, m => m.Id == Minions.Hound.Id);
+
+        Assert.True(exp.SummonMinion(Minions.Hound));  // gates satisfiable -> re-summons cleanly
+        Assert.Contains(exp.Minions, m => m.Id == Minions.Hound.Id);
+    }
+
     [Fact]
     public void AltCostSummonDoesNotSpendCharge()
     {

@@ -206,6 +206,18 @@ availability (`Body` DEX capacity minus what's already gear/technique-reserved �
 Any of the four silently returns `false` with no player-facing reason shown, which would look
 identically like "does nothing."
 
+### ✅ CORE-SETTLED (2026-07-12, loop) — the summon path works; "can't summon" = Hound already fielded (no-op), not a broken gate
+Settled headlessly on the REAL Marksman kit (new `MinionTests.TheMarksmanHoundIsFieldedAtAssemblyAnd
+ReSummonsAfterDismiss`). Hound is the Ranger's DEFAULT minion (`CoreRunes.Ranger` `DefaultMinions`), so
+it's ALREADY fielded at assembly — `SummonMinion(Hound)` hits `Caster.Summon`'s `HasMinion → return
+true` short-circuit and changes nothing, which is exactly "does nothing." The gates are all satisfiable
+for this kit (MinionCap 2, MaxSummons = cap+2 = 4, Hound reserves DEX 1): the test dismisses the Hound
+and re-summons it cleanly, proving the Summon mechanism itself is NOT broken. ⇒ Any live "can't summon"
+is the **already-fielded no-op** (a feedback gap — same silent-no-op class as round-1 item 1's merchant
+buttons: the action correctly does nothing but surfaces no reason), OR a genuinely spent gate
+(cap/Summons/DEX) — neither a mechanical bug. Remaining is a Game-layer UX ask (show WHY a summon
+no-ops), shared with the merchant-button feedback gap; not headless-fixable and design-adjacent.
+
 **4. Screenshot-confirmed — the Hound minion card's description text overlaps another text element**
 ("Found"/"Hound"/"DEX" rendering on top of each other, illegible). Not yet root-caused (no geometry
 check done this pass) — likely two `list`/text elements sharing the same rect on the Minions palette
