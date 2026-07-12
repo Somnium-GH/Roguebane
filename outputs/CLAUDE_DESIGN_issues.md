@@ -189,6 +189,22 @@ your dev-loop guide so the class of bug can't recur —
 Also written into `design/LAYOUT_CONTRACT.md` §3, so it's binding regardless of whether this note
 stays here.
 
+### ResourceStrip Value Text — 4px Slot Clips "current/max" (B33)
+Doug (2026-07-12 playtest): the top resourceStrip reads as illegible — "only GOLD's number is
+visible." Root-caused against the real `layout.json`: the shared `resourceItem` template
+(`layout.json:10245`, referenced by every screen's resourceStrip) sizes its `resource.value` part rect
+at `[14, 1, 4, 9]` — **width 4px**, authored around the single-digit `sample: "6"`. But the engine feeds
+Supplies/Charge/Summons as `"current/max"` strings (e.g. `"3/5"`, and up to `"10/12"` = 5 chars ≈ 25px
+at mono `fontPx 7`), which overflow the 4px slot and collide with the `resource.label` rect that begins
+only 7px later at x=21. Gold alone is a bare digit (no denominator, no cap), so it fits the 4px slot and
+stays legible — exactly matching the report. Confirmed native to the CD-authored template, not our data
+path (`Game1.ManifestRenderer.cs:1207-1210` populate all four correctly). **Ask:** rework the
+`resourceItem` chip so the value slot fits a 5-char `"current/max"` string — widen the value rect and
+push/reflow the label (and likely the 47px chip width + the strip's own `size[0]`/gap) to suit, in
+`design/dchtml` + re-extracted `layout.json`. Same class as B30/B31, but HORIZONTAL and larger than a
+1px nudge — the slot is ~6× too narrow, not a razor-margin shortfall. One template fix covers all five
+screens' strips.
+
 ### Technique + Minion Icons Still Needed (B18)
 Flurry, Aimed Shot, Siphon, Barkskin, Sacrifice, Bind, and the Frenzy/Flurry two-badge split-fill are
 all landed (confirm-to-close, see below). **Still needed for the v6 kits — the only open icons:**

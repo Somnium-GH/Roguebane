@@ -223,6 +223,17 @@ would clip or sit under their icon glyph, exactly matching "unreadable" while Go
 Needs a `layout.json` geometry check on the resourceStrip chip template (same shortfall pattern as
 today's other container bugs) before routing to CD.
 
+### ⇒ ROOT-CAUSED + ROUTED TO CD as B33 (2026-07-12, loop) — the value slot is 4px, sample-sized for one digit
+Confirmed exactly the suspected shortfall against the real `layout.json`: the shared `resourceItem`
+template (`layout.json:10245`, used by all five screens' strips) sizes its `resource.value` part rect at
+`[14, 1, 4, 9]` — **width 4px**, authored around the single-digit `sample: "6"`. The live
+Supplies/Charge/Summons values are `"current/max"` (`"3/5"`, up to `"10/12"` ≈ 25px at mono `fontPx 7`),
+so they overflow the 4px slot and collide with the label rect at x=21; Gold's bare digit fits and stays
+legible — matching "only GOLD visible" precisely. Data path is correct (`Game1.ManifestRenderer.cs:1207-
+1210`), so this is purely CD-authored geometry. Logged to the CD outbox as **B33** (rework the chip so
+the value slot fits a 5-char string — HORIZONTAL, ~6× too narrow, larger than a B30/B31 1px nudge). One
+template fix covers every screen. No engine change.
+
 **6. REAL DESIGN GAP — technique/minion ACTIVATION state (not just roster equip/unequip) should stay
 live and toggleable during `Cleared` (post-combat, pre-Redeploy), specifically so the player can heal
 while deciding whether to redeploy.** Doug: "settings should persist between encounters... while
