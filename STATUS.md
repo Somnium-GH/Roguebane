@@ -26,6 +26,20 @@ design change).
 5. Does NOT touch Staff's wield-gating `Stat` (INT→STR) — that's the separate item 1 in the balance-
    pass entry below, already unblocked on its own; keep the two changes in separate commits if clean.
 
+### ✅ BUILT (2026-07-12, loop) — `68796b4` (steps 1,2,4-partial) + `7798c73` (steps 3,4-complete)
+All four code-catch-up steps done, code now matches the flat "T3 = +3" canon. (1) `Body.cs`:
+`CharmMinionMult`/`TomeSpellMult` (×0.1/tier doubles) → `CharmMinionBonus`/`SpellImplementBonus` (int
+= tier), clean rename, no alias. (2) `Caster.cs`: minion `power + CharmMinionBonus`, spell `power +
+SpellImplementBonus`. (3) Staff's own bonus: `SpellImplementBonus` takes the MAX tier across usable
+`Tome`-or-`Staff` (never sums — the retired 2× idea was the only summing rationale); staff lives in
+`_hands`, so it reads directly by `Kind`. (4) `WandTests` rewritten off the multiplicative values, with
+a new case pinning **T3 = +3** (tome AND staff) and T4 = +4 — Doug's worked example, now in tests.
+535/535. Step 5 (Staff wield-gating INT→STR) intentionally untouched — still open as balance-pass item 1.
+**Process note:** the earlier B27 STATUS commit (`39e98fa`) inadvertently bundled Doug's OWN external
+STATUS.md edits (this LOCKED entry + the NEEDS-HUMAN→RESOLVED rework) — I staged STATUS.md for the B27
+bullet without spotting his uncommitted edits above it. His words, committed under my message by
+accident; flagged rather than history-rewritten.
+
 ## ‼ TOP PRIORITY / LOCKED (2026-07-12, Doug) — shield mitigation rule CHANGE: any standing shield
 ## point fully blocks a normal hit (no bleed-through); this is a BEHAVIOR CHANGE, existing tests
 ## asserting the old spillover math must be corrected, not just re-greened
