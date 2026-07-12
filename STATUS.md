@@ -46,6 +46,29 @@ disappears together, not just its background chrome. Add a Core/shell test: rend
 quest/camp/foe state resolved and assert neither `questPanel` nor `campMarker` (nor their children)
 paint anything.
 
+### ✅ FIXED (2026-07-12, loop) — quest/camp clusters now gate by node type; blanket-panel gate rejected as unsafe
+Landed exactly as root-caused, with one correction to the prescribed fix. **Rejected part (1)'s literal
+"gate ANY element whose Binds resolves null, full stop":** parsed the real `layout.json` — DOZENS of
+chrome panels (`attrPool`, `actionBar`, `inventory`, `runeBag`, `supplies`, `support`, `merchant`,
+`preview`, `core`, `coreEffectBlock`, ...) carry binds that ALL resolve null via `ResolveScreenBind`'s
+`_ => null` default, yet every one must draw as container chrome. A blanket panel gate would erase the
+entire UI. The renderer treats panel binds as structural markers, not gates — so the gate MUST stay
+scoped to the two node-conditional clusters, never generalized. **What shipped (`Game1.ManifestRenderer
+.cs`):** (a) new `NodeGateBindFor(id)` maps `quest*`→`encounter.quest`, `campMarker*`→`encounter.camp`
+(the cluster is flat siblings, no parent link, and children like `questKicker`/`campMarkerLabel` carry
+NO bind of their own — id-prefix is the only handle; `campMarker` NOT `camp`, to spare citymap's
+`campaignStrip`/`campaignTaken`); (b) a gate at the top of `DrawManifestElement` (the screen's `Elements`
+list is flat, so every cluster member — panel chrome AND labels/actions — passes through it) draws
+nothing when the gate bind resolves null; (c) `ResolveScreenBind` gains `encounter.quest`/`encounter.camp`,
+truthy only when `Exp.Map.Current.Type` is `Quest`/`Camp`, null otherwise — so at a fight node the gate
+closes and the whole cluster vanishes, killing Doug's empty-box overprint. Verified: all 7 `quest*` + 4
+`campMarker*` ids partition cleanly with zero collision. **Headless test:** `LayoutManifestTests
+.NodeConditionalPopupIdsMatchTheirGatePrefix` pins the cross-layer contract the gate depends on (bind→id-
+prefix), tolerant to a CD re-drop. Core.Tests 533/533, Game builds clean. **Residual (out of headless
+reach, needs Doug live re-check):** the actual "cluster paints nothing at a Skirmish node" render assert
+is Game-layer/MonoGame — confirm live that the QUEST box is gone over a real fight, and that quest/camp
+popups DO still appear at their own nodes once the engine hosts those foeless arrivals (CD_STATUS #39).
+
 **What else this drop unblocks (reprioritize forward, formerly-blocked work):**
 - **B30 (technique bars 4th card) — CD says fixed, landed in this drop's `layout.json`.** Verify live:
   a 4-technique kit (e.g. Adept) should show all 4 action-bar cards on both Equipment and Encounter now.
