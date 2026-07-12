@@ -65,7 +65,7 @@ public class WandTests
         var body = IntBody(10);
         Assert.True(body.Wield(Armory.Wands[2]));
         Assert.True(body.Wield(Armory.Tomes[3]));
-        Assert.Equal(4, body.TomeSpellBonus);
+        Assert.Equal(4, body.SpellImplementBonus);
         var foe = Shielded(0);
         var c = new Caster(body, foe);
         Assert.True(c.Activate(Zap));
@@ -75,7 +75,25 @@ public class WandTests
         // A broken off-hand arm (hand 1 = armL) silences the tome's bonus.
         var armL = body.Parts.First(p => p.Id == "armL");
         body.Damage(armL, 9);
-        Assert.Equal(0, body.TomeSpellBonus);
+        Assert.Equal(0, body.SpellImplementBonus);
+    }
+
+    [Fact]
+    public void SpellBonusIsFlatPerTier_T3EqualsPlus3_AndStaffMatchesTomeWithoutStacking()
+    {
+        // "T3 = +3" LOCKED (2026-07-12, Doug): a T3-owned spell implement grants exactly +3, flat/
+        // additive. A 2H staff carries the SAME +1/tier bonus as a tome, read off the wielded staff
+        // directly; the two never STACK (the effective bonus is the MAX tier across usable sources).
+        Assert.Equal(3, WithSpellImplement(Armory.Tomes[2]));    // Ornate Tome, tier 3 -> +3
+        Assert.Equal(3, WithSpellImplement(Armory.Staffs[2]));   // Ornate Staff, tier 3 -> +3 (its OWN bonus)
+        Assert.Equal(4, WithSpellImplement(Armory.Tomes[3]));    // T4 owned -> +4
+    }
+
+    private static int WithSpellImplement(Weapon w)
+    {
+        var body = IntBody(12);
+        Assert.True(body.Wield(w));
+        return body.SpellImplementBonus;
     }
 
     [Fact]

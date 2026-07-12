@@ -459,10 +459,10 @@ public sealed class Caster
         var consulted = _self.Consulted(run.Tech);
         var wandCast = consulted.Count > 0 && consulted.All(w => w.Kind == WeaponKind.Wand);
         var power = EffectivePower(run.Tech) + robe;
-        // §6d tome offhand: +1 flat SPELL damage per tier — INT casts only (WEAPONS.md rescale
-        // 2026-07-12, was a ×0.1/tier multiplier over base+robe).
+        // §6d INT spell implement (tome offhand OR 2H staff): +1 flat SPELL damage per tier — INT casts
+        // only (WEAPONS.md rescale 2026-07-12, "T3 = +3" LOCKED; was a ×0.1/tier multiplier over base+robe).
         if (run.Tech.Stat == Stat.Int)
-            power += _self.TomeSpellBonus;
+            power += _self.SpellImplementBonus;
         var landed = Hit(target, part, power, run.Tech.ShieldPiercing, wandCast);
         // Foe Effect: Brittle (FOES.md) — a CLEAN landed hit (Hit's own "not already broken" gate,
         // same as Siphon below) on this foe's STR (arm) part that just broke it refunds the attacker's

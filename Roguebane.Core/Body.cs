@@ -264,13 +264,16 @@ public sealed class Body
 
     private IEnumerable<Weapon> UsableHands() => _hands.Where((_, i) => HandItemUsable(i));
 
-    // §6d magic offhands (FLAT +1 per tier — WEAPONS.md rescale 2026-07-12, was a ×0.1/tier multiplier):
-    // ONE off-hand slot exists, so the best USABLE held piece counts — a broken arm silences its bonus
-    // like any other hand item. Bonus = its tier (a tier-2 charm adds +2 flat minion damage).
+    // §6d magic implements (FLAT +1 per tier — WEAPONS.md rescale 2026-07-12, "T3 = +3" LOCKED, was a
+    // ×0.1/tier multiplier): the best USABLE held piece counts, and a broken arm silences its bonus like
+    // any other hand item. Bonus = its tier (a tier-2 charm adds +2 flat minion damage).
     public int CharmMinionBonus => UsableHands()
         .Where(w => w.Kind == WeaponKind.Charm).Select(w => w.Tier).DefaultIfEmpty(0).Max();
-    public int TomeSpellBonus => UsableHands()
-        .Where(w => w.Kind == WeaponKind.Tome).Select(w => w.Tier).DefaultIfEmpty(0).Max();
+    // Spell bonus sources are the Tome (offhand) AND the Staff (2H, its OWN +1/tier per the LOCKED rule).
+    // They never STACK — the retired "staff = 2× a tome" idea is exactly what would have justified
+    // summing — so take the MAX tier across usable spell implements, never the sum.
+    public int SpellImplementBonus => UsableHands()
+        .Where(w => w.Kind is WeaponKind.Tome or WeaponKind.Staff).Select(w => w.Tier).DefaultIfEmpty(0).Max();
 
     // The weapons a technique consults, by its stat (§7) — broken-arm hands never answer (§6d).
     // A CHARGE/pierce verb (Shot family) looses the RANGED slot, never a hand item — that's the
