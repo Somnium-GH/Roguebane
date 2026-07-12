@@ -197,6 +197,20 @@ computes (`Caster.StatusOf`/the encounter card render) — worth a live check of
 technique's card shows the same "charging" visual as a targeted-and-armed attack card, since nothing
 in the FSM should be blocking it from looking that way.
 
+### ✅ CORE/LOGIC-SETTLED (2026-07-12, loop) — the charging signal IS present for heals, at both layers
+Traced both layers and pinned the Core half. (a) `Caster.StatusOf` reports a powered Bandage exactly
+like an attack — `Active:true` with a live counting-down Timered `Countdown` — with NO foe and NO aim
+involved (new `TechStatusTests.PoweredSelfHealChargesLikeAnAttackWithNoTarget`). (b) The Game render
+resolver `ResolveStateBind` (`Game1.ManifestRenderer.cs:1811`) maps that snapshot to "COOLDOWN"→"READY"
+for a Self heal via the SAME branch order as an attack — it is NOT gated on having a target/aim (only
+`ChargeDry` and `Sustained` short-circuit ahead, neither of which a Timered heal hits). So neither the
+status layer nor the state-bind logic makes a heal read as inert, and the auto-fire path (Discharge's
+`Heals` branch on `MostDamagedPart`) needs no target either. ⇒ **No logic gap.** Any residual "reads as
+inert" is either the correct no-op when nothing is damaged (a full-HP heal charges, reaches ready, mends
+nothing), or a card-SKIN/art detail — is there a distinct heal-card visual for COOLDOWN/READY? — which
+is a CD/art question, not engine. Re-check live once B33/B34 land; if the card still looks dead while
+COOLDOWN/READY resolve, route the missing skin to CD.
+
 **3. "I can't summon my hound for some reason."** `SummonMinion` is already gated by `CanEditLoadout`
 (Choosing OR Cleared, see the FIXED entry below) — not blocked by the Cleared-state bug. Hound itself
 (`Minions.cs:18`) is cheap: `MinionGate.Stat`, DEX `Reserve: 1`. **Needs a live trace** — check at the
