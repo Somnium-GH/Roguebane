@@ -22,6 +22,19 @@ public sealed class MapNode
     public IReadOnlyList<string> Next { get; }
     public bool Visited { get; private set; }
 
+    // The backdrop scene id for this node's encounter; the shell resolves it to bg/{scene}.png via the
+    // manifest imageBind (CD_STATUS #41). Only the DESIGNED mappings are wired — Camp and Castle. The
+    // terrain variants for Skirmish / Quest, and the quarry-vs-lumber split for ResourceHold, are
+    // UNDESIGNED (Needs human), so every other kind falls back to the neutral combat field. Scene is a
+    // pure function of Type (no randomness), so a node's backdrop is stable across revisits — the
+    // flagged terrain-persistence question does not arise until random terrain is introduced.
+    public string Scene => Type switch
+    {
+        NodeType.Camp => "enc_camp",
+        NodeType.Castle => "enc_city_gates",
+        _ => "combat_field",
+    };
+
     // Layout hints for the chart render: Col = depth from camp, Row = lane within that depth. Pure
     // data (no engine types) so Core stays headless; the shell maps them to screen coordinates.
     public int Col { get; private set; }

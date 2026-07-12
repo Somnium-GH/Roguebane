@@ -75,6 +75,24 @@ that the guard blockers are cleared):**
    `combat_field` · city/castle arrival→`enc_city_gates` · default→`combat_field`. Terrain-per-node
    persistence (does a node keep the same terrain across repeat visits, or reroll) is undecided —
    flagging rather than picking; cheapest default is "assign once when the node is generated, persist."
+   **✅ BUILT — DESIGNED CASES ONLY (2026-07-12, loop):** wired the unambiguous half.
+   - Core: `MapNode.Scene` (computed, pure function of `Type`) — `Camp`→`enc_camp`, `Castle`→
+     `enc_city_gates`, every other kind→`combat_field` (the neutral existing default, NOT an invented
+     terrain). Because Scene has no randomness/state, revisits are stable **by construction** — this is
+     how the flagged terrain-PERSISTENCE question is sidestepped, not answered: it can't arise until
+     random terrain exists. Headless-tested: `MapNodeSceneTests` (7 InlineData + a stability Fact), 544
+     green.
+   - Engine: `ResolveScreenBind("encounter.scene")` → `Exp.Map.Current.Scene`; the `backdrop`
+     element's `.scene` render case now resolves the templated `imageBind bg/{encounter.scene}` (falls
+     back to the authored mock if unresolved/unshipped); dropped the hardcoded `Stretch(combat_field)`
+     at `Game1.cs` DrawEncounterScreen — the manifest backdrop owns it now (compile-clean; live pixel
+     confirm pending Doug's rebuild, his instance is running so output is DLL-locked here).
+   - **⚠ NEEDS HUMAN (design):** 6 of the 8 new terrain PNGs (`enc_forest/enc_mountain/enc_river/
+     enc_meadow/enc_quarry/enc_lumber`) are shipped-but-UNWIRED. Two undesigned questions gate them:
+     (a) which terrain variant Skirmish/Quest nodes draw (currently all→`combat_field`), and (b) the
+     ResourceHold quarry-vs-lumber split — Core has NO quarry/lumber distinction anywhere, so that's a
+     NEW model field, not just a mapping. Once Doug picks, extending `MapNode.Scene` + one InlineData
+     row per case is the whole change.
 
 4. **B32/B33/B34 (attrPip stretch, resourceStrip current/max chip, minionCard overlap) need ZERO engine
    code changes** — they're pure geometry/template fixes inside `layout.json` itself, and the existing

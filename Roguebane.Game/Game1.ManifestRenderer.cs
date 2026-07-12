@@ -187,6 +187,16 @@ public partial class Game1
                 // space — source-cropped to the viewport aspect so nothing stretches, no bars.
                 if (e.Binds is { } sceneBind && sceneBind.EndsWith(".scene") && e.Image is { Length: > 0 } bg)
                 {
+                    // Prefer the LIVE per-node scene: resolve the imageBind template (bg/{encounter.scene})
+                    // through the screen binds. Fall back to the authored mock image when the bind can't
+                    // resolve to a shipped texture (out of run, or an unmapped scene id).
+                    if (e.ImageBind is { } sib && sib.Contains('{'))
+                    {
+                        var live = System.Text.RegularExpressions.Regex.Replace(sib, @"\{(.+?)\}",
+                            mm => ResolveScreenBind(mm.Groups[1].Value) ?? "");
+                        if (!live.Contains('{') && _assets.Texture(NormalizeContentPath(live)) is not null)
+                            bg = live;
+                    }
                     if (_assets.Texture(NormalizeContentPath(bg)) is { } bgTex)
                     {
                         var dw = _ui.DesignW > 0 ? _ui.DesignW : W;
@@ -735,6 +745,10 @@ public partial class Game1
         // NodeGateBindFor hides the whole cluster, killing the empty-box overprint. (Camp had a twin
         // encounter.camp gate; RETIRED per CD_STATUS #39 — camp now renders via encounter.scene backdrop.)
         "encounter.quest" => InRun && Exp.Map.Current.Type == Roguebane.Core.NodeType.Quest ? "quest" : null,
+        // Per-node backdrop scene (CD_STATUS #41): Core owns the scene id off the live node; the
+        // backdrop element's imageBind bg/{encounter.scene} resolves through here. Null out of run so
+        // the element falls back to its authored mock image.
+        "encounter.scene" => InRun ? Exp.Map.Current.Scene : null,
         "campaign.taken" => InRun ? _campaign.LegIndex + " / " + _campaign.LegCount : null,
         _ => null,
     };

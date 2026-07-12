@@ -1309,11 +1309,12 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
     }
 
     // Combat screen (design/01): rendered from the manifest; only the cleared/lost state overlay is
-    // legacy (it isn't part of the encounter design). The battlefield backdrop stays under the chrome.
+    // legacy (it isn't part of the encounter design). The battlefield backdrop is the manifest's own
+    // `backdrop` element (imageBind bg/{encounter.scene}, CD_STATUS #41) — it resolves the live per-node
+    // scene and aspect-fills under the chrome, so no hardcoded combat_field underlay is needed.
     private void DrawEncounterScreen()
     {
-        Stretch(_assets.Background("combat_field"), 0, 0, W, H);
-        DrawManifestScreen("encounter"); // its manifest resourceStrip carries the run resources
+        DrawManifestScreen("encounter"); // backdrop element draws first (z:0); resourceStrip carries resources
         DrawStateOverlay();
     }
 
