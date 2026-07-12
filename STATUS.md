@@ -107,6 +107,18 @@ shield-pierce/subtract answer, or accept the stalemate), NOT an engine bug.
 ## concrete, ready-to-build content changes, no remaining design ambiguity
 Doug's latest balance spreadsheet (`Kits` sheet) has already locked these; routing to build.
 
+### ✅ BUILT #1 + #2-DEFINED (2026-07-12, loop) — `ab62748`
+**#1 done:** `Armory.cs` Staff `Stat.Int`→`Stat.Str`; added `Jab` to Adept's default kit (4th slot) so
+the STR staff becomes a free backup attack (Demand tab STR 3 = Staff 2 + Jab 1); Staff's own +1/tier
+SPELL bonus is `Kind==Staff`-keyed so it still boosts INT casts; `WEAPONS.md` staff row reconciled to
+"2H STR / 2 STR". 536/536, campaigns green across all races. **#2 Blast DEFINED** verbatim in
+`Techniques.cs` (INT/Timered/CD 15/Mult 1.0/Consults Primary, defaults = zero-Charge) + registered in
+`All`. **⚠ #2 kit-wiring FLAGGED (needs Doug's spreadsheet Kits row):** which of Summoner's 3 techniques
+(ActionSlots 3, currently Ember/Sacrifice/Barkskin) Blast replaces — or whether ActionSlots grows — isn't
+determinable from STATUS alone (the entry says "replacing/joining ... per the spreadsheet's Kits sheet",
+lists "Brace" where the code has Barkskin, and "distinct from Ember" implies Ember stays). Blast is
+defined and ready; the Summoner loadout slot needs Doug's exact composition before wiring.
+
 **1. Staff flips from INT to STR — makes Jab a free backup attack, zero changes needed to Jab itself.**
 Today `Armory.cs:71`: `Staffs = Named("staff", Stat.Int, WeaponKind.Staff, ...)`. Change `Stat.Int` →
 `Stat.Str`. `Jab` (`Techniques.cs:12-15`) is already `Stat.Str, Consults: WeaponUse.Primary` — once
