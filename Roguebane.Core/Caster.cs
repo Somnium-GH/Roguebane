@@ -389,9 +389,8 @@ public sealed class Caster
             var canFire = minion.Gate != MinionGate.Stat || _self.IsActive(Reservation(minion));
             if (countdown <= 0 && canFire && _default is { Down: false })
             {
-                // §6d charm offhand: +0.1x MINION attack damage per tier of the held charm.
-                Hit(_default, null, (int)Math.Round(
-                    minion.Power * _self.CharmMinionMult, MidpointRounding.AwayFromZero));
+                // §6d charm offhand: +1 flat MINION attack damage per tier of the held charm.
+                Hit(_default, null, minion.Power + _self.CharmMinionBonus);
                 countdown = minion.Timer;
             }
             _minionCountdown[minion.Id] = countdown;
@@ -460,10 +459,10 @@ public sealed class Caster
         var consulted = _self.Consulted(run.Tech);
         var wandCast = consulted.Count > 0 && consulted.All(w => w.Kind == WeaponKind.Wand);
         var power = EffectivePower(run.Tech) + robe;
-        // §6d tome offhand: +0.1x SPELL damage per tier — INT casts only, applied over the whole
-        // spell damage (base + robe; composition order is a balance-pass knob).
+        // §6d tome offhand: +1 flat SPELL damage per tier — INT casts only (WEAPONS.md rescale
+        // 2026-07-12, was a ×0.1/tier multiplier over base+robe).
         if (run.Tech.Stat == Stat.Int)
-            power = (int)Math.Round(power * _self.TomeSpellMult, MidpointRounding.AwayFromZero);
+            power += _self.TomeSpellBonus;
         var landed = Hit(target, part, power, run.Tech.ShieldPiercing, wandCast);
         // Foe Effect: Brittle (FOES.md) — a CLEAN landed hit (Hit's own "not already broken" gate,
         // same as Siphon below) on this foe's STR (arm) part that just broke it refunds the attacker's

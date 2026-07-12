@@ -61,7 +61,9 @@ Base technique speed **8.0s**; melee/ranged verbs CONSULT the weapon for damage;
 - **Shields (passive):** Brace (CON T1, 2) · Steel (CON T2, 3) · Barkskin (INT T1, 1) · Stoneskin (INT T2, 2 — pool 6, +2 pips/3s) · Bind (STR T1, 2) · Parry (DEX T1, 2).
 - **Heals:** Bandage (CON T1, 2) · Suture (CON T2, 3) · Sacrifice (consume 1 fielded minion; heal scales with its tier; minion destroyed, no refund).
 - **Minions:** Skeleton (INT T1, res 1, 1/3s) · Iron Golem (INT T2, res 2, 3/5s) · Hound (DEX T1, res 1, 1/4s + accuracy aura).
-- **Weapon families / numbers:** see `WEAPONS.md`. Staff is 2 INT + magic dmg = 2× a tome. Bows/sling damage OPEN.
+- **Weapon families / numbers:** see `WEAPONS.md`. Staff SPELL bonus = +1/tier, same as tome (corrected
+  2026-07-12 — Doug's flat-bonus rescale set both equal; staff is no longer 2× a tome). Bows/sling
+  damage OPEN.
 
 ## Reservation / combat model
 - One shared per-stat pool. **Two different triggers feed it — do not conflate them:**

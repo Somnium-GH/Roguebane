@@ -61,7 +61,8 @@ public static class Armory
 
     // INT implements (§6d): wand = 1H shield-SUBTRACTION hand item (resolution is its own slice);
     // staff = 2H plain blockable melee, 2 INT/t per WEAPONS.md's table; charm/tome = pure-bonus
-    // offhands (+0.1x minion/spell damage per tier — consumers are their own slice), Power 0.
+    // offhands (+1 FLAT minion/spell damage per tier — WEAPONS.md rescale 2026-07-12; staff's own
+    // +1/tier SPELL bonus is doc-canon but not yet wired), Power 0.
     // Wand/staff Timer (1.0 here) is WEAPONS.md's own Open/TBD ("wand / staff timer multipliers") —
     // placeholder, not a locked number.
     // Req corrected 2026-07-05 (WEAPONS.md): 2->1 INT/tier — the old value put Summoner's kit one

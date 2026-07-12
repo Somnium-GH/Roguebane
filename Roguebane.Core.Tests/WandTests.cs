@@ -58,34 +58,34 @@ public class WandTests
     }
 
     [Fact]
-    public void ATomeOffhandMultipliesSpellDamage()
+    public void ATomeOffhandAddsFlatSpellDamage()
     {
-        // §6d: Glowing Tome (tier 4) = +0.4x spell damage. Gemstone Wand 6 dmg -> round(6 x 1.4) = 8.
-        // INT 10: enough to sustain wand (reserve 6) + tome (reserve 4) at once (SUSTAIN MODEL pool).
+        // §6d (WEAPONS.md flat rescale 2026-07-12, was ×0.1/tier): Glowing Tome (tier 4) = +4 FLAT spell
+        // damage. Gemstone Wand 6 dmg -> 6 + 4 = 10. INT 10: sustains wand (reserve 6) + tome (4) together.
         var body = IntBody(10);
         Assert.True(body.Wield(Armory.Wands[2]));
         Assert.True(body.Wield(Armory.Tomes[3]));
-        Assert.Equal(1.4, body.TomeSpellMult, 3);
+        Assert.Equal(4, body.TomeSpellBonus);
         var foe = Shielded(0);
         var c = new Caster(body, foe);
         Assert.True(c.Activate(Zap));
         c.Step();
-        Assert.Equal(92, foe.Hp); // 8 landed
+        Assert.Equal(90, foe.Hp); // 10 landed
 
         // A broken off-hand arm (hand 1 = armL) silences the tome's bonus.
         var armL = body.Parts.First(p => p.Id == "armL");
         body.Damage(armL, 9);
-        Assert.Equal(1.0, body.TomeSpellMult, 3);
+        Assert.Equal(0, body.TomeSpellBonus);
     }
 
     [Fact]
-    public void ACharmOffhandMultipliesMinionDamage()
+    public void ACharmOffhandAddsFlatMinionDamage()
     {
         var body = IntBody();
-        Assert.True(body.Wield(Armory.Charms[1])); // Bone Charm, tier 2 -> x1.2
-        Assert.Equal(1.2, body.CharmMinionMult, 3);
+        Assert.True(body.Wield(Armory.Charms[1])); // Bone Charm, tier 2 -> +2 flat
+        Assert.Equal(2, body.CharmMinionBonus);
         body.Unwield(Armory.Charms[1]);
-        Assert.Equal(1.0, body.CharmMinionMult, 3);
+        Assert.Equal(0, body.CharmMinionBonus);
     }
 
     [Fact]

@@ -264,11 +264,12 @@ public sealed class Body
 
     private IEnumerable<Weapon> UsableHands() => _hands.Where((_, i) => HandItemUsable(i));
 
-    // §6d magic offhands (+0.1x per tier): ONE off-hand slot exists, so the best USABLE held
-    // piece counts — a broken arm silences its bonus like any other hand item.
-    public double CharmMinionMult => 1.0 + 0.1 * UsableHands()
+    // §6d magic offhands (FLAT +1 per tier — WEAPONS.md rescale 2026-07-12, was a ×0.1/tier multiplier):
+    // ONE off-hand slot exists, so the best USABLE held piece counts — a broken arm silences its bonus
+    // like any other hand item. Bonus = its tier (a tier-2 charm adds +2 flat minion damage).
+    public int CharmMinionBonus => UsableHands()
         .Where(w => w.Kind == WeaponKind.Charm).Select(w => w.Tier).DefaultIfEmpty(0).Max();
-    public double TomeSpellMult => 1.0 + 0.1 * UsableHands()
+    public int TomeSpellBonus => UsableHands()
         .Where(w => w.Kind == WeaponKind.Tome).Select(w => w.Tier).DefaultIfEmpty(0).Max();
 
     // The weapons a technique consults, by its stat (§7) — broken-arm hands never answer (§6d).
