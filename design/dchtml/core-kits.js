@@ -17,8 +17,9 @@
 // STARTER GEAR + KITS (v6 §C, all T1):
 //   Grunt    — Iron Longsword + Wooden Shield; Iron plate ×4 · Jab, Brace, Bandage · no minions.
 //   Warden   — Iron Longsword + Iron Buckler; Iron plate ×4 (CON via Fortified) · Jab, Brace, Bandage.
-//   Adept    — Wooden Staff; Cotton Robe + Cloth Cap · Ember, Siphon, Stoneskin.
-//   Summoner — Adept Wand + Wooden Charm; Cotton Robe + Cloth Cap · Ember, Sacrifice, Barkskin · Skeleton.
+//   Adept    — Wooden Staff (STR-gated 2026-07-12); Cotton Robe + Cloth Cap · Ember, Siphon, Stoneskin, Jab.
+//   Summoner — Adept Wand + Wooden Shield (2026-07-12, was Wooden Charm); Cotton Robe + Cloth Cap ·
+//              Ember, Blast, Sacrifice, Brace (was Barkskin) · Skeleton.
 //   Reaver   — 2× Iron Dagger; Leather ×4 · Frenzy, Flurry, Bandage (CORE_RUNES.md 2026-07-05: the
 //              flat CON part-heal is baseline on every core bar Adept/Summoner — "no heal" retired).
 //   Ranger   — Iron Dagger + Short Bow; Leather ×4 · Aimed Shot, Lunge, Bandage · Hound.
@@ -167,6 +168,8 @@ const T = {
   steel:     { name: 'Steel',      attr: 'CON', cost: 3, glyph: '◆', desc: 'The greater CON ward — turn each blow aside behind hardened steel.' },
   suture:    { name: 'Suture',     attr: 'CON', cost: 3, glyph: '✛', desc: 'Mends your most-damaged part, 2 points every 8.0s.' },
   sacrifice: { name: 'Sacrifice',  attr: '—',   cost: 0, glyph: '❖', costLabel: '1 MINION', desc: 'Consume one of your minions to mend your body.' },
+  // NEW 2026-07-12 (Doug's balance pass): wand-consulting INT attack, Summoner's kit.
+  blast:     { name: 'Blast',      attr: 'INT', cost: 1, glyph: '✹', needs: 'wand',      desc: "A quick bolt from your wand, subtracting from the target's shields as it lands." },
 };
 const tk = (key, intent) => ({ ...T[key], intent });
 // minions (v6 §D: Skeleton 1 · Iron Golem 3 (sheet) · Hound 1)
@@ -246,11 +249,12 @@ export const CORES = {
     // an all-INT kit that fits the Human pool EXACTLY when healthy loses its ward first.
     scenario: { damage: { INT: 1 }, debuff: {}, figStates: { head: 'damaged' } },
     gear: [
-      W('staff_wooden', 'Wooden Staff', 'INT', 2, 'handR', 'wooden', 'COMMON'),
+      // STR-gated 2026-07-12 (Doug's balance pass) — makes Jab a free backup attack.
+      W('staff_wooden', 'Wooden Staff', 'STR', 2, 'handR', 'wooden', 'COMMON'),
       ...ROBE,
     ],
     techCap: 4,
-    techniques: [tk('ember', 'TARGETING'), tk('siphon', 'CHARGING'), tk('stoneskin', 'HELD')],
+    techniques: [tk('ember', 'TARGETING'), tk('siphon', 'CHARGING'), tk('stoneskin', 'HELD'), tk('jab', 'READY')],
     bayCap: 1, bays: [],
     finds: {
       gear: [
@@ -272,11 +276,13 @@ export const CORES = {
     scenario: { damage: { INT: 2 }, debuff: {}, figStates: { head: 'damaged' } },
     gear: [
       W('wand_adept', 'Adept Wand', 'INT', 1, 'handL', 'adept', 'MAGIC'),
-      W('charm_wooden', 'Wooden Charm', 'INT', 1, 'handR', 'wooden', 'COMMON'),
+      // Wooden Shield replaces the Charm (2026-07-12, Doug's balance pass) — pairs with Brace below.
+      // A 1H Wand freely pairs with a shield in the other hand (only a 2H Bow excludes one).
+      SH('shield_wooden', 'Wooden Shield', 1, 'handR', 't1', 'COMMON'),
       ...ROBE,
     ],
-    techCap: 3,
-    techniques: [tk('ember', 'READY'), tk('sacrifice', 'READY'), tk('barkskin', 'HELD')],
+    techCap: 4,
+    techniques: [tk('ember', 'READY'), tk('blast', 'READY'), tk('sacrifice', 'READY'), tk('brace', 'HELD')],
     bayCap: 3,
     bays: [mk('skeleton', 'ACTIVE')],
     finds: {

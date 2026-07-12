@@ -1,3 +1,193 @@
+## ‼ LOCKED (2026-07-12, Doug) — item 7: Barbarian non-home-race disable order — REVISES the 2026-07-03
+## cascade tiebreak lock; verified by hand against the exact code, precise expected outcome per race
+Doug picked "fix the disable order" (armor sheds before a weapon), and separately guessed a single
+piece drop would cover it — **confirmed exactly right for Human, and worked out the full math so the
+loop doesn't have to guess:**
+
+**Current cascade (`Body.cs:150`):** `candidates.OrderByDescending(c => c.Reserve)
+.ThenByDescending(c => c.Seq)` — sheds the single highest-Reserve item first, ties by most-recently-
+equipped. For Barbarian's STR pool this picks the Claymore (net 2 STR under Warlord's Might) over any
+single Plate piece (net 1 STR each — `Armor.Requirement` is `2*Tier` raw, `EffectiveArmor` applies
+Warlord's Might's −1/tier), because the claymore is the single priciest candidate. Losing the claymore
+= zero offense.
+
+**Fix:** partition by kind before the existing ranking — armor sheds before hand/ranged weapons,
+keeping the current Reserve/Seq ordering WITHIN each group (a minimal, surgical change, not a rewrite):
+```
+candidates
+    .OrderBy(c => c.Kind == "armor" ? 0 : 1)
+    .ThenByDescending(c => c.Reserve)
+    .ThenByDescending(c => c.Seq)
+```
+**This REVISES the 2026-07-03 lock ("highest-requirement-first, ties last-equipped-first," recorded in
+[[shared-todo]]) — flagging explicitly, not silently overriding it.** The new rule is still "highest-
+requirement-first, ties last-equipped-first" but now scoped WITHIN armor-vs-weapon tiers rather than
+globally — armor is fully exhausted as an option before a weapon is ever touched. This is a general
+rule (applies to every stat/every core), not a Barbarian special-case, so it's worth a quick sanity
+pass on other tight kits too once built, though nothing else in the current roster is known to hit this
+specific weapon-vs-armor tradeoff today.
+
+**Verified by hand against the exact numbers — write these as the new pinned test expectations,
+replacing the current blanket exclusion:**
+Full kit STR demand = Claymore 2 (net) + 4 Plate pieces × 1 (net) + Cleave 2 + Bind 2 = 10 (techniques
+reserve from the pool too, gear pool = Capacity − TechReserved). Gear-only demand (claymore + 4 armor) = 6.
+- **Half-Giant** (Capacity 10, gear pool 6): demand 6 ≤ pool 6 — nothing sheds, exact fit, unchanged.
+- **Human** (Capacity 9, gear pool 5): demand 6 > pool 5 by exactly 1 — sheds exactly **ONE** armor
+  piece (1 STR), claymore/Cleave/Bind all stay active. Full offense intact.
+- **Elf/Dwarf/Halfling** (Capacity 8, gear pool 4): demand 6 > pool 4 by exactly 2 — sheds exactly
+  **TWO** armor pieces (2 STR), claymore/Cleave/Bind all stay active. Full offense intact.
+Replace `CoreCampaignTests`' current `core.Id == "barbarian" && race.Id != "half_giant"` exclusion with
+a real assertion: every race WINS the campaign under Barbarian (not just Half-Giant), with the exact
+armor-piece-count-disabled expectations above pinned per race. This directly matches `CORE_RUNES.md`'s
+own already-written framing ("must deactivate/trade one small item... same triage pattern as any tight
+core") — that text was actually right, the CASCADE was the thing not yet matching it.
+
+## ‼ TOP PRIORITY / LOCKED (2026-07-12, Doug) — 6 items answered in one pass; build all, no remaining
+## ambiguity on any of them
+Doug worked through the "needs your attention" batch. Six separate, independent items below —
+loop can build them in any order, none block each other except where noted.
+
+### 1. ENGINE BUG — `colorBind` wrongly fills the whole part rect even when the template authors NO
+### fill; the resolved color never reaches the text either. Root-caused precisely, matches Doug's
+### report ("technique tiles... solid background instead of just a border and the same color text")
+`Game1.ManifestRenderer.cs` (~lines 1006-1041, the per-part draw loop): `fillTok =
+ResolveColorToken(pp.ColorBind, datum)`, then unconditionally `if (fillTok is not null) DrawFill(...)`
+— this ignores whether the template actually authored a `fill` for that part. Confirmed in the live
+`layout.json`: `techCard`'s `technique.attr` ("STR"/"INT"/etc label) and `technique.cost` (the number
+tag) parts both have `"colorBind": "technique.attrColor"` but **no `fill` key at all** — CD's intent is
+plainly "no fill, just tint something," yet the renderer fills the full rect anyway with whatever
+attribute color the technique resolves to. Meanwhile the TEXT color (`TextPxWrapped`/`TextPx`, ~line
+1101/1105) reads `_ui.Color(pp.Color ?? "ink", Ink)` — the STATIC authored `"color"` field (e.g. both
+parts are authored `"color": "str"` as the design-mockup default), which is NEVER updated by
+`colorBind`. So today: the FILL varies correctly per technique (INT shows blue, STR shows red, etc.)
+but the TEXT stays hardcoded to whatever the sample technique's color was ("str"/red) — for an actual
+STR technique the two coincidentally match (solid fill + same-color invisible text = the blob Doug
+described); for anything else they clash (colored fill, wrong-colored text) — worse, not better.
+
+**Fix — hoist the resolved token so both fill and text can use it correctly:** move `fillTok`'s
+declaration out of the `if (!stateBound)` block (currently local to it, out of scope by the time text
+draws) to the enclosing scope. Then: only apply `fillTok` as a `DrawFill` when `pp.Fill is not null`
+(i.e. the template actually authored a fill — `technique.icon`'s glyph swatch, which DOES have
+`fill:"str"`, keeps working exactly as today, colorBind overriding the static fallback). When
+`pp.Fill is null` but `fillTok` resolved (the `technique.attr`/`technique.cost` case, and likely
+others), draw NO fill and use `fillTok` for the TEXT color instead of the static `pp.Color`. Net rule:
+`colorBind` tints whatever's actually being drawn — the fill if one's authored, the text if none is.
+
+**This is not scoped to one card.** Any current or future template part with `colorBind` set and no
+`fill` hits the same bug — worth a quick grep across `layout.json` for other `colorBind`-without-`fill`
+parts once this lands, to confirm nothing else is quietly drawing the same wrong blob (spot-checked
+`wareCard`'s `ware.tag` — it DOES author both `fill` and `border`, so it's unaffected, but a fresh grep
+after the fix is cheap insurance). Add a Core-adjacent... actually this is Game-layer only (no Core
+change) — a live `RB_SMOKE` shot of a technique card before/after is the right verification, not an
+xunit test (rendering, not simulation).
+
+### 2. Merchant sell-eligibility — REVERSED from CD's #42 assumption: equipped pieces CAN be sold
+Doug: "equipped pieces can be sold why not." Drop the "equipped/wielded/slotted pieces CAN'T be sold"
+rule CD's #42 payload assumed (dimmed card + `EQUIPPED` chip in the price strip). Keep the attribute
+BADGES as authored (Doug: "keep the badges") — no need to route CD a design change here, just build the
+sell feed without excluding worn/wielded items. Selling an equipped piece should presumably
+auto-unequip it (needs a decision on whether that's instant or blocked mid-combat — same
+`CanEditLoadout`/`Choosing-or-Cleared` gate that already governs all other loadout edits applies here
+too, no new rule needed). This item was already flagged "NEW, unplanned scope, not yet prioritized" —
+still true, just noting the assumption flip for whenever it gets built.
+
+### 3. RuneDiscount → 0 for all cores: CONFIRMED, and it turns out there's nothing to build
+Checked `CoreRune.cs`: `RuneDiscount` already defaults to `0`, and NONE of the 7 roster cores in
+`CoreRunes.cs` ever pass a nonzero value — every core is already at the "retired to 0" state the working
+assumption in `CORE_RUNES.md` describes. This was a pure documentation question, now answered: mark
+`CORE_RUNES.md`'s "flagged, needs Doug's confirm" note as CONFIRMED, no code change owed.
+
+### 4. Contextual backdrops — map-generation now "secretly" assigns each node's Scene (Doug's rule)
+Doug: "The city map should be generated with it secretly knowing what each encounter is and what
+backdrop/theme it wants it to be. The only ones that are special are the quarry and lumber yard ones for
+resource nodes and the camp and castle ones." Translates to a precise rule:
+- **Camp → `enc_camp`, Castle → `enc_city_gates`** — already built (`MapNode.Scene`), fixed, no
+  randomness, unchanged.
+- **ResourceHold → randomly `enc_quarry` OR `enc_lumber`**, decided once per node, stable across
+  revisits (Doug's "secretly knowing" = decided at generation time, not re-rolled).
+- **Everything else that routes through Encounter (Skirmish, Quest — Merchant has its own screen, never
+  reads this; Unknown always resolves to a concrete type before becoming Current)** → randomly one of
+  the general terrain pool: `enc_forest` / `enc_mountain` / `enc_river` / `enc_meadow`, same
+  once-per-node stability rule.
+
+**Implementation shape:** `MapNode.Scene` is currently a parameterless pure function of `Type` (no
+randomness by design, per its own doc comment). Needs randomness now, but the sim must stay
+DETERMINISTIC (CLAUDE.md) — reuse the EXACT pattern `Expedition.EncounterFor` already uses for
+per-node-stable foe picks: a private `Seed(nodeId)` method in `Expedition.cs` derives a stable seed per
+(leg, node id). Change `MapNode.Scene` from a property to `public string Scene(ulong seed)` — Camp/
+Castle ignore the seed (fixed), ResourceHold hashes it into a 2-way pick, everything else hashes it into
+the 4-way terrain pool pick. Add a small `Expedition.CurrentScene` convenience property (`Map.Current
+.Scene(Seed(Map.Current.Id))`) so `Game1.ManifestRenderer.cs:751`'s `"encounter.scene" => InRun ?
+Exp.Map.Current.Scene : null` becomes `Exp.CurrentScene` — keeps `Seed` private, no visibility widening.
+**Needs-CD note (write to the outbox in the same pass):** none for the mechanism itself (it's pure
+engine wiring over assets CD already shipped), but flag that the terrain pool is only 4 variants for
+what could be many Skirmish/Quest nodes on a denser future map (`shared-todo.md`'s "City map node
+density" item) — repeats will happen, that's expected/fine per Doug's "cheap to add more" framing
+already on file, not a blocker now.
+
+**✅ BUILT (2026-07-12, loop):** exactly the specified shape. `MapNode.Scene` is now
+`public string Scene(ulong seed)` — Camp→`enc_camp`, Castle→`enc_city_gates` (both ignore the seed);
+ResourceHold→`new Rng(seed).Next(2)` over `{enc_quarry, enc_lumber}`; every other kind→`Next(4)` over
+`{enc_forest, enc_mountain, enc_river, enc_meadow}`. `Expedition.CurrentScene` =>
+`Map.Current.Scene(Seed(Map.Current.Id))` (Seed stays private, no visibility widening); the engine's
+`encounter.scene` bind now reads `Exp.CurrentScene`. Deterministic + per-node-stable by construction
+(reuses the FNV `Seed(leg,id)` that already seeds foe/merchant/loot rolls), so a node keeps one
+backdrop all run. Retired the old parameterless `Scene` property + its "Needs-human/combat_field
+fallback" — that flag is now RESOLVED, all 8 terrain PNGs are wired. Tests rewritten
+(`MapNodeSceneTests`): pool membership, fixed-cases-ignore-seed, both-variants-and-all-4-terrains
+reachable across seeds, determinism. 544 green, Game compiles clean. CD outbox density note handled
+below (already tracked in `shared-todo.md`).
+
+### 5. DEX-timed Retreat/Redeploy — LOCKED formula (Doug, placeholder numbers, build for real)
+Doug: "Starts on arrival, ticks to full in 30s, 2% faster per dex as a placeholder." Precise reading,
+matching the EXACT existing haste-rate shape (`Caster.cs:23`'s `HasteRate = 2 // % cooldown reduction
+per point of DEX` — Doug is deliberately reusing this convention, not inventing a new one):
+- Timer starts the instant the player ARRIVES at the node (not on node-clear).
+- Base time-to-available: **30 seconds** (300 ticks at the fixed 10 ticks/sec clock, matching
+  `Techniques.cs`'s own tick convention).
+- DEX reduces this: **2% faster per DEX point**, same `HasteRate = 2` shape as technique cooldowns —
+  `effectiveTicks = 300 * (1 - 0.02 * Capacity(Dex))`, clamped to a sane floor the same way
+  `Caster.EffectiveCooldown` clamps its own haste (check `HasteCap` there — reuse it, don't invent a
+  new cap).
+- Exposed as a 0..1 progress fraction (ticks elapsed / effectiveTicks) for the UI to read — the
+  Retreat/Redeploy button needs a fill-bar or readout, which is new manifest surface CD hasn't built
+  yet (see outbox item below).
+**All placeholder numbers per Doug's own framing — build for real, not a stub, but the 30s/2% are
+explicitly tunable later, not a final balance pass.**
+
+**CD outbox item needed (writing it now, in the same pass):** the Retreat/Redeploy button currently has
+no progress-UX authored — needs a fill-bar (or radial, or numeric countdown, CD's call on treatment)
+showing progress toward availability, gated so it doesn't show at all once the button is already
+available. Routing to `outputs/CLAUDE_DESIGN_issues.md` as its own item.
+
+### 6. Foes healing with techniques — Part 1 UNBLOCKED (just build it, not a design question), Part 2
+### FULL trigger rule LOCKED (Doug, "full implementation")
+Doug on Part 1 ("keeps everything active that's possible to activate," the technique-activation-retry
+gap): "sounds like it's just something that needs to change not sure why it's a blocker." Correct —
+reclassifying from Needs-Human to a plain build item: `Battle.cs`'s foe setup currently calls
+`Activate` on the whole `Arsenal` ONCE at encounter start; anything that fails (insufficient capacity at
+that instant) is never retried even after capacity frees up later. Fix: a continuous best-effort retry
+— attempt every not-yet-active Arsenal technique each tick (or on every capacity-change event, whichever
+is cheaper to wire against the existing tick loop). This benefits every foe technique, not just healing.
+
+**Part 2 — the actual heal-priority decision rule, Doug's exact words: "it should see any damage that
+either has removed or disabled something or 25% but it should always try to heal CON hard. Full
+implementation."** Reading: trigger heal-priority (prefer any off-cooldown `Heals:true` technique over
+attacking) when EITHER (a) the foe has a part currently DISABLED/broken by damage (any stat, not just
+CON), OR (b) the foe's overall HP has dropped to ≤75% (i.e. taken ≥25% total damage) — these are the
+two trigger conditions, not additive thresholds. Separately and unconditionally: **whenever a CON part
+specifically is damaged/disabled, prioritize healing it aggressively** — reads as CON getting special
+weight because losing it cascades (a broken chest kills BOTH the CON heal line AND the CON shield line
+at once, per this file's own earlier finding), so a foe should treat a hurt CON part as more urgent than
+the general threshold would otherwise rank it. **"Full implementation" = build both parts for real, not
+a stopgap** — Part 1's retry loop plus Part 2's trigger rule, wired together so a foe that regains
+capacity (Part 1) and meets a trigger condition (Part 2) actually activates its heal that tick.
+**Flagging my own reading for a quick confirm, not blocking on it:** "25%" is read here as "HP has
+dropped to 75% or below" (25% damage taken) rather than "HP at or below 25% remaining" — if Doug meant
+the latter (a much later, more desperate trigger), that's a one-line change once caught. Also open: does
+this retroactively change Troll/`ArmedHealing`'s existing balance/tests (flagged in the original entry,
+still applies) — re-check their thesis once built, don't assume unchanged.
+
 ## ✅ RE-ARM — CD DROP PASS 12 PROCESSED (2026-07-12) — LOOP MAY RESUME
 The 3 truncated files (`layout.json`, `Content.mgcb`, `design/dchtml/asset-manifest.js`) turned out to
 be a MOUNT-side sync glitch, not a real corruption on Doug's end — his local copies were complete
@@ -264,12 +454,12 @@ as "just" the balance pass:**
 `design/systems/CORE_RUNES.md`'s Summoner + Adept entries are already reconciled to match (this pass) —
 canon doc is ahead of code now, code just needs to catch up to what's written above.
 
-**Also needs a CD outbox item** (not written yet — I'll add it in the same pass as this STATUS entry):
-`design/dchtml/core-kits.js` still shows the PRE-balance-pass kits for both Adept (staff_wooden as `'INT'`,
-no Jab in `techniques`) and Summoner (Wand+Charm, Ember/Sacrifice/Barkskin, `finds.minions` still lists
-`golem`/`hound` as FINDS not defaults — that part's fine, only the *default* `bays`/`gear`/`techniques`
-need the swap). Once the engine build above lands, the NewGame/Equipment screens will keep showing the
-OLD kit until CD gets this — it's a real design/engine divergence risk, not just cosmetic drift.
+**✅ DONE 2026-07-12 — `design/dchtml/core-kits.js` hand-patched directly** (Doug: "fix core_kits.js on
+our side so I don't need a round trip" — skipped the usual CD outbox route on his explicit instruction).
+Adept's `staff_wooden` → `'STR'` + `jab` added; Summoner's `charm_wooden` → a Wooden Shield, `techniques`
+→ `[ember, blast, sacrifice, brace]`, `techCap` → 4, new `blast` entry added to the `T` catalog.
+Syntax-checked clean. CD outbox has a Confirm-to-Close note flagging this as a direct patch so their
+NEXT drop doesn't silently revert it.
 
 **1. Staff flips from INT to STR — makes Jab a free backup attack, zero changes needed to Jab itself.**
 Today `Armory.cs:71`: `Staffs = Named("staff", Stat.Int, WeaponKind.Staff, ...)`. Change `Stat.Int` →

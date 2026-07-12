@@ -7,22 +7,13 @@ moves to **## Confirm-to-Close** (one line, nothing to do but clear it from memo
 
 ## Open
 
-### Adept + Summoner Starting Kits — `core-kits.js` Stale Against the 2026-07-12 Balance Pass
-Doug's balance spreadsheet locked real kit changes for these two cores (engine side is being built now,
-see STATUS.md) but `core-kits.js` (design/dchtml, so NewGame + Equipment's default-kit render) still
-shows the OLD kits — this will visibly diverge from the shipped game once the engine catches up.
-- **Adept:** `staff_wooden` should be `'STR'` (was `'INT'`) — the Staff flips to STR-gated. Add **Jab**
-  to `techniques` (currently `[ember, siphon, stoneskin]` → `[ember, siphon, stoneskin, jab]`, techCap
-  stays 4). Weapon note if you carry one: Staff's own spell bonus is now the same flat formula as a
-  Tome, no longer "2× a tome."
-- **Summoner:** `gear` swaps `charm_wooden` → a Wooden Shield entry (CON shieldobj, same slot pattern as
-  Grunt/Warden's `shield_wooden`) — Wand stays. `techniques` becomes `[ember, blast, sacrifice, brace]`
-  (was `[ember, sacrifice, barkskin]`) — **`blast` is new** (INT wand-attack; if you don't have a `T.blast`
-  entry yet, mirror `T.jab`'s shape) and **Brace replaces Barkskin** (CON shield source, not INT ward).
-  `techCap` grows 3→4. `bays`/default minions: **Skeleton only** — this part may already be right on your
-  side (worth a quick check, not a report of a bug).
-Reference for exact numbers: `design/systems/CORE_RUNES.md`'s Adept/Summoner entries were just
-reconciled to the locked spreadsheet — safe to copy from there directly rather than re-deriving.
+### CityMap Retreat/Redeploy — Progress-to-Available UX (NEW, 2026-07-12 Doug)
+New mechanic landing engine-side: Retreat/Redeploy now takes time to become available (DEX-timed, starts
+on arrival, placeholder 30s base). The button currently has no way to show progress toward that — needs
+a treatment (fill-bar sweep across the button, a radial, a numeric countdown, whatever reads best against
+`retreatBtn`'s existing states) that's hidden once the button is actually available (so it doesn't clutter
+the normal case). No numbers needed from you — the engine will feed a 0..1 progress fraction, just needs
+somewhere to draw it.
 
 ### Figure + Gear Asset Regen Batch (B2-GO)
 Bow sprites landed (see Confirm-to-Close) — the rest of the batch is still open:
@@ -70,6 +61,14 @@ re-extraction is still open, the engine renders only what the manifest authors:
 
 
 ## Confirm-to-Close (landed and verified — nothing to do, just clear these from memory)
+- **Adept + Summoner Starting Kits** — **hand-patched directly in `design/dchtml/core-kits.js` by
+  Cowork, 2026-07-12, at Doug's explicit request (skipping the usual CD round-trip).** NOT your work,
+  but flagging clearly so your NEXT drop doesn't silently clobber it: Adept's `staff_wooden` is now
+  `'STR'` + `jab` added to `techniques`; Summoner's `gear` swaps `charm_wooden` → `SH('shield_wooden',
+  'Wooden Shield', 1, 'handR', 't1', 'COMMON')`, `techniques` is now `[ember, blast, sacrifice, brace]`,
+  `techCap` is 4. A new `blast` entry was added to the `T` catalog (INT, cost 1, `needs:'wand'`) since it
+  didn't exist yet. If your own generation pipeline re-derives `core-kits.js` from a different source of
+  truth, fold these same changes in there too so a future drop doesn't revert them.
 - **B0 · B0b · B1a · B3** — evening 2026-07-03 drop, all verified landed.
 - **B1b** — key-set diff guard now runs automatically in `extract_merge.js` on every merge.
 - **B4** — "open Equipment" button elements on Encounter + CampaignMap, landed.

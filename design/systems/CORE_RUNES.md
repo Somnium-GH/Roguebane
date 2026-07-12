@@ -53,8 +53,9 @@ Shared rule: **on-hit boons require a landed PART-hit** — never a shield-absor
 
 Base HP stays race-owned (all refs show Human hp 20). The old per-core `RuneDiscount` (rune-PRICE
 discount) appears nowhere in v6 — affordability perks now live in the Core Effects, which discount
-ATTRIBUTE costs, a different thing. Working assumption: RuneDiscount retires to 0 for all cores
-(**flagged, needs Doug's confirm** — Jack of All Trades reads as attribute costs, not rune prices).
+ATTRIBUTE costs, a different thing. **RuneDiscount retires to 0 for all cores — CONFIRMED 2026-07-12
+(Doug).** Matches current code already (`CoreRune.cs`'s default, never overridden by any roster core) —
+no code change was owed, this was purely a documentation question.
 
 ## Default loadouts
 Requirement = fully-active reserve demand per stat (armor + weapons + skills + minions), effect discounts applied.

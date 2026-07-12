@@ -264,6 +264,10 @@ public sealed class Expedition
     // STABLE per merchant node (same node id => same price, so the run stays reproducible).
     public int HealPricePerHp => 1 + new Rng(Seed(Map.Current.Id) ^ HealSalt).Next(2); // 1..2 gold / HP
 
+    // The backdrop scene for the node the player is on (item 4, Doug 2026-07-12): the node decides its
+    // own terrain off its stable per-node seed, so it's fixed for the whole run. Keeps `Seed` private.
+    public string CurrentScene => Map.Current.Scene(Seed(Map.Current.Id));
+
     // §12 merchant healing: a 1-HP buy at the per-HP price, and a FULL repair at a premium (placeholder
     // +1 gold per missing HP — tune with the rest of the economy). HP only, out of combat (§10).
     public bool BuyHeal()

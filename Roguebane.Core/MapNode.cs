@@ -23,17 +23,22 @@ public sealed class MapNode
     public bool Visited { get; private set; }
 
     // The backdrop scene id for this node's encounter; the shell resolves it to bg/{scene}.png via the
-    // manifest imageBind (CD_STATUS #41). Only the DESIGNED mappings are wired — Camp and Castle. The
-    // terrain variants for Skirmish / Quest, and the quarry-vs-lumber split for ResourceHold, are
-    // UNDESIGNED (Needs human), so every other kind falls back to the neutral combat field. Scene is a
-    // pure function of Type (no randomness), so a node's backdrop is stable across revisits — the
-    // flagged terrain-persistence question does not arise until random terrain is introduced.
-    public string Scene => Type switch
+    // manifest imageBind (CD_STATUS #41; terrain rule LOCKED by Doug 2026-07-12). Camp and Castle are
+    // fixed. ResourceHold picks quarry-vs-lumber; every other Encounter-routed kind (Skirmish / Quest —
+    // Merchant has its own screen and never reads this; Unknown always resolves to a concrete type
+    // before it can be Current) picks from the general terrain pool. `seed` is the caller's per-node
+    // STABLE seed (Expedition.Seed over leg+id), so a node keeps ONE backdrop across revisits while
+    // different nodes vary — deterministic, no wall-clock, per CLAUDE.md's fixed-timestep rule.
+    public string Scene(ulong seed) => Type switch
     {
         NodeType.Camp => "enc_camp",
         NodeType.Castle => "enc_city_gates",
-        _ => "combat_field",
+        NodeType.ResourceHold => ResourceScenes[new Rng(seed).Next(ResourceScenes.Length)],
+        _ => TerrainScenes[new Rng(seed).Next(TerrainScenes.Length)],
     };
+
+    private static readonly string[] ResourceScenes = { "enc_quarry", "enc_lumber" };
+    private static readonly string[] TerrainScenes = { "enc_forest", "enc_mountain", "enc_river", "enc_meadow" };
 
     // Layout hints for the chart render: Col = depth from camp, Row = lane within that depth. Pure
     // data (no engine types) so Core stays headless; the shell maps them to screen coordinates.

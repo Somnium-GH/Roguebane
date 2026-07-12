@@ -748,7 +748,7 @@ public partial class Game1
         // Per-node backdrop scene (CD_STATUS #41): Core owns the scene id off the live node; the
         // backdrop element's imageBind bg/{encounter.scene} resolves through here. Null out of run so
         // the element falls back to its authored mock image.
-        "encounter.scene" => InRun ? Exp.Map.Current.Scene : null,
+        "encounter.scene" => InRun ? Exp.CurrentScene : null,
         "campaign.taken" => InRun ? _campaign.LegIndex + " / " + _campaign.LegCount : null,
         _ => null,
     };
