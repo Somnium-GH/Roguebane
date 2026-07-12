@@ -1,3 +1,21 @@
+## ‼ SMALL FIX (2026-07-12) — full 7-core audit against Doug's "all the kits are wrong" — one real
+## discrepancy found, everything else checks out clean
+Doug asked for a full pass; did a field-by-field comparison of all 7 cores across `CoreRunes.cs` (the
+only copy that affects real gameplay), `design/systems/CORE_RUNES.md` (canon doc), and `design/dchtml/
+core-kits.js` (CD's own mirror, just hand-patched this session). Result: **Grunt, Warden, Reaver,
+Ranger, and Barbarian match cleanly across all three** — budget, action slots, minion cap, stat bonuses,
+starting weapons/armor/techniques all agree. Two real gaps, not more:
+1. **Summoner** — already known, already directed above (item 2 of the earlier LOCKED batch): `CoreRunes.cs`
+   hasn't picked up the Blast/Brace/Wooden-Shield/Skeleton-only/`ActionSlots:4` rebuild yet (confirmed via
+   `git log` — not built as of this pass). Not a new finding, just confirming it's still the one thing
+   actually outstanding.
+2. **NEW — Adept's `MinionCap` is `0` in `CoreRunes.cs` (line 44) but `1` in BOTH `CORE_RUNES.md` ("Minions:
+   none (capacity 1)") and `core-kits.js` (`bayCap: 1`).** Two sources agree, one doesn't — reads like
+   `CoreRunes.cs` is the stale one here (Adept has no "no minions ever" framing anywhere the way Reaver's
+   explicit "glass-cannon... no minion capacity" does). **Fix:** `CoreRunes.cs:44`, `MinionCap: 0` →
+   `MinionCap: 1`. Low-risk, single-line, but flagging rather than just asserting — if there was a reason
+   Adept was set to 0 that isn't written down anywhere, surface it before building over it.
+
 ## ‼ LOCKED (2026-07-12, Doug) — item 7: Barbarian non-home-race disable order — REVISES the 2026-07-03
 ## cascade tiebreak lock; verified by hand against the exact code, precise expected outcome per race
 Doug picked "fix the disable order" (armor sheds before a weapon), and separately guessed a single
@@ -80,6 +98,21 @@ parts once this lands, to confirm nothing else is quietly drawing the same wrong
 after the fix is cheap insurance). Add a Core-adjacent... actually this is Game-layer only (no Core
 change) — a live `RB_SMOKE` shot of a technique card before/after is the right verification, not an
 xunit test (rendering, not simulation).
+
+**✅ BUILT (2026-07-12, loop):** exactly per the prescription. In `DrawParts` (Game1.ManifestRenderer.
+cs): hoisted a `string? textTok` into the per-part scope; captured `fromColorBind = fillTok is not
+null` right after `ResolveColorToken(pp.ColorBind, datum)` (distinguishing the colorBind token from the
+bind-specific swatch/glyph paths); the fill decision now reads "if `fromColorBind && pp.Fill is null` →
+set `textTok`, draw NO rect fill; else fill as before" — so bind-specific swatches (attr.color, attrs.
+pip) and glyph tiles (technique.icon, which authors `fill`) are untouched, and a colorBind part WITH an
+authored fill still fills (colorBind overriding the token). Both general text draws now read
+`_ui.Color(textTok ?? pp.Color ?? "ink", Ink)`. **The insurance grep found this was NOT one card:** 7
+colorBind-without-fill TEXT parts all drew the blob — `technique.attr`, `technique.cost`, `minion.cost`,
+`pool.attr.total`, `attrs.total`, `loadout.attr`, `minions.attr` — all now tint text uniformly. The 3
+other `colorBind`-without-`fill` hits are on `border` sub-objects (equipment/newgame/coreCard element
+borders), a SEPARATE pre-existing path (part-border colorBind was already ignored at the `Border(...)`
+draw) — out of scope, unaffected. Game compiles clean; live RB_SMOKE pixel-confirm pending Doug's
+rebuild (his instance is running, output DLL-locked here).
 
 ### 2. Merchant sell-eligibility — REVERSED from CD's #42 assumption: equipped pieces CAN be sold
 Doug: "equipped pieces can be sold why not." Drop the "equipped/wielded/slotted pieces CAN'T be sold"

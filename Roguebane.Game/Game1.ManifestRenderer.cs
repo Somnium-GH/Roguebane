@@ -1003,6 +1003,10 @@ public partial class Game1
                 }
                 // Remaining state-driven chrome (.rarity) still needs its model — keep gated.
                 var stateBound = pp.Binds is { } sb && sb.EndsWith(".rarity");
+                // A colorBind on a part that authors NO fill tints the TEXT, not the whole rect (Doug
+                // item 1: technique.attr/technique.cost drew a solid attr-color blob instead of a
+                // same-color label). Carried out of the fill block below to the text draw.
+                string? textTok = null;
                 if (!stateBound)
                 {
                     // attr.color binds the swatch's fill TOKEN to the datum (str/int/dex/con);
@@ -1014,6 +1018,7 @@ public partial class Game1
                     // colorBind (manifest-declared) wins; the older bind-specific tinting stays as the
                     // fallback for manifests that predate it.
                     string? fillTok = ResolveColorToken(pp.ColorBind, datum);
+                    var fromColorBind = fillTok is not null; // vs the bind-specific swatch/glyph paths below
                     var skipFill = false;
                     if (fillTok is not null) { }
                     else if (pp.Binds == "attr.color" && datum is not null)
@@ -1033,7 +1038,11 @@ public partial class Game1
                         fillTok = tq.Stat.ToString().ToLowerInvariant();
                     else if (pp.Binds is "technique.icon" or "loadout.glyph" && datum is Roguebane.Core.Minion mnq)
                         fillTok = mnq.Stat.ToString().ToLowerInvariant();
-                    if (fillTok is not null) DrawFill(RectOf(pp.Rect), new Fill { Token = fillTok });
+                    // colorBind tints whatever's actually drawn: the fill if the template authored one
+                    // (or a bind-specific swatch/glyph tile, which fills by design), otherwise the TEXT.
+                    if (fromColorBind && pp.Fill is null)
+                        textTok = fillTok;                       // no rect fill — carry to the text draw
+                    else if (fillTok is not null) DrawFill(RectOf(pp.Rect), new Fill { Token = fillTok });
                     else if (!skipFill && pp.Fill is { } pf) DrawFill(RectOf(pp.Rect), pf);
                     if (pp.Border is { } pb)
                         Border(pp.Rect.X, pp.Rect.Y, pp.Rect.W, pp.Rect.H, _ui.Color(pb.Color, Border0),
@@ -1098,11 +1107,11 @@ public partial class Game1
                             : (int)(pp.Rect.X + pp.Rect.W - asz.X);
                         var ay = (int)(pp.Rect.Y + pp.Rect.H / 2f - asz.Y / 2f);
                         RecordTextBox(InkBox(tfont, text!, ax, ay, pp.FontPx), RectOf(pp.Rect), text!, tfont);
-                        TextPx(tfont, text!, ax, ay, _ui.Color(pp.Color ?? "ink", Ink), pp.FontPx);
+                        TextPx(tfont, text!, ax, ay, _ui.Color(textTok ?? pp.Color ?? "ink", Ink), pp.FontPx);
                         continue;
                     }
                 }
-                TextPxWrapped(tfont, text!, RectOf(pp.Rect), _ui.Color(pp.Color ?? "ink", Ink), pp.FontPx);
+                TextPxWrapped(tfont, text!, RectOf(pp.Rect), _ui.Color(textTok ?? pp.Color ?? "ink", Ink), pp.FontPx);
             }
         }
     }
