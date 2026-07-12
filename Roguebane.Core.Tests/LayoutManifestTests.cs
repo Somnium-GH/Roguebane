@@ -356,4 +356,25 @@ public class LayoutManifestTests
             Assert.InRange(sh.Opacity, 0.0, 1.0);
         });
     }
+
+    [Fact]
+    public void NodeConditionalPopupIdsMatchTheirGatePrefix()
+    {
+        // Cross-layer CONTRACT, not CD content (Doug 2026-07-12: an empty "QUEST" box floated over a
+        // live fight). The quest/camp popups are flat sibling clusters with no parent link, so the Game
+        // renderer hides each cluster by id-PREFIX (NodeGateBindFor) off the panel's bind. This pins the
+        // assumption that gate depends on: whatever CD names them, an `encounter.quest`-bound element's
+        // id must start "quest" and an `encounter.camp`-bound one "campMarker" -- otherwise the prefix
+        // gate would miss it and the box would leak back onto fight nodes. Tolerant: if CD drops the
+        // binds entirely there is nothing to check; only a prefix MISMATCH reddens -- which is exactly
+        // when the Game-side gate needs updating in lockstep.
+        foreach (var s in Real().Screens.Values)
+            foreach (var e in s.Elements)
+            {
+                if (e.Binds == "encounter.quest")
+                    Assert.StartsWith("quest", e.Id, StringComparison.Ordinal);
+                if (e.Binds == "encounter.camp")
+                    Assert.StartsWith("campMarker", e.Id, StringComparison.Ordinal);
+            }
+    }
 }
