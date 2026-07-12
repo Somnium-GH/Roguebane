@@ -140,6 +140,22 @@ conditional-width/hide-when-empty field on `Element`, or (b) telling us which ca
 pixel widths so it's threshold-authored per screen state — your call. Not blocking, low urgency,
 cosmetic only.
 
+### Minion Combat Card — Name/Description Vertical Overlap (B34)
+Doug (2026-07-12 playtest): the Hound minion card's description text overlaps its name/attr —
+"Found"/"Hound"/"DEX" stacked illegibly. Root-caused against the real `layout.json`: the
+`combatMinionCard` template (`layout.json:10745`, the in-combat action-bar minion card) authors its
+header divider at rect `[1,1,76,26]` (ends y27), the `minion.name` at `[6,24,0,0]` (`fontPx 8.5`, so its
+glyphs span ≈ y24–33 — overrunning the header downward), the `minion.cost` (the DEX gate) at
+`[73,24,0,0]`, and the `minion.description` at `[1,27,76,108]` — its TOP edge (y27) sits directly inside
+the name's rendered glyph band, so the full-width description overprints both the name (left) and the
+cost (right). The sibling Equipment `minionCard` (`layout.json:11632`) does NOT have this: a taller
+header `[1,1,76,37]` (ends y38), a BOUNDED name `[6,24,45,11]` (ends y35, inside the header), and the
+description at `[1,38,...]` starting at the header bottom — clean, no overlap. **Ask:** bring
+`combatMinionCard`'s vertical layout in line with `minionCard`'s — grow the header divider to enclose
+the name and move `minion.description`'s top below the name glyph band (≈ y36+, there's ample room:
+the card is 136px tall). `.dc.html` + re-extracted `layout.json`. No engine change — the sibling
+template already renders correctly with the same fields.
+
 ### Re-Extraction for the v6 Roster (B20)
 The big one — the engine renders only what the manifest authors, so everything here is render-blocked
 until it lands.

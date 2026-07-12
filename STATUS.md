@@ -213,6 +213,18 @@ card template, or a z-order/anchor collision specific to this card's description
 `layout.json` geometry check against the minion card template (same class of investigation as the
 CON-row/pip-strip bugs already fixed this week), then route to CD if it's a region/z problem.
 
+### ⇒ ROOT-CAUSED + ROUTED TO CD as B34 (2026-07-12, loop) — combatMinionCard, description top sits in the name glyph band
+Not the palette card — it's the IN-COMBAT `combatMinionCard` (`layout.json:10745`). Its header divider
+`[1,1,76,26]` ends y27, but the `minion.name` `[6,24,0,0]` (`fontPx 8.5`) renders glyphs ≈ y24–33
+(overrunning the header), and `minion.description` `[1,27,76,108]` has its TOP at y27 — inside that glyph
+band — so the full-width description overprints both the name (left) and the DEX-gate `minion.cost`
+(`[73,24,...]`, right), giving Doug's three-way "Found/Hound/DEX" stack. The Equipment sibling
+`minionCard` (`layout.json:11632`) is CLEAN with the same fields: taller header `[1,1,76,37]`, bounded
+name `[6,24,45,11]` (ends y35, inside the header), description at `[1,38,...]` (header bottom). ⇒ CD-owned
+geometry, logged as **B34** (align `combatMinionCard`'s header/name/description vertical layout to the
+working `minionCard`). No engine change — the sibling template proves the fields render fine when placed
+right.
+
 **5. Screenshot-confirmed — the top resourceStrip (Supplies/Charge/Summons) reads as illegible; only
 GOLD's number is visible.** Checked the data path (`Game1.ManifestRenderer.cs:1204-1211`): all four
 `ResourceReadout`s ARE populated correctly — Supplies/Charge/Summons format as `"current/max"` (e.g.
