@@ -31,9 +31,9 @@ DPS at the base 8.0s technique speed with a plain 1.0× verb: **DPS = dmg ÷ (8 
 | Bow (Short Bow) | 2H DEX, ranged slot | 1.0× | **OPEN** | 2 DEX | — | bypasses shields, spends Charge; needs both arms |
 | Sling (Shepherd's) | 1H DEX, ranged slot | **OPEN** | **OPEN** (< bow) | 1 DEX | — | bypasses shields, spends Charge; needs one arm |
 | Wand (Adept) | 1H INT, dual-OK | **OPEN** | 2 | 1 INT | — | shield-SUBTRACTION (reduced by standing shields, not consumed, no Charge) |
-| Staff (Wooden) | 2H INT | **OPEN** | 2 | 2 INT | — | plain BLOCKABLE melee; blocks the ranged slot; **+0.2× SPELL damage / tier (2× a tome)** |
-| Charm (Wooden) | off-hand INT | — | — | 1 INT | — | +0.1× MINION damage / tier |
-| Tome (Old Worn) | off-hand INT | — | — | 1 INT | — | +0.1× SPELL damage / tier |
+| Staff (Wooden) | 2H INT | **OPEN** | 2 | 2 INT | — | plain BLOCKABLE melee; blocks the ranged slot; **+1 SPELL damage / tier (2× a tome)** |
+| Charm (Wooden) | off-hand INT | — | — | 1 INT | — | +1 MINION damage / tier |
+| Tome (Old Worn) | off-hand INT | — | — | 1 INT | — | +1 SPELL damage / tier |
 
 **Material ladders:** melee Iron → Steel → Mithral → Dwarven Steel; bow Short → Long → Compound → Elven;
 sling Shepherd's → Braided → Sinew → Giantsbane; wand Adept → Twisted → Gemstone → Glowing; staff Wooden →

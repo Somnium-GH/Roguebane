@@ -137,6 +137,34 @@ popups DO still appear at their own nodes once the engine hosts those foeless ar
 **Not this drop's problem, no action:** the 4 pre-existing extraction gaps above; `#35` (parent-relative
 positioning, still engine-pending, unrelated); `#33` (prototype Core Effects note, informational).
 
+## ‼ NEEDS HUMAN (2026-07-12, external WEAPONS.md edit) — INT-implement damage rescaled MULT→FLAT in canon; code still multiplicative; staff value self-contradicts, do NOT reconcile until Doug confirms
+An external edit to `design/systems/WEAPONS.md` (folded into the loop's commit, accepted) changed the
+three INT-implement damage bonuses from MULTIPLICATIVE fractions to FLAT per-tier increments:
+- Staff SPELL: `+0.2× / tier (2× a tome)` → `+1 / tier (2× a tome)`
+- Charm MINION: `+0.1× / tier` → `+1 / tier`
+- Tome SPELL: `+0.1× / tier` → `+1 / tier`
+
+**Why not auto-reconciled (two blockers):**
+1. **Internal contradiction in the edit.** Old values were consistent (staff 0.2 = 2× tome 0.1, matching
+   the "(2× a tome)" annotation). New values set BOTH staff and tome to `+1/tier`, so staff is no longer
+   2× a tome — yet the "(2× a tome)" annotation stayed, AND `RULES_SNAPSHOT.md:64` (which SUPERSEDES per
+   CLAUDE.md) still reads "Staff … magic dmg = 2× a tome." So staff should likely be `+2/tier`, not `+1`.
+   This reads like an in-progress edit, not a finished number set — needs Doug to confirm staff = +1 or +2.
+2. **It's a mechanics/balance change, spreadsheet-driven.** Code currently implements the OLD multiplicative
+   form: `Body.CharmMinionMult`/`TomeSpellMult` = `1.0 + 0.1×tier` (`Body.cs:269-272`), consumed as
+   `power * mult` (`Caster.cs:394` minion, `Caster.cs:466` spell). Flipping to flat `+N/tier` means
+   rename→`…Bonus` (int), rewire both consumers to `power + bonus`, and rewrite the 4 asserts in
+   `WandTests.cs` (`TomeSpellMult==1.4`, `CharmMinionMult==1.2`) that pin the multiplicative values.
+   These numbers ride Doug's off-repo balance spreadsheet — per CLAUDE.md, reconcile on a spreadsheet drop,
+   not a raw contradictory doc edit.
+
+**Also:** staff's SPELL bonus is UNIMPLEMENTED regardless (no `StaffSpellMult` in code — only charm-minion
+and tome-spell exist), so the staff line is doc-only today either way. **Ask Doug:** confirm (a) flat
+`+1/tier` for charm-minion and tome-spell is final, and (b) staff = `+1` or `+2` per tier. On his yes,
+one clean pass reconciles `Body.cs` + `Caster.cs` + `WandTests.cs` (and wires the staff bonus if he wants
+it live). Until then code stays multiplicative and green (533/533) — canon and code KNOWINGLY diverge here,
+flagged, not silently dropped.
+
 ## ‼ URGENT CORRECTION (2026-07-12, Doug) — the CardPress fix the loop ALREADY SHIPPED for the
 ## Self-technique deactivate bug went the WRONG DIRECTION; the rule is the opposite of what was built
 **The loop already landed a fix** (`CombatTargeting.cs:20-33`, current code): `if (t.IsPassive ||
