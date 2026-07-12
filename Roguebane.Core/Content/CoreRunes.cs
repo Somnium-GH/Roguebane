@@ -41,7 +41,9 @@ public static class CoreRunes
         "adept",
         RuneBudget: 16,
         ActionSlots: 4,
-        MinionCap: 0,
+        MinionCap: 1, // capacity 1, starts empty — matches CORE_RUNES.md ("none (capacity 1)") and
+                      // core-kits.js (bayCap 1, bays:[]); the old 0 was same-day drift (Doug 2026-07-05,
+                      // no documented reason), reconciled 2026-07-12 per Doug's 7-core audit.
         // Jab added 2026-07-12 (Roguebane_Balance (14).xlsx): with the Staff now STR-gated it becomes a
         // free backup attack, giving Adept a real STR pressure (Demand tab: STR 3 = Staff 2 + Jab 1)
         // alongside its INT spell suite. Fills the 4th action slot.

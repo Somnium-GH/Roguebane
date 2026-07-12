@@ -7,6 +7,18 @@ moves to **## Confirm-to-Close** (one line, nothing to do but clear it from memo
 
 ## Open
 
+### core-kits.js → fetch shared cores.json (NEW, 2026-07-12 Doug, LOCKED architecture)
+Race stats + core budget/actions/minionCap/statBonus/CoreEffect/starting-kit are moving out of three
+hand-maintained copies (your `core-kits.js`, our `CoreRunes.cs`, `CORE_RUNES.md`) into one shared
+`design/systems/cores.json` — this is the fix for the exact drift this session kept catching (the
+Adept/Summoner kit patch we just hand-applied to your file, and today's Adept MinionCap mismatch).
+Once `design/systems/cores.json` lands (engine-side, tracked in `STATUS.md`), switch `core-kits.js`'s
+per-core `budget`/`effect`/`gear`/`techniques`/`bayCap` fields to a `fetch()` of that file at module
+load (same pattern you already use for the dynamic `import()`), instead of hand-typed object literals.
+Keep everything display-only as-is — accent hex, blurb, scenario copy, figure key, `finds` — none of
+that is drifting and none of it is in the JSON's scope. We'll ping you when the file lands with its
+exact shape; no action needed until then, just flagging so it's not a surprise in a future drop.
+
 ### CityMap Retreat/Redeploy — Progress-to-Available UX (NEW, 2026-07-12 Doug)
 New mechanic landing engine-side: Retreat/Redeploy now takes time to become available (DEX-timed, starts
 on arrival, placeholder 30s base). The button currently has no way to show progress toward that — needs

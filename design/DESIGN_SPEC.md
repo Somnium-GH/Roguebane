@@ -891,9 +891,12 @@ points there so the canon stays design-focused.
     Unblocks: `WornArmorBinding.SpriteKeys` (already resolves race/slot/theme keys, STATUS.md Debt) needs
     wiring into `Game1`'s figure compose — that's the only remaining gap, and it's an engine task now,
     not a design question.
-16. ~~ITEM-RANKING / auto-unequip priority~~ RESOLVED 2026-07-03 (§6e): disables highest-requirement-
-    first, ties last-equipped-first — a pure ranking over the live attr level. Numbers ride the
-    balance pass like everything else.
+16. ~~ITEM-RANKING / auto-unequip priority~~ RESOLVED 2026-07-03 (§6e), **REVISED 2026-07-12 (Doug,
+    Barbarian non-home-race finding)**: armor sheds before a weapon/ranged item is ever touched — a
+    coarser partition ranked ahead of the original ordering, which still applies WITHIN each tier
+    (highest-requirement-first, ties last-equipped-first, now scoped to armor-vs-armor or weapon-vs-
+    weapon, not globally). Reason: the old global ordering could shed a build's only weapon over a
+    cheap armor piece, leaving zero offense — see `STATUS.md`'s Barbarian entry for the worked numbers.
 17. ~~MERCHANT SCREEN~~ RESOLVED 2026-07-03: design/07 v2 + the manifest `merchant` screen ARE the
     design; popover retired; click-to-buy receiving LOCKED in §12. Residual OPEN: ware pricing/rarity
     economy tune (part of the balance pass).
@@ -910,6 +913,16 @@ points there so the canon stays design-focused.
 22. Ranged-weapon RENDER MOUNT (§6e): where an equipped bow/wand draws while the melee hands are full —
     assumed default: NOT drawn until a back-mount figure layer exists (fold into the figure-art regen
     batch, payload B2); do not invent art meanwhile.
+23. **LOCKED 2026-07-12 (Doug) — shared `cores.json` config, scope confirmed, implementation queued.**
+    Race base stats + each Core Rune's budget/actions/minion-cap/stat-bonus/Core-Effect/starting-kit
+    (technique/weapon/armor/minion IDs) move from three hand-maintained copies (`CoreRunes.cs` in
+    C#, `core-kits.js` in CD's JS, this doc's own prose tables) into ONE JSON file both sides read —
+    the exact three-way-drift problem this session kept hitting. **Explicitly OUT of scope (Doug's
+    call):** the underlying mechanical catalogs — what a technique/weapon/armor piece actually DOES
+    (reserve cost, damage, cooldown) — stay real C# in `Techniques.cs`/`Armory.cs`/`ArmorLines.cs`;
+    only the ASSEMBLY (which core gets which kit) moves to data. See `STATUS.md` for the implementation
+    directive (schema, file location, and the CD-sprite-id-vs-Core-weapon-id mismatch that needs
+    resolving as part of this).
 
 ## 18. DROPPED — must not resurface
 - **"Chassis" as the identity model** → split into **Race + Core rune** (§7).

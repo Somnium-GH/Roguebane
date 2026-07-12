@@ -1,4 +1,69 @@
-## ‼ SMALL FIX (2026-07-12) — full 7-core audit against Doug's "all the kits are wrong" — one real
+## ‼ HIGH PRIORITY / LOCKED (2026-07-12, Doug) — shared `cores.json` config: races + core kit assembly
+## move to ONE data file both Core and CD read, ending the 3-way drift this whole session kept hitting.
+## Scope CONFIRMED (Doug): races/kits only, mechanical catalogs (Techniques.cs/Armory.cs) stay C#.
+**Why:** this session found the SAME numbers drifting three separate ways (`CoreRunes.cs`, `core-kits.js`,
+`CORE_RUNES.md`) repeatedly — Adept/Summoner's balance-pass kit, now the Adept MinionCap mismatch above.
+A single source removes the class of bug, not just this instance of it.
+
+**Schema (`design/systems/cores.json` — sibling to `CORE_RUNES.md`, not inside `Roguebane.Content/`
+since it's design data, not a built game asset):**
+```json
+{
+  "races": {
+    "human":      { "str": 5, "int": 5, "dex": 5, "con": 5, "hp": 20 },
+    "elf":        { "str": 4, "int": 6, "dex": 4, "con": 4, "hp": 18 },
+    "dwarf":      { "str": 4, "int": 4, "dex": 4, "con": 6, "hp": 22 },
+    "halfling":   { "str": 4, "int": 4, "dex": 6, "con": 4, "hp": 18 },
+    "half_giant": { "str": 6, "int": 4, "dex": 4, "con": 4, "hp": 20 }
+  },
+  "cores": {
+    "grunt": {
+      "budget": 20, "actionSlots": 4, "minionCap": 2,
+      "statBonus": { "str": 1, "int": 1, "dex": 1, "con": 1 },
+      "effect": "JackOfAllTrades",
+      "kit": { "techniques": ["jab", "brace", "bandage"],
+               "weapons": ["<Weapon.Id for Iron Longsword>", "<Weapon.Id for Wooden Shield>"],
+               "armor": ["<4 Iron Plate Armor.Id strings>"], "minions": [] }
+    }
+    /* ...remaining 6 cores, same shape... */
+  }
+}
+```
+(Verify exact numbers against `CoreRunes.cs`'s CURRENT values — Adept's `minionCap` should already be
+the fixed `1` from the item right above this one; Summoner's `kit` should be the TARGET Blast/Brace/
+Wooden-Shield/Skeleton-only kit even though `CoreRunes.cs` hasn't caught up yet — this JSON becomes the
+new source of truth, so author it correct and let the loader make `CoreRunes.cs`'s old hardcoded values
+moot rather than matching them.)
+
+**‼ Real gap found while scoping this, needs resolving as part of the work, not after:** weapon/armor
+IDs are NOT unified today. `Armory.cs`'s `Named()` helper derives a weapon's `Id` from its display name
+(e.g. "Iron Buckler" → `shield_iron`, NOT `shield_buckler`) — but `core-kits.js`'s hand-authored ids use
+a DIFFERENT scheme for the same items (its own comment: "Ids follow the CD gear-catalog SPRITE
+convention"), and `shield_buckler` (JS) vs `shield_iron` (C#) for the same Iron Buckler is a real,
+already-existing divergence, not something this JSON introduces. **Before authoring the `kit.weapons`/
+`kit.armor` arrays, pick ONE id scheme both sides use** — recommend Core's own generated `Weapon.Id`/
+`Armor.Id` (already the mechanically authoritative one, and CD's sprite paths already need to resolve
+`sprites/gear/{id}` somehow, so reconciling toward Core's ids is probably less total churn than the
+reverse). Dump the actual generated ids via a quick throwaway `Console.WriteLine(string.Join(",",
+Armory.AllWeapons.Select(w => w.Id)))`-style check rather than hand-deriving them from the `Named()`
+lambda by eye — cheap insurance against a transcription bug in a file meant to stop exactly that class
+of error.
+
+**C# loader (Core side):** add a `CoreRuneCatalog.Load(string path)` (or embed the JSON as a compiled
+resource via the `.csproj` — no runtime file-path fragility, still swappable in dev) that deserializes
+into `Race`/`CoreRune` records via `System.Text.Json`, resolving `kit.techniques`/`weapons`/`armor`/
+`minions` id strings against `Techniques.All`/`Armory.AllWeapons`/`ArmorLines.All` (or equivalent
+lookup-by-id, add one if it doesn't exist)/`Minions.All` — throw loudly on an unresolvable id rather than
+silently dropping a kit item. `Content.Races`/`Content.CoreRunes`'s static fields become thin wrappers
+around the loaded catalog (`public static readonly Race Human = Catalog.Races["human"];` etc.) so
+every existing call site (`Races.Human`, `CoreRunes.Grunt`, `CoreRunes.Roster`) keeps compiling
+unchanged — this should be a content-loading change, not a call-site rewrite.
+
+**CD outbox item needed (writing it now):** `core-kits.js`'s per-core `budget`/`effect`/`gear`/
+`techniques`/`bayCap` fields should be POPULATED from `cores.json` (a `fetch()` at module load,
+matching how it already `import()`s dynamically) rather than hand-typed — keep `core-kits.js`'s own
+DISPLAY-only fields (accent hex, blurb, scenario, figure key, `finds`) as-is, those aren't drifting and
+aren't part of this JSON's scope.
 ## discrepancy found, everything else checks out clean
 Doug asked for a full pass; did a field-by-field comparison of all 7 cores across `CoreRunes.cs` (the
 only copy that affects real gameplay), `design/systems/CORE_RUNES.md` (canon doc), and `design/dchtml/
@@ -15,6 +80,15 @@ starting weapons/armor/techniques all agree. Two real gaps, not more:
    explicit "glass-cannon... no minion capacity" does). **Fix:** `CoreRunes.cs:44`, `MinionCap: 0` →
    `MinionCap: 1`. Low-risk, single-line, but flagging rather than just asserting — if there was a reason
    Adept was set to 0 that isn't written down anywhere, surface it before building over it.
+   **✅ BUILT (2026-07-12, loop) — no undocumented reason found, safe to reconcile.** Checked before
+   overwriting per the flag: `git blame` shows the `0` was set by Doug on 2026-07-05 — the SAME day
+   `CORE_RUNES.md` recorded "none (capacity 1)", so it reads as same-day drift, not a deliberate 0. No
+   code comment or design note anywhere justifies 0 (unlike Reaver's explicit "no minion capacity"
+   framing). Both other sources agree: `core-kits.js` adept entry = `bayCap: 1, bays: []`. Applied
+   `CoreRunes.cs:44` `MinionCap 0 -> 1` with a reconciliation comment, and pinned it in a new test
+   (`AdeptHasMinionCapacityOne`, CoreRuneRosterTests) so the drift can't silently return. 545 green;
+   nothing keyed off the old 0. (Summoner kit rebuild — the audit's other finding — remains the one
+   outstanding kit item, still awaiting Doug's spreadsheet.)
 
 ## ‼ LOCKED (2026-07-12, Doug) — item 7: Barbarian non-home-race disable order — REVISES the 2026-07-03
 ## cascade tiebreak lock; verified by hand against the exact code, precise expected outcome per race

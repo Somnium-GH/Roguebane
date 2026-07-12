@@ -58,6 +58,14 @@ public class CoreRuneRosterTests
         Assert.All(CoreRunes.Roster, c => Assert.False(string.IsNullOrEmpty(c.Accent), $"{c.Id} accent"));
     }
 
+    // Adept holds minion capacity 1 — reconciled 2026-07-12 from a same-day-drift 0 in CoreRunes.cs
+    // against CORE_RUNES.md ("none (capacity 1)") and core-kits.js (bayCap 1). Pinned so the drift
+    // can't silently return. (Starting minions aren't part of the technique Kit for any core, so there's
+    // nothing extra to assert about Adept's empty bay here — capacity is the whole discrepancy.)
+    [Fact]
+    public void AdeptHasMinionCapacityOne()
+        => Assert.Equal(1, CoreRunes.Adept.MinionCap);
+
     [Fact]
     public void EveryTechniqueAndMinionCarriesDisplayCopy()
     {
