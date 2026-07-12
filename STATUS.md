@@ -64,6 +64,49 @@ unchanged — this should be a content-loading change, not a call-site rewrite.
 matching how it already `import()`s dynamically) rather than hand-typed — keep `core-kits.js`'s own
 DISPLAY-only fields (accent hex, blurb, scenario, figure key, `finds`) as-is, those aren't drifting and
 aren't part of this JSON's scope.
+
+### ⇒ SCOPING PASS (2026-07-12, loop) — dumped the authoritative ids; 3 blockers surfaced BEFORE authoring
+Ran a throwaway that dumped every generated id + each core's RESOLVED kit straight from `CoreRunes.Roster`
+(not hand-derived — Doug's own instruction). Deleted after. Results, and why the JSON isn't authored yet:
+
+**Id scheme LOCKED = Core's generated ids** (per Doug's rec). Authoritative kit ids per core (verified,
+ready to transcribe once the blockers below clear):
+- **grunt** budget20 slots4 cap2 JackOfAllTrades · str1/int1/dex1/con1 · tech `jab,brace,bandage` ·
+  wpn `longsword_iron,shield_wooden` · armor `armor_str_{head,chest,arms,legs}_iron` · minions —
+- **warden** 18/4/1 Fortified · con5 · `jab,brace,bandage` · `longsword_iron,shield_iron` · str-plate ·  —
+- **adept** 16/4/1 Resonance · int5 · `ember,siphon,stoneskin,jab` · `staff_wooden` ·
+  `armor_int_chest_cotton,armor_int_head_cotton` · —  (MinionCap now 1, from the fix above)
+- **summoner** 17/3/3 Conscription · int3/con2 · `ember,sacrifice,barkskin` · `wand_adept,charm_wooden` ·
+  int-robe · `skeleton,iron_golem`  ← **CURRENT, not the target** (see blocker 3)
+- **reaver** 19/4/0 Finesse · dex5 · `frenzy,flurry,bandage` · `dagger_iron,dagger_iron` · dex-leather · —
+- **ranger** 18/4/2 FletcherLuck · dex4/con1 · `aimed_shot,lunge,bandage` · `dagger_iron,bow` ·
+  dex-leather · `hound`
+- **barbarian** 14/3/1 WarlordMight · str4/con1 · `cleave,bind,bandage` · `claymore_iron` · str-plate · —
+- Gear id note: the divergence Doug flagged is real — Iron Buckler = Core `shield_iron` (TIER 2),
+  Wooden Shield = `shield_wooden` (tier 1); core-kits.js's `shield_buckler` must migrate to Core ids
+  (that's the CD-outbox migration, above).
+
+**‼ 3 BLOCKERS — cores.json NOT authored yet (would bake wrong values into the source-of-truth file):**
+1. **`Techniques.All` is INCOMPLETE — loader would throw.** It lists only 8 (`jab,cleave,lunge,ember,
+   siphon,brace,bandage,blast`), but cores reference `stoneskin,sacrifice,barkskin,frenzy,flurry,
+   aimed_shot,bind` — which exist as `Technique` objects (the kits resolve) but are absent from `.All`.
+   Doug's loader resolves `kit.techniques` against `Techniques.All` and "throws loudly on an unresolvable
+   id" → it would throw on 7 real techniques. **FIX FIRST (Needs decision):** complete `Techniques.All`
+   (safest — audit callers that may assume 8), or resolve against a fuller lookup. Bounded but must
+   precede the loader.
+2. **Race HP mismatch — which is canon?** Doug's schema HP (human20/elf18/dwarf22/halfling18/half_giant20)
+   ≠ current `Races.cs` (human16/elf13/dwarf17/halfling13/half_giant20). STATS match exactly; only HP
+   differs, and only half_giant agrees. Doug's schema comment says "verify against current" — reads like
+   the schema HP was illustrative/stale, but if it's an INTENDED HP rebalance that's a design change I
+   won't guess. **Needs Doug: are code HP (16/13/17/13/20) canon, or is the schema HP the new target?**
+3. **Summoner target unpinned.** Doug wants the JSON to carry Summoner's TARGET (Blast/Brace/Wooden-
+   Shield/Skeleton-only/slots4), not the current kit above — but only those 5 deltas are named; budget,
+   bonuses, and armor for the target aren't, and the Summoner rebuild still awaits Doug's spreadsheet.
+   Can't author Summoner correctly until it lands.
+
+Once 1-3 clear, authoring is pure transcription of the verified table above + the loader (`CoreRuneCatalog
+.Load`) + the thin-wrapper swap. Flagging rather than guessing, per the whole point of this JSON.
+
 ## discrepancy found, everything else checks out clean
 Doug asked for a full pass; did a field-by-field comparison of all 7 cores across `CoreRunes.cs` (the
 only copy that affects real gameplay), `design/systems/CORE_RUNES.md` (canon doc), and `design/dchtml/
