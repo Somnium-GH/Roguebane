@@ -79,14 +79,15 @@ public partial class Game1
 
     private void DrawManifestElement(Element e, Rectangle r)
     {
-        // Node-conditional popups (quest / camp): each is a FLAT cluster of siblings (panel chrome +
-        // its kicker/label/note/actions), NOT a parent->child tree, and most members carry no bind of
+        // Node-conditional popup (quest): a FLAT cluster of siblings (panel chrome + its
+        // kicker/label/note/actions), NOT a parent->child tree, and most members carry no bind of
         // their own — so nothing hid them at a fight node (Doug 2026-07-12: an empty "QUEST" box floated
-        // over a live Skirmish, foe at 19/28). They belong on screen ONLY at their own node type. Gate
+        // over a live Skirmish, foe at 19/28). It belongs on screen ONLY at its own node type. Gate
         // the whole cluster by id-prefix off the panel's bind; a closed gate draws nothing, chrome
         // included. This is NOT the general panel case: attrPool/actionBar/inventory/supplies/... bind
-        // structural markers that resolve null yet must ALWAYS draw, so the gate stays scoped to these
-        // two clusters by name, never "any panel whose bind resolves null".
+        // structural markers that resolve null yet must ALWAYS draw, so the gate stays scoped to this
+        // cluster by name, never "any panel whose bind resolves null". (Camp used to be the second
+        // gated cluster; RETIRED per CD_STATUS #39 — see NodeGateBindFor below.)
         if (NodeGateBindFor(e.Id) is { } gate && ResolveScreenBind(gate) is null)
             return;
         // data-bind-gate (LAYOUT_CONTRACT §12): content+binds coexisting means the content is the
@@ -620,12 +621,13 @@ public partial class Game1
         return new Rectangle(parent.X + ox, parent.Y + oy, Math.Max(0, parent.Width - ox), h);
     }
 
-    // Maps a quest/camp cluster member (by id) to the screen-bind that gates its whole cluster, or
-    // null when the element is not part of a node-conditional popup. "campMarker" (not "camp") keeps
-    // citymap's campaignStrip/campaignTaken out of the gate; "quest" is unique to the encounter cluster.
+    // Maps a quest cluster member (by id) to the screen-bind that gates its whole cluster, or null
+    // when the element is not part of a node-conditional popup. "quest" is unique to the encounter
+    // cluster. (Camp was RETIRED from the manifest, CD_STATUS #39: it no longer floats an element —
+    // it resolves purely via encounter.scene=enc_camp backdrop + a foeless action bar, so the old
+    // "campMarker" gate branch is gone.)
     private static string? NodeGateBindFor(string id) =>
         id.StartsWith("quest", StringComparison.Ordinal) ? "encounter.quest"
-        : id.StartsWith("campMarker", StringComparison.Ordinal) ? "encounter.camp"
         : null;
 
     // Screen-level (non-list) binds -> display text: the NewGame Loadout preview reads the BuildSession.
@@ -728,11 +730,11 @@ public partial class Game1
         // Scene descriptor: the node type is live data; locale place names ("the high pass") have no
         // model yet (design-open §17) — the type alone renders, nothing is invented.
         "encounter.label" => InRun ? NodeLabel(Exp.Map.Current.Type) : null,
-        // Node-conditional popup gates (Doug 2026-07-12): the quest/camp clusters draw ONLY at their
-        // own node type. Resolve non-null (truthy) at that node, null everywhere else — at a fight node
-        // the gate closes and NodeGateBindFor hides the whole cluster, killing the empty-box overprint.
+        // Node-conditional popup gate (Doug 2026-07-12): the quest cluster draws ONLY at a Quest node.
+        // Resolve non-null (truthy) there, null everywhere else — at a fight node the gate closes and
+        // NodeGateBindFor hides the whole cluster, killing the empty-box overprint. (Camp had a twin
+        // encounter.camp gate; RETIRED per CD_STATUS #39 — camp now renders via encounter.scene backdrop.)
         "encounter.quest" => InRun && Exp.Map.Current.Type == Roguebane.Core.NodeType.Quest ? "quest" : null,
-        "encounter.camp" => InRun && Exp.Map.Current.Type == Roguebane.Core.NodeType.Camp ? "camp" : null,
         "campaign.taken" => InRun ? _campaign.LegIndex + " / " + _campaign.LegCount : null,
         _ => null,
     };

@@ -57,6 +57,14 @@ that the guard blockers are cleared):**
    = `enc_camp` + a `CAMP` caption + a foeless action bar, no floating element. This folds into the
    existing "foeless arrivals" engine work (Camp/Quest/nothing-here unmount the foe cluster) — see
    CD_STATUS #39, still OPEN engine-side regardless of this drop.
+   **✅ BUILT (2026-07-12, loop):** deleted the `campMarker` branch from `NodeGateBindFor`
+   (`Game1.ManifestRenderer.cs`) — gate is now quest-only. Also removed the now-dead `encounter.camp`
+   screen-bind resolver (0 refs in layout.json + code after the branch went) and reconciled the three
+   stale "quest/camp" doc comments to quest-only, each pointing at CD_STATUS #39 for the camp retire.
+   Compile clean (0 err). Verified `campMarker`/`encounter.camp` = 0 matches in the new layout.json.
+   The broader "foeless arrivals" unmount (camp renders foeless via backdrop) is item 3's territory,
+   still OPEN. NOTE: `encounter.scene` imageBind (`bg/{encounter.scene}`) is ALREADY in layout.json —
+   item 3 is just the Core+engine wiring to SET the scene field per node.
 
 3. **New: `encounter.scene` per-node backdrop pick (CD_STATUS #41).** Core needs to set a `scene` field
    per node when building encounter state; engine resolves the backdrop through the existing imageBind
