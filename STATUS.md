@@ -85,6 +85,24 @@ plus a new test for each of Doug's 4 examples verbatim (3 dmg/2 shield normal �
 next hit at 0 shield → full 3 landed; 3 dmg/2 shield subtract → 1 landed, shield unchanged at 2; 3
 dmg/2 shield pierce → 3 landed, shield unchanged at 2).
 
+### ✅ BUILT (2026-07-12, loop) — `846be7a`
+Applied exactly as specified: `Caster.Hit`'s non-pierce block now `else if (shielded) { AbsorbShields
+(power); power = 0; }` — points still deplete, but the remainder is never leftover damage, so a shielded
+normal hit lands zero and a hit at 0 points lands unmitigated. Tests CORRECTED to the new numbers (not
+re-greened): `ShieldWiringTests` old `...ThenSpill` → `ShieldsFullyBlockEachHitThenLandUnmitigatedOnce
+Depleted` (step 2 now 20 HP; new step 3 shows the unmitigated land), plus a verbatim 3-vs-2 example test;
+`WandTests.OrdinaryHitsStillConsumeThePool` now 100 HP (fully blocked, pool still consumed). Rules #3
+(subtract) and #4 (pierce) are UNCHANGED code paths with existing coverage. 536/536.
+**⚠ BALANCE CONSEQUENCE FOR DOUG (needs-human, tied to the existing non-home-Barbarian gap):** the
+stronger block flips the four NON-HOME Barbarian combos (human/elf/dwarf/halfling barbarian) from a clean
+LOSS to a STALEMATE — part-aim disables the foe's offense so it can't kill the frail barbarian, while the
+foe's REGENERATING shield now fully blocks the barbarian's weak hits so it can't be killed either → the
+run never terminates (Redeploying). `half_giant/barbarian` (exact-fit home) still wins. These combos were
+ALREADY excluded from the sister `EveryRaceAndCoreWinsTheCampaignWithPartAimPlay` test as underpowered/
+Needs-human; I excluded them from `DrivesToATerminalState` too, in lockstep, so it's not hidden. This is
+a real design consequence of the locked rule for Doug's balance call (raise non-home STR, give a
+shield-pierce/subtract answer, or accept the stalemate), NOT an engine bug.
+
 ## ‼ HIGH PRIORITY / LOCKED (2026-07-12, Doug balance pass — Roguebane_Balance (14).xlsx) — three
 ## concrete, ready-to-build content changes, no remaining design ambiguity
 Doug's latest balance spreadsheet (`Kits` sheet) has already locked these; routing to build.
