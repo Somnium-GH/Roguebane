@@ -14,6 +14,17 @@ public static class Techniques
             Consults: WeaponUse.Primary,
             Desc: "A quick strike with your wielded weapon, for half its power.");
 
+    // Blast [LOCKED 2026-07-12, Doug, Roguebane_Balance (14).xlsx]: a fast wand-consulting INT attack.
+    // Cooldown 1.5s = 15 ticks. Consults Primary on Stat.Int picks up a wielded Wand and resolves
+    // through the EXISTING wand shield-subtraction path (wandCast in Caster) — no new logic. Leaving
+    // ShieldPiercing/ChargeCost at defaults IS the zero-Charge behavior (only pierce draws Charge).
+    // Desc is plain-mechanical placeholder copy (Jab/Ember style, no lore invented) — Needs Claude
+    // Design if Doug wants different wording; the mechanic is fully locked.
+    public static readonly Technique Blast =
+        new("blast", Stat.Int, Reserve: 1, TechniqueKind.Timered, Cooldown: 15, Power: 0, DamageMult: 1.0,
+            Consults: WeaponUse.Primary,
+            Desc: "A quick bolt from your wand for {power} damage, subtracting from the target's shields as it lands.");
+
     public static readonly Technique Cleave =
         new("cleave", Stat.Str, Reserve: 2, TechniqueKind.Timered, Cooldown: 120, Power: 0, DamageMult: 1.5,
             Consults: WeaponUse.Primary,
@@ -103,5 +114,5 @@ public static class Techniques
     // survive live foe part-aim on skirmishes; a build that drops it pays the intended penalty. Steel/
     // Barkskin/Bind/Parry/Suture/Sacrifice stay opt-in (higher-tier content) until a kit picks them.
     public static readonly IReadOnlyList<Technique> All =
-        new[] { Jab, Cleave, Lunge, Ember, Siphon, Brace, Bandage };
+        new[] { Jab, Cleave, Lunge, Ember, Siphon, Brace, Bandage, Blast };
 }

@@ -60,16 +60,20 @@ public static class Armory
         t, 1.0, Hands: 1, WeaponKind.Sling)).ToArray();
 
     // INT implements (§6d): wand = 1H shield-SUBTRACTION hand item (resolution is its own slice);
-    // staff = 2H plain blockable melee, 2 INT/t per WEAPONS.md's table; charm/tome = pure-bonus
-    // offhands (+1 FLAT minion/spell damage per tier — WEAPONS.md rescale 2026-07-12; staff's own
-    // +1/tier SPELL bonus is doc-canon but not yet wired), Power 0.
+    // staff = 2H plain blockable melee, now STR-gated (2 STR/t, INT→STR flip 2026-07-12) so Jab wields
+    // it; charm/tome = pure-bonus offhands (+1 FLAT minion/spell damage per tier — WEAPONS.md rescale
+    // 2026-07-12), Power 0. Staff also carries its own +1/tier SPELL bonus (SpellImplementBonus).
     // Wand/staff Timer (1.0 here) is WEAPONS.md's own Open/TBD ("wand / staff timer multipliers") —
     // placeholder, not a locked number.
     // Req corrected 2026-07-05 (WEAPONS.md): 2->1 INT/tier — the old value put Summoner's kit one
     // INT over the model's demand (8).
     public static readonly IReadOnlyList<Weapon> Wands = Named("wand", Stat.Int, WeaponKind.Wand,
         1.0, 2, 1, 1, "Adept Wand", "Twisted Wand", "Gemstone Wand", "Glowing Wand");
-    public static readonly IReadOnlyList<Weapon> Staffs = Named("staff", Stat.Int, WeaponKind.Staff,
+    // Staff is STR-gated (Roguebane_Balance (14).xlsx, Doug 2026-07-12): the 2H INT→STR flip makes Jab
+    // (Stat.Str, Consults Primary) pick up a wielded Staff for free, giving Adept a real STR pressure
+    // alongside its INT spells. Its own +1/tier SPELL bonus (SpellImplementBonus, by Kind==Staff) is
+    // unaffected by the wield-gating stat.
+    public static readonly IReadOnlyList<Weapon> Staffs = Named("staff", Stat.Str, WeaponKind.Staff,
         1.0, 2, 2, 2, "Wooden Staff", "Twisted Staff", "Ornate Staff", "Humming Staff");
     public static readonly IReadOnlyList<Weapon> Charms = Named("charm", Stat.Int, WeaponKind.Charm,
         1.0, 0, 1, 1, "Wooden Charm", "Bone Charm", "Ornate Charm", "Humming Charm");

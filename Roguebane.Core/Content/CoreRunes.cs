@@ -42,7 +42,10 @@ public static class CoreRunes
         RuneBudget: 16,
         ActionSlots: 4,
         MinionCap: 0,
-        DefaultEquipment: new[] { Techniques.Ember, Techniques.Siphon, Techniques.Stoneskin },
+        // Jab added 2026-07-12 (Roguebane_Balance (14).xlsx): with the Staff now STR-gated it becomes a
+        // free backup attack, giving Adept a real STR pressure (Demand tab: STR 3 = Staff 2 + Jab 1)
+        // alongside its INT spell suite. Fills the 4th action slot.
+        DefaultEquipment: new[] { Techniques.Ember, Techniques.Siphon, Techniques.Stoneskin, Techniques.Jab },
         DefaultWeapons: new[] { Armory.Staffs[0] }, // Wooden Staff
         DefaultArmor: RobeKitT1,
         IntBonus: 5,
