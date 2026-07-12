@@ -129,28 +129,30 @@ public class CombatTargetingTests
         return -1;
     }
 
-    // Item 1 (STATUS.md 2026-07-12 round 2, Doug: heals "can't be deactivated to save ATTR"): a powered
-    // Self technique must toggle OFF on a second left-press, exactly like a passive shield source and
-    // every other card — not dead-end at a no-op. It still never enters the targeting FSM (nothing to aim).
+    // CORRECTED RULE (STATUS.md 2026-07-12, Doug): left-click NEVER disables anything — only right-click
+    // does, uniformly across every technique kind. So a second LEFT-press on an active Self technique is
+    // a no-op (stays active, never enters the FSM); RIGHT-press is the sole deactivate path.
     [Fact]
-    public void PressingAPoweredSelfTechniqueTogglesItOffWithoutTargeting()
+    public void LeftPressOnActiveSelfTechniqueIsANoOp_RightPressDeactivates()
     {
         var (exp, ctrl) = Fighting();
         var ix = IndexOf(exp, Techniques.Bandage);
         Assert.True(ix >= 0); // the seeded kit fields the heal
         Assert.Equal(TargetSide.Self, exp.Equipment[ix].Side);
-        ctrl.CardPress(exp, ix);                // power
+        ctrl.CardPress(exp, ix);                // power ON (left-click powers, never disables)
         Assert.True(exp.IsActive(exp.Equipment[ix]));
-        ctrl.CardPress(exp, ix);                // active self-tech -> toggle OFF, never the FSM
+        ctrl.CardPress(exp, ix);                // active self-tech -> NO-OP: stays active, never the FSM
+        Assert.True(exp.IsActive(exp.Equipment[ix]));
+        Assert.Equal(-1, ctrl.Targeting);
+        ctrl.CardRightPress(exp, ix);           // right-click is the ONLY disable path
         Assert.False(exp.IsActive(exp.Equipment[ix]));
-        Assert.Equal(-1, ctrl.Targeting);
-        ctrl.CardPress(exp, ix);                // inactive -> power back on, still never the FSM
-        Assert.True(exp.IsActive(exp.Equipment[ix]));
-        Assert.Equal(-1, ctrl.Targeting);
     }
 
+    // CORRECTED RULE (STATUS.md 2026-07-12, Doug): the pre-existing passive left-click-toggle-off was
+    // ALSO wrong — left-click never disables. A left-press on an active passive shield is a no-op; only
+    // right-click frees the stat. (A left-press on an INACTIVE card still powers it ON — that's not a disable.)
     [Fact]
-    public void PressingAPoweredShieldSourceTogglesItOffWithoutTargeting()
+    public void LeftPressOnActiveShieldSourceIsANoOp_RightPressDeactivates()
     {
         var (exp, ctrl) = Fighting();
         var ix = IndexOf(exp, Techniques.Brace);
@@ -159,10 +161,12 @@ public class CombatTargetingTests
         // Activation default refinement [LOCKED 2026-07-09]: Sustained techniques auto-power on
         // encounter entry, so Brace is already active by the time Fighting() returns.
         Assert.True(exp.IsActive(exp.Equipment[ix]));
-        ctrl.CardPress(exp, ix);                // active -> toggle OFF, never the FSM
-        Assert.False(exp.IsActive(exp.Equipment[ix]));
+        ctrl.CardPress(exp, ix);                // active passive -> NO-OP: stays active, never the FSM
+        Assert.True(exp.IsActive(exp.Equipment[ix]));
         Assert.Equal(-1, ctrl.Targeting);
-        ctrl.CardPress(exp, ix);                // inactive -> toggle back ON, still never the FSM
+        ctrl.CardRightPress(exp, ix);           // right-click is the ONLY disable path
+        Assert.False(exp.IsActive(exp.Equipment[ix]));
+        ctrl.CardPress(exp, ix);                // now inactive -> left-click powers back ON (never the FSM)
         Assert.True(exp.IsActive(exp.Equipment[ix]));
         Assert.Equal(-1, ctrl.Targeting);
     }
