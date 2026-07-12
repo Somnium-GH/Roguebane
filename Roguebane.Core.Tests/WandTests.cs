@@ -133,7 +133,9 @@ public class WandTests
     [Fact]
     public void OrdinaryHitsStillConsumeThePool()
     {
-        // Contrast: a melee consult eats shield points (AbsorbShields), it doesn't subtract.
+        // Contrast: a melee consult eats shield points (AbsorbShields), it doesn't subtract. Under the
+        // LOCKED 2026-07-12 rule a shielded normal hit is FULLY blocked (no spill) — but the pool is
+        // still consumed by the block, which is what this test pins.
         var body = IntBody();
         Assert.True(body.Wield(Armory.Sword)); // Iron Longsword: 4 dmg (STR consult)
         var foe = Shielded(3);
@@ -142,7 +144,7 @@ public class WandTests
             Power: 0, Consults: WeaponUse.Primary)));
         c.Step();
 
-        Assert.Equal(99, foe.Hp);                 // 4 - 3 absorbed = 1 lands
-        Assert.Equal(0, foe.Frame!.ShieldPoints); // the pool was CONSUMED
+        Assert.Equal(100, foe.Hp);                // 4 vs 3 points -> fully blocked, ZERO lands (was 99)
+        Assert.Equal(0, foe.Frame!.ShieldPoints); // the pool was still CONSUMED by the block
     }
 }

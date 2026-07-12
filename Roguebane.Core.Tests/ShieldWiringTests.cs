@@ -23,8 +23,12 @@ public class ShieldWiringTests
     }
 
     [Fact]
-    public void ShieldsAbsorbHitsBeforeHpThenSpill()
+    public void ShieldsFullyBlockEachHitThenLandUnmitigatedOnceDepleted()
     {
+        // §6b mitigation rule CHANGE [LOCKED 2026-07-12, Doug]: any standing point FULLY blocks a normal
+        // hit — no bleed-through even when power exceeds the points. Points still deplete (up to what
+        // stands); once the pool hits 0, the next hit lands completely unmitigated. (Was: absorb what
+        // fits, spill the remainder.)
         var body = Shielded();
         new Caster(body).Activate(Techniques.Barkskin);
         var defender = new Fighter(body, maxHp: 20);
@@ -35,13 +39,37 @@ public class ShieldWiringTests
         var attacker = new Caster(atkBody, defender);
         attacker.Activate(strike);
 
-        attacker.Step();                       // power 2 -> 3 layers absorb 2
+        attacker.Step();                       // power 2 vs 3 points -> fully blocked, 2 points spent
         Assert.Equal(20, defender.Hp);          // nothing reaches HP
         Assert.Equal(1, body.ShieldPoints);
 
-        attacker.Step();                       // power 2 -> 1 layer absorbs 1, 1 spills
+        attacker.Step();                       // power 2 vs 1 point -> STILL fully blocked, NO spill
         Assert.Equal(0, body.ShieldPoints);
-        Assert.Equal(19, defender.Hp);          // the spill lands
+        Assert.Equal(20, defender.Hp);          // was 19 under the old spillover rule
+
+        attacker.Step();                       // shield now at 0 -> the hit lands unmitigated
+        Assert.Equal(18, defender.Hp);          // full power 2
+    }
+
+    [Fact]
+    public void ShieldMitigation_3PowerVs2Points_BlocksFullyThenLandsUnmitigated()
+    {
+        // Doug's LOCKED worked example verbatim (2026-07-12): 3 power vs 2 standing points.
+        var body = Shielded();
+        body.RaiseShield("test", 2, regenEvery: 1_000_000);
+        var defender = new Fighter(body, maxHp: 20);
+        var atk = new Body();
+        atk.Add(new BodyPart("arm", Stat.Str, 4));
+        var strike = new Technique("s3", Stat.Str, 1, TechniqueKind.Sustained, 0, Power: 3);
+        var attacker = new Caster(atk, defender);
+        attacker.Activate(strike);
+
+        attacker.Step();                       // 3 vs 2 -> shield drops to 0, ZERO lands (rule #1)
+        Assert.Equal(20, defender.Hp);
+        Assert.Equal(0, body.ShieldPoints);
+
+        attacker.Step();                       // shield at 0 -> full 3 lands (rule #2)
+        Assert.Equal(17, defender.Hp);
     }
 
     [Fact]

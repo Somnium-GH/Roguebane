@@ -510,7 +510,13 @@ public sealed class Caster
         // big stacks blunt wands; wands chip through what stands.
         if (frame is not null && !pierce)
         {
-            power = subtract ? Math.Max(0, power - frame.ShieldPoints) : frame.AbsorbShields(power);
+            // §6b shield mitigation [LOCKED 2026-07-12, Doug]: ANY standing point fully blocks a normal
+            // hit — no bleed-through even when power exceeds the point count. AbsorbShields still runs so
+            // the points deplete (the shield "drops to 0"), but its unabsorbed remainder is NO LONGER
+            // used as leftover damage — a shielded normal hit lands exactly zero. A hit at 0 points
+            // (shielded == false going in) skips this and lands unmitigated. Subtract (wand) is unchanged.
+            if (subtract) power = Math.Max(0, power - frame.ShieldPoints);
+            else if (shielded) { frame.AbsorbShields(power); power = 0; }
             if (power <= 0) return false;
         }
 
