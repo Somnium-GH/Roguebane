@@ -20,6 +20,21 @@ priorities, ranked highest-first.**
   `Roguebane.Game/Content/Content.mgcb`** — the copy the actual build reads (this repo's own standing
   gotcha, not new). Files exist on disk (`Roguebane.Content/icons/...`), just not wired for the game
   build yet. Mirror the 5 `#begin`/`/build:` blocks across before anything tries to render these icons.
+  ### ✅ FIXED (2026-07-12, loop) — mirrored the 3 REAL icons; the "5" over-counted by 2 dead assets
+  Investigated each icon against its actual consumer instead of mirroring blind. **parry/steel/suture:
+  real** — technique cards blit `imageBind "icons/technique/{technique.id}"` and the Core ids are
+  literally `parry`/`steel`/`suture` (`Content/Techniques.cs`); mirrored into the Game mgcb translated to
+  this repo's convention (no-`.png` asset name + `/build:../../Roguebane.Content/...;<asset>` single-
+  source, NOT CD's in-dir `.png` form), pipeline now emits `icons/technique/{parry,steel,suture}.xnb`,
+  Game build 0 errors (`cc6ad1f`). **golem/hound: NOT mirrored — they have ZERO consumers.** Nothing in
+  `layout.json` or code requests `icons/minion/*`; minion cards render art from `sprites/minions/{minion
+  .type}`, and `sprites/minions/golem` + `sprites/minions/hound` ALREADY build. Mirroring `icons/minion/
+  {golem,hound}` would only create two dead assets. (Corroborating: the golem's Core minion id is
+  `iron_golem`, not `golem`, so `icons/minion/golem` couldn't be a live `{minion.id}` path either.) ⇒ **CD
+  outbox note:** CD's authoring `Content.mgcb` carries two icon assets (`icons/minion/golem`,
+  `icons/minion/hound`) with no engine consumer — either intended for a future card that doesn't exist
+  yet, or leftover; the shipped minion cards use `sprites/minions/*`. Not a defect, but worth CD confirming
+  intent so the authoring copy doesn't accrue orphan assets.
 
 **‼ TOP PRIORITY — root-caused Doug's live bug report (screenshot: an empty "QUEST" box floating over
 a REAL combat encounter, foe alive at 19/28 HP).** This is a genuine ENGINE gap, not a CD mistake — CD's
