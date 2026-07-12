@@ -129,14 +129,22 @@ public class CombatTargetingTests
         return -1;
     }
 
+    // Item 1 (STATUS.md 2026-07-12 round 2, Doug: heals "can't be deactivated to save ATTR"): a powered
+    // Self technique must toggle OFF on a second left-press, exactly like a passive shield source and
+    // every other card — not dead-end at a no-op. It still never enters the targeting FSM (nothing to aim).
     [Fact]
-    public void PressingAPoweredSelfTechniqueNeverTargets()
+    public void PressingAPoweredSelfTechniqueTogglesItOffWithoutTargeting()
     {
         var (exp, ctrl) = Fighting();
         var ix = IndexOf(exp, Techniques.Bandage);
         Assert.True(ix >= 0); // the seeded kit fields the heal
+        Assert.Equal(TargetSide.Self, exp.Equipment[ix].Side);
         ctrl.CardPress(exp, ix);                // power
-        ctrl.CardPress(exp, ix);                // active self-tech -> must NOT enter targeting
+        Assert.True(exp.IsActive(exp.Equipment[ix]));
+        ctrl.CardPress(exp, ix);                // active self-tech -> toggle OFF, never the FSM
+        Assert.False(exp.IsActive(exp.Equipment[ix]));
+        Assert.Equal(-1, ctrl.Targeting);
+        ctrl.CardPress(exp, ix);                // inactive -> power back on, still never the FSM
         Assert.True(exp.IsActive(exp.Equipment[ix]));
         Assert.Equal(-1, ctrl.Targeting);
     }

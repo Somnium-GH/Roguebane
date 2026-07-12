@@ -1,3 +1,113 @@
+## ‼ URGENT CORRECTION (2026-07-12, Doug) — the CardPress fix the loop ALREADY SHIPPED for the
+## Self-technique deactivate bug went the WRONG DIRECTION; the rule is the opposite of what was built
+**The loop already landed a fix** (`CombatTargeting.cs:20-33`, current code): `if (t.IsPassive ||
+t.Side == TargetSide.Self) { e.Toggle(t); return; }` — this makes a second LEFT-click toggle OFF both
+passive (shield) techniques AND self techniques. **Doug: "it should only be right click that disables
+a technique and on passives it appears left click does as well [and it shouldn't]."** The correct rule
+is the opposite of what shipped: **left-click must NEVER disable anything, for ANY technique kind —
+only right-click (`CardRightPress`, already correct and unconditional, no change needed there) is
+allowed to deactivate.** Passive's pre-existing left-click-toggles-off behavior (from before this
+week's fix) was ALSO wrong per this corrected rule, not just the newly-added Self case — both need to
+land as a no-op on a second left-press, not a toggle.
+
+**Fix:** change line 30 from `if (t.IsPassive || t.Side == TargetSide.Self) { e.Toggle(t); return; }`
+to `if (t.IsPassive || t.Side == TargetSide.Self) return;` — an already-active passive or self
+technique does NOTHING on a second left-press (no targeting to enter, and now no disable either);
+only `CardRightPress` frees the stat. Update the doc comment above it (lines 20-24) to state the
+corrected rule plainly: left-click only powers-on or re-aims, never disables; right-click is the sole
+disable path, uniformly across every technique kind. **Update/reverse whatever Core test was added
+for the original (now-wrong) fix** — it should assert a second LEFT-press on an active passive/self
+card leaves it unchanged (still active), and a RIGHT-press on the same card deactivates it.
+
+## ‼ VISUAL FOLLOW-UP (2026-07-12, Doug) — "does it appear unequipped though? things should get
+## visually removed at least" — checked: gear already does this correctly, techniques don't yet
+Gear already has the visual treatment Doug's asking about, confirmed by reading the render code: the
+Equipment screen's `invCard`/`loadoutCard` root chrome carries a real 4-state vocabulary including
+`"equipped"` (green) vs `"disabled"` (red — "assigned but unsustainable," `Game1.ManifestRenderer.cs:
+1017-1037`, driven by `HandItemGearOnlyUsable`/`ArmorGearOnlySustained`/`RangedGearOnlyUsable`), AND
+separately the paper-doll figure never draws a disabled hand item at all (`Body.HandItemUsable`,
+capability-truth doll vs. assignment-truth card — the doll shows only what's actually working, the
+card stays visible but flips red). So for gear: not literally removed from the list, but visually
+unmistakable (red card + vanishes off the character model) — this already satisfies "should look
+different," nothing to fix.
+
+**Techniques don't have an equivalent yet.** `Caster.StatusOf`'s `TechStatus` (`Caster.cs:192-205`)
+exposes `Active`/`Countdown`/`Cooldown`/`Sustained`/`ChargeDry`/`Ready`/`Auto` — no "silenced/can't
+afford it right now" flag distinct from plain "not currently active." Once the `IntendedOn`
+auto-recovery fix above lands, a technique that's `IntendedOn == true` but `!Active` (cascaded off,
+waiting for room) will be mechanically distinguishable from one that's simply never been turned on —
+worth surfacing that distinction visually on the action-bar card too (a red/disabled treatment
+mirroring gear's, rather than looking identical to an untouched card), so the player can SEE "Bandage
+wants to run but can't afford it" the same way they can already see a red sword. Bundle this into the
+same pass as the `IntendedOn` engine work above — the state this needs (`IntendedOn && !Active`) is a
+direct byproduct of that fix, not separate plumbing.
+
+## ✅ RESOLVED (2026-07-12, Doug confirms) — "defender limb damage does not seem to be occurring" WAS
+## the CON-row-doesn't-fit bug (B31), not a separate mechanic gap — closes that thread for good
+Doug: "it must be the CON not fitting on the screen bug in encounter, as eventually I saw other part
+damage occur." Confirms the root cause definitively: the earlier "no damage appearing on any part"
+reports were the Encounter screen's `poolRows` 1px-vertical-shortfall (B31, already root-caused and
+routed to CD, engine-side pip-width half already fixed) hiding the CON row specifically, not a broken
+hit-application mechanic — part damage on STR/INT/DEX was landing and visible the whole time, CON was
+just the one row that couldn't render. **Supersedes the earlier "likely explained by shield
+absorption" follow-up** (Ranger-has-no-shield theory) — that was a plausible alternate explanation at
+the time but isn't the actual cause; the shield-absorption behavior described there is still accurate
+as a mechanic, it just isn't what was happening in Doug's specific test. No engine work needed beyond
+the already-tracked B31 CD widen. Nothing further to trace here.
+
+## ✅ LOCKED/FEATURE (2026-07-12, Doug) — a technique silenced by part damage should auto-recover the
+## instant its stat heals enough room, matching how GEAR and MINIONS already behave — TECHNIQUES are
+## the one exception today, confirmed by reading Body/Caster directly; precise fix shape identified
+Doug: "Part damage should only temporarily cause things to be unequipped so that once healed the
+equipment returns to being equipped again automatically. This is because in combat you can't change
+equipment and it shouldn't be permanent that it's not equipped. Coupled with the fixes to after combat
+behavior and targeted healing, should give us the flow we're looking for."
+
+**Confirmed: this rule ALREADY holds for gear and minions, but not techniques — a real, isolated gap.**
+- **Gear (weapons/armor):** never actually unequips from damage. `Body.Damage`'s own comment says it
+  plainly (`Body.cs:189-190`): "gear does NOT fall off below its threshold — it stays ASSIGNED, reads
+  DISABLED (red), stops answering (`UsableHands`), and re-activates when the stat heals." `DisabledGear`
+  is purely a LIVE-recomputed view (which pieces currently don't fit the pool), never a stored
+  removal — so healing the part instantly, automatically un-disables it with zero extra code. Nothing
+  to fix here.
+- **Minions:** already auto-recover, by design, every tick. `Caster.PruneSilenced` (`Caster.cs:554-559`,
+  comment: "a drained stat only IDLES a stat-gated minion — it stays SUMMONED... and re-raises FREE the
+  moment its stat recovers") loops every currently-summoned minion each `Step()` and retries
+  `_self.Activate(Reservation(minion))` unconditionally — free, automatic, no player action. Nothing to
+  fix here either.
+- **Techniques are the ONE exception.** `Body.Cascade` (`Body.cs:360-364`) forcibly evicts a
+  technique's `Active` reservation from `_actives` when a stat SHRINKS below what's reserved (a part
+  breaking). `Caster.PruneSilenced` (`Caster.cs:545-552`) then sees the mismatch and REMOVES the whole
+  `Run` from `_active` outright — the technique goes fully inactive, its `Run` object (cooldown,
+  ResonanceStacks, everything) is gone. **There is no equivalent "retry every tick, re-raise free the
+  moment room reopens" pass for techniques anywhere in the codebase** — once cascaded off, a technique
+  stays off until the player manually re-toggles it, and since Equipment/roster edits are blocked
+  during `Fighting` (by design) the player's ONLY recourse mid-fight is a manual card re-press — exactly
+  the "permanent until you notice and fix it yourself" gap Doug is flagging.
+
+**The fix needs ONE nuance the minion case doesn't have, so it isn't a blind copy-paste of the minion
+loop:** a minion has no "voluntarily paused but still summoned" state — it's either summoned or
+dismissed, so retrying every summoned-but-inactive minion every tick is always correct. A technique DOES
+have a real voluntary-off state (the player just-fixed CardPress/right-click deactivate, earlier this
+week) — if the retry loop is naive ("any equipped-but-inactive technique, try to activate"), it would
+immediately re-arm a technique the player deliberately turned OFF the instant room reopens, silently
+defeating that fix (there'd be no way to actually keep something off to save ATTR). **Needs a
+way to distinguish "involuntarily silenced by a cascade" from "player turned it off on purpose."**
+Recommended shape (mirrors the minion pattern, generalized): track an `IntendedOn` bit per equipped
+technique, separate from whether it's currently `Active` — a card-press-to-power (or the encounter-entry
+Sustained auto-activate) sets `IntendedOn = true` and attempts `Activate`; a card-press/right-press-to-
+unpower sets `IntendedOn = false` and calls `Deactivate`. `Body.Cascade`'s involuntary eviction does
+NOT touch `IntendedOn` — it only removes the live reservation. Then extend `PruneSilenced`'s per-tick
+pass with one more loop, parallel to the minion one: for every equipped technique with `IntendedOn ==
+true && !IsActive`, retry `Activate(technique, auto: true)` — free, silent, exactly like the minion
+re-raise. A technique the player left off stays off (`IntendedOn == false`, never retried); a technique
+knocked off by a broken part comes back the instant the stat heals enough, with no player action —
+which, combined with this week's other two fixes (activation live during `Cleared`, and heals now
+actually deactivatable to free ATTR), is the complete flow Doug described. Add a Core test: activate a
+technique, break its stat below its reserve (cascades off), heal the stat back up, assert it's
+`Active` again next `Step()` with no `Toggle()` call in between; separately assert a technique the
+player explicitly deactivated stays off through the same heal cycle.
+
 ## ‼ HIGH PRIORITY (2026-07-12, Doug — 2 screenshots) — attribute pip stretch: CD's own mockup doesn't
 ## stretch at all (visual-parity ask, engine already correct); the ENGINE's stretch has a real rounding
 ## bug of its own (uneven cell widths/gaps within one row) — root-caused, precise fix identified
@@ -62,6 +172,16 @@ consistent-with-every-other-card gesture fails silently). **Fix:** in `CardPress
 Self` the same as `IsPassive` — toggle off directly on a second press — instead of falling through to
 `return`. Add a Core test: pressing an active Self technique's card twice deactivates it (mirrors
 whatever passive-shield test already covers the `IsPassive` branch).
+
+### ✅ FIXED (2026-07-12, loop) — exactly as root-caused above
+`CombatTargeting.CardPress` now merges the two non-targeting cases into one branch —
+`if (t.IsPassive || t.Side == TargetSide.Self) { e.Toggle(t); return; }` — so a powered Self heal
+toggles OFF on a second left-press (freeing the stat) just like a passive shield and every other card;
+only foe-targeted techniques enter TARGETING. The dead `if (t.Side == TargetSide.Self) return;` line is
+gone. The existing test that pinned the OLD no-op behavior (`PressingAPoweredSelfTechniqueNeverTargets`)
+is renamed/rewritten to `PressingAPoweredSelfTechniqueTogglesItOffWithoutTargeting`, mirroring the
+shield test: power → second press toggles off (Targeting stays -1) → third press powers back on. Build
+green, Core.Tests 530/530.
 
 **2. DESIGN clarification, not (this half) a bug — heal techniques should visually read as
 armed/charging the instant they're powered, no separate "targeted" step.** Doug: "heals don't work

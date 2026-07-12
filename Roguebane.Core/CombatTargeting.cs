@@ -18,16 +18,16 @@ public sealed class CombatTargeting
         Targeting >= 0 && Targeting < e.Equipment.Count && e.IsActive(e.Equipment[Targeting]);
 
     // Left-press a card: POWER an inactive module, or (on an active one) enter TARGETING and clear its
-    // target. §8 target-side rules: a SELF technique never targets (its aim auto-picks on the caster),
-    // and a PASSIVE shield source never enters the FSM at all — pressing its active card toggles it
-    // OFF (§6b: toggling just frees the stat).
+    // target. §8 target-side rules: neither a PASSIVE shield source nor a SELF technique (its aim
+    // auto-picks on the caster — nothing to aim) enters the targeting FSM; pressing either one's active
+    // card toggles it OFF, so a player can free the stat on a second left-press exactly the way every
+    // other card responds (§6b). Only foe-targeted techniques enter TARGETING.
     public void CardPress(Expedition e, int i)
     {
         if (i < 0 || i >= e.Equipment.Count) return;
         var t = e.Equipment[i];
         if (!e.IsActive(t)) { e.Toggle(t); return; }
-        if (t.IsPassive) { e.Toggle(t); return; }
-        if (t.Side == TargetSide.Self) return; // powered self-tech: nothing to aim
+        if (t.IsPassive || t.Side == TargetSide.Self) { e.Toggle(t); return; }
         Targeting = i;
         e.ClearAim(t);
     }
