@@ -1,3 +1,86 @@
+## ✅ RE-ARM — CD DROP PASS 12 PROCESSED (2026-07-12) — LOOP MAY RESUME
+The 3 truncated files (`layout.json`, `Content.mgcb`, `design/dchtml/asset-manifest.js`) turned out to
+be a MOUNT-side sync glitch, not a real corruption on Doug's end — his local copies were complete
+(confirmed: his line count matched mine almost exactly). Doug pasted the missing tails directly; each
+was spliced onto the valid prefix I already had (verified byte-exact against the known-good portion
+before re-appending) and all three now validate: `layout.json` parses (275,576 bytes), `Content.mgcb`
+has 3,157 `#begin` blocks (matches DROP_AUDIT's stated 3,155 PNGs + 2 `/copy:` entries), `asset-
+manifest.js` passes `node --check` with 3,155 entries (matches DROP_AUDIT exactly). No guesswork — every
+byte came from Doug's own file, not inferred.
+
+**Guards (`tools/drop_audit.py`), now that layout.json is valid:**
+- campaignmap / citymap / newgame: clean.
+- 4 PRE-EXISTING gaps (byte-identical debt from before this drop, not a regression): `minionField` /
+  `minionFieldLabel` / `encounter.minions.sprite` (Encounter), `minionCard` bind `minions.hotkey`
+  (Equipment).
+- `questPanel` "no content/sample literal": EXPECTED per CD_STATUS #39 (quest catalog is Doug's own
+  pass, deliberately blank). `campMarker`'s twin entry from pass 11 is gone — consistent with it being
+  RETIRED this pass.
+- **2 NEW gaps, both on `merchant`'s `wareCard` template:** bind `ware.icon` unmapped, imageBind
+  `icons/technique/{ware.techId}` absent from the template. Reads like the same open per-kind icon
+  variance CD's own pass-12 note already flagged under B22 ("armor measures wareCard first... B22 stays
+  open") — not treating as a fresh regression, but noting here in case it surprises anyone building the
+  new Merchant BUY/SELL mode (#42).
+- Ref size / asset presence: all 9 new PNGs confirmed on disk at correct paths, registered in CD's own
+  `Content.mgcb`.
+
+**Loop: resume normal STATUS work. Still open from this drop (unchanged from before, safe to build now
+that the guard blockers are cleared):**
+
+1. **Mirror the 9 new assets into `Roguebane.Game/Content/Content.mgcb`** (the standing gotcha — build
+   reads this copy, not CD's). Append, translating CD's in-dir form to this repo's single-source form
+   (same idiom as pass 11's icon mirror):
+   ```
+   #begin bg/enc_camp
+   /importer:TextureImporter
+   /processor:TextureProcessor
+   /processorParam:ColorKeyEnabled=False
+   /processorParam:GenerateMipmaps=False
+   /processorParam:PremultiplyAlpha=True
+   /processorParam:ResizeToPowerOfTwo=False
+   /processorParam:MakeSquare=False
+   /processorParam:TextureFormat=Color
+   /build:../../Roguebane.Content/bg/enc_camp.png;bg/enc_camp
+   ```
+   Repeat for `enc_forest`, `enc_mountain`, `enc_river`, `enc_meadow`, `enc_quarry`, `enc_lumber`,
+   `enc_city_gates` (all `bg/*`), and `icons/rune/core_barbarian` (same block shape, path
+   `icons/rune/core_barbarian`). 9 blocks total, all identical shape except the path/id.
+   **✅ BUILT (2026-07-12, loop):** all 9 blocks appended to `Roguebane.Game/Content/Content.mgcb`
+   (after the trailing `sprites/minions/wisp` block), each in the repo's single-source `/build:
+   ../../Roguebane.Content/...` idiom. All 9 source PNGs confirmed on disk at the referenced paths.
+   Build now sees the pass-12 assets. Items 2 (campMarker retire) + 3 (encounter.scene) still OPEN.
+
+2. **`campMarker` is RETIRED from the manifest (CD_STATUS #39) — drop the engine's special case.**
+   `Game1.ManifestRenderer.cs:624-628` currently special-cases IDs starting with `"campMarker"` (maps
+   to `"encounter.camp"` for the node-conditional popup gate). Those element IDs no longer exist in the
+   new `layout.json` — delete that branch. Camp now resolves purely via the backdrop: `encounter.scene`
+   = `enc_camp` + a `CAMP` caption + a foeless action bar, no floating element. This folds into the
+   existing "foeless arrivals" engine work (Camp/Quest/nothing-here unmount the foe cluster) — see
+   CD_STATUS #39, still OPEN engine-side regardless of this drop.
+
+3. **New: `encounter.scene` per-node backdrop pick (CD_STATUS #41).** Core needs to set a `scene` field
+   per node when building encounter state; engine resolves the backdrop through the existing imageBind
+   mechanism (`bg/{encounter.scene}`) instead of the hardcoded `combat_field` call (`Game1.cs:1315`).
+   CD's suggested mapping: Camp→`enc_camp` · ResourceHold→`enc_quarry`/`enc_lumber` (per operation,
+   needs a designed split — currently ResourceHold doesn't distinguish quarry vs lumber anywhere in
+   Core, that's a NEW small design question, not just wiring) · Skirmish/Quest→a terrain variant or
+   `combat_field` · city/castle arrival→`enc_city_gates` · default→`combat_field`. Terrain-per-node
+   persistence (does a node keep the same terrain across repeat visits, or reroll) is undecided —
+   flagging rather than picking; cheapest default is "assign once when the node is generated, persist."
+
+4. **B32/B33/B34 (attrPip stretch, resourceStrip current/max chip, minionCard overlap) need ZERO engine
+   code changes** — they're pure geometry/template fixes inside `layout.json` itself, and the existing
+   manifest-driven renderer already reads geometry generically. Once the manifest parses, these three
+   playtest bugs (Doug's own reports: unreadable resourceStrip, garbled minion card text, pip overflow)
+   are just... fixed. Worth a quick live-test confirm after the rebuild, but no directive needed beyond
+   "rebuild once layout.json is valid."
+
+5. **Merchant BUY/SELL mode + ware attribute badges (CD_STATUS #42) — NEW, unplanned scope, not yet
+   prioritized.** A real feature (mode toggle, sell-your-goods feed, badge rework), not a bugfix — needs
+   its own sequencing slot once the drop is unblocked; not folding into this RE-ARM's priority list
+   sight-unseen. Doug should confirm "equipped pieces can't be sold" (CD's own flagged assumption, #42)
+   before this gets built.
+
 ## ✅ LOCKED (2026-07-12, Doug) — Charm/Tome/Staff bonus scalar CONFIRMED ("T3 = +3"): flat +1/tier
 ## owned, staff = tome exactly (no 2× stacking) — supersedes the NEEDS-HUMAN block and item 3 of the
 ## balance-pass entry below; annotation fix already applied, code catch-up ready to build
@@ -113,11 +196,45 @@ the STR staff becomes a free backup attack (Demand tab STR 3 = Staff 2 + Jab 1);
 SPELL bonus is `Kind==Staff`-keyed so it still boosts INT casts; `WEAPONS.md` staff row reconciled to
 "2H STR / 2 STR". 536/536, campaigns green across all races. **#2 Blast DEFINED** verbatim in
 `Techniques.cs` (INT/Timered/CD 15/Mult 1.0/Consults Primary, defaults = zero-Charge) + registered in
-`All`. **⚠ #2 kit-wiring FLAGGED (needs Doug's spreadsheet Kits row):** which of Summoner's 3 techniques
-(ActionSlots 3, currently Ember/Sacrifice/Barkskin) Blast replaces — or whether ActionSlots grows — isn't
-determinable from STATUS alone (the entry says "replacing/joining ... per the spreadsheet's Kits sheet",
-lists "Brace" where the code has Barkskin, and "distinct from Ember" implies Ember stays). Blast is
-defined and ready; the Summoner loadout slot needs Doug's exact composition before wiring.
+`All`. **✅ #2 kit-wiring UNBLOCKED 2026-07-12 (Doug confirmed via the spreadsheet's `Kits` sheet, read directly
+— exact rows below) — build this, no ambiguity left:**
+
+`CoreRunes.cs`'s `Summoner` definition (currently lines 79-96) changes to:
+```
+ActionSlots: 4,                                                    // was 3 — kit grows to 4 techniques
+DefaultEquipment: new[] { Techniques.Ember, Techniques.Blast, Techniques.Sacrifice, Techniques.Brace },
+DefaultWeapons: new[] { Armory.Wands[0], Armory.Shields[0] },      // Adept Wand + Wooden Shield (was + Charm)
+DefaultArmor: RobeKitT1,                                           // unchanged
+DefaultMinions: new[] { Minions.Skeleton },                        // was Skeleton + IronGolem
+IntBonus: 3, ConBonus: 2,                                          // UNCHANGED — Demand tab confirms
+```
+Verified directly against the spreadsheet's `Kits` sheet rows for Summoner (Robe/Cap/Wooden Shield/Wand/
+Blast/Ember/Sacrifice/Brace/skeleton) and the `Demand` tab (Summoner: STR0/INT7/DEX0/CON3 — CON3 = Wooden
+Shield(1)+Brace(2) exactly, confirming the shield+Brace swap; INT/CON core bonuses stay 3/2, unchanged).
+
+**Two things bundled into this that aren't spreadsheet-driven, flagging separately so they don't get lost
+as "just" the balance pass:**
+- **Wand+Shield is mechanically LEGAL — confirmed with Doug.** WEAPONS.md's old "a bow/wand can't coexist
+  with a held shield (both need free hands)" was WRONG — it's pure hand-COUNT: a shield occupies one
+  hand like any 1H item; only a 2H Bow has no hand left for one. Wand and Sling are both 1H, so either
+  freely pairs with a shield. **Fixed in `WEAPONS.md`** (mechanics section) — no code change needed here,
+  `Weapon.Hands` already models Wand as 1H, so nothing in the equip-slot math was actually blocking this;
+  it was purely a doc error.
+- **Dropping `IronGolem` from Summoner's `DefaultMinions` is NOT new from this spreadsheet — it fixes a
+  pre-existing code/doc mismatch.** `design/systems/CORE_RUNES.md`'s Summoner entry already said "Minions:
+  Skeleton (capacity 3, 2 free)" — singular — before this pass; the code's `Skeleton + IronGolem` default
+  was already inconsistent with its own canon doc. Worth a quick sanity check once built: does dropping
+  IronGolem change any existing test's assumptions about Summoner's starting field state?
+
+`design/systems/CORE_RUNES.md`'s Summoner + Adept entries are already reconciled to match (this pass) —
+canon doc is ahead of code now, code just needs to catch up to what's written above.
+
+**Also needs a CD outbox item** (not written yet — I'll add it in the same pass as this STATUS entry):
+`design/dchtml/core-kits.js` still shows the PRE-balance-pass kits for both Adept (staff_wooden as `'INT'`,
+no Jab in `techniques`) and Summoner (Wand+Charm, Ember/Sacrifice/Barkskin, `finds.minions` still lists
+`golem`/`hound` as FINDS not defaults — that part's fine, only the *default* `bays`/`gear`/`techniques`
+need the swap). Once the engine build above lands, the NewGame/Equipment screens will keep showing the
+OLD kit until CD gets this — it's a real design/engine divergence risk, not just cosmetic drift.
 
 **1. Staff flips from INT to STR — makes Jab a free backup attack, zero changes needed to Jab itself.**
 Today `Armory.cs:71`: `Staffs = Named("staff", Stat.Int, WeaponKind.Staff, ...)`. Change `Stat.Int` →

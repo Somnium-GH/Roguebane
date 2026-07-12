@@ -43,8 +43,11 @@ Twisted → Ornate → Humming; charm Wooden → Bone → Ornate → Humming; to
 - **Timer** multiplies the technique's base charge; **DEX haste** shortens it further at cast (≤28%).
 - **Dual-wield:** damage from BOTH weapons per the technique's text; timer = the AVERAGE of the two.
 - **Two equip layers (§6d):** a MELEE hand-config (main + off-hand) and one separate RANGED slot. A shield
-  object lives in the off-hand; a bow/wand can't coexist with a held shield (both need free hands). Broken arm
-  removes a hand-slot; a bow needs both arms, a sling one.
+  object occupies ONE hand, same as any 1H item — it's pure hand-count, not a special exclusion
+  (**corrected 2026-07-12, Doug**: the old wording wrongly lumped Wand in with Bow). A **Bow needs BOTH
+  hands** (2H), so it can never share a hand-config with a shield. **Sling and Wand are each 1H**, so
+  either one CAN pair with a shield in the other hand — Summoner's kit does exactly this (Wand + Wooden
+  Shield). Broken arm removes a hand-slot; a bow needs both arms, a sling or wand needs one.
 - DPS climbs with STR investment (bigger req, slower swing, more damage); DEX weapons stay cheap / fast / low.
 
 ## Open / TBD

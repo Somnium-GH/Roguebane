@@ -235,7 +235,7 @@ constitution}`, `icons/rune/{mark,path_minor,path_major,keystone}`, `icons/resou
 Generators + capture (the whole package is reproducible from these): `roster_gen.js` (figures+gear+layout.json),
 `bg_gen.js` (backdrops), `ui_gen.js` (buttons), `ui_atoms_gen.js`
 (attr/rune-TIER/resource/reticle/minion icons), `atom_capture.js` + `atom_slice.js` (technique chips, pips, and
-map node tokens — captured/stamped from the screens; see ASSET_GEN_METHOD.md), `rune_capture.js` (the five
+map node tokens — captured/stamped from the screens; see ASSET_GEN_METHOD.md), `rune_capture.js` (the seven
 Core-rune identity tokens `icons/rune/core_*` — captured from NewGame's own decagon+glyph cards, dual-bg
 transparency recovery), `frame_gen.js` (the 9-slice
 `ui/frame/*` ornate panel/card chrome — LAYOUT_CONTRACT §10), `mgcb_gen.js` (Content.mgcb
@@ -262,7 +262,7 @@ control uses the shared `ui/button/button_{on,normal}` chrome.
 | `icons/attr/{strength,intellect,dexterity,constitution}` | attribute swatch (NO glyph — plain stat-colour box) | all | static attribute id | 120×120 | 4 | hi-fi · deterministic colour box (engine may draw a tinted rect instead — see UI_ASSET_MAP.md) |
 | `icons/technique/{swing,frenzy,firebolt,disarm,brace,shot,bandage,block,cleave,drain,ember,jab,lunge,stoneskin,siphon,sacrifice,barkskin,flurry,aimed_shot,bind,parry,steel,suture}` | technique glyph chip | Combat, Build | `technique.id` | 120×120 | 23 | hi-fi · deterministic chip + screen glyph, re-centred (§12); chips with no card on a locked screen are reconstructed via `RB_buildChipOverlay` (atom_slice `RB_TECHS_SYNTH`/`RB_TECHS_V6`/`RB_TECHS_SPLIT`/`RB_TECHS_T2`); `frenzy`/`flurry` carry the 50/50 STR/DEX split fill; `parry,steel,suture` = the v6 T2 ladder (payload B18, 2026-07-12) |
 | `icons/rune/{mark,path_minor,path_major,keystone}` | rune tier glyph — shape encodes tier: diamond(4)/pentagon(5)/hexagon(6)/octagon(8) | Build | `rune.tier` | 120×120 | 4 | hi-fi · deterministic polygon per tier (`ui_atoms_gen.js`) |
-| `icons/rune/core_{grunt,warden,adept,summoner,reaver,ranger}` | Core-rune identity token — decagon (10-gon) shape encodes the "Core" tier, per-core accent fill + carved glyph (✚◈✦❖⚔↗) | New Game | `core.id` | ~412×412 | 6 | hi-fi · CAPTURED from the live NewGame core cards (`proto/rune_capture.js`, dual-bg transparency recovery) — not hand-drawn; supersedes the inline-SVG-only token (DEV_LOOP_MEMORY #2) |
+| `icons/rune/core_{grunt,warden,adept,summoner,reaver,ranger,barbarian}` | Core-rune identity token — decagon (10-gon) shape encodes the "Core" tier, per-core accent fill + carved glyph (✚◈✦❖⚔↗⚒) | New Game | `core.id` | ~412×412 (barbarian 365×365) | 7 | hi-fi · CAPTURED from the live NewGame core cards (`proto/rune_capture.js`, dual-bg transparency recovery) — not hand-drawn; supersedes the inline-SVG-only token (DEV_LOOP_MEMORY #2). `core_barbarian` added 2026-07-12 (v6 roster) |
 | `icons/node/{camp,resource,merchant,unknown,castle,skirmish}` | map token | Run Map | `node.type` + `node.revealed` (→`unknown`) | 220 (castle 413) | 6 | hi-fi · captured WITH a smooth high-res emboss (gloss + soft bevel) from the RunMap nodes; transparent corners via dual-bg recovery (ASSET_GEN_METHOD.md). `skirmish` = the dedicated combat node (red ⚔ on dark, blood border; reveals 1 jump out like merchants) — captured from CityMap's live `b1` exemplar |
 | `icons/resource/{supplies,support,spoils,hp,charge,summons}` | resource glyph | resource readout top-right of EVERY in-run screen (Encounter/CityMap/CampaignMap/Equipment/Merchant) + merchant provisions/healing | resource readouts (`run.resources`, `data-image-bind="icons/resource/{resource.id}"`) | 120×120 | 6 | placeholder · `charge` = the shield-PIERCE resource (steel heater shield run through by a `hit`-red bolt); `summons` = the minion-deploy resource (§9/§14: mint spirit rising from a teal summoning circle) — both `ui_atoms_gen.js` |
 | `icons/map/{enemy_host,enemy_host_near}` | enemy war-party marker — a LEFT-facing mounted knight + red war banner + barding; rides the leading edge of the Run Map DOOM BAR as the horde marches from the castle (right) toward your camp (left). Reaching camp = you lose; `enemy_host_near` brightens the red as it closes | Run Map (doom bar) | `enemy.advance` distance + near-camp danger flag | 60×52 | 2 | world-art · deterministic flat-bevel (ART_RULES) via `proto/party_gen.js` |
@@ -311,7 +311,15 @@ CityMap's supplies/support cards rendered frameless until 2026-07-01). And scree
 
 | id | type | screen | drives-from (Core) | size px | variants | status |
 |---|---|---|---|---|---|---|
-| `bg/combat_field` | scene backdrop | Combat | active encounter biome | 1920×1080 | — | placeholder |
+| `bg/combat_field` | scene backdrop | Encounter (default skirmish field) | `encounter.scene` (`data-image-bind="bg/{encounter.scene}"`) | 1920×1080 | — | placeholder |
+| `bg/enc_camp` | scene backdrop — YOUR camp in the right foreground (fire + tents + gear where a foe would stand; IS the Camp-arrival treatment, replaces the retired campMarker icon+note) | Encounter · Camp node | `encounter.scene` | 1920×1080 | — | placeholder · contextual set, Doug 2026-07-12 |
+| `bg/enc_forest` | scene backdrop — deep-wood clearing (any wooded node: skirmish, quest, …) | Encounter | `encounter.scene` | 1920×1080 | — | placeholder · contextual set |
+| `bg/enc_mountain` | scene backdrop — high pass, cold peaks + snow rims | Encounter | `encounter.scene` | 1920×1080 | — | placeholder · contextual set |
+| `bg/enc_river` | scene backdrop — moonlit ford, water band in the midground | Encounter | `encounter.scene` | 1920×1080 | — | placeholder · contextual set |
+| `bg/enc_meadow` | scene backdrop — open grassland at dusk, grass-tuft fore band | Encounter | `encounter.scene` | 1920×1080 | — | placeholder · contextual set |
+| `bg/enc_quarry` | scene backdrop — cut-stone terraces + timber hoist (ResourceHold: stone) | Encounter | `encounter.scene` | 1920×1080 | — | placeholder · contextual set |
+| `bg/enc_lumber` | scene backdrop — clear-cut, stump field + log decks (ResourceHold: timber) | Encounter | `encounter.scene` | 1920×1080 | — | placeholder · contextual set |
+| `bg/enc_city_gates` | scene backdrop — walled city on the horizon, lit gate + road (the march arrives) | Encounter | `encounter.scene` | 1920×1080 | — | placeholder · contextual set |
 | `bg/build_alcove` | scene backdrop | Build | static (loadout) | 1920×1080 | — | placeholder |
 | `bg/map_chart` | scene backdrop | Run Map | static | 1920×1080 | — | placeholder |
 | `bg/spine_road` | scene backdrop | Campaign Spine | static | 1920×1080 | — | placeholder |

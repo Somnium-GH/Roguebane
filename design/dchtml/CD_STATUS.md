@@ -28,6 +28,58 @@ with the sources, so the engine side always has the current open-gap status alon
 
 ## OPEN
 
+### 42. Merchant BUY/SELL mode + ware attribute badges (payload 2026-07-12) — engine mode/feed pending
+- **What (2026-07-12, Doug):** (a) the Wares surface now has TWO whole-screen modes — **BUY** (the
+  merchant's stock, as before) and **SELL** (**Your Goods**: the player's inventory in the same
+  category sections; worn/wielded/slotted pieces CAN'T be sold — dimmed card + `EQUIPPED` chip in the
+  price strip; sellable rows show a green `SELL` chip + a `+Ng` buyback price). New elements:
+  `modeToggle` + `modeBuyBtn`/`modeSellBtn` (binds `merchant.mode.buy`/`.sell`, bind-gate; the ACTIVE
+  mode wears the gold `button_on` skin via the per-state **`asset`** field — the same NEW field
+  CityMap's `retreatBtn` introduced in #39, still engine-pending). `waresTitle` is now BOUND
+  (`merchant.mode.title`, sample "Wares" / sell "Your Goods"). Sell ships as its own ref:
+  `design/07-merchant-sell.png`. (b) the ARM/WPN/TEC **kind boxes are RETIRED** from `wareCard` —
+  replaced by the Equipment-invCard **attribute badge** (attr label over the amount, attr-coloured;
+  runes: affected attr + rune-budget points, paths amber): binds `ware.badge` + `ware.attr` +
+  `ware.cost` + `colorBind ware.attrColor` REPLACE `ware.category`/`ware.categoryColor`. (c)
+  **techniques carry NO badge** (redundant — their glyph chip's fill already encodes the attribute):
+  the design draws the captured glyph chip (`icons/technique/<id>`, B18 set) + the colored `"DEX 1"`
+  cost tag (`ware.tag`/`ware.tagColor`, action-bar grammar). (d) **Techniques stock rule: always 3
+  or 6** — the wares list is now a **3-column GRID** (`flow:"grid", cols:3`, card back at 258px/129
+  design), so a 6-stock stacks as TWO ROWS OF 3, and the pager packs WHOLE sections by height (a page
+  holds three single-row sections, or one double-row + one single) — a section never splits across
+  pages. All samples are the REAL catalog (core-kits `TECHS`/`MINIONS`
+  exports, gear defs, the Equipment rune bag) — only prices/flavor are samples.
+- **Consequences (engine, NOT yet done):** hold `merchant.mode`, swap the section feed (stock vs
+  player inventory + sell eligibility/pricing), stamp the two mode buttons' active/idle states
+  (needs the per-state `asset` swap, #39), and SUPPRESS the badge box on technique wares (they
+  resolve no `ware.badge`/`ware.attr`/`ware.cost` — the unresolved-content-suppresses rule must
+  extend to the box chrome, or the sale face will draw an empty badge). The technique glyph chip on
+  the sale face is template-side still the B22 per-kind variance (armor measures `wareCard` first) —
+  B22 stays open; the design + icons are ready.
+- **Design assumption to confirm (Doug):** "equipped pieces can't be sold" is the sell-eligibility
+  rule the view exercises — flag if selling off your back should be allowed instead.
+- **Status:** OPEN until the engine hosts the mode + sell feed. Bind delta is in DROP_AUDIT pass 12.
+
+### 41. `encounter.scene` — per-node contextual backdrop pick (Doug 2026-07-12); engine pick + field pending
+- **What (2026-07-12, "a sense of journey"):** every Encounter node type gets a scene-appropriate
+  backdrop instead of the one hardcoded `bg/combat_field` draw (`Game1.cs:1315`). Eight new procedural
+  backdrops shipped from `bg_gen.js` (same toolkit, deterministic): `enc_camp` (fire + tents + gear in
+  the RIGHT foreground where a foe would stand — this IS the Camp-arrival treatment now), terrain
+  variants `enc_forest` / `enc_mountain` / `enc_river` / `enc_meadow` (ANY encounter type may use them —
+  quests included, no quest-only distinction per Doug), `enc_quarry` / `enc_lumber` (ResourceHold
+  operations), `enc_city_gates` (the march arrives). The Encounter backdrop element now authors
+  `binds:"encounter.scene"` + `imageBind:"bg/{encounter.scene}"` — the PICK is the existing imageBind
+  mechanism; static `image` stays `bg/combat_field.png` so an engine without the field draws as today.
+- **Consequences (engine, NOT yet done):** populate `encounter.scene` per node when building Core state
+  (suggested mapping: Camp→`enc_camp` · ResourceHold→`enc_quarry`/`enc_lumber` per operation ·
+  Skirmish/Quest→a terrain variant or `combat_field` · city/castle arrival→`enc_city_gates` ·
+  default→`combat_field`) and resolve the backdrop through the imageBind instead of the hardcoded call.
+  Terrain-per-node persistence (a node keeps its terrain across visits) is an engine data question.
+- **Design-side exercise:** Encounter's `scene` preview prop cycles all variants; the shipped
+  01-encounter refs stay on the default field except `01-encounter-camp.png` (enc_camp).
+- **Status:** OPEN until the engine sets the field + draws the pick. Variant set is open-ended — more
+  scenes are cheap (one block in `bg_gen.js` each); scope additions with Doug.
+
 ### 40. `border.colorBind` — accent binds now target the BORDER draw site (B20 / Doug #7); engine apply pending
 - **What (2026-07-12):** the coreCard Core-Effect block's `colorBind:"core.accent"` was engine-drawn as a
   FULL-RECT fill behind the effect text — a contrast violation Doug reported. The accent is a LEFT-BORDER
@@ -42,25 +94,30 @@ with the sources, so the engine side always has the current open-gap status alon
   these instead of the engine's flagged stopgap palette.
 - **Status:** OPEN until the engine tints bound borders + reads `style.coreAccents`.
 
-### 39. Encounter FOELESS arrivals (quest / camp / nothing-here) + CityMap retreat→redeploy states (B29) — engine gating/draw pending
-- **What (2026-07-12):** the Encounter shell now hosts non-combat arrivals. (a) `questPanel` (+
-  questTitle/questPrompt/questAccept/questDecline children) — the quest prompt card INSIDE the shell
-  (card-frame chrome, ACCEPT gold / DECLINE neutral), gated on `encounter.quest` (`data-bind-gate`);
-  title/prompt are bound SAMPLES (quest copy/catalog is Doug's separate pass). (b) `campMarker`
-  (icon + CAMP + note), gated on `encounter.camp` — Camp is a foeless encounter so techniques can be
-  pre-activated (HELD/CHARGING still reserve; a TARGETING intent relaxes to READY foeless). (c)
-  "nothing here" = the shell with NO marker — no new elements; the engine resolves neither
-  `encounter.foe` nor quest/camp. The foe cluster (glow, stream, foeFigure, foeHp, foeLabel, reticle,
-  aim tags) must UNMOUNT when `encounter.foe` is unresolved. (d) CityMap gains `retreatBtn` with two
-  authored states: `retreat` (neutral) / `redeploy` (gold, relabelled) — replacing the engine-only
-  overlay. ⚠ the states carry NEW fields: `label` (per-state text swap) and `asset` (per-state
-  ui/button skin swap) — no engine support exists for either yet.
-- **Consequences (engine, NOT yet done):** foe-cluster unmount on unresolved `encounter.foe`;
-  quest/camp element gating; per-state `label`/`asset` swap on `retreatBtn`. The DEX-gated
-  retreat/redeploy TIMER is undecided on the engine side — deliberately NOT designed against (per B29).
+### 39. Encounter FOELESS arrivals (quest / camp / nothing-here) + CityMap retreat→redeploy states (B29) — CD manifest half DELIVERED; engine foeless-tick still owed
+- **What (2026-07-12, re-cut same day per Doug):** the Encounter shell now hosts non-combat arrivals.
+  (a) `questPanel` (+ questTitle/questPrompt/questAccept/questDecline children) — the quest prompt card
+  INSIDE the shell (card-frame chrome, ACCEPT gold / DECLINE neutral), gated on `encounter.quest`
+  (`data-bind-gate`); title/prompt are bound SAMPLES (quest copy/catalog is Doug's separate pass).
+  (b) **Camp is now BACKDROP-carried, not element-carried:** the old `campMarker` icon+note element is
+  RETIRED from the manifest (Doug: "not what we're going for") — a Camp arrival draws the `enc_camp`
+  backdrop (fire + tents in the right foreground, entry #41) with NO extra elements. Camp stays a
+  foeless encounter: techniques can be pre-activated (HELD/CHARGING still reserve; a TARGETING intent
+  relaxes to READY foeless). (c) "nothing here" = the shell with no foe and the plain field — no
+  elements. The foe cluster (glow, stream, foeFigure, foeHp, foeLabel, reticle, aim tags) must UNMOUNT
+  when `encounter.foe` is unresolved. (d) CityMap `retreatBtn` keeps two authored states: `retreat`
+  (neutral) / `redeploy` (gold, relabelled) — ⚠ the states carry NEW fields `label` (per-state text
+  swap) and `asset` (per-state ui/button skin swap); no engine support exists for either yet.
+- **Consequences (engine, NOT yet done — the supervised/large item, per the 2026-07-12 loop note):**
+  the engine-side foeless-tick (Core state + Game render for Camp/Quest/nothing-here): foe-cluster
+  unmount on unresolved `encounter.foe`; quest element gating; camp = scene pick (#41) + no foe;
+  per-state `label`/`asset` swap on `retreatBtn`. The DEX-gated retreat/redeploy TIMER is undecided
+  engine-side — deliberately NOT designed against (per B29). Any engine code that resolved the old
+  `campMarker*` element ids must drop them — they no longer exist in the manifest.
 - **Renders:** quest + camp ship as their own refs (`design/01-encounter-quest.png` /
   `01-encounter-camp.png`) — mutually-exclusive whole-screen states, same rule as the cores.
-- **Status:** OPEN until the engine hosts all three foeless arrivals + the two-state button.
+- **Status:** OPEN until the engine hosts all three foeless arrivals + the two-state button. Nothing
+  further is owed from CD on this entry.
 
 ### 38. `countWidth` (data-driven group width + hide-at-zero, B27) — NEW manifest field, engine draw pending
 - **What (2026-07-12):** Equipment `minionColumn` + Encounter `minionGroup` now emit

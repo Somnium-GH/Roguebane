@@ -26,8 +26,14 @@
 </helmet>
 <div data-screen-label="Encounter" data-screen="encounter" data-design="1920,1080" style="position:relative;width:1920px;height:1080px;overflow:hidden;font-family:'IM Fell English',Georgia,serif;color:#ece0cb;background:#0c0810;">
 
-  <!-- ===== EGA FANTASY BACKDROP (baked: Content/bg/combat_field.png, §10 rule A) ===== -->
-  <div data-el="backdrop" data-anchor="Center" data-z="0" data-binds="encounter.scene" style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:url('Content/bg/combat_field.png') center top/cover no-repeat;image-rendering:pixelated;"></div>
+  <!-- ===== EGA FANTASY BACKDROP (baked: Content/bg/*.png, §10 rule A) =====
+       CONTEXTUAL SCENES (Doug 2026-07-12, "a sense of journey"): the shell picks a backdrop per node
+       via imageBind bg/{encounter.scene} — combat_field (default skirmish field), enc_forest /
+       enc_mountain / enc_river / enc_meadow (terrain — ANY encounter type may use them, quests
+       included; no quest-only distinction), enc_quarry / enc_lumber (ResourceHold operations),
+       enc_city_gates (the march arrives), enc_camp (Camp — your fire+tents fill the right foreground
+       where a foe would stand; this REPLACES the old campMarker icon+note treatment entirely). -->
+  <div data-el="backdrop" data-anchor="Center" data-z="0" data-binds="encounter.scene" data-image-bind="bg/{encounter.scene}" style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:{{ sceneBg }};image-rendering:pixelated;"></div>
   <!-- torch glow (your side) — animated runtime overlay on top of baked backdrop -->
   <div style="position:absolute;left:0;top:56px;width:760px;height:560px;background:radial-gradient(60% 60% at 22% 32%,#e0913a55,transparent 70%);animation:rb-torch 3.2s infinite;pointer-events:none;"></div>
   <!-- hostile glow (foe side) — combat arrivals only (payload B29: the shell also hosts foeless
@@ -48,12 +54,15 @@
       <!-- RESOURCE READOUT (payload v5 §G: top-right on every IN-RUN screen) — supplies / gold / charge / summons -->
       <div data-el="resourceStrip" data-anchor="TopRight" data-z="6" data-binds="run.resources" data-container="1" data-template="resourceItem" data-flow="horizontal" style="display:flex;align-items:center;flex:none;gap:10px;margin-right:14px;">
         <sc-for list="{{ resources }}" as="res" hint-placeholder-count="4">
-          <!-- uniform chip width (payload 2026-07-03 pm residual #5): the engine stamps every chip at the
-               TEMPLATE width, so content-width chips under-size the region and the last chip clips —
-               fix the chip at 94px so region extents == stamped extents, 4 chips always seat -->
-          <div data-tpl="resourceItem" style="display:flex;align-items:center;gap:6px;width:94px;flex:none;">
+          <!-- uniform chip width (payload 2026-07-03 pm residual #5 + B33 2026-07-12): the engine stamps
+               every chip at the TEMPLATE width, so the chip is fixed (124px) and region extents ==
+               stamped extents, 4 chips always seat. The engine feeds supplies/charge/summons as
+               "current/max" (up to 5 chars ≈ 44px at 14px mono), so the value is a FIXED 44px band and
+               the label starts clear of it — the old 4px slot measured off a bare-digit sample clipped
+               every fraction (only GOLD stayed legible). -->
+          <div data-tpl="resourceItem" style="display:flex;align-items:center;gap:6px;width:124px;flex:none;">
             <span data-binds="resource.icon" data-image-bind="icons/resource/{resource.id}" style="width:22px;height:22px;flex:none;background-image:{{ res.iconCss }};background-size:100% 100%;image-rendering:pixelated;"></span>
-            <span data-binds="resource.value" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#e9d6b0;">{{ res.value }}</span>
+            <span data-binds="resource.value" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#e9d6b0;width:44px;flex:none;">{{ res.value }}</span>
             <span data-binds="resource.label" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:#8d775c;">{{ res.label }}</span>
           </div>
         </sc-for>
@@ -77,7 +86,7 @@
   <div style="position:absolute;left:0;top:56px;width:1920px;height:660px;z-index:3;">
     <!-- zone labels -->
     <span data-el="youLabel" data-shadow="title" style="position:absolute;left:26px;top:12px;font-size:20px;letter-spacing:1px;color:#e9d6b0;text-shadow:0 2px 6px #000;">You</span>
-    <span style="position:absolute;left:50%;top:14px;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:#8d775c;">— BATTLEFIELD —</span>
+    <span style="position:absolute;left:50%;top:14px;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:#8d775c;">{{ zoneCaption }}</span>
     <sc-if value="{{ hasFoe }}" hint-placeholder-val="{{ true }}">
     <span data-el="foeLabel" data-anchor="TopRight" data-shadow="title" style="position:absolute;right:26px;top:12px;font-size:20px;letter-spacing:1px;color:#e9c7bd;text-shadow:0 2px 6px #000;">Foe</span>
     </sc-if>
@@ -180,15 +189,11 @@
       </div>
     </div>
 
-    <!-- ===== CAMP ARRIVAL (payload B29.2) — a foeless "empty encounter": the player can pre-activate
-         techniques here so Timered attacks are already charging before the next real fight. The
-         "nothing here" arrival is this shell with NO marker at all (just the arrive beat — no new
-         elements needed; the engine simply resolves neither encounter.foe nor encounter.quest/camp). -->
-    <div data-el="campMarker" data-anchor="Right" data-binds="encounter.camp" data-bind-gate="" style="position:absolute;left:1350px;top:240px;width:240px;visibility:{{ campVis }};display:flex;flex-direction:column;align-items:center;gap:10px;z-index:3;">
-      <img data-el="campMarkerIcon" data-type="icon" data-shadow="soft" src="Content/icons/node/camp.png" width="88" height="88" style="image-rendering:pixelated;filter:drop-shadow(0 3px 5px #0009);" alt="camp">
-      <span data-el="campMarkerLabel" data-shadow="title" style="font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:3px;color:#7fa05a;text-shadow:0 1px 3px #000;">CAMP</span>
-      <span data-el="campMarkerNote" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:17px;line-height:1.5;color:#cdbfa8;text-align:center;">The host rests. Activate techniques now and they charge before the next fight.</span>
-    </div>
+    <!-- ===== CAMP ARRIVAL (payload B29.2, re-cut per Doug 2026-07-12) — the camp is the BACKDROP
+         now (enc_camp: fire + tents + gear in the right foreground where a foe would stand), not a
+         floating icon+note; the old campMarker element is REMOVED. Camp stays a foeless encounter —
+         techniques can be pre-activated (HELD/CHARGING still reserve; TARGETING relaxes to READY).
+         The "nothing here" arrival is the shell with no foe and the plain field — no elements. -->
   </div>
 
   <!-- ===== BOTTOM BAND: POOL | ACTION BAR (§10: engine-drawn drop shadow, DATA not baked into any
@@ -268,7 +273,7 @@
                          number stack carry the wire; the part name was clutter on the tile) -->
                     <span data-binds="technique.state" style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;padding:2px 5px;color:{{ t.stateColor }};border:1px solid {{ t.stateColor }};">{{ t.state }}</span>
                   </div>
-                  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-top:7px;">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-top:7px;min-height:22px;">
                     <span data-binds="technique.name" style="font-size:17px;color:#ece0cb;">{{ t.name }}</span>
                     <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;white-space:nowrap;">
                       <sc-if value="{{ t.single }}" hint-placeholder-val="{{ true }}"><span data-binds="technique.attr" data-color-bind="technique.attrColor" style="color:{{ t.costColor }};">{{ t.attr }}</span> <span data-binds="technique.cost" data-color-bind="technique.attrColor" style="color:{{ t.costColor }};">{{ t.cost }}</span></sc-if>
@@ -302,7 +307,13 @@
                     </span>
                     <span data-binds="minion.state" style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;padding:2px 5px;color:{{ b.stateColor }};border:1px solid {{ b.stateColor }};">{{ b.state }}</span>
                   </div>
-                  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-top:7px;">
+                  <!-- min-height (payload B34 2026-07-12): grunt — the extraction-default core — has NO
+                       filled minions, so this template measures from an EMPTY card; without a fixed
+                       name-row height the header collapsed to y27 and minion.description overprinted the
+                       live name/cost (Hound playtest). Empty + filled cards now share FILLED geometry:
+                       header ends ~y37, description starts below the name band — matches Equipment's
+                       minionCard. (Same guard on the techCard name row.) -->
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-top:7px;min-height:22px;">
                     <span data-binds="minion.name" style="font-size:17px;color:#ece0cb;">{{ b.name }}</span>
                     <span data-binds="minion.cost" data-color-bind="minion.gateColor" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:{{ b.gateColor }};white-space:nowrap;">{{ b.attrLabel }} {{ b.cost }}</span>
                   </div>
@@ -319,7 +330,7 @@
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1080},&quot;core&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;grunt&quot;,&quot;warden&quot;,&quot;adept&quot;,&quot;summoner&quot;,&quot;reaver&quot;,&quot;ranger&quot;,&quot;barbarian&quot;],&quot;default&quot;:&quot;grunt&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vessel&quot;},&quot;race&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;human&quot;,&quot;elf&quot;,&quot;dwarf&quot;,&quot;halfling&quot;,&quot;half_giant&quot;],&quot;default&quot;:&quot;human&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vessel&quot;},&quot;arrival&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;combat&quot;,&quot;quest&quot;,&quot;camp&quot;,&quot;empty&quot;],&quot;default&quot;:&quot;combat&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Arrival&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1080},&quot;core&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;grunt&quot;,&quot;warden&quot;,&quot;adept&quot;,&quot;summoner&quot;,&quot;reaver&quot;,&quot;ranger&quot;,&quot;barbarian&quot;],&quot;default&quot;:&quot;grunt&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vessel&quot;},&quot;race&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;human&quot;,&quot;elf&quot;,&quot;dwarf&quot;,&quot;halfling&quot;,&quot;half_giant&quot;],&quot;default&quot;:&quot;human&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vessel&quot;},&quot;arrival&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;combat&quot;,&quot;quest&quot;,&quot;camp&quot;,&quot;empty&quot;],&quot;default&quot;:&quot;combat&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Arrival&quot;},&quot;scene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;field&quot;,&quot;forest&quot;,&quot;mountain&quot;,&quot;river&quot;,&quot;meadow&quot;,&quot;quarry&quot;,&quot;lumber&quot;,&quot;city_gates&quot;],&quot;default&quot;:&quot;field&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Arrival&quot;}}">
 class Component extends DCLogic {
   /* Encounter (combat). The `core` prop sets which of the six PROTOTYPE cores is lit; the `race`
    * prop sets the vessel race (pools = race base + core stat bonus, HP = 10 + 2×CON — v6 sheet), so
@@ -347,7 +358,8 @@ class Component extends DCLogic {
     const fallback = { youHp: [], foeHp: [], pool: [], techniques: [], bays: [], resources: [], shieldPips: [], aimTags: [],
       hasBays: true, bayWidth: '172px', heroFig: 'human_grunt', heroStates: null, heroHide: [], hpLabel: 'GRUNT · HP',
       youHpText: '', hasFieldMinion: false, fieldLabel: '', fieldArt: '', retAnim: 'none',
-      hasFoe: true, questVis: 'hidden', campVis: 'hidden', sceneLabel: 'SKIRMISH' };
+      hasFoe: true, questVis: 'hidden', sceneLabel: 'SKIRMISH', zoneCaption: '— BATTLEFIELD —',
+      sceneBg: "url('Content/bg/combat_field.png') center top/cover no-repeat" };
     if (!K) return fallback;
     const core = K.get(coreId);
     const race = K.RACES[this.props.race] ? this.props.race : 'human';
@@ -356,12 +368,20 @@ class Component extends DCLogic {
     // ARRIVAL (payload B29): the shell hosts combat AND the three foeless arrivals — quest / camp /
     // "nothing here". Foeless: the foe cluster unmounts (engine: encounter.foe unresolved), a
     // TARGETING intent relaxes to READY (nothing to aim at — HELD/CHARGING keep reserving, which is
-    // the whole point of Camp pre-activation), and the quest card / camp marker show per arrival.
+    // the whole point of Camp pre-activation), and the quest card / camp BACKDROP show per arrival.
     // The quest panel stays in the DOM (visibility-only toggle) so extraction always carries it.
     const arrival = ['combat', 'quest', 'camp', 'empty'].includes(this.props.arrival) ? this.props.arrival : 'combat';
     const hasFoe = arrival === 'combat';
     if (!hasFoe) R.techniques = R.techniques.map(t => t.state === 'TARGETING' ? { ...t, state: 'READY' } : t);
     const sceneLabel = { combat: 'SKIRMISH', quest: 'QUEST', camp: 'CAMP', empty: 'QUIET FIELD' }[arrival];
+    const zoneCaption = { combat: '— BATTLEFIELD —', quest: '— WAYSIDE —', camp: '— YOUR CAMP —', empty: '— OPEN GROUND —' }[arrival];
+    // CONTEXTUAL SCENE (Doug 2026-07-12): backdrop per node, engine-side via bg/{encounter.scene}.
+    // `scene` is a preview prop exercising each variant; Camp always shows its own camp-foreground
+    // backdrop (that IS the camp treatment now — the campMarker icon+note is retired).
+    const SCENES = { field: 'combat_field', forest: 'enc_forest', mountain: 'enc_mountain', river: 'enc_river',
+      meadow: 'enc_meadow', quarry: 'enc_quarry', lumber: 'enc_lumber', city_gates: 'enc_city_gates' };
+    const scene = SCENES[this.props.scene] ? this.props.scene : 'field';
+    const sceneBg = "url('Content/bg/" + (arrival === 'camp' ? 'enc_camp' : SCENES[scene]) + ".png') center top/cover no-repeat";
 
     // hero HP: max = the race formula (10 + 2×CON); current is a combat sample (live bind)
     const hpMax = K.raceHp(race), hpCur = hpMax - 6;
@@ -371,10 +391,11 @@ class Component extends DCLogic {
     for (let i = 0; i < 6; i++) shieldPips.push({ bg: '#7fc4b0', bd: '#0a0807', style: 'solid' });
     for (let i = 0; i < 3; i++) shieldPips.push({ bg: '#241b14', bd: '#4f9a8a', style: 'dashed' });
     const resources = [
-      { id: 'supplies', label: 'SUPPLIES', value: '6' },
+      // B33: supplies/charge/summons are "current/max" strings engine-side — sample the real format
+      { id: 'supplies', label: 'SUPPLIES', value: '6/8' },
       { id: 'spoils',   label: 'GOLD',     value: '128' },
-      { id: 'charge',   label: 'CHARGE',   value: '3' },
-      { id: 'summons',  label: 'SUMMONS',  value: '2' },
+      { id: 'charge',   label: 'CHARGE',   value: '3/5' },
+      { id: 'summons',  label: 'SUMMONS',  value: '2/2' },
     ].map(r => ({ ...r, iconCss: "url('Content/icons/resource/" + r.id + ".png')" }));
 
     // live attribute pool — gear standing reservation (−45° hatch) + ACTIVE technique/minion reservation (solid)
@@ -424,7 +445,7 @@ class Component extends DCLogic {
     };
     const emptyBay = () => ({ name: '', border: '#3a2c1d', bg: '#14100b', op: '.5', cardBorderStyle: 'dashed',
       iconBg: '#14100b', iconBorderStyle: 'dashed', state: '', stateColor: 'transparent', cost: '', attrLabel: '',
-      gateColor: 'transparent', descNode: 'open bay', hotkey: '' });
+      gateColor: 'transparent', descNode: 'open slot', hotkey: '' });   // B19: "bay" retired — "slot" like the techniques
     const bays = (R.bays || []).map(bayCard);
     while (bays.length < core.bayCap) bays.push(emptyBay());
     bays.forEach((b, i) => { b.hotkey = String(core.techCap + i + 1); });
@@ -444,7 +465,7 @@ class Component extends DCLogic {
       youHpText: hpCur + ' / ' + hpMax,
       hasFieldMinion: !!active, fieldLabel: active ? active.name.toUpperCase() : '',
       fieldArt: active ? "Content/sprites/minions/" + (K.MINION_SPRITE[active.name] || 'skeleton') + ".png" : '', retAnim,
-      hasFoe, sceneLabel, questVis: arrival === 'quest' ? 'visible' : 'hidden', campVis: arrival === 'camp' ? 'visible' : 'hidden' };
+      hasFoe, sceneLabel, sceneBg, zoneCaption, questVis: arrival === 'quest' ? 'visible' : 'hidden' };
   }
 }
 </script>

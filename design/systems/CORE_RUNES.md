@@ -67,17 +67,24 @@ Minions: none (capacity 2).
 Bonus +5 CON. Weapons: Iron Longsword + Iron Buckler · Armor: Iron plate ×4 (paid in CON, −1/tier via Fortified) ·
 Techniques: Jab, Brace, Bandage · Minions: none (capacity 1).
 
-### Adept — *THE SCHOLAR* · badge CASTER — req **INT 10**
-Bonus +5 INT. Weapons: Wooden Staff (+magic damage = 2× a tome) · Armor: Cotton Robe + Cloth Cap · Techniques:
-Ember, Siphon, Stoneskin · Minions: none (capacity 1). **Stoneskin numbers (Doug, 2026-07-05): T2 INT ward —
-pool 6, +2 pips / 3.0s, reserve 2 INT** (rung 2 of the barkskin ladder, TECHNIQUES.md).
+### Adept — *THE SCHOLAR* · badge CASTER — req **INT 8 · STR 3**
+Bonus +5 INT. Weapons: Wooden Staff (STR-gated, own +1/tier SPELL bonus — same flat formula as a Tome, no
+longer "2× a tome"; **corrected 2026-07-12**, Doug's balance pass) · Armor: Cotton Robe + Cloth Cap ·
+Techniques: Ember, Siphon, Stoneskin, **Jab** (added 2026-07-12 — the STR-gated Staff makes Jab a free
+backup attack, giving Adept a real STR pressure alongside its INT spell suite) · Minions: none (capacity
+1). **Stoneskin numbers (Doug, 2026-07-05): T2 INT ward — pool 6, +2 pips / 3.0s, reserve 2 INT** (rung 2
+of the barkskin ladder, TECHNIQUES.md).
 
-### Summoner — *THE BINDER* · badge SPECIALIST — req **INT 8**
-Bonus +3 INT · +2 CON. Weapons: Adept Wand + Wooden Charm · Armor: Cotton Robe + Cloth Cap · Techniques: Ember,
-Sacrifice, Barkskin · Minions: Skeleton (capacity 3, 2 free). **Sacrifice locked 2026-07-05 (Doug):** heal
-scales with the sacrificed minion's tier, minion destroyed permanently (no refund) — see TECHNIQUES.md for
-the (still-flagged) exact per-tier numbers. Barkskin here is T1 — Adept gets the stronger Stoneskin T2
-(below); the two are intentionally different tiers, not a mix-up.
+### Summoner — *THE BINDER* · badge SPECIALIST — req **INT 7 · CON 3**
+Bonus +3 INT · +2 CON. Weapons: Adept Wand + **Wooden Shield** (CON shieldobj — **reworked 2026-07-12**,
+Doug's balance pass; Wooden Charm is DROPPED from the starting kit) · Armor: Cotton Robe + Cloth Cap ·
+Techniques: Ember, **Blast** (new — INT wand-attack, see TECHNIQUES.md), Sacrifice, **Brace** (replaces
+Barkskin — a CON shield source pairing with the new Wooden Shield, instead of an INT ward) · Minions:
+Skeleton only (capacity 3, 2 free). A Wand (1H) freely pairs with a shield in the other hand — only a
+2H Bow excludes one; the old "bow/wand can't coexist with a shield" wording in WEAPONS.md was wrong and
+is corrected there too. **Sacrifice locked 2026-07-05 (Doug):** heal scales with the sacrificed minion's
+tier, minion destroyed permanently (no refund) — see TECHNIQUES.md for the (still-flagged) exact
+per-tier numbers.
 
 ### Reaver — *THE DUELIST* · badge SPECIALIST — req **DEX 9 · CON 2**
 Bonus +5 DEX. Weapons: 2× Iron Dagger · Armor: leather ×4 · Techniques: Frenzy, Flurry, Bandage · Minions: none (capacity 0).

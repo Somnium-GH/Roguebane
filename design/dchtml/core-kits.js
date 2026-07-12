@@ -176,6 +176,10 @@ const M = {
   hound:    { name: 'Hound',      attr: 'DEX', cost: 1, desc: 'A swift pet; nips every 4.0s and sharpens your aim (+5%) while active.' },
 };
 const mk = (key, intent) => ({ ...M[key], intent });
+// Merchant draws its sale/sell samples from these SAME defs (payload 2026-07-12: "we have items to
+// draw from so don't make any up") — exported verbatim, never duplicated.
+export const TECHS = T;
+export const MINIONS = M;
 
 // ---- the six cores (v6 §C defaults; badge/blurb feed the NewGame cards) --------------------------
 export const CORES = {
@@ -262,7 +266,7 @@ export const CORES = {
     id: 'summoner', cls: 'Summoner', role: 'THE BINDER', badge: 'SPECIALIST', accent: '#9a78b0',
     figure: 'summoner', budget: 17,
     effect: { name: 'Conscription', rules: 'Minions do not consume Summons when activated.' },
-    blurb: 'Starts with a thrall and open bays — its Summons are never spent.',
+    blurb: 'Starts with a thrall and open minion slots — its Summons are never spent.',
     // SCENARIO — head grazed (INT −2). Wand, charm and the Barkskin ward all still fit, but the last
     // free INT pip is gone: the Skeleton's gate can't be sustained and it drops to IDLE (starved, §9).
     scenario: { damage: { INT: 2 }, debuff: {}, figStates: { head: 'damaged' } },

@@ -1,3 +1,98 @@
+# DROP AUDIT — 2026-07-12 (pass 12: playtest fixes B32/B33/B34 + contextual backdrops + barbarian rune + B2-GO rides)
+
+**Pass 12 delta (2026-07-12 payload, evening — Doug playtest bugs + "sense of journey" backdrops):**
+
+- **B33 — `resourceItem` value slot reworked for `"current/max"`.** Root cause confirmed as authored:
+  the value rect `[14,1,4,9]` was measured off the bare-digit sample `"6"`. The chip is re-authored on
+  all FIVE screens (one shared template): fixed **124px** chip (design 62), value = a FIXED **44px**
+  band (design rect now `[14,1,22,9]` — fits 5-char `"10/12"` at mono fontPx 7), label starts clear of
+  it at x39. Samples now exercise the real engine format (`6/8` supplies · `128` gold · `3/5` charge ·
+  `2/2` summons), so extraction can never re-shrink the slot. Strip size grew `[188,11]→[263,11]`
+  (TopRight-anchored; header seats all 4 chips + buttons on every screen — verified in the refs).
+- **B34 — `combatMinionCard` name/description overlap fixed.** Root cause: grunt (the extraction-default
+  core) has NO filled minions, so the template measured from an EMPTY card — the name row collapsed and
+  the header divider shrank to y27, putting `minion.description`'s top inside the live name's glyph
+  band. Fix = state-independent geometry: the name row carries `min-height:22px` (same guard added to
+  the techCard name row), so empty + filled cards share FILLED geometry. Extracted result: header
+  `[1,1,76,37]`, description `[1,38,76,97]` — exactly the sibling Equipment `minionCard`'s vertical
+  layout. Also swept the B19 leftover: the empty card's sample is now **"open slot"** (was "open bay"),
+  and the summoner blurb's "open bays" → "open minion slots" (`core-kits.js`).
+- **B32 — preview pips now stretch-to-fill (engine parity).** Equipment `attrPip` dropped its
+  `max-width:106px` per-pip cap — a 4-cap and an 8-cap row now span the SAME row width in the mockups,
+  matching the shipped `ListLayout.StretchCells`. (Encounter's poolPip already stretched.) Template
+  `attrPip` size re-extracted `[24,9]→[54,9]` — cosmetic; the engine stretches per live count.
+- **Contextual encounter backdrops (NEW, Doug direction — first scoped set).** Eight new deterministic
+  blocks in `proto/bg_gen.js` (same toolkit: dusk gradient / stars / dither / silhouettes / clean dark
+  ground / vignette / scanlines): **`enc_camp`** (fire + tents + gear in the RIGHT foreground where a
+  foe would stand — this REPLACES the `campMarker` icon+note treatment entirely, per Doug),
+  **`enc_forest` / `enc_mountain` / `enc_river` / `enc_meadow`** (terrain — usable by ANY encounter
+  type, quests included; no quest-only distinction), **`enc_quarry` / `enc_lumber`** (ResourceHold
+  operations, plural per Doug's examples), **`enc_city_gates`** (the march arrives — walled city, lit
+  gate, road). The Encounter backdrop element now authors `binds:"encounter.scene"` +
+  `imageBind:"bg/{encounter.scene}"`; static image stays `combat_field` so an engine without the field
+  draws as today. **Engine owes the per-node pick + field — see CD_STATUS #41.** A `scene` preview prop
+  (field/forest/mountain/river/meadow/quarry/lumber/city_gates) exercises every variant in the one
+  screen; the shell's center caption follows the arrival (— YOUR CAMP — at camp, etc.).
+- **`campMarker` RETIRED (B29 re-cut).** `campMarker`/`campMarkerIcon`/`campMarkerLabel`/
+  `campMarkerNote` are GONE from Encounter + `layout.json` — a Camp arrival is the `enc_camp` backdrop
+  + `CAMP` label + foeless action bar, no floating icon. CD_STATUS #39 rewritten: CD's manifest half is
+  DELIVERED; the engine-side foeless-tick (Core state + Game render for Camp/Quest/nothing-here)
+  remains the supervised/large item, as flagged in the loop note.
+- **Barbarian core-rune icon shipped:** `icons/rune/core_barbarian.png` (365×365, decagon in the
+  `#cf7a44` accent + carved ⚒, transparent corners) — captured from the live NewGame card via
+  `rune_capture.js` (dual-bg recovery), completing the 7-core token set. Engine-blit only (screens draw
+  the inline SVG) → no render owed to it beyond this pass's refresh.
+- **B2-GO rides this drop (inventory for your smoke probes).** Already built + manifest-synced:
+  **36 melee weapon PNGs** (`{longsword,axe,mace,claymore,battleaxe,warhammer,dagger,rapier,shortsword}_
+  {iron,steel,mithral,dwarven}`), **sling/staff/charm/tome/wand ×4 tiers each**, **8 ranged back-mounts**
+  (`bow_*_back` + `sling_*_back`), worn tree under `sprites/gear/worn/{human,elf,dwarf,halfling,
+  half_giant}/`, **41 figures** in `layout.json.figures` (all with `sockets.back`; elf_ranger neckline
+  fix in), `worn` inventory block, `gear_catalog.json` rows. Binding-spec gap G1 (the `back` socket
+  is absent from LAYOUT_CONTRACT §1/§2) still rides CD_STATUS #32 — spec sync, not art.
+- **B20 status:** the design-side remainder was already in (5×7 NewGame, statBonus chips, rules-text
+  action cards, "minions" vocabulary) — this pass re-extracts + re-renders the refs against it, incl.
+  `05-newgame.png` (5 races × 3-page core pager) and the full per-core 01/02 sets.
+
+- **Merchant BUY/SELL mode + attribute badges (same-day follow-up, Doug).** (a) `modeToggle` +
+  `modeBuyBtn`/`modeSellBtn` on the Wares header; SELL = **Your Goods** (grunt kit + finds + rune bag,
+  real items) — equipped/slotted pieces dimmed with an `EQUIPPED` chip, sellable rows `SELL` + `+Ng`;
+  new ref **`design/07-merchant-sell.png`** (+ reference mirror). `waresTitle` now bound
+  (`merchant.mode.title`). (b) `wareCard`'s ARM/WPN/TEC kind boxes RETIRED → the invCard **attribute
+  badge** (`ware.badge`/`ware.attr`/`ware.cost` + `colorBind ware.attrColor` replace
+  `ware.category`/`ware.categoryColor`); runes badge = affected attr + budget points. (c) TECHNIQUES
+  carry no badge (redundant with the glyph chip's attr fill) — glyph chip + colored `"DEX 1"` tag,
+  the action-bar grammar. (d) technique stock rule: **always 3 or 6** — the wares list is a 3-col
+  GRID (a 6-stock = two rows of 3) and the pager packs whole sections by HEIGHT, so a section never
+  splits across pages (card width stays 258px). All samples re-sourced to the REAL catalog (`core-kits.js` now exports
+  `TECHS`/`MINIONS`; Merchant imports it — Quilted Jack / Ashwood Bow / Bound Wisp etc. sample
+  inventions are GONE). See **CD_STATUS #42** for the engine half (mode state, sell feed,
+  badge-suppression on technique wares).
+
+- **Changed files:** `Encounter.dc.html` (B33/B34 + scene bind + campMarker removal + zoneCaption),
+  `Merchant.dc.html` (BUY/SELL mode + badges + 3-col grid wares),
+  `Equipment.dc.html` (B32/B33), `CityMap.dc.html` / `Merchant.dc.html` / `CampaignMap.dc.html` (B33),
+  `core-kits.js` (B19 blurb sweep + `TECHS`/`MINIONS` exports), `proto/bg_gen.js` (+8 scene blocks + conifers/ridge/ground/tent
+  helpers), `Content/ASSET_MANIFEST.md`, `CD_STATUS.md` (#41 added; #39 rewritten; #40 unchanged).
+- **Assets added (9):** `bg/enc_{camp,forest,mountain,river,meadow,quarry,lumber,city_gates}.png` +
+  `icons/rune/core_barbarian.png`. `asset-manifest.js` + `Content.mgcb` REBUILT from disk (full
+  walkers, multi-asset pass): **3146 → 3155**, in sync. **No removals.**
+- **`Content/layout.json` re-extracted** — full 6-screen harness (`extract_all.html` → PNG channel →
+  `extract_merge.js`, key-set guard passed): encounter:47 equipment:52 citymap:41 newgame:31
+  campaignmap:10 merchant:30 elements, 36 templates. Bind DELTA: `encounter.scene` now carries
+  `imageBind:"bg/{encounter.scene}"`; `campMarker*` element ids REMOVED; Merchant gains
+  `modeToggle`/`modeBuyBtn`/`modeSellBtn` (+ per-state `asset`) and bound `waresTitle`; `wareCard`
+  parts `ware.badge`/`ware.attr`/`ware.cost`/`ware.attrColor` REPLACE `ware.category`/
+  `ware.categoryColor`; no other bind keys changed.
+- **Refs re-rendered (all confirmed 1920×1080, tile+stitch pipeline):** `01-encounter-{grunt,warden,
+  adept,summoner,reaver,ranger,barbarian,quest,camp}.png`, `02-equipment-{grunt,warden,adept,summoner,
+  reaver,ranger,barbarian}.png`, `03-citymap.png`, `04-campaignmap.png`, `05-newgame.png`,
+  `07-merchant.png`, `07-merchant-sell.png` (NEW) (+ all `reference/screens/` mirrors),
+  `00-assets-3-ui.png` (sheet regen — new
+  backdrops + 7th rune token). 06-style-frame / 08-reticle-mounts unchanged — untouched.
+- **Manual design edits (Doug/user) since pass 11:** none reported or observed.
+
+---
+
 # DROP AUDIT — 2026-07-12 (pass 11: payload-B sweep — B18/B20/B22/B26/B27/B29/B30/B31 + doc closes)
 
 **Pass 11 delta (the 2026-07-12 payload, B28 already closed by Doug):**

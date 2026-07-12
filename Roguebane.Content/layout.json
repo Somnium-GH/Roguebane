@@ -5094,7 +5094,8 @@
           "color": "ink",
           "font": "display",
           "fontPx": 8,
-          "image": "Content/bg/combat_field.png"
+          "image": "Content/bg/combat_field.png",
+          "imageBind": "bg/{encounter.scene}"
         },
         {
           "id": "youLabel",
@@ -5403,7 +5404,7 @@
           "color": "ink",
           "font": "display",
           "fontPx": 8,
-          "image": "Content/ui/reticle/focus_p0.png",
+          "image": "Content/ui/reticle/focus_p2.png",
           "frames": [
             "ui/reticle/focus_p0",
             "ui/reticle/focus_p1",
@@ -5508,98 +5509,6 @@
           }
         },
         {
-          "id": "campMarker",
-          "type": "panel",
-          "anchor": "Right",
-          "offset": [
-            -165,
-            -78
-          ],
-          "size": [
-            120,
-            88
-          ],
-          "z": 19,
-          "binds": "encounter.camp",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8
-        },
-        {
-          "id": "campMarkerIcon",
-          "type": "icon",
-          "anchor": "TopLeft",
-          "offset": [
-            38,
-            0
-          ],
-          "size": [
-            44,
-            44
-          ],
-          "z": 20,
-          "parent": "campMarker",
-          "color": "ink",
-          "font": "display",
-          "fontPx": 8,
-          "image": "Content/icons/node/camp.png",
-          "shadow": {
-            "token": "soft",
-            "dx": 0,
-            "dy": 3,
-            "blur": 4,
-            "color": "outline",
-            "opacity": 0.45
-          }
-        },
-        {
-          "id": "campMarkerLabel",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            49,
-            49
-          ],
-          "size": [
-            22,
-            9
-          ],
-          "z": 21,
-          "parent": "campMarker",
-          "color": "good",
-          "font": "mono",
-          "fontPx": 6.5,
-          "shadow": {
-            "token": "title",
-            "dx": 0,
-            "dy": 2,
-            "blur": 3,
-            "color": "outline",
-            "opacity": 0.65
-          },
-          "content": "CAMP"
-        },
-        {
-          "id": "campMarkerNote",
-          "type": "text",
-          "anchor": "TopLeft",
-          "offset": [
-            0,
-            63
-          ],
-          "size": [
-            120,
-            26
-          ],
-          "z": 22,
-          "parent": "campMarker",
-          "color": "parch",
-          "font": "display",
-          "fontPx": 8.5,
-          "align": "center",
-          "content": "The host rests. Activate techniques now and they charge before the next fight."
-        },
-        {
           "id": "questPanel",
           "type": "panel",
           "anchor": "Right",
@@ -5611,7 +5520,7 @@
             280,
             115
           ],
-          "z": 23,
+          "z": 19,
           "binds": "encounter.quest",
           "color": "ink",
           "fill": "panel",
@@ -5650,7 +5559,7 @@
             252,
             7
           ],
-          "z": 24,
+          "z": 20,
           "parent": "questPanel",
           "color": "mutedDim",
           "font": "mono",
@@ -5669,7 +5578,7 @@
             252,
             16
           ],
-          "z": 25,
+          "z": 21,
           "parent": "questPanel",
           "binds": "quest.title",
           "color": "inkBright",
@@ -5689,7 +5598,7 @@
             252,
             29
           ],
-          "z": 26,
+          "z": 22,
           "parent": "questPanel",
           "binds": "quest.prompt",
           "color": "parch",
@@ -5709,7 +5618,7 @@
             252,
             22
           ],
-          "z": 27,
+          "z": 23,
           "parent": "questPanel",
           "color": "ink",
           "font": "display",
@@ -5727,7 +5636,7 @@
             123,
             22
           ],
-          "z": 28,
+          "z": 24,
           "parent": "questActions",
           "binds": "quest.accept",
           "color": "panelCard",
@@ -5756,7 +5665,7 @@
             123,
             22
           ],
-          "z": 29,
+          "z": 25,
           "parent": "questActions",
           "binds": "quest.decline",
           "color": "parch",
@@ -5785,7 +5694,7 @@
             960,
             28
           ],
-          "z": 30,
+          "z": 26,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -5816,7 +5725,7 @@
             57,
             15
           ],
-          "z": 31,
+          "z": 27,
           "parent": "statusStrip",
           "color": "inkWarm",
           "font": "display",
@@ -5835,7 +5744,7 @@
             33,
             8
           ],
-          "z": 32,
+          "z": 28,
           "parent": "statusStrip",
           "binds": "encounter.label",
           "color": "muted",
@@ -5848,14 +5757,14 @@
           "type": "text",
           "anchor": "Top",
           "offset": [
-            -182,
+            -212,
             6
           ],
           "size": [
             48,
             16
           ],
-          "z": 33,
+          "z": 29,
           "parent": "statusStrip",
           "binds": "combat.paused",
           "color": "amber",
@@ -5878,10 +5787,10 @@
             0
           ],
           "size": [
-            463,
+            523,
             20
           ],
-          "z": 34,
+          "z": 30,
           "parent": "statusStrip",
           "color": "ink",
           "font": "display",
@@ -5896,10 +5805,10 @@
             4
           ],
           "size": [
-            203,
+            263,
             11
           ],
-          "z": 35,
+          "z": 31,
           "parent": "topControls",
           "binds": "run.resources",
           "color": "ink",
@@ -5910,7 +5819,7 @@
             "flow": "horizontal",
             "gap": 5,
             "size": [
-              47,
+              62,
               11
             ]
           }
@@ -5920,14 +5829,14 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            215,
+            275,
             0
           ],
           "size": [
             98,
             20
           ],
-          "z": 36,
+          "z": 32,
           "parent": "topControls",
           "binds": "combat.autoAttack",
           "color": "panelCard",
@@ -5949,14 +5858,14 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            318,
+            378,
             0
           ],
           "size": [
             60,
             20
           ],
-          "z": 37,
+          "z": 33,
           "parent": "topControls",
           "binds": "combat.retreat",
           "color": "parch",
@@ -5978,14 +5887,14 @@
           "type": "text",
           "anchor": "TopLeft",
           "offset": [
-            383,
+            443,
             0
           ],
           "size": [
             80,
             20
           ],
-          "z": 38,
+          "z": 34,
           "parent": "topControls",
           "binds": "nav.equipment",
           "color": "border",
@@ -6014,7 +5923,7 @@
             960,
             182
           ],
-          "z": 39,
+          "z": 35,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -6053,7 +5962,7 @@
             330,
             181
           ],
-          "z": 40,
+          "z": 36,
           "parent": "hudFooter",
           "binds": "Body.pool",
           "color": "ink",
@@ -6080,7 +5989,7 @@
             79,
             15
           ],
-          "z": 41,
+          "z": 37,
           "parent": "attrPool",
           "color": "inkBright",
           "font": "display",
@@ -6099,7 +6008,7 @@
             309,
             82
           ],
-          "z": 42,
+          "z": 38,
           "parent": "attrPool",
           "binds": "pool",
           "color": "ink",
@@ -6127,7 +6036,7 @@
             309,
             6
           ],
-          "z": 43,
+          "z": 39,
           "parent": "attrPool",
           "binds": "pool.legend",
           "color": "mutedWarm",
@@ -6147,7 +6056,7 @@
             630,
             181
           ],
-          "z": 44,
+          "z": 40,
           "parent": "hudFooter",
           "binds": "loadout",
           "color": "ink",
@@ -6166,7 +6075,7 @@
             59,
             15
           ],
-          "z": 45,
+          "z": 41,
           "parent": "actionBar",
           "color": "inkBright",
           "font": "display",
@@ -6185,7 +6094,7 @@
             433,
             7
           ],
-          "z": 46,
+          "z": 42,
           "parent": "actionBar",
           "color": "parch",
           "font": "mono",
@@ -6204,7 +6113,7 @@
             433,
             136
           ],
-          "z": 47,
+          "z": 43,
           "parent": "actionBar",
           "binds": "loadout.techniques",
           "color": "ink",
@@ -6232,7 +6141,7 @@
             170,
             146
           ],
-          "z": 48,
+          "z": 44,
           "parent": "actionBar",
           "color": "ink",
           "border": {
@@ -6265,7 +6174,7 @@
             162,
             7
           ],
-          "z": 49,
+          "z": 45,
           "parent": "minionGroup",
           "color": "parch",
           "font": "mono",
@@ -6284,7 +6193,7 @@
             162,
             136
           ],
-          "z": 50,
+          "z": 46,
           "parent": "minionGroup",
           "binds": "loadout.minions",
           "color": "ink",
@@ -7063,7 +6972,7 @@
           "type": "text",
           "anchor": "Top",
           "offset": [
-            -50,
+            -80,
             6
           ],
           "size": [
@@ -7093,7 +7002,7 @@
             8
           ],
           "size": [
-            203,
+            263,
             11
           ],
           "z": 33,
@@ -7107,7 +7016,7 @@
             "flow": "horizontal",
             "gap": 5,
             "size": [
-              47,
+              62,
               11
             ]
           }
@@ -7671,7 +7580,7 @@
             8
           ],
           "size": [
-            203,
+            263,
             11
           ],
           "z": 4,
@@ -7685,7 +7594,7 @@
             "flow": "horizontal",
             "gap": 5,
             "size": [
-              47,
+              62,
               11
             ]
           }
@@ -9665,7 +9574,7 @@
             20
           ],
           "size": [
-            203,
+            263,
             11
           ],
           "z": 4,
@@ -9679,7 +9588,7 @@
             "flow": "horizontal",
             "gap": 5,
             "size": [
-              47,
+              62,
               11
             ]
           }
@@ -10200,7 +10109,7 @@
           "anchor": "TopLeft",
           "offset": [
             14,
-            9
+            11
           ],
           "size": [
             33,
@@ -10208,6 +10117,7 @@
           ],
           "z": 13,
           "parent": "waresPanel",
+          "binds": "merchant.mode.title",
           "color": "inkBright",
           "font": "display",
           "fontPx": 12,
@@ -10219,7 +10129,88 @@
             "color": "outline",
             "opacity": 0.65
           },
-          "content": "Wares"
+          "sample": "Wares"
+        },
+        {
+          "id": "modeToggle",
+          "type": "panel",
+          "anchor": "Right",
+          "offset": [
+            -14,
+            -219
+          ],
+          "size": [
+            100,
+            19
+          ],
+          "z": 14,
+          "parent": "waresPanel",
+          "binds": "merchant.mode",
+          "color": "ink",
+          "font": "display",
+          "fontPx": 8
+        },
+        {
+          "id": "modeBuyBtn",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            0,
+            0
+          ],
+          "size": [
+            48,
+            19
+          ],
+          "z": 15,
+          "parent": "modeToggle",
+          "binds": "merchant.mode.buy",
+          "color": "panelCard",
+          "font": "mono",
+          "fontPx": 6.5,
+          "image": "Content/ui/button/button_on.png",
+          "states": {
+            "active": {
+              "asset": "ui/button/button_on",
+              "color": "ground"
+            },
+            "idle": {
+              "asset": "ui/button/button_normal",
+              "color": "inkWarm"
+            }
+          },
+          "content": "BUY"
+        },
+        {
+          "id": "modeSellBtn",
+          "type": "text",
+          "anchor": "TopLeft",
+          "offset": [
+            52,
+            0
+          ],
+          "size": [
+            48,
+            19
+          ],
+          "z": 16,
+          "parent": "modeToggle",
+          "binds": "merchant.mode.sell",
+          "color": "parch",
+          "font": "mono",
+          "fontPx": 6.5,
+          "image": "Content/ui/button/button_normal.png",
+          "states": {
+            "active": {
+              "asset": "ui/button/button_on",
+              "color": "ground"
+            },
+            "idle": {
+              "asset": "ui/button/button_normal",
+              "color": "inkWarm"
+            }
+          },
+          "content": "SELL"
         },
         {
           "id": "waresShelves",
@@ -10227,13 +10218,13 @@
           "anchor": "TopLeft",
           "offset": [
             14,
-            33
+            37
           ],
           "size": [
             692,
-            387
+            384
           ],
-          "z": 14,
+          "z": 17,
           "parent": "waresPanel",
           "binds": "merchant.stock.sections",
           "color": "ink",
@@ -10245,7 +10236,7 @@
             "gap": 12,
             "size": [
               692,
-              123
+              124
             ]
           }
         },
@@ -10261,7 +10252,7 @@
             960,
             28
           ],
-          "z": 15,
+          "z": 18,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -10292,7 +10283,7 @@
             57,
             15
           ],
-          "z": 16,
+          "z": 19,
           "parent": "statusStrip",
           "color": "inkWarm",
           "font": "display",
@@ -10311,7 +10302,7 @@
             33,
             8
           ],
-          "z": 17,
+          "z": 20,
           "parent": "statusStrip",
           "binds": "merchant.label",
           "color": "muted",
@@ -10328,10 +10319,10 @@
             8
           ],
           "size": [
-            203,
+            263,
             11
           ],
-          "z": 18,
+          "z": 21,
           "parent": "statusStrip",
           "binds": "run.resources",
           "color": "ink",
@@ -10342,7 +10333,7 @@
             "flow": "horizontal",
             "gap": 5,
             "size": [
-              47,
+              62,
               11
             ]
           }
@@ -10359,7 +10350,7 @@
             60,
             20
           ],
-          "z": 19,
+          "z": 22,
           "parent": "statusStrip",
           "binds": "merchant.leave",
           "color": "parch",
@@ -10388,7 +10379,7 @@
             960,
             36
           ],
-          "z": 20,
+          "z": 23,
           "color": "ink",
           "fill": {
             "type": "gradient",
@@ -10427,7 +10418,7 @@
             88,
             11
           ],
-          "z": 21,
+          "z": 24,
           "parent": "footer",
           "color": "muted",
           "font": "display",
@@ -10446,7 +10437,7 @@
             109,
             17
           ],
-          "z": 22,
+          "z": 25,
           "parent": "footer",
           "binds": "merchant.stock.page",
           "color": "ink",
@@ -10465,7 +10456,7 @@
             22,
             17
           ],
-          "z": 23,
+          "z": 26,
           "parent": "pager",
           "binds": "merchant.stock.pagePrev",
           "color": "parch",
@@ -10494,14 +10485,14 @@
             55,
             8
           ],
-          "z": 24,
+          "z": 27,
           "parent": "pager",
           "binds": "merchant.stock.pageLabel",
           "color": "parch",
           "font": "mono",
           "fontPx": 6,
           "align": "center",
-          "sample": "PAGE 1 / 2"
+          "sample": "PAGE 1 / 3"
         },
         {
           "id": "pageNext",
@@ -10515,7 +10506,7 @@
             22,
             17
           ],
-          "z": 25,
+          "z": 28,
           "parent": "pager",
           "binds": "merchant.stock.pageNext",
           "color": "parch",
@@ -10544,7 +10535,7 @@
             39,
             9
           ],
-          "z": 26,
+          "z": 29,
           "parent": "footer",
           "binds": "run.gold",
           "color": "mutedWarm",
@@ -10558,7 +10549,7 @@
   "templates": {
     "resourceItem": {
       "size": [
-        47,
+        62,
         11
       ],
       "parts": [
@@ -10580,18 +10571,18 @@
           "rect": [
             14,
             1,
-            4,
+            22,
             9
           ],
           "color": "inkWarm",
           "font": "mono",
           "fontPx": 7,
           "binds": "resource.value",
-          "sample": "6"
+          "sample": "6/8"
         },
         {
           "rect": [
-            21,
+            39,
             3,
             26,
             6
@@ -10964,7 +10955,7 @@
             1,
             38,
             101,
-            80
+            79
           ],
           "color": "parch",
           "font": "display",
@@ -11068,7 +11059,7 @@
             1,
             1,
             76,
-            26
+            37
           ],
           "color": "ink",
           "border": {
@@ -11158,15 +11149,15 @@
         {
           "rect": [
             1,
-            27,
+            38,
             76,
-            108
+            97
           ],
           "color": "parch",
           "font": "display",
           "fontPx": 8.25,
           "binds": "minion.description",
-          "sample": "open bay"
+          "sample": "open slot"
         }
       ],
       "color": "ink",
@@ -11197,7 +11188,7 @@
     },
     "attrPip": {
       "size": [
-        53,
+        54,
         9
       ],
       "parts": [],
@@ -11296,7 +11287,7 @@
             "flow": "horizontal",
             "gap": 2,
             "size": [
-              53,
+              54,
               9
             ]
           },
@@ -13644,7 +13635,7 @@
     "wareCard": {
       "size": [
         129,
-        104
+        105
       ],
       "parts": [
         {
@@ -13652,7 +13643,7 @@
             1,
             1,
             127,
-            26
+            27
           ],
           "color": "ink",
           "border": {
@@ -13671,32 +13662,57 @@
             7,
             6,
             23,
-            16
+            17
           ],
-          "color": "panelDeep",
-          "fill": "gold",
+          "color": "ink",
+          "fill": "str",
           "border": {
             "color": "outline",
             "w": 1,
             "style": "solid"
           },
-          "font": "mono",
-          "fontPx": 5,
-          "colorBind": "ware.categoryColor",
-          "binds": "ware.category",
-          "sample": "ARM"
+          "font": "display",
+          "fontPx": 8,
+          "colorBind": "ware.attrColor",
+          "binds": "ware.badge"
         },
         {
           "rect": [
-            96,
+            15,
             9,
-            26,
+            8,
+            4
+          ],
+          "color": "panelDeep",
+          "font": "mono",
+          "fontPx": 4,
+          "binds": "ware.attr",
+          "sample": "STR"
+        },
+        {
+          "rect": [
+            17,
+            14,
+            4,
+            7
+          ],
+          "color": "panelDeep",
+          "font": "mono",
+          "fontPx": 6.5,
+          "binds": "ware.cost",
+          "sample": "2"
+        },
+        {
+          "rect": [
+            100,
+            9,
+            22,
             10
           ],
-          "color": "rareMagic",
-          "fill": "rareMagic",
+          "color": "rareRare",
+          "fill": "rareRare",
           "border": {
-            "color": "rareMagic",
+            "color": "rareRare",
             "w": 1,
             "style": "solid"
           },
@@ -13704,12 +13720,12 @@
           "fontPx": 4.5,
           "colorBind": "ware.tagColor",
           "binds": "ware.tag",
-          "sample": "MAGIC"
+          "sample": "RARE"
         },
         {
           "rect": [
             7,
-            31,
+            32,
             115,
             12
           ],
@@ -13722,7 +13738,7 @@
         {
           "rect": [
             7,
-            45,
+            46,
             115,
             8
           ],
@@ -13735,7 +13751,7 @@
         {
           "rect": [
             7,
-            56,
+            57,
             115,
             22
           ],
@@ -13748,7 +13764,7 @@
         {
           "rect": [
             1,
-            83,
+            84,
             127,
             20
           ],
@@ -13769,7 +13785,7 @@
         {
           "rect": [
             7,
-            89,
+            90,
             15,
             8
           ],
@@ -13787,7 +13803,7 @@
         {
           "rect": [
             93,
-            88,
+            89,
             10,
             10
           ],
@@ -13801,7 +13817,7 @@
         {
           "rect": [
             107,
-            88,
+            89,
             15,
             11
           ],
@@ -13814,7 +13830,7 @@
         {
           "rect": [
             107,
-            88,
+            89,
             10,
             11
           ],
@@ -13853,7 +13869,7 @@
     "shopSection": {
       "size": [
         692,
-        123
+        124
       ],
       "parts": [
         {
@@ -13887,15 +13903,16 @@
             0,
             19,
             692,
-            104
+            105
           ],
           "list": {
             "template": "wareCard",
-            "flow": "horizontal",
+            "flow": "grid",
             "gap": 8,
+            "cols": 3,
             "size": [
               129,
-              104
+              105
             ]
           },
           "binds": "section.wares"

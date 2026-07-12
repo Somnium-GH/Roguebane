@@ -34,11 +34,13 @@
       <!-- RESOURCE READOUT (payload v5 §G: top-right on every IN-RUN screen) -->
       <div data-el="resourceStrip" data-anchor="TopRight" data-z="6" data-binds="run.resources" data-container="1" data-template="resourceItem" data-flow="horizontal" style="display:flex;align-items:center;gap:10px;margin-right:6px;">
         <sc-for list="{{ resources }}" as="res" hint-placeholder-count="4">
-          <!-- uniform chip width (payload B0 2026-07-03 late, mirrors Encounter's proven fix): fixed
-               94px chip + 10px container gap so region==stamped extents, 4 chips always seat -->
-          <div data-tpl="resourceItem" style="display:flex;align-items:center;gap:6px;width:94px;flex:none;">
+          <!-- uniform chip width (payload B0 2026-07-03 late + B33 2026-07-12): fixed 124px chip +
+               10px container gap so region==stamped extents, 4 chips always seat. The engine feeds
+               supplies/charge/summons as "current/max" (up to 5 chars ≈ 44px at 14px mono), so the
+               value is a FIXED 44px band and the label starts clear of it. -->
+          <div data-tpl="resourceItem" style="display:flex;align-items:center;gap:6px;width:124px;flex:none;">
             <span data-binds="resource.icon" data-image-bind="icons/resource/{resource.id}" style="width:22px;height:22px;flex:none;background-image:{{ res.iconCss }};background-size:100% 100%;image-rendering:pixelated;"></span>
-            <span data-binds="resource.value" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#e9d6b0;">{{ res.value }}</span>
+            <span data-binds="resource.value" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#e9d6b0;width:44px;flex:none;">{{ res.value }}</span>
             <span data-binds="resource.label" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:#8d775c;">{{ res.label }}</span>
           </div>
         </sc-for>
@@ -111,9 +113,21 @@
 
   <!-- ===== CENTER+RIGHT: WARES — the 5-category, rarity-weighted gear shop (§12) ===== -->
   <div data-el="waresPanel" data-anchor="Right" data-z="4" data-binds="merchant.stock" style="position:absolute;left:480px;top:56px;width:1440px;height:952px;padding:18px 28px 0;display:flex;flex-direction:column;">
-    <div style="display:flex;align-items:baseline;gap:14px;">
-      <span data-el="waresTitle" data-shadow="title" style="font-size:24px;letter-spacing:1px;color:#f0dcb4;text-shadow:0 2px 6px #000;">Wares</span>
-      
+    <div style="display:flex;align-items:center;gap:14px;">
+      <span data-el="waresTitle" data-shadow="title" data-binds="merchant.mode.title" style="font-size:24px;letter-spacing:1px;color:#f0dcb4;text-shadow:0 2px 6px #000;">{{ waresTitle }}</span>
+      <!-- BUY / SELL MODE (payload 2026-07-12): one wares surface, two whole-screen modes — BUY shows
+           the merchant's stock, SELL shows YOUR goods (equipped pieces can't be sold — dimmed with an
+           EQUIPPED chip in the price strip). The active mode wears the gold button_on skin: per-state
+           `asset` swap, the same NEW field CityMap's retreatBtn introduced (engine support pending,
+           CD_STATUS #39/#42). Sell view ships as its own ref: design/07-merchant-sell.png. -->
+      <div data-el="modeToggle" data-anchor="Right" data-binds="merchant.mode" style="margin-left:auto;display:flex;gap:8px;">
+        <div data-el="modeBuyBtn" data-binds="merchant.mode.buy" data-bind-gate="" data-states="{&quot;active&quot;:{&quot;asset&quot;:&quot;ui/button/button_on&quot;,&quot;color&quot;:&quot;ground&quot;},&quot;idle&quot;:{&quot;asset&quot;:&quot;ui/button/button_normal&quot;,&quot;color&quot;:&quot;inkWarm&quot;}}" onClick="{{ setBuy }}" style="position:relative;width:96px;height:38px;background:url('Content/ui/button/{{ buySkin }}.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:1.5px;color:{{ buyColor }};">BUY</span>
+        </div>
+        <div data-el="modeSellBtn" data-binds="merchant.mode.sell" data-bind-gate="" data-states="{&quot;active&quot;:{&quot;asset&quot;:&quot;ui/button/button_on&quot;,&quot;color&quot;:&quot;ground&quot;},&quot;idle&quot;:{&quot;asset&quot;:&quot;ui/button/button_normal&quot;,&quot;color&quot;:&quot;inkWarm&quot;}}" onClick="{{ setSell }}" style="position:relative;width:96px;height:38px;background:url('Content/ui/button/{{ sellSkin }}.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:1.5px;color:{{ sellColor }};">SELL</span>
+        </div>
+      </div>
     </div>
 
     <!-- CATEGORY SECTIONS — one dedicated section per category in stock this visit
@@ -126,11 +140,32 @@
             <span data-binds="section.label" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:3px;color:#e9d6b0;">{{ sec.label }}</span>
             <span data-binds="section.count" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8d775c;">{{ sec.count }}</span>
           </div>
-          <div data-container="1" data-template="wareCard" data-flow="horizontal" data-binds="section.wares" style="display:flex;gap:16px;">
+          <!-- 3-COLUMN GRID (2026-07-12b): a 6-item stock stacks as TWO ROWS OF 3 (never a long
+               single row, never split across pager pages — the pager packs whole sections by height) -->
+          <div data-container="1" data-template="wareCard" data-flow="grid" data-cols="3" data-binds="section.wares" style="display:grid;grid-template-columns:repeat(3,258px);gap:16px;">
             <sc-for list="{{ sec.wares }}" as="w" hint-placeholder-count="1">
-              <div data-tpl="wareCard" data-states="{&quot;affordable&quot;:{&quot;border&quot;:&quot;border&quot;,&quot;fill&quot;:&quot;panelCard&quot;},&quot;tooPoor&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;fill&quot;:&quot;panelDeep&quot;,&quot;opacity&quot;:0.55},&quot;sold&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;borderStyle&quot;:&quot;dashed&quot;,&quot;opacity&quot;:0.4}}" style="flex:0 0 258px;min-height:198px;border:2px solid {{ w.border }};background:{{ w.bg }};display:flex;flex-direction:column;cursor:pointer;">
+              <div data-tpl="wareCard" data-states="{&quot;affordable&quot;:{&quot;border&quot;:&quot;border&quot;,&quot;fill&quot;:&quot;panelCard&quot;},&quot;tooPoor&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;fill&quot;:&quot;panelDeep&quot;,&quot;opacity&quot;:0.55},&quot;sold&quot;:{&quot;border&quot;:&quot;borderDim&quot;,&quot;borderStyle&quot;:&quot;dashed&quot;,&quot;opacity&quot;:0.4}}" style="min-height:198px;border:2px solid {{ w.border }};background:{{ w.bg }};display:flex;flex-direction:column;cursor:pointer;opacity:{{ w.op }};">
                 <div data-part="" style="padding:10px 12px 9px;border-bottom:1px solid #2e2218;display:flex;align-items:center;justify-content:space-between;">
-                  <span data-binds="ware.category" data-color-bind="ware.categoryColor" style="width:46px;height:32px;border:2px solid #0a0807;background:{{ w.chipColor }};display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;color:#160f09;flex:none;">{{ w.chip }}</span>
+                  <!-- ATTRIBUTE BADGE (payload 2026-07-12: the ARM/WPN/TEC kind boxes are RETIRED) —
+                       the Equipment invCard badge idiom: attr label over the amount, coloured by that
+                       attribute (runes: affected attr + rune-budget points, paths amber). Items are
+                       the real catalog (core-kits.js TECHS/MINIONS + gear defs + the rune bag).
+                       TECHNIQUES carry NO badge (redundant — their glyph chip's fill already encodes
+                       the attribute): they show the real captured glyph chip + the colored "DEX 1"
+                       tag instead, the action-bar grammar. -->
+                  <sc-if value="{{ w.hasBadge }}" hint-placeholder-val="{{ true }}">
+                  <span data-binds="ware.badge" data-color-bind="ware.attrColor" style="width:46px;height:34px;border:2px solid #0a0807;background:{{ w.badgeColor }};display:flex;flex-direction:column;align-items:center;justify-content:center;flex:none;">
+                    <span data-binds="ware.attr" style="font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;letter-spacing:.5px;color:#160f09;line-height:1;">{{ w.badgeLabel }}</span>
+                    <span data-binds="ware.cost" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#160f09;line-height:1;margin-top:2px;">{{ w.badgeNum }}</span>
+                  </span>
+                  </sc-if>
+                  <sc-if value="{{ w.isTech }}" hint-placeholder-val="{{ false }}">
+                  <!-- technique glyph chip — same 30×30 grammar as the Encounter/Equipment action-bar
+                       cards; the engine blits the captured icons/technique/<id>.png (B18 set complete).
+                       Note: this chip is the B22 "per-kind chip art on the sale face" for techniques —
+                       template-side it still pends the B22 per-kind variance (armor measures first). -->
+                  <span data-binds="ware.icon" data-image-bind="icons/technique/{ware.techId}" style="width:30px;height:30px;border:2px solid #0a0807;background:{{ w.glyphBg }};display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:15px;color:#0a0807;font-weight:700;flex:none;">{{ w.glyph }}</span>
+                  </sc-if>
                   <span data-binds="ware.tag" data-color-bind="ware.tagColor" style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:1.5px;color:{{ w.tagColor }};border:1.5px solid {{ w.tagColor }};background:{{ w.tagBg }};padding:3px 7px;">{{ w.tag }}</span>
                 </div>
                 <div style="padding:9px 12px;flex:1;">
@@ -175,14 +210,18 @@
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1080}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1080},&quot;mode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;buy&quot;,&quot;sell&quot;],&quot;default&quot;:&quot;buy&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Shop&quot;}}">
 class Component extends DCLogic {
   /* MERCHANT — the out-of-combat shop (DESIGN_SPEC §12). One DEDICATED SECTION per category in
    * stock this visit (Armor / Weapons / Techniques / Minions / Runes); a visit carries any subset
    * (2–3 typical, all five possible). The layout holds THREE sections per page; the footer pager
-   * flips to the rest. Sample state shows the rare all-five visit so both pages render.
-   * All names/prices are SAMPLE data. */
-  state = { page: 0 };
+   * flips to the rest. TWO MODES (payload 2026-07-12): BUY = the merchant's stock (sample: the rare
+   * all-five visit so both pages render); SELL = YOUR goods, grouped the same way — equipped pieces
+   * can't be sold (dimmed, EQUIPPED chip). Techniques stock is always 3 or 6; a 6-stock stacks as
+   * TWO ROWS OF 3 on the 3-col grid, always whole on one page. Every item is the REAL catalog (core-kits TECHS/MINIONS +
+   * gear defs + the Equipment rune bag) — prices are merchant samples. */
+  state = { page: 0, mode: null, K: null };
+  componentDidMount() { import('./core-kits.js').then(K => this.setState({ K })); }
   renderVals() {
     const GOLD = 128;
     const ATTR = { STR: '#c2553f', INT: '#6f8fc4', DEX: '#82a85e', CON: '#cf9a44' };
@@ -211,80 +250,149 @@ class Component extends DCLogic {
       priced({ id: 'summons',  name: 'Summons',  qty: '+1', price: 22 }),
     ].map(p => ({ ...p, iconCss: "url('Content/icons/resource/" + p.id + ".png')" }));
 
-    // one card grammar for every category; tag = rarity (gear/minions/runes) or attribute (techniques)
-    const rarTag = (o) => ({ ...o, tagColor: RARITY[o.tag].color, tagBg: RARITY[o.tag].bg });
-    const attrTag = (o) => ({ ...o, tagColor: ATTR[o.tag.split(' ')[0]], tagBg: 'transparent' });
+    const resources = [
+      // B33: supplies/charge/summons are "current/max" strings engine-side — sample the real format
+      { id: 'supplies', label: 'SUPPLIES', value: '6/8' },
+      { id: 'spoils',   label: 'GOLD',     value: '' + GOLD },
+      { id: 'charge',   label: 'CHARGE',   value: '3/5' },
+      { id: 'summons',  label: 'SUMMONS',  value: '2/2' },
+    ].map(r => ({ ...r, iconCss: "url('Content/icons/resource/" + r.id + ".png')" }));
 
-    // this visit's stock — SAMPLE: the rare all-five-categories day, so both pages render.
-    // When a gear category shows, it always shows THREE; techniques always show FIVE.
-    const STOCK = {
+    const K = this.state.K;
+    const base = { hpPips, healOffers, provisions, resources };
+    if (!K) return { ...base, sections: [], waresTitle: 'Wares', pageLabel: '',
+      prevPage: () => {}, nextPage: () => {}, prevOp: '.45', nextOp: '.45',
+      setBuy: () => {}, setSell: () => {}, buySkin: 'button_on', sellSkin: 'button_normal',
+      buyColor: '#1a130c', sellColor: '#cdb497' };
+
+    // rarity tag (top-right; gear + runes carry one, techniques/minions don't) + the ATTRIBUTE BADGE
+    // (replaces the ARM/WPN/TEC kind boxes, payload 2026-07-12): attr label over the amount, coloured
+    // by that attribute. Runes: affected attr + rune-budget points; paths amber.
+    const tag = (o) => ({ ...o, tag: o.rarity || '', tagColor: o.rarity ? RARITY[o.rarity].color : 'transparent', tagBg: o.rarity ? RARITY[o.rarity].bg : 'transparent' });
+    const badge = (o) => tag({ ...o, hasBadge: true, isTech: false, badgeLabel: o.bAttr, badgeNum: '' + o.bNum,
+      badgeColor: o.bColor || ATTR[o.bAttr] || '#6a5a48', attrColor: o.bColor || ATTR[o.bAttr] || '#6a5a48' });
+
+    // REAL CATALOG ONLY (payload 2026-07-12 "don't make any up"): techniques/minions come verbatim
+    // from core-kits TECHS/MINIONS (name·attr·cost·rules text); gear rows mirror core-kits gear defs /
+    // gear_catalog.json (name·attr·reserve·rarity); runes are the Equipment rune-bag items. Only the
+    // gold prices + flavor lines are merchant samples.
+    // techniques: NO attr badge (redundant with the glyph chip's attr-coloured fill) — glyph chip +
+    // the colored "DEX 1" cost tag, the action-bar grammar. Glyph PNGs are the captured B18 set.
+    const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+    const tech = (key, price) => { const t = K.TECHS[key];
+      return priced({ name: t.name, note: 'TECHNIQUE', price, desc: t.desc,
+        hasBadge: false, isTech: true, glyph: t.glyph, glyphBg: K.glyphFill(t), techId: slug(t.name),
+        tag: t.attr + ' ' + t.cost, tagColor: ATTR[t.attr], tagBg: 'transparent' }); };
+    const minion = (key, price) => { const m = K.MINIONS[key];
+      return badge(priced({ name: m.name, note: 'MINION', price, desc: m.desc, bAttr: m.attr, bNum: m.cost })); };
+    const gear = (o) => badge(priced(o));
+
+    // BUY — this visit's stock (sample: the rare all-five-categories day, so both pages render).
+    // TECHNIQUES stock is ALWAYS 3 or 6 (here 6): one row, one page, never wrapped.
+    const BUY = {
       armor: [
-        rarTag(priced({ name: 'Steel Helm', note: 'HEAD ARMOR', tag: 'MAGIC', price: 26,
+        gear({ name: 'Steel Helm', note: 'HEAD ARMOR', rarity: 'RARE', price: 26, bAttr: 'STR', bNum: 2,
+          desc: 'A close-fitting helm scribed against meddling voices.' }),
+        gear({ name: 'Silk Hood', note: 'HEAD ARMOR', rarity: 'MAGIC', price: 18, bAttr: 'INT', bNum: 1,
+          desc: 'Fine-spun silk, light as a whisper.' }),
+        gear({ name: 'Iron Breastplate', note: 'CHEST ARMOR', rarity: 'MAGIC', price: 14, bAttr: 'STR', bNum: 2,
+          desc: 'Riveted iron; heavy, but it holds the line.' }),
+      ],
+      weapons: [
+        gear({ name: 'Iron Mace', note: 'MACE \u00b7 1H', rarity: 'COMMON', price: 18, bAttr: 'STR', bNum: 3,
+          desc: 'An honest weight of iron, kept keen.' }),
+        gear({ name: 'Long Bow', note: 'BOW \u00b7 RANGED', rarity: 'RARE', price: 64, bAttr: 'DEX', bNum: 2,
+          desc: 'Strung tight \u2014 it finds the gap in any guard.' }),
+        gear({ name: 'Iron Buckler', note: 'SHIELD \u00b7 1H', rarity: 'MAGIC', price: 22, bAttr: 'CON', bNum: 2,
+          desc: 'A quick iron disc; turns a blow and buys a breath.' }),
+      ],
+      techniques: [
+        tech('lunge', 20), tech('ember', 14), tech('bandage', 16),
+        tech('stoneskin', 28), tech('parry', 24), tech('suture', 34),
+      ],
+      minions: [ minion('skeleton', 20), minion('golem', 44), minion('hound', 24) ],
+      runes: [
+        gear({ name: 'Ember Mote', note: 'MARK', rarity: 'RARE', price: 30, bAttr: 'STR', bNum: '1p',
+          desc: 'Increases STR by 1.' }),
+        gear({ name: 'Master INT Mark', note: 'MARK', rarity: 'RARE', price: 58, bAttr: 'INT', bNum: '6p',
+          desc: 'Increases INT by 6.' }),
+        gear({ name: 'Path of Embers', note: 'PATH \u00b7 MINOR', rarity: 'EPIC', price: 55, bAttr: 'PATH', bNum: '3p', bColor: '#d9a441',
+          desc: 'All sources of block except shields block twice as much damage.' }),
+      ],
+    };
+
+    // SELL — YOUR goods, same card grammar (sample = the grunt kit + finds + rune bag). Worn/wielded
+    // pieces can't be sold: dimmed + EQUIPPED chip. Sell offers are the merchant's buyback samples.
+    const sellable = (o) => ({ ...o, border: '#5a4636', bg: '#1c140d', op: '1', buyLabel: 'SELL', buyColor: '#7fa05a', price: '+' + o.price });
+    const equipped = (o) => ({ ...o, border: '#382a1d', bg: '#15100b', op: '.55', buyLabel: 'EQUIPPED', buyColor: '#8a7256', price: '+' + o.price });
+    const SELL = {
+      armor: [
+        sellable(badge({ name: 'Steel Helm', note: 'HEAD ARMOR', rarity: 'RARE', price: 13, bAttr: 'STR', bNum: 2,
           desc: 'A close-fitting helm scribed against meddling voices.' })),
-        rarTag(priced({ name: 'Quilted Jack', note: 'CHEST ARMOR', tag: 'COMMON', price: 14,
-          desc: 'Boiled wool and rivets, light on the road.' })),
-        rarTag(priced({ name: 'Iron Greaves', note: 'LEG ARMOR', tag: 'MAGIC', price: 22,
+        equipped(badge({ name: 'Iron Helm', note: 'HEAD ARMOR \u00b7 WORN', rarity: 'COMMON', price: 7, bAttr: 'STR', bNum: 2,
+          desc: 'Plain iron, dented and true.' })),
+        equipped(badge({ name: 'Iron Breastplate', note: 'CHEST ARMOR \u00b7 WORN', rarity: 'MAGIC', price: 7, bAttr: 'STR', bNum: 2,
+          desc: 'Riveted iron; heavy, but it holds the line.' })),
+        equipped(badge({ name: 'Iron Vambraces', note: 'ARM ARMOR \u00b7 WORN', rarity: 'COMMON', price: 7, bAttr: 'STR', bNum: 2,
+          desc: 'Forearm plate, scarred by parries.' })),
+        equipped(badge({ name: 'Iron Greaves', note: 'LEG ARMOR \u00b7 WORN', rarity: 'COMMON', price: 7, bAttr: 'STR', bNum: 2,
           desc: 'Heavy going, but they hold the line.' })),
       ],
       weapons: [
-        rarTag(priced({ name: 'Ashwood Bow', note: 'BOW \u00b7 DEX', tag: 'RARE', price: 64,
-          desc: 'Feathered ash, strung tight \u2014 it finds the gap in any guard.' })),
-        rarTag(priced({ name: 'Woodsman\u2019s Axe', note: 'AXE \u00b7 STR', tag: 'COMMON', price: 18,
-          desc: 'An honest edge, kept keen.' })),
-        rarTag(priced({ name: 'Duelist\u2019s Blade', note: 'SWORD \u00b7 DEX', tag: 'MAGIC', price: 34,
-          desc: 'Light in the hand, quick to answer.' })),
-      ],
-      techniques: [
-        attrTag(priced({ name: 'Lunge', note: 'TECHNIQUE', tag: 'DEX 1', price: 20, desc: 'A darting thrust.' })),
-        attrTag(priced({ name: 'Bandage', note: 'TECHNIQUE', tag: 'CON 1', price: 16, desc: 'Binds a wounded part.' })),
-        attrTag(priced({ name: 'Stoneskin', note: 'TECHNIQUE', tag: 'INT 2', price: 28, desc: 'A hide of living stone.' })),
-        attrTag(priced({ name: 'Shield-Wall', note: 'TECHNIQUE', tag: 'CON 2', price: 30, desc: 'Raised shields, shoulder to shoulder.' })),
-        attrTag(priced({ name: 'Firebolt', note: 'TECHNIQUE', tag: 'INT 2', price: 34, desc: 'A mote of fire hurled from afar.' })),
-      ],
-      minions: [
-        rarTag(priced({ name: 'Skeleton Thrall', note: 'MINION \u00b7 INT 1', tag: 'COMMON', price: 20,
-          desc: 'A patient servant of old bone, tireless on the march.' })),
-        rarTag(priced({ name: 'Bound Wisp', note: 'MINION \u00b7 INT 1', tag: 'MAGIC', price: 28,
-          desc: 'A mote of pale light that worries the foe.' })),
-        rarTag(priced({ name: 'Grave Hound', note: 'MINION \u00b7 INT 1', tag: 'COMMON', price: 24,
-          desc: 'It asks only a whistle and a bone.' })),
+        sellable(badge({ name: 'Iron Mace', note: 'MACE \u00b7 1H', rarity: 'COMMON', price: 9, bAttr: 'STR', bNum: 3,
+          desc: 'An honest weight of iron, kept keen.' })),
+        sellable(badge({ name: 'Iron Buckler', note: 'SHIELD \u00b7 1H', rarity: 'MAGIC', price: 11, bAttr: 'CON', bNum: 2,
+          desc: 'A quick iron disc; turns a blow and buys a breath.' })),
+        equipped(badge({ name: 'Iron Longsword', note: 'SWORD \u00b7 WIELDED', rarity: 'MAGIC', price: 10, bAttr: 'STR', bNum: 2,
+          desc: 'The line soldier\u2019s blade.' })),
+        equipped(badge({ name: 'Wooden Shield', note: 'SHIELD \u00b7 WIELDED', rarity: 'COMMON', price: 4, bAttr: 'CON', bNum: 1,
+          desc: 'Banded oak, drinks the blow.' })),
       ],
       runes: [
-        rarTag(priced({ name: 'Ember Mote', note: 'MARK \u00b7 STR', tag: 'RARE', price: 30,
-          desc: 'A warm coal of strength, set beneath the skin.' })),
-        rarTag(priced({ name: 'Fleetfoot Mark', note: 'MARK \u00b7 DEX', tag: 'RARE', price: 32,
-          desc: 'A runner\u2019s blessing, cut small.' })),
-        rarTag(priced({ name: 'Path of Embers', note: 'PATH \u00b7 MINOR', tag: 'EPIC', price: 55,
-          desc: 'The first step down a burning road.' })),
+        sellable(badge({ name: 'Ember Mote', note: 'MARK \u00b7 \u00d73 IN BAG', rarity: 'RARE', price: 8, bAttr: 'STR', bNum: '1p',
+          desc: 'Increases STR by 1.' })),
+        sellable(badge({ name: 'Path of Embers', note: 'PATH \u00b7 MINOR', rarity: 'EPIC', price: 27, bAttr: 'PATH', bNum: '3p', bColor: '#d9a441',
+          desc: 'All sources of block except shields block twice as much damage.' })),
+        sellable(badge({ name: 'Bloodletter', note: 'PATH \u00b7 MAJOR', rarity: 'EPIC', price: 15, bAttr: 'PATH', bNum: '5p', bColor: '#d9a441',
+          desc: 'When dual wielding two-handed weapons your attack speed is increased by 125%.' })),
+        equipped(badge({ name: 'Master INT Mark', note: 'MARK \u00b7 SLOTTED', rarity: 'RARE', price: 29, bAttr: 'INT', bNum: '6p',
+          desc: 'Increases INT by 6.' })),
       ],
     };
-    const CAT = {
-      armor:      { label: 'ARMOR',      chip: 'ARM', color: ATTR.CON },
-      weapons:    { label: 'WEAPONS',    chip: 'WPN', color: ATTR.STR },
-      techniques: { label: 'TECHNIQUES', chip: 'TEC', color: ATTR.INT },
-      minions:    { label: 'MINIONS',    chip: 'MIN', color: '#4f9a8a' },
-      runes:      { label: 'RUNES',      chip: 'RUN', color: '#d9a441' },
-    };
 
-    // page system: three sections to a page, canonical category order
+    const CAT = { armor: 'ARMOR', weapons: 'WEAPONS', techniques: 'TECHNIQUES', minions: 'MINIONS', runes: 'RUNES' };
+    const mode = this.state.mode || (this.props.mode === 'sell' ? 'sell' : 'buy');
+    const STOCK = mode === 'sell' ? SELL : BUY;
+
+    // HEIGHT-AWARE paging (2026-07-12b): sections pack WHOLE onto pages in canonical order — never
+    // split. The 3-col grid stacks a 4–6 item section as two rows (a 6-stock = two rows of 3), which
+    // costs double height: a page fits three single-row sections (3×232+2×24=744 ≤ 768) or one
+    // double-row + one single (446+24+232=702 ≤ 768).
     const present = ['armor', 'weapons', 'techniques', 'minions', 'runes'].filter(k => (STOCK[k] || []).length);
-    const PER_PAGE = 3;
-    const pageCount = Math.max(1, Math.ceil(present.length / PER_PAGE));
+    const secH = (k) => Math.ceil(STOCK[k].length / 3) > 1 ? 446 : 232;
+    const BUDGET = 768, GAP = 24;
+    const pages = [];
+    let cur = [], used = 0;
+    present.forEach(k => {
+      const need = secH(k) + (cur.length ? GAP : 0);
+      if (cur.length && used + need > BUDGET) { pages.push(cur); cur = [k]; used = secH(k); }
+      else { cur.push(k); used += need; }
+    });
+    if (cur.length) pages.push(cur);
+    const pageCount = Math.max(1, pages.length);
     const page = Math.min(Math.max(this.state.page, 0), pageCount - 1);
-    const sections = present.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE).map(k => ({
-      label: CAT[k].label,
-      count: '' + STOCK[k].length,
-      wares: STOCK[k].map(w => ({ ...w, chip: CAT[k].chip, chipColor: CAT[k].color })),
+    const sections = (pages[page] || []).map(k => ({
+      label: CAT[k], count: '' + STOCK[k].length, wares: STOCK[k],
     }));
 
-    const resources = [
-      { id: 'supplies', label: 'SUPPLIES', value: '6' },
-      { id: 'spoils',   label: 'GOLD',     value: '' + GOLD },
-      { id: 'charge',   label: 'CHARGE',   value: '3' },
-      { id: 'summons',  label: 'SUMMONS',  value: '2' },
-    ].map(r => ({ ...r, iconCss: "url('Content/icons/resource/" + r.id + ".png')" }));
-
-    return { hpPips, healOffers, provisions, resources, sections,
+    return { ...base, sections,
+      waresTitle: mode === 'sell' ? 'Your Goods' : 'Wares',
+      buySkin: mode === 'buy' ? 'button_on' : 'button_normal',
+      sellSkin: mode === 'sell' ? 'button_on' : 'button_normal',
+      buyColor: mode === 'buy' ? '#1a130c' : '#cdb497',
+      sellColor: mode === 'sell' ? '#1a130c' : '#cdb497',
+      setBuy: () => this.setState({ mode: 'buy', page: 0 }),
+      setSell: () => this.setState({ mode: 'sell', page: 0 }),
       pageLabel: 'PAGE ' + (page + 1) + ' / ' + pageCount,
       prevPage: () => this.setState({ page: Math.max(0, page - 1) }),
       nextPage: () => this.setState({ page: Math.min(pageCount - 1, page + 1) }),

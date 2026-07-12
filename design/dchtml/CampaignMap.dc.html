@@ -34,11 +34,13 @@
       <!-- RESOURCE READOUT (payload v5 §G: top-right on every IN-RUN screen) -->
       <div data-el="resourceStrip" data-anchor="TopRight" data-z="5" data-binds="run.resources" data-container="1" data-template="resourceItem" data-flow="horizontal" style="display:flex;align-items:center;gap:10px;">
         <sc-for list="{{ resources }}" as="res" hint-placeholder-count="4">
-          <!-- uniform chip width (payload B0 2026-07-03 late, mirrors Encounter's proven fix): fixed
-               94px chip + 10px container gap so region==stamped extents, 4 chips always seat -->
-          <div data-tpl="resourceItem" style="display:flex;align-items:center;gap:6px;width:94px;flex:none;">
+          <!-- uniform chip width (payload B0 2026-07-03 late + B33 2026-07-12): fixed 124px chip +
+               10px container gap so region==stamped extents, 4 chips always seat. The engine feeds
+               supplies/charge/summons as "current/max" (up to 5 chars ≈ 44px at 14px mono), so the
+               value is a FIXED 44px band and the label starts clear of it. -->
+          <div data-tpl="resourceItem" style="display:flex;align-items:center;gap:6px;width:124px;flex:none;">
             <span data-binds="resource.icon" data-image-bind="icons/resource/{resource.id}" style="width:22px;height:22px;flex:none;background-image:{{ res.iconCss }};background-size:100% 100%;image-rendering:pixelated;"></span>
-            <span data-binds="resource.value" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#e9d6b0;">{{ res.value }}</span>
+            <span data-binds="resource.value" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#e9d6b0;width:44px;flex:none;">{{ res.value }}</span>
             <span data-binds="resource.label" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:#8d775c;">{{ res.label }}</span>
           </div>
         </sc-for>
@@ -192,10 +194,11 @@ class Component extends DCLogic {
 
     return { roads, cities,
       resources: [
-        { id: 'supplies', label: 'SUPPLIES', value: '6' },
+        // B33: supplies/charge/summons are "current/max" strings engine-side — sample the real format
+        { id: 'supplies', label: 'SUPPLIES', value: '6/8' },
         { id: 'spoils',   label: 'GOLD',     value: '128' },
-        { id: 'charge',   label: 'CHARGE',   value: '3' },
-        { id: 'summons',  label: 'SUMMONS',  value: '2' },
+        { id: 'charge',   label: 'CHARGE',   value: '3/5' },
+        { id: 'summons',  label: 'SUMMONS',  value: '2/2' },
       ].map(r => ({ ...r, iconCss: "url('Content/icons/resource/" + r.id + ".png')" })) };
   }
 }

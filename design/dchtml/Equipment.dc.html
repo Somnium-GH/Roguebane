@@ -37,11 +37,13 @@
       <!-- RESOURCE READOUT (payload v5 §G: top-right on every IN-RUN screen) -->
       <div data-el="resourceStrip" data-anchor="TopRight" data-z="6" data-binds="run.resources" data-container="1" data-template="resourceItem" data-flow="horizontal" style="display:flex;align-items:center;gap:10px;">
         <sc-for list="{{ resources }}" as="res" hint-placeholder-count="4">
-          <!-- uniform chip width (payload B0 2026-07-03 late, mirrors Encounter's proven fix): fixed
-               94px chip + 10px container gap so region==stamped extents, 4 chips always seat -->
-          <div data-tpl="resourceItem" style="display:flex;align-items:center;gap:6px;width:94px;flex:none;">
+          <!-- uniform chip width (payload B0 2026-07-03 late + B33 2026-07-12): fixed 124px chip +
+               10px container gap so region==stamped extents, 4 chips always seat. The engine feeds
+               supplies/charge/summons as "current/max" (up to 5 chars ≈ 44px at 14px mono), so the
+               value is a FIXED 44px band and the label starts clear of it. -->
+          <div data-tpl="resourceItem" style="display:flex;align-items:center;gap:6px;width:124px;flex:none;">
             <span data-binds="resource.icon" data-image-bind="icons/resource/{resource.id}" style="width:22px;height:22px;flex:none;background-image:{{ res.iconCss }};background-size:100% 100%;image-rendering:pixelated;"></span>
-            <span data-binds="resource.value" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#e9d6b0;">{{ res.value }}</span>
+            <span data-binds="resource.value" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#e9d6b0;width:44px;flex:none;">{{ res.value }}</span>
             <span data-binds="resource.label" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:#8d775c;">{{ res.label }}</span>
           </div>
         </sc-for>
@@ -97,10 +99,13 @@
             <span data-binds="attrs.key" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;width:34px;color:#e9d6b0;">{{ a.key }}</span>
             <span data-binds="attrs.part" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8d775c;width:46px;">{{ a.part }}</span>
             <!-- pip strip as PARTS (payload #3): nested list stamped from live cells, textured via
-                 ui/pip/* imageBind instead of flat fills -->
+                 ui/pip/* imageBind instead of flat fills. Pips STRETCH to fill the row (payload B32:
+                 the engine's ListLayout.StretchCells spans every row to the SAME authored width — a
+                 4-cap and an 8-cap row are equally wide; the old max-width per-pip cap made low-cap
+                 rows span short in the preview, contradicting the shipped game) -->
             <div data-container="1" data-template="attrPip" data-flow="horizontal" data-binds="attrs.cells" style="flex:1;display:flex;gap:3px;">
               <sc-for list="{{ a.pips }}" as="p" hint-placeholder-count="8">
-                <span data-tpl="attrPip" data-binds="cell.state" data-image-bind="ui/pip/{cell.asset}" style="flex:1;max-width:106px;height:18px;background:{{ p.bg }};border:1px {{ p.style }} {{ p.bd }};"></span>
+                <span data-tpl="attrPip" data-binds="cell.state" data-image-bind="ui/pip/{cell.asset}" style="flex:1;height:18px;background:{{ p.bg }};border:1px {{ p.style }} {{ p.bd }};"></span>
               </sc-for>
             </div>
             <div style="display:flex;align-items:baseline;justify-content:flex-end;gap:5px;width:74px;font-family:'JetBrains Mono',monospace;">
@@ -433,10 +438,11 @@ class Component extends DCLogic {
       prevPage: () => setPage(page - 1), nextPage: () => setPage(page + 1),
       prevOp: page === 0 ? '.45' : '1', nextOp: page >= pageCount - 1 ? '.45' : '1',
       resources: [
-        { id: 'supplies', label: 'SUPPLIES', value: '6' },
+        // B33: supplies/charge/summons are "current/max" strings engine-side — sample the real format
+        { id: 'supplies', label: 'SUPPLIES', value: '6/8' },
         { id: 'spoils',   label: 'GOLD',     value: '128' },
-        { id: 'charge',   label: 'CHARGE',   value: '3' },
-        { id: 'summons',  label: 'SUMMONS',  value: '2' },
+        { id: 'charge',   label: 'CHARGE',   value: '3/5' },
+        { id: 'summons',  label: 'SUMMONS',  value: '2/2' },
       ].map(r => ({ ...r, iconCss: "url('Content/icons/resource/" + r.id + ".png')" })) };
   }
 }

@@ -105,6 +105,53 @@ async function RB_buildBackdrops(env) {
     ctx.globalAlpha=1;
   }
 
+  // ---- contextual-encounter helpers (Doug direction 2026-07-12: "a sense of journey" — every
+  // encounter node type gets a scene-appropriate backdrop; same toolkit, same idiom) ----
+  // conifer treeline band — sawtooth spruce silhouettes with an optional lit-edge hairline
+  function conifers(ctx, baseY, color, rand, units, h, rim){
+    const uw=W/units;
+    for(let i=0;i<units;i++){
+      const x=i*uw+uw/2, th=h*(0.6+rand()*0.7), tw=uw*(0.65+rand()*0.3);
+      ctx.fillStyle=color;
+      ctx.beginPath(); ctx.moveTo(x,baseY-th);
+      ctx.lineTo(x+tw/2,baseY); ctx.lineTo(x-tw/2,baseY); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(x,baseY-th*0.68);            // upper tier
+      ctx.lineTo(x+tw*0.34,baseY-th*0.30); ctx.lineTo(x-tw*0.34,baseY-th*0.30); ctx.fill();
+      if(rim){ ctx.strokeStyle=rim; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(x,baseY-th); ctx.lineTo(x-tw/2,baseY); ctx.stroke(); }
+    }
+    ctx.fillStyle=color; ctx.fillRect(0,baseY-2,W,2+(H-baseY));  // close the band under the trees
+  }
+  // jagged mountain ridge through deterministic points; snowcaps on the highest verts
+  function ridge(ctx, baseY, color, rand, step, hMin, hMax, rim, snow){
+    const pts=[];
+    for(let x=0;x<=W+step;x+=step){ const up=(pts.length%2===0);
+      pts.push([x, baseY-(up? hMax*(0.55+rand()*0.45) : hMin*(0.3+rand()*0.7))]); }
+    ctx.fillStyle=color; ctx.beginPath(); ctx.moveTo(0,baseY);
+    pts.forEach(([x,y])=>ctx.lineTo(x,y)); ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.fill();
+    if(rim){ ctx.strokeStyle=rim; ctx.lineWidth=1; ctx.beginPath();
+      pts.forEach(([x,y],j)=> j? ctx.lineTo(x,y-1) : ctx.moveTo(x,y-1)); ctx.stroke(); }
+    if(snow){ ctx.fillStyle=snow;
+      pts.forEach(([x,y],j)=>{ if(j%2===1 && y<baseY-hMax*0.7){
+        ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+step*0.16,y+hMax*0.14); ctx.lineTo(x-step*0.16,y+hMax*0.14); ctx.fill(); } }); }
+  }
+  // clean dark ground band + horizon line (combat_field's proven treatment)
+  function ground(ctx, gy, topHex, botHex, lineHex){
+    const gg=ctx.createLinearGradient(0,gy,0,H);
+    gg.addColorStop(0,topHex); gg.addColorStop(1,botHex);
+    ctx.fillStyle=gg; ctx.fillRect(0,gy,W,H-gy);
+    ctx.fillStyle=lineHex; ctx.fillRect(0,gy-2,W,4);
+  }
+  // ridge-pole tent silhouette; `litX` (fire position) picks which slope takes the rim-light
+  function tent(ctx, cx, baseY, w, h, color, rimColor){
+    ctx.fillStyle=color;
+    ctx.beginPath(); ctx.moveTo(cx,baseY-h); ctx.lineTo(cx+w/2,baseY); ctx.lineTo(cx-w/2,baseY); ctx.fill();
+    ctx.strokeStyle=rimColor; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(cx,baseY-h); ctx.lineTo(cx-w/2,baseY); ctx.stroke();  // fire-lit slope
+    ctx.fillStyle='rgba(0,0,0,.55)';                                                   // door slit
+    ctx.beginPath(); ctx.moveTo(cx-w*0.06,baseY-h*0.52); ctx.lineTo(cx+w*0.10,baseY); ctx.lineTo(cx-w*0.22,baseY); ctx.fill();
+  }
+
   const out = {};
 
   // ---- 1. combat_field : dusk battlefield before a keep ----
@@ -234,6 +281,269 @@ async function RB_buildBackdrops(env) {
     for(let i=0;i<7;i++){ const x=140+r()*(W-360), w=70+r()*90, h=60+r()*70; ctx.fillRect(x,H-210-h,w,h); ctx.fillStyle='rgba(0,0,0,.5)'; ctx.fillRect(x,H-210-h,w,3); ctx.fillStyle='#130c07'; }
     vignette(ctx,'rgba(10,7,4,0.9)',0.5); scanlines(ctx);
     out['merchant_stall']=c;
+  })();
+
+  // ==== CONTEXTUAL ENCOUNTER BACKDROPS (Doug 2026-07-12: "a sense of journey" — the Encounter
+  // shell picks a scene per node via bg/{encounter.scene}; combat_field stays the plain default).
+  // All keep the family idiom: dusk gradient → glow → stars → dither → silhouettes → CLEAN dark
+  // ground (~y610–650, figures + HUD live there) → vignette → scanlines. Deterministic seeds. ====
+
+  // ---- 6. enc_camp : YOUR camp in the right foreground (replaces the campMarker icon+note —
+  // campfire, tents, gear where a foe would stand; foeless arrival, so the right side is free) ----
+  (function(){
+    const c=createCanvas(W,H), ctx=c.getContext('2d'), r=rng(1212);
+    vgrad(ctx,[[0,'#2b1f3a'],[0.40,'#241a30'],[0.62,'#1b1522'],[0.78,'#141018'],[1,'#0d0a12']]);
+    const mg=ctx.createRadialGradient(W*0.24,H*0.16,0,W*0.24,H*0.16,480);
+    mg.addColorStop(0,'rgba(184,156,214,0.14)'); mg.addColorStop(1,'rgba(184,156,214,0)');
+    ctx.fillStyle=mg; ctx.fillRect(0,0,W,H);
+    stars(ctx, 20, 500, 140, r, '#e6dcf0');
+    dither(ctx, 120, 560, '#3a2b4a','#2b1f3a', 8, 0.55);
+    conifers(ctx, 596, '#141020', r, 18, 84, 'rgba(150,130,200,.16)');
+    ground(ctx, 636, '#0e0a18', '#08060f', '#060410');
+    // fire glow owns the right half
+    let fg=ctx.createRadialGradient(1460,640,0,1460,640,560);
+    fg.addColorStop(0,'rgba(232,145,58,0.26)'); fg.addColorStop(1,'rgba(232,145,58,0)');
+    ctx.fillStyle=fg; ctx.fillRect(0,0,W,H);
+    fg=ctx.createRadialGradient(1460,652,0,1460,652,190);
+    fg.addColorStop(0,'rgba(244,178,86,0.22)'); fg.addColorStop(1,'rgba(244,178,86,0)');
+    ctx.fillStyle=fg; ctx.fillRect(0,0,W,H);
+    // tents (fire-lit slopes face the fire)
+    tent(ctx, 1728, 682, 306, 272, '#171019', 'rgba(240,170,90,.38)');
+    tent(ctx, 1318, 664, 178, 146, '#120d15', 'rgba(240,170,90,.26)');
+    // gear: crates + a stump seat + a spear rack leaning by the big tent
+    ctx.fillStyle='#100b12'; ctx.fillRect(1152,606,44,36); ctx.fillRect(1186,618,32,24);
+    ctx.fillStyle='rgba(240,170,90,.14)'; ctx.fillRect(1152,606,44,3); ctx.fillRect(1186,618,32,2);
+    ctx.fillStyle='#120c10'; ctx.fillRect(1372,636,30,22);
+    ctx.fillStyle='rgba(240,170,90,.16)'; ctx.fillRect(1372,636,30,2);
+    ctx.strokeStyle='#0f0a10'; ctx.lineWidth=3;
+    [[1546,668,1568,556],[1560,668,1572,552],[1576,668,1578,550]].forEach(([x0,y0,x1,y1])=>{
+      ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke(); });
+    // the campfire itself: crossed logs + layered flame + ground light pool
+    ctx.fillStyle='rgba(232,145,58,.16)'; ctx.beginPath(); ctx.ellipse(1460,668,120,20,0,0,7); ctx.fill();
+    ctx.save(); ctx.translate(1460,658);
+    ctx.rotate(0.42); ctx.fillStyle='#241408'; ctx.fillRect(-26,-4,52,8);
+    ctx.rotate(-0.84); ctx.fillRect(-26,-4,52,8); ctx.restore();
+    ctx.fillStyle='rgba(232,120,40,.9)'; ctx.beginPath(); ctx.moveTo(1460,606); ctx.lineTo(1476,652); ctx.lineTo(1444,652); ctx.fill();
+    ctx.fillStyle='rgba(248,200,90,.95)'; ctx.beginPath(); ctx.moveTo(1460,622); ctx.lineTo(1469,652); ctx.lineTo(1451,652); ctx.fill();
+    embers(ctx, 1460, 630, 90, r, '#e8a13a');
+    vignette(ctx,'rgba(8,7,16,0.9)',0.55); scanlines(ctx);
+    out['enc_camp']=c;
+  })();
+
+  // ---- 7. enc_forest : deep-wood clearing (any wooded node) ----
+  (function(){
+    const c=createCanvas(W,H), ctx=c.getContext('2d'), r=rng(606);
+    vgrad(ctx,[[0,'#22301f'],[0.40,'#1b2a1e'],[0.62,'#152016'],[0.78,'#0f1710'],[1,'#0a0f0a']]);
+    const mg=ctx.createRadialGradient(W*0.65,H*0.18,0,W*0.65,H*0.18,520);
+    mg.addColorStop(0,'rgba(200,224,180,0.19)'); mg.addColorStop(1,'rgba(200,224,180,0)');
+    ctx.fillStyle=mg; ctx.fillRect(0,0,W,H);
+    stars(ctx, 20, 440, 90, r, '#e0ecd0');
+    dither(ctx, 120, 540, '#2c3a28','#22301f', 8, 0.55);
+    conifers(ctx, 548, '#131c12', r, 24, 116, 'rgba(170,210,150,.26)');
+    // low mist pooling between the tree bands
+    const fmist=ctx.createLinearGradient(0,540,0,600);
+    fmist.addColorStop(0,'rgba(170,200,150,0)'); fmist.addColorStop(0.5,'rgba(170,200,150,0.07)'); fmist.addColorStop(1,'rgba(170,200,150,0)');
+    ctx.fillStyle=fmist; ctx.fillRect(0,540,W,60);
+    conifers(ctx, 618, '#0d140c', r, 13, 176, 'rgba(150,190,130,.20)');
+    // fireflies drifting over the undergrowth line
+    for(let i=0;i<38;i++){ const x=r()*W|0, y=(470+r()*150)|0, a=0.14+r()*0.30;
+      ctx.globalAlpha=a; ctx.fillStyle='#c8d878'; ctx.fillRect(x,y,2,2);
+      ctx.globalAlpha=a*0.4; ctx.fillRect(x-1,y-1,4,4); }
+    ctx.globalAlpha=1;
+    ground(ctx, 640, '#0c120a', '#070b06', '#050904');
+    vignette(ctx,'rgba(6,10,6,0.9)',0.55); scanlines(ctx);
+    out['enc_forest']=c;
+  })();
+
+  // ---- 8. enc_mountain : high pass under cold peaks ----
+  (function(){
+    const c=createCanvas(W,H), ctx=c.getContext('2d'), r=rng(707);
+    vgrad(ctx,[[0,'#232840'],[0.40,'#1d2236'],[0.65,'#161a29'],[0.80,'#10131d'],[1,'#0a0c12']]);
+    const mg=ctx.createRadialGradient(W*0.30,H*0.14,0,W*0.30,H*0.14,520);
+    mg.addColorStop(0,'rgba(190,210,240,0.16)'); mg.addColorStop(1,'rgba(190,210,240,0)');
+    ctx.fillStyle=mg; ctx.fillRect(0,0,W,H);
+    stars(ctx, 16, 460, 170, r, '#dfe8f4');
+    // thin cloud streaks hanging on the ranges
+    for(let i=0;i<4;i++){ const y=210+i*46+r()*20, x=r()*W*0.6, w=420+r()*520;
+      const cg=ctx.createLinearGradient(x,0,x+w,0);
+      cg.addColorStop(0,'rgba(200,214,238,0)'); cg.addColorStop(0.5,'rgba(200,214,238,0.07)'); cg.addColorStop(1,'rgba(200,214,238,0)');
+      ctx.fillStyle=cg; ctx.fillRect(x,y,w,10); }
+    dither(ctx, 100, 520, '#2a3048','#232840', 8, 0.5);
+    ridge(ctx, 520, '#141827', r, 150, 60, 230, 'rgba(180,200,235,.30)', 'rgba(210,225,245,.38)');
+    ridge(ctx, 616, '#0d101b', r, 210, 40, 140, 'rgba(160,180,220,.20)', null);
+    skyline(ctx, 648, '#0a0c14', r, 30, 26, false);
+    ground(ctx, 650, '#0b0d14', '#060810', '#04060a');
+    vignette(ctx,'rgba(7,8,14,0.9)',0.55); scanlines(ctx);
+    out['enc_mountain']=c;
+  })();
+
+  // ---- 9. enc_river : moonlit ford — water band runs the midground, fight on the near bank ----
+  (function(){
+    const c=createCanvas(W,H), ctx=c.getContext('2d'), r=rng(808);
+    vgrad(ctx,[[0,'#243046'],[0.42,'#1e2839'],[0.62,'#17202c'],[0.78,'#101620'],[1,'#0a0e14']]);
+    const mg=ctx.createRadialGradient(W*0.68,H*0.17,0,W*0.68,H*0.17,540);
+    mg.addColorStop(0,'rgba(190,205,230,0.27)'); mg.addColorStop(1,'rgba(190,205,230,0)');
+    ctx.fillStyle=mg; ctx.fillRect(0,0,W,H);
+    stars(ctx, 18, 460, 130, r, '#dce6f2');
+    dither(ctx, 110, 500, '#2b3852','#243046', 8, 0.5);
+    skyline(ctx, 508, '#131a26', r, 16, 64, false, 'rgba(150,180,220,.14)');   // far bank rises
+    // the water band: flat sheet + drifting shimmer + the moon's broken reflection column
+    const wg=ctx.createLinearGradient(0,512,0,606);
+    wg.addColorStop(0,'#1a2432'); wg.addColorStop(1,'#121a26');
+    ctx.fillStyle=wg; ctx.fillRect(0,512,W,94);
+    for(let i=0;i<130;i++){ const x=r()*W|0, y=(516+r()*84)|0, w=(10+r()*36)|0;
+      ctx.globalAlpha=0.08+r()*0.09; ctx.fillStyle='#9ab0cc'; ctx.fillRect(x,y,w,1); }
+    for(let y=514;y<604;y+=5){ const jx=(W*0.68+(r()-0.5)*54)|0, w=(8+r()*30)|0;
+      ctx.globalAlpha=0.18+r()*0.30; ctx.fillStyle='#c8d8ec'; ctx.fillRect(jx-w/2,y,w,2); }
+    ctx.globalAlpha=1;
+    // reeds along the near waterline
+    ctx.fillStyle='#080c12';
+    for(let x=0;x<W;x+=8+((r()*10)|0)){ const h=(7+r()*13)|0; ctx.fillRect(x,606-h,2,h); }
+    ground(ctx, 612, '#0c0f16', '#070910', '#05070c');
+    vignette(ctx,'rgba(7,9,14,0.9)',0.55); scanlines(ctx);
+    out['enc_river']=c;
+  })();
+
+  // ---- 10. enc_meadow : open grassland at dusk ----
+  (function(){
+    const c=createCanvas(W,H), ctx=c.getContext('2d'), r=rng(909);
+    vgrad(ctx,[[0,'#33283a'],[0.40,'#2c2433'],[0.62,'#241f28'],[0.78,'#181419'],[1,'#0e0c10']]);
+    const hg=ctx.createRadialGradient(W*0.5,H*0.55,0,W*0.5,H*0.55,900);
+    hg.addColorStop(0,'rgba(224,170,90,0.19)'); hg.addColorStop(1,'rgba(224,170,90,0)');
+    ctx.fillStyle=hg; ctx.fillRect(0,0,W,H);
+    stars(ctx, 18, 430, 100, r, '#f0e6d0');
+    dither(ctx, 100, 520, '#3a2e42','#33283a', 8, 0.5);
+    // rolling hills, warm rim; a couple of lone broadleaf trees on the mid ridge
+    ['#1d1a22','#171420','#110f18'].forEach((col,i)=>{
+      const baseY=540+i*44, ridgePts=[];
+      ctx.fillStyle=col; ctx.beginPath(); ctx.moveTo(0,baseY);
+      for(let x=0;x<=W;x+=160){ const y=baseY - Math.sin((x/W)*Math.PI*(1.1+i*0.5)+i*1.7)*38*(1+r()*0.3); ridgePts.push([x,y]); ctx.lineTo(x,y); }
+      ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.fill();
+      ctx.strokeStyle=`rgba(224,170,90,${0.17-i*0.045})`; ctx.lineWidth=2;
+      ctx.beginPath(); ridgePts.forEach(([x,y],j)=> j? ctx.lineTo(x,y-1) : ctx.moveTo(x,y-1)); ctx.stroke();
+      if(i===1){ [[430,-6],[1490,-2]].forEach(([tx,dy])=>{
+        const ty=baseY-30+dy;
+        ctx.fillStyle='#100e16'; ctx.fillRect(tx-3,ty-26,6,26);
+        ctx.beginPath(); ctx.arc(tx,ty-38,22,0,7); ctx.fill();
+        ctx.beginPath(); ctx.arc(tx-14,ty-28,14,0,7); ctx.fill();
+        ctx.beginPath(); ctx.arc(tx+15,ty-30,15,0,7); ctx.fill(); }); }
+    });
+    // grass-tuft band along the fore ridge
+    ctx.fillStyle='#0d0b12';
+    for(let x=0;x<W;x+=6+((r()*9)|0)){ const h=(8+r()*12)|0; ctx.fillRect(x,634-h,2,h); }
+    // fireflies low over the grass
+    for(let i=0;i<26;i++){ const x=r()*W|0, y=(520+r()*110)|0, a=0.12+r()*0.26;
+      ctx.globalAlpha=a; ctx.fillStyle='#d8c878'; ctx.fillRect(x,y,2,2); }
+    ctx.globalAlpha=1;
+    ground(ctx, 636, '#0e0c12', '#080709', '#060508');
+    vignette(ctx,'rgba(8,7,12,0.9)',0.55); scanlines(ctx);
+    out['enc_meadow']=c;
+  })();
+
+  // ---- 11. enc_quarry : cut-stone terraces + hoist (ResourceHold — stone operation) ----
+  (function(){
+    const c=createCanvas(W,H), ctx=c.getContext('2d'), r=rng(1010);
+    vgrad(ctx,[[0,'#2e2a2a'],[0.42,'#262322'],[0.62,'#1d1a19'],[0.78,'#141211'],[1,'#0c0b0a']]);
+    const dg=ctx.createRadialGradient(W*0.5,H*0.5,0,W*0.5,H*0.5,880);
+    dg.addColorStop(0,'rgba(200,180,150,0.10)'); dg.addColorStop(1,'rgba(200,180,150,0)');
+    ctx.fillStyle=dg; ctx.fillRect(0,0,W,H);
+    stars(ctx, 16, 380, 60, r, '#e6ded0');
+    dither(ctx, 90, 480, '#363130','#2e2a2a', 8, 0.5);
+    // stepped benches cut down toward the pit floor from both sides
+    for(let i=0;i<5;i++){ const y=402+i*52, xw=560-i*96;
+      ctx.fillStyle= i%2 ? '#181514' : '#151211';
+      ctx.fillRect(0,y,xw,H-y); ctx.fillRect(W-xw,y,xw,H-y);
+      ctx.fillStyle='rgba(210,190,160,.10)'; ctx.fillRect(0,y,xw,2); ctx.fillRect(W-xw,y,xw,2); }
+    // timber hoist over the pit
+    ctx.fillStyle='#0e0c0b';
+    ctx.fillRect(1272,336,10,304);                      // mast
+    ctx.save(); ctx.translate(1277,344); ctx.rotate(0.35); ctx.fillRect(0,-5,250,9); ctx.restore();  // jib
+    ctx.fillRect(1246,614,62,26);                       // base
+    ctx.strokeStyle='#0e0c0b'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(1511,430); ctx.lineTo(1511,538); ctx.stroke();   // rope
+    ctx.fillStyle='#12100e'; ctx.fillRect(1499,538,24,20);                        // hanging block
+    ctx.fillStyle='rgba(210,190,160,.12)'; ctx.fillRect(1499,538,24,2);
+    // cut-block piles low on the benches
+    ctx.fillStyle='#131110';
+    [[300,596,54,40],[352,610,40,26],[1600,590,60,46],[1662,614,36,22],[820,616,44,22]].forEach(([x,y,w,h])=>{
+      ctx.fillRect(x,y,w,h); ctx.fillStyle='rgba(210,190,160,.10)'; ctx.fillRect(x,y,w,2); ctx.fillStyle='#131110'; });
+    ground(ctx, 640, '#100e0d', '#090807', '#070605');
+    vignette(ctx,'rgba(9,8,7,0.9)',0.5); scanlines(ctx);
+    out['enc_quarry']=c;
+  })();
+
+  // ---- 12. enc_lumber : clear-cut + log decks (ResourceHold — timber operation) ----
+  (function(){
+    const c=createCanvas(W,H), ctx=c.getContext('2d'), r=rng(1111);
+    vgrad(ctx,[[0,'#2c2618'],[0.45,'#221d12'],[0.65,'#19150d'],[0.80,'#110e09'],[1,'#0a0806']]);
+    const lg=ctx.createRadialGradient(W*0.30,H*0.48,0,W*0.30,H*0.48,640);
+    lg.addColorStop(0,'rgba(224,163,74,0.15)'); lg.addColorStop(1,'rgba(224,163,74,0)');
+    ctx.fillStyle=lg; ctx.fillRect(0,0,W,H);
+    stars(ctx, 16, 400, 80, r, '#ece0c8');
+    dither(ctx, 100, 500, '#332c1c','#2c2618', 8, 0.5);
+    conifers(ctx, 540, '#161408', r, 20, 104, 'rgba(224,190,130,.12)');   // the wood not yet felled
+    ground(ctx, 640, '#0e0b07', '#080604', '#060503');
+    // stump field across the clear-cut band (pale cut faces catch the lantern light)
+    for(let i=0;i<26;i++){ const x=(60+r()*(W-120))|0, y=(560+r()*66)|0, w=(8+r()*8)|0, h=(6+r()*7)|0;
+      ctx.fillStyle='#0d0a06'; ctx.fillRect(x,y,w,h);
+      ctx.fillStyle='rgba(214,186,140,.20)'; ctx.fillRect(x,y,w,2); }
+    // log decks (stacked trunks, pale end-grain rings) + support posts
+    function deck(bx,by,rows,rad){
+      for(let row=0;row<rows;row++){ const n=rows-row;
+        for(let k=0;k<n;k++){ const cx=bx+k*rad*2+row*rad, cy=by-row*(rad*1.8);
+          ctx.fillStyle='#171208'; ctx.beginPath(); ctx.arc(cx,cy,rad,0,7); ctx.fill();
+          ctx.fillStyle='rgba(224,190,130,.16)'; ctx.beginPath(); ctx.arc(cx,cy,rad*0.62,0,7); ctx.fill();
+          ctx.fillStyle='#171208'; ctx.beginPath(); ctx.arc(cx,cy,rad*0.28,0,7); ctx.fill(); } }
+      ctx.fillStyle='#100c06';
+      ctx.fillRect(bx-rad-8, by-rad*1.6, 6, rad*2.6);
+      ctx.fillRect(bx+(rows-1)*rad*2+rad+2, by-rad*1.6, 6, rad*2.6); }
+    deck(1330,632,3,17); deck(1620,630,2,20);
+    // bucking frame (two X-legs + a trunk across) by the lantern glow
+    ctx.strokeStyle='#120e08'; ctx.lineWidth=6;
+    [[470,640,510,560],[510,640,470,560],[650,640,690,560],[690,640,650,560]].forEach(([x0,y0,x1,y1])=>{
+      ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke(); });
+    ctx.fillStyle='#171208'; ctx.fillRect(440,552,280,14);
+    ctx.fillStyle='rgba(224,190,130,.14)'; ctx.fillRect(440,552,280,2);
+    embers(ctx, W*0.30, 560, 36, r, '#d8b878');   // sawdust motes in the lantern pool
+    vignette(ctx,'rgba(9,7,4,0.9)',0.5); scanlines(ctx);
+    out['enc_lumber']=c;
+  })();
+
+  // ---- 13. enc_city_gates : the march arrives — walled city on the horizon, road to the gate ----
+  (function(){
+    const c=createCanvas(W,H), ctx=c.getContext('2d'), r=rng(1313);
+    vgrad(ctx,[[0,'#322438'],[0.45,'#26203a'],[0.72,'#1d1830'],[1,'#141022']]);
+    const cg=ctx.createRadialGradient(W*0.5,540,0,W*0.5,540,760);
+    cg.addColorStop(0,'rgba(224,170,90,0.18)'); cg.addColorStop(1,'rgba(224,170,90,0)');
+    ctx.fillStyle=cg; ctx.fillRect(0,0,W,H);
+    stars(ctx, 14, 420, 110, r, '#f0e6d0');
+    dither(ctx, 90, 500, '#3a2e4a','#2a2240', 8, 0.5);
+    // distant spires behind the wall
+    ctx.fillStyle='#1b1530';
+    [[700,470,26,120],[860,440,30,150],[1010,455,24,135],[1150,478,28,112]].forEach(([x,y,w,h])=>{
+      ctx.fillRect(x,y,w,h); ctx.beginPath(); ctx.moveTo(x-4,y); ctx.lineTo(x+w/2,y-26); ctx.lineTo(x+w+4,y); ctx.fill(); });
+    // curtain wall + towers + the lit gatehouse
+    ctx.fillStyle='#161126'; ctx.fillRect(430,562,1060,60);
+    for(let x=430;x<1490;x+=36) ctx.fillRect(x,550,20,12);                     // crenellations
+    [[500,72,166],[724,62,132],[1160,62,132],[1372,72,166]].forEach(([x,w,h])=>{
+      ctx.fillStyle='#131022'; ctx.fillRect(x,622-h,w,h);
+      for(let mx=x-4;mx<x+w;mx+=22) ctx.fillRect(mx,622-h-10,12,12);
+      for(let i=0;i<5;i++){ ctx.globalAlpha=0.35+r()*0.4; ctx.fillStyle='#e0aa5a';
+        ctx.fillRect(x+8+((r()*(w-18))|0), 622-h+16+((r()*(h-40))|0), 3,5); }
+      ctx.globalAlpha=1; });
+    ctx.fillStyle='#110e20'; ctx.fillRect(886,438,148,184);                    // gatehouse
+    for(let mx=886;mx<1034;mx+=24) ctx.fillRect(mx,426,14,14);
+    ctx.fillStyle='rgba(232,170,80,.55)';                                      // the open gate's light
+    ctx.beginPath(); ctx.moveTo(936,622); ctx.lineTo(936,566); ctx.quadraticCurveTo(960,540,984,566); ctx.lineTo(984,622); ctx.fill();
+    ground(ctx, 626, '#0f0b1a', '#0a0714', '#080512');
+    // road tapering up to the gate, faint wheel ruts
+    ctx.fillStyle='#141024'; ctx.beginPath();
+    ctx.moveTo(W/2-26,626); ctx.lineTo(W/2+26,626); ctx.lineTo(W*0.72,H); ctx.lineTo(W*0.28,H); ctx.fill();
+    ctx.strokeStyle='rgba(224,170,90,.08)'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(W/2-13,630); ctx.lineTo(W*0.39,H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(W/2+13,630); ctx.lineTo(W*0.61,H); ctx.stroke();
+    vignette(ctx,'rgba(8,6,14,0.9)',0.55); scanlines(ctx);
+    out['enc_city_gates']=c;
   })();
 
   for(const name in out) await saveFile('Content/bg/'+name+'.png', out[name]);
