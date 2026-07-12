@@ -58,12 +58,17 @@ public static class ListLayout
         var cells = new List<LayoutRect>(Math.Max(0, count));
         if (count <= 0) return cells;
         var inner = region.W - (count - 1) * gap;
+        // Derive every cell edge from ONE monotonic boundary sequence over the cells-only width `inner`
+        // (each boundary rounded exactly once), then shift cell i right by i whole gaps. This makes the
+        // realized gap between any two neighbours EXACTLY `gap` and lets cell widths vary only by the
+        // unavoidable ±1px of integer rounding — never the inconsistent seam Doug saw ("gaps... like
+        // CON", "borders too stretched", B32). The old code rounded each cell's two edges from two
+        // independent fractional expressions, so a specific pair's gap could land at gap-1 or gap+1.
+        int Boundary(int k) => (int)Math.Round(k * inner / (double)count);
         for (var i = 0; i < count; i++)
         {
-            // Round each cell's left edge from the exact fractional position so rounding never
-            // accumulates a gap on the right — the last cell lands flush against the region edge.
-            var x0 = region.X + (int)Math.Round(i * (inner / (double)count + gap));
-            var x1 = region.X + (int)Math.Round(i * (inner / (double)count + gap) + inner / (double)count);
+            var x0 = region.X + Boundary(i) + i * gap;
+            var x1 = region.X + Boundary(i + 1) + i * gap;
             cells.Add(new LayoutRect(x0, region.Y, Math.Max(1, x1 - x0), cellHeight));
         }
         return cells;

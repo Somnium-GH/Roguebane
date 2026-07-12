@@ -100,6 +100,15 @@ that the guard blockers are cleared):**
    playtest bugs (Doug's own reports: unreadable resourceStrip, garbled minion card text, pip overflow)
    are just... fixed. Worth a quick live-test confirm after the rebuild, but no directive needed beyond
    "rebuild once layout.json is valid."
+   **✅ VERIFIED + CORRECTION (2026-07-12, loop):** this item CONFLATED B32 with B33/B34. B33 and B34
+   ARE pure geometry and pass-12's layout.json DID fix them — confirmed by reading the regenerated
+   manifest: `resourceItem`'s `resource.value` slot is now `[14,1,22,9]` (width 22px, was 4px — B33
+   resolved); `combatMinionCard`'s header is `[1,1,76,37]` with `minion.description` top at y38 = header
+   bottom (name y24-33 + cost now inside the header band — B34's three-way overlap resolved, matching
+   the working `minionCard` sibling). BUT **B32 is NOT geometry** — its real defect (see the HIGH
+   PRIORITY block below) is an ENGINE rounding bug in `ListLayout.StretchCells`, untouched by a manifest
+   reparse. Now BUILT (that block); rebuilding layout.json alone would have left B32's uneven pip
+   gaps/widths shipping. B33/B34 still want the one live pixel-confirm on Doug's rebuild.
 
 5. **Merchant BUY/SELL mode + ware attribute badges (CD_STATUS #42) — NEW, unplanned scope, not yet
    prioritized.** A real feature (mode toggle, sell-your-goods feed, badge rework), not a bugfix — needs
@@ -622,6 +631,17 @@ guarantees every inter-cell gap is visually identical and every cell only varies
 ±1px from integer pixel rounding, never an inconsistent gap. Add a Core test asserting, for a range
 of `(regionWidth, count, gap)` combinations, that every adjacent pair's realized gap equals `gap`
 exactly and total cell-width variance across one row is at most 1px.
+
+### ✅ BUILT (2026-07-12, loop) — part 2 (engine rounding bug) fixed exactly per spec
+`ListLayout.StretchCells` rebuilt off a single monotonic boundary sequence over the cells-only width
+`inner`: `Boundary(k) = round(k * inner / count)`, cell i = `[X + Boundary(i) + i*gap, X + Boundary(i+1)
++ i*gap]`. The per-cell shift by `i` WHOLE gaps makes every realized inter-cell gap EXACTLY `gap`
+(algebraically: `x0(i+1) − x1(i) = gap`), and cell widths are consecutive boundary diffs so they vary
+by at most 1px. Retired the old two-independent-`Math.Round` edges that let a pair's gap land at gap±1.
+Test `StretchCellsGivesUniformGapsAndEvenWidths` (ListLayoutTests) sweeps 6 (width,gap) × 7 counts,
+asserting exact-gap + ≤1px width spread + flush-right; 545 green. Core-only, StretchCells signature
+unchanged so the renderer call site is untouched. Part 1 (CD's own prototype doesn't stretch — visual-
+parity ask for their `.dc.html`) is still an OPEN CD-outbox item, not engine.
 
 ## ‼ HIGH PRIORITY (2026-07-12, Doug playtest round 2) — FIVE more reports: a real, precisely
 ## root-caused Self-technique deactivate bug; two screenshot-confirmed display bugs; a real DESIGN

@@ -56,6 +56,27 @@ public class ListLayoutTests
     }
 
     [Fact]
+    public void StretchCellsGivesUniformGapsAndEvenWidths()
+    {
+        // B32 (Doug playtest): the realized gap between EVERY neighbouring pair must be exactly `gap`
+        // (an occasional gap-1/gap+1 seam read as "gaps... like CON"), and cell widths within one row
+        // may differ by at most the unavoidable 1px of integer rounding ("borders too stretched" was a
+        // fixed stroke on an unevenly-narrow cell). Swept across widths/counts/gaps that force fractions.
+        foreach (var (w, gap) in new[] { (332, 2), (327, 2), (200, 3), (101, 1), (55, 0), (918, 5) })
+            foreach (var n in new[] { 2, 3, 4, 5, 6, 7, 8 })
+            {
+                var region = new LayoutRect(17, 4, w, 9);
+                var cells = ListLayout.StretchCells(region, n, gap, cellHeight: 9);
+                for (var i = 0; i + 1 < cells.Count; i++)
+                    Assert.Equal(gap, cells[i + 1].X - (cells[i].X + cells[i].W)); // realized gap == gap, exactly
+                var widths = cells.Select(c => c.W).ToList();
+                Assert.True(widths.Max() - widths.Min() <= 1,
+                    $"width spread {widths.Max() - widths.Min()} > 1 for w={w} n={n} gap={gap}");
+                Assert.Equal(region.X + region.W, cells[^1].X + cells[^1].W); // still flush right
+            }
+    }
+
+    [Fact]
     public void StretchCellsEmptyForNonPositiveCount()
         => Assert.Empty(ListLayout.StretchCells(new LayoutRect(0, 0, 100, 10), 0, 2, 10));
 
