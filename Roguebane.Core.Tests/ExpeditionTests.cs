@@ -228,6 +228,31 @@ public class ExpeditionTests
     }
 
     [Fact]
+    public void RapidMerchantHealsNeverOvershootMaxHp()
+    {
+        // Item 2 (STATUS.md 2026-07-12, Doug: rapid heal-clicking ended a Grunt at "29/28"). BuyHeal is
+        // double-guarded -- it no-ops at cap (MaxHp - Hp <= 0) BEFORE spending, and Fighter.Heal itself
+        // clamps -- so the sim can never carry Hp past MaxHp. A rendered overage is therefore a display
+        // desync (two snapshots), not a Core bug. Pin the invariant through the real merchant path:
+        // buy until buying stops (cap OR out of gold), then confirm further clicks are pure no-ops.
+        var exp = FullLoadout();
+        exp.Enter("a2"); FightToEnd(exp); // earns spoils to spend
+        exp.Enter("b");
+
+        while (exp.BuyHeal()) { }                 // drain to the stopping point
+        var hp = exp.Player.Hp;
+        var gold = exp.Gold;
+        Assert.True(hp <= exp.Player.MaxHp);      // never overshot on the way here
+
+        for (var i = 0; i < 5; i++)               // Doug's "3 clicks quickly," and then some
+        {
+            Assert.False(exp.BuyHeal());          // no further buy once it has stopped
+            Assert.Equal(hp, exp.Player.Hp);      // HP frozen -- no overheal, ever
+            Assert.Equal(gold, exp.Gold);         // and no gold bled on a dead click
+        }
+    }
+
+    [Fact]
     public void MerchantStocksSeededSuppliesAndCharge()
     {
         // §12 resource stock: small seeded quantities, stable per node; buying tops the resource up

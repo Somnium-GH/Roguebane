@@ -33,6 +33,17 @@ onto `attrs.total`. Rename `attrs.alloc`/`pool.attr.alloc` → `attrs.total`/`po
 everywhere authored, clean rename, no dual-name fallback, then re-extract. Our side renames the
 matching bind-resolution switch in lockstep.
 
+### Attribute Pip Stretch — Prototype Parity (B32)
+Your own mockup/prototype doesn't stretch pip rows to a common width — a preview parity gap, not a
+shipping bug. A reference screenshot shows 4 attribute pip rows at different capacities (4/8/4/8),
+each drawn at a fixed per-pip width, so rows of different capacity span different total widths.
+The shipped game already doesn't work that way: every pip row stretches its cells to fill the SAME
+authored row width regardless of live pip count (a 4-pip stat and an 8-pip stat both span the row's
+full width) — that's engine-side (`ListLayout.StretchCells`) and needs nothing from you there. Ask:
+bring your own prototype/`.dc.html` preview's pip rendering in line with stretch-to-fill, so your
+reference material stops visually contradicting what's actually shipping — low urgency, doesn't block
+anything, just keeps future design review from being misled by a stale-looking mockup.
+
 ### Audit Key-Set Diff (B1b)
 Add a key-set diff (screens/templates vs. the previous manifest) to your pre-ship audit, so a
 silently dropped screen can't ship again (the campaignmap-loss class — you re-included it, the guard

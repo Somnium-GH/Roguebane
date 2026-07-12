@@ -1,3 +1,232 @@
+## ‼ HIGH PRIORITY (2026-07-12, Doug — 2 screenshots) — attribute pip stretch: CD's own mockup doesn't
+## stretch at all (visual-parity ask, engine already correct); the ENGINE's stretch has a real rounding
+## bug of its own (uneven cell widths/gaps within one row) — root-caused, precise fix identified
+Doug: "we really need it to stretch the attributes as implemented in the game in the second SS. but
+even the game has trouble with pips of different sizes looking bad (borders too stretched) and looking
+like they have gaps in them at some stretches too like CON does there." Two separate things:
+
+**1. CD's own mockup/prototype doesn't implement stretch — visual-parity gap in THEIR reference, not
+a shipping bug.** SS1 shows 4 pip rows at differing capacities (4/8/4/8) each drawn at a fixed
+per-pip width, so rows of different capacity span different total widths — never stretched to a
+common row width. The shipped game already does NOT work this way: `ListLayout.StretchCells`
+(`ListLayout.cs:56-70`, wired at `Game1.ManifestRenderer.cs:855`) recomputes each pip's actual width
+from the LIVE cell count every render, ignoring the authored template pip width entirely — a 4-pip
+row and an 8-pip row already span the same authored row width today (SS2 confirms this — STR/INT/
+DEX/CON all read the same total bar width despite different pip counts). **This is a CD-side
+prototype/`.dc.html` gap**: if their own preview tool doesn't implement the equivalent stretch-to-fill
+behavior, their reference material will keep visually contradicting what's actually shipping,
+confusing future design review even though nothing is broken in the game. Route to CD outbox: ask
+them to implement stretch-to-fill in their own prototype CSS/JS so their reference matches shipped
+behavior — not urgent (doesn't block anything), but worth closing the gap so their mockups stay
+trustworthy.
+
+**2. REAL ENGINE BUG — `StretchCells`'s per-cell rounding can produce inconsistent gaps/cell widths
+within the SAME row, matching Doug's "borders too stretched... gaps... like CON does there."**
+Root-caused in `ListLayout.StretchCells` (`ListLayout.cs:61-67`): each cell's LEFT edge (`x0`) and
+RIGHT edge (`x1`) are computed from two SEPARATE `Math.Round()` calls on two different real-number
+expressions — `x0 = round(i * (inner/count + gap))` and `x1 = round(i * (inner/count + gap) +
+inner/count)` — rather than both edges being read off one shared, monotonic sequence of boundary
+points. Nothing enforces `x0(i+1) − x1(i) == gap` exactly; each edge rounds independently (C#
+`Math.Round` defaults to round-half-to-even), so the REALIZED gap between two specific neighboring
+cells can land at `gap−1`, `gap`, or `gap+1` px depending on where each cell's fractional position
+happens to fall — an inconsistency that varies cell-to-cell within one row, not a uniform under/over
+count. This is exactly what would read as "gaps in them at some stretches" (an occasional wider seam
+between two specific pips) and, combined with cell WIDTHS also varying ±1px row to row from the same
+rounding, "borders too stretched" (a fixed-width border stroke reads proportionally heavier on the
+narrower of two adjacent unevenly-sized cells, `DrawLeafTemplate`, `Game1.ManifestRenderer.cs:1505-
+1518`, draws fill+border off the same cell rect, so this isn't a fill/border mismatch — it's the
+upstream cell rects themselves being inconsistent). **Fix:** rebuild `StretchCells` off a single
+array of `count + 1` boundary points (each rounded exactly once, e.g. `boundary[k] = round(k *
+region.W / (double)count)`), then derive each cell as `[boundary[i], boundary[i+1] − gap]` — this
+guarantees every inter-cell gap is visually identical and every cell only varies by the unavoidable
+±1px from integer pixel rounding, never an inconsistent gap. Add a Core test asserting, for a range
+of `(regionWidth, count, gap)` combinations, that every adjacent pair's realized gap equals `gap`
+exactly and total cell-width variance across one row is at most 1px.
+
+## ‼ HIGH PRIORITY (2026-07-12, Doug playtest round 2) — FIVE more reports: a real, precisely
+## root-caused Self-technique deactivate bug; two screenshot-confirmed display bugs; a real DESIGN
+## gap (activation state should be live during `Cleared`, not just roster edits); one needs live trace
+
+**1. CONFIRMED BUG — a powered Self-side technique (Bandage/Suture/Sacrifice — the heal kit) can never
+be turned back off by left-clicking its own card.** Doug: "[heals] can't be deactivated to save ATTR
+if needed at the moment." Root-caused exactly: `CombatTargeting.CardPress` (`CombatTargeting.cs:24-33`)
+handles an already-active card by kind — `IsPassive` → direct toggle-off; anything else → enter
+TARGETING (clear aim, wait for a foe-click) — but has a THIRD, dead-end branch ahead of the general
+case: `if (t.Side == TargetSide.Self) return;` (line 30) — a self-targeting technique that's already
+active does **nothing** on a second left-press, unlike every other technique kind. The comment's own
+reasoning ("nothing to aim") is correct but incomplete — it explains why Self shouldn't enter
+targeting, not why it should also skip the toggle-off passive techniques get. `CardRightPress`
+(line 36-42) has no such exclusion and WILL toggle it off — so right-click already works today, just
+not the left-click-twice players naturally try (that's what "can't be deactivated" describes: the
+consistent-with-every-other-card gesture fails silently). **Fix:** in `CardPress`, treat `Side ==
+Self` the same as `IsPassive` — toggle off directly on a second press — instead of falling through to
+`return`. Add a Core test: pressing an active Self technique's card twice deactivates it (mirrors
+whatever passive-shield test already covers the `IsPassive` branch).
+
+**2. DESIGN clarification, not (this half) a bug — heal techniques should visually read as
+armed/charging the instant they're powered, no separate "targeted" step.** Doug: "heals don't work
+because they're not targeted (which they should be targeted actually unless it's an attack heal which
+just auto-heals)." Distinguishing dedicated Heals (Bandage/Suture, `Side: TargetSide.Self`,
+`Heals: true`) from Siphon (a normal targeted ATTACK with a lifesteal side effect — correctly goes
+through real foe-targeting since it IS an attack). Checked `Discharge` (`Caster.cs:404-436`): the
+`Heals` branch is checked FIRST and never reads `Aimed`/`Part` at all — it fires on the caster's own
+`MostDamagedPart()` purely off cooldown + Auto, so mechanically a powered Heal SHOULD already
+auto-fire with no target step, matching what Doug wants. If it visually still reads as "not
+targeted"/inert to the player, that's a presentation gap in whatever action-bar card state the shell
+computes (`Caster.StatusOf`/the encounter card render) — worth a live check of whether a Self
+technique's card shows the same "charging" visual as a targeted-and-armed attack card, since nothing
+in the FSM should be blocking it from looking that way.
+
+**3. "I can't summon my hound for some reason."** `SummonMinion` is already gated by `CanEditLoadout`
+(Choosing OR Cleared, see the FIXED entry below) — not blocked by the Cleared-state bug. Hound itself
+(`Minions.cs:18`) is cheap: `MinionGate.Stat`, DEX `Reserve: 1`. **Needs a live trace** — check at the
+moment of the failed summon: `Exp.MinionCap` (0 would block outright), `_minions.Count >= MinionCap`
+(already at cap), `Exp.Summons` (the finite SummonsLeft resource, 0 blocks), and live DEX
+availability (`Body` DEX capacity minus what's already gear/technique-reserved — 1 free DEX needed).
+Any of the four silently returns `false` with no player-facing reason shown, which would look
+identically like "does nothing."
+
+**4. Screenshot-confirmed — the Hound minion card's description text overlaps another text element**
+("Found"/"Hound"/"DEX" rendering on top of each other, illegible). Not yet root-caused (no geometry
+check done this pass) — likely two `list`/text elements sharing the same rect on the Minions palette
+card template, or a z-order/anchor collision specific to this card's description field. Needs a
+`layout.json` geometry check against the minion card template (same class of investigation as the
+CON-row/pip-strip bugs already fixed this week), then route to CD if it's a region/z problem.
+
+**5. Screenshot-confirmed — the top resourceStrip (Supplies/Charge/Summons) reads as illegible; only
+GOLD's number is visible.** Checked the data path (`Game1.ManifestRenderer.cs:1204-1211`): all four
+`ResourceReadout`s ARE populated correctly — Supplies/Charge/Summons format as `"current/max"` (e.g.
+`"3/5"`), Gold as a bare number (`"1"`, no denominator, since gold has no cap). **Likely cause:** the
+three `"X/Y"` strings are visibly longer than Gold's bare digit — if the resourceStrip's per-chip
+value-text region was authored/sized around the short Gold case, the longer `"current/max"` strings
+would clip or sit under their icon glyph, exactly matching "unreadable" while Gold alone stays legible.
+Needs a `layout.json` geometry check on the resourceStrip chip template (same shortfall pattern as
+today's other container bugs) before routing to CD.
+
+**6. REAL DESIGN GAP — technique/minion ACTIVATION state (not just roster equip/unequip) should stay
+live and toggleable during `Cleared` (post-combat, pre-Redeploy), specifically so the player can heal
+while deciding whether to redeploy.** Doug: "settings should persist between encounters... while
+waiting for the user to click redeploy, counters and all technique functionality should work because
+we need to be able to heal. Just that the enemy should actually be disappearing from being killed so
+they can no longer be targeted." Today's gap is narrower than it sounds and has a clean fix:
+`DrawRunScreen` (`Game1.cs:1305`) already renders the FULL combat HUD — action bar, resourceStrip,
+attribute pool — for `Fighting` **and** `Cleared` alike (`Exp.State is Fighting or Cleared`). But
+`UpdateRun` (`Game1.cs:497-506`) only calls `UpdateCombat` (which owns ALL card-press/right-press/
+foe-targeting input, `Game1.cs:482-524`) while `Fighting`; the `Cleared` branch checks only the
+Redeploy click/`E`-key. **Same class of bug as the quest Y/N buttons earlier this week: the shell
+draws it, but input isn't wired for that state** — the cards are visibly there and look interactive,
+clicking them does nothing. The good news: `UpdateCombat` already self-gates everywhere it needs to —
+the foe-targeting paths check `Exp.Enemy is { Down: false }` (a cleared node's dead foe is `Down`, so
+it's already correctly excluded/untargetable, satisfying Doug's "enemy should no longer be targeted"
+constraint for free), the combat-tick loop is separately guarded on `Exp.State == Fighting` (won't
+tick outside real combat), and `Exp.Retreat()` already no-ops when `State != Fighting`
+(`Expedition.cs:458`) so the `F` key is harmless too. **Fix:** call `UpdateCombat` (or at minimum its
+card-press/right-press/targeting-sync lines) from `UpdateRun`'s `Cleared` branch as well as `Fighting`,
+alongside the existing Redeploy-click check. Add a Core+shell test: toggling a technique while
+`Cleared` (no live foe) succeeds and its cooldown/heal-tick continues to progress before Redeploy is
+pressed.
+
+## ‼ HIGH PRIORITY (2026-07-12, Doug playtest) — THREE new reports: merchant Supplies/Charge/Summons
+## buttons inert, an HP overheal (29/28) from rapid heal-clicking, and defender limb damage not landing
+## — triaged by static read only (no live trace available); confidence noted per item, none confirmed root-caused
+
+**1. Supplies/Charge/Summons purchase buttons "not functional."** Checked the wiring end to end —
+click AND keyboard (`S`/`C`/`M`) both call `Exp.BuySupplies()`/`BuyCharge()`/`BuySummons()`
+(`Game1.cs:597-608`), the manifest element resolves (`provisionRows`, `layout.json:9838`, bind
+`merchant.provisions.stock`), and its geometry is an EXACT fit (`3 rows × size[193,30] + 2 × gap 4 =
+98`, container `size:[309→193,98]` matches precisely — not a shortfall like the recent CON-row/pip
+bugs). Click detection (`Click(r) => _clicked && r.Contains(_cursor)`) is stateless and correctly
+edge-triggered (`_clicked` requires "up last frame, down this frame," `Game1.cs:286`) — no
+multi-fire-per-press or click-stealing found. **Structurally, nothing is broken.** The one live guard
+that COULD make all three look silently inert together: each Buy method blocks outright when its
+resource is already at cap (`Map.Supplies >= Map.MaxSupplies`, `Charge >= MaxCharge`, `Summons >=
+MaxSummons` — `Expedition.cs:303-332`) or has 0 rolled stock (`SummonsStock` is additionally gated on
+`MaxSummons > 0`, so a chassis with no minion capacity, e.g. Grunt, legitimately can never buy
+Summons). If Doug tested at/near full Supplies+Charge (a plausible starting/early-run state) the
+buttons would correctly do nothing and give ZERO feedback that they're blocked-not-broken — a real UX
+gap even if the guard logic itself is correct. **Needs a live trace**, specifically: check
+`Exp.SuppliesStock`/`ChargeStock`/`SummonsStock`, `Map.Supplies`/`MaxSupplies`,
+`Exp.Charge`/`MaxCharge`, `Exp.Summons`/`MaxSummons`, and gold, at the moment of a "dead" click. If
+stock/cap/gold all check out and the click still no-ops, that's a real bug distinct from anything
+found here. Separately, regardless of cause: these buttons should render visibly disabled (or the
+click should surface why it did nothing) rather than silently eat the input — worth doing either way.
+
+**2. HP overheal: Grunt ended up 29/28 after clicking the merchant's 1-HP heal "3 times quickly."**
+`Fighter.Heal` clamps correctly (`_hp = Math.Min(MaxHp, _hp + amount)`, `Fighter.cs:61`) and the public
+`Hp` getter ALSO clamps (`Math.Min(_hp, MaxHp)`, line 41) — a single `Heal(1)` call cannot push HP past
+Max by construction, and `_clicked` is confirmed edge-triggered (see above) so 3 rapid clicks are 3
+separate, individually-safe `BuyHeal()` calls, not a per-frame multi-fire. **Given both of those check
+out, an internal `_hp > MaxHp` state looks structurally hard to reach from repeated `Heal()` calls
+alone** — the more likely explanation is a DISPLAY desync (the rendered "29" and "28" were read from
+two different moments/snapshots, not the same live `Fighter` read at once), same class as this file's
+earlier confirmed "technique reservation doesn't visibly update" bug. The other real possibility:
+`MaxHp` itself dropped between two of the three heal calls (`MaxHp` is CON-scaled — `_base + ConToHp *
+Body.Capacity(Stat.Con)`, `Fighter.cs:40` — so it moves only if CON *capacity* changes, not
+reservation; nothing found in the merchant-heal path that would touch CON capacity, but flagging it
+since it's the only mechanism that could make a correctly-clamped-at-call-time `_hp` read as over cap
+later). **Needs a live trace**: log `Fighter.Hp`/`MaxHp` on every `BuyHeal()` call plus whatever reads
+them for the resourceStrip display, across a rapid-click repro, to see whether the overage exists
+inside `Fighter` itself or only in the rendered numbers.
+
+### ✅ CORE-SETTLED (2026-07-12, loop) — the sim cannot overheal; 29/28 is a DISPLAY desync, test added
+Pinned the double-guard end to end: `BuyHeal` bails at cap (`MaxHp - Hp <= 0`) BEFORE spending, and
+`Fighter.Heal` clamps anyway — `_hp` can never carry past `MaxHp`. New test
+`ExpeditionTests.RapidMerchantHealsNeverOvershootMaxHp` drains BuyHeal through the REAL merchant path,
+then rapid-clicks 5 more times (Doug's "3 clicks quickly," and then some) asserting each is a pure
+no-op: HP frozen ≤ MaxHp, no gold bled. Also: 29/28 is structurally UNreachable from one consistent
+`Fighter` read — `MaxHp` moves only in steps of `ConToHp`(=2), so an odd 29→28 (Δ1) drop can't come
+from CON; the only way to render 29/28 is reading current-HP and Max-HP from two different frames.
+⇒ **Game-layer display desync (same class as the "reservation doesn't visibly update" bug), not a Core
+bug.** Remaining work is presentation-side: read Hp and MaxHp from ONE live `Fighter` snapshot per frame
+for the resourceStrip — out of headless reach.
+
+**3. "Defender limb damage does not seem to be occurring."** Traced the full hit path for the case
+most likely meant (a foe damaging the player's body parts, §8 part-aim): `Sieges.cs` sets
+`foePartAim: true` for Skirmish/ResourceHold/Castle (the only three encounter kinds), so
+`Battle.Step()` (`Battle.cs:73-76`) picks a part via `FoeTargeting.Pick` and calls
+`offense.Aim(tech, _player, part)` fresh EVERY tick before `offense.Step()` runs. Followed the run all
+the way through `Discharge` → `Hit` (`Caster.cs:404-491`, `497-543`): `part` flows through unbroken
+(`onAim` is true whenever `run.Aimed` is the live player, `var part = onAim ? run.Part : null`), and
+`Hit` calls `frame?.Damage(part, partPower)` before applying flat HP damage — `Fighter.Frame => Body`
+is never null for the player, so the `?.` can't be silently swallowing this. **Nothing broken found on
+a static read of this path** — every hop looked correct. Two things NOT fully ruled out without a live
+trace: (a) whether `FoeTargeting.Pick` can return null under some live condition (falling back to
+flat-HP-only for that tick, silently, without necessarily being a bug); (b) whether Doug re-tested
+this specifically because the Encounter Attribute Pool display fix (CD outbox B31, pip-strips now
+stretch to fill their region) has landed and he's now looking at previously-invisible part rows for the
+first time and finding them genuinely flat — if so, this may be the same "no visible damage on any
+part" observation flagged earlier in this file as blocked on the CON-row fix, now confirmable and
+possibly still real. **Needs a live trace**: fight a Skirmish/ResourceHold, watch a specific body
+part's `Damaged(stat)` (not just the HP total) across several foe hits, confirm whether it moves at
+all.
+
+**Follow-up (2026-07-12, Doug retested): likely EXPLAINED, not a bug.** "My ranger seemed to get part
+damage actually and I think it's because they don't have a shield in this build." This lines up
+exactly with `Hit()`'s own ordering (`Caster.cs:512-516`): shields absorb a hit COMPLETELY before it
+ever reaches the part/HP split (`power = frame.AbsorbShields(power); if (power <= 0) return false;` —
+an absorbed hit returns before either `frame.Damage` or `target.Damage` runs). A character standing
+behind an active shield (Brace/Steel) legitimately shows ZERO damage anywhere — not just on parts —
+until the shield pool is actually depleted; Ranger (no shield tech in its starting kit) has nothing to
+absorb hits, so damage lands immediately and visibly. **This likely resolves the original report**:
+Doug was probably testing a shielded chassis. Still worth a live confirm: fight a shielded character
+long enough to deplete the shield, and check that part damage THEN starts appearing normally — if it
+still doesn't once the shield is down, that's the real bug, isolated from the shield-absorption
+explanation.
+
+### ✅ CORE-SETTLED (2026-07-12, loop) — limb damage DOES land in the live sim; matches Doug's own shield explanation
+Converted the "needs a live trace" into a deterministic headless fact. New tests
+`FoePartAimLandsTests` drive the REAL shipped `Sieges.SkirmishPoint`/`ResourceHoldPoint` factories (the
+actual FOES.md T1 pool, Wraith+Ogre, `foePartAim: true` wired live) against an UNshielded, offenseless
+player and assert a player limb erodes — passes for every seed 0-7. ⇒ **The §8 foe-part-aim mechanism
+works end-to-end through live content, not just the bespoke `PartAimMitigationTests` encounters.** This
+IS the headless proof of Doug's own follow-up: an unshielded build takes visible part damage; the
+earlier "not occurring" was the shield absorbing hits whole (`Hit()` returns before the part/HP split
+while a pool stands). Two live-only residuals remain, both NOT Core bugs: (a) the shielded-until-depleted
+half of Doug's confirm (would need a shield-pool-timing test — deferred, brittle to pin headlessly), and
+(b) PACING — the low-HP T1 foe's first swing is slow (Ogre Swing cooldown 80t = 8s vs 14 HP; Wraith
+Ember 30t = 3s), so a player with real offense may kill the foe before it ever connects, which would
+also read as "no limb damage" without being a bug. Neither needs a blind code change.
+
 ## ✅ FIXED (2026-07-10, loop) — Equipment is unreachable in the `Cleared` state (right after
 ## winning a fight, before Redeploy) — confirmed real bug, precise root cause, two-layer fix needed
 Doug: "equipment should become enabled after combat." Confirmed: today Equipment is NOT reachable
