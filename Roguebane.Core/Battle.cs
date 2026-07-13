@@ -70,6 +70,12 @@ public sealed class Battle
             foreach (var (foe, offense) in _foeOffense)
             {
                 if (foe.Down) continue;
+                // Part 1 (Doug 2026-07-12): best-effort re-activation every tick. A technique that
+                // couldn't fit at encounter setup (its stat pool was short) is retried here — capacity
+                // may have freed since (a damaged part healed, a heal mended the pool), so a foe's kit
+                // self-completes instead of being permanently down whatever didn't fit at tick 0.
+                // Activate is idempotent (already-active techs return immediately), so this is cheap.
+                foreach (var tech in foe.Arsenal) offense.Activate(tech);
                 var part = _encounter.FoePartAim ? FoeTargeting.Pick(foe.Aim, _player.Body, _rng) : null;
                 foreach (var tech in foe.Arsenal)
                     if (part is not null) offense.Aim(tech, _player, part); else offense.ClearAim(tech);

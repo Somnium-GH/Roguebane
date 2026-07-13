@@ -67,4 +67,29 @@ public class FoeTrollTests
 
         Assert.Equal(2, frame.Contribution(frame.Parts[0])); // still wounded -- the mend never fires
     }
+
+    // Part 1 (Doug 2026-07-12): a foe technique that couldn't activate at encounter setup (its pool was
+    // short) must RE-ATTEMPT activation each tick, so it comes online the moment capacity frees. Same
+    // broken-chest setup as above, but here we heal the chest mid-fight — Bandage should then activate
+    // and mend the arm. Without the per-tick retry this fails (setup's one-shot Activate never retries).
+    [Fact]
+    public void FoeReActivatesASilencedTechniqueOnceCapacityIsRestored()
+    {
+        var foe = Foes.Troll("troll");
+        var frame = foe.Frame!;
+        frame.Damage(frame.Parts[0], 2); // wound the arm so Bandage has somewhere to mend
+        frame.Damage(frame.Parts[3], 3); // break the chest: CON below Bandage's Reserve 2 -> can't activate at setup
+
+        var player = Bystander();
+        var battle = new Battle(new Caster(new Body()), new Encounter("e", foe, foePartAim: false), player);
+
+        for (var i = 0; i < 80; i++) battle.Step();
+        Assert.Equal(2, frame.Contribution(frame.Parts[0])); // still wounded -- Bandage was silenced at setup
+
+        frame.Repair(frame.Parts[3], 3);            // heal the chest -> CON capacity is back for Bandage
+        for (var i = 0; i < 160; i++) battle.Step(); // Part 1 retry activates Bandage; a discharge mends the arm
+
+        Assert.True(frame.Contribution(frame.Parts[0]) > 2,
+            "Bandage should re-activate and mend once the chest healed (Part 1 per-tick retry)");
+    }
 }

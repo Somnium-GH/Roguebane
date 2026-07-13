@@ -319,6 +319,16 @@ reclassifying from Needs-Human to a plain build item: `Battle.cs`'s foe setup cu
 that instant) is never retried even after capacity frees up later. Fix: a continuous best-effort retry
 — attempt every not-yet-active Arsenal technique each tick (or on every capacity-change event, whichever
 is cheaper to wire against the existing tick loop). This benefits every foe technique, not just healing.
+**✅ BUILT (2026-07-12, loop) — Part 1 done.** `Battle.Step()`'s foe loop now runs `foreach (var tech
+in foe.Arsenal) offense.Activate(tech);` every tick (per-tick, not event-driven — simplest against the
+existing loop; `Activate` is idempotent so already-active techs return immediately, making it cheap).
+A technique short on capacity at setup now comes online the instant its pool frees. Test
+`FoeReActivatesASilencedTechniqueOnceCapacityIsRestored` (FoeTrollTests): breaks the Troll's chest below
+Bandage's CON Reserve (silenced at setup, arm stays wounded), repairs the chest mid-fight, and asserts
+the arm then mends — impossible without the retry. 546 green, no regression across the foe-fight suite.
+**Part 2 (heal-priority trigger rule) still OPEN** — next: prefer an off-cooldown `Heals:true` technique
+over attacking when a part is disabled OR HP <=75%, with CON parts weighted urgent. (Doug's "25%"
+reading flagged as HP<=75%, not <=25% remaining — one-line change if he meant the latter.)
 
 **Part 2 — the actual heal-priority decision rule, Doug's exact words: "it should see any damage that
 either has removed or disabled something or 25% but it should always try to heal CON hard. Full
