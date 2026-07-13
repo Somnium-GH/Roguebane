@@ -425,7 +425,19 @@ that the guard blockers are cleared):**
    **✅ BUILT (2026-07-12, loop):** all 9 blocks appended to `Roguebane.Game/Content/Content.mgcb`
    (after the trailing `sprites/minions/wisp` block), each in the repo's single-source `/build:
    ../../Roguebane.Content/...` idiom. All 9 source PNGs confirmed on disk at the referenced paths.
-   Build now sees the pass-12 assets. Items 2 (campMarker retire) + 3 (encounter.scene) still OPEN.
+   Build now sees the pass-12 assets. Items 2 (campMarker retire) + 3 (encounter.scene) DONE (below).
+   **✅ FULL-BUILD VERIFIED (2026-07-12, loop):** Doug's instance closed, so ran a FULL Game build (not
+   just `-t:Compile`) — `Build succeeded, 0 Warnings, 0 Errors`, and all 9 new assets compiled to `.xnb`
+   (`bin/Debug/net9.0/Content/bg/enc_*.xnb` + `icons/rune/core_barbarian.xnb` all present). This proves
+   the content-pipeline change AND every Game code change this session (colorBind text-tint, campMarker
+   retire, encounter.scene backdrop, seeded Scene, RetreatTimer wiring) link and build end-to-end.
+   **✅ RUNTIME-CONFIRMED via RB_SMOKE (2026-07-12, loop):** `RB_SMOKE=1 RB_SCREEN=encounter
+   RB_SIZE=960x540` rendered clean — `SMOKE OK: fonts=2 probes=14 bound=14` (every asset binds). The
+   saved shot shows the action-bar technique cards drawing colored TEXT labels (INT/CON) on transparent
+   card backgrounds — NOT the solid attr-color blobs of the colorBind bug, so item 1's fix is confirmed
+   live, not just compile-clean. The per-node backdrop renders (no void/error box). Build-integrity AND
+   the colorBind pixel caveat are both now closed; only the seeded per-terrain-variant backdrops and the
+   Retreat/Redeploy fill-bar (no UI yet) remain for a future visual check.
 
 2. **`campMarker` is RETIRED from the manifest (CD_STATUS #39) — drop the engine's special case.**
    `Game1.ManifestRenderer.cs:624-628` currently special-cases IDs starting with `"campMarker"` (maps
