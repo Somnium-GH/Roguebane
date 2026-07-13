@@ -333,6 +333,17 @@ rule (applies to every stat/every core), not a Barbarian special-case, so it's w
 pass on other tight kits too once built, though nothing else in the current roster is known to hit this
 specific weapon-vs-armor tradeoff today.
 
+**✅ BUILT (2026-07-12, loop).** Applied the exact partition to `Body.cs`'s `DisabledGear` cascade
+(`.OrderBy(Kind=="armor"?0:1).ThenByDescending(Reserve).ThenByDescending(Seq)`) — armor fully sheds
+before any hand/ranged weapon, Reserve/Seq ranking preserved within each tier. Per Doug's "don't
+hand-pin the stale per-race numbers, ask first" flag, I did NOT pin race arithmetic — instead added a
+general DAMAGE-scenario test (`DamageShedsArmorBeforeAWeaponOnTheSameStatPool`, BodyTests): a same-STR-
+pool weapon (reserve 5, the HIGHER demand) + Plate (req 4) both fit at full health; a hit that nets the
+pool to 8 forces exactly one to shed, and the test asserts the WEAPON is kept and the ARMOR sheds —
+which fails under the old Reserve-first ordering (it would drop the higher-reserve weapon). 561 green;
+Game builds 0/0. The stale "Half-Giant is the exact fit / others triage" prose in RACES.md/CORE_RUNES.md
+was already corrected in Doug's own balance-(14) pass.
+
 **Verified by hand against the exact numbers — write these as the new pinned test expectations,
 replacing the current blanket exclusion:**
 Full kit STR demand = Claymore 2 (net) + 4 Plate pieces × 1 (net) + Cleave 2 + Bind 2 = 10 (techniques

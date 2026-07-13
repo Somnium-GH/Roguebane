@@ -147,7 +147,14 @@ public sealed class Body
         var armor = new HashSet<Stat>();
         var ranged = false;
 
-        foreach (var c in candidates.OrderByDescending(c => c.Reserve).ThenByDescending(c => c.Seq))
+        // Armor sheds BEFORE hand/ranged weapons (Doug item 7): a stat pool short from part damage
+        // should strip protection first and keep the weapon, so a hurt fighter can still fight instead
+        // of being disarmed (the old Reserve-first ordering dropped Barbarian's Claymore over any single
+        // plate piece). Reserve/Seq still rank WITHIN each group — a minimal partition, not a rewrite.
+        foreach (var c in candidates
+            .OrderBy(c => c.Kind == "armor" ? 0 : 1)
+            .ThenByDescending(c => c.Reserve)
+            .ThenByDescending(c => c.Seq))
         {
             if (remaining <= pool) break;
             remaining -= c.Reserve;

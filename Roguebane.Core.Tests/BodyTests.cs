@@ -132,6 +132,30 @@ public class BodyTests
     }
 
     [Fact]
+    public void DamageShedsArmorBeforeAWeaponOnTheSameStatPool()
+    {
+        // Doug item 7: when a stat pool is short from part damage, ARMOR sheds before the weapon so a
+        // hurt fighter keeps its offense. The weapon here has the HIGHER reserve, so the OLD reserve-
+        // first cascade would have dropped the weapon — this test fails without the armor-first partition.
+        var body = new Body();
+        var arm = new BodyPart("arm", Stat.Str, 9);
+        body.Add(arm);
+        var blade = new Weapon("blade", Stat.Str, 5, Power: 1);            // reserve 5 (the higher demand)
+        var plate = new Armor("plate", "Plate", Stat.Str, ArmorLine.Plate, 2); // STR-governed, requirement 4
+        Assert.True(body.Wield(blade));
+        Assert.True(body.Equip(plate));
+        Assert.True(body.HandItemGearOnlyUsable(0));     // full health: STR 9 covers 5 + 4 exactly
+        Assert.True(body.ArmorGearOnlySustained(plate));
+
+        // Damage 5, of which the sustained plate soaks its own PartMitigation (2*T2 = 4), nets 1 to the
+        // arm -> STR 9 -> 8. Now 5 + 4 no longer fits, exactly one item must shed.
+        body.Damage(arm, 5);
+        Assert.Equal(8, body.Capacity(Stat.Str)); // guard the setup: pool really dropped to 8
+        Assert.True(body.HandItemGearOnlyUsable(0), "the weapon must be KEPT — armor sheds first (item 7)");
+        Assert.False(body.ArmorGearOnlySustained(plate), "the armor is the piece that sheds");
+    }
+
+    [Fact]
     public void RangedGearOnlyUsableIgnoresLingeringTechniqueReservation()
     {
         var body = new Body();
