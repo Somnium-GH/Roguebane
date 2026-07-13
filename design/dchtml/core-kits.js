@@ -6,6 +6,16 @@
 // STATUS: PROTOTYPE Core Effects (supersede §11 canon — payload B15) tuned to the **v6 balance sheet**
 // (2026-07-05 session). v6 is the number gospel: attributes, reserve costs, default loadouts.
 //
+// ⚠ PENDING SWITCH (payload 2026-07-12, LOCKED architecture): the per-core budget/effect/gear/
+// techniques/bayCap literals below move to a fetch() of the SHARED `design/systems/cores.json`
+// (repo) at module load ONCE the engine-side loader lands — Doug pings when the shape is final.
+// Until then they stay hand-typed. The 2026-07-12 Cowork hand-patch (Adept staff→STR + Jab;
+// Summoner shield-for-charm + Blast + 4 actions) is ADOPTED below VERBATIM — do not revert it.
+// Display-only fields (accent, scenarios, figure keys, finds, RACES copy) stay ours; the RACES
+// blurb/tag drift vs Race.cs canon resolves itself at the fetch switch (payload: no standalone fix).
+// NOTE the remaining kit deltas in cores.json (slings + `shot` on grunt/warden/barbarian, reaver
+// longsword+rapier, ranger axe+shield+brace, techCap 4s) land WITH the fetch switch, not before.
+//
 // ================================ DETERMINISTIC REQUIREMENTS (v6, written down) =====================
 // RACES (baseline 4/4/4/4; Human +1 across = breadth, specialists +2 into one affinity = depth):
 //   Human 5/5/5/5 · Elf 4/6/4/4 (INT) · Dwarf 4/4/4/6 (CON) · Halfling 4/4/6/4 (DEX).
@@ -155,7 +165,7 @@ const T = {
   lunge:     { name: 'Lunge',      attr: 'DEX', cost: 1, glyph: '➤', needs: 'melee',      desc: 'A darting thrust; charge-free DEX damage.' },
   frenzy:    { name: 'Frenzy',     attr: 'STR', either: ['STR', 'DEX'], cost: 3, glyph: '⇶', needs: 'twoWeapons', desc: 'Both blades in three wild arcs — paid in STR or DEX. (3 → 2 with Finesse)' },
   flurry:    { name: 'Flurry',     attr: 'STR', either: ['STR', 'DEX'], cost: 2, glyph: '⇉', needs: 'twoWeapons', desc: 'A fast dual-wield flurry — paid in STR or DEX. (2 → 1 with Finesse)' },
-  aimedshot: { name: 'Aimed Shot', attr: 'DEX', cost: 2, glyph: '➶', needs: 'bow', charge: 1, desc: 'A slow, heavy bow shot; pierces the shield pool.' },
+  aimed_shot: { name: 'Aimed Shot', attr: 'DEX', cost: 2, glyph: '➶', needs: 'bow', charge: 1, desc: 'A slow, heavy bow shot; pierces the shield pool.' },   // key = Core Technique.Id (payload 2026-07-12: was `aimedshot`)
   ember:     { name: 'Ember',      attr: 'INT', cost: 1, glyph: '✦', desc: 'A fast fire bolt; a targeted hit feeds Resonance.' },
   siphon:    { name: 'Siphon',     attr: 'INT', cost: 2, glyph: '◉', desc: 'A draining bolt; a landed part-hit heals you for the damage dealt.' },
   barkskin:  { name: 'Barkskin',   attr: 'INT', cost: 1, glyph: '❦', desc: 'A lesser INT ward; pool 2, refills a pip every 3.0s.' },
@@ -334,7 +344,7 @@ export const CORES = {
       ...PLAIN_LEATHER,
     ],
     techCap: 4,
-    techniques: [tk('aimedshot', 'CHARGING'), tk('lunge', 'READY'), tk('bandage', 'COOLDOWN')],
+    techniques: [tk('aimed_shot', 'CHARGING'), tk('lunge', 'READY'), tk('bandage', 'COOLDOWN')],
     bayCap: 2,
     bays: [mk('hound', 'ACTIVE')],
     finds: {

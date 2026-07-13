@@ -51,13 +51,21 @@
           </div>
         </sc-for>
       </div>
-      <!-- RETREAT / REDEPLOY (payload B29.3 — replaces the engine-only overlay): ONE button, two
-           authored states. `retreat` = pull the host back to camp mid-node (neutral chrome);
+      <!-- RETREAT / REDEPLOY (payload B29.3) + PROGRESS-TO-AVAILABLE (payload 2026-07-12): ONE button,
+           THREE authored states. `charging` = retreat not yet available (DEX-timed, runs from arrival;
+           placeholder 30s base) — disabled skin, dim label, and the nested `retreatProgress` track +
+           `retreatProgressFill` sweep 0→1 on `nav.retreatPct` (the SAME track+fill grammar the engine
+           already draws for ShieldPool.regenPct / technique.chargePct). The track is bind-GATED on
+           `nav.retreatPct`: once retreat is available the engine stops resolving it and the sweep
+           unmounts — no clutter in the normal case. `retreat` = available (neutral chrome);
            `redeploy` = the node is CLEARED — relabels + turns gold (button_on skin, dark label).
-           States carry `label` + `asset` so the relabel/skin swap is data, not a second element.
-           Sample shows REDEPLOY (the current beacon — camp — is cleared). -->
-      <div data-el="retreatBtn" data-anchor="TopRight" data-binds="nav.retreat" data-bind-gate="" data-states="{&quot;retreat&quot;:{&quot;asset&quot;:&quot;ui/button/button_normal&quot;,&quot;color&quot;:&quot;parch&quot;,&quot;label&quot;:&quot;⮐ RETREAT&quot;},&quot;redeploy&quot;:{&quot;asset&quot;:&quot;ui/button/button_on&quot;,&quot;color&quot;:&quot;panelCard&quot;,&quot;label&quot;:&quot;⚑ REDEPLOY&quot;}}" title="Redeploy from this cleared beacon" style="position:relative;width:156px;height:40px;background:url('Content/ui/button/button_on.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;">
-        <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:1.5px;color:#1a130c;">⚑ REDEPLOY</span>
+           States carry `label` + `asset` (engine-pending, CD_STATUS #39/#43).
+           Sample shows CHARGING at 62% (the arrival-truth state). -->
+      <div data-el="retreatBtn" data-anchor="TopRight" data-binds="nav.retreat" data-bind-gate="" data-states="{&quot;charging&quot;:{&quot;asset&quot;:&quot;ui/button/button_disabled&quot;,&quot;color&quot;:&quot;mutedDim&quot;,&quot;label&quot;:&quot;⮐ RETREAT&quot;},&quot;retreat&quot;:{&quot;asset&quot;:&quot;ui/button/button_normal&quot;,&quot;color&quot;:&quot;parch&quot;,&quot;label&quot;:&quot;⮐ RETREAT&quot;},&quot;redeploy&quot;:{&quot;asset&quot;:&quot;ui/button/button_on&quot;,&quot;color&quot;:&quot;panelCard&quot;,&quot;label&quot;:&quot;⚑ REDEPLOY&quot;}}" title="Retreat unlocks as your host settles in (DEX-timed)" style="position:relative;width:156px;height:40px;background:url('Content/ui/button/button_disabled.png') center/100% 100% no-repeat;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:1.5px;color:#8d775c;">⮐ RETREAT</span>
+        <div data-el="retreatProgress" data-binds="nav.retreatPct" data-bind-gate="" style="position:absolute;left:7px;right:7px;bottom:5px;height:5px;background:#241b14;border:1px solid #0a0807;overflow:hidden;">
+          <div data-el="retreatProgressFill" data-binds="nav.retreatPct" style="height:100%;width:62%;background:#d9a441;"></div>
+        </div>
       </div>
       <span data-el="layerNote" data-anchor="TopRight" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#b09a82;">LAYER 2<br></span>
     </div>

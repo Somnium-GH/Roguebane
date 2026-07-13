@@ -1,3 +1,27 @@
+## ✅ CD DROP PASS 13 PROCESSED (2026-07-12, loop) — retreat progress-to-available UX + core-kits round-trip prep
+The drop landed in the working tree (layout.json re-extracted + 6 refs + dchtml sources + CD_STATUS/
+DROP_AUDIT). Processed and verified — safe to build on:
+- **Guard (`tools/drop_audit.py`): no regressions.** 9 gaps total = 7 PRE-EXISTING (byte-identical debt
+  from pass-12: encounter minionField/minionFieldLabel/minions.sprite, equipment minionCard hotkey,
+  questPanel-blank per #39, merchant wareCard ware.icon/techId per B22) + 2 NEW on citymap
+  (`retreatBtn`/`retreatProgress` "no content/sample literal") — these are the #43 sweep elements,
+  EXPECTED to be bind-gated (they unmount when the engine returns null, by design). No keys removed.
+- **layout.json parses; full suite 561 green against it** (FigureHitTest/ScreenLayout/CardTemplate read
+  the live manifest). No new assets to mirror — the `charging` state reuses `ui/button/button_disabled`.
+- **CD_STATUS #43 (engine work) connects to code I already built.** The sweep's fill binds
+  `nav.retreatPct` (a 0..1 fraction) and gate-unmounts when the engine returns null — this is the UI
+  half of item 5, whose engine half (`RetreatTimer` + `Exp.RetreatProgress`/`RetreatReady`) is DONE.
+  **Remaining engine wiring, still gated on item-5's flagged timing decisions (NOT half-wired to avoid a
+  visibly-stuck sweep):** (a) resolve `nav.retreatPct` => `RetreatReady ? null : RetreatProgress` via a
+  fill-width block + gate (same grammar as `ShieldPool.regenPct`); (b) the `retreatBtn` three-way state
+  pick (charging/retreat/redeploy) — the per-state label/asset swap is owed from #39; (c) the Core
+  timing question I flagged on item 5 — `_arrivalTicks` only advances during Fighting, so on the CityMap
+  `retreatBtn` (shown out of combat) a sub-30s fight would leave the sweep frozen mid-charge; making it
+  complete needs a shell-loop tick during Cleared/Choosing + the retreat-vs-redeploy semantics Doug
+  hasn't locked. Once those land, (a)/(b) are a clean follow-up.
+- core-kits.js hand-patch ADOPTED verbatim by CD (no revert risk now); `aimed_shot` key rename done
+  their side; cores.json fetch-switch still deferred to CD (my loader already reads the file).
+
 ## ‼ TOP PRIORITY (2026-07-12, Doug) — 3 bugs + 1 LHS guardrail note, root-caused by static read (no
 ## build here) — two have precise, confirmed fixes; one needs a quick live confirm before guessing further
 ### 1. Arm/leg offensive targeting always resolves to the SAME limb regardless of which one is clicked

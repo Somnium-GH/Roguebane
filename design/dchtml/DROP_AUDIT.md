@@ -1,3 +1,58 @@
+# DROP AUDIT — 2026-07-12 (pass 13: retreat progress-to-available + core-kits round-trip prep)
+
+**Pass 13 delta (2026-07-12 payload, late — the two actionable items; B2-GO / B20 were already
+delivered in pass 12's drop and await your smoke probes, B22 stays deferred per the payload):**
+
+- **CityMap Retreat/Redeploy — progress-to-available UX (NEW payload item).** Treatment chosen:
+  a **fill-bar sweep across the button** in the game's established charge grammar (the techCard /
+  heroShieldRegen track+fill), not a radial or numeric countdown — no text noise, instantly reads as
+  "charging". `retreatBtn` gains a third authored state **`charging`** (`button_disabled` skin +
+  `mutedDim` label) and nested **`retreatProgress`** track + **`retreatProgressFill`** fill (amber,
+  parent-relative children). Fill binds **`nav.retreatPct`** — feed the 0..1 fraction there; the track
+  binds the same key as its visibility gate, so once retreat is available the engine resolves nothing
+  and the sweep unmounts. See **CD_STATUS #43** (engine half: timer feed + state pick; #39 updated —
+  the retreat timer is no longer "undecided"). ⚠ The 03-citymap ref's retreatBtn sample deliberately
+  switched REDEPLOY → CHARGING at 62% (the arrival-truth state, and the state that needed pixel
+  proof); redeploy remains fully specified in `states` and in the pass-11/12 refs (git history).
+- **core-kits.js — the 2026-07-12 Cowork hand-patch is ADOPTED verbatim** (diffed against the live
+  repo copy, per the payload's don't-revert warning): Adept staff → **STR-gated** + **Jab** as 4th
+  technique; Summoner **Wooden Shield replaces the Charm**, **techCap 3→4**, techniques → Ember /
+  **Blast** (new `T.blast` def, wand INT attack) / Sacrifice / **Brace**; header kit comments follow.
+  Our next drop therefore no longer reverts their patch.
+- **`aimed_shot` key rename (payload fix):** the `T` catalog key `aimedshot` → **`aimed_shot`**
+  (= Core's `Technique.Id`, so the future cores.json id lookup can't miss). Name/desc/icon unchanged —
+  zero pixel change; the captured chip was already `icons/technique/aimed_shot.png`.
+- **cores.json fetch switch NOT taken yet** (payload: LOCKED architecture, wait for the loader ping).
+  A ⚠ PENDING SWITCH note now sits in core-kits.js' header: what moves to the fetch
+  (budget/effect/gear/techniques/bayCap), what stays display-side, and that the REMAINING kit deltas in
+  cores.json (slings + `shot` on grunt/warden/barbarian, reaver longsword+rapier, ranger
+  axe+shield+brace, remaining techCap 4s) land WITH the switch, not before. RACES blurb/tag drift vs
+  Race.cs canon: left as-is per payload (resolves at the switch).
+- **⚠ State-exercise FLAG (Doug call wanted):** with the patched kit the Summoner's Skeleton no longer
+  starves in its scenario (the shield freed an INT pip) — it renders **ACTIVE**, so the minion **IDLE**
+  state has lost its ref exemplar; likewise Adept's Stoneskin no longer collapses (staff moved off INT).
+  Adopted verbatim rather than re-tuning your scenario data — say the word and we deepen the Summoner
+  scenario (INT −3) to re-exercise IDLE.
+
+- **Changed files:** `CityMap.dc.html` (retreat states + sweep), `core-kits.js` (hand-patch adoption +
+  rename + header note), `Content/layout.json` (re-extracted), `CD_STATUS.md` (#43 added, #39 timer
+  line updated), this audit.
+- **`Content/layout.json` re-extracted** — full 6-screen harness (`extract_all.html` → PNG channel →
+  `extract_merge.js`, key-set guard passed): encounter:47 equipment:52 **citymap:43 (+2)** newgame:31
+  campaignmap:10 merchant:30, 36 templates. Bind DELTA: **`nav.retreatPct` NEW** (on both sweep
+  elements); `retreatBtn.states` gains `charging`; samples follow the patched Adept/Summoner kits
+  (staff badge STR 2, Blast/Brace cards, 4/4 slotted). No keys removed.
+- **Renders refreshed (6, all verified 1920×1080, tile+stitch):** `design/03-citymap.png`,
+  `design/01-encounter-{adept,summoner}.png`, `design/02-equipment-{adept,summoner}.png`,
+  `design/05-newgame.png` + their `reference/screens/` twins. NOT re-shot (correctly): all other
+  cores/screens (kits untouched), 04/06/07/08, `00-assets-*` sheets.
+- **NOT rebuilt (correctly):** `asset-manifest.js` + `Content.mgcb` — zero PNG adds/removes this pass
+  (3155, in sync).
+- **Manual design edits (Doug/user) since pass 12:** none in the editor; the Cowork core-kits
+  hand-patch (engine-side, 2026-07-12) is recorded + adopted above.
+
+---
+
 # DROP AUDIT — 2026-07-12 (pass 12: playtest fixes B32/B33/B34 + contextual backdrops + barbarian rune + B2-GO rides)
 
 **Pass 12 delta (2026-07-12 payload, evening — Doug playtest bugs + "sense of journey" backdrops):**
