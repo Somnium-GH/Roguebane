@@ -75,18 +75,20 @@ public class BuildSessionTests
     [Fact]
     public void EquipmentOnlyEverIncludesPaletteTechniques()
     {
-        var build = New(); // Grunt kit: jab, brace, bandage — Siphon/Lunge aren't in it and no rune grants yet
+        var build = New(); // Grunt kit (cores.json): jab, shot, brace, bandage — Siphon/Lunge aren't in it
         build.Toggle(Techniques.Siphon);
         build.Toggle(Techniques.Lunge);
 
         Assert.True(build.IsSelected(Techniques.Jab)); // kit
         // off-palette toggles never surface in Equipment — the inventory can't offer more than the
-        // current core's kit plus whatever the runes taken so far grant
-        Assert.Equal(new[] { "jab", "brace", "bandage" }, build.Equipment.Select(t => t.Id));
+        // current core's kit plus whatever the runes taken so far grant.
+        Assert.DoesNotContain("siphon", build.Equipment.Select(t => t.Id));
+        Assert.DoesNotContain("lunge", build.Equipment.Select(t => t.Id));
+        Assert.Equal(build.CoreRune.Kit.Select(t => t.Id), build.Equipment.Select(t => t.Id));
 
         build.Toggle(Techniques.Jab); // a kit item can still be dropped
         Assert.False(build.IsSelected(Techniques.Jab));
-        Assert.Equal(new[] { "brace", "bandage" }, build.Equipment.Select(t => t.Id));
+        Assert.DoesNotContain("jab", build.Equipment.Select(t => t.Id));
     }
 
     [Fact]
@@ -116,7 +118,8 @@ public class BuildSessionTests
     [Fact]
     public void LaunchMintsTheChosenBodyIntoARun()
     {
-        var build = New(); // kit: jab, brace, bandage
+        var build = New();
+        var kitSize = build.CoreRune.Kit.Count; // Grunt's kit, whatever the current balance tune is
         build.Climb(Paths.VesselLadder);
         build.Toggle(Techniques.Jab); // drop a kit item
 
@@ -124,7 +127,7 @@ public class BuildSessionTests
         var session = build.Launch(run);
 
         Assert.Equal(SessionState.Fighting, session.State);
-        Assert.Equal(2, session.Equipment.Count); // kit (brace, bandage) minus jab
+        Assert.Equal(kitSize - 1, session.Equipment.Count); // kit minus the dropped jab
         Assert.Equal(3, session.Run.Nodes.Count); // cp1, cp2, castle
     }
 
@@ -183,10 +186,12 @@ public class BuildSessionTests
     [Fact]
     public void CyclingCoreRuneReseedsTheKit()
     {
-        var build = New(); // Grunt: jab, brace, bandage
-        Assert.Equal(new[] { "jab", "brace", "bandage" }, build.Equipment.Select(t => t.Id));
+        // The Equipment reseeds to whatever the CURRENT core's kit is (asserted against the core itself
+        // so a balance-tune of the kits doesn't redden this behavioral test).
+        var build = New(); // Grunt
+        Assert.Equal(build.CoreRune.Kit.Select(t => t.Id), build.Equipment.Select(t => t.Id));
 
-        build.CycleCoreRune(1); // Warden: jab, brace, bandage
-        Assert.Equal(new[] { "jab", "brace", "bandage" }, build.Equipment.Select(t => t.Id));
+        build.CycleCoreRune(1); // Warden
+        Assert.Equal(build.CoreRune.Kit.Select(t => t.Id), build.Equipment.Select(t => t.Id));
     }
 }

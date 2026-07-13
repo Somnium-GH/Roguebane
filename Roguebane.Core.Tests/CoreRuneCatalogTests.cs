@@ -32,14 +32,19 @@ public class CoreRuneCatalogTests
     [Fact]
     public void ResolvedGruntMatchesTheJson()
     {
+        // STRUCTURAL invariants only (budget/slots/cap/bonus/effect) — the exact kit ids are a balance-
+        // tuning surface (per CLAUDE.md, don't pin design-authored content that gets re-dropped; the
+        // resolve/throw tests below cover id integrity). Assert instead that the kit is non-empty and the
+        // action bar can hold it.
         var g = Cat.Cores["grunt"];
         Assert.Equal(20, g.RuneBudget);
         Assert.Equal(4, g.ActionSlots);
         Assert.Equal(2, g.MinionCap);
         Assert.Equal((1, 1, 1, 1), (g.StrBonus, g.IntBonus, g.DexBonus, g.ConBonus));
         Assert.Equal(CoreEffectKind.JackOfAllTrades, g.Effect);
-        Assert.Equal(new[] { "jab", "brace", "bandage" }, g.Kit.Select(t => t.Id).ToArray());
-        Assert.Equal(new[] { "longsword_iron", "shield_wooden" }, g.DefaultWeapons!.Select(w => w.Id).ToArray());
+        Assert.NotEmpty(g.Kit);
+        Assert.True(g.Kit.Count <= g.ActionSlots, "kit must fit the action bar");
+        Assert.NotEmpty(g.DefaultWeapons!);
     }
 
     [Fact]

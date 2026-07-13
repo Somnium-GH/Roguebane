@@ -22,11 +22,13 @@ public class StartingKitTests
     }
 
     [Fact]
-    public void WardenWieldsLongswordAndIronBucklerWornInPlate()
+    public void WardenWieldsLongswordAndShieldWornInPlate()
     {
+        // cores.json target (balance (14)): Iron Buckler downgraded to a Wooden Shield (drops CON req
+        // 10->9); a Shepherd's Sling was added on the ranged slot.
         var body = Assemble(CoreRunes.Warden);
         Assert.Contains(body.Hands, w => w.Id == "longsword_iron");
-        Assert.Contains(body.Hands, w => w.Id == "shield_buckler"); // Iron Buckler, T2
+        Assert.Contains(body.Hands, w => w.Id == "shield_wooden");
         Assert.Equal("armor_str_chest_iron", body.ArmorOn(Stat.Con)?.Id);
     }
 
@@ -52,19 +54,25 @@ public class StartingKitTests
     }
 
     [Fact]
-    public void ReaverWieldsTwinDaggersWornInLeather()
+    public void ReaverWieldsMixedBladesWornInLeather()
     {
+        // cores.json target (2026-07-12 balance (14)): the twin-dagger kit became a STR+DEX mixed pair
+        // (Iron Longsword + Iron Rapier) so Frenzy/Flurry's stat-flexibility actually matters.
         var body = Assemble(CoreRunes.Reaver);
-        Assert.Equal(2, body.Hands.Count(w => w.Id == "dagger_iron"));
+        Assert.Contains(body.Hands, w => w.Id == "longsword_iron");
+        Assert.Contains(body.Hands, w => w.Id == "rapier_iron");
         Assert.Equal("armor_dex_legs_plain", body.ArmorOn(Stat.Dex)?.Id);
         Assert.Equal("armor_dex_arms_plain", body.ArmorOn(Stat.Str)?.Id);
     }
 
     [Fact]
-    public void RangerWieldsDaggerAndBowWornInLeather()
+    public void RangerWieldsAxeBowAndShieldWornInLeather()
     {
+        // cores.json target (balance (14)): dropped the dagger for an Iron Axe and gained a Wooden
+        // Shield (hand items); the Short Bow still mounts the separate ranged slot.
         var body = Assemble(CoreRunes.Ranger);
-        Assert.Contains(body.Hands, w => w.Id == "dagger_iron");
+        Assert.Contains(body.Hands, w => w.Id == "axe_iron");
+        Assert.Contains(body.Hands, w => w.Id == "shield_wooden");
         Assert.Equal("bow_short", body.Ranged?.Id);
         Assert.Equal("armor_dex_legs_plain", body.ArmorOn(Stat.Dex)?.Id);
     }

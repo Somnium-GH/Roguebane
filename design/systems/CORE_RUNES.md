@@ -49,7 +49,7 @@ Shared rule: **on-hit boons require a landed PART-hit** — never a shield-absor
 | Summoner | 17 | 4 | 3 |
 | Reaver | 19 | 4 | 0 |
 | Ranger | 18 | 4 | 2 |
-| Barbarian | 14 | 3 | 1 |
+| Barbarian | 14 | 4 | 1 |
 
 Base HP stays race-owned (all refs show Human hp 20). The old per-core `RuneDiscount` (rune-PRICE
 discount) appears nowhere in v6 — affordability perks now live in the Core Effects, which discount
@@ -61,12 +61,14 @@ no code change was owed, this was purely a documentation question.
 Requirement = fully-active reserve demand per stat (armor + weapons + skills + minions), effect discounts applied.
 
 ### Grunt — *THE GENERALIST* · badge STARTER — req **STR 5 · CON 2**
-Bonus +1 all. Weapons: Iron Longsword + Wooden Shield · Armor: Iron plate ×4 · Techniques: Jab, Brace, Bandage ·
-Minions: none (capacity 2).
+Bonus +1 all. Weapons: Iron Longsword + Wooden Shield + Shepherd's Sling (ranged, DEX backup — **added
+2026-07-12**, `Roguebane_Balance (14).xlsx`) · Armor: Iron plate ×4 · Techniques: Jab, **Shot** (new —
+fires the Sling, legacy technique now in real use), Brace, Bandage · Minions: none (capacity 2).
 
-### Warden — *THE WALL* · badge BULWARK — req **CON 10 · STR 3**
-Bonus +5 CON. Weapons: Iron Longsword + Iron Buckler · Armor: Iron plate ×4 (paid in CON, −1/tier via Fortified) ·
-Techniques: Jab, Brace, Bandage · Minions: none (capacity 1).
+### Warden — *THE WALL* · badge BULWARK — req **CON 9 · STR 3**
+Bonus +5 CON. Weapons: Iron Longsword + **Wooden Shield** (downgraded from Iron Buckler — **(14)**,
+drops CON req 10→9) + Shepherd's Sling (ranged backup, same as Grunt) · Armor: Iron plate ×4 (paid in
+CON, −1/tier via Fortified) · Techniques: Jab, **Shot**, Brace, Bandage · Minions: none (capacity 1).
 
 ### Adept — *THE SCHOLAR* · badge CASTER — req **INT 8 · STR 3**
 Bonus +5 INT. Weapons: Wooden Staff (STR-gated, own +1/tier SPELL bonus — same flat formula as a Tome, no
@@ -87,40 +89,44 @@ is corrected there too. **Sacrifice locked 2026-07-05 (Doug):** heal scales with
 tier, minion destroyed permanently (no refund) — see TECHNIQUES.md for the (still-flagged) exact
 per-tier numbers.
 
-### Reaver — *THE DUELIST* · badge SPECIALIST — req **DEX 9 · CON 2**
-Bonus +5 DEX. Weapons: 2× Iron Dagger · Armor: leather ×4 · Techniques: Frenzy, Flurry, Bandage · Minions: none (capacity 0).
+### Reaver — *THE DUELIST* · badge SPECIALIST — req **DEX 9 · STR 2 · CON 2**
+Bonus +5 DEX. Weapons: **Iron Longsword + Iron Rapier** (STR+DEX mixed pair — **replaced the twin-dagger
+kit, `(14)` 2026-07-12**; this is why Frenzy/Flurry were made stat-flexible in the first place, a mixed
+pair makes `AltStat: Stat.Dex` matter far more than two same-stat daggers did) · Armor: leather ×4 ·
+Techniques: Frenzy, Flurry, Bandage · Minions: none (capacity 0).
 **Bandage added 2026-07-05 (Doug + balance spreadsheet Kits/Demand tabs, CON 2):** Reaver carries the flat CON part-heal like
 every core bar Adept/Summoner — the earlier "no heal glass cannon" framing is retired. **Locked 2026-07-05 (Doug):** Frenzy/Flurry are single **stat-flexible** techniques (STR OR DEX, same
 reserve — see TECHNIQUES.md); Reaver pays them in DEX, and Finesse (−1) brings them to 2/1 — leather 4 +
-daggers 2 + Frenzy 2 + Flurry 1 = the DEX 9 above. (The earlier `frenzy_dex`/`flurry_dex` clone framing is retired.)
+rapier 2 + Frenzy 2 + Flurry 1 = the DEX 9 above; the longsword's STR 2 is a separate, small STR demand
+this core didn't carry before (14).
 
-### Ranger — *THE MARKSMAN* · badge SPECIALIST — req **DEX 10 · CON 2**
-Bonus +4 DEX · +1 CON. Weapons: Iron Dagger + Short Bow · Armor: leather ×4 · Techniques: Aimed Shot, Lunge,
-Bandage · Minions: Hound (capacity 2, 1 free).
+### Ranger — *THE MARKSMAN* · badge SPECIALIST — req **DEX 7 · STR 2 · CON 5**
+Bonus +4 DEX · +1 CON. Weapons: **Iron Axe + Short Bow + Wooden Shield** (gains a shield, drops the
+dagger for an axe — `(14)` 2026-07-12; axe/shield are hand items, bow is the separate ranged slot, all
+three coexist) · Armor: leather ×4 · Techniques: **Jab**, Aimed Shot, Bandage, **Brace** (replaces
+Lunge — Brace needs the new shield) · Minions: Hound (capacity 2, 1 free).
 
-### Barbarian — *THE WARLORD* · badge SPECIALIST — req **STR 10 · CON 2 (Half-Giant is the exact fit)**
-Bonus +4 STR · +1 CON. Weapons: Iron Claymore (2H) · Armor: Iron plate ×4 · Techniques: Cleave, Bind,
-Bandage · Minions: none (capacity 1). Added 2026-07-05 — numbers from Doug (budget 14 · actions 3 ·
-minions 1) + the `01/02-*-barbarian` refs.
+### Barbarian — *THE WARLORD* · badge SPECIALIST — req **STR 8 · DEX 2 · CON 5**
+Bonus +4 STR · +1 CON. Weapons: **Iron Claymore (2H) + Shepherd's Sling (ranged) + Wooden Shield**
+(gains a ranged backup and a shield — `(14)` 2026-07-12) · Armor: Iron plate ×4 · Techniques: Cleave,
+**Shot**, Bandage, **Brace** (replaces Bind — Brace needs the new shield) · Minions: none (capacity 1).
+Budget 14, actions **4** (was 3, raised to fit the now-4-technique kit).
 
-**Corrected 2026-07-05 against Doug's balance spreadsheet (kept outside the repo; this superseded an
-earlier hand-math error — see below):** fully-active STR = claymore 2 (5−3 Warlord's Might) + plate 4
-(4 pieces × (2−1), Warlord's Might's plate discount) + Cleave 2 + Bind 2 = **10**. Half-Giant's effective
-STR is 6+4=**10** — an EXACT fit, zero headroom, not an over-demand. Every other race falls short by 1-2
-STR (Human −1, Elf/Dwarf/Halfling −2 — see RACES.md's clearance table) and must deactivate/trade one
-small item to run the kit, same triage pattern as any tight core. Engine consequence: the "every core
-activates its whole default kit" test does NOT need a Barbarian exemption — assert Half-Giant+Barbarian
-activates the FULL kit; other race+Barbarian pairs activate the sustainable subset (same as any other
-short combo).
+**Superseded 2026-07-12 against `Roguebane_Balance (14).xlsx` (the 2026-07-05 "Half-Giant is the exact
+fit" framing below no longer holds — kept for the arithmetic history, not as current design):** fully-
+active STR = claymore 2 (5−3 Warlord's Might) + plate 4 (4 pieces × (2−1), Warlord's Might's plate
+discount) + Cleave 2 = **8** (Bind's STR 2 dropped out along with Bind itself). Half-Giant's effective
+STR is 6+4=10 — **2 points of headroom now, not an exact fit.** Recomputing the whole roster against
+(14)'s `Analysis` sheet: **every race clears every core**, several at exactly +0 headroom but none
+short — this retires the "only Half-Giant clears Barbarian" narrative entirely, not just the exact
+number. See `RACES.md`'s clearance table (same pass). The disable-cascade fix (armor sheds before
+weapons — `Body.cs`) is still correct as a general rule; it just won't trigger on a healthy Barbarian
+kit anymore regardless of race.
 
-**What was wrong (logged so it doesn't happen again):** the previous text here computed Warlord's Might
-as −2 STR on the claymore only, and priced plate at its raw 2/piece with no discount at all, giving a
-hand-math total of 15 vs. Half-Giant's 10 — a real 5-point gap that was then written up as an
-intentional "over-demand identity" needing a test exemption. Doug's actual balance model (reconciled
-2026-07-05) shows the true numbers above: the Warlord's Might discount is −3 on the claymore AND −1/piece
-on plate, which is what makes Half-Giant land on exactly 10. The "over-demand" framing and the planned
-test exemption were both artifacts of that hand-math error, not real design intent — do not resurrect
-them.
+**2026-07-05 arithmetic history (STR 10, exact-fit-only-Half-Giant) — superseded above, not current:**
+fully-active STR was claymore 2 + plate 4 + Cleave 2 + **Bind 2** = 10, an exact fit for Half-Giant only.
+That was correct for the KIT AS IT STOOD THEN (with Bind, no shield, no sling) — the kit itself changed
+2026-07-12, not the arithmetic method.
 
 ## Shared rules
 - **Healing map:** Grunt, Warden, Ranger, Barbarian, **Reaver** → Bandage (T1 CON heal); Adept → Siphon (lifesteal spell);

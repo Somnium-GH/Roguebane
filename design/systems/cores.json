@@ -19,8 +19,8 @@
       "badge": "STARTER",
       "accent": "amber",
       "kit": {
-        "techniques": ["jab", "brace", "bandage"],
-        "weapons": ["longsword_iron", "shield_wooden"],
+        "techniques": ["jab", "shot", "brace", "bandage"],
+        "weapons": ["longsword_iron", "shield_wooden", "sling_shepherds"],
         "armor": ["armor_str_head_iron", "armor_str_chest_iron", "armor_str_arms_iron", "armor_str_legs_iron"],
         "minions": []
       }
@@ -37,8 +37,8 @@
       "badge": "BULWARK",
       "accent": "gold",
       "kit": {
-        "techniques": ["jab", "brace", "bandage"],
-        "weapons": ["longsword_iron", "shield_buckler"],
+        "techniques": ["jab", "shot", "bandage", "brace"],
+        "weapons": ["longsword_iron", "shield_wooden", "sling_shepherds"],
         "armor": ["armor_str_head_iron", "armor_str_chest_iron", "armor_str_arms_iron", "armor_str_legs_iron"],
         "minions": []
       }
@@ -92,7 +92,7 @@
       "accent": "dex",
       "kit": {
         "techniques": ["frenzy", "flurry", "bandage"],
-        "weapons": ["dagger_iron", "dagger_iron"],
+        "weapons": ["longsword_iron", "rapier_iron"],
         "armor": ["armor_dex_head_plain", "armor_dex_chest_plain", "armor_dex_arms_plain", "armor_dex_legs_plain"],
         "minions": []
       }
@@ -109,14 +109,14 @@
       "badge": "SPECIALIST",
       "accent": "dex",
       "kit": {
-        "techniques": ["aimed_shot", "lunge", "bandage"],
-        "weapons": ["dagger_iron", "bow_short"],
+        "techniques": ["jab", "aimed_shot", "bandage", "brace"],
+        "weapons": ["axe_iron", "bow_short", "shield_wooden"],
         "armor": ["armor_dex_head_plain", "armor_dex_chest_plain", "armor_dex_arms_plain", "armor_dex_legs_plain"],
         "minions": ["hound"]
       }
     },
     "barbarian": {
-      "budget": 14, "actionSlots": 3, "minionCap": 1,
+      "budget": 14, "actionSlots": 4, "minionCap": 1,
       "statBonus": { "str": 4, "int": 0, "dex": 0, "con": 1 },
       "effect": "WarlordMight",
       "effectName": "Warlord's Might",
@@ -127,8 +127,8 @@
       "badge": "SPECIALIST",
       "accent": "str",
       "kit": {
-        "techniques": ["cleave", "bind", "bandage"],
-        "weapons": ["claymore_iron"],
+        "techniques": ["cleave", "shot", "bandage", "brace"],
+        "weapons": ["claymore_iron", "sling_shepherds", "shield_wooden"],
         "armor": ["armor_str_head_iron", "armor_str_chest_iron", "armor_str_arms_iron", "armor_str_legs_iron"],
         "minions": []
       }

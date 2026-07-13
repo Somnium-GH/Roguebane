@@ -1,3 +1,72 @@
+## ‼ TOP PRIORITY (2026-07-12, Doug) — `cores.json` RECONCILED against `Roguebane_Balance (14).xlsx`;
+## kit contents changed for 5 of 7 cores; supersedes some math already locked earlier in this file
+Doug: "The json does not match the spreadsheet." Correct — the JSON in the entry below this one was
+built from `CoreRunes.cs`/`CORE_RUNES.md`, which are themselves now behind Doug's spreadsheet (14).
+Diffed `design/systems/cores.json` cell-by-cell against the workbook's `Kits`/`Demand`/`Races and Core
+Rune`/`Analysis` sheets (which are internally consistent — `Demand` = SUMIFS over `Kits`, `Analysis` =
+race+bonus−`Demand`, both check out) and corrected the file in place. **Race base stats and core stat
+bonuses already matched exactly — untouched.** Five cores' starting KITS changed:
+
+- **Grunt** — `+shot` technique, `+sling_shepherds` (ranged slot) as a cheap DEX backup. Weapons now
+  `[longsword_iron, shield_wooden, sling_shepherds]`, techniques `[jab, shot, brace, bandage]`.
+- **Warden** — same `+shot`/`+sling_shepherds` addition, AND its shield downgrades from Iron Buckler
+  to **`shield_wooden`** (the spreadsheet's Demand sheet computes Warden CON as **9**, not the
+  `CORE_RUNES.md`-stated 10 — Iron Buckler's extra point is what made the old 10; the spreadsheet's
+  own Kits row literally says "Wooden Shield" for Warden, so treating that as intentional). Weapons
+  `[longsword_iron, shield_wooden, sling_shepherds]`, techniques `[jab, shot, bandage, brace]`.
+- **Reaver** — drops the twin-dagger identity entirely: weapons become `[longsword_iron, rapier_iron]`
+  (a STR longsword + a DEX rapier, not two identical daggers) — this is actually WHY Frenzy/Flurry were
+  made stat-flexible (`AltStat: Stat.Dex`) in the first place; a mixed STR/DEX pair makes that mechanic
+  matter far more than two same-stat daggers ever did. Techniques unchanged (`frenzy, flurry, bandage`).
+- **Ranger** — biggest change: gains a shield (`shield_wooden`) and swaps its dagger for an axe
+  (`axe_iron`), keeps `bow_short`; techniques swap `lunge` out for `jab` + `brace` (net: `[jab,
+  aimed_shot, bandage, brace]`, still 4, fits the existing `actionSlots:4`). Verified mechanically
+  legal: axe/shield are both hand items (2 slots), bow is the separate ranged slot (`Body.cs`'s
+  `Wield`/`EquipRanged` — confirmed no 3-way conflict).
+- **Barbarian** — gains `sling_shepherds` (ranged) AND `shield_wooden` (hand) alongside the Claymore;
+  `bind` is dropped in favor of `brace` (which **requires an equipped shield** — `Techniques.cs`'s own
+  desc — so the shield addition and the Bind→Brace swap are the same change, not two). Confirmed a 2H
+  Claymore does NOT exclude a shield under the current rules — `WEAPONS.md`'s own line, corrected by
+  Doug same-day 2026-07-12: "a shield object occupies ONE hand, same as any 1H item — it's pure
+  hand-count, not a special exclusion" (only the Bow needs both hands). **`actionSlots` 3→4** to fit
+  the now-4-technique kit (`cleave, shot, bandage, brace`) — already reflected in `cores.json`.
+- **Adept and Summoner needed NO changes** — both already matched the spreadsheet exactly.
+
+**Companion C# fix needed (Armory.cs, add to the id-fix pass below):** `Techniques.Shot`'s `Reserve` is
+currently `0` (`"legacy content... inert but harmless"` — it was never in a real kit before). The
+spreadsheet prices `shot` at 1 (`Costs` sheet), and Barbarian's DEX demand (2 = Sling1+Shot1) only
+works out if Shot actually costs something. Change `Reserve: 0` → `Reserve: 1` on `Armory.cs`'s `Shot`
+technique. Confirmed mechanically sound with a Sling (not just Bow): `Body.cs`'s `Consulted()` resolves
+a `ShieldPiercing` technique off `_ranged` by matching `Stat`, not `Kind` — Shot (Stat.Dex) reads
+whatever's in the ranged slot, Bow or Sling alike.
+
+**‼ Two small spreadsheet-hygiene footnotes for Doug (not blocking, don't silently "fix" these into
+the JSON since they don't change which items are in a kit, only a demand-total footnote):**
+1. Warden's `Sling`/`Shot` rows show `Discount: 1.0` (→ Cost 0 each), but Warden's Core Effect
+   (Fortified) has no rule that discounts DEX items — reads like copy-paste residue from Grunt's block
+   right above it (Grunt's identical rows ARE correctly zero, via Jack of All Trades). The live engine
+   will show Warden's real DEX demand as 2 once this kit lands, not the sheet's computed 0 — harmless
+   either way (Warden has huge DEX headroom regardless), just flagging the likely typo.
+2. Ranger's `Demand` sheet DEX total (7) is 1 short of what its own `Kits` rows sum to (8, if Hound's
+   DEX1 is included) — Summoner's `skeleton` row IS included in its INT sum by the same formula
+   pattern, so Hound's exclusion looks like an inconsistency, not a rule. Doesn't change kit contents
+   either way (Hound's still in Ranger's kit) — just means Ranger's real DEX demand may run 8, not 7.
+
+**‼ SUPERSEDES existing STATUS.md math — re-verify before building, don't build the old numbers:**
+The "Barbarian non-home-race disable order" entry further down this file (Doug-locked 2026-07-12,
+earlier in this same session) was worked out by hand against Barbarian's OLD demand of **STR 10**
+("Half-Giant is the exact fit, every other race sheds 1-2 armor pieces"). Barbarian's demand under
+`cores.json` (14) is now **STR 8** (Claymore2 + Plate4 + Cleave2, no Bind) — recomputing fresh against
+the *whole* roster (all 7 cores × all 5 races) using the spreadsheet's own `Analysis` sheet: **every
+race now clears every core**, several exactly at +0 headroom but NONE short. This removes the entire
+"Half-Giant is the only exact fit, others must triage" framing for Barbarian — nobody sheds anything
+in a fully-healthy Barbarian kit anymore. The disable-cascade CODE fix (`Body.cs`'s armor-before-weapon
+partition) is still correct and worth keeping (it's a general rule, not Barbarian-specific), but the
+SPECIFIC per-race pinned test numbers in that older entry are stale — don't build them as written;
+recompute against the new demand once the loader lands, or ask before pinning test values by hand
+again. `RACES.md`'s clearance table and `CORE_RUNES.md`'s "Half-Giant is Barbarian's home, exact fit"
+prose both need the same correction (see the doc edits made in this same pass).
+
 ## ‼ TOP PRIORITY / LOCKED (2026-07-12, Doug) — `design/systems/cores.json` is AUTHORED and DONE; the
 ## 3 blockers the loop's scoping pass raised are all RESOLVED below — nothing left to decide, build only
 `design/systems/cores.json` now EXISTS with real, verified values for all 5 races + all 7 cores (races +

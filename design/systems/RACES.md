@@ -27,28 +27,34 @@ formula — numbers flagged placeholder-blessed like the rest; art already shipp
 Effective stat in a core = race base + the core's stat bonus (`CORE_RUNES.md`). A core's **demand** is its
 fully-active reserve per stat. ● = runs the whole kit at once; number = short by (deactivate or rune to fit).
 
-Demands (verified against Doug's balance spreadsheet): Grunt STR 5 · CON 2 · Warden CON 10 · Adept INT 10 ·
-Summoner INT 8 · Reaver DEX 9 · Ranger DEX 10 · CON 2 · Barbarian STR 10 · CON 2 (**Half-Giant is the
-exact fit, zero headroom** — see CORE_RUNES.md's Barbarian note; corrected 2026-07-05, was miscalculated
-as STR 15).
+Demands (**recomputed 2026-07-12 against `Roguebane_Balance (14).xlsx`** — supersedes the numbers below;
+several kits changed, not just numbers, see CORE_RUNES.md's per-core notes): Grunt STR 5 · CON 2 ·
+Warden CON 9 · STR 3 · Adept INT 8 · STR 3 · Summoner INT 7 · CON 3 · Reaver DEX 9 · STR 2 · CON 2 ·
+Ranger DEX 7 · STR 2 · CON 5 · Barbarian STR 8 · DEX 2 · CON 5.
 
 | Core | Human 5/5/5/5 | Elf 4/6/4/4 | Dwarf 4/4/4/6 | Halfling 4/4/6/4 | Half-Giant 6/4/4/4 |
 |---|:--:|:--:|:--:|:--:|:--:|
 | Grunt | ● +1 | ● +0 | ● +0 | ● +0 | ● +2 |
-| Warden | ● +0 | −1 | ● +1 | −1 | −1 |
-| Adept | ● +0 | ● +1 | −1 | −1 | −1 |
-| Summoner | ● +0 | ● +1 | −1 | −1 | −1 |
+| Warden | ● +1 | ● +0 | ● +1 | ● +0 | ● +0 |
+| Adept | ● +2 | ● +1 | ● +1 | ● +1 | ● +1 |
+| Summoner | ● +1 | ● +2 | ● +0 | ● +0 | ● +0 |
 | Reaver | ● +1 | ● +0 | ● +0 | ● +2 | ● +0 |
-| Ranger | −1 | −2 | −2 | ● +0 | −2 |
-| Barbarian | −1 | −2 | −2 | −2 | ● +0 |
+| Ranger | ● +1 | ● +0 | ● +1 | ● +0 | ● +0 |
+| Barbarian | ● +1 | ● +0 | ● +0 | ● +0 | ● +0 |
 
-**Read:** Human runs 5 of 6 classic cores full but tight (breadth, no headroom). Each specialist owns its
-lane with room — Elf the INT cores, Dwarf the Warden, Halfling the Ranger. **Half-Giant is Barbarian's
-home** — the one race that clears its full kit, and clears it EXACTLY (zero headroom, the tightest fit in
-the game); every other race falls 1-2 STR short and triages one small item via the §6e cascade.
-(Corrected 2026-07-05 against Doug's balance spreadsheet — this row previously read −6/−7/−7/−7/−5 from a hand-
-math error that overstated Barbarian's STR demand as 15 instead of 10; see CORE_RUNES.md's Barbarian
-note for the full reconciliation.)
+**Read (2026-07-12 — every core's kit got a bit cheaper or gained a spare item that redistributed its
+demand): every race now clears every core's full default kit**, several exactly at +0 headroom (tight,
+no slack) but NONE short. This retires the earlier "only Half-Giant clears Barbarian, only Halfling
+clears Ranger" framing entirely — it wasn't a rounding difference, the demand genuinely dropped (e.g.
+Barbarian's Bind→Brace swap alone cuts 2 STR). The §6e disable cascade (armor sheds before weapons)
+still exists as a general rule for when damage/debuffs shrink a pool mid-run — it just doesn't trigger
+on any race's healthy default kit anymore.
+
+**2026-07-05 numbers (superseded above, kept for history):** Grunt STR 5 · CON 2 · Warden CON 10 ·
+Adept INT 10 · Summoner INT 8 · Reaver DEX 9 · Ranger DEX 10 · CON 2 · Barbarian STR 10 · CON 2, with
+Barbarian showing Half-Giant as the sole exact fit and every other race short 1-2 STR. That table was
+internally correct for the kits as they stood then — the kits themselves changed 2026-07-12, not the
+arithmetic.
 
 ## Open / TBD
 - Current in-code values (Human 3/3/3/3-era placeholders) need updating; **Dwarf, Halfling + Half-Giant are
