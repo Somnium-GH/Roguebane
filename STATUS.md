@@ -1,3 +1,94 @@
+## ‼ TOP PRIORITY (2026-07-12, Doug) — 3 bugs + 1 LHS guardrail note, root-caused by static read (no
+## build here) — two have precise, confirmed fixes; one needs a quick live confirm before guessing further
+### 1. Arm/leg offensive targeting always resolves to the SAME limb regardless of which one is clicked
+**Root cause confirmed, `Roguebane.Game\Game1.cs`.** `FigureHitTest.StatAt` (`Layout/FigureHitTest.cs`)
+only returns WHICH STAT was clicked (`Stat.Str`, `Stat.Dex`, ...) — it collapses armL/armR (both STR)
+and legL/legR (both DEX) into the same result, discarding which physical limb the cursor was actually
+over. `FoePartAt` (`Game1.cs:865-873`) then does `foe.Frame.Parts.FirstOrDefault(bp => bp.Stat ==
+stat)` — always the FIRST matching part, so aiming at either arm (or either leg) always resolves to the
+same one. This is why it "seems to only target both at once" — whichever limb you click, the same part
+takes the hit.
+The fix already exists ONE method away and just isn't wired to input: `FoeAimedPartScreenRect`
+(`Game1.cs:836-859`, its own comment cites "Doug item 3") already solves this exact problem for
+RENDERING the aim reticle on a specific limb, using `FigureBinding.PairIndexOf(name)` to disambiguate
+armL(0)/armR(1). Apply the same idea in the INPUT direction:
+1. `FigureHitTest.StatAt` needs to also report the PAIR INDEX of the visual part it hit (not just the
+   Stat) — e.g. change its return to `(Stat Stat, int PairIndex)?` (or an `out int pairIndex` param),
+   setting `PairIndex = FigureBinding.PairIndexOf(name)` (−1 for unpaired parts) at the same point it
+   currently sets `hit = stat`.
+2. `FoePartAt` then picks the specific part: `foe.Frame.Parts.Where(bp => bp.Stat == stat).ToList()`,
+   and if `pairIndex >= 0 && group.Count > 1`, index into `group` by the position whose visual PairIndex
+   matches (same matching idea as `FoeAimedPartScreenRect`'s `vi != idx` skip) — else (unpaired) return
+   `group.FirstOrDefault()` as today.
+3. `FigureHitTestTests.cs`'s two existing tests only assert `stat == Stat.Str` (never check WHICH arm) —
+   safe to extend, not break: update their call sites for the new return shape, and add a case per test
+   that specifically probes armL vs armR (and legL vs legR) and asserts they resolve to DIFFERENT pair
+   indices/parts.
+
+### 2. Attribute pool RHS ("total") never shows the right number — manifest/renderer bind-name mismatch
+**Root cause confirmed** (same bug CLASS as this session's earlier colorBind/fill fix — a manifest bind
+string with no matching C# case, silently falling back to `wp.Sample`'s static placeholder text,
+`Game1.ManifestRenderer.cs:1474`). `layout.json`'s `poolRow` and `attrBar` templates both author the
+RHS text part as `binds: "pool.attr.total"` / `binds: "attrs.total"` (and `colorBind:
+"pool.attr.totalColor"` / `"attrs.totalColor"`) — but `ResolveBind`'s `AttrRow` switch
+(`Game1.ManifestRenderer.cs:1782-1792`) only recognizes `attrs.alloc`/`pool.attr.alloc`, which NOTHING
+in `layout.json` actually binds to (grepped the whole manifest — zero hits). `attrs.total` falls through
+to `_ => null` every time, so the RHS is permanently stuck on its authored sample text — never updates,
+exactly "never reads the correct total."
+**Fix:**
+1. In the `AttrRow ab => bind switch` block, replace the dead `"attrs.alloc" or "pool.attr.alloc"` case
+   with `"attrs.total" or "pool.attr.total" => (ab.Capacity + ab.Damaged).ToString(),` — NOT
+   `ab.Capacity` alone. Reasoning: the pip bar (`PoolCells`, same file, line ~1334) is explicitly
+   "authored to MAX (undamaged) capacity, so Capacity+Damaged cells total" — the RHS text should match
+   the pip bar's own total cell count for internal consistency (current/max, where max doesn't shrink
+   with damage — only its COLOR flags that some of it is presently unavailable). `ab.Capacity` alone is
+   already damage-reduced (see `Body.Capacity()`'s doc comment), so binding RHS to bare `Capacity` would
+   make the number shrink AND rely on color to flag damage — redundant/wrong per the "flag-coloured ONLY
+   when damaged" design intent (implies the number itself stays at max).
+2. Add the missing `ResolveColorToken` case: `"attrs.totalColor" or "pool.attr.totalColor" when datum is
+   AttrRow ar => ar.Damaged > 0 ? "damage" : null,` — `"damage"` is the same token already used for the
+   pip bar's damaged-zone cells (line ~1339), keep it consistent rather than inventing a new one.
+3. This is a clean rename (dead `alloc` → live `total`), not an addition alongside it — per `CLAUDE.md`
+   hygiene, don't keep `attrs.alloc` around as an unused alias.
+   **✅ BUILT + RB_SMOKE-CONFIRMED (2026-07-12, loop).** Applied all 3 exactly: dead `attrs.alloc`/
+   `pool.attr.alloc` case → `attrs.total`/`pool.attr.total => (ab.Capacity + ab.Damaged)` (max, so the
+   number matches the pip bar's cell count); added `ResolveColorToken` case `attrs.totalColor`/
+   `pool.attr.totalColor when datum is AttrRow ar => ar.Damaged > 0 ? "damage" : null`. Verified against
+   pre-fix: the RHS totals were ALL stuck on the sample "6"; the post-fix `RB_SCREEN=encounter` shot now
+   shows live per-stat maxes (STR 3/5, INT 5/8, DEX 5/5, CON 4/7). Game builds 0/0. (Bug 1 arm/leg
+   targeting + bug 3 healing-never-fires still OPEN.)
+
+### 3. Healing techniques (Bandage/Suture/Sacrifice/Siphon's lifesteal) reach READY but never seem to fire
+**Traced thoroughly, core logic reads correct on paper — flagging the ambiguity rather than guessing a
+fix blind (no build/test capability here to verify either way).** `Caster.cs`'s full path for a
+Self-side Heals technique: `CardPress` toggles it on (`Activate(technique, auto: true)`) → `Step()`
+counts its cooldown down and auto-`Discharge()`s once ready (`run.Auto` defaults true, no aim needed for
+this branch) → `Discharge`'s `if (run.Tech.Heals)` block resolves `_self.MostDamagedPart()` directly and
+repairs it, fully automatically, no `run.Aimed`/`run.Part` involved at all. **There is no click-a-
+friendly-part interaction anywhere in the codebase** — `CombatTargeting.CardPress` explicitly no-ops a
+second press on an active Self-side technique (`t.Side == TargetSide.Self`, by design: "nothing to
+aim"), and nothing in `Game1.cs` routes a click on the PLAYER's own figure to any targeting call (only
+`FoeRect()`/foe clicks reach `FoePress`).
+**Two different bugs would look identical from the outside — need to know which one Doug's hitting:**
+(a) genuinely nothing heals even though the technique is active+READY (a real regression somewhere I
+haven't isolated by reading alone), or (b) the technique IS auto-healing correctly, but Doug is trying
+to click his own damaged parts expecting to CHOOSE which one heals (an interaction that was never built
+— auto-picks most-damaged only, no player choice). **Needs a quick live check before building anything:**
+toggle Bandage on with a damaged part, watch a few seconds — does the part actually mend? If yes, this
+is (b), a documented-but-maybe-surprising design gap (worth asking Doug if hand-picking the healed part
+is something he actually wants — that would be new, real scope: extend `CombatTargeting`/`Discharge` to
+accept a self-aimed part). If no, it's (a), and the next place to add logging/breakpoints is
+`Discharge`'s `Heals` branch and `_self.MostDamagedPart()` in `Body.cs`.
+
+### Guardrail, not a new bug: LHS ("available") formula — Doug flagged it should include all reserved
+It already does, in the one path traced — confirming rather than guessing at a second bug: `attrs.
+available`/`pool.attr.available` (`Game1.ManifestRenderer.cs:1786`) computes `Capacity - GearReserved -
+TechReserved` (both terms), and `Body.Available(stat)` (`Body.cs:105`) is the same:
+`Capacity(stat) - Reserved(stat)` where `Reserved = TechReserved + GearReserved`. **When building the
+RHS fix above, do not touch this line or its formula** — if Doug is still seeing the LHS read wrong
+after the RHS fix lands, that's a different, not-yet-found bug and needs a fresh live repro (which
+screen, which stat, what sequence of actions) rather than another guess.
+
 ## ‼ TOP PRIORITY (2026-07-12, Doug) — `cores.json` RECONCILED against `Roguebane_Balance (14).xlsx`;
 ## kit contents changed for 5 of 7 cores; supersedes some math already locked earlier in this file
 Doug: "The json does not match the spreadsheet." Correct — the JSON in the entry below this one was

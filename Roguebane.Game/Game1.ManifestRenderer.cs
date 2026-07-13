@@ -1683,6 +1683,10 @@ public partial class Game1
         "core.accent" when datum is Roguebane.Core.CoreRune c =>
             c.Accent is { Length: > 0 } ca ? ca : null,
         "attr.color" when datum is not null => ResolveBind(datum, "attr.color"),
+        // RHS total tints "damage" red only while a part is broken (bug 2) — same token as the pip
+        // bar's damaged-zone cells, so the number and its bar read consistently.
+        "attrs.totalColor" or "pool.attr.totalColor" when datum is AttrRow ar =>
+            ar.Damaged > 0 ? "damage" : null,
         "technique.attrColor" or "loadout.attrColor" or "invItems.attrColor" or "minion.gateColor" =>
             datum switch
             {
@@ -1784,7 +1788,11 @@ public partial class Game1
             "attrs.key" or "pool.attr.key" => ab.Key,
             "attrs.part" or "pool.attr.part" => ab.Part,
             "attrs.available" or "pool.attr.available" => (ab.Capacity - ab.GearReserved - ab.TechReserved).ToString(),
-            "attrs.alloc" or "pool.attr.alloc" => ab.Capacity.ToString(),
+            // RHS "total" = MAX (undamaged) pool: Capacity is already damage-reduced (Body.Capacity),
+            // so add Damaged back so the number matches the pip bar's own max cell count and only its
+            // COLOR flags that some is presently unavailable (bug 2 — the manifest binds attrs.total /
+            // pool.attr.total, which had no case and fell through to the sample text). Dead alloc removed.
+            "attrs.total" or "pool.attr.total" => (ab.Capacity + ab.Damaged).ToString(),
             "attrs.damaged" or "pool.attr.damaged" => ab.Damaged.ToString(),
             "attrs.gearReserved" or "pool.attr.gearReserved" => ab.GearReserved.ToString(),
             "attrs.techReserved" or "pool.attr.techReserved" => ab.TechReserved.ToString(),
