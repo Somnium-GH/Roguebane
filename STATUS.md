@@ -305,6 +305,20 @@ per point of DEX` — Doug is deliberately reusing this convention, not inventin
 **All placeholder numbers per Doug's own framing — build for real, not a stub, but the 30s/2% are
 explicitly tunable later, not a final balance pass.**
 
+**✅ BUILT — FORMULA + WIRING (2026-07-12, loop); gating + Cleared-ticking flagged open.** New pure
+`RetreatTimer` (Core): `EffectiveTicks(dex) = round(300 * (1 - min(HasteCap, dex*HasteRate)/100))`,
+`Progress(dex, elapsed)` 0..1, `Ready(...)`. Reuses the EXACT haste convention — made `Caster.HasteRate`/
+`HasteCap` public (single source, not a new cap). `Expedition`: `_arrivalTicks` resets to 0 in `Enter`
+(on arrival → Fighting, NOT on clear), increments each `Tick`; exposed `RetreatProgress` (0..1 for the
+UI fill-bar) + `RetreatReady`. Tests `RetreatTimerTests`: base 300, 2%/DEX table, HasteCap saturation,
+0..1 clamp, + an integration test (arrival=0, fills while fighting). 553 green.
+**⚠ OPEN WIRING (not guessed):** (a) `_arrivalTicks` only advances during Fighting because the shell
+drives `Tick` only then — if a fight clears before the timer fills it freezes at Cleared; making it tick
+through Cleared needs a shell-loop change. (b) `Retreat()`/`Redeploy()` are NOT yet gated on
+`RetreatReady` — deferred until CD builds the button's progress surface (the outbox item below) so
+behavior doesn't change with no on-screen indicator. (c) Whether Retreat (mid-fight) and Redeploy
+(post-clear) share this one timer, or each has its own, is undecided — flagging, not picking.
+
 **CD outbox item needed (writing it now, in the same pass):** the Retreat/Redeploy button currently has
 no progress-UX authored — needs a fill-bar (or radial, or numeric countdown, CD's call on treatment)
 showing progress toward availability, gated so it doesn't show at all once the button is already
@@ -329,6 +343,19 @@ the arm then mends — impossible without the retry. 546 green, no regression ac
 **Part 2 (heal-priority trigger rule) still OPEN** — next: prefer an off-cooldown `Heals:true` technique
 over attacking when a part is disabled OR HP <=75%, with CON parts weighted urgent. (Doug's "25%"
 reading flagged as HP<=75%, not <=25% remaining — one-line change if he meant the latter.)
+**⇒ NEEDS DOUG before building — 3 forks the current model exposes (loop investigated `Caster`/`Battle`
+2026-07-12):** (1) **"prefer heal over ATTACKING" has no clean hook today.** Foe attacks and heals fire
+on INDEPENDENT cooldowns via `Caster.Step()` — a foe already attacks AND heals in parallel; there's no
+single action-selection gate to make it heal *instead of* attacking. Does Doug want a new gate that
+SUPPRESSES foe attack discharges while a heal is pending, or is the current parallel firing fine (Part 2
+then reduces to just the trigger + CON-targeting)? (2) **Trigger threshold is MORE restrictive than
+today.** A `Heals:true` tech already holds until wounded and fires on ANY damage (`Discharge`,
+`MostDamagedPart`) — gating it behind "part disabled OR HP<=75%" would make foes heal LESS than now.
+Confirm that's intended vs the current always-heal-when-hurt. (3) **CON-weighted targeting: foe-only or
+universal?** `MostDamagedPart` is SHARED by player and foe heal paths (`Caster.cs:409` & `:481`), so
+weighting CON there changes PLAYER heal targeting too. Item 6 is scoped "foes", but the CON-cascade
+rationale is universal. Pick one before it ships. Building any of these blind risks changing player
+balance or inventing an AI mechanic — flagged per CLAUDE.md, not guessed.
 
 **Part 2 — the actual heal-priority decision rule, Doug's exact words: "it should see any damage that
 either has removed or disabled something or 25% but it should always try to heal CON hard. Full

@@ -20,8 +20,11 @@ public sealed class Caster
         // damage has shifted that room) could free/check the WRONG stat and leak the real reservation.
     }
 
-    private const int HasteRate = 2; // % cooldown reduction per point of DEX (action speed)
-    private const int HasteCap = 28; // ...capped so haste stays non-OP near 20 DEX
+    // The shared DEX action-speed convention: % faster per DEX point, capped. Public because the
+    // Retreat/Redeploy timer (RetreatTimer, item 5) reuses these EXACT numbers rather than inventing
+    // its own cap/rate (Doug 2026-07-12) — one source keeps the two in lockstep.
+    public const int HasteRate = 2; // % cooldown reduction per point of DEX (action speed)
+    public const int HasteCap = 28; // ...capped so haste stays non-OP near 20 DEX
 
     private readonly Body _self;
     private Rng? _rng; // chance effects (evasion); set by Battle so a fight is reproducible

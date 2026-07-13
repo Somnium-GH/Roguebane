@@ -22,6 +22,7 @@ public sealed class Expedition
     private readonly List<Technique> _equipment;
     private readonly Stash _stash;
     private readonly int _leg; // folded into Seed() so a merchant/encounter/heal/stock roll differs leg to leg
+    private int _arrivalTicks; // ticks since arriving at the current fight node -> RetreatTimer progress (item 5)
     // §12 gear stock: rolled ONCE per merchant node from its seed (reproducible), purchases consume
     // it. Techniques/minions/runes are OFFERED but not yet buyable — their receiving models (mid-run
     // palette/minion/rune mutation) are the design-open gate.
@@ -268,6 +269,13 @@ public sealed class Expedition
     // own terrain off its stable per-node seed, so it's fixed for the whole run. Keeps `Seed` private.
     public string CurrentScene => Map.Current.Scene(Seed(Map.Current.Id));
 
+    // Retreat/Redeploy availability timer (item 5): 0..1 fill toward the button unlocking, DEX-sped.
+    // Reads off ticks-since-arrival at the current node. The UI draws this fraction; the actual gating
+    // of Retreat()/Redeploy() on RetreatReady is deferred until CD builds the button's progress surface
+    // (STATUS-flagged) so behavior doesn't change under players with no on-screen indicator yet.
+    public double RetreatProgress => RetreatTimer.Progress(_player.Body.Capacity(Stat.Dex), _arrivalTicks);
+    public bool RetreatReady => RetreatTimer.Ready(_player.Body.Capacity(Stat.Dex), _arrivalTicks);
+
     // §12 merchant healing: a 1-HP buy at the per-HP price, and a FULL repair at a premium (placeholder
     // +1 gold per missing HP — tune with the rest of the economy). HP only, out of combat (§10).
     public bool BuyHeal()
@@ -400,6 +408,7 @@ public sealed class Expedition
         var isFirstEncounter = Battle is null;
         Battle = new Battle(_caster, Maps.EncounterFor(node, Map.SupportBank, Seed(node.Id)), _player, Seed(node.Id));
         State = ExpeditionState.Fighting;
+        _arrivalTicks = 0; // Retreat/Redeploy timer (item 5) starts on ARRIVAL, per Doug — not on node-clear
         if (!isFirstEncounter) _caster.RearmForEncounter(); // §17 default-activation-state LOCK: no free carry-over charge
         _caster.ApplyEncounterDefaults(_equipment); // 2026-07-09 LOCKED: Sustained auto-powers every encounter, Timered stays cold
         return true;
@@ -420,6 +429,11 @@ public sealed class Expedition
     public void Tick()
     {
         if (State != ExpeditionState.Fighting || Battle is null) return;
+        _arrivalTicks++; // item 5: fill the Retreat/Redeploy timer while at the node
+        // NOTE (open wiring, flagged in STATUS): this only advances during Fighting because the shell
+        // drives Tick only in that state. If a fight is cleared before the timer fills, it currently
+        // freezes at Cleared — making it tick through Cleared too needs a shell-loop change + a decision
+        // on whether Retreat (mid-fight) and Redeploy (post-clear) share this one timer.
 
         Battle.Step();
         switch (Battle.Outcome)
