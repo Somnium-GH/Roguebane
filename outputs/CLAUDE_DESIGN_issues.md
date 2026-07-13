@@ -20,16 +20,26 @@ somewhere to draw it.
 ### core-kits.js → fetch shared cores.json (NEW, 2026-07-12 Doug, LOCKED architecture)
 Race stats + core budget/actions/minionCap/statBonus/CoreEffect/starting-kit are moving out of three
 hand-maintained copies (your `core-kits.js`, our `CoreRunes.cs`, `CORE_RUNES.md`) into one shared
-`design/systems/cores.json` — the fix for the drift this session kept catching. Once
-`design/systems/cores.json` lands (engine-side, tracked in `STATUS.md`), switch `core-kits.js`'s
-per-core `budget`/`effect`/`gear`/`techniques`/`bayCap` fields to a `fetch()` of that file at module
-load, instead of hand-typed object literals. Keep display-only fields as-is — accent hex, blurb,
-scenario copy, figure key, `finds` — none of that is in the JSON's scope. We'll ping you with the
-exact shape when it lands; no action needed yet.
+`design/systems/cores.json` — the fix for the drift this session kept catching. The file is now
+authored (`design/systems/cores.json`, engine-side loader tracked in `STATUS.md`) — once the loader
+lands, switch `core-kits.js`'s per-core `budget`/`effect`/`gear`/`techniques`/`bayCap` fields to a
+`fetch()` of that file at module load, instead of hand-typed object literals. Keep pure-display fields
+as-is — accent hex, scenario copy, figure key, `finds` — none of that is in the JSON's scope. We'll
+ping you when the loader's built and the shape is final.
 (`core-kits.js` currently carries a Cowork hand-patch to Adept's weapon/techniques and Summoner's full
 kit, applied 2026-07-12 to unblock testing ahead of this round-trip — if your pipeline regenerates the
-file from a different source before `cores.json` lands, diff against the live file first so you don't
-revert it.)
+file from a different source before the fetch switch lands, diff against the live file first so you
+don't revert it.)
+
+Two small things the id/copy audit for this turned up, worth fixing whenever you touch this file next:
+- Your `T` catalog's `aimedshot` key (no underscore) should become `aimed_shot` — that's Core's actual
+  technique id (`Technique.Id`, confirmed in test) and once `cores.json` references techniques by id,
+  a mismatched key here would silently break the Ranger kit's lookup.
+- Your `RACES` object's `blurb`/`tag` fields have drifted from `Race.cs`'s copy, which is the CANON
+  text (its own comment: "Copy is CANON per design/05 v2, drop #17, 2026-07-03") — all 5 races differ
+  (e.g. your Elf tag is "THE KEEN", canon is "THE DEEP MINDED"). This resolves itself once `RACES` is
+  fetched from `cores.json` instead of hand-typed, so no standalone fix needed — just flagging so it's
+  not a surprise when the fetch switch changes visible copy.
 
 ### Figure + Gear Asset Regen Batch (B2-GO)
 Bow sprites already shipped. Still open:

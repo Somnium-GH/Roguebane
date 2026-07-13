@@ -913,16 +913,18 @@ points there so the canon stays design-focused.
 22. Ranged-weapon RENDER MOUNT (§6e): where an equipped bow/wand draws while the melee hands are full —
     assumed default: NOT drawn until a back-mount figure layer exists (fold into the figure-art regen
     batch, payload B2); do not invent art meanwhile.
-23. **LOCKED 2026-07-12 (Doug) — shared `cores.json` config, scope confirmed, implementation queued.**
+23. **LOCKED 2026-07-12 (Doug) — shared `cores.json` config, scope confirmed, file AUTHORED.**
     Race base stats + each Core Rune's budget/actions/minion-cap/stat-bonus/Core-Effect/starting-kit
     (technique/weapon/armor/minion IDs) move from three hand-maintained copies (`CoreRunes.cs` in
     C#, `core-kits.js` in CD's JS, this doc's own prose tables) into ONE JSON file both sides read —
     the exact three-way-drift problem this session kept hitting. **Explicitly OUT of scope (Doug's
     call):** the underlying mechanical catalogs — what a technique/weapon/armor piece actually DOES
     (reserve cost, damage, cooldown) — stay real C# in `Techniques.cs`/`Armory.cs`/`ArmorLines.cs`;
-    only the ASSEMBLY (which core gets which kit) moves to data. See `STATUS.md` for the implementation
-    directive (schema, file location, and the CD-sprite-id-vs-Core-weapon-id mismatch that needs
-    resolving as part of this).
+    only the ASSEMBLY (which core gets which kit) moves to data. `design/systems/cores.json` now
+    exists with real, verified values for all 5 races + 7 cores — see `STATUS.md` for the remaining
+    engineering (two `Armory.cs` id fixes so Core's ids match CD's already-shipped sprite ids, a
+    technique id-lookup gap, and the C# loader that makes `CoreRunes.cs`/`Races.cs` thin wrappers
+    around it).
 
 ## 18. DROPPED — must not resurface
 - **"Chassis" as the identity model** → split into **Race + Core rune** (§7).

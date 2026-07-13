@@ -1,0 +1,137 @@
+{
+  "races": {
+    "human":      { "str": 5, "int": 5, "dex": 5, "con": 5, "hp": 16, "title": "Human", "tag": "THE FOUNDER LINE", "blurb": "No innate edge or lack - fits any core it can afford." },
+    "elf":        { "str": 4, "int": 6, "dex": 4, "con": 4, "hp": 13, "title": "Elf", "tag": "THE DEEP MINDED", "blurb": "A keen head for spellcraft, but frail - punishes a dropped block." },
+    "dwarf":      { "str": 4, "int": 4, "dex": 4, "con": 6, "hp": 17, "title": "Dwarf", "tag": "THE UNYIELDING", "blurb": "Thick of chest and slow to fall - the line holds where a Dwarf stands." },
+    "halfling":   { "str": 4, "int": 4, "dex": 6, "con": 4, "hp": 13, "title": "Halfling", "tag": "THE QUICK STEP", "blurb": "Fast hands, faster feet - answers before the foe can." },
+    "half_giant": { "str": 6, "int": 4, "dex": 4, "con": 4, "hp": 20, "title": "Half-Giant", "tag": "THE BROKEN GROUND", "blurb": "Strength enough to carry what breaks a smaller back." }
+  },
+  "cores": {
+    "grunt": {
+      "budget": 20, "actionSlots": 4, "minionCap": 2,
+      "statBonus": { "str": 1, "int": 1, "dex": 1, "con": 1 },
+      "effect": "JackOfAllTrades",
+      "effectName": "Jack of All Trades",
+      "effectDesc": "Every attribute cost you pay is reduced by 1.",
+      "effectFreeSummons": false,
+      "archetype": "THE GENERALIST",
+      "flavor": "No edge, no hole. A fat budget of cheap runes climbs into any keystone you pay for.",
+      "badge": "STARTER",
+      "accent": "amber",
+      "kit": {
+        "techniques": ["jab", "brace", "bandage"],
+        "weapons": ["longsword_iron", "shield_wooden"],
+        "armor": ["armor_str_head_iron", "armor_str_chest_iron", "armor_str_arms_iron", "armor_str_legs_iron"],
+        "minions": []
+      }
+    },
+    "warden": {
+      "budget": 18, "actionSlots": 4, "minionCap": 1,
+      "statBonus": { "str": 0, "int": 0, "dex": 0, "con": 5 },
+      "effect": "Fortified",
+      "effectName": "Fortified",
+      "effectDesc": "Plate armor is paid in CON at 1 less per tier.",
+      "effectFreeSummons": false,
+      "archetype": "THE WALL",
+      "flavor": "Armour on every limb, no bay, fewer actions - soaks blows and holds the line.",
+      "badge": "BULWARK",
+      "accent": "gold",
+      "kit": {
+        "techniques": ["jab", "brace", "bandage"],
+        "weapons": ["longsword_iron", "shield_buckler"],
+        "armor": ["armor_str_head_iron", "armor_str_chest_iron", "armor_str_arms_iron", "armor_str_legs_iron"],
+        "minions": []
+      }
+    },
+    "adept": {
+      "budget": 16, "actionSlots": 4, "minionCap": 1,
+      "statBonus": { "str": 0, "int": 5, "dex": 0, "con": 0 },
+      "effect": "Resonance",
+      "effectName": "Resonance",
+      "effectDesc": "Each targeted spell that hits reduces its next charge time by 2%, stacking up to 5 times.",
+      "effectFreeSummons": false,
+      "archetype": "THE SCHOLAR",
+      "flavor": "Frail chest, one arm - but a deep INT head for spells and the widest action bar.",
+      "badge": "CASTER",
+      "accent": "int",
+      "kit": {
+        "techniques": ["ember", "siphon", "stoneskin", "jab"],
+        "weapons": ["staff_wooden"],
+        "armor": ["armor_int_chest_cotton", "armor_int_head_cotton"],
+        "minions": []
+      }
+    },
+    "summoner": {
+      "budget": 17, "actionSlots": 4, "minionCap": 3,
+      "statBonus": { "str": 0, "int": 3, "dex": 0, "con": 2 },
+      "effect": "Conscription",
+      "effectName": "Conscription",
+      "effectDesc": "Minions do not consume Summons when activated.",
+      "effectFreeSummons": true,
+      "archetype": "THE BINDER",
+      "flavor": "Three bays - fights through a war-party of summons while staying back. INT funds them all.",
+      "badge": "SPECIALIST",
+      "accent": "teal",
+      "kit": {
+        "techniques": ["ember", "blast", "sacrifice", "brace"],
+        "weapons": ["wand_adept", "shield_wooden"],
+        "armor": ["armor_int_chest_cotton", "armor_int_head_cotton"],
+        "minions": ["skeleton"]
+      }
+    },
+    "reaver": {
+      "budget": 19, "actionSlots": 4, "minionCap": 0,
+      "statBonus": { "str": 0, "int": 0, "dex": 5, "con": 0 },
+      "effect": "Finesse",
+      "effectName": "Finesse",
+      "effectDesc": "Techniques requiring two weapons cost 1 less to activate.",
+      "effectFreeSummons": false,
+      "archetype": "THE DUELIST",
+      "flavor": "No shield, twin blades. Glass-cannon STR-DEX - ends parts before they answer.",
+      "badge": "SPECIALIST",
+      "accent": "dex",
+      "kit": {
+        "techniques": ["frenzy", "flurry", "bandage"],
+        "weapons": ["dagger_iron", "dagger_iron"],
+        "armor": ["armor_dex_head_plain", "armor_dex_chest_plain", "armor_dex_arms_plain", "armor_dex_legs_plain"],
+        "minions": []
+      }
+    },
+    "ranger": {
+      "budget": 18, "actionSlots": 4, "minionCap": 2,
+      "statBonus": { "str": 0, "int": 0, "dex": 4, "con": 1 },
+      "effect": "FletcherLuck",
+      "effectName": "Fletcher's Luck",
+      "effectDesc": "Bow techniques have a 20% chance to consume no charge when fired, and bows cost 1 less per tier to equip.",
+      "effectFreeSummons": false,
+      "archetype": "THE MARKSMAN",
+      "flavor": "Strikes from range with a shield-piercing bow; high DEX, thin armour - answers first.",
+      "badge": "SPECIALIST",
+      "accent": "dex",
+      "kit": {
+        "techniques": ["aimed_shot", "lunge", "bandage"],
+        "weapons": ["dagger_iron", "bow_short"],
+        "armor": ["armor_dex_head_plain", "armor_dex_chest_plain", "armor_dex_arms_plain", "armor_dex_legs_plain"],
+        "minions": ["hound"]
+      }
+    },
+    "barbarian": {
+      "budget": 14, "actionSlots": 3, "minionCap": 1,
+      "statBonus": { "str": 4, "int": 0, "dex": 0, "con": 1 },
+      "effect": "WarlordMight",
+      "effectName": "Warlord's Might",
+      "effectDesc": "Two-handed swords cost 3 less strength to equip; STR plate costs 1 less strength per piece to equip.",
+      "effectFreeSummons": false,
+      "archetype": "THE WARLORD",
+      "flavor": "One great blade, plate on every limb - spends everything the body has on the swing.",
+      "badge": "SPECIALIST",
+      "accent": "str",
+      "kit": {
+        "techniques": ["cleave", "bind", "bandage"],
+        "weapons": ["claymore_iron"],
+        "armor": ["armor_str_head_iron", "armor_str_chest_iron", "armor_str_arms_iron", "armor_str_legs_iron"],
+        "minions": []
+      }
+    }
+  }
+}

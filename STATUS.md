@@ -1,111 +1,95 @@
-## ‼ HIGH PRIORITY / LOCKED (2026-07-12, Doug) — shared `cores.json` config: races + core kit assembly
-## move to ONE data file both Core and CD read, ending the 3-way drift this whole session kept hitting.
-## Scope CONFIRMED (Doug): races/kits only, mechanical catalogs (Techniques.cs/Armory.cs) stay C#.
-**Why:** this session found the SAME numbers drifting three separate ways (`CoreRunes.cs`, `core-kits.js`,
-`CORE_RUNES.md`) repeatedly — Adept/Summoner's balance-pass kit, now the Adept MinionCap mismatch above.
-A single source removes the class of bug, not just this instance of it.
+## ‼ TOP PRIORITY / LOCKED (2026-07-12, Doug) — `design/systems/cores.json` is AUTHORED and DONE; the
+## 3 blockers the loop's scoping pass raised are all RESOLVED below — nothing left to decide, build only
+`design/systems/cores.json` now EXISTS with real, verified values for all 5 races + all 7 cores (races +
+core budget/actions/minionCap/statBonus/CoreEffect/starting-kit — Doug's confirmed scope, mechanical
+catalogs stay in `Techniques.cs`/`Armory.cs`/`ArmorLines.cs`). Every id in it is a REAL id already present
+in the C# content classes today, EXCEPT two that require the small, precise fixes in step 1 below (both
+already worked out — apply them verbatim, they're not open questions). Read the file directly rather than
+transcribing it back into this doc — it's the source of truth now, don't let a second hand-copy drift.
 
-**Schema (`design/systems/cores.json` — sibling to `CORE_RUNES.md`, not inside `Roguebane.Content/`
-since it's design data, not a built game asset):**
-```json
-{
-  "races": {
-    "human":      { "str": 5, "int": 5, "dex": 5, "con": 5, "hp": 20 },
-    "elf":        { "str": 4, "int": 6, "dex": 4, "con": 4, "hp": 18 },
-    "dwarf":      { "str": 4, "int": 4, "dex": 4, "con": 6, "hp": 22 },
-    "halfling":   { "str": 4, "int": 4, "dex": 6, "con": 4, "hp": 18 },
-    "half_giant": { "str": 6, "int": 4, "dex": 4, "con": 4, "hp": 20 }
-  },
-  "cores": {
-    "grunt": {
-      "budget": 20, "actionSlots": 4, "minionCap": 2,
-      "statBonus": { "str": 1, "int": 1, "dex": 1, "con": 1 },
-      "effect": "JackOfAllTrades",
-      "kit": { "techniques": ["jab", "brace", "bandage"],
-               "weapons": ["<Weapon.Id for Iron Longsword>", "<Weapon.Id for Wooden Shield>"],
-               "armor": ["<4 Iron Plate Armor.Id strings>"], "minions": [] }
-    }
-    /* ...remaining 6 cores, same shape... */
-  }
-}
+**Answering the loop's 3 blockers (all resolved, none are "needs Doug"):**
+1. *`Techniques.All` incomplete* — not a design question, an id-lookup gap (step 2 below fixes it: a new
+   `Techniques.Full` list + the loader also pulling `Armory`'s combat verbs). `.All`'s curated "default
+   palette" role is untouched.
+2. *Race HP mismatch* — the JSON uses the CURRENT LIVE `Races.cs` values (human16/elf13/dwarf17/
+   halfling13/half_giant20) verbatim, not the stale `10 + 2×CON` numbers from `core-kits.js`'s header
+   comment. HP is explicitly flagged `Open/TBD` in `RACES.md` ("final numbers await Doug's tune") — the
+   non-invented, zero-risk move is to carry forward exactly what's live today (so landing this JSON
+   changes ZERO actual game behavior) and separately flag the stale comment for whenever Doug's real HP
+   pass happens (see the small CD/doc note at the bottom of this item — not blocking).
+3. *Summoner target unpinned* — it isn't: `CORE_RUNES.md`'s own "Default loadouts" section already
+   fully specifies it (Ember/Blast/Sacrifice/Brace, Adept Wand + Wooden Shield, Cotton Robe + Cloth Cap,
+   Skeleton only, budget 17, +3 INT/+2 CON) — that's what's in the JSON. One number needed deriving, not
+   guessing: `actionSlots` is **4**, not the Layout-numbers table's stale **3** — a kit of 4 techniques
+   cannot fit a 3-slot bar (every other core's `actionSlots` ≥ its kit size; this is the only value
+   consistent with the rest of the same doc, and matches the already-hand-patched `core-kits.js`'s
+   `techCap: 4`). `CORE_RUNES.md`'s Layout-numbers table row for Summoner needs its Actions cell 3→4 as
+   part of this same pass — one-line doc fix, not a design call.
+
+**Step 1 — two small `Armory.cs` id fixes (exact code, apply verbatim, both confirmed by the audit
+below — this is why `core-kits.js`'s ids didn't match Core's generated ones for exactly these two
+weapons and no others):**
+
+*Bows* (`Armory.cs` line 52-55) — today `t == 1 ? "bow" : "bow-" + t` generates `bow`, `bow-2`, `bow-3`,
+`bow-4`, which matches NOTHING (not even internally consistent — tier 1 has no suffix at all). CD's bow
+sprites already shipped as `bow_{short,long,compound,elven}` (Confirm-to-Close B11, landed) and
+`core-kits.js` already samples `'bow_short'`/`'bow_long'`. Replace with:
+```csharp
+public static readonly IReadOnlyList<Weapon> Bows = Enumerable.Range(1, 4).Select(t => new Weapon(
+    "bow_" + new[] { "short", "long", "compound", "elven" }[t - 1], Stat.Dex, 2 * t, Power: 2 /* PLACEHOLDER §17 #9 */,
+    new[] { "Short Bow", "Long Bow", "Compound Bow", "Elven Bow" }[t - 1],
+    t, 1.0, Hands: 2, WeaponKind.Bow)).ToArray();
 ```
-(Verify exact numbers against `CoreRunes.cs`'s CURRENT values — Adept's `minionCap` should already be
-the fixed `1` from the item right above this one; Summoner's `kit` should be the TARGET Blast/Brace/
-Wooden-Shield/Skeleton-only kit even though `CoreRunes.cs` hasn't caught up yet — this JSON becomes the
-new source of truth, so author it correct and let the loader make `CoreRunes.cs`'s old hardcoded values
-moot rather than matching them.)
+*Shields* (`Armory.cs` line 85-86) — today built via the generic `Named()` helper, which extracts "the
+word before the last space" as the tier token; that works for Wooden/Kite/Tower (`shield_wooden`,
+`shield_kite`, `shield_tower`) but misfires on tier 2 "Iron Buckler" → `shield_iron` (CD's landed sprite
+id is `shield_buckler`). Give Shields its own explicit id array instead of relying on `Named()`:
+```csharp
+public static readonly IReadOnlyList<Weapon> Shields = Enumerable.Range(1, 4).Select(t => new Weapon(
+    "shield_" + new[] { "wooden", "buckler", "kite", "tower" }[t - 1], Stat.Con, t, Power: 0,
+    new[] { "Wooden Shield", "Iron Buckler", "Kite Shield", "Tower Shield" }[t - 1],
+    t, 1.0, Hands: 1, WeaponKind.Shield)).ToArray();
+```
+*Test pins that need updating in the same commit (grepped, this is the full list):*
+- `Roguebane.Core.Tests/StartingKitTests.cs:29` — `w.Id == "shield_iron"` → `"shield_buckler"`.
+- `Roguebane.Core.Tests/StartingKitTests.cs:66` — `body.Ranged?.Id == "bow"` → `"bow_short"`.
+- `Roguebane.Core.Tests/BowTests.cs:50` — `exp.Player.Body.Ranged?.Id == "bow"` → `"bow_short"`.
+- `Roguebane.Core.Tests/BodyTests.cs:142` constructs its own inline `new Weapon("bow", ...)` test double
+  (not reading the catalog) — harmless as-is, leave it, just noting it's not a false hit.
+- `BowTests.cs:51` already asserts `t.Id == "aimed_shot"` — confirms Core's canonical technique id is
+  already correct; only `core-kits.js`'s OWN internal dict key (`'aimedshot'`, no underscore) needs
+  renaming, which is a CD outbox ask, not a C# change (queued separately).
 
-**‼ Real gap found while scoping this, needs resolving as part of the work, not after:** weapon/armor
-IDs are NOT unified today. `Armory.cs`'s `Named()` helper derives a weapon's `Id` from its display name
-(e.g. "Iron Buckler" → `shield_iron`, NOT `shield_buckler`) — but `core-kits.js`'s hand-authored ids use
-a DIFFERENT scheme for the same items (its own comment: "Ids follow the CD gear-catalog SPRITE
-convention"), and `shield_buckler` (JS) vs `shield_iron` (C#) for the same Iron Buckler is a real,
-already-existing divergence, not something this JSON introduces. **Before authoring the `kit.weapons`/
-`kit.armor` arrays, pick ONE id scheme both sides use** — recommend Core's own generated `Weapon.Id`/
-`Armor.Id` (already the mechanically authoritative one, and CD's sprite paths already need to resolve
-`sprites/gear/{id}` somehow, so reconciling toward Core's ids is probably less total churn than the
-reverse). Dump the actual generated ids via a quick throwaway `Console.WriteLine(string.Join(",",
-Armory.AllWeapons.Select(w => w.Id)))`-style check rather than hand-deriving them from the `Named()`
-lambda by eye — cheap insurance against a transcription bug in a file meant to stop exactly that class
-of error.
+**Step 2 — technique id-lookup gap:** add to `Techniques.cs` (does not touch or replace `.All`, which
+stays the curated default-palette list):
+```csharp
+public static readonly IReadOnlyList<Technique> Full =
+    new[] { Jab, Blast, Cleave, Lunge, Ember, Siphon, Brace, Steel, Barkskin, Stoneskin, Bind, Parry,
+             Bandage, Suture, Sacrifice }; // superset of .All for id-lookup (e.g. the cores.json loader)
+```
+The loader (step 3) builds its technique dictionary from `Techniques.Full.Concat(new Technique[] {
+Armory.Swing, Armory.Frenzy, Armory.Flurry, Armory.Shot, Armory.AimedShot })` — that covers every
+technique id referenced anywhere in `cores.json` (verified: `jab,brace,bandage,ember,siphon,stoneskin,
+sacrifice,frenzy,flurry,aimed_shot,cleave,lunge,bind,blast` — all 14 present across those two sources).
 
-**C# loader (Core side):** add a `CoreRuneCatalog.Load(string path)` (or embed the JSON as a compiled
-resource via the `.csproj` — no runtime file-path fragility, still swappable in dev) that deserializes
-into `Race`/`CoreRune` records via `System.Text.Json`, resolving `kit.techniques`/`weapons`/`armor`/
-`minions` id strings against `Techniques.All`/`Armory.AllWeapons`/`ArmorLines.All` (or equivalent
-lookup-by-id, add one if it doesn't exist)/`Minions.All` — throw loudly on an unresolvable id rather than
-silently dropping a kit item. `Content.Races`/`Content.CoreRunes`'s static fields become thin wrappers
-around the loaded catalog (`public static readonly Race Human = Catalog.Races["human"];` etc.) so
-every existing call site (`Races.Human`, `CoreRunes.Grunt`, `CoreRunes.Roster`) keeps compiling
-unchanged — this should be a content-loading change, not a call-site rewrite.
+**Step 3 — C# loader:** `CoreRuneCatalog.Load(string path)` (or embed `cores.json` as a compiled
+resource via the `.csproj` — no runtime file-path fragility, still swappable in dev), deserialize via
+`System.Text.Json` into `Race`/`CoreRune` records, resolving `kit.techniques` against step 2's combined
+dictionary, `kit.weapons` against `Armory.AllWeapons.ToDictionary(w => w.Id)`, `kit.armor` against
+`ArmorLines.All.ToDictionary(a => a.Id)`, `kit.minions` against `Minions.All.ToDictionary(m => m.Id)` —
+throw loudly on an unresolvable id. `Content.Races`/`Content.CoreRunes`'s static fields become thin
+wrappers around the loaded catalog (`public static readonly Race Human = Catalog.Races["human"];` etc.)
+so every existing call site (`Races.Human`, `CoreRunes.Grunt`, `CoreRunes.Roster`) keeps compiling
+unchanged — a content-loading change, not a call-site rewrite. New tests pin the loader itself (schema
+parses, every id resolves, the RESOLVED `CoreRune`/`Race` objects match the values checked into
+`cores.json` — unlike CD's `layout.json`, this file IS our own design data, so pinning its literal
+values is the point, not the thing `CLAUDE.md` warns against).
 
-**CD outbox item needed (writing it now):** `core-kits.js`'s per-core `budget`/`effect`/`gear`/
-`techniques`/`bayCap` fields should be POPULATED from `cores.json` (a `fetch()` at module load,
-matching how it already `import()`s dynamically) rather than hand-typed — keep `core-kits.js`'s own
-DISPLAY-only fields (accent hex, blurb, scenario, figure key, `finds`) as-is, those aren't drifting and
-aren't part of this JSON's scope.
-
-### ⇒ SCOPING PASS (2026-07-12, loop) — dumped the authoritative ids; 3 blockers surfaced BEFORE authoring
-Ran a throwaway that dumped every generated id + each core's RESOLVED kit straight from `CoreRunes.Roster`
-(not hand-derived — Doug's own instruction). Deleted after. Results, and why the JSON isn't authored yet:
-
-**Id scheme LOCKED = Core's generated ids** (per Doug's rec). Authoritative kit ids per core (verified,
-ready to transcribe once the blockers below clear):
-- **grunt** budget20 slots4 cap2 JackOfAllTrades · str1/int1/dex1/con1 · tech `jab,brace,bandage` ·
-  wpn `longsword_iron,shield_wooden` · armor `armor_str_{head,chest,arms,legs}_iron` · minions —
-- **warden** 18/4/1 Fortified · con5 · `jab,brace,bandage` · `longsword_iron,shield_iron` · str-plate ·  —
-- **adept** 16/4/1 Resonance · int5 · `ember,siphon,stoneskin,jab` · `staff_wooden` ·
-  `armor_int_chest_cotton,armor_int_head_cotton` · —  (MinionCap now 1, from the fix above)
-- **summoner** 17/3/3 Conscription · int3/con2 · `ember,sacrifice,barkskin` · `wand_adept,charm_wooden` ·
-  int-robe · `skeleton,iron_golem`  ← **CURRENT, not the target** (see blocker 3)
-- **reaver** 19/4/0 Finesse · dex5 · `frenzy,flurry,bandage` · `dagger_iron,dagger_iron` · dex-leather · —
-- **ranger** 18/4/2 FletcherLuck · dex4/con1 · `aimed_shot,lunge,bandage` · `dagger_iron,bow` ·
-  dex-leather · `hound`
-- **barbarian** 14/3/1 WarlordMight · str4/con1 · `cleave,bind,bandage` · `claymore_iron` · str-plate · —
-- Gear id note: the divergence Doug flagged is real — Iron Buckler = Core `shield_iron` (TIER 2),
-  Wooden Shield = `shield_wooden` (tier 1); core-kits.js's `shield_buckler` must migrate to Core ids
-  (that's the CD-outbox migration, above).
-
-**‼ 3 BLOCKERS — cores.json NOT authored yet (would bake wrong values into the source-of-truth file):**
-1. **`Techniques.All` is INCOMPLETE — loader would throw.** It lists only 8 (`jab,cleave,lunge,ember,
-   siphon,brace,bandage,blast`), but cores reference `stoneskin,sacrifice,barkskin,frenzy,flurry,
-   aimed_shot,bind` — which exist as `Technique` objects (the kits resolve) but are absent from `.All`.
-   Doug's loader resolves `kit.techniques` against `Techniques.All` and "throws loudly on an unresolvable
-   id" → it would throw on 7 real techniques. **FIX FIRST (Needs decision):** complete `Techniques.All`
-   (safest — audit callers that may assume 8), or resolve against a fuller lookup. Bounded but must
-   precede the loader.
-2. **Race HP mismatch — which is canon?** Doug's schema HP (human20/elf18/dwarf22/halfling18/half_giant20)
-   ≠ current `Races.cs` (human16/elf13/dwarf17/halfling13/half_giant20). STATS match exactly; only HP
-   differs, and only half_giant agrees. Doug's schema comment says "verify against current" — reads like
-   the schema HP was illustrative/stale, but if it's an INTENDED HP rebalance that's a design change I
-   won't guess. **Needs Doug: are code HP (16/13/17/13/20) canon, or is the schema HP the new target?**
-3. **Summoner target unpinned.** Doug wants the JSON to carry Summoner's TARGET (Blast/Brace/Wooden-
-   Shield/Skeleton-only/slots4), not the current kit above — but only those 5 deltas are named; budget,
-   bonuses, and armor for the target aren't, and the Summoner rebuild still awaits Doug's spreadsheet.
-   Can't author Summoner correctly until it lands.
-
-Once 1-3 clear, authoring is pure transcription of the verified table above + the loader (`CoreRuneCatalog
-.Load`) + the thin-wrapper swap. Flagging rather than guessing, per the whole point of this JSON.
+**Non-blocking doc cleanup, same pass:** `CORE_RUNES.md`'s Layout-numbers table Summoner-Actions 3→4
+(see blocker 3 above); `core-kits.js`'s header-comment HP formula (`10 + 2×race CON`) doesn't match
+`Races.cs`'s live values or its own `RACES` object's `blurb`/`tag` text (which also drifted from
+`Races.cs`'s CANON copy — see the CD outbox item queued for this) — flag both for whenever Doug's real
+HP/copy pass happens, neither blocks this rollout.
 
 ## discrepancy found, everything else checks out clean
 Doug asked for a full pass; did a field-by-field comparison of all 7 cores across `CoreRunes.cs` (the
