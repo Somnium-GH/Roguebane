@@ -24,6 +24,14 @@ armL(0)/armR(1). Apply the same idea in the INPUT direction:
    safe to extend, not break: update their call sites for the new return shape, and add a case per test
    that specifically probes armL vs armR (and legL vs legR) and asserts they resolve to DIFFERENT pair
    indices/parts.
+   **✅ BUILT (2026-07-12, loop).** `FigureHitTest.StatAt` now returns `(Stat, int PairIndex)?`
+   (PairIndex = `FigureBinding.PairIndexOf(name)`, −1 unpaired). `FoePartAt` picks the specific limb:
+   `group = Parts.Where(Stat == hit.Stat)`, and `group[hit.PairIndex]` when paired (`PairIndex >= 0 &&
+   < group.Count && Count > 1`) — the same group-position↔pair-index convention `FoeAimedPartScreenRect`
+   uses for the reticle — else `FirstOrDefault()`. Updated the 2 existing test call sites to `?.Stat` and
+   added `ArmLAndArmRResolveToDifferentPairIndices` (probes each arm's isolable outer edge, asserts the
+   two carry the different pair indices `PairIndexOf("armL")` vs `("armR")`). 560 green; Game builds 0/0.
+   (Bug 3 healing-never-fires still OPEN — flagged for live confirm, not guessed.)
 
 ### 2. Attribute pool RHS ("total") never shows the right number — manifest/renderer bind-name mismatch
 **Root cause confirmed** (same bug CLASS as this session's earlier colorBind/fill fix — a manifest bind

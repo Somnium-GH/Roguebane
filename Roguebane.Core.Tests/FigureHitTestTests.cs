@@ -50,9 +50,9 @@ public class FigureHitTestTests
 
                 checkedAnyOverlap = true;
                 var (sx, sy) = ToScreen(fig, (overlapX0 + overlapX1) / 2, (overlapY0 + overlapY1) / 2);
-                var stat = FigureHitTest.StatAt(fig, 0, 0, fig.Size[0], fig.Size[1], sx, sy);
-                Assert.True(stat == Stat.Str,
-                    $"{name}.{armName} overlaps torso at figure-space ({(overlapX0 + overlapX1) / 2},{(overlapY0 + overlapY1) / 2}) but hit-test resolved to {stat}, not Str — Z tie-break no longer favors the arm.");
+                var hit = FigureHitTest.StatAt(fig, 0, 0, fig.Size[0], fig.Size[1], sx, sy);
+                Assert.True(hit?.Stat == Stat.Str,
+                    $"{name}.{armName} overlaps torso at figure-space ({(overlapX0 + overlapX1) / 2},{(overlapY0 + overlapY1) / 2}) but hit-test resolved to {hit?.Stat}, not Str — Z tie-break no longer favors the arm.");
             }
         }
         Assert.True(checkedAnyOverlap, "fixture has no figure with an arm/torso rect overlap to test against");
@@ -77,11 +77,49 @@ public class FigureHitTestTests
 
                 checkedAny = true;
                 var (sx, sy) = ToScreen(fig, probeFx, probeFy);
-                var stat = FigureHitTest.StatAt(fig, 0, 0, fig.Size[0], fig.Size[1], sx, sy);
-                Assert.True(stat == Stat.Str,
-                    $"{name}.{armName}'s own outer edge (figure-space {probeFx},{probeFy}) resolved to {stat}, not Str.");
+                var hit = FigureHitTest.StatAt(fig, 0, 0, fig.Size[0], fig.Size[1], sx, sy);
+                Assert.True(hit?.Stat == Stat.Str,
+                    $"{name}.{armName}'s own outer edge (figure-space {probeFx},{probeFy}) resolved to {hit?.Stat}, not Str.");
             }
         }
         Assert.True(checkedAny, "fixture has no figure with an arm rect extending outside torso to test against");
+    }
+
+    // Doug bug: aiming at either arm resolved to the SAME part (StatAt reported only the stat). Now it
+    // also reports the visual PAIR INDEX, so armL and armR are distinguishable. Probe each arm's own
+    // outer edge (unambiguously that arm) and assert they carry the two DIFFERENT pair indices.
+    [Fact]
+    public void ArmLAndArmRResolveToDifferentPairIndices()
+    {
+        var m = Real();
+        var checkedAny = false;
+        foreach (var (name, fig) in m.Figures)
+        {
+            if (!fig.Parts.TryGetValue("torso", out var torso)
+                || !fig.Parts.TryGetValue("armL", out _) || !fig.Parts.TryGetValue("armR", out _)) continue;
+
+            int? PairIndexAtOuterEdge(string armName)
+            {
+                var arm = fig.Parts[armName];
+                var probeFx = arm.Rect[0] < torso.Rect[0] ? arm.Rect[0] : arm.Rect[0] + arm.Rect[2] - 1;
+                var probeFy = arm.Rect[1] + arm.Rect[3] / 2;
+                if (probeFx >= torso.Rect[0] && probeFx < torso.Rect[0] + torso.Rect[2]) return null; // nested; can't isolate
+                var (sx, sy) = ToScreen(fig, probeFx, probeFy);
+                var hit = FigureHitTest.StatAt(fig, 0, 0, fig.Size[0], fig.Size[1], sx, sy);
+                Assert.True(hit?.Stat == Stat.Str, $"{name}.{armName} outer edge resolved to {hit?.Stat}, not Str.");
+                return hit!.Value.PairIndex;
+            }
+
+            var li = PairIndexAtOuterEdge("armL");
+            var ri = PairIndexAtOuterEdge("armR");
+            if (li is null || ri is null) continue; // this figure's arms are too nested to isolate — skip
+
+            checkedAny = true;
+            Assert.True(li >= 0 && ri >= 0, $"{name}: paired arms must carry a non-negative pair index (armL={li}, armR={ri}).");
+            Assert.NotEqual(li, ri); // the whole point: the two arms are now distinguishable
+            Assert.Equal(FigureBinding.PairIndexOf("armL"), li);
+            Assert.Equal(FigureBinding.PairIndexOf("armR"), ri);
+        }
+        Assert.True(checkedAny, "fixture has no figure with isolable armL/armR to test against");
     }
 }

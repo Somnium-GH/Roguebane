@@ -868,8 +868,15 @@ public partial class Game1 : Microsoft.Xna.Framework.Game
         var manifest = _layout.Manifest;
         if (manifest is null || !manifest.Figures.TryGetValue(foe.Figure, out var fig)) return null;
         var box = FoeRect();
-        if (FigureHitTest.StatAt(fig, box.X, box.Y, box.Width, box.Height, p.X, p.Y) is not { } stat) return null;
-        return foe.Frame.Parts.FirstOrDefault(bp => bp.Stat == stat);
+        if (FigureHitTest.StatAt(fig, box.X, box.Y, box.Width, box.Height, p.X, p.Y) is not { } hit) return null;
+        // Resolve the SPECIFIC limb, not just the first part sharing the stat: the visual pair index
+        // (0/1) maps to the position within the stat group, the same convention FoeAimedPartScreenRect
+        // uses to render the reticle. Unpaired stats (pairIndex -1) or a single-part group read the
+        // first as before.
+        var group = foe.Frame.Parts.Where(bp => bp.Stat == hit.Stat).ToList();
+        if (hit.PairIndex >= 0 && hit.PairIndex < group.Count && group.Count > 1)
+            return group[hit.PairIndex];
+        return group.FirstOrDefault();
     }
 
     // Between-fights Equipment: open button (CityMap) + the overlay's technique cards & close button.
