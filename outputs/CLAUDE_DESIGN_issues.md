@@ -2,22 +2,12 @@
 
 This file holds only what CD still needs to act on. Open asks are alphabetized by topic under
 **## Open**, each its own heading — scan the headings to find something, don't read top to bottom.
-Sending an item to CD is not the close signal; it clears only once verified landed in the repo, and
-moves to **## Confirm-to-Close** (one line, nothing to do but clear it from memory).
+An item moves to **## Confirm-to-Close** once verified landed in the repo, and drops out of this file
+entirely once that pass is behind us — `STATUS.md`'s re-arm history is the permanent record, this file
+is a to-do list, not an archive. Keep entries self-contained; don't lean on cross-references into
+Confirm-to-Close, since that section gets pruned regularly.
 
 ## Open
-
-### core-kits.js → fetch shared cores.json (NEW, 2026-07-12 Doug, LOCKED architecture)
-Race stats + core budget/actions/minionCap/statBonus/CoreEffect/starting-kit are moving out of three
-hand-maintained copies (your `core-kits.js`, our `CoreRunes.cs`, `CORE_RUNES.md`) into one shared
-`design/systems/cores.json` — this is the fix for the exact drift this session kept catching (the
-Adept/Summoner kit patch we just hand-applied to your file, and today's Adept MinionCap mismatch).
-Once `design/systems/cores.json` lands (engine-side, tracked in `STATUS.md`), switch `core-kits.js`'s
-per-core `budget`/`effect`/`gear`/`techniques`/`bayCap` fields to a `fetch()` of that file at module
-load (same pattern you already use for the dynamic `import()`), instead of hand-typed object literals.
-Keep everything display-only as-is — accent hex, blurb, scenario copy, figure key, `finds` — none of
-that is drifting and none of it is in the JSON's scope. We'll ping you when the file lands with its
-exact shape; no action needed until then, just flagging so it's not a surprise in a future drop.
 
 ### CityMap Retreat/Redeploy — Progress-to-Available UX (NEW, 2026-07-12 Doug)
 New mechanic landing engine-side: Retreat/Redeploy now takes time to become available (DEX-timed, starts
@@ -27,8 +17,22 @@ a treatment (fill-bar sweep across the button, a radial, a numeric countdown, wh
 the normal case). No numbers needed from you — the engine will feed a 0..1 progress fraction, just needs
 somewhere to draw it.
 
+### core-kits.js → fetch shared cores.json (NEW, 2026-07-12 Doug, LOCKED architecture)
+Race stats + core budget/actions/minionCap/statBonus/CoreEffect/starting-kit are moving out of three
+hand-maintained copies (your `core-kits.js`, our `CoreRunes.cs`, `CORE_RUNES.md`) into one shared
+`design/systems/cores.json` — the fix for the drift this session kept catching. Once
+`design/systems/cores.json` lands (engine-side, tracked in `STATUS.md`), switch `core-kits.js`'s
+per-core `budget`/`effect`/`gear`/`techniques`/`bayCap` fields to a `fetch()` of that file at module
+load, instead of hand-typed object literals. Keep display-only fields as-is — accent hex, blurb,
+scenario copy, figure key, `finds` — none of that is in the JSON's scope. We'll ping you with the
+exact shape when it lands; no action needed yet.
+(`core-kits.js` currently carries a Cowork hand-patch to Adept's weapon/techniques and Summoner's full
+kit, applied 2026-07-12 to unblock testing ahead of this round-trip — if your pipeline regenerates the
+file from a different source before `cores.json` lands, diff against the live file first so you don't
+revert it.)
+
 ### Figure + Gear Asset Regen Batch (B2-GO)
-Bow sprites landed (see Confirm-to-Close) — the rest of the batch is still open:
+Bow sprites already shipped. Still open:
 1. **Weapon sprites** — ONE silhouette per type, FOUR material palettes (Iron → Steel → Mithral →
    Dwarven Steel), hand-socket mounts per LAYOUT_CONTRACT: Longsword · Axe · Mace · Claymore ·
    Battleaxe · Warhammer · Dagger · Rapier · Short Sword.
@@ -47,15 +51,14 @@ Note: figure-MORPH mechanics residuals (§7/§17 #15) are our composition questi
 proceed on the current contract; propose contract changes in drop notes, don't block.
 
 ### Merchant Sale Card Art (B22)
-The SALE card grammar itself landed (gold-trimmed `priceStrip` footer on `wareCard` — BUY/short-of-coin
-chip + spoils coin + price, the visual signature an `invCard` never has) — that structural half is done,
-see Confirm-to-Close for the next batch scope. Still open: **per-kind chip ART** (technique glyph / rune
-polygon on the sale face) — deliberately deferred on your side pending the real sale catalog (sample
-names don't all map to captured glyph ids yet), no rush, doesn't block our mechanic work.
+Sale card grammar (gold-trimmed `priceStrip` footer on `wareCard`) already shipped. Still open:
+**per-kind chip ART** (technique glyph / rune polygon on the sale face) — deliberately deferred on
+your side pending the real sale catalog (sample names don't all map to captured glyph ids yet), no
+rush, doesn't block our mechanic work.
 
 ### Re-Extraction for the v6 Roster (B20)
-The coreCard accent contrast fix + accent tokens landed (see Confirm-to-Close) — the rest of the
-re-extraction is still open, the engine renders only what the manifest authors:
+coreCard accent contrast fix + accent tokens already shipped. Still open, the engine renders only
+what the manifest authors:
 1. Per-core STAT-BONUS chips (`core.statBonus` list on the NewGame coreCard + Equipment identity
    block; one colored chip per non-zero stat: Grunt +1 all · Warden +5 CON · Adept +5 INT · Summoner
    +3 INT/+2 CON · Reaver +5 DEX · Ranger +4 DEX/+1 CON · Barbarian +4 STR/+1 CON), action-bar cards
@@ -73,65 +76,9 @@ re-extraction is still open, the engine renders only what the manifest authors:
 
 
 ## Confirm-to-Close (landed and verified — nothing to do, just clear these from memory)
-- **Adept + Summoner Starting Kits** — **hand-patched directly in `design/dchtml/core-kits.js` by
-  Cowork, 2026-07-12, at Doug's explicit request (skipping the usual CD round-trip).** NOT your work,
-  but flagging clearly so your NEXT drop doesn't silently clobber it: Adept's `staff_wooden` is now
-  `'STR'` + `jab` added to `techniques`; Summoner's `gear` swaps `charm_wooden` → `SH('shield_wooden',
-  'Wooden Shield', 1, 'handR', 't1', 'COMMON')`, `techniques` is now `[ember, blast, sacrifice, brace]`,
-  `techCap` is 4. A new `blast` entry was added to the `T` catalog (INT, cost 1, `needs:'wand'`) since it
-  didn't exist yet. If your own generation pipeline re-derives `core-kits.js` from a different source of
-  truth, fold these same changes in there too so a future drop doesn't revert them.
-- **B0 · B0b · B1a · B3** — evening 2026-07-03 drop, all verified landed.
-- **B1b** — key-set diff guard now runs automatically in `extract_merge.js` on every merge.
-- **B4** — "open Equipment" button elements on Encounter + CampaignMap, landed.
-- **B5 · B6** — `invCard`/`loadoutCard`/`invTab` `states.family` + hover overlays, landed.
-- **B7** — raceCard head-portrait imageBind moved to the correct (square) element, landed.
-- **B8** — CityMap beaconNode hover/current states authored, `glow` spec'd (`style.pulse`, steady
-  1.8s ease-in-out breathe). Building the pulse primitive + wiring it is ours now, not a CD ask.
-- **B9** — folded into Figure + Gear Asset Regen (B2-GO), no separate item.
-- **B10** — gear catalog display-name drift vs. §6c canon, corrected.
-- **B11** — bow sprites `bow_{short,long,compound,elven}` (+ `*_back`) + catalog rows, landed.
-- **B12** — worn-armor part set (race-first, full-part convention): 744 files landed clean. Canon in
-  LAYOUT_CONTRACT §12a / DESIGN_SPEC §7a.
-- **B13 · B14** — `waresShelves`/`buildMinions` sizing fixes, landed.
-- **B17** — Dwarf + Halfling figure batch, landed and exceeded (Half-Giant + Barbarian too).
-- **B18** — every technique/minion icon now shipped: Flurry/Aimed Shot/Siphon/Barkskin/Sacrifice/Bind/
-  Frenzy-Flurry split-fill, plus this pass's Parry/Steel/Suture + Iron Golem/Hound. Nothing open.
-- **B19** — "bay(s)" retired as the minion-slot term everywhere, landed.
-- **B20 (partial)** — coreCard Core-Effect accent contrast (Doug #7) fixed: `border.colorBind` now
-  tints the LEFT-BORDER trim, never a full-rect fill, on NewGame coreCard/previewCoreEffect AND
-  Equipment's coreEffectBlock. `style.coreAccents` published (all 7 cores). Rest of B20 still open
-  above.
-- **B21** — no-absolute-positioning: `parent`-field re-extraction landed (160 keys, 6 screens), and
-  the standing invariant is now permanent in `CLAUDE.md`/`LAYOUT_CONTRACT.md` §3. Remaining piece
-  (engine recursive parent-box resolution) is ours, not a CD ask.
-- **B23** — Equipment tab buttons (`invTab`) widened to fill their row, three labels readable.
-- **B24** — `inventory.invItems` widened to fit its authored 2-column grid.
-- **B25** — `attrs.cells` pip strip widened so a 6-capacity stat's 6th (free) pip renders.
-- **B26** — `CD_STATUS.md` #34 armor-reservation wording corrected (armor consumes pool, same as
-  weapons/techniques) — stale sub-items cleared too.
-- **B27** — minion column reflow: new declarative `countWidth` field (`{bind,item,gap,pad,hideAtZero}`)
-  on Equipment `minionColumn` + Encounter `minionGroup`. Reading the field is ours now, not a CD ask.
-- **B28** — attrBar reorder/rename/color, closed directly by Doug.
-- **B29** — Encounter shell hosts quest/camp/nothing-here + CityMap retreat→redeploy: all three CD-side
-  asks delivered (`questPanel`+children gated on `encounter.quest`, `campMarker` gated on
-  `encounter.camp`, "nothing here" = bare shell needing no new elements, `retreatBtn` two states with
-  new `label`/`asset` per-state fields). Remaining work (engine element-gating, foe-cluster unmount,
-  per-state label/asset swap) is ours, not a CD ask.
-- **B30** — both technique action-bars (Equipment `loadoutList`, Encounter `techList`) now seat a 4th
-  card; region-width fix, same idiom as B23-B25.
-- **B31** — Encounter `poolRows` grown to `[309,82]`; the CON row renders.
-- **B32** — `attrPip` dropped its `max-width:106px` cap; verified `[54,9]` in the fixed `layout.json` —
-  pip rows now stretch to a common width regardless of live count.
-- **B33** — `resourceItem`'s value rect widened to fit `"current/max"`; verified `[14,1,22,9]` with
-  sample `"6/8"` in the fixed `layout.json` (was `[14,1,4,9]`/`"6"`).
-- **B34** — `combatMinionCard` header divider grown to `[1,1,76,37]` (verified), matching the sibling
-  `minionCard`'s vertical layout — no more name/description overlap.
-- **Contextual Encounter Backgrounds** — 8 new backdrops shipped (`enc_{camp,forest,mountain,river,
-  meadow,quarry,lumber,city_gates}`), `campMarker` retired entirely, Encounter's backdrop element now
-  authors `binds:"encounter.scene"` + `imageBind:"bg/{encounter.scene}"` — verified both directly in the
-  fixed `layout.json` (`campMarker` absent, `encounter.scene` present and wired). Per-node scene PICK is
-  engine-side work (CD_STATUS #41), tracked in `STATUS.md`, not a CD ask.
+(none currently pending — everything through B0-B34 and the Contextual Encounter Backgrounds batch has
+been verified landed and cleared from this file; STATUS.md's re-arm history has the permanent record if
+you need to trace one back)
 
 ## Standing FYIs (context, not action items)
 - **Name lengths:** the "Dwarven Steel Short Sword" (24ch) class overflows current card name rects —
