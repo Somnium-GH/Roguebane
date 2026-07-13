@@ -228,16 +228,15 @@ public class MinionTests
     [Fact]
     public void SummonMinionMovesAStashedMinionIntoAFreeSlot()
     {
-        // v6: Wand+Charm+Ember+Barkskin leave the Summoner exactly 1 free INT after its kit's
-        // Skeleton+Golem. Hound gates on DEX instead, which the Summoner never touches, so it
-        // proves the free SLOT (MinionCap 3) fills independent of the INT pool being nearly spent.
+        // cores.json target kit: Summoner starts with just the Skeleton (cap 3). Hound gates on DEX,
+        // which the Summoner never touches, so it proves a free SLOT fills independent of the INT pool.
         var exp = SummonerExpedition();
-        Assert.Equal(2, exp.MinionCount); // Skeleton + Golem from the kit
+        Assert.Equal(1, exp.MinionCount); // Skeleton only from the kit
         exp.Stash.AddMinion(Minions.Hound); // as if bought from a merchant
 
         Assert.True(exp.SummonMinion(Minions.Hound));
         Assert.Contains(Minions.Hound, exp.Minions);
-        Assert.Equal(3, exp.MinionCount);
+        Assert.Equal(2, exp.MinionCount);
     }
 
     [Fact]
@@ -253,12 +252,12 @@ public class MinionTests
     public void DismissMinionFreesTheSlotAndLeavesItResummonable()
     {
         var exp = SummonerExpedition();
-        Assert.True(exp.DismissMinion(Minions.IronGolem)); // leaves a slot, not removed from any pool
-        Assert.Equal(1, exp.MinionCount);
-        Assert.DoesNotContain(Minions.IronGolem, exp.Minions);
+        Assert.True(exp.DismissMinion(Minions.Skeleton)); // leaves a slot, not removed from any pool
+        Assert.Equal(0, exp.MinionCount);
+        Assert.DoesNotContain(Minions.Skeleton, exp.Minions);
 
-        Assert.True(exp.SummonMinion(Minions.IronGolem)); // kit membership persists -> re-summon works
-        Assert.Equal(2, exp.MinionCount);
+        Assert.True(exp.SummonMinion(Minions.Skeleton)); // kit membership persists -> re-summon works
+        Assert.Equal(1, exp.MinionCount);
     }
 
     [Fact]

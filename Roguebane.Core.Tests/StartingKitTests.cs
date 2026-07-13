@@ -26,7 +26,7 @@ public class StartingKitTests
     {
         var body = Assemble(CoreRunes.Warden);
         Assert.Contains(body.Hands, w => w.Id == "longsword_iron");
-        Assert.Contains(body.Hands, w => w.Id == "shield_iron"); // Iron Buckler, T2
+        Assert.Contains(body.Hands, w => w.Id == "shield_buckler"); // Iron Buckler, T2
         Assert.Equal("armor_str_chest_iron", body.ArmorOn(Stat.Con)?.Id);
     }
 
@@ -41,11 +41,13 @@ public class StartingKitTests
     }
 
     [Fact]
-    public void SummonerWieldsWandAndCharmWornInRobe()
+    public void SummonerWieldsWandAndShieldWornInRobe()
     {
+        // cores.json target kit (2026-07-12): Adept Wand + Wooden Shield (the old Wooden Charm was
+        // dropped when Summoner picked up Blast/Brace and the shield in the rebuild).
         var body = Assemble(CoreRunes.Summoner);
         Assert.Contains(body.Hands, w => w.Id == "wand_adept");
-        Assert.Contains(body.Hands, w => w.Id == "charm_wooden");
+        Assert.Contains(body.Hands, w => w.Id == "shield_wooden");
         Assert.Equal("armor_int_chest_cotton", body.ArmorOn(Stat.Con)?.Id);
     }
 
@@ -63,7 +65,7 @@ public class StartingKitTests
     {
         var body = Assemble(CoreRunes.Ranger);
         Assert.Contains(body.Hands, w => w.Id == "dagger_iron");
-        Assert.Equal("bow", body.Ranged?.Id);
+        Assert.Equal("bow_short", body.Ranged?.Id);
         Assert.Equal("armor_dex_legs_plain", body.ArmorOn(Stat.Dex)?.Id);
     }
 

@@ -47,7 +47,7 @@ public class BowTests
         var exp = Forge.Embark(Races.Human, CoreRunes.Ranger, CoreRunes.Ranger.NewLoadout(),
             CoreRunes.Ranger.Kit, Maps.StandardLeg());
 
-        Assert.Equal("bow", exp.Player.Body.Ranged?.Id); // bow mounts the RANGED slot at assembly
+        Assert.Equal("bow_short", exp.Player.Body.Ranged?.Id); // bow mounts the RANGED slot at assembly
         Assert.Contains(CoreRunes.Ranger.Kit, t => t.Id == "aimed_shot"); // the Aimed Shot verb is on the bar
         Assert.True(Armory.AimedShot.ShieldPiercing);                    // and it pierces
     }

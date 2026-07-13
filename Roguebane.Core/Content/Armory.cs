@@ -49,8 +49,10 @@ public static class Armory
     // RANGED slot. Bow: full shield bypass + Charge (§10); damage/tier OPEN §17 #9 — the flat
     // placeholder 2 stays FLAGGED. Sling: 1H, shield-compatible, same bypass+Charge, weaker —
     // damage/tier equally OPEN, flat placeholder 1 FLAGGED.
+    // Ids follow CD's landed bow sprites (bow_{short,long,compound,elven}, B11) and cores.json — the old
+    // `t==1?"bow":"bow-"+t` scheme matched nothing and wasn't even internally consistent (2026-07-12).
     public static readonly IReadOnlyList<Weapon> Bows = Enumerable.Range(1, 4).Select(t => new Weapon(
-        t == 1 ? "bow" : "bow-" + t, Stat.Dex, 2 * t, Power: 2 /* PLACEHOLDER §17 #9 */,
+        "bow_" + new[] { "short", "long", "compound", "elven" }[t - 1], Stat.Dex, 2 * t, Power: 2 /* PLACEHOLDER §17 #9 */,
         new[] { "Short Bow", "Long Bow", "Compound Bow", "Elven Bow" }[t - 1],
         t, 1.0, Hands: 2, WeaponKind.Bow)).ToArray();
     public static readonly IReadOnlyList<Weapon> Slings = Enumerable.Range(1, 4).Select(t => new Weapon(
@@ -82,8 +84,12 @@ public static class Armory
 
     // CON shield OBJECT (§6c): 1H off-hand item, Power 0 (blocks nothing on its own — the shield
     // pool it feeds is a technique's job, §6b), gate 1 CON/tier (resolved 2026-07-04).
-    public static readonly IReadOnlyList<Weapon> Shields = Named("shield", Stat.Con, WeaponKind.Shield,
-        1.0, 0, 1, 1, "Wooden Shield", "Iron Buckler", "Kite Shield", "Tower Shield");
+    // Explicit ids (not Named()): the generic "word before the last space" tokenizer misfires on tier-2
+    // "Iron Buckler" -> shield_iron, but CD's landed sprite + cores.json id is shield_buckler (2026-07-12).
+    public static readonly IReadOnlyList<Weapon> Shields = Enumerable.Range(1, 4).Select(t => new Weapon(
+        "shield_" + new[] { "wooden", "buckler", "kite", "tower" }[t - 1], Stat.Con, t, Power: 0,
+        new[] { "Wooden Shield", "Iron Buckler", "Kite Shield", "Tower Shield" }[t - 1],
+        t, 1.0, Hands: 1, WeaponKind.Shield)).ToArray();
 
     public static readonly IReadOnlyList<IReadOnlyList<Weapon>> Ladders = new[]
     {

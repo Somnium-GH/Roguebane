@@ -6,4 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <!-- Single source of truth for races + core kits (Doug LOCKED 2026-07-12); embedded so there's no
+       runtime file-path fragility. LogicalName keeps the manifest name stable as "cores.json". -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\design\systems\cores.json">
+      <LogicalName>cores.json</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

@@ -46,7 +46,7 @@ Shared rule: **on-hit boons require a landed PART-hit** — never a shield-absor
 | Grunt | 20 | 4 | 2 |
 | Warden | 18 | 4 | 1 |
 | Adept | 16 | 4 | 1 |
-| Summoner | 17 | 3 | 3 |
+| Summoner | 17 | 4 | 3 |
 | Reaver | 19 | 4 | 0 |
 | Ranger | 18 | 4 | 2 |
 | Barbarian | 14 | 3 | 1 |

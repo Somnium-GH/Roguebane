@@ -115,4 +115,12 @@ public static class Techniques
     // Barkskin/Bind/Parry/Suture/Sacrifice stay opt-in (higher-tier content) until a kit picks them.
     public static readonly IReadOnlyList<Technique> All =
         new[] { Jab, Cleave, Lunge, Ember, Siphon, Brace, Bandage, Blast };
+
+    // Superset of `.All` for id-lookup (the cores.json loader resolves kit techniques against this, NOT
+    // `.All` — which stays the curated default-palette roster). Combat verbs that live in Armory
+    // (Swing/Frenzy/Flurry/Shot/AimedShot) are folded in by the loader, not here, since they belong to
+    // the weapon catalog. (cores.json rollout, 2026-07-12.)
+    public static readonly IReadOnlyList<Technique> Full =
+        new[] { Jab, Blast, Cleave, Lunge, Ember, Siphon, Brace, Steel, Barkskin, Stoneskin, Bind, Parry,
+                Bandage, Suture, Sacrifice };
 }

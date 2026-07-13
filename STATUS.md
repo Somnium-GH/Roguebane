@@ -7,6 +7,25 @@ in the C# content classes today, EXCEPT two that require the small, precise fixe
 already worked out — apply them verbatim, they're not open questions). Read the file directly rather than
 transcribing it back into this doc — it's the source of truth now, don't let a second hand-copy drift.
 
+**✅ BUILT (2026-07-12, loop) — full rollout, steps 1-3 + doc fix, 559 green + Game 0/0.**
+- Step 1: `Armory.Bows` now `bow_{short,long,compound,elven}`, `Armory.Shields` given an explicit id
+  array `shield_{wooden,buckler,kite,tower}` (was `Named()`-misfiring to `shield_iron`). Test pins
+  updated (StartingKit shield_iron→shield_buckler, bow→bow_short; BowTests bow→bow_short).
+- Step 2: `Techniques.Full` (15-technique superset for id-lookup; `.All` untouched as the curated palette).
+- Step 3: `CoreRuneCatalog` — deserializes cores.json (EMBEDDED as a compiled resource via the csproj,
+  no runtime path fragility) into `Race`/`CoreRune`, resolving kit ids against Techniques.Full + Armory
+  combat verbs / AllWeapons / ArmorLines.All / Minions.All, throwing loudly on any unknown id.
+  `Content.Races`/`Content.CoreRunes` are now thin wrappers over `CoreRuneCatalog.Default` — every call
+  site compiles unchanged. **Summoner's rebuild happened for free** (Blast/Brace/Wooden-Shield/Skeleton-
+  only/slots-4 all came from the JSON; 3 tests that pinned the old Wand+Charm/Skeleton+Golem kit updated
+  to the target). New `CoreRuneCatalogTests` pin the resolved race/core values against the JSON literals
+  + the throw-on-unknown-id contract.
+- Doc: `CORE_RUNES.md` Layout-numbers Summoner Actions 3→4 (the one-line fix Doug flagged for this pass).
+- **DTO note (gotcha for future):** used plain classes + `[JsonPropertyName]` for the JSON DTOs, NOT
+  positional records — System.Text.Json silently left the record constructor params null (case-
+  insensitive ctor-param binding quirk), which crashed static init before the class-DTO switch.
+- The CD-side `core-kits.js → fetch(cores.json)` migration stays a CD-outbox item (their work, not mine).
+
 **Answering the loop's 3 blockers (all resolved, none are "needs Doug"):**
 1. *`Techniques.All` incomplete* — not a design question, an id-lookup gap (step 2 below fixes it: a new
    `Techniques.Full` list + the loader also pulling `Armory`'s combat verbs). `.All`'s curated "default
